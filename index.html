@@ -1,0 +1,43 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>KITAQ SERIES — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="assets/manual.css"></head><body><a class="skip" href="#main">本文へ</a><header class="mast"><a href="index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER'S MANUAL <b>2026.09</b> · <a href="en/index.html" lang="en" hreflang="en">English</a></div></header><div class="layout"><aside><nav aria-label="巻の選択"><a href="index.html">総合目次</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB LIBRARY</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC LIBRARY</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">この巻を検索</label><input type="search" id="search" placeholder="例：入力 / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="この巻の目次"><a href="#はじめに">はじめに</a><a href="#このマニュアルの使い方">このマニュアルの使い方</a><a href="#7冊の役割">7冊の役割</a><a href="#指定フォントの使い方">指定フォントの使い方</a><a href="#本書の版と検証の読み方">本書の版と検証の読み方</a><a href="#作業机を用意する">作業机を用意する</a><a href="#この版で修正したコンパイラの問題">この版で修正したコンパイラの問題</a><a href="#HTMLを持ち歩く-公開する">HTMLを持ち歩く・公開する</a><a href="#books">マニュアルを選ぶ</a></nav><button class="print" type="button">この巻を印刷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>KITAQ SERIES</h1><p class="subtitle">プログラミング・ユーザーズマニュアル</p><div class="edition">初めての一行から、実行・観測・再テストまで。<br>ローカルソース採取：2026年9月12日</div></div><p><strong>公開範囲：</strong>今回の公開ソースはコンパイラ・ライブラリ・エミュレータ本体・CLI・連携API・SARAKURAです。KOKURA-GUI、KUROSAKI-GUI、PLITAの公開は後日です。GUIの記述は参考情報です。</p><h2 id="はじめに">はじめに</h2>
+<p>KITAQGBは、ZachtronicsのNES向けCコンパイラ <strong>NORCALのフォーク</strong> として始まった、ゲームボーイ／ゲームボーイカラー向けのC系コンパイラです。NORCALを出発点に、GBのCPU、メモリ、映像、音、ROMバンクなどに合わせた機能が加えられています。原作者・原プロジェクトへの敬意を込めて、ここに系譜を明記します。</p>
+<p><strong>KITAQGBという名前には、二つの意味があります。</strong> 表の意味は <strong>Kernel-Informed Toolchain for AI-Quality Game Boy Development</strong>。対象マシンを深く理解するツールチェーンで、人間のプログラマーと生成AIの双方を支えるという目標を表しています。</p>
+<p>もう一つは <strong>Kids&#x27; Imagination Transformed into Actual Quests in Game Boy Forests</strong> ――「子どもの想像を、Game Boyの森で本物の冒険へ変える道具」。小さなアイデアや落書き、AI支援の試作を、実際に遊べる冒険へ変えたいという創作の願いを重ねたダブルミーニングです。名称の説明は作者提供のREADMEに基づきます。</p>
+<p>NORCALはNES版HACK*MATCHに関係してKeith Holman氏が開発したCコンパイラです。<a href="https://keithholman.net/nes-compiler.html">NORCAL: A C Compiler for the NES</a> と <a href="https://trashworldnews.com/hack-match/">HACK*MATCH for the NES</a> に原作者による紹介があります。フォークの説明と名称の由来は作者提供のREADMEに基づきます。</p>
+<h2 id="このマニュアルの使い方">このマニュアルの使い方</h2>
+<p>昔のコンピュータに付属した取扱説明書のように、最初は短いプログラムを入力し、実行結果を見てから仕組みを学びます。わからない語をすべて覚えてから始める必要はありません。</p>
+<ol>
+<li>GBなら第1巻、FCなら第4巻の「最初のプログラム」から始めます。</li>
+<li>入力・画像・音を加えるときは、第2巻または第5巻の対応する機能へ進みます。</li>
+<li>画面や音の確認はKOKURA／KUROSAKI、異常の整理はSARAKURAを使います。</li>
+<li>関数名がわかるときは、検索欄または各巻の命令・API辞典を使います。</li>
+</ol>
+<p>「命令」は文法、コンパイラ組み込み関数、ライブラリ関数、コマンドライン操作を分けて説明します。CPUの命令表もコンパイラ巻の付録にあります。GBとFCで同じ名前に見えても、引数や動作が同じとは限りません。</p>
+<h2 id="7冊の役割">7冊の役割</h2>
+<div class="tablewrap"><table>
+<tr><th>巻</th><th>入力</th><th>出力・役割</th></tr>
+<tr><td>KITAQGB</td><td>Cソース・素材</td><td>GB/CGB用ROM、マップ、ビルド情報</td></tr>
+<tr><td>KITAQGBライブラリ</td><td>ゲームからの関数呼び出し</td><td>描画・音・入力・物理などの処理</td></tr>
+<tr><td>KOKURA</td><td>GB/CGB用ROM</td><td>実行画面、音、状態、観測ログ</td></tr>
+<tr><td>KITAQFC</td><td>Cソース・CHR素材</td><td>NES/FDS向け出力とビルド情報</td></tr>
+<tr><td>KITAQFCライブラリ</td><td>ゲームからの関数呼び出し</td><td>NES向けの描画・音・機器処理</td></tr>
+<tr><td>KUROSAKI</td><td>NES/FDSイメージ</td><td>実行・記録・解析</td></tr>
+<tr><td>SARAKURA</td><td>ビルド情報と診断イベント</td><td>診断HTML、修正・再テストの計画</td></tr>
+</table></div>
+<h2 id="指定フォントの使い方">指定フォントの使い方</h2>
+<p>大文字26字、数字10字、小文字26字、記号30字は、作者指定の <a href="samples/assets/ascii.c">ascii.c</a> をそのまま収録しました。追加の字形を描き直してはいません。元データの番号とASCIIコードの対応は <a href="verification/font_conversion.json">変換記録</a>、全字形は <a href="verification/font_source_atlas.png">タイル一覧</a> にあります。空白は空タイルです。元データにないバックスラッシュと縦棒は空白となります。すべての提供字形を <code>gb_font.c</code> と <code>fc_font.c</code> で表示できます。</p>
+<h2 id="本書の版と検証の読み方">本書の版と検証の読み方</h2>
+<p><strong>2026年9月12日のローカルソースを基準</strong> とする版です。「最新」はこの採取時点を指し、将来のGitHub公開版の更新まで自動追従する意味ではありません。参照ソースと使用実行ファイルのSHA-256を同梱しています。過去のREADMEにある「未対応」「確認済み」は、そのまま現在の保証として転載していません。</p>
+<p>「ビルド確認」はROMが生成できたこと、「実行確認」は指定フレームまでエミュレータで動かしたことです。画面の期待値を照合した結果はサンプル一覧に別記します。実機や全周辺機器での互換性を保証する印ではありません。警告はログに残します。</p>
+<h2 id="作業机を用意する">作業机を用意する</h2>
+<p>本書のコマンド例は <strong>Windows PowerShell</strong> です。CソースはUTF-8のテキストとして保存します。コマンドを実行するフォルダーを「カレントディレクトリ」と呼びます。ファイル名に空白があるときは引用符で囲み、実行ファイルのパスは <code>&amp; &quot;パス&quot;</code> と書きます。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code># リポジトリのルートで実行します。
+New-Item -ItemType Directory -Force out | Out-Null
+.\kitaqgb\kitaqgb.exe --help
+.\kitaqfc\kitaqfc.exe --help</code></pre></div>
+<p>説明中の <code>game.c</code>、<code>game.gb</code>、<code>game.nes</code> は自分のファイル名に置き換えます。山括弧付きの <code>&lt;ROM&gt;</code> は書式上の引数名であり、山括弧ごと入力しません。長いコマンドは本書では原則1行にしています。Bashの行継続文字 <code>\</code> をPowerShellへ貼り付けないでください。</p>
+<h2 id="この版で修正したコンパイラの問題">この版で修正したコンパイラの問題</h2>
+<p>サンプルを実行する過程で、KITAQGBの同名ローカル分岐ラベルの混同と、KITAQFCの関数呼び出し時の途中値・戻り値の扱いに問題が見つかりました。本版の検証では修正済みコンパイラを使い、GBのオブジェクトプール例も通常の教材に含めています。<a href="verification/compiler_fixes.md">変更内容と再発防止テスト</a> を参照してください。古いEXEで同じ症状が出る場合は、本版のソースからコンパイラを再ビルドします。</p>
+<p>API辞典の呼び出し断片は完全なROMとは区別しています。全API・実機・全周辺機器を試験したという意味ではありません。各教材の確認結果は <a href="verification.html">検証記録</a> に示します。</p>
+<h2 id="HTMLを持ち歩く-公開する">HTMLを持ち歩く・公開する</h2>
+<p>このフォルダーの <code>index.html</code> を開けば、外部CDNやインターネットなしで読めます。スタイル、検索用JavaScript、サンプル、検証画像も相対リンクで同梱しています。HTMLファイルだけを抜き出さず、フォルダー単位で扱ってください。印刷ボタンでは目次欄を省いた紙面になります。</p>
+<p>GitHubへアップロードする範囲はこの <code>latest</code> フォルダーです。閲覧用HTMLの生成にサーバー処理は不要です。GitHubでHTMLファイルを開く画面は通常ソース表示になるため、Webマニュアルとして公開する場合はGitHub Pagesなどの静的ホスティングを設定します。公開作業そのものは本書作成時には実行していません。具体的な配置手順は同梱 <code>README.md</code> を参照してください。</p><h2 id="books">マニュアルを選ぶ</h2><div class="books"><a class="book" href="kitaqgb.html"><span>01</span><strong>KITAQGB</strong><small>ゲームボーイ Cプログラミング</small></a><a class="book" href="gb-library.html"><span>02</span><strong>KITAQGB LIBRARY</strong><small>ゲームを組み立てる道具箱</small></a><a class="book" href="kokura.html"><span>03</span><strong>KOKURA</strong><small>実行・観察・記録</small></a><a class="book" href="kitaqfc.html"><span>04</span><strong>KITAQFC</strong><small>ファミコン Cプログラミング</small></a><a class="book" href="fc-library.html"><span>05</span><strong>KITAQFC LIBRARY</strong><small>NESライブラリと機器</small></a><a class="book" href="kurosaki.html"><span>06</span><strong>KUROSAKI</strong><small>NES・FDSの実行と解析</small></a><a class="book" href="sarakura.html"><span>07</span><strong>SARAKURA</strong><small>診断・比較・再テスト</small></a></div><footer>2026-09-12版 • <a href="index.html">総合目次</a> • <a href="verification.html">検証記録</a> • <a href="reference/inventory.json">版の指紋</a><br>サンプルのビルド・エミュレータ実行・期待値照合は別項目として記録します。</footer></main></div><script src="assets/manual.js"></script></body></html>

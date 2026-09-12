@@ -1,0 +1,273 @@
+--- a/kitaqgb/Assembler.cs
++++ b/kitaqgb/Assembler.cs
+@@ -1179,8 +1179,12 @@
+         // Apply until no more conversions are possible.
+         for (int iter = 0; iter < 16; iter++)
+         {
+-            // Pass 1: address map for labels/functions in the code section.
++            // Function names are global, but codegen restarts local label names
++            // (loop_end_1, else_1, etc.) for every function. Match the emitter's
++            // scope when deciding whether a branch can use an 8-bit displacement.
+             var addr = new Dictionary<string, int>();
++            var localAddr = new Dictionary<(string Function, string Label), int>();
++            string function = "";
+             int pc = CodeStart;
+             foreach (var e in cur)
+             {
+@@ -1192,9 +1196,14 @@
+                 string mnemonic;
+                 AsmOperand operand;
+ 
+-                if (e.Match(Tag.Function, out label) || e.Match(Tag.Label, out label))
+-                {
++                if (e.Match(Tag.Function, out label))
++                {
++                    function = label;
+                     if (!addr.ContainsKey(label)) addr.Add(label, pc);
++                }
++                else if (e.Match(Tag.Label, out label))
++                {
++                    localAddr[(function, label)] = pc;
+                 }
+                 else if (e.Match(Tag.SkipTo, out skipTarget))
+                 {
+@@ -1221,6 +1230,7 @@
+             // Pass 2: decide conversions (JP -> JR) using the *current* layout.
+             bool changed = false;
+             pc = CodeStart;
++            function = "";
+             for (int i = 0; i < cur.Count; i++)
+             {
+                 var e = cur[i];
+@@ -1231,6 +1241,11 @@
+                 string mnemonic;
+                 AsmOperand operand;
+ 
++                if (e.Match(Tag.Function, out string currentFunction))
++                {
++                    function = currentFunction;
++                    continue;
++                }
+                 if (e.Match(Tag.SkipTo, out skipTarget))
+                 {
+                     if (skipTarget < pc && ShouldIgnoreBackwardBankBoundarySkip(pc, skipTarget))
+@@ -1257,7 +1272,7 @@
+                     if (TryMapJPToJR(mnemonic, out jrMnemonic) && operand.Modifier == ImmediateModifier.None)
+                     {
+                         int target;
+-                        if (TryResolveAbsoluteTarget(operand, addr, out target))
++                        if (TryResolveAbsoluteTarget(operand, addr, localAddr, function, out target))
+                         {
+                             // If we were to encode this as JR, the displacement is relative to (pc + 2).
+                             int delta = target - (pc + 2);
+@@ -1402,7 +1417,8 @@
+         return false;
+     }
+ 
+-    static bool TryResolveAbsoluteTarget(AsmOperand operand, Dictionary<string, int> addr, out int target)
++    static bool TryResolveAbsoluteTarget(AsmOperand operand, Dictionary<string, int> addr,
++        Dictionary<(string Function, string Label), int> localAddr, string function, out int target)
+     {
+         target = 0;
+ 
+@@ -1414,7 +1430,8 @@
+         }
+ 
+         int baseAddr;
+-        if (!addr.TryGetValue(operand.Base.Value, out baseAddr)) return false;
++        if (!localAddr.TryGetValue((function, operand.Base.Value), out baseAddr) &&
++            !addr.TryGetValue(operand.Base.Value, out baseAddr)) return false;
+         target = baseAddr + operand.Offset;
+         return true;
+     }
+--- a/kitaqfc/CodeGenerator.cs
++++ b/kitaqfc/CodeGenerator.cs
+@@ -3339,6 +3339,41 @@
+         }
+ 
+         void EmitCall(FilePosition source, Expr funcExpr, Expr[] args, FunctionContext ctx, int expectedReturnSize)
++        {
++            // Every function uses the same temporary pool. An outer expression
++            // can still own bytes in it while a callee evaluates its own body:
++            // e.g. f() + array[0], or the first argument of g(a, f()).
++            // Save the caller's live bytes before evaluating arguments so nested
++            // calls also preserve already evaluated arguments and lvalue pointers.
++            int[] liveTemps = _tempPool.Where(t => !_freeTemps.Contains(t)).ToArray();
++            if (liveTemps.Length != 0)
++            {
++                EmitAsm("TAY");
++                foreach (int temp in liveTemps)
++                {
++                    EmitAsm("LDA", Mem(temp));
++                    EmitAsm("PHA");
++                }
++                EmitAsm("TYA");
++            }
++
++            EmitCallCore(source, funcExpr, args, ctx, expectedReturnSize);
++
++            if (liveTemps.Length != 0)
++            {
++                // Return values use A (low) and X (high). PLA only changes A;
++                // keep its result in Y while restoring the saved bytes.
++                EmitAsm("TAY");
++                for (int i = liveTemps.Length - 1; i >= 0; i--)
++                {
++                    EmitAsm("PLA");
++                    EmitAsm("STA", Mem(liveTemps[i]));
++                }
++                EmitAsm("TYA");
++            }
++        }
++
++        void EmitCallCore(FilePosition source, Expr funcExpr, Expr[] args, FunctionContext ctx, int expectedReturnSize)
+         {
+             string funcName;
+             if (!funcExpr.Match(Tag.Name, out funcName))
+@@ -4579,10 +4614,21 @@
+                         "struct/union call result cannot be used as a scalar value");
+                     return;
+                 }
+-                EmitCall(expr.Source, funcExpr, args, ctx, expectedSize);
+-                if (expectedSize == 2)
+-                {
+-                    // Call already returns A(low), X(high).
++                int returnSize = NormalizeScalarSize(DetermineExprSize(expr, ctx));
++                EmitCall(expr.Source, funcExpr, args, ctx, returnSize);
++                if (expectedSize == 2 && returnSize == 1)
++                {
++                    // A byte return does not define X. Widen the declared value,
++                    // not the stale high register left by the callee.
++                    EmitAsm("LDX", Imm(0));
++                    if (callType != null && IsSignedIntegerType(callType))
++                    {
++                        string extended = NewGeneratedLabel("call_sign_extended");
++                        EmitAsm("CMP", Imm(0x80));
++                        EmitAsm("BCC", Rel(extended));
++                        EmitAsm("LDX", Imm(0xFF));
++                        _assembly.Add(Expr.Make(Tag.Label, extended).WithSource(expr.Source));
++                    }
+                 }
+                 return;
+             }
+@@ -4716,6 +4762,7 @@
+             if (expr.Match(Tag.LogicalNot, out lhs))
+             {
+                 EmitBooleanToA(expr, ctx);
++                if (expectedSize == 2) EmitAsm("LDX", Imm(0));
+                 return;
+             }
+             if (expr.Match(Tag.BitwiseNot, out lhs))
+@@ -4758,6 +4805,7 @@
+             if (IsComparisonTag(expr.Tag) || expr.Tag == Tag.LogicalAnd || expr.Tag == Tag.LogicalOr)
+             {
+                 EmitBooleanToA(expr, ctx);
++                if (expectedSize == 2) EmitAsm("LDX", Imm(0));
+                 return;
+             }
+ 
+--- /dev/null
++++ b/tests/test_kitaqgb_jump_label_scope.py
+@@ -0,0 +1,32 @@
++"""A reused loop_end_1 must resolve inside its own function during JP->JR."""
++import os
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++ROOT=Path(__file__).resolve().parents[1]
++sys.path.insert(0,str(ROOT));sys.path.insert(0,str(ROOT/'kokura/python'))
++from kitaqgb_py import compile_rom,resolve_kitaqgb_executable
++from kokura_bridge import Core,KokuraLibrary
++
++class JumpLabelScopeTests(unittest.TestCase):
++    def test_entity_full_pool_and_reuse_in_both_optimization_modes(self):
++        dll=ROOT/'kokura/target/debug/kokura_capi.dll'
++        self.assertTrue(dll.exists(), 'Runtime regression requires the KOKURA C API')
++        dll_dir=os.add_dll_directory(str(dll.parent)) if hasattr(os,'add_dll_directory') else None
++        try:
++            kokura=KokuraLibrary(str(dll))
++            for optimization in ('-O0','-O1'):
++                with self.subTest(optimization=optimization),tempfile.TemporaryDirectory() as tmp:
++                    rom=Path(tmp)/'scope.gb'
++                    result=compile_rom([ROOT/'kitaqgb/lib/entity.c',ROOT/'tests/fixtures/entity_label_scope.c'],rom,
++                        executable=resolve_kitaqgb_executable(),working_directory=Path(tmp),raise_on_error=False,
++                        extra_args=['-I',str(ROOT/'lib'),'--rst-disable','--no-cache','--no-disasm','--stack-bank=fixed',optimization])
++                    self.assertTrue(result.success,result.stderr)
++                    with Core(kokura) as core:
++                        core.load_rom_path(rom);core.run_frames(4)
++                        self.assertEqual(core.read_block(0xC500,8),bytes([0,16,255,42,15,0,255,0xA5]))
++        finally:
++            if dll_dir:dll_dir.close()
++
++if __name__=='__main__':unittest.main()
+--- /dev/null
++++ b/tests/test_kitaqfc_call_temps.py
+@@ -0,0 +1,21 @@
++"""Observe nested 8/16-bit C calls in KUROSAKI, including live argument slots."""
++import json,os,subprocess,tempfile,unittest
++from pathlib import Path
++ROOT=Path(__file__).resolve().parents[1]
++class FcCallTempsTests(unittest.TestCase):
++    def test_nested_calls_preserve_live_expression_values(self):
++        compiler=Path(os.environ.get('KITAQFC_EXE',ROOT/'kitaqfc/kitaqfc.exe'))
++        kurosaki=Path(os.environ.get('KUROSAKI_EXE',ROOT/'kurosaki/target/release/kurosaki.exe'))
++        self.assertTrue(compiler.exists(),str(compiler));self.assertTrue(kurosaki.exists(),str(kurosaki))
++        expected=[42,6,0x1436,0x600,35,39,7,1,1,0xA55A,0xFFF9,1]
++        for opt in ['-O0','-O1']:
++            with self.subTest(optimization=opt),tempfile.TemporaryDirectory() as tmp:
++                out=Path(tmp);rom=out/'test.nes';state=out/'state.json'
++                p=subprocess.run([str(compiler),str(ROOT/'tests/fixtures/fc_call_temps.c'),'-o',str(rom),'--mapper=nrom','--no-disasm',opt],cwd=out,capture_output=True,timeout=60)
++                self.assertEqual(p.returncode,0,(p.stdout+p.stderr).decode('utf-8',errors='replace'))
++                p=subprocess.run([str(kurosaki),'snapshot-save',str(rom),'--frames','4','--out',str(state)],cwd=out,capture_output=True,timeout=60)
++                self.assertEqual(p.returncode,0,p.stderr.decode('utf-8',errors='replace'))
++                ram=json.loads(state.read_text(encoding='utf-8'))['bus']['ram']
++                actual=[ram[0x600+2*i] | (ram[0x601+2*i]<<8) for i in range(len(expected))]
++                self.assertEqual(actual,expected)
++if __name__=='__main__':unittest.main()
+--- /dev/null
++++ b/tests/fixtures/entity_label_scope.c
+@@ -0,0 +1,18 @@
++#include "entity.h"
++__location(0xC500) u8 scope_results[8];
++void main() {
++    u8 i; u8 id;
++    entity_init();
++    scope_results[0] = entity_count_active();
++    for (i=0; i<ENTITY_MAX; i++) { id=entity_create(1,20,30); }
++    scope_results[1] = entity_count_active();
++    scope_results[2] = entity_create(1,0,0);
++    entity_get(0)->x = 42;
++    scope_results[3] = (u8)entity_get(0)->x;
++    entity_destroy(0);
++    scope_results[4] = entity_count_active();
++    scope_results[5] = entity_create(2,7,9);
++    scope_results[6] = entity_create(2,7,9);
++    scope_results[7] = 0xA5;
++    while (1) { }
++}
+--- /dev/null
++++ b/tests/fixtures/fc_call_temps.c
+@@ -0,0 +1,22 @@
++__location(0x0600) u16 call_results[12];
++u8 vals[4];
++u16 wide[1];
++u8 sum8(u8 a,u8 b) { return (u8)(a+b); }
++u16 sum16(u16 a,u16 b) { return (u16)(a+b); }
++s8 signed_byte(s8 a) { return a; }
++void main(void) {
++    vals[0]=1; vals[1]=2; vals[3]=4; wide[0]=0x0102;
++    call_results[0]=(u8)(sum8(10,20)+vals[0]+vals[1]+vals[3]+5);
++    call_results[1]=sum8(1,sum8(2,3));
++    call_results[2]=(u16)(sum16(0x1234,0x0100)+wide[0]);
++    call_results[3]=sum16(0x0100,sum16(0x0200,0x0300));
++    call_results[4]=(u8)(sum8(2,3)*sum8(3,4));
++    call_results[5]=(u8)(sum8(10,20)+sum8(4,5));
++    call_results[6]=(u8)(sum8(5,7)-sum8(2,3));
++    call_results[7]=(u8)(sum8(8,1)&sum8(2,1));
++    call_results[8]=(sum16(256,1)==sum16(128,129));
++    call_results[9]=0xA55A;
++    call_results[10]=(s16)signed_byte(-7);
++    call_results[11]=!sum8(0,0);
++    while(1) { }
++}

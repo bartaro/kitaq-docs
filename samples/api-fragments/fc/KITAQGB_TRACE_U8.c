@@ -1,0 +1,3 @@
+// Usage fragment, not a standalone ROM.
+// Declaration source: kitaqfc_project/kitaqfc/lib/debug.h
+KITAQGB_TRACE_U8(name, value);

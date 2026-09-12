@@ -1,0 +1,918 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>VERIFICATION — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="assets/manual.css"></head><body><a class="skip" href="#main">本文へ</a><header class="mast"><a href="index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER'S MANUAL <b>2026.09</b> · <a href="en/verification.html" lang="en" hreflang="en">English</a></div></header><div class="layout"><aside><nav aria-label="巻の選択"><a href="index.html">総合目次</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB LIBRARY</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC LIBRARY</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">この巻を検索</label><input type="search" id="search" placeholder="例：入力 / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="この巻の目次"><a href="#scope">今回の確認範囲</a><a href="#result-gb_hello">gb_hello</a><a href="#result-gb_arithmetic">gb_arithmetic</a><a href="#result-gb_control">gb_control</a><a href="#result-gb_aggregate">gb_aggregate</a><a href="#result-gb_bits_memory">gb_bits_memory</a><a href="#result-gb_input">gb_input</a><a href="#result-gb_fixed">gb_fixed</a><a href="#result-gb_entity">gb_entity</a><a href="#result-gb_debug">gb_debug</a><a href="#result-gb_chain">gb_chain</a><a href="#result-fc_hello">fc_hello</a><a href="#result-fc_arithmetic">fc_arithmetic</a><a href="#result-fc_control">fc_control</a><a href="#result-fc_aggregate">fc_aggregate</a><a href="#result-fc_bits_memory">fc_bits_memory</a><a href="#result-fc_input">fc_input</a><a href="#result-fc_fixed">fc_fixed</a><a href="#result-fc_entity">fc_entity</a><a href="#result-fc_debug">fc_debug</a><a href="#result-fc_chain">fc_chain</a><a href="#result-gb_cgb_palette">gb_cgb_palette</a><a href="#result-gb_scroll">gb_scroll</a><a href="#result-gb_vram_queue">gb_vram_queue</a><a href="#result-gb_sprite">gb_sprite</a><a href="#result-gb_rng">gb_rng</a><a href="#result-gb_flags">gb_flags</a><a href="#result-gb_circle">gb_circle</a><a href="#result-fc_scroll">fc_scroll</a><a href="#result-fc_vram_queue">fc_vram_queue</a><a href="#result-fc_sprite">fc_sprite</a><a href="#result-fc_sound">fc_sound</a><a href="#result-gb_sound">gb_sound</a><a href="#result-gb_font">gb_font</a><a href="#result-fc_font">fc_font</a><a href="#result-gb_system">gb_system</a><a href="#result-gb_scene">gb_scene</a><a href="#result-fc_system">fc_system</a><a href="#result-fc_scene">fc_scene</a><a href="#result-gb_camera">gb_camera</a><a href="#result-gb_rle">gb_rle</a><a href="#result-gb_board">gb_board</a><a href="#result-gb_physics">gb_physics</a><a href="#result-gb_link">gb_link</a><a href="#result-gb_bank">gb_bank</a><a href="#result-gb_asset">gb_asset</a><a href="#result-gb_danmaku">gb_danmaku</a><a href="#result-fc_subpixel">fc_subpixel</a><a href="#visual_checks-json">サンプル画面の数値・字体照合</a><a href="#workflow-json">診断ワークフロー</a><a href="#compiler_tests-json">コンパイラ修正の回帰試験</a><a href="#browser_checks-json">ブラウザーでの表示確認</a><a href="#site_checks-json">HTML構造とリンク</a></nav><button class="print" type="button">この巻を印刷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>VERIFICATION</h1><p class="subtitle">ビルド・実行・表示の確認記録</p><div class="edition">初めての一行から、実行・観測・再テストまで。<br>ローカルソース採取：2026年9月12日</div></div><p><a href="verification/bilingual_checks.json">日本語・英語版の対応検査</a> ／ <a href="verification/english_browser_checks.json">英語版のブラウザー検査</a> ／ <a href="PUBLICATION_CHECKS.md">今回の公開用ビルドと試験</a></p><h2 id="scope">今回の確認範囲</h2><p>コンパイラ2種とKUROSAKI CLIは採取した現在のソースからビルドしました。KOKURAとSARAKURAは同梱inventoryに指紋を記録したローカル実行ファイルを使用しています。全機能・全周辺機器・実機の試験ではありません。</p><p>各サンプルのコンパイル終了コード、120フレームのエミュレータ実行、画面は以下です。期待値の画素照合は別の結果がある場合に明示します。終了コード0だけで入力・音・ゲーム挙動の正常を証明したとはしません。</p><section id="gb_hello"><h2 id="result-gb_hello">gb_hello</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>HELLO WORLD and 042</p><img class="screen" loading="lazy" src="verification/gb_hello.png" alt="gb_hello のエミュレータ実行画面"><p><a href="verification/gb_hello-build.txt">ビルドログ</a> ／ <a href="verification/gb_hello-runtime.txt">実行ログ</a></p></section><section id="gb_arithmetic"><h2 id="result-gb_arithmetic">gb_arithmetic</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>030</p><img class="screen" loading="lazy" src="verification/gb_arithmetic.png" alt="gb_arithmetic のエミュレータ実行画面"><p><a href="verification/gb_arithmetic-build.txt">ビルドログ</a> ／ <a href="verification/gb_arithmetic-runtime.txt">実行ログ</a></p></section><section id="gb_control"><h2 id="result-gb_control">gb_control</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_control.png" alt="gb_control のエミュレータ実行画面"><p><a href="verification/gb_control-build.txt">ビルドログ</a> ／ <a href="verification/gb_control-runtime.txt">実行ログ</a></p></section><section id="gb_aggregate"><h2 id="result-gb_aggregate">gb_aggregate</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_aggregate.png" alt="gb_aggregate のエミュレータ実行画面"><p><a href="verification/gb_aggregate-build.txt">ビルドログ</a> ／ <a href="verification/gb_aggregate-runtime.txt">実行ログ</a></p></section><section id="gb_bits_memory"><h2 id="result-gb_bits_memory">gb_bits_memory</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>010</p><img class="screen" loading="lazy" src="verification/gb_bits_memory.png" alt="gb_bits_memory のエミュレータ実行画面"><p><a href="verification/gb_bits_memory-build.txt">ビルドログ</a> ／ <a href="verification/gb_bits_memory-runtime.txt">実行ログ</a></p></section><section id="gb_input"><h2 id="result-gb_input">gb_input</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>000 initially; A increments once per press</p><img class="screen" loading="lazy" src="verification/gb_input.png" alt="gb_input のエミュレータ実行画面"><p><a href="verification/gb_input-build.txt">ビルドログ</a> ／ <a href="verification/gb_input-runtime.txt">実行ログ</a></p></section><section id="gb_fixed"><h2 id="result-gb_fixed">gb_fixed</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>012</p><img class="screen" loading="lazy" src="verification/gb_fixed.png" alt="gb_fixed のエミュレータ実行画面"><p><a href="verification/gb_fixed-build.txt">ビルドログ</a> ／ <a href="verification/gb_fixed-runtime.txt">実行ログ</a></p></section><section id="gb_entity"><h2 id="result-gb_entity">gb_entity</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001</p><img class="screen" loading="lazy" src="verification/gb_entity.png" alt="gb_entity のエミュレータ実行画面"><p><a href="verification/gb_entity-build.txt">ビルドログ</a> ／ <a href="verification/gb_entity-runtime.txt">実行ログ</a></p></section><section id="gb_debug"><h2 id="result-gb_debug">gb_debug</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; trace log contains HP=42</p><img class="screen" loading="lazy" src="verification/gb_debug.png" alt="gb_debug のエミュレータ実行画面"><p><a href="verification/gb_debug-build.txt">ビルドログ</a> ／ <a href="verification/gb_debug-runtime.txt">実行ログ</a></p></section><section id="gb_chain"><h2 id="result-gb_chain">gb_chain</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; history contains (20,30)</p><img class="screen" loading="lazy" src="verification/gb_chain.png" alt="gb_chain のエミュレータ実行画面"><p><a href="verification/gb_chain-build.txt">ビルドログ</a> ／ <a href="verification/gb_chain-runtime.txt">実行ログ</a></p></section><section id="fc_hello"><h2 id="result-fc_hello">fc_hello</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>HELLO WORLD and 042</p><img class="screen" loading="lazy" src="verification/fc_hello.png" alt="fc_hello のエミュレータ実行画面"><p><a href="verification/fc_hello-build.txt">ビルドログ</a> ／ <a href="verification/fc_hello-runtime.txt">実行ログ</a></p></section><section id="fc_arithmetic"><h2 id="result-fc_arithmetic">fc_arithmetic</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>030</p><img class="screen" loading="lazy" src="verification/fc_arithmetic.png" alt="fc_arithmetic のエミュレータ実行画面"><p><a href="verification/fc_arithmetic-build.txt">ビルドログ</a> ／ <a href="verification/fc_arithmetic-runtime.txt">実行ログ</a></p></section><section id="fc_control"><h2 id="result-fc_control">fc_control</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/fc_control.png" alt="fc_control のエミュレータ実行画面"><p><a href="verification/fc_control-build.txt">ビルドログ</a> ／ <a href="verification/fc_control-runtime.txt">実行ログ</a></p></section><section id="fc_aggregate"><h2 id="result-fc_aggregate">fc_aggregate</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/fc_aggregate.png" alt="fc_aggregate のエミュレータ実行画面"><p><a href="verification/fc_aggregate-build.txt">ビルドログ</a> ／ <a href="verification/fc_aggregate-runtime.txt">実行ログ</a></p></section><section id="fc_bits_memory"><h2 id="result-fc_bits_memory">fc_bits_memory</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>010</p><img class="screen" loading="lazy" src="verification/fc_bits_memory.png" alt="fc_bits_memory のエミュレータ実行画面"><p><a href="verification/fc_bits_memory-build.txt">ビルドログ</a> ／ <a href="verification/fc_bits_memory-runtime.txt">実行ログ</a></p></section><section id="fc_input"><h2 id="result-fc_input">fc_input</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>000 initially; A increments once per press</p><img class="screen" loading="lazy" src="verification/fc_input.png" alt="fc_input のエミュレータ実行画面"><p><a href="verification/fc_input-build.txt">ビルドログ</a> ／ <a href="verification/fc_input-runtime.txt">実行ログ</a></p></section><section id="fc_fixed"><h2 id="result-fc_fixed">fc_fixed</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>012</p><img class="screen" loading="lazy" src="verification/fc_fixed.png" alt="fc_fixed のエミュレータ実行画面"><p><a href="verification/fc_fixed-build.txt">ビルドログ</a> ／ <a href="verification/fc_fixed-runtime.txt">実行ログ</a></p></section><section id="fc_entity"><h2 id="result-fc_entity">fc_entity</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001</p><img class="screen" loading="lazy" src="verification/fc_entity.png" alt="fc_entity のエミュレータ実行画面"><p><a href="verification/fc_entity-build.txt">ビルドログ</a> ／ <a href="verification/fc_entity-runtime.txt">実行ログ</a></p></section><section id="fc_debug"><h2 id="result-fc_debug">fc_debug</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; trace log contains HP=42</p><img class="screen" loading="lazy" src="verification/fc_debug.png" alt="fc_debug のエミュレータ実行画面"><p><a href="verification/fc_debug-build.txt">ビルドログ</a> ／ <a href="verification/fc_debug-runtime.txt">実行ログ</a></p></section><section id="fc_chain"><h2 id="result-fc_chain">fc_chain</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; history contains (20,30)</p><img class="screen" loading="lazy" src="verification/fc_chain.png" alt="fc_chain のエミュレータ実行画面"><p><a href="verification/fc_chain-build.txt">ビルドログ</a> ／ <a href="verification/fc_chain-runtime.txt">実行ログ</a></p></section><section id="gb_cgb_palette"><h2 id="result-gb_cgb_palette">gb_cgb_palette</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 in purple on white; CGB mode</p><img class="screen" loading="lazy" src="verification/gb_cgb_palette.png" alt="gb_cgb_palette のエミュレータ実行画面"><p><a href="verification/gb_cgb_palette-build.txt">ビルドログ</a> ／ <a href="verification/gb_cgb_palette-runtime.txt">実行ログ</a></p></section><section id="gb_scroll"><h2 id="result-gb_scroll">gb_scroll</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>title moves left as SCX increases</p><img class="screen" loading="lazy" src="verification/gb_scroll.png" alt="gb_scroll のエミュレータ実行画面"><p><a href="verification/gb_scroll-build.txt">ビルドログ</a> ／ <a href="verification/gb_scroll-runtime.txt">実行ログ</a></p></section><section id="gb_vram_queue"><h2 id="result-gb_vram_queue">gb_vram_queue</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>4 at (3,8)</p><img class="screen" loading="lazy" src="verification/gb_vram_queue.png" alt="gb_vram_queue のエミュレータ実行画面"><p><a href="verification/gb_vram_queue-build.txt">ビルドログ</a> ／ <a href="verification/gb_vram_queue-runtime.txt">実行ログ</a></p></section><section id="gb_sprite"><h2 id="result-gb_sprite">gb_sprite</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>letter A at sprite position</p><img class="screen" loading="lazy" src="verification/gb_sprite.png" alt="gb_sprite のエミュレータ実行画面"><p><a href="verification/gb_sprite-build.txt">ビルドログ</a> ／ <a href="verification/gb_sprite-runtime.txt">実行ログ</a></p></section><section id="gb_rng"><h2 id="result-gb_rng">gb_rng</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>value 000 through 009; same seed repeats</p><img class="screen" loading="lazy" src="verification/gb_rng.png" alt="gb_rng のエミュレータ実行画面"><p><a href="verification/gb_rng-build.txt">ビルドログ</a> ／ <a href="verification/gb_rng-runtime.txt">実行ログ</a></p></section><section id="gb_flags"><h2 id="result-gb_flags">gb_flags</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001</p><img class="screen" loading="lazy" src="verification/gb_flags.png" alt="gb_flags のエミュレータ実行画面"><p><a href="verification/gb_flags-build.txt">ビルドログ</a> ／ <a href="verification/gb_flags-runtime.txt">実行ログ</a></p></section><section id="gb_circle"><h2 id="result-gb_circle">gb_circle</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 after one step; this example uses integer pixels</p><img class="screen" loading="lazy" src="verification/gb_circle.png" alt="gb_circle のエミュレータ実行画面"><p><a href="verification/gb_circle-build.txt">ビルドログ</a> ／ <a href="verification/gb_circle-runtime.txt">実行ログ</a></p></section><section id="fc_scroll"><h2 id="result-fc_scroll">fc_scroll</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>title scrolls horizontally</p><img class="screen" loading="lazy" src="verification/fc_scroll.png" alt="fc_scroll のエミュレータ実行画面"><p><a href="verification/fc_scroll-build.txt">ビルドログ</a> ／ <a href="verification/fc_scroll-runtime.txt">実行ログ</a></p></section><section id="fc_vram_queue"><h2 id="result-fc_vram_queue">fc_vram_queue</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>4 at (3,8)</p><img class="screen" loading="lazy" src="verification/fc_vram_queue.png" alt="fc_vram_queue のエミュレータ実行画面"><p><a href="verification/fc_vram_queue-build.txt">ビルドログ</a> ／ <a href="verification/fc_vram_queue-runtime.txt">実行ログ</a></p></section><section id="fc_sprite"><h2 id="result-fc_sprite">fc_sprite</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>A sprite on screen</p><img class="screen" loading="lazy" src="verification/fc_sprite.png" alt="fc_sprite のエミュレータ実行画面"><p><a href="verification/fc_sprite-build.txt">ビルドログ</a> ／ <a href="verification/fc_sprite-runtime.txt">実行ログ</a></p></section><section id="fc_sound"><h2 id="result-fc_sound">fc_sound</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 and a pulse tone</p><img class="screen" loading="lazy" src="verification/fc_sound.png" alt="fc_sound のエミュレータ実行画面"><p><a href="verification/fc_sound-build.txt">ビルドログ</a> ／ <a href="verification/fc_sound-runtime.txt">実行ログ</a></p></section><section id="gb_sound"><h2 id="result-gb_sound">gb_sound</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 and a short pulse tone</p><img class="screen" loading="lazy" src="verification/gb_sound.png" alt="gb_sound のエミュレータ実行画面"><p><a href="verification/gb_sound-build.txt">ビルドログ</a> ／ <a href="verification/gb_sound-runtime.txt">実行ログ</a></p></section><section id="gb_font"><h2 id="result-gb_font">gb_font</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>Uppercase, lowercase, numbers and all 30 supplied punctuation glyphs</p><img class="screen" loading="lazy" src="verification/gb_font.png" alt="gb_font のエミュレータ実行画面"><p><a href="verification/gb_font-build.txt">ビルドログ</a> ／ <a href="verification/gb_font-runtime.txt">実行ログ</a></p></section><section id="fc_font"><h2 id="result-fc_font">fc_font</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>Uppercase, lowercase, numbers and all 30 supplied punctuation glyphs</p><img class="screen" loading="lazy" src="verification/fc_font.png" alt="fc_font のエミュレータ実行画面"><p><a href="verification/fc_font-build.txt">ビルドログ</a> ／ <a href="verification/fc_font-runtime.txt">実行ログ</a></p></section><section id="gb_system"><h2 id="result-gb_system">gb_system</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>002</p><img class="screen" loading="lazy" src="verification/gb_system.png" alt="gb_system のエミュレータ実行画面"><p><a href="verification/gb_system-build.txt">ビルドログ</a> ／ <a href="verification/gb_system-runtime.txt">実行ログ</a></p></section><section id="gb_scene"><h2 id="result-gb_scene">gb_scene</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; no callbacks registered</p><img class="screen" loading="lazy" src="verification/gb_scene.png" alt="gb_scene のエミュレータ実行画面"><p><a href="verification/gb_scene-build.txt">ビルドログ</a> ／ <a href="verification/gb_scene-runtime.txt">実行ログ</a></p></section><section id="fc_system"><h2 id="result-fc_system">fc_system</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>002</p><img class="screen" loading="lazy" src="verification/fc_system.png" alt="fc_system のエミュレータ実行画面"><p><a href="verification/fc_system-build.txt">ビルドログ</a> ／ <a href="verification/fc_system-runtime.txt">実行ログ</a></p></section><section id="fc_scene"><h2 id="result-fc_scene">fc_scene</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; no callbacks registered</p><img class="screen" loading="lazy" src="verification/fc_scene.png" alt="fc_scene のエミュレータ実行画面"><p><a href="verification/fc_scene-build.txt">ビルドログ</a> ／ <a href="verification/fc_scene-runtime.txt">実行ログ</a></p></section><section id="gb_camera"><h2 id="result-gb_camera">gb_camera</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042: world x=52 minus camera x=10</p><img class="screen" loading="lazy" src="verification/gb_camera.png" alt="gb_camera のエミュレータ実行画面"><p><a href="verification/gb_camera-build.txt">ビルドログ</a> ／ <a href="verification/gb_camera-runtime.txt">実行ログ</a></p></section><section id="gb_rle"><h2 id="result-gb_rle">gb_rle</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; three bytes each equal to 42</p><img class="screen" loading="lazy" src="verification/gb_rle.png" alt="gb_rle のエミュレータ実行画面"><p><a href="verification/gb_rle-build.txt">ビルドログ</a> ／ <a href="verification/gb_rle-runtime.txt">実行ログ</a></p></section><section id="gb_board"><h2 id="result-gb_board">gb_board</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_board.png" alt="gb_board のエミュレータ実行画面"><p><a href="verification/gb_board-build.txt">ビルドログ</a> ／ <a href="verification/gb_board-runtime.txt">実行ログ</a></p></section><section id="gb_physics"><h2 id="result-gb_physics">gb_physics</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042: integer pixel coordinates</p><img class="screen" loading="lazy" src="verification/gb_physics.png" alt="gb_physics のエミュレータ実行画面"><p><a href="verification/gb_physics-build.txt">ビルドログ</a> ／ <a href="verification/gb_physics-runtime.txt">実行ログ</a></p></section><section id="gb_link"><h2 id="result-gb_link">gb_link</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>255 for disconnected link; 000 if timeout; peer value when connected</p><img class="screen" loading="lazy" src="verification/gb_link.png" alt="gb_link のエミュレータ実行画面"><p><a href="verification/gb_link-build.txt">ビルドログ</a> ／ <a href="verification/gb_link-runtime.txt">実行ログ</a></p></section><section id="gb_bank"><h2 id="result-gb_bank">gb_bank</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; bank 0 fixed-ROM data copy</p><img class="screen" loading="lazy" src="verification/gb_bank.png" alt="gb_bank のエミュレータ実行画面"><p><a href="verification/gb_bank-build.txt">ビルドログ</a> ／ <a href="verification/gb_bank-runtime.txt">実行ログ</a></p></section><section id="gb_asset"><h2 id="result-gb_asset">gb_asset</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_asset.png" alt="gb_asset のエミュレータ実行画面"><p><a href="verification/gb_asset-build.txt">ビルドログ</a> ／ <a href="verification/gb_asset-runtime.txt">実行ログ</a></p></section><section id="gb_danmaku"><h2 id="result-gb_danmaku">gb_danmaku</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; numeric pool example, no bullet BG compositor</p><img class="screen" loading="lazy" src="verification/gb_danmaku.png" alt="gb_danmaku のエミュレータ実行画面"><p><a href="verification/gb_danmaku-build.txt">ビルドログ</a> ／ <a href="verification/gb_danmaku-runtime.txt">実行ログ</a></p></section><section id="fc_subpixel"><h2 id="result-fc_subpixel">fc_subpixel</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; explicit game-side integration using header constants</p><img class="screen" loading="lazy" src="verification/fc_subpixel.png" alt="fc_subpixel のエミュレータ実行画面"><p><a href="verification/fc_subpixel-build.txt">ビルドログ</a> ／ <a href="verification/fc_subpixel-runtime.txt">実行ログ</a></p></section><h2 id="visual_checks-json">サンプル画面の数値・字体照合</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">コピー</button><pre><code>[
+  {
+    &quot;id&quot;: &quot;gb_hello&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_arithmetic&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;030&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_control&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_aggregate&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_bits_memory&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;010&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_input&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;000&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_fixed&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;012&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_entity&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_debug&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_chain&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_system&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;002&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_scene&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_hello&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_arithmetic&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;030&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_control&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_aggregate&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_bits_memory&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;010&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_input&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;000&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_fixed&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;012&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_entity&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_debug&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_chain&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_system&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;002&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_scene&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_camera&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_rle&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_board&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_physics&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_link&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;255&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_bank&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_asset&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_danmaku&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_subpixel&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_cgb_palette&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_vram_queue&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;4&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_flags&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_circle&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_vram_queue&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;4&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_sound&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_sound&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;042&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_input_pressed&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 5,
+    &quot;expected_text&quot;: &quot;ABCDEFGHIJKLMNOP&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 6,
+    &quot;expected_text&quot;: &quot;QRSTUVWXYZ&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;0123456789&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 10,
+    &quot;expected_text&quot;: &quot;abcdefghijklmnop&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 11,
+    &quot;expected_text&quot;: &quot;qrstuvwxyz&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 13,
+    &quot;expected_text&quot;: &quot;!#$%&amp;&#x27;()*+,-./&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 14,
+    &quot;expected_text&quot;: &quot;:;&lt;=&gt;?@[]^_`{}~&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;gb_font&quot;,
+    &quot;tile_x&quot;: 16,
+    &quot;tile_y&quot;: 13,
+    &quot;expected_text&quot;: &quot;\&quot;&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_input_pressed&quot;,
+    &quot;tile_x&quot;: 3,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;001&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 5,
+    &quot;expected_text&quot;: &quot;ABCDEFGHIJKLMNOP&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 6,
+    &quot;expected_text&quot;: &quot;QRSTUVWXYZ&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 8,
+    &quot;expected_text&quot;: &quot;0123456789&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 10,
+    &quot;expected_text&quot;: &quot;abcdefghijklmnop&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 11,
+    &quot;expected_text&quot;: &quot;qrstuvwxyz&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 13,
+    &quot;expected_text&quot;: &quot;!#$%&amp;&#x27;()*+,-./&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_font&quot;,
+    &quot;tile_x&quot;: 2,
+    &quot;tile_y&quot;: 14,
+    &quot;expected_text&quot;: &quot;:;&lt;=&gt;?@[]^_`{}~&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;fc_font&quot;,
+    &quot;tile_x&quot;: 16,
+    &quot;tile_y&quot;: 13,
+    &quot;expected_text&quot;: &quot;\&quot;&quot;,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;errors&quot;: []
+  }
+]</code></pre></div><h2 id="workflow-json">診断ワークフロー</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">コピー</button><pre><code>[
+  {
+    &quot;id&quot;: &quot;sarakura-gb-synthetic&quot;,
+    &quot;tool&quot;: &quot;sarakura&quot;,
+    &quot;arguments&quot;: [
+      &quot;gb&quot;,
+      &quot;analyze&quot;,
+      &quot;--metadata&quot;,
+      &quot;[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\gb\\build.json&quot;,
+      &quot;--events&quot;,
+      &quot;[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\gb\\events.jsonl&quot;,
+      &quot;--out&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-gb&quot;,
+      &quot;--fail-on&quot;,
+      &quot;never&quot;,
+      &quot;--no-repro-bundle&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;verified_date&quot;: &quot;2026-09-12&quot;,
+    &quot;report_language&quot;: &quot;en&quot;
+  },
+  {
+    &quot;id&quot;: &quot;sarakura-gb-validate&quot;,
+    &quot;tool&quot;: &quot;sarakura&quot;,
+    &quot;arguments&quot;: [
+      &quot;validate&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-gb\\ai_diagnostics.json&quot;,
+      &quot;--strict&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;sarakura-gb-ci&quot;,
+    &quot;tool&quot;: &quot;sarakura&quot;,
+    &quot;arguments&quot;: [
+      &quot;ci-summary&quot;,
+      &quot;--diagnostics&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-gb&quot;,
+      &quot;--fail-on&quot;,
+      &quot;error&quot;,
+      &quot;--enforce&quot;
+    ],
+    &quot;exit_code&quot;: 1,
+    &quot;expected_exit_codes&quot;: [
+      1
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;sarakura-gb-real&quot;,
+    &quot;tool&quot;: &quot;sarakura&quot;,
+    &quot;arguments&quot;: [
+      &quot;gb&quot;,
+      &quot;analyze&quot;,
+      &quot;--metadata&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\gb_hello\\build.json&quot;,
+      &quot;--events&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\gb_hello\\diag&quot;,
+      &quot;--out&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\real-gb&quot;,
+      &quot;--fail-on&quot;,
+      &quot;never&quot;,
+      &quot;--no-repro-bundle&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;verified_date&quot;: &quot;2026-09-12&quot;,
+    &quot;report_language&quot;: &quot;en&quot;
+  },
+  {
+    &quot;id&quot;: &quot;sarakura-fc-synthetic&quot;,
+    &quot;tool&quot;: &quot;sarakura&quot;,
+    &quot;arguments&quot;: [
+      &quot;fc&quot;,
+      &quot;analyze&quot;,
+      &quot;--metadata&quot;,
+      &quot;[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\fc\\build.json&quot;,
+      &quot;--events&quot;,
+      &quot;[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\fc\\events.jsonl&quot;,
+      &quot;--out&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-fc&quot;,
+      &quot;--fail-on&quot;,
+      &quot;never&quot;,
+      &quot;--no-repro-bundle&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;verified_date&quot;: &quot;2026-09-12&quot;,
+    &quot;report_language&quot;: &quot;en&quot;
+  },
+  {
+    &quot;id&quot;: &quot;sarakura-fc-validate&quot;,
+    &quot;tool&quot;: &quot;sarakura&quot;,
+    &quot;arguments&quot;: [
+      &quot;validate&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-fc\\ai_diagnostics.json&quot;,
+      &quot;--strict&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;sarakura-fc-ci&quot;,
+    &quot;tool&quot;: &quot;sarakura&quot;,
+    &quot;arguments&quot;: [
+      &quot;ci-summary&quot;,
+      &quot;--diagnostics&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-fc&quot;,
+      &quot;--fail-on&quot;,
+      &quot;error&quot;,
+      &quot;--enforce&quot;
+    ],
+    &quot;exit_code&quot;: 1,
+    &quot;expected_exit_codes&quot;: [
+      1
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;sarakura-fc-real&quot;,
+    &quot;tool&quot;: &quot;sarakura&quot;,
+    &quot;arguments&quot;: [
+      &quot;fc&quot;,
+      &quot;analyze&quot;,
+      &quot;--metadata&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\build.json&quot;,
+      &quot;--events&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\events.jsonl&quot;,
+      &quot;--out&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\real-fc&quot;,
+      &quot;--fail-on&quot;,
+      &quot;never&quot;,
+      &quot;--no-repro-bundle&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;verified_date&quot;: &quot;2026-09-12&quot;,
+    &quot;report_language&quot;: &quot;en&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-inspect&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;inspect-rom&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes&quot;,
+      &quot;--json&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\rom.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-disasm&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;disasm&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes&quot;,
+      &quot;--bytes&quot;,
+      &quot;64&quot;,
+      &quot;--text&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\reset.txt&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-decompile&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;decompile&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes&quot;,
+      &quot;--max-instructions&quot;,
+      &quot;64&quot;,
+      &quot;--format&quot;,
+      &quot;markdown&quot;,
+      &quot;--out&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\decompile.md&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-trace&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;trace&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes&quot;,
+      &quot;--frames&quot;,
+      &quot;2&quot;,
+      &quot;--cpu&quot;,
+      &quot;--out&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\trace.jsonl&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-snapshot-save&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;snapshot-save&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes&quot;,
+      &quot;--frames&quot;,
+      &quot;60&quot;,
+      &quot;--out&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\state.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-snapshot-load&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;snapshot-load&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\state.json&quot;,
+      &quot;--json&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\loaded.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-snapshot-resume&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;snapshot-resume&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\state.json&quot;,
+      &quot;--frames&quot;,
+      &quot;2&quot;,
+      &quot;--json&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\resumed.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-replay-record&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;replay-record&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes&quot;,
+      &quot;--frames&quot;,
+      &quot;60&quot;,
+      &quot;--out&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\replay.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-replay-run&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;replay-run&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\replay.json&quot;,
+      &quot;--verify&quot;,
+      &quot;--json&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\replay-result.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-mapper-test&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;mapper-test&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes&quot;,
+      &quot;--json&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\mapper-test.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-pad&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;run&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_input\\program.nes&quot;,
+      &quot;--frames&quot;,
+      &quot;120&quot;,
+      &quot;--pad1&quot;,
+      &quot;1&quot;,
+      &quot;--png&quot;,
+      &quot;[WORKSPACE]\\kitaq-docs\\verification\\fc_input_pressed.png&quot;,
+      &quot;--json&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\pad.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kokura-pad&quot;,
+    &quot;tool&quot;: &quot;kokura&quot;,
+    &quot;arguments&quot;: [
+      &quot;[WORKSPACE]\\manual\\_manual_work\\gb_input\\program.gb&quot;,
+      &quot;--run-frames&quot;,
+      &quot;120&quot;,
+      &quot;--input-script&quot;,
+      &quot;NONE:30;A:2;NONE:88&quot;,
+      &quot;--png&quot;,
+      &quot;[WORKSPACE]\\kitaq-docs\\verification\\gb_input_pressed.png&quot;,
+      &quot;--dump-report&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\gb-pad.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;kurosaki-audio&quot;,
+    &quot;tool&quot;: &quot;kurosaki&quot;,
+    &quot;arguments&quot;: [
+      &quot;audio-export&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\fc_sound\\program.nes&quot;,
+      &quot;--frames&quot;,
+      &quot;120&quot;,
+      &quot;--wav&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\fc-audio.wav&quot;,
+      &quot;--json&quot;,
+      &quot;[WORKSPACE]\\manual\\_manual_work\\workflow\\fc-audio.json&quot;
+    ],
+    &quot;exit_code&quot;: 0,
+    &quot;expected_exit_codes&quot;: [
+      0
+    ],
+    &quot;status&quot;: &quot;passed&quot;
+  },
+  {
+    &quot;id&quot;: &quot;gb-audio-pcm&quot;,
+    &quot;frames&quot;: 133196,
+    &quot;sample_rate&quot;: 65536,
+    &quot;channels&quot;: 2,
+    &quot;peak&quot;: 7730,
+    &quot;rms&quot;: 1406.811,
+    &quot;nonzero_samples&quot;: 13204,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;scope&quot;: &quot;PCM generated and non-silent; no subjective timbre or hardware claim&quot;
+  },
+  {
+    &quot;id&quot;: &quot;fc-audio-pcm&quot;,
+    &quot;frames&quot;: 88055,
+    &quot;sample_rate&quot;: 44100,
+    &quot;channels&quot;: 1,
+    &quot;peak&quot;: 6721,
+    &quot;rms&quot;: 3338.903,
+    &quot;nonzero_samples&quot;: 87490,
+    &quot;status&quot;: &quot;passed&quot;,
+    &quot;scope&quot;: &quot;PCM generated and non-silent; no subjective timbre or hardware claim&quot;
+  }
+]</code></pre></div><h2 id="compiler_tests-json">コンパイラ修正の回帰試験</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">コピー</button><pre><code>{
+  &quot;kitaqgb&quot;: {
+    &quot;regression_suite_tests&quot;: 16,
+    &quot;passed&quot;: 16,
+    &quot;new_regression&quot;: &quot;test_kitaqgb_jump_label_scope.py&quot;,
+    &quot;new_regression_modes&quot;: [&quot;-O0&quot;, &quot;-O1&quot;],
+    &quot;before_fix&quot;: &quot;both modes failed compilation at Branch out of range&quot;,
+    &quot;after_fix&quot;: &quot;both modes compiled and matched KOKURA RAM expectations&quot;,
+    &quot;log&quot;: &quot;gb-regression-suite.txt&quot;
+  },
+  &quot;kitaqfc&quot;: {
+    &quot;new_regression&quot;: &quot;test_kitaqfc_call_temps.py&quot;,
+    &quot;modes&quot;: [&quot;-O0&quot;, &quot;-O1&quot;],
+    &quot;expected_values_per_mode&quot;: 12,
+    &quot;before_fix&quot;: &quot;both modes failed KUROSAKI RAM comparisons&quot;,
+    &quot;after_fix&quot;: &quot;both modes matched all expected values&quot;,
+    &quot;log&quot;: &quot;fc-regression.txt&quot;
+  },
+  &quot;portable_scripts&quot;: {
+    &quot;build.ps1&quot;: &quot;gb_hello and fc_scene selected with comma-separated PowerShell arguments; both built successfully&quot;,
+    &quot;sarakura_demo.ps1&quot;: &quot;GB and FC synthetic reports generated and schema validated&quot;
+  }
+}</code></pre></div><h2 id="browser_checks-json">ブラウザーでの表示確認</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">コピー</button><pre><code>{
+  &quot;browser&quot;: &quot;Codex in-app browser&quot;,
+  &quot;checks&quot;: [
+    {&quot;check&quot;: &quot;Desktop index visual inspection&quot;, &quot;status&quot;: &quot;passed&quot;},
+    {&quot;check&quot;: &quot;390 x 844 mobile index visual inspection&quot;, &quot;status&quot;: &quot;passed&quot;},
+    {&quot;check&quot;: &quot;Desktop library page body width equals viewport (1265 px)&quot;, &quot;status&quot;: &quot;passed&quot;},
+    {&quot;check&quot;: &quot;entity_create hash opens the matching API entry&quot;, &quot;status&quot;: &quot;passed&quot;},
+    {&quot;check&quot;: &quot;entity_create search filters to 8 matching entries&quot;, &quot;status&quot;: &quot;passed&quot;},
+    {&quot;check&quot;: &quot;Copy button writes the selected entity_create declaration&quot;, &quot;status&quot;: &quot;passed&quot;}
+  ],
+  &quot;print&quot;: &quot;Print CSS and details expansion implemented; physical printing not tested&quot;
+}</code></pre></div><h2 id="site_checks-json">HTML構造とリンク</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">コピー</button><pre><code>{
+  &quot;main_html_pages&quot;: 9,
+  &quot;synthetic_report_pages&quot;: 2,
+  &quot;local_links_checked&quot;: 958,
+  &quot;api_entries&quot;: 1029,
+  &quot;sample_programs&quot;: 47,
+  &quot;successful_builds&quot;: 47,
+  &quot;emulator_runs&quot;: 47,
+  &quot;errors&quot;: [],
+  &quot;status&quot;: &quot;passed&quot;
+}</code></pre></div><footer>2026-09-12版 • <a href="index.html">総合目次</a> • <a href="verification.html">検証記録</a> • <a href="reference/inventory.json">版の指紋</a><br>サンプルのビルド・エミュレータ実行・期待値照合は別項目として記録します。</footer></main></div><script src="assets/manual.js"></script></body></html>
