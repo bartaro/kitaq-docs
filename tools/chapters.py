@@ -71,7 +71,7 @@ GBは小さなメモリと8ビットCPUを持ちます。画面は基本的に8�
 ソースから作る場合は、.NET Framework 4.8を対象とするVisual Studio/MSBuild環境を用意します。以下はDeveloper PowerShellなど、`MSBuild.exe` が使える端末での操作です。
 
 ```powershell
-MSBuild.exe .\kitaqgb\kitaqgb.csproj /t:Build /p:Configuration=Release
+MSBuild.exe .\kitaqgb\kitaqgb\kitaqgb.csproj /t:Build /p:Configuration=Release
 .\kitaqgb\bin\Release\kitaqgb.exe --help
 ```
 
@@ -326,7 +326,7 @@ KITAQFCはKITAQGBのフロントエンドを利用し、NES/Famicomの6502系CPU
 
 ## 2　準備とビルド
 ```powershell
-MSBuild.exe .\kitaqfc\kitaqfc.csproj /t:Build /p:Configuration=Release
+MSBuild.exe .\kitaqfc\kitaqfc\kitaqfc.csproj /t:Build /p:Configuration=Release
 .\kitaqfc\bin\Release\kitaqfc.exe --help
 ```
 

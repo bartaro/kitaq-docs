@@ -170,7 +170,7 @@ def cli_section(key,inventory):
         if entry:out.append(code(key+' '+entry[1],'powershell'))
         out.append(code(h['text'],'help')+'</details>')
     if key in ('kitaqgb','kitaqfc'):
-        base=g.ROOT/key
+        base=g.ROOT/key/key
         out.append('<h3>Developer command syntax</h3><p>These usages come from Program.DebugTools.cs and Program.VibeTools.cs. ROM comparison, symbol search and templates are subcommands separate from ordinary C compilation.</p>')
         for file in ('Program.DebugTools.cs','Program.VibeTools.cs'):
             for usage in re.findall(r'"(usage: [^"\r\n]+)"',g.read(base/file)):out.append(code(usage,'usage'))

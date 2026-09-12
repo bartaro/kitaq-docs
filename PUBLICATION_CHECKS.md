@@ -49,3 +49,22 @@ commercial ROMs, BIOS images and private analysis data are excluded.
 Original font glyphs and synthetic tutorial assets are included with their
 applicable license notices. See `LICENSE`, `LICENSE.ja` and
 `THIRD_PARTY_NOTICES.md` for licensing scope.
+
+## Compiler layout update — 2026-09-13
+
+KITAQGB and KITAQFC now put build sources inside a same-named subdirectory.
+For example, from the parent of the sibling repositories the project is
+`kitaqgb/kitaqgb/kitaqgb.csproj`; the ready-to-run compiler remains
+`kitaqgb/kitaqgb.exe`. The same convention applies to KITAQFC. Each compiler
+repository includes a Release executable and its `.exe.config`, plus the
+library and license notices. Windows with .NET Framework 4.8 is required.
+
+Build commands in both editions use the new layout. Historical source-location
+labels and fingerprints still describe the September 12 snapshot: a recorded
+`kitaqgb/Program.cs` is now `kitaqgb/kitaqgb/Program.cs`, and likewise for KITAQFC.
+The relocation did not change those C# source contents.
+
+日本語: コンパイラのビルド用ソースを各リポジトリ内の同名フォルダーへ移しました。
+ビルド済みEXEは各リポジトリの直下にあります。日英本文のビルドコマンドは更新済みです。
+過去の検証記録にあるC#ソースの場所には、同名フォルダーを一段追加して読み替えてください。
+ライブラリと教材の配置は変わりません。

@@ -37,7 +37,7 @@ def main():
        if subcmd!='help': entry['help'].append(cli(name,[cmd,subcmd,'--help']))
   data['tools'][name]=entry
   print(name, len(entry['help']), len(first['text']))
- for dirname in ('kitaqgb','kitaqgb/lib','kokura/crates/kokura-cli/src','kitaqfc','kitaqfc/lib','kurosaki/crates/kurosaki-cli/src','sarakura/crates/sarakura-cli/src','sarakura/catalogs'):
+ for dirname in ('kitaqgb/kitaqgb','kitaqgb/lib','kokura/crates/kokura-cli/src','kitaqfc/kitaqfc','kitaqfc/lib','kurosaki/crates/kurosaki-cli/src','sarakura/crates/sarakura-cli/src','sarakura/catalogs'):
   for path in sorted((ROOT/dirname).iterdir()):
    if path.is_file() and path.suffix in ('.cs','.c','.h','.rs','.json','.md','.toml'):
     data['sources'].append({'path':path.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})

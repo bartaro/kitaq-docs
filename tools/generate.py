@@ -214,7 +214,7 @@ def cli_section(key,inventory):
   if entry:out.append(code(key+' '+entry[1],'powershell'))
   out.append(code(h['text'],'help')+'</details>')
  if key in ('kitaqgb','kitaqfc'):
-  base=ROOT/('kitaqgb' if key=='kitaqgb' else 'kitaqfc')
+  base=ROOT/('kitaqgb/kitaqgb' if key=='kitaqgb' else 'kitaqfc/kitaqfc')
   out.append('<h3>開発補助コマンドの書式</h3><p>以下は現在のProgram.DebugTools.cs / Program.VibeTools.csにある書式です。ROM差分、シンボル探索、テンプレートなどは通常のCコンパイルと別のサブコマンドです。</p>')
   for file in ('Program.DebugTools.cs','Program.VibeTools.cs'):
    for usage in re.findall(r'"(usage: [^"\r\n]+)"',read(base/file)):
@@ -233,7 +233,7 @@ def headers_section(platform):
   out.append('<details class="searchable"><summary><code>'+E(name)+'</code> — '+E(MODULES.get(Path(p).stem,''))+'</summary>'+code(read(ROOT/p))+'<p class="source">'+E(p)+'</p></details>')
  return ''.join(out)
 def asm_section(platform):
- p=ROOT/('kitaqgb/AsmInfo.cs' if platform=='gb' else 'kitaqfc/AsmInfo.cs')
+ p=ROOT/('kitaqgb/kitaqgb/AsmInfo.cs' if platform=='gb' else 'kitaqfc/kitaqfc/AsmInfo.cs')
  defs=re.findall(r'Def\(0x([\dA-Fa-f]{2}),\s*"([^"]+)",\s*(\w+)\)',read(p))
  out=['<h2 id="assembly">付録：アセンブリ命令索引</h2><p>AsmInfo.csの命令表を採取しています。これはコンパイラ内部の綴り・オペランド形式の索引です。分岐先やメモリアドレスを持つ行は書式例であり、単独で実行するプログラムではありません。レジスターの保持やフラグ変化は呼び出し規約とコード生成を参照してください。</p><div class="tablewrap"><table><tr><th>opcode</th><th>命令名</th><th>形式</th><th>書式例</th></tr>']
  formats={'IMP':'','IMM':' #1','IMM8':' #1','IMM16':' #0xC000','ABS':' 0xC000','REL':' +target','IND':'','ZPG':' 0x20','LDH':' 0x40','ABX':' 0x0200,X','ABY':' 0x0200,Y','ZPX':' 0x20,X','ZPY':' 0x20,Y','ZXI':' (0x20,X)','ZYI':' (0x20),Y'}

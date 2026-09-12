@@ -102,3 +102,6 @@ Read the filename, line and KQ diagnostic number at the first error. Later error
 `__asm { ... }` accepts KITAQGB's instruction names. It is not a promise to accept arbitrary source written for another GB assembler. Internal spellings include names such as `LD_A_IMM`. Understand arguments, return values, preserved registers and stack behavior before using inline assembly. The appendix lists instruction spellings and operand forms.
 
 {{CODE:11}}
+
+## Source locations after the layout update
+The compiler source files now live in the same-named subdirectory of their repository. Historical source labels in the API reference retain the September 12 paths. See [the layout update](../GITHUB_SETUP.md) for the mapping. The root executable and library paths are unchanged.

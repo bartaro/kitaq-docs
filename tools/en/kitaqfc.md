@@ -65,3 +65,6 @@ Calling a VRC6 or VRC7 sound operation does not change the ROM's mapper setting.
 KQ diagnostics and developer commands such as `symfind`, `src2asm` and `romdiff` resemble their GB counterparts. Some inherited GB help choices may not represent implemented NES features. The FC dictionary is collected separately from FC source and headers.
 
 Warnings such as KQ2421 for direct PPU operations can appear even in display-off initialization. Do not disrupt safe initialization merely to eliminate a warning: inspect rendering timing and execution logs. Zero errors and zero warnings are different outcomes.
+
+## Source locations after the layout update
+The compiler source files now live in the same-named subdirectory of their repository. Historical source labels in the API reference retain the September 12 paths. See [the layout update](../GITHUB_SETUP.md) for the mapping. The root executable and library paths are unchanged.

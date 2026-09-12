@@ -29,7 +29,7 @@ def definitions(p):
  return out
 def collect(platform):
  lib=ROOT/('kitaqgb/lib' if platform=='gb' else 'kitaqfc/lib')
- comp=ROOT/('kitaqgb' if platform=='gb' else 'kitaqfc')
+ comp=ROOT/('kitaqgb/kitaqgb' if platform=='gb' else 'kitaqfc/kitaqfc')
  headers=list(sorted(lib.glob('*.h')))
  impl={}
  for f in [*lib.glob('*.c'),*headers]:
