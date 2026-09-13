@@ -1,3 +1,6 @@
+## Prebuilt Windows CLI
+The repository now includes `sarakura.exe` at its root. Download the repository ZIP and keep the license notices with the executable. This Windows x64 CLI needs no Rust, Python or .NET installation to run. The build steps below are for rebuilding from source. The independent project code is licensed by DAISUKE OBA under MIT; dependency terms are preserved in BINARY_NOTICES.md and licenses/.
+
 ## 1. SARAKURA's job
 SARAKURA combines compiler build information with emulator diagnostic events and presents them in a form useful for repairs and retests. It is neither a ROM-executing emulator nor a program that silently edits your C code.
 

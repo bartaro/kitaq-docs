@@ -9,9 +9,9 @@ WORK.mkdir(exist_ok=True)
 TOOLS = {
  'kitaqgb': ROOT/'kitaqgb/kitaqgb.exe',
  'kitaqfc': ROOT/'kitaqfc/kitaqfc.exe',
- 'kokura': ROOT/'kokura/target/release/kokura-cli.exe',
- 'kurosaki': ROOT/'kurosaki/target/release/kurosaki.exe',
- 'sarakura': ROOT/'sarakura/target/release/sarakura.exe',
+ 'kokura': ROOT/'kokura/kokura-cli.exe',
+ 'kurosaki': ROOT/'kurosaki/kurosaki.exe',
+ 'sarakura': ROOT/'sarakura/sarakura.exe',
 }
 for _name, _path in {'kitaqgb': WORK/'gb_compiler/kitaqgb.exe', 'kitaqfc': WORK/'fc_compiler/kitaqfc.exe', 'kurosaki': WORK/'kurosaki_target/debug/kurosaki.exe'}.items():
  if _path.exists(): TOOLS[_name] = _path

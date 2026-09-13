@@ -92,7 +92,7 @@ void main() {
 
 ```powershell
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\gb_hello.c -I .\kitaq-docs\samples -o .\out\hello.gb --profile=dev --rst-disable --stack-bank=fixed
-.\kokura\target\release\kokura-cli.exe .\out\hello.gb --run-frames 120 --png .\out\hello.png --dump-report .\out\hello.json
+.\kokura\kokura-cli.exe .\out\hello.gb --run-frames 120 --png .\out\hello.png --dump-report .\out\hello.json
 ```
 
 画面にHELLO WORLDと042が出れば、この例の目標達成です。`m_` で始まる関数は本書の学習用ヘルパーで、KITAQGBの標準命令ではありません。定義はサンプルの共通ヘッダーで読めます。`__wait_vblank` や `__vram_copy` が本来の組み込み機能です。
@@ -486,9 +486,9 @@ KOKURAはGB/CGB用のエミュレータと観測ツールです。ROMを動か�
 ## 2　ビルドと最初の実行
 ```powershell
 Push-Location .\kokura
-cargo build -p kokura-cli --release
+.\scripts\build.ps1
 Pop-Location
-.\kokura\target\release\kokura-cli.exe .\out\hello.gb --run-frames 120 --png .\out\hello.png --dump-report .\out\hello.json
+.\kokura\kokura-cli.exe .\out\hello.gb --run-frames 120 --png .\out\hello.png --dump-report .\out\hello.json
 ```
 
 Rust/Cargoの環境が必要です。CLIだけが必要なら上記の対象crateをビルドします。ROMは第1巻のhelloで作れます。引数を省いたフレーム数の既定値は1なので、見たい場面まで進めるには `--run-frames` を指定します。これは待機する秒数ではなく、エミュレータが進めるフレーム数です。
@@ -497,14 +497,14 @@ Rust/Cargoの環境が必要です。CLIだけが必要なら上記の対象crat
 `--hardware auto` が既定で、`dmg` / `cgb` を明示できます。両対応ROMを確認するときは両モードで実行します。CGB専用ROMをDMGで起動できないことを、エミュレータの故障と混同しないでください。
 
 ```powershell
-.\kokura\target\release\kokura-cli.exe .\out\game.gbc --hardware cgb --run-frames 180 --png .\out\cgb.png
+.\kokura\kokura-cli.exe .\out\game.gbc --hardware cgb --run-frames 180 --png .\out\cgb.png
 ```
 
 ## 4　入力を与える
 `--input` は同時押し、`--input-seq` は時間順です。ボタン名は `A,B,START,SELECT,UP,DOWN,LEFT,RIGHT`、何も押さない区間は `NONE` を使います。PowerShellではセミコロンを含む入力列を引用符で囲みます。
 
 ```powershell
-.\kokura\target\release\kokura-cli.exe .\out\game.gb --run-frames 120 --input-seq "NONE:30;A:1;NONE:89" --png .\out\after_a.png --dump-report .\out\after_a.json
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --input-seq "NONE:30;A:1;NONE:89" --png .\out\after_a.png --dump-report .\out\after_a.json
 ```
 
 押下エッジを調べるには離す区間も必要です。単にAを120フレーム押す試験は、Aを120回押す試験とは違います。サンプル入力教材なら上の入力でカウンターが1回増えることを目標にします。
@@ -513,16 +513,16 @@ Rust/Cargoの環境が必要です。CLIだけが必要なら上記の対象crat
 `--png` は最後の画面、`--screenshot` と `--screenshot-frames` は選択したフレームの連続画像です。`--record-video` は動画、`--record-wav` は音の記録です。音源を使わないhelloのWAVが無音でも異常ではありません。
 
 ```powershell
-.\kokura\target\release\kokura-cli.exe .\out\sound.gb --run-frames 180 --record-wav .\out\sound.wav --record-wav-frames 1:180 --png .\out\sound.png
-.\kokura\target\release\kokura-cli.exe .\out\game.gb --run-frames 180 --record-video .\out\play.gif --record-video-frames 30:120
+.\kokura\kokura-cli.exe .\out\sound.gb --run-frames 180 --record-wav .\out\sound.wav --record-wav-frames 1:180 --png .\out\sound.png
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 180 --record-video .\out\play.gif --record-video-frames 30:120
 ```
 
 範囲指定は `開始:終了` です。ロードした状態の通算フレームと実行区間の番号を混同しないよう、レポートも残します。音の有無、音程、途切れ、クリップは別々に確認します。エミュレータ録音と実機録音が完全一致するという保証にはなりません。
 
 ## 6　状態の保存と再開
 ```powershell
-.\kokura\target\release\kokura-cli.exe .\out\game.gb --run-frames 120 --save-state .\out\title.kqs
-.\kokura\target\release\kokura-cli.exe .\out\game.gb --load-state .\out\title.kqs --input START --run-frames 30 --save-state .\out\started.kqs --png .\out\started.png
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --save-state .\out\title.kqs
+.\kokura\kokura-cli.exe .\out\game.gb --load-state .\out\title.kqs --input START --run-frames 30 --save-state .\out\started.kqs --png .\out\started.png
 ```
 
 同じROMと同じエミュレータ版を基本にします。セーブステートはゲーム内セーブデータとは別です。CLIのKQS形式とC APIのJSON状態は同じファイル形式ではありません。拡張子を書き換えて相互に使わないでください。
@@ -531,7 +531,7 @@ Rust/Cargoの環境が必要です。CLIだけが必要なら上記の対象crat
 ROMと同じ場所に `.map`、`.source_map.txt`、`.dbg2.json`、`.build_report.json` があれば自動検出されます。別のビルドの情報を同じ名前で置くと観測が誤解を招くため、ROMとsidecarを一組で保存します。
 
 ```powershell
-.\kokura\target\release\kokura-cli.exe .\out\game.gb --symbols .\out\game.map --watch-window wram:0xC000:0x40 --run-frames 60 --dump-report .\out\watch.json
+.\kokura\kokura-cli.exe .\out\game.gb --symbols .\out\game.map --watch-window wram:0xC000:0x40 --run-frames 60 --dump-report .\out\watch.json
 ```
 
 `wram` は窓のラベル、0xC000は先頭アドレス、0x40は長さです。観測窓を小さくすると、ゲームのどの変数が変化したか読みやすくなります。`--watch-baseline-mode` は初期値・前フレーム・名前付き基準からの比較方法を選びます。
@@ -540,15 +540,15 @@ ROMと同じ場所に `.map`、`.source_map.txt`、`.dbg2.json`、`.build_report
 `--breakpoint`、`--watchpoint`、`--run-until`、`--snapshot-at` は条件で止める・保存するための窓口です。引数の小言語はそれぞれ異なるため、下の実装書式とヘルプを参照してください。
 
 ```powershell
-.\kokura\target\release\kokura-cli.exe .\out\game.gb --run-frames 120 --replay-interval 1 --replay-max-checkpoints 120 --dump-replay-tape .\out\baseline.replay.json --dump-report .\out\baseline.json
-.\kokura\target\release\kokura-cli.exe .\out\game.gb --run-frames 120 --replay-interval 1 --compare-replay-tape .\out\baseline.replay.json --dump-report .\out\compare.json
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --replay-interval 1 --replay-max-checkpoints 120 --dump-replay-tape .\out\baseline.replay.json --dump-report .\out\baseline.json
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --replay-interval 1 --compare-replay-tape .\out\baseline.replay.json --dump-report .\out\compare.json
 ```
 
 最初に違った位置を調べてから、その周辺を細かく観測します。`--decompile-out` は疑似コードや制御フロー、`--disassemble-out` はCPU命令の表示です。デコンパイルは元のCソースや変数名を完全復元する機能ではありません。
 
 ## 9　診断をSARAKURAへ渡す
 ```powershell
-.\kokura\target\release\kokura-cli.exe .\out\game.gb --run-frames 300 --emit-diagnostics .\out\gb_events.jsonl --dump-report .\out\run.json
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 300 --emit-diagnostics .\out\gb_events.jsonl --dump-report .\out\run.json
 .\sarakura\target\debug\sarakura.exe gb analyze --metadata .\out\build.json --events .\out\gb_events.jsonl --out .\out\gb_report --fail-on error
 ```
 
@@ -558,7 +558,7 @@ KOKURAの `--emit-diagnostics` は **JSONLファイル名** を受け取りま�
 pairは2台、four_player_adapterはホストが相手を選ぶ論理方式、dmg07は物理DMG-07プロトコルのモデルです。`--link-job` にJSONを渡す方法と、`--link-topology` / `--link-session` を指定する方法があります。
 
 ```powershell
-.\kokura\target\release\kokura-cli.exe --link-topology pair --run-frames 120 --link-session "name=p1|slot=0|rom=out/host.gb|input=NONE" --link-session "name=p2|slot=1|rom=out/peer.gb|input=NONE" --dump-report .\out\pair.json
+.\kokura\kokura-cli.exe --link-topology pair --run-frames 120 --link-session "name=p1|slot=0|rom=out/host.gb|input=NONE" --link-session "name=p2|slot=1|rom=out/peer.gb|input=NONE" --dump-report .\out\pair.json
 ```
 
 各ROMは通信を行うように作る必要があります。普通のhelloを2台動かしても通信ライブラリのテストにはなりません。セッションごとのROM、slot、入力、状態を残し、物理機器未確認の境界も記録します。
@@ -576,8 +576,8 @@ KUROSAKIはKITAQFCの情報を読み込めるNES/Famicom/FDSの観測エミュ�
 ## 2　ビルドと起動
 ```powershell
 Push-Location .\kurosaki
-cargo build -p kurosaki-cli --release
-.\target\release\kurosaki.exe --help
+.\scripts\build.ps1
+.\kurosaki.exe --help
 Pop-Location
 ```
 
@@ -677,8 +677,8 @@ SARAKURAは、コンパイラのビルド情報とエミュレータの診断イ
 ## 2　準備
 ```powershell
 Push-Location .\sarakura
-cargo build -p sarakura-cli --release
-.\target\release\sarakura.exe --help
+.\scripts\build.ps1
+.\sarakura.exe --help
 Pop-Location
 ```
 

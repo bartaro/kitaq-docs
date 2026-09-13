@@ -1,3 +1,6 @@
+## Prebuilt Windows CLI
+The repository now includes `kurosaki.exe` at its root. Download the repository ZIP and keep the license notices with the executable. This Windows x64 CLI needs no Rust, Python or .NET installation to run. The build steps below are for rebuilding from source. The independent project code is licensed by DAISUKE OBA under MIT; dependency terms are preserved in BINARY_NOTICES.md and licenses/.
+
 ## 1. What KUROSAKI does
 KUROSAKI is an NES/Famicom/FDS observation emulator that reads KITAQFC information. Its CLI inspects ROMs, executes software, records audio, diagnoses behavior, saves snapshots, replays input, disassembles instructions and decompiles candidate functions. Mapper implementations differ in scope, so inspect the ROM and support information first.
 

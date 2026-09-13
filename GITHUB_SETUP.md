@@ -39,3 +39,11 @@ The relocation did not change those C# source contents.
 ビルド済みEXEは各リポジトリの直下にあります。日英本文のビルドコマンドは更新済みです。
 過去の検証記録にあるC#ソースの場所には、同名フォルダーを一段追加して読み替えてください。
 ライブラリと教材の配置は変わりません。
+
+## Ready-to-run Rust CLI executables - 2026-09-13
+
+The sarakura, kokura and kurosaki repositories include root-level `sarakura.exe`,
+`kokura-cli.exe` and `kurosaki.exe` for Windows x64. No Rust/Python/.NET runtime
+is needed to execute these CLIs. Preserve the accompanying license notices.
+The independent code in all three projects is licensed by DAISUKE OBA.
+Run each `scripts/build.ps1` to rebuild only its CLI and refresh the root EXE.
