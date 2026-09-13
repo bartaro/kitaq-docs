@@ -59,8 +59,8 @@ KOKURA `--emit-diagnostics` takes a **JSONL filename**, such as `out/gb_events.j
 
 Each ROM must implement communication. Running two ordinary hello programs does not test the link library. Record each session's ROM, slot, input and state, and identify which physical-device behavior remains untested.
 
-## 11. GUI and external applications
-The GUI frontends and PLITA are deferred from this public release. Their behavior is separate from CLI screenshots: GUI key bindings and available features depend on the frontend implementation. The published C ABI is in `kokura-capi`; Python access is available through the supplied bridge and Python crate. Establish a minimal CLI reproduction before distinguishing a frontend issue from a ROM issue.
+## 11. External applications
+The published C ABI is in `kokura-capi`; Python access is available through the supplied bridge and Python crate. Establish a minimal CLI reproduction before investigating integration behavior.
 
 ## 12. Read reports in order
 Check the executed frames and stop reason first, then the screen, input result, sound, errors and warnings, and profile. A long observation of a title screen with no input can naturally produce static-screen or repeated-PC warnings. Compare warnings with the intended scene rather than mechanically treating every warning as a malfunction.

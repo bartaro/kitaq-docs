@@ -563,8 +563,8 @@ pairは2台、four_player_adapterはホストが相手を選ぶ論理方式、dm
 
 各ROMは通信を行うように作る必要があります。普通のhelloを2台動かしても通信ライブラリのテストにはなりません。セッションごとのROM、slot、入力、状態を残し、物理機器未確認の境界も記録します。
 
-## 11　GUIと外部プログラムから使う
-CLIの画面保存はGUIの操作ではありません。GUIやPLITAフロントエンドは別の実行面で、キー割り当てや対応機能はその実装に依存します。C ABIは `kokura-capi`、Pythonは同梱ブリッジから利用できます。まずCLIで最小の再現を作ると、GUI固有の問題とROM側の問題を分けられます。
+## 11　外部プログラムから使う
+C ABIは `kokura-capi`、Pythonは同梱ブリッジから利用できます。まずCLIで最小の再現を作り、連携APIからの動作と比較してください。
 
 ## 12　レポートを読む順番
 実行フレームと停止理由、画面、入力結果、音、エラーと警告、プロファイルの順に読みます。無入力のタイトル画面を長く観測すると、静止画面やPCループの警告が自然に出ることがあります。警告を機械的に故障と断定せず、意図した場面と照合します。
@@ -655,10 +655,8 @@ sarakura fc analyze --metadata .\out\build.json --events .\out\kurosaki_events.j
 
 KUROSAKIの `--emit-diagnostics` は **JSONLファイル** を指定します。KOKURAと同様にファイル名を指定します。CPU traceファイルと診断イベントファイルを取り違えないでください。
 
-## 10　GUIの操作
-`cargo build -p kurosaki-gui --release` でGUIをビルドできます。ROMを開くかドロップし、矢印で方向、Z/XでA/B、EnterでSTARTを操作します。Spaceで実行／停止、Ctrl+Bでキャプチャbundle切り替え、Ctrl+Kでcheckpoint保存です。GUI文書とキー定義で確認した基本操作を掲載しています。
-
-キャプチャの既定保存先は `%LOCALAPPDATA%\KUROSAKI\captures` です。`.kcb` は開始状態・トレース・終了状態等をまとめるフォルダー形式です。保存先のファイルが揃っていることを確かめてから共有します。CLI画像の確認は、GUIのDPIやキー操作まで確認したという意味ではありません。
+## 10　公開範囲
+KUROSAKI-GUIは未公開です。本書では公開済みのCLIと連携APIを扱います。
 
 ## 11　FDS・保存データ
 `fds-inspect` はディスクの構造、`export-assets` は素材の抽出窓口です。FDSは起動方式・BIOS・ディスクアクセスの条件も関わるため、NESカートリッジの試験と分けます。バッテリー保存 `.sav` とスナップショット `.kss.json` は用途が違います。実装に対応した保存レイアウトを確認して使います。

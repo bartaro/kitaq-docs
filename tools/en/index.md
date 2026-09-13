@@ -34,7 +34,7 @@ This edition is based on the **local source snapshot of September 12, 2026**. â€
 
 A successful build means a ROM was produced. An execution check means an emulator advanced through the specified frames. Pixel comparisons, input behavior and sound checks are recorded separately. This is not a guarantee of compatibility with every peripheral or physical console; warnings remain visible in the logs.
 
-The current public source release excludes KOKURA GUI frontends, KUROSAKI GUI and PLITA. Their descriptions remain as reference information for a later release. Use the published cores, CLIs and integration APIs now.
+The current public source release excludes KOKURA GUI frontends, KUROSAKI GUI and PLITA. Use the published cores, CLIs and integration APIs now.
 
 ## Prepare a working directory
 Examples use **Windows PowerShell**. Save C files as UTF-8 text. The current directory is the folder in which you run a command. Quote paths containing spaces and invoke an executable with `& "path"` when needed. Clone the repositories as siblings, following [GitHub setup](../GITHUB_SETUP.md), and run cross-project commands from their parent folder.

@@ -54,12 +54,8 @@ Register changes, generated PCM and correctly sounding audio are separate checks
 
 KUROSAKI `--emit-diagnostics` takes a **JSONL file path**, just like KOKURA. Keep CPU traces and diagnostic-event files distinct.
 
-## 10. GUI reference for a later release
-**KUROSAKI-GUI and PLITA are not included in the current public source release.** The following describes the development frontend and is retained for reference; its build command cannot be used with this CLI-only publication.
-
-In a source tree containing the frontend, `cargo build -p kurosaki-gui --release` builds it. Open or drop a ROM, use arrow keys for directions, Z/X for A/B and Enter for START. Space toggles run/pause, Ctrl+B toggles capture bundles and Ctrl+K saves a checkpoint. These are the basic bindings checked against the GUI documentation and key definitions.
-
-The default capture location is `%LOCALAPPDATA%\KUROSAKI\captures`. A `.kcb` is a folder bundle containing start state, traces, end state and related information. Check that the expected files exist before sharing it. CLI screenshot checks do not verify GUI DPI behavior or keyboard interaction.
+## 10. Publication scope
+KUROSAKI-GUI remains unpublished. The current manual covers the CLI and its integration APIs.
 
 ## 11. FDS and save RAM
 `fds-inspect` examines disk structure; `export-assets` exports assets. Test FDS separately from NES cartridges because startup, BIOS and disk-access requirements differ. Battery `.sav` files and `.kss.json` snapshots serve different purposes; use a save layout supported by the implementation.

@@ -36,7 +36,6 @@ API抜粋等には原プロジェクトの著作権表示も適用されます�
 - [KOKURA](reference/KOKURA-LICENSE.txt)
 - [KUROSAKI](reference/KUROSAKI-LICENSE.txt)
 - [SARAKURA](reference/SARAKURA-LICENSE.txt)
-- [PLITA共有ライブラリ](reference/PLITA-LICENSE.txt)
 
 日本語参考訳も同梱しています。英語原文を正本とし、相違がある場合は英語原文を優先します。
 日本語訳は許諾条件を変更しません。再配布時は英語原文と第三者の原ライセンス本文も保持してください。
@@ -49,20 +48,16 @@ API抜粋等には原プロジェクトの著作権表示も適用されます�
 - [KOKURA](reference/KOKURA-LICENSE.ja.txt)
 - [KUROSAKI](reference/KUROSAKI-LICENSE.ja.txt)
 - [SARAKURA](reference/SARAKURA-LICENSE.ja.txt)
-- [PLITA共有ライブラリ](reference/PLITA-LICENSE.ja.txt)
 - [自作ASCIIフォント](samples/assets/LICENSE.ascii.ja.txt)
 
-各ソフトのバイナリを配布する場合、Rustクレートやフォント等の第三者条件は別途引き継ぐ必要があります。
-本体のMIT表記によってApache、OFL、Ubuntu Font等の依存物がMITへ変更されることはありません。
-このHTML配布物にはコンパイラ・エミュレータ本体や第三者GUIフォントを同梱していません。
+各ソフトのバイナリを配布する場合、Rustクレート等の第三者条件は別途引き継ぐ必要があります。
+本体のMIT表記によって第三者の依存物がMITへ変更されることはありません。
+このHTML配布物にはコンパイラ・エミュレータ本体を同梱していません。
 
-各ソフトのLICENSEに、自作ASCIIフォントの適用範囲または使用するGUIフォントの権利表記を追記しています。
+各ソフトのLICENSEには、自作ASCIIフォントの適用範囲を記載しています。
 KITAQGBのLICENSEには、MIT対象のコードと任天堂のロゴ・商標の権利を区別する注記もあります。
 参照用LICENSE内のパスは各ソフトの配布ディレクトリを基準とします。
-第三者フォントのライセンス本文も、フォント本体を含めず参照用に同梱しています。
 
-- KOKURA: [Hack](reference/font-licenses/kokura/epaint_default_fonts-0.32.3/Hack-Regular.txt)、[Noto Emoji](reference/font-licenses/kokura/epaint_default_fonts-0.32.3/OFL.txt)、[Ubuntu Light](reference/font-licenses/kokura/epaint_default_fonts-0.32.3/UFL.txt)、[emoji-icon-font](reference/font-licenses/kokura/epaint_default_fonts-0.32.3/emoji-icon-font-mit-license.txt)、[フォント内の著作権表示](reference/font-licenses/kokura/epaint_default_fonts-0.32.3/font-copyright-records.txt)、[font8x8](reference/font-licenses/kokura/font8x8-0.3.1/LICENSE)と[由来](reference/font-licenses/kokura/font8x8-0.3.1/README.md)
-- KUROSAKI / PLITA: [Roboto](reference/font-licenses/plita/Roboto-OFL.txt)、[Roboto Mono](reference/font-licenses/plita/RobotoMono-OFL.txt)
 
 OSにインストールされたフォントや、入力ROM・スクリーンショット等に含まれる別の字形は、
 今回確認された自作92字形のMIT許諾には含まれません。
