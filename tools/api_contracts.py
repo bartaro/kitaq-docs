@@ -143,6 +143,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_asset_examples(contracts))
     proofs.update(verified_bank_examples(contracts))
     proofs.update(verified_sprite_examples(contracts))
+    proofs.update(verified_oam_examples(contracts))
     for key in proofs:
         contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
     coverage = []
@@ -268,6 +269,31 @@ def verified_vram_examples(contracts, family='vram', modes=None):
                     raise ValueError('VRAM example evidence changed: '+file)
         verified[key]={'api':key.split(':')[1],'kind':family,'runs':selected}
     return verified
+
+
+def verified_oam_examples(contracts):
+    """Require real OAM DMA geometry/color evidence and exact source identities."""
+    path=SITE/'verification/api-oam/results.json'
+    if not path.exists():return {}
+    runs=json.loads(path.read_text(encoding='utf-8'))['records']
+    if len(runs)!=2 or {(r['platform'],r['mode']) for r in runs}!={('gb','dmg'),('gb','cgb')}:return {}
+    if not all(r['passed'] and r['frames']==240 and r['label_pixel_mismatches']==0 and r['sprite_pixel_mismatches']==0 and r['sprite_pixels_checked']==3456 for r in runs):return {}
+    result={};repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    for key,contract in contracts.items():
+        if contract['review']!='oam-source-20260915':continue
+        selected=[r for r in runs if r['platform']==key.split(':')[0]]
+        for run in selected:
+            if run['source']!=contract['example']['program']:raise ValueError('OAM example mismatch: '+key)
+            runtime=(Path(run['image']).parent/'runtime.json').as_posix()
+            files={run['source']:run['source_sha256'],run['image']:run['image_sha256'],runtime:run['runtime_sha256'],**run['support_sha256']}
+            for name,expected in files.items():
+                if hashlib.sha256((SITE/name).read_bytes()).hexdigest()!=expected:raise ValueError('OAM evidence changed: '+name)
+            for name,expected in run['library_sha256'].items():
+                source=repos/('kitaq'+run['platform'])/'lib'/name
+                if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('OAM library changed: '+str(source))
+        result[key]={'api':key.split(':')[1],'kind':'oam','runs':selected}
+    return result
 
 
 def verified_sprite_examples(contracts):
@@ -459,7 +485,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam']:
                 block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
                     caption = ('--cgb='+run['target']+' / ' if result.get('kind') in ['cgb-palette','cgb-dma-wram'] else '')+run['mode'].upper()

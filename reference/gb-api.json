@@ -11582,7 +11582,8 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_oam_dma(u16 src_ptr) {\n    __oam_dma(src_ptr);\n}"
+      "new_example": "void example_oam_dma(u16 src_ptr) {\n    __oam_dma(src_ptr);\n}",
+      "implementation_excerpt": "// Copy one 160-byte, page-aligned OAM source and return after DMA completes.\n            if (funcName == \"__oam_dma\")\n            {\n                if (args.Length != 1) Error(expr, \"__oam_dma(src_ptr) expects 1 argument\");\n\n                CompileIntoHL(args[0]); // Evaluate once; hardware uses only the high byte.\n                // Mask interrupt sources without changing IME, including calls made inside an ISR.\n                EmitAsm(\"LD_A_MEM\", new AsmOperand(0xFFFF, AddressMode.Absolute));\n                EmitAsm(\"PUSH_AF\");\n                EmitAsm(\"XOR_A\");\n                EmitAsm(\"LD_MEM_A\", new AsmOperand(0xFFFF, AddressMode.Absolute));\n                // LDH [FF46],A; LD B,40; DEC B; JR NZ,-3; RET.\n                // Initialize on every call, so no startup copy or readiness flag is needed.\n                byte[] dmaStub = { 0xE0, 0x46, 0x06, 0x28, 0x05, 0x20, 0xFD, 0xC9 };\n                for (int i = 0; i < dmaStub.Length; i++)\n                {\n                    EmitAsm(\"LD_A_IMM\", new AsmOperand(dmaStub[i], AddressMode.Immediate));\n                    EmitAsm(\"LDH_MEM_A\", new AsmOperand((OamDmaStubAddr + i) & 0xFF, AddressMode.HighMem));\n                }\n                EmitAsm(\"LD_A_H\");\n                // CALL pushes before DMA starts; RET reads the stack only after the wait.\n                EmitAsm(\"CALL\", new AsmOperand(OamDmaStubAddr, AddressMode.Absolute));\n                EmitAsm(\"POP_AF\");\n                EmitAsm(\"LD_MEM_A\", new AsmOperand(0xFFFF, AddressMode.Absolute));\n                return;\n            }"
     },
     {
       "name": "sprite_init",
