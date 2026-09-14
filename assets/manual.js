@@ -13,6 +13,72 @@
     de: ['Referenzen und Beispiele: {hits} / Text: {prose}', 'Nach Befehl oder Funktion suchen', 'Kopiert', 'Auswählen und kopieren', 'Kopieren'],
   };
   const ui = labels[lang] || labels.en;
+  const returnLabels = {
+    en: ['Return to the original item', 'Return to contents'],
+    ja: ['元の項目に戻る', '目次に戻る'],
+    ko: ['원래 항목으로 돌아가기', '목차로 돌아가기'],
+    'zh-CN': ['返回原来的条目', '返回目录'],
+    'zh-TW': ['返回原來的項目', '返回目錄'],
+    es: ['Volver al apartado de origen', 'Volver al índice'],
+    'pt-BR': ['Voltar ao item de origem', 'Voltar ao índice'],
+    fr: ['Revenir à la rubrique d’origine', 'Revenir au sommaire'],
+    de: ['Zur ursprünglichen Stelle zurückkehren', 'Zurück zum Inhalt'],
+  };
+  function verificationNavigation(){
+    const script=[...document.scripts].find(s=>/\/assets\/manual\.js(?:\?|$)/.test(s.src));
+    if(!script)return;
+    const root=new URL('../',script.src);
+    const current=new URL(location.href);
+    const permitted=/^(?:(?:en|ko|zh-CN|zh-TW|es|pt|fr|de)\/)?(?:index|kitaqgb|kitaqfc|gb-library|fc-library|kokura|kurosaki|sarakura|loop-engineering)\.html$/;
+    if(!current.pathname.endsWith('/verification.html')){
+      document.querySelectorAll('a[href]').forEach(a=>{
+        const target=new URL(a.href,current);
+        if(target.origin!==root.origin || !target.pathname.startsWith(root.pathname) || !target.pathname.endsWith('/verification.html'))return;
+        const source=new URL(current);
+        const item=a.closest('details[id],section[id],article[id]');
+        if(item)source.hash=item.id;
+        else if(!source.hash)source.hash='main';
+        const relative=source.pathname.slice(root.pathname.length);
+        if(!permitted.test(relative))return;
+        target.searchParams.set('from',relative+source.search+source.hash);
+        a.href=target.href;
+      });
+      return;
+    }
+    let destination=new URL('index.html',current);
+    let hasOrigin=false;
+    const from=current.searchParams.get('from');
+    if(from){
+      try{
+        const candidate=new URL(from,root);
+        const relative=candidate.pathname.slice(root.pathname.length);
+        if(candidate.origin===root.origin && candidate.protocol===root.protocol && candidate.pathname.startsWith(root.pathname) && permitted.test(relative)){
+          destination=candidate;hasOrigin=true;
+        }
+      }catch{}
+    }
+    const main=document.querySelector('main');
+    if(!main)return;
+    const label=(returnLabels[lang]||returnLabels.en)[hasOrigin?0:1];
+    if(hasOrigin){
+      document.querySelectorAll('nav.languages a').forEach(a=>{
+        const target=new URL(a.href,current);
+        target.searchParams.set('from',destination.pathname.slice(root.pathname.length)+destination.search+destination.hash);
+        a.href=target.href;
+      });
+    }
+    [main,...main.querySelectorAll('section[id]')].forEach(container=>{
+      const paragraph=document.createElement('p');paragraph.className='verification-return';
+      const link=document.createElement('a');link.href=destination.href;link.textContent='← '+label;
+      paragraph.append(link);
+      if(container===main)container.prepend(paragraph);
+      else{
+        const heading=container.querySelector('h2');
+        if(heading)heading.after(paragraph);else container.prepend(paragraph);
+      }
+    });
+  }
+  verificationNavigation();
   const search = document.querySelector('#search');
   const status = document.querySelector('#search-status');
   const items = [...document.querySelectorAll('.searchable')];
