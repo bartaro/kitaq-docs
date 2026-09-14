@@ -136,6 +136,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_vram_examples(contracts, 'vramq', {'fc': {'nrom'}}))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
+    proofs.update(verified_asset_examples(contracts))
     for key in proofs:
         contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
     coverage = []
@@ -263,6 +264,31 @@ def verified_vram_examples(contracts, family='vram', modes=None):
     return verified
 
 
+def verified_asset_examples(contracts):
+    """Require bank-separated, colored uploads on both targets and their exact source files."""
+    path = SITE/'verification/api-asset/results.json'
+    if not path.exists(): return {}
+    runs = json.loads(path.read_text(encoding='utf-8'))['records']
+    expected = {('gb','dmg'),('gb','cgb'),('fc','surom512')}
+    if len(runs)!=3 or {(r['platform'],r['mode']) for r in runs}!=expected: return {}
+    if not all(r['passed'] and r.get('frames')==300 and r['label_pixel_mismatches']==0 and
+               r['geometry_pixel_mismatches']==0 and r['geometry_color_mismatches']==0 for r in runs): return {}
+    result = {}
+    for key,contract in contracts.items():
+        if contract['review']!='asset-source-20260915': continue
+        selected = [r for r in runs if r['platform']==key.split(':')[0]]
+        for run in selected:
+            if run['source']!=contract['example']['program']: raise ValueError('Asset sample mismatch: '+key)
+            folder = str(Path(run['image']).parent).replace('\\','/')
+            files = {run['source']:run['source_sha256'],run['image']:run['image_sha256'],
+                     folder+'/runtime.json':run['runtime_sha256'],**run['support_sha256']}
+            for file,expected_hash in files.items():
+                if hashlib.sha256((SITE/file).read_bytes()).hexdigest()!=expected_hash:
+                    raise ValueError('Asset example evidence changed: '+file)
+        result[key] = {'api':key.split(':')[1],'kind':'asset','runs':selected}
+    return result
+
+
 def verified_cgb_dma_wram_examples(contracts):
     """Require the complete DMA/WRAM execution matrix and negative diagnostics."""
     folder = SITE/'verification/api-cgb-dma-wram'
@@ -376,7 +402,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset']:
                 block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
                     caption = ('--cgb='+run['target']+' / ' if result.get('kind') in ['cgb-palette','cgb-dma-wram'] else '')+run['mode'].upper()

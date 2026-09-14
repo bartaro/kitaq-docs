@@ -1,0 +1,702 @@
+{
+  "gb:asset_set_table": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_set"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "as_table_bank"
+        ]
+      ],
+      [
+        "table",
+        [
+          "as_table_arg"
+        ]
+      ],
+      [
+        "count",
+        [
+          "as_count"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "as_registration"
+    ],
+    "record_sha256": "622e1bfd26fc6a3e5a10f53b77df3983f06e8f8ad07ac4039313c8c6f96d6f08",
+    "example": {
+      "program": "samples/api-examples/gb/asset_banks.c",
+      "code": "asset_set_table(3,asset_descriptors,4); // Four descriptors in bank 3, payloads in bank 2.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\asset_banks.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "as_demo_set",
+        "as_red_geometry",
+        "as_pairs_gb",
+        "as_status"
+      ]
+    }
+  },
+  "gb:asset_get": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_get"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ],
+      [
+        "out_desc",
+        [
+          "as_out"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_get_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_fixed_code"
+    ],
+    "record_sha256": "22b5ce9a152cc858525b5f85fa83933e712199358d64c01e99b53094ccbcbb1b",
+    "example": {
+      "program": "samples/api-examples/gb/asset_banks.c",
+      "code": "loaded=asset_get(0,&descriptor);\nexpect(loaded==1,1);\nexpect(descriptor.type==ASSET_TYPE_TILES && descriptor.bank==2,2);\nexpect(descriptor.ptr==asset_shapes && descriptor.len==144,3);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\asset_banks.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "as_demo_get",
+        "as_red_geometry",
+        "as_pairs_gb",
+        "as_status"
+      ]
+    }
+  },
+  "gb:asset_load_raw": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_raw"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ],
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "max_len",
+        [
+          "as_max"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_raw_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_copy_bounds",
+      "as_fixed_code"
+    ],
+    "record_sha256": "0bc274eedf8d73fa8cbbf93d4b0d09d22ba06cf62f3e0fc579831f3a90738138",
+    "example": {
+      "program": "samples/api-examples/gb/asset_banks.c",
+      "code": "loaded=asset_load_raw(0,buffer,7); // Success with truncation: copy seven of 144 bytes.\nexpect(loaded==1 && buffer[7]==0x55,7);\nfor(i=0;i<7;i++) expect(buffer[(__safe_index u8)i]==expected_shape_byte(i),8);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\asset_banks.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "as_demo_raw",
+        "as_red_geometry",
+        "as_pairs_gb",
+        "as_status"
+      ]
+    }
+  },
+  "gb:asset_load_tiles": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_tiles_gb"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ],
+      [
+        "vram_dst",
+        [
+          "as_vram_gb"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_tiles_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_fixed_code",
+      "as_tile_timing",
+      "as_gb_bank_state"
+    ],
+    "record_sha256": "ae6318c15a8db7189cfee7e0a594b8d383a9872cbe421bb59ac9662912c6fec3",
+    "example": {
+      "program": "samples/api-examples/gb/asset_banks.c",
+      "code": "__bankswitch(payload_bank); // GB tile upload expects the payload bank already visible.\nloaded=asset_load_tiles(0,0x8010); // Nine tiles = 144 bytes, LCD off.\nexpect(loaded==1,24);\n__bankswitch(1);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\asset_banks.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "as_demo_tiles",
+        "as_red_geometry",
+        "as_pairs_gb",
+        "as_status"
+      ]
+    }
+  },
+  "gb:asset_get_bank": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_bank"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_bank_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_lookup_cost",
+      "as_fixed_code"
+    ],
+    "record_sha256": "b687a45fd125c2aab0209e79090f3abc6438dd54dc92c9f50eeef77c5dc7b9c5",
+    "example": {
+      "program": "samples/api-examples/gb/asset_banks.c",
+      "code": "payload_bank=asset_get_bank(0);\nexpect(payload_bank==2,17); // Payload bank, not descriptor-table bank 3.\nexpect(asset_get_bank(4)==0,18); // Failure sentinel; a valid descriptor may also use bank 0.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\asset_banks.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "as_demo_bank",
+        "as_red_geometry",
+        "as_pairs_gb",
+        "as_status"
+      ]
+    }
+  },
+  "gb:asset_get_ptr": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_ptr"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_ptr_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_lookup_cost",
+      "as_fixed_code"
+    ],
+    "record_sha256": "c310110f187419ab0cb930f27cf535c8483976b2bffcbb9b08971ee3896fe88f",
+    "example": {
+      "program": "samples/api-examples/gb/asset_banks.c",
+      "code": "payload_pointer=asset_get_ptr(0);\nexpect(payload_pointer==asset_shapes,19);\nexpect(*asset_bank_marker==0xA1,20); // Getting the pointer leaves bank 1 selected.\n// Use payload_bank together with payload_pointer for a far copy; do not dereference it here.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\asset_banks.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "as_demo_ptr",
+        "as_red_geometry",
+        "as_pairs_gb",
+        "as_status"
+      ]
+    }
+  },
+  "gb:asset_get_len": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_len"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_len_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_lookup_cost",
+      "as_fixed_code"
+    ],
+    "record_sha256": "8d95f6fb3cc96b332d9d6be7399f08ee662e45bd037aa8e2a42861523ae671fa",
+    "example": {
+      "program": "samples/api-examples/gb/asset_banks.c",
+      "code": "expect(asset_get_len(0)==144,21); // Bytes, not tiles.\nexpect(asset_get_len(3)==0 && asset_get_len(4)==0,22); // Empty asset and invalid ID both yield zero.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\asset_banks.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "as_demo_len",
+        "as_red_geometry",
+        "as_pairs_gb",
+        "as_status"
+      ]
+    }
+  },
+  "gb:__farmemcpy": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_far"
+    ],
+    "args": [
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "bank",
+        [
+          "as_far_bank"
+        ]
+      ],
+      [
+        "src",
+        [
+          "as_far_src_gb"
+        ]
+      ],
+      [
+        "len",
+        [
+          "as_far_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "as_copy_bounds",
+      "as_fixed_code",
+      "as_gb_bank_state"
+    ],
+    "record_sha256": "f7dc2638e3bed39ffbb6db7020d5f048cc60a150cc3889bd371b69ec271c3632",
+    "example": {
+      "program": "samples/api-examples/gb/asset_banks.c",
+      "code": "__farmemcpy(buffer,payload_bank,payload_pointer,32);\nexpect(*asset_bank_marker==0xA1,27); // Source bank 2 was selected only for the copy.\nfor(i=0;i<32;i++) expect(buffer[(__safe_index u8)i]==expected_shape_byte(i),28);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\asset_banks.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "as_demo_far",
+        "as_red_geometry",
+        "as_pairs_gb",
+        "as_status"
+      ]
+    }
+  },
+  "gb:__far_memcpy": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_far"
+    ],
+    "args": [
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "bank",
+        [
+          "as_far_bank"
+        ]
+      ],
+      [
+        "src",
+        [
+          "as_far_src_gb"
+        ]
+      ],
+      [
+        "len",
+        [
+          "as_far_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "as_copy_bounds",
+      "as_fixed_code",
+      "as_gb_bank_state"
+    ],
+    "record_sha256": "21f682476368bb9a20d596c1da1d7e6a23a3b2df2ad578b902fbd4d5fbce6302",
+    "example": {
+      "program": "samples/api-examples/gb/asset_banks.c",
+      "code": "__far_memcpy(buffer,2,asset_shapes,32); // Same backend as __farmemcpy.\nexpect(*asset_bank_marker==0xA1,29);\nfor(i=0;i<32;i++) expect(buffer[(__safe_index u8)i]==expected_shape_byte(i),32);\nbuffer[32]=0x55;\n__far_memcpy(buffer+32,2,asset_shapes,0); // Zero count writes no bytes and restores the bank.\nexpect(buffer[32]==0x55 && *asset_bank_marker==0xA1,30);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\asset_banks.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "as_demo_far",
+        "as_red_geometry",
+        "as_pairs_gb",
+        "as_status"
+      ]
+    }
+  },
+  "fc:asset_set_table": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_set"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "as_table_bank"
+        ]
+      ],
+      [
+        "table",
+        [
+          "as_table_arg"
+        ]
+      ],
+      [
+        "count",
+        [
+          "as_count"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "as_registration"
+    ],
+    "record_sha256": "132fe82894ebd08dd9bb4a851b679dabbffd8009c1b300be98aa74cae699f4e9",
+    "example": {
+      "program": "samples/api-examples/fc/asset_banks.c",
+      "code": "asset_set_table(3,asset_descriptors,4); // Four descriptors in bank 3, payloads in bank 2.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\asset_banks.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.nes --mapper=mmc1 --board=surom512 --no-cache --no-disasm",
+      "expected": [
+        "as_demo_set",
+        "as_red_geometry",
+        "as_pairs_fc",
+        "as_status"
+      ]
+    }
+  },
+  "fc:asset_get": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_get"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ],
+      [
+        "out_desc",
+        [
+          "as_out"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_get_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_fixed_code"
+    ],
+    "record_sha256": "be3a5a4bc1b26833037dc0cbd37bb1ad60cbcda09d923a319adb7bf604fa3ce8",
+    "example": {
+      "program": "samples/api-examples/fc/asset_banks.c",
+      "code": "loaded=asset_get(0,&descriptor);\nexpect(loaded==1,1);\nexpect(descriptor.type==ASSET_TYPE_TILES && descriptor.bank==2,2);\nexpect(descriptor.ptr==asset_shapes && descriptor.len==144,3);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\asset_banks.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.nes --mapper=mmc1 --board=surom512 --no-cache --no-disasm",
+      "expected": [
+        "as_demo_get",
+        "as_red_geometry",
+        "as_pairs_fc",
+        "as_status"
+      ]
+    }
+  },
+  "fc:asset_load_raw": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_raw"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ],
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "max_len",
+        [
+          "as_max"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_raw_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_copy_bounds",
+      "as_fixed_code"
+    ],
+    "record_sha256": "6094df1f15767e9e3c13825eb2632385798a3ab39eb182704984e6abc93d50c5",
+    "example": {
+      "program": "samples/api-examples/fc/asset_banks.c",
+      "code": "loaded=asset_load_raw(0,buffer,7); // Success with truncation: copy seven of 144 bytes.\nexpect(loaded==1 && buffer[7]==0x55,7);\nfor(i=0;i<7;i++) expect(buffer[(__safe_index u8)i]==expected_shape_byte(i),8);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\asset_banks.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.nes --mapper=mmc1 --board=surom512 --no-cache --no-disasm",
+      "expected": [
+        "as_demo_raw",
+        "as_red_geometry",
+        "as_pairs_fc",
+        "as_status"
+      ]
+    }
+  },
+  "fc:asset_load_tiles": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_tiles_fc"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ],
+      [
+        "vram_dst",
+        [
+          "as_vram_fc"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_tiles_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_fixed_code",
+      "as_tile_timing",
+      "as_fc_bank_state",
+      "as_fc_timing"
+    ],
+    "record_sha256": "f9ca76692da2e5146cf9ce45a6bff0c414525d559c99f6fc1daa889460a32b19",
+    "example": {
+      "program": "samples/api-examples/fc/asset_banks.c",
+      "code": "loaded=asset_load_tiles(0,0x0010); // 144 bytes: library uploads chunks of 128 and 16 bytes.\nexpect(loaded==1 && bank_get_current()==1 && *asset_bank_marker==0xA1,24);\n// LCD and NMI are off; CHR RAM is writable. The library selects payload bank 2 and restores bank 1.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\asset_banks.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.nes --mapper=mmc1 --board=surom512 --no-cache --no-disasm",
+      "expected": [
+        "as_demo_tiles",
+        "as_red_geometry",
+        "as_pairs_fc",
+        "as_status"
+      ]
+    }
+  },
+  "fc:asset_get_bank": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_bank"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_bank_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_lookup_cost",
+      "as_fixed_code"
+    ],
+    "record_sha256": "e8cc8683bca3c8ebc85eb916161d00eb8248e5c7a94ccbff20729e259434b36d",
+    "example": {
+      "program": "samples/api-examples/fc/asset_banks.c",
+      "code": "payload_bank=asset_get_bank(0);\nexpect(payload_bank==2,17); // Payload bank, not descriptor-table bank 3.\nexpect(asset_get_bank(4)==0,18); // Failure sentinel; a valid descriptor may also use bank 0.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\asset_banks.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.nes --mapper=mmc1 --board=surom512 --no-cache --no-disasm",
+      "expected": [
+        "as_demo_bank",
+        "as_red_geometry",
+        "as_pairs_fc",
+        "as_status"
+      ]
+    }
+  },
+  "fc:asset_get_ptr": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_ptr"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_ptr_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_lookup_cost",
+      "as_fixed_code"
+    ],
+    "record_sha256": "d516cd79306260ca102ef1473cebfea736aa36715cb31ed7485945bfb5da7ff6",
+    "example": {
+      "program": "samples/api-examples/fc/asset_banks.c",
+      "code": "payload_pointer=asset_get_ptr(0);\nexpect(payload_pointer==asset_shapes,19);\nexpect(*asset_bank_marker==0xA1,20); // Getting the pointer leaves bank 1 selected.\n// Use payload_bank together with payload_pointer for a far copy; do not dereference it here.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\asset_banks.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.nes --mapper=mmc1 --board=surom512 --no-cache --no-disasm",
+      "expected": [
+        "as_demo_ptr",
+        "as_red_geometry",
+        "as_pairs_fc",
+        "as_status"
+      ]
+    }
+  },
+  "fc:asset_get_len": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_len"
+    ],
+    "args": [
+      [
+        "asset_id",
+        [
+          "as_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "as_len_ret"
+    ],
+    "notes": [
+      "as_registration",
+      "as_lookup_cost",
+      "as_fixed_code"
+    ],
+    "record_sha256": "fd01fe37d6568c44e69af833a88c3007ab7159ec65bb0f095819bb7be2776f92",
+    "example": {
+      "program": "samples/api-examples/fc/asset_banks.c",
+      "code": "expect(asset_get_len(0)==144,21); // Bytes, not tiles.\nexpect(asset_get_len(3)==0 && asset_get_len(4)==0,22); // Empty asset and invalid ID both yield zero.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\asset_banks.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.nes --mapper=mmc1 --board=surom512 --no-cache --no-disasm",
+      "expected": [
+        "as_demo_len",
+        "as_red_geometry",
+        "as_pairs_fc",
+        "as_status"
+      ]
+    }
+  },
+  "fc:__far_memcpy": {
+    "review": "asset-source-20260915",
+    "purpose": [
+      "as_far"
+    ],
+    "args": [
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "bank",
+        [
+          "as_far_bank"
+        ]
+      ],
+      [
+        "src",
+        [
+          "as_far_src_fc"
+        ]
+      ],
+      [
+        "len",
+        [
+          "as_far_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "as_copy_bounds",
+      "as_fixed_code"
+    ],
+    "record_sha256": "96417caa6e933c80fb07474c0e751a7acd215b6f530327c40d182c2a38e8a75b",
+    "example": {
+      "program": "samples/api-examples/fc/asset_banks.c",
+      "code": "__far_memcpy(buffer,payload_bank,(u16)payload_pointer,32);\nexpect(*asset_bank_marker==0xA1 && bank_get_current()==1,27);\nfor(i=0;i<32;i++) expect(buffer[(__safe_index u8)i]==expected_shape_byte(i),28);\nbuffer[32]=0x55;\n__far_memcpy(buffer+32,2,(u16)asset_shapes,0);\nexpect(buffer[32]==0x55 && *asset_bank_marker==0xA1,30);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\asset_banks.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\asset_banks.nes --mapper=mmc1 --board=surom512 --no-cache --no-disasm",
+      "expected": [
+        "as_demo_far",
+        "as_red_geometry",
+        "as_pairs_fc",
+        "as_status"
+      ]
+    }
+  }
+}
