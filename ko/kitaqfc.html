@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>KITAQFC — KITAQ 시리즈 설명서</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">본문으로 건너뛰기</a><header class="mast"><a href="index.html">KITAQ <span>개발 시스템</span></a><div>사용 설명서 <b>2026.09</b></div></header><nav aria-label="언어 선택" class="languages"><a href="../en/kitaqfc.html" hreflang="en" lang="en">English</a> <a href="../kitaqfc.html" hreflang="ja" lang="ja">日本語</a> <a aria-current="page" href="../ko/kitaqfc.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/kitaqfc.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a href="../zh-TW/kitaqfc.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/kitaqfc.html" hreflang="es" lang="es">Español</a> <a href="../pt/kitaqfc.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/kitaqfc.html" hreflang="fr" lang="fr">Français</a> <a href="../de/kitaqfc.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="권 선택"><a href="index.html">목차</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 라이브러리</a><a href="kokura.html"><b>03</b> KOKURA</a><a aria-current="page" href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 라이브러리</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">이 권에서 검색</label><input id="search" placeholder="예: input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="이 권의 목차" class="toc"><!-- loop-prompts:start --><a data-loop-prompts="true" href="#loop-prompts">생성형 AI 게임 개발 프롬프트</a><!-- loop-prompts:end --><a href="#1-KITAQFC와-GB-컴파일러의-관계">1. KITAQFC와 GB 컴파일러의 관계</a><a href="#2-개발-환경과-빌드">2. 개발 환경과 빌드</a><a href="#3-첫-프로그램">3. 첫 프로그램</a><a href="#4-언어의-기본">4. 언어의 기본</a><a href="#5-지원되지-않는-구문-바꾸기">5. 지원되지 않는 구문 바꾸기</a><a href="#6-메모리와-PPU">6. 메모리와 PPU</a><a href="#7-NMI와-VRAM-큐">7. NMI와 VRAM 큐</a><a href="#8-매퍼와-ROM-구성">8. 매퍼와 ROM 구성</a><a href="#9-FDS-확장-음원-주변기기">9. FDS, 확장 음원, 주변기기</a><a href="#10-진단과-빌드-결과">10. 진단과 빌드 결과</a><a href="#소스-위치">소스 위치</a><a href="#samples">완성된 예제 프로그램</a><a href="#api">컴파일러 내장 함수 사전</a><a href="#commands">명령 문법 참조</a><a href="#assembly">부록: 어셈블리 명령어 색인</a></nav><button class="print" type="button">이 권 인쇄</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 참고 판본</p><h1>KITAQFC</h1><p class="subtitle">패미컴 C 프로그래밍</p><div class="edition">첫 코드 한 줄부터 실행, 관찰, 재시험까지.<br/>소스 스냅샷: 2026년 9월 14일 · 한국어판: 2026년 9월 14일</div></div><!-- loop-prompts:start --><section data-loop-prompts="true"><h2 id="loop-prompts">생성형 AI 게임 개발 프롬프트</h2><p>요구 사항을 작성한 뒤 프롬프트 전체를 AI에 전달하세요. 구현, 에뮬레이터 테스트, SARAKURA 분석, 수정 후 재검증까지 다룹니다.</p><p><a href="loop-engineering.html#fc">KITAQFC</a></p></section><!-- loop-prompts:end --><section class="authored"><h2 id="1-KITAQFC와-GB-컴파일러의-관계">1. KITAQFC와 GB 컴파일러의 관계</h2>
+<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>KITAQFC — KITAQ 시리즈 설명서</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">본문으로 건너뛰기</a><header class="mast"><a href="index.html">KITAQ <span>개발 시스템</span></a><div>사용 설명서 <b>2026.09</b></div></header><nav aria-label="언어 선택" class="languages"><a href="../en/kitaqfc.html" hreflang="en" lang="en">English</a> <a href="../kitaqfc.html" hreflang="ja" lang="ja">日本語</a> <a aria-current="page" href="../ko/kitaqfc.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/kitaqfc.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a href="../zh-TW/kitaqfc.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/kitaqfc.html" hreflang="es" lang="es">Español</a> <a href="../pt/kitaqfc.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/kitaqfc.html" hreflang="fr" lang="fr">Français</a> <a href="../de/kitaqfc.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="권 선택"><a href="index.html">목차</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 라이브러리</a><a href="kokura.html"><b>03</b> KOKURA</a><a aria-current="page" href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 라이브러리</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">이 권에서 검색</label><input id="search" placeholder="예: input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="이 권의 목차" class="toc"><a href="#1-KITAQFC와-GB-컴파일러의-관계">1. KITAQFC와 GB 컴파일러의 관계</a><a href="#2-개발-환경과-빌드">2. 개발 환경과 빌드</a><a href="#3-첫-프로그램">3. 첫 프로그램</a><a href="#4-언어의-기본">4. 언어의 기본</a><a href="#5-지원되지-않는-구문-바꾸기">5. 지원되지 않는 구문 바꾸기</a><a href="#6-메모리와-PPU">6. 메모리와 PPU</a><a href="#7-NMI와-VRAM-큐">7. NMI와 VRAM 큐</a><a href="#8-매퍼와-ROM-구성">8. 매퍼와 ROM 구성</a><a href="#9-FDS-확장-음원-주변기기">9. FDS, 확장 음원, 주변기기</a><a href="#10-진단과-빌드-결과">10. 진단과 빌드 결과</a><!-- loop-prompts:start --><a data-loop-prompts="true" href="#loop-prompts">11. 활용 예: 생성형 AI로 게임 개발하기</a><!-- loop-prompts:end --><a href="#소스-위치">소스 위치</a><a href="#samples">완성된 예제 프로그램</a><a href="#api">컴파일러 내장 함수 사전</a><a href="#commands">명령 문법 참조</a><a href="#assembly">부록: 어셈블리 명령어 색인</a></nav><button class="print" type="button">이 권 인쇄</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 참고 판본</p><h1>KITAQFC</h1><p class="subtitle">패미컴 C 프로그래밍</p><div class="edition">첫 코드 한 줄부터 실행, 관찰, 재시험까지.<br/>소스 스냅샷: 2026년 9월 14일 · 한국어판: 2026년 9월 14일</div></div><section class="authored"><h2 id="1-KITAQFC와-GB-컴파일러의-관계">1. KITAQFC와 GB 컴파일러의 관계</h2>
 <p>KITAQFC는 KITAQGB의 프런트엔드를 사용하여 NES·패미컴의 6502 계열 CPU용 코드를 생성합니다. GB ROM을 NES ROM으로 변환하는 도구는 아닙니다. 대상 기종의 화면, 음향, 메모리, 매퍼에 맞춰 프로그램을 작성하세요.</p>
 <p>기록된 검사에서는 구조체 복사와 일반 함수 호출을 사용한 예제가 실행되었습니다. 다만 <strong>NES에서 do-while과 switch는 코드 생성 미지원 오류를 냈습니다.</strong> 구문 분석기가 문장을 읽을 수 있다는 사실만으로 해당 기종에서 사용할 수 있다고 판단해서는 안 됩니다.</p>
 <h2 id="2-개발-환경과-빌드">2. 개발 환경과 빌드</h2>
@@ -65,7 +65,229 @@ __scroll_set(0, 0);</code></pre></div>
 <h2 id="10-진단과-빌드-결과">10. 진단과 빌드 결과</h2>
 <p>KQ 진단과 <code>symfind</code>, <code>src2asm</code>, <code>romdiff</code> 같은 개발 명령은 GB판과 비슷합니다. 다만 GB에서 상속한 도움말 항목 중에는 NES에 구현되지 않은 기능도 있을 수 있습니다. FC API 사전은 FC 소스와 헤더에서 별도로 수집했습니다.</p>
 <p>직접 PPU 조작에 대한 KQ2421 같은 경고는 화면을 끈 초기화에서도 나올 수 있습니다. 경고를 없애려고 안전한 초기화 순서를 깨뜨리지 마세요. 렌더링 시점과 실행 로그를 확인해야 합니다. ‘오류 없음’과 ‘경고 없음’은 서로 다른 결과입니다.</p>
-<h2 id="소스-위치">소스 위치</h2>
+<!-- loop-prompts:start --><section data-loop-prompts="true"><h2 id="loop-prompts">11. 활용 예: 생성형 AI로 게임 개발하기</h2><p>요구 사항을 작성한 뒤 프롬프트 전체를 AI에 전달하세요. 구현, 에뮬레이터 테스트, SARAKURA 분석, 수정 후 재검증까지 다룹니다.</p><p><button type="button" class="copy" data-copy-source="prompt-fc">프롬프트 전체 복사</button> · <a download href="../prompts/ko/kitaqfc-prompt.md">Markdown 다운로드</a></p><pre id="prompt-fc" hidden><code># KITAQFC·KUROSAKI·SARAKURA를 활용한 게임 개발
+
+요구 사항을 작성한 뒤 이 문서 전체를 AI에 전달하세요. 명령은 `kitaqgb`, `kitaqfc`, `kokura`, `kurosaki`, `sarakura`, `kitaq-docs` 저장소와 `game-gb` 또는 `game-fc` 프로젝트가 같은 상위 폴더에 있는 구성을 가정합니다. 해당 상위 폴더에서 실행하고, 실제 환경에 맞게 경로를 조정하세요.
+
+## 요구 사항
+
+- 게임 이름: &lt;작성&gt;
+- 장르와 핵심 플레이 방식: &lt;작성&gt;
+- 조작 방법과 성공·실패 조건: &lt;작성&gt;
+- 필수 화면·스테이지·적·아이템: &lt;작성&gt;
+- 그래픽 스타일·배경 음악·효과음: &lt;작성, 제공 자료의 경로도 명시&gt;
+- 저장·통신·주변기기 등 추가 요구 사항: &lt;작성 또는 없음&gt;
+- 프로젝트 폴더: &lt;작성&gt;
+- 재배포 조건: &lt;예: 자체 제작 코드와 소재를 MIT로 공개할 수 있는 상태&gt;
+
+- 대상: &lt;NES/패미컴 카트리지 또는 FDS&gt;
+- 매퍼·ROM 크기·미러링: &lt;지정하거나 요구 사항에 따라 선정&gt;
+- 영상 방식과 성능 목표: &lt;예: NTSC, 초당 60회 게임 갱신&gt;
+
+## 수행할 작업
+
+KITAQFC와 해당 라이브러리로 게임을 구현해 주세요. 실행과 디버깅에는 KUROSAKI를, 진단 정리와 수정 전후 비교에는 SARAKURA를 사용하세요.
+
+합격 기준을 충족할 때까지 명세 구체화 → 작은 단위 구현 → 빌드 → 입력과 관찰 → 원인 조사 → 수정 → 동일 조건 재검증을 반복하세요. 계획 작성, 코드 제시 또는 컴파일 성공만으로 완료하지 마세요.
+
+### 환경과 합격 기준 확인
+
+1. 작업 폴더의 지침, 도구별 README, HTML 설명서, 사용할 라이브러리의 헤더와 구현을 읽으세요. 실행 파일 경로와 버전 또는 SHA-256을 기록하고, 명령은 실제 `--help` 출력으로, API는 소스로 확인하세요.
+2. 입력·화면·소리·진행·갱신 빈도를 판정할 수 있는 합격 기준을 정하세요. 예를 들어 START를 눌렀다 놓으면 시작하고, 충돌하면 잔기가 하나 줄며, 일시 정지 시 지정한 소리가 멈추고 해제 후 다시 재생되는지 확인합니다.
+3. 중요한 모호함만 질문하고, 일반적인 되돌릴 수 있는 구현 판단은 자율적으로 진행하세요. 요구 사항이나 합격 기준을 임의로 완화하지 마세요.
+4. 먼저 작은 제공 예제를 컴파일러·에뮬레이터·SARAKURA로 실행해 도구 간 연결을 확인하세요. 이것을 요청받은 게임의 완성으로 간주하지 마세요.
+
+### 작게 시작해 플레이 가능한 형태로 구현
+
+- 작은 게임은 NROM부터 검토하고, 규모나 뱅크 전환이 필요하면 MMC3 등 적절한 매퍼를 선택하세요. 이름만으로 지원 여부를 판단하지 말고 `inspect-rom`, `mapper-info`, `audit-board`와 구현으로 필요한 보드 기능을 확인하세요.
+- PRG/CHR 크기, CHR-ROM 또는 CHR-RAM, 미러링, 고정 뱅크, 인터럽트 벡터, 저장 RAM을 계획하세요. 최적화나 뱅크 변경 후에는 헤더와 실제 배치를 대조하세요. `--nes-local-ram`은 CPU 내부 RAM `$0000–$07FF`를 사용합니다. 제로 페이지·스택·OAM 버퍼·런타임 및 라이브러리 영역과 겹치지 않게 하세요.
+- KITAQFC의 C 문법, FC 라이브러리와 `void main(void)`를 사용하세요. GB API의 호환성을 가정하지 마세요. 헤더에 선언만 있는 항목도 있으므로 구현 위치를 확인하고 필요한 `.c`를 포함하세요.
+- PPU 레지스터, NMI, OAM DMA, 주사선별 스프라이트 제한, 스크롤, 미러링, 속성 테이블, APU/DMC를 고려하세요. 전송 큐의 여유 공간을 PPU VRAM 용량과 혼동하지 말고 NMI 한 번에 처리할 작업량을 제한하세요.
+- 제공된 자체 제작 `ascii.c` 글꼴을 FC CHR 형식으로 변환하고 CHR·팔레트·네임 테이블·속성 데이터를 확인하세요. FDS는 디스크 접근·저장·BIOS 조건을 별도로 검증하고 카트리지와 같은 부팅 조건을 가정하지 마세요.
+
+- 먼저 부팅·타이틀·조작 가능한 플레이어·성공 또는 실패·재시작을 연결한 뒤 내용을 늘리세요.
+- 그래픽·음악·효과음의 편집 가능한 원본과 생성 절차를 보관하고, 빌드가 실제로 내보낸 데이터를 읽는지 확인하세요.
+- 소스 주석은 영어, 진행 보고는 한국어로 작성하세요. SARAKURA의 표준 보고서는 영어로 유지하세요.
+
+### 빌드와 실행 결과 연결
+
+`out/iter-001`처럼 반복별 출력 폴더를 나누세요. 명령, 종료 코드, 소스·소재·도구·ROM·메타데이터의 해시를 기록하세요. 빌드 실패 후 남아 있는 이전 ROM을 실행하지 마세요. 맵·소스 맵·디버그 정보는 ROM과 동일한 빌드에서 나온 것을 사용하세요.
+
+다음은 입력 없는 NROM 확인 예입니다. `main.c`, 필요한 라이브러리 구현, CHR 파일을 준비하고 매퍼를 조정하세요. 요구하는 형식을 확인하지 않은 채 컴파일러 빌드 메타데이터를 KUROSAKI의 `--kitaqfc-debug`에 전달하지 마세요.
+
+```powershell
+$iteration = &#x27;.\game-fc\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqfc\kitaqfc.exe&#x27; &#x27;.\game-fc\src\main.c&#x27; `
+  -I &#x27;.\kitaqfc\lib&#x27; -o &quot;$iteration\game.nes&quot; `
+  --mapper=nrom &#x27;--nes-chr=.\game-fc\assets\game.chr&#x27; --no-disasm `
+  &quot;--kurosaki-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; run &quot;$iteration\game.nes&quot; `
+  --frames 300 --pad1 0 --png &quot;$iteration\frame.png&quot; `
+  --json &quot;$iteration\run.json&quot; --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; fc analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }
+```
+
+
+300프레임의 무입력 실행은 초기 확인에 불과합니다. 게임이 정상이라고 판단하기 전에 순서가 있는 플레이 시나리오를 추가하세요.
+
+### 순서가 있는 입력 재현
+
+- `--pad1`과 `--pad2`는 NES 원시 비트 마스크입니다. A=1, B=2, SELECT=4, START=8, UP=16, DOWN=32, LEFT=64, RIGHT=128입니다. 라이브러리의 `BTN_*` 값과 혼동하지 마세요.
+- `run --pad1`은 고정 입력입니다. 순서가 있는 조작에는 누르기·유지·놓기를 구분한 리플레이를 만드세요. `Replay`와 `ReplayFrame` 정의를 확인하세요. 공개 CLI의 `replay-record`는 사람의 플레이가 아니라 무입력을 기록합니다.
+- ROM의 SHA-256, 리플레이 대상과 프레임 범위를 직접 대조하세요. `replay-run --verify`는 기대 최종 해시가 있을 때만 비교하므로 게임 동작이나 ROM 대응을 포괄적으로 검증하지 않습니다. 테스트를 통과시키려고 기대값을 관측값으로 무조건 덮어쓰지 마세요.
+
+```powershell
+&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; replay-run `
+  &#x27;.\game-fc\out\iter-001\game.nes&#x27; &#x27;.\game-fc\tests\start-and-play.replay.json&#x27; `
+  --frames 900 --json &#x27;.\game-fc\out\iter-001\play.json&#x27; `
+  --png &#x27;.\game-fc\out\iter-001\play.png&#x27; `
+  --wav &#x27;.\game-fc\out\iter-001\play.wav&#x27;
+```
+
+
+시험할 ROM에 맞는 리플레이를 준비하세요. 공개 CLI의 `replay-run`에는 `--emit-diagnostics`가 없습니다. 없는 옵션을 사용하거나 CPU 트레이스를 진단 이벤트로 넘기지 마세요. 순서가 있는 입력을 SARAKURA로 분석하려면 공개 `kurosaki-core`의 `RunOptions.replay_frames`와 `diagnostic_events_from_trace_and_report`를 이용한 검증 하네스를 프로젝트 안에 만드세요. 같은 ROM·리플레이·프레임 조건으로 실행하고 그 실행의 트레이스와 진단 보고서에서 JSONL을 생성하세요. 트레이스 설정과 보존 범위를 확인하고 하네스의 화면·관측 결과를 CLI 리플레이와 대조하세요. 무입력 진단을 플레이 시나리오의 증거로 사용하지 마세요. 필요한 환경이 없으면 해당 검증을 미완료로 보고하세요.
+
+### 화면·소리·상태·성능 확인
+
+- 누르기·유지·놓기를 구분한 입력 시나리오를 저장하세요. 부팅, 시작, 이동, 행동, 충돌, 스크롤, 스테이지 전환, 게임 오버, 재시작, 일시 정지와 필요한 저장·통신 등 명세의 모든 경로를 실행하세요.
+- 필요한 프레임의 PNG, 입력 데이터, 실행 보고서, 진단 JSONL, WAV와 필요한 상태·메모리 관측을 보관하세요. 도달 프레임과 정지 이유를 확인하세요. 이미지를 실제로 열어 보고, 한 장의 스크린샷만으로 움직임이나 입력 반응을 검증했다고 하지 마세요. 카운터·좌표·상태 전환을 기대값과 비교하고 화면 끝·타일 및 속성 경계·스프라이트 밀집 장면도 확인하세요.
+- 음악·효과음·동시 재생·끊김·일시 정지·재개를 확인하세요. WAV 생성만으로 올바른 소리를 증명할 수 없습니다. 들을 수 없는 환경에서는 실시한 파형·수치 검사와 아직 확인하지 못한 청감 품질을 구분하세요.
+- 부하가 큰 장면의 대상 CPU 작업량·게임 갱신·전송량을 측정하고 FC에서는 NMI 작업도 포함하세요. 호스트에서의 에뮬레이터 처리 속도를 게임 갱신 빈도나 실기 속도와 동일시하지 마세요. `--allow-unimplemented`로 계속 실행된다고 해서 미구현 기능이 지원되는 것은 아닙니다.
+
+### 분석·수정·재검증
+
+- 시험한 ROM의 빌드 메타데이터와 해당 실행의 진단 JSONL을 SARAKURA에 전달하세요. CPU 트레이스나 일반 실행 보고서로 대체하지 마세요. `--frames`는 분석 조건이며, SARAKURA는 ROM을 실행하거나 소스를 자동 수정하지 않습니다.
+- `report.html`, `ai_diagnostics.json`, `repair_prompt.md`, `retest_plan.json`을 읽고 재현 절차·화면·소리·소스와 대조하세요. 추정한 소스 위치와 원인을 확인된 사실과 구분하고, 정상 대기 루프와 멈춤 버그를 구분하세요. 경고를 개별 판단하고 미지원 이벤트와 분석 한계를 기록하세요. 필터로 경고를 숨기거나 테스트를 줄여 합격시키지 마세요.
+- 문제를 최소 재현 예제로 줄이고 원인을 수정한 뒤 다시 빌드하세요. 컴파일러나 에뮬레이터가 원인이면 게임 코드와 분리해 결함을 확인하고 도구 수정에 회귀 검증을 추가하세요.
+- 입력·난수 시드·기종 및 영상 방식·매퍼·관측 프레임·진단 설정을 맞춰 재검증하세요. ROM마다 해당 메타데이터를 사용하고 코드나 RAM 배치가 바뀐 뒤 저장 상태를 무조건 재사용하지 마세요.
+
+```powershell
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-fc\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-fc\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-fc\out\delta.json&#x27; --markdown &#x27;.\game-fc\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce
+```
+
+
+진단 차이는 조작·그래픽·소리의 합격 판정과 함께 사용하세요. 같은 실패가 반복되면 근거와 가설을 다시 검토하고 무작정 수정을 이어 가지 마세요.
+
+### 완료 조건과 결과물
+
+납품할 소스와 설정으로 만든 최종 ROM에서 모든 필수 시나리오를 다시 실행하세요. 무적 상태·자동 시험 입력·다른 매퍼만으로 최종 빌드의 일반 플레이를 검증했다고 하지 마세요. 요구 사항과 시험의 대응표, 남은 경고의 이유, 미확인·미지원 항목을 명시하세요. 실기 시험을 하지 않았다면 ‘실기 미확인’으로 표시하세요.
+
+소스, 도구·라이브러리 식별 정보, 편집 가능한 소재, 재현 가능한 빌드·검증 스크립트, ROM, 최종 검증 증거, 설치·조작·알려진 제한을 설명한 README를 제공하세요. 필요한 리플레이와 검증 하네스도 포함하세요. 공개·외부 전송은 명시적으로 허용된 범위에서만 수행하세요. 검증 후 불필요한 중간 빌드와 임시 트레이스는 지우되 소스·소재·최종 결과물·필요한 회귀 증거는 보관하세요.
+
+환경이나 권한 때문에 필수 검사를 할 수 없다면 정확한 재현 절차와 필요한 조치를 보고하고, 완료로 처리하지 마세요.
+</code></pre><p>요구 사항을 작성한 뒤 이 문서 전체를 AI에 전달하세요. 명령은 <code>kitaqgb</code>, <code>kitaqfc</code>, <code>kokura</code>, <code>kurosaki</code>, <code>sarakura</code>, <code>kitaq-docs</code> 저장소와 <code>game-gb</code> 또는 <code>game-fc</code> 프로젝트가 같은 상위 폴더에 있는 구성을 가정합니다. 해당 상위 폴더에서 실행하고, 실제 환경에 맞게 경로를 조정하세요.</p>
+<h3 id="prompt-example-fc-section-1">요구 사항</h3>
+<ul>
+<li>게임 이름: &lt;작성&gt;</li>
+<li>장르와 핵심 플레이 방식: &lt;작성&gt;</li>
+<li>조작 방법과 성공·실패 조건: &lt;작성&gt;</li>
+<li>필수 화면·스테이지·적·아이템: &lt;작성&gt;</li>
+<li>그래픽 스타일·배경 음악·효과음: &lt;작성, 제공 자료의 경로도 명시&gt;</li>
+<li>저장·통신·주변기기 등 추가 요구 사항: &lt;작성 또는 없음&gt;</li>
+<li>프로젝트 폴더: &lt;작성&gt;</li>
+<li>재배포 조건: &lt;예: 자체 제작 코드와 소재를 MIT로 공개할 수 있는 상태&gt;</li>
+</ul>
+<ul>
+<li>대상: &lt;NES/패미컴 카트리지 또는 FDS&gt;</li>
+<li>매퍼·ROM 크기·미러링: &lt;지정하거나 요구 사항에 따라 선정&gt;</li>
+<li>영상 방식과 성능 목표: &lt;예: NTSC, 초당 60회 게임 갱신&gt;</li>
+</ul>
+<h3 id="prompt-example-fc-section-2">수행할 작업</h3>
+<p>KITAQFC와 해당 라이브러리로 게임을 구현해 주세요. 실행과 디버깅에는 KUROSAKI를, 진단 정리와 수정 전후 비교에는 SARAKURA를 사용하세요.</p>
+<p>합격 기준을 충족할 때까지 명세 구체화 → 작은 단위 구현 → 빌드 → 입력과 관찰 → 원인 조사 → 수정 → 동일 조건 재검증을 반복하세요. 계획 작성, 코드 제시 또는 컴파일 성공만으로 완료하지 마세요.</p>
+<h4 id="prompt-example-fc-section-3">환경과 합격 기준 확인</h4>
+<ol>
+<li>작업 폴더의 지침, 도구별 README, HTML 설명서, 사용할 라이브러리의 헤더와 구현을 읽으세요. 실행 파일 경로와 버전 또는 SHA-256을 기록하고, 명령은 실제 <code>--help</code> 출력으로, API는 소스로 확인하세요.</li>
+<li>입력·화면·소리·진행·갱신 빈도를 판정할 수 있는 합격 기준을 정하세요. 예를 들어 START를 눌렀다 놓으면 시작하고, 충돌하면 잔기가 하나 줄며, 일시 정지 시 지정한 소리가 멈추고 해제 후 다시 재생되는지 확인합니다.</li>
+<li>중요한 모호함만 질문하고, 일반적인 되돌릴 수 있는 구현 판단은 자율적으로 진행하세요. 요구 사항이나 합격 기준을 임의로 완화하지 마세요.</li>
+<li>먼저 작은 제공 예제를 컴파일러·에뮬레이터·SARAKURA로 실행해 도구 간 연결을 확인하세요. 이것을 요청받은 게임의 완성으로 간주하지 마세요.</li>
+</ol>
+<h4 id="prompt-example-fc-section-4">작게 시작해 플레이 가능한 형태로 구현</h4>
+<ul>
+<li>작은 게임은 NROM부터 검토하고, 규모나 뱅크 전환이 필요하면 MMC3 등 적절한 매퍼를 선택하세요. 이름만으로 지원 여부를 판단하지 말고 <code>inspect-rom</code>, <code>mapper-info</code>, <code>audit-board</code>와 구현으로 필요한 보드 기능을 확인하세요.</li>
+<li>PRG/CHR 크기, CHR-ROM 또는 CHR-RAM, 미러링, 고정 뱅크, 인터럽트 벡터, 저장 RAM을 계획하세요. 최적화나 뱅크 변경 후에는 헤더와 실제 배치를 대조하세요. <code>--nes-local-ram</code>은 CPU 내부 RAM <code>$0000–$07FF</code>를 사용합니다. 제로 페이지·스택·OAM 버퍼·런타임 및 라이브러리 영역과 겹치지 않게 하세요.</li>
+<li>KITAQFC의 C 문법, FC 라이브러리와 <code>void main(void)</code>를 사용하세요. GB API의 호환성을 가정하지 마세요. 헤더에 선언만 있는 항목도 있으므로 구현 위치를 확인하고 필요한 <code>.c</code>를 포함하세요.</li>
+<li>PPU 레지스터, NMI, OAM DMA, 주사선별 스프라이트 제한, 스크롤, 미러링, 속성 테이블, APU/DMC를 고려하세요. 전송 큐의 여유 공간을 PPU VRAM 용량과 혼동하지 말고 NMI 한 번에 처리할 작업량을 제한하세요.</li>
+<li>제공된 자체 제작 <code>ascii.c</code> 글꼴을 FC CHR 형식으로 변환하고 CHR·팔레트·네임 테이블·속성 데이터를 확인하세요. FDS는 디스크 접근·저장·BIOS 조건을 별도로 검증하고 카트리지와 같은 부팅 조건을 가정하지 마세요.</li>
+</ul>
+<ul>
+<li>먼저 부팅·타이틀·조작 가능한 플레이어·성공 또는 실패·재시작을 연결한 뒤 내용을 늘리세요.</li>
+<li>그래픽·음악·효과음의 편집 가능한 원본과 생성 절차를 보관하고, 빌드가 실제로 내보낸 데이터를 읽는지 확인하세요.</li>
+<li>소스 주석은 영어, 진행 보고는 한국어로 작성하세요. SARAKURA의 표준 보고서는 영어로 유지하세요.</li>
+</ul>
+<h4 id="prompt-example-fc-section-5">빌드와 실행 결과 연결</h4>
+<p><code>out/iter-001</code>처럼 반복별 출력 폴더를 나누세요. 명령, 종료 코드, 소스·소재·도구·ROM·메타데이터의 해시를 기록하세요. 빌드 실패 후 남아 있는 이전 ROM을 실행하지 마세요. 맵·소스 맵·디버그 정보는 ROM과 동일한 빌드에서 나온 것을 사용하세요.</p>
+<p>다음은 입력 없는 NROM 확인 예입니다. <code>main.c</code>, 필요한 라이브러리 구현, CHR 파일을 준비하고 매퍼를 조정하세요. 요구하는 형식을 확인하지 않은 채 컴파일러 빌드 메타데이터를 KUROSAKI의 <code>--kitaqfc-debug</code>에 전달하지 마세요.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>$iteration = &#x27;.\game-fc\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqfc\kitaqfc.exe&#x27; &#x27;.\game-fc\src\main.c&#x27; `
+  -I &#x27;.\kitaqfc\lib&#x27; -o &quot;$iteration\game.nes&quot; `
+  --mapper=nrom &#x27;--nes-chr=.\game-fc\assets\game.chr&#x27; --no-disasm `
+  &quot;--kurosaki-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; run &quot;$iteration\game.nes&quot; `
+  --frames 300 --pad1 0 --png &quot;$iteration\frame.png&quot; `
+  --json &quot;$iteration\run.json&quot; --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; fc analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }</code></pre></div>
+<p>300프레임의 무입력 실행은 초기 확인에 불과합니다. 게임이 정상이라고 판단하기 전에 순서가 있는 플레이 시나리오를 추가하세요.</p>
+<h4 id="prompt-example-fc-section-6">순서가 있는 입력 재현</h4>
+<ul>
+<li><code>--pad1</code>과 <code>--pad2</code>는 NES 원시 비트 마스크입니다. A=1, B=2, SELECT=4, START=8, UP=16, DOWN=32, LEFT=64, RIGHT=128입니다. 라이브러리의 <code>BTN_*</code> 값과 혼동하지 마세요.</li>
+<li><code>run --pad1</code>은 고정 입력입니다. 순서가 있는 조작에는 누르기·유지·놓기를 구분한 리플레이를 만드세요. <code>Replay</code>와 <code>ReplayFrame</code> 정의를 확인하세요. 공개 CLI의 <code>replay-record</code>는 사람의 플레이가 아니라 무입력을 기록합니다.</li>
+<li>ROM의 SHA-256, 리플레이 대상과 프레임 범위를 직접 대조하세요. <code>replay-run --verify</code>는 기대 최종 해시가 있을 때만 비교하므로 게임 동작이나 ROM 대응을 포괄적으로 검증하지 않습니다. 테스트를 통과시키려고 기대값을 관측값으로 무조건 덮어쓰지 마세요.</li>
+</ul>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; replay-run `
+  &#x27;.\game-fc\out\iter-001\game.nes&#x27; &#x27;.\game-fc\tests\start-and-play.replay.json&#x27; `
+  --frames 900 --json &#x27;.\game-fc\out\iter-001\play.json&#x27; `
+  --png &#x27;.\game-fc\out\iter-001\play.png&#x27; `
+  --wav &#x27;.\game-fc\out\iter-001\play.wav&#x27;</code></pre></div>
+<p>시험할 ROM에 맞는 리플레이를 준비하세요. 공개 CLI의 <code>replay-run</code>에는 <code>--emit-diagnostics</code>가 없습니다. 없는 옵션을 사용하거나 CPU 트레이스를 진단 이벤트로 넘기지 마세요. 순서가 있는 입력을 SARAKURA로 분석하려면 공개 <code>kurosaki-core</code>의 <code>RunOptions.replay_frames</code>와 <code>diagnostic_events_from_trace_and_report</code>를 이용한 검증 하네스를 프로젝트 안에 만드세요. 같은 ROM·리플레이·프레임 조건으로 실행하고 그 실행의 트레이스와 진단 보고서에서 JSONL을 생성하세요. 트레이스 설정과 보존 범위를 확인하고 하네스의 화면·관측 결과를 CLI 리플레이와 대조하세요. 무입력 진단을 플레이 시나리오의 증거로 사용하지 마세요. 필요한 환경이 없으면 해당 검증을 미완료로 보고하세요.</p>
+<h4 id="prompt-example-fc-section-7">화면·소리·상태·성능 확인</h4>
+<ul>
+<li>누르기·유지·놓기를 구분한 입력 시나리오를 저장하세요. 부팅, 시작, 이동, 행동, 충돌, 스크롤, 스테이지 전환, 게임 오버, 재시작, 일시 정지와 필요한 저장·통신 등 명세의 모든 경로를 실행하세요.</li>
+<li>필요한 프레임의 PNG, 입력 데이터, 실행 보고서, 진단 JSONL, WAV와 필요한 상태·메모리 관측을 보관하세요. 도달 프레임과 정지 이유를 확인하세요. 이미지를 실제로 열어 보고, 한 장의 스크린샷만으로 움직임이나 입력 반응을 검증했다고 하지 마세요. 카운터·좌표·상태 전환을 기대값과 비교하고 화면 끝·타일 및 속성 경계·스프라이트 밀집 장면도 확인하세요.</li>
+<li>음악·효과음·동시 재생·끊김·일시 정지·재개를 확인하세요. WAV 생성만으로 올바른 소리를 증명할 수 없습니다. 들을 수 없는 환경에서는 실시한 파형·수치 검사와 아직 확인하지 못한 청감 품질을 구분하세요.</li>
+<li>부하가 큰 장면의 대상 CPU 작업량·게임 갱신·전송량을 측정하고 FC에서는 NMI 작업도 포함하세요. 호스트에서의 에뮬레이터 처리 속도를 게임 갱신 빈도나 실기 속도와 동일시하지 마세요. <code>--allow-unimplemented</code>로 계속 실행된다고 해서 미구현 기능이 지원되는 것은 아닙니다.</li>
+</ul>
+<h4 id="prompt-example-fc-section-8">분석·수정·재검증</h4>
+<ul>
+<li>시험한 ROM의 빌드 메타데이터와 해당 실행의 진단 JSONL을 SARAKURA에 전달하세요. CPU 트레이스나 일반 실행 보고서로 대체하지 마세요. <code>--frames</code>는 분석 조건이며, SARAKURA는 ROM을 실행하거나 소스를 자동 수정하지 않습니다.</li>
+<li><code>report.html</code>, <code>ai_diagnostics.json</code>, <code>repair_prompt.md</code>, <code>retest_plan.json</code>을 읽고 재현 절차·화면·소리·소스와 대조하세요. 추정한 소스 위치와 원인을 확인된 사실과 구분하고, 정상 대기 루프와 멈춤 버그를 구분하세요. 경고를 개별 판단하고 미지원 이벤트와 분석 한계를 기록하세요. 필터로 경고를 숨기거나 테스트를 줄여 합격시키지 마세요.</li>
+<li>문제를 최소 재현 예제로 줄이고 원인을 수정한 뒤 다시 빌드하세요. 컴파일러나 에뮬레이터가 원인이면 게임 코드와 분리해 결함을 확인하고 도구 수정에 회귀 검증을 추가하세요.</li>
+<li>입력·난수 시드·기종 및 영상 방식·매퍼·관측 프레임·진단 설정을 맞춰 재검증하세요. ROM마다 해당 메타데이터를 사용하고 코드나 RAM 배치가 바뀐 뒤 저장 상태를 무조건 재사용하지 마세요.</li>
+</ul>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-fc\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-fc\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-fc\out\delta.json&#x27; --markdown &#x27;.\game-fc\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce</code></pre></div>
+<p>진단 차이는 조작·그래픽·소리의 합격 판정과 함께 사용하세요. 같은 실패가 반복되면 근거와 가설을 다시 검토하고 무작정 수정을 이어 가지 마세요.</p>
+<h4 id="prompt-example-fc-section-9">완료 조건과 결과물</h4>
+<p>납품할 소스와 설정으로 만든 최종 ROM에서 모든 필수 시나리오를 다시 실행하세요. 무적 상태·자동 시험 입력·다른 매퍼만으로 최종 빌드의 일반 플레이를 검증했다고 하지 마세요. 요구 사항과 시험의 대응표, 남은 경고의 이유, 미확인·미지원 항목을 명시하세요. 실기 시험을 하지 않았다면 ‘실기 미확인’으로 표시하세요.</p>
+<p>소스, 도구·라이브러리 식별 정보, 편집 가능한 소재, 재현 가능한 빌드·검증 스크립트, ROM, 최종 검증 증거, 설치·조작·알려진 제한을 설명한 README를 제공하세요. 필요한 리플레이와 검증 하네스도 포함하세요. 공개·외부 전송은 명시적으로 허용된 범위에서만 수행하세요. 검증 후 불필요한 중간 빌드와 임시 트레이스는 지우되 소스·소재·최종 결과물·필요한 회귀 증거는 보관하세요.</p>
+<p>환경이나 권한 때문에 필수 검사를 할 수 없다면 정확한 재현 절차와 필요한 조치를 보고하고, 완료로 처리하지 마세요.</p></section><!-- loop-prompts:end --><h2 id="소스-위치">소스 위치</h2>
 <p>컴파일러 소스와 프로젝트 파일은 저장소 안의 같은 이름을 가진 하위 폴더에 있습니다. 실행 파일은 저장소 루트에, 라이브러리는 <code>lib/</code>에 있습니다. 프로젝트 경로와 빌드 요구 사항은 <a href="../GITHUB_SETUP.md">폴더 구성 안내</a>를 참고하세요.</p></section><h2 id="samples">완성된 예제 프로그램</h2><p>각 프로그램과 공통 헤더, 제공된 ascii.c, 변환 리소스를 함께 실었습니다. m_으로 시작하는 이름은 설명서용 도우미입니다. 빌드 명령은 기대 결과와 검증 기록을 함께 읽으세요. 명령은 저장소들이 나란히 놓인 상위 폴더에서 실행합니다.</p><p><a href="../samples/build.ps1">일괄 빌드 스크립트</a> / <a href="verification.html">결과와 화면</a></p><details class="sample searchable" id="sample-fc_font"><summary>제공된 영문자, 숫자, 기호 <code>fc_font.c</code></summary><p>기대 결과: 대문자, 소문자, 숫자, 제공된 기호 30개 모두 표시</p><p><a download="" href="../samples/fc_font.c">소스 내려받기</a> / <a href="verification.html#fc_font">검증 상태</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_font.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_font.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// Display the letters, digits and punctuation from the supplied ascii.c font.
 // Expected: Uppercase, lowercase, numbers and all 30 supplied punctuation glyphs
 #include "fc_common.h"

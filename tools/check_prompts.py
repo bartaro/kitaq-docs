@@ -73,14 +73,37 @@ def main():
                 if (language, width) in [('ja', 1440), ('ko', 1440), ('de', 390)]:
                     page.screenshot(path=str(S / 'verification' / f'prompts-{language}-{width}.png'))
             page.set_viewport_size({'width': 1440, 'height': 1000})
-            page.goto((folder / 'kitaqfc.html').as_uri())
-            page.locator('section[data-loop-prompts] a').click()
-            assert page.url.endswith('loop-engineering.html#fc')
-            other = 'ja' if language != 'ja' else 'en'
-            page.locator('nav.languages a[hreflang="' + other + '"]').click()
-            assert page.url.endswith('loop-engineering.html#fc')
-            assert page.locator('html').get_attribute('lang') == other
-            edition['fc_anchor_and_language_switch'] = 'passed'
+            for platform, tool, chapter in [('gb', 'kitaqgb', 14), ('fc', 'kitaqfc', 11)]:
+                page.goto((folder / (tool + '.html')).as_uri())
+                assert page.locator('[data-copy-source]').count() == 1
+                title = page.locator('#loop-prompts').text_content()
+                assert int(re.match(r'\d+', title)[0]) == chapter, title
+                assert int(re.match(r'\d+', page.locator('main h2').first.text_content())[0]) == 1
+                titles = page.locator('main h2').all_text_contents()
+                position = titles.index(title)
+                assert int(re.match(r'\d+', titles[position - 1])[0]) == chapter - 1
+                assert position < titles.index(page.locator('#samples').text_content())
+                page.locator('nav.toc a[href="#loop-prompts"]').click()
+                assert page.url.endswith(tool + '.html#loop-prompts')
+                page.locator('[data-copy-source]').click()
+                actual = page.evaluate('navigator.clipboard.readText()')
+                assert actual.replace('\r\n', '\n') == load_prompt(language, platform)
+                for width in (1440, 390):
+                    page.set_viewport_size({'width': width, 'height': 844})
+                    assert not page.evaluate('document.documentElement.scrollWidth > innerWidth'), (tool, language, width)
+                if language == 'ja':
+                    page.locator('#loop-prompts').evaluate("el => { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 70); }")
+                    page.screenshot(path=str(S / 'verification' / (tool + '-prompt-placement-ja.png')))
+                other = 'ja' if language != 'ja' else 'en'
+                page.locator('nav.languages a[hreflang="' + other + '"]').click()
+                assert page.url.endswith(tool + '.html#loop-prompts')
+                assert page.locator('html').get_attribute('lang') == other
+                page.set_viewport_size({'width': 1440, 'height': 1000})
+            for tool in ('index', 'gb-library', 'fc-library', 'kokura', 'kurosaki', 'sarakura'):
+                source = (folder / (tool + '.html')).read_text(encoding='utf-8')
+                assert 'data-loop-prompts' not in source and 'data-copy-source' not in source, (language, tool)
+            edition['numbered_compiler_examples_and_language_switch'] = 'passed'
+            edition['other_volumes_exclude_game_prompts'] = 'passed'
             report['editions'].append(edition)
         browser.close()
     report['status'] = 'passed' if not report['errors'] else 'failed'

@@ -114,7 +114,7 @@
   });
   function reveal(){
     if(!location.hash)return;
-    if(document.querySelector('[data-copy-source]') && ['#gb','#fc'].includes(location.hash)){
+    if(document.querySelector('[data-copy-source]') && ['#gb','#fc','#loop-prompts'].includes(location.hash)){
       document.querySelectorAll('nav.languages a').forEach(a=>{
         a.href=a.href.split('#')[0]+location.hash;
       });

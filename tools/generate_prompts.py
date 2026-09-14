@@ -101,9 +101,10 @@ def load_prompt(language, platform):
 
 
 def publish(language):
-    """Write both prompts in one localized volume and link existing manuals to it."""
+    """Publish downloads and numbered examples in the two compiler manuals."""
     folder = SITE if language == 'ja' else SITE / language
     ui = json.loads((SOURCE / 'ui.json').read_text(encoding='utf-8'))[language]
+    placement = json.loads((SOURCE / 'placement.json').read_text(encoding='utf-8'))[language]
     shell = (folder / 'index.html').read_text(encoding='utf-8')
     shell = re.sub(r'<!-- loop-prompts:start -->.*?<!-- loop-prompts:end -->', '', shell, flags=re.S)
     shell = re.sub(r'<title>.*?</title>', '<title>' + html.escape(ui['title']) + ' — KITAQ SERIES</title>', shell, count=1, flags=re.S)
@@ -130,20 +131,38 @@ def publish(language):
         path = folder / (key + '.html')
         page = path.read_text(encoding='utf-8')
         page = re.sub(r'<!-- loop-prompts:start -->.*?<!-- loop-prompts:end -->', '', page, flags=re.S)
-        links = []
-        for platform, tool in [('gb', 'KITAQGB'), ('fc', 'KITAQFC')]:
-            if key in ('kitaqgb', 'gb-library', 'kokura') and platform != 'gb':
-                continue
-            if key in ('kitaqfc', 'fc-library', 'kurosaki') and platform != 'fc':
-                continue
-            links.append('<a href="loop-engineering.html#' + platform + '">' + tool + '</a>')
-        block = '<!-- loop-prompts:start --><section data-loop-prompts="true"><h2 id="loop-prompts">' + html.escape(ui['title']) + '</h2><p>' + html.escape(ui['intro']) + '</p><p>' + ' · '.join(links) + '</p></section><!-- loop-prompts:end -->'
-        # Place the entry immediately after the cover, before the first chapter.
-        page, count = re.subn(r'(<main\b[^>]*>.*?</div></div>)', lambda m: m[1] + block, page, count=1, flags=re.S)
-        if count != 1:
-            raise ValueError('Manual cover not found: ' + str(path))
-        toc_entry = '<!-- loop-prompts:start --><a data-loop-prompts="true" href="#loop-prompts">' + html.escape(ui['title']) + '</a><!-- loop-prompts:end -->'
-        page = re.sub(r'(<nav\b[^>]*class="toc"[^>]*>)', lambda m: m[1] + toc_entry, page, count=1)
+        if key not in ('kitaqgb', 'kitaqfc'):
+            write_html(path, page)
+            continue
+        platform = 'gb' if key == 'kitaqgb' else 'fc'
+        text = load_prompt(language, platform)
+        href = ('' if language == 'ja' else '../') + 'prompts/' + language + '/' + key + '-prompt.md'
+        # Insert after the final teaching chapter and before the source/reference material.
+        main_start = page.index('<main')
+        headings = list(re.finditer(r'<h2\b[^>]*id="([^"]+)"[^>]*>(.*?)</h2>', page[main_start:], re.S))
+        numbered = [i for i, h in enumerate(headings) if re.match(r'^\d+[.．、]?', html.unescape(re.sub('<[^>]+>', '', h[2])))]
+        if not numbered or numbered[-1] + 1 >= len(headings):
+            raise ValueError('Final numbered chapter not found: ' + str(path))
+        last = headings[numbered[-1]]
+        numbering = re.match(r'^(\d+)([\s.．、]+)', html.unescape(re.sub('<[^>]+>', '', last[2])))
+        number = int(numbering[1]) + 1
+        following = headings[numbered[-1] + 1]
+        heading = str(number) + numbering[2] + placement['chapter']
+        block = ('<!-- loop-prompts:start --><section data-loop-prompts="true"><h2 id="loop-prompts">'
+                 + html.escape(heading) + '</h2><p>' + html.escape(ui['intro'])
+                 + '</p><p><button type="button" class="copy" data-copy-source="prompt-' + platform + '">'
+                 + html.escape(ui['copy_all']) + '</button> · <a download href="' + href + '">'
+                 + html.escape(ui['download']) + '</a></p><pre id="prompt-' + platform
+                 + '" hidden><code>' + html.escape(text) + '</code></pre>'
+                 + render_markdown(text, 'prompt-example-' + platform, ui['copy'])
+                 + '</section><!-- loop-prompts:end -->')
+        position = main_start + following.start()
+        page = page[:position] + block + page[position:]
+        toc_entry = '<!-- loop-prompts:start --><a data-loop-prompts="true" href="#loop-prompts">' + html.escape(heading) + '</a><!-- loop-prompts:end -->'
+        anchor = '<a href="#' + following[1] + '"'
+        if page.count(anchor) != 1:
+            raise ValueError('Reference table-of-contents entry not unique: ' + str(path))
+        page = page.replace(anchor, toc_entry + anchor, 1)
         write_html(path, page)
 
 
@@ -153,4 +172,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     for language in ([args.language] if args.language else LANGUAGES):
         publish(language)
-        print(language + ': prompt page, two downloads and manual links generated')
+        print(language + ': prompt downloads and numbered compiler examples generated')

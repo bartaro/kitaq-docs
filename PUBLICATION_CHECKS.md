@@ -71,21 +71,30 @@ applicable license notices. See `LICENSE`, `LICENSE.ja` and
 The prompt supplement provides KITAQGB/KOKURA/SARAKURA and
 KITAQFC/KUROSAKI/SARAKURA workflows in all nine published languages.
 Each edition includes the full prompt, a complete-text copy button and two
-Markdown downloads. Links from the manuals and READMEs open the corresponding
-language and target platform.
+Markdown downloads. The KITAQGB and KITAQFC manuals contain complete reference
+examples as chapters 14 and 11, after their teaching chapters. Other software
+and library manuals do not contain game-development prompts. Both compilers'
+READMEs place collapsible complete prompts immediately after the development
+philosophy, with direct links to the same-language HTML chapter.
 
 [Prompt verification](verification/prompt_checks.json) records real clipboard
 comparisons for all 18 prompts, shared command preservation, desktop/mobile
-layout checks, and FC section navigation across language changes in an isolated
+layout checks, chapter order, and GB/FC chapter navigation across language changes in an isolated
 headless Microsoft Edge session. These are documentation checks, not gameplay
 or physical-hardware tests. The FC prompt explicitly accounts for the public
 CLI's lack of diagnostic-event output from `replay-run`.
 
 Run `python -B tools/check_prompts.py` with Playwright available to repeat the
-browser checks. `tools/generate_prompts.py` rebuilds the supplement and links.
+browser checks. `tools/generate_prompts.py` rebuilds the supplement and numbered examples.
+[README checks](verification/readme_prompt_checks.json) verify all 18 localized
+examples, their position after the development philosophy, and direct links.
+Run `python -B tools/check_readme_prompts.py <repositories-directory>` to repeat them.
 The complete site has 90 edition pages, plus two existing diagnostic HTML reports.
 
 日本語：GB用・FC用の開発プロンプトを公開中の9言語に収録しました。
 18本すべてで全文コピーとMarkdownの一致、コマンドの保持、PC・スマートフォン幅の
-表示、言語切替後もFC用の位置を保つ動作を確認しています。これは説明書の検証であり、
+表示、言語切替後もGB用・FC用の項目を保つ動作を確認しています。HTMLではKITAQGBの
+第14項・KITAQFCの第11項に参考例として収録し、他のソフトウェアやライブラリの説明書には
+載せていません。両コンパイラのREADMEは、開発方針の直後に各言語の全文を折りたたみ表示します。
+これは説明書の検証であり、
 ゲームや実機の動作検証を意味しません。確認結果は上記の記録を参照してください。
