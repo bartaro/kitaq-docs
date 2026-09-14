@@ -1,5 +1,5 @@
 // Usage fragment, not a standalone ROM.
-// Declaration source: lib/audio_vblank.h
+// Declaration source: kitaqgb/lib/audio_vblank.h
 void example_AudioVBlank_PlayMusic(u8 *song) {
     AudioVBlank_PlayMusic(song);
 }

@@ -1,6 +1,18 @@
 (() => {
   'use strict';
-  const en = document.documentElement.lang === 'en';
+  const lang = document.documentElement.lang;
+  const labels = {
+    en: ['Reference/examples: {hits} / Text: {prose}', 'Filter by command or feature', 'Copied', 'Select and copy', 'Copy'],
+    ja: ['辞典・教材 {hits}件 / 本文 {prose}件', '命令名・機能名で絞り込み', 'コピー済み', '選択してコピー', 'コピー'],
+    ko: ['참조·예제: {hits}건 / 본문: {prose}건', '명령이나 기능으로 검색', '복사됨', '선택하여 복사', '복사'],
+    'zh-CN': ['参考与示例：{hits} 项 / 正文：{prose} 处', '按命令或功能筛选', '已复制', '请选择后复制', '复制'],
+    'zh-TW': ['參考與範例：{hits} 項 / 本文：{prose} 處', '依命令或功能篩選', '已複製', '請選取後複製', '複製'],
+    es: ['Referencias y ejemplos: {hits} / Texto: {prose}', 'Buscar por comando o función', 'Copiado', 'Seleccionar y copiar', 'Copiar'],
+    'pt-BR': ['Referências e exemplos: {hits} / Texto: {prose}', 'Filtrar por comando ou recurso', 'Copiado', 'Selecione e copie', 'Copiar'],
+    fr: ['Références et exemples : {hits} / Texte : {prose}', 'Rechercher une commande ou une fonction', 'Copié', 'Sélectionner et copier', 'Copier'],
+    de: ['Referenzen und Beispiele: {hits} / Text: {prose}', 'Nach Befehl oder Funktion suchen', 'Kopiert', 'Auswählen und kopieren', 'Kopieren'],
+  };
+  const ui = labels[lang] || labels.en;
   const search = document.querySelector('#search');
   const status = document.querySelector('#search-status');
   const items = [...document.querySelectorAll('.searchable')];
@@ -13,8 +25,8 @@
       items.forEach(el=>{const ok=!q||el.textContent.toLocaleLowerCase().includes(q);el.hidden=!ok;if(ok&&q)hits++;});
       document.querySelectorAll('.hit').forEach(x=>x.classList.remove('hit'));
       let prose=0;
-      if(q) document.querySelectorAll('main > p, main > h2, main > h3').forEach(el=>{if(el.textContent.toLocaleLowerCase().includes(q)){el.classList.add('hit');prose++;}});
-      status.textContent=q?(en?`Reference/examples: ${hits} / Text: ${prose}`:`辞典・教材 ${hits}件 / 本文 ${prose}件`):(en?'Filter by command or feature':'命令名・機能名で絞り込み');
+      if(q) document.querySelectorAll('main > p, main > h2, main > h3, .authored > p, .authored > h2, .authored > h3').forEach(el=>{if(el.textContent.toLocaleLowerCase().includes(q)){el.classList.add('hit');prose++;}});
+      status.textContent=q?ui[0].replace('{hits}', hits).replace('{prose}', prose):ui[1];
     },100);
   });
   document.addEventListener('click',async e=>{
@@ -22,9 +34,9 @@
     const button=e.target.closest('.copy');
     if(button){
       const text=button.parentElement.querySelector('code').textContent;
-      try { await navigator.clipboard.writeText(text); button.textContent=en?'Copied':'コピー済み'; }
-      catch { const a=document.createElement('textarea');a.value=text;document.body.append(a);a.select();const ok=document.execCommand('copy');a.remove();button.textContent=ok?(en?'Copied':'コピー済み'):(en?'Select and copy':'選択してコピー'); }
-      setTimeout(()=>button.textContent=en?'Copy':'コピー',1800);
+      try { await navigator.clipboard.writeText(text); button.textContent=ui[2]; }
+      catch { const a=document.createElement('textarea');a.value=text;document.body.append(a);a.select();const ok=document.execCommand('copy');a.remove();button.textContent=ok?ui[2]:ui[3]; }
+      setTimeout(()=>button.textContent=ui[4],1800);
     }
     if(e.target.closest('.print'))window.print();
   });

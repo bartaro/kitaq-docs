@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>SARAKURA — KITAQ 系列手冊</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">跳至本文</a><header class="mast"><a href="index.html">KITAQ <span>開發系統</span></a><div>使用手冊 <b>2026.09</b></div></header><nav aria-label="選擇語言" class="languages"><a href="../en/sarakura.html" hreflang="en" lang="en">English</a> <a href="../sarakura.html" hreflang="ja" lang="ja">日本語</a> <a href="../ko/sarakura.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/sarakura.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a aria-current="page" href="../zh-TW/sarakura.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/sarakura.html" hreflang="es" lang="es">Español</a> <a href="../pt/sarakura.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/sarakura.html" hreflang="fr" lang="fr">Français</a> <a href="../de/sarakura.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="選擇分卷"><a href="index.html">目錄</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 函式庫</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 函式庫</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a aria-current="page" href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">搜尋本卷</label><input id="search" placeholder="例如：input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="本卷目錄" class="toc"><a href="#已建置的-Windows-CLI">已建置的 Windows CLI</a><a href="#1-SARAKURA-負責什麼">1. SARAKURA 負責什麼</a><a href="#2-建置工具">2. 建置工具</a><a href="#3-第一次分析">3. 第一次分析</a><a href="#4-先檢查輸入">4. 先檢查輸入</a><a href="#5-解讀診斷">5. 解讀診斷</a><a href="#6-輸出檔案">6. 輸出檔案</a><a href="#7-規則目錄-篩選與涵蓋情況">7. 規則目錄、篩選與涵蓋情況</a><a href="#8-比較修改前後">8. 比較修改前後</a><a href="#9-格式驗證與-CI">9. 格式驗證與 CI</a><a href="#10-處理重現資料">10. 處理重現資料</a><a href="#11-最小練習輸入">11. 最小練習輸入</a><a href="#12-一次修復與複測循環">12. 一次修復與複測循環</a><a href="#commands">命令語法參考</a></nav><button class="print" type="button">列印本卷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 參考版</p><h1>SARAKURA</h1><p class="subtitle">診斷、比較與複測</p><div class="edition">從第一行程式，到執行、觀察與複測。<br/>原始碼快照：2026 年 9 月 14 日 · 繁體中文版：2026 年 9 月 14 日</div></div><section class="authored"><h2 id="已建置的-Windows-CLI">已建置的 Windows CLI</h2>
+<p>儲存庫根目錄提供 Windows x64 版 <code>sarakura.exe</code>。下載 ZIP 時請一併保留授權聲明。執行無須 Rust、Python 或 .NET；以下步驟用於從原始碼重新建置。獨立專案程式碼由 DAISUKE OBA 以 MIT 授權提供，相依條件保留於 <code>BINARY_NOTICES.md</code> 和 <code>licenses/</code>。</p>
+<h2 id="1-SARAKURA-負責什麼">1. SARAKURA 負責什麼</h2>
+<p>SARAKURA 結合編譯器建置資訊與模擬器診斷事件，整理成有助修復和複測的資料。它不是執行 ROM 的模擬器，也不會默默改動你的 C 原始碼。</p>
+<h2 id="2-建置工具">2. 建置工具</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>Push-Location .\sarakura
+.\scripts\build.ps1
+.\sarakura.exe --help
+Pop-Location</code></pre></div>
+<p>簡寫 <code>sarakura</code> 假設已加入 PATH；否則請使用執行檔路徑。GB 選擇 <code>gb analyze</code>，FC 選擇 <code>fc analyze</code>。</p>
+<h2 id="3-第一次分析">3. 第一次分析</h2>
+<p>需要兩類輸入：<code>--metadata</code> 是建置時 JSON，<code>--events</code> 是執行時診斷 JSONL。JSONL 每行放一個 JSON 物件。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura gb analyze --metadata .\out\build.json --events .\out\gb_events.jsonl --out .\out\report --fail-on error</code></pre></div>
+<p>在瀏覽器開啟輸出的 <code>report.html</code>。讀取個別診斷前，先確認目標、觀察影格數、錯誤數和警告數。<code>--frames</code> 描述分析條件，不是要求 SARAKURA 執行那麼多影格的 ROM。</p>
+<h2 id="4-先檢查輸入">4. 先檢查輸入</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura inspect-metadata --metadata .\out\build.json
+sarakura inspect-events --events .\out\gb_events.jsonl
+sarakura emitter-check gb --metadata .\out\build.json --events .\out\gb_events.jsonl --strict</code></pre></div>
+<p>調查遊戲行為前，先分清楚檔案無法讀取、平台不符、事件類型不支援等問題。把一般模擬器報告當成事件檔傳入，不會使它變成有效診斷輸入。</p>
+<h2 id="5-解讀診斷">5. 解讀診斷</h2>
+<p>error 值得優先調查，warning 是否有問題視情境而定，info 則提供背景。嚴重程度有助安排優先順序，但無法完全理解遊戲意圖。例如只看重複 PC，未必能區分正常標題等待迴圈和當機。</p>
+<p>請搭配 ROM 雜湊、輸入序列、場景、畫面、聲音與原始碼位置判斷。修復前後條件應相同，否則診斷變少可能只是換了場景。</p>
+<h2 id="6-輸出檔案">6. 輸出檔案</h2>
+<p>內建說明、診斷提示與修復指引採英文，HTML 宣告 <code>lang="en"</code>。使用者字串和事件 ID 不會自動翻譯。預設遮蔽處理會替換部分專案標籤及路徑，但不保證匿名化所有位址或觀察內容。公開私有輸入的分析結果前，請檢查報告。</p>
+<div class="tablewrap"><table>
+<tr><th>檔案</th><th>用途</th></tr>
+<tr><td>ai_diagnostics.json</td><td>自動處理用的正規化診斷</td></tr>
+<tr><td>diagnostic_summary.json</td><td>數量統計與摘要</td></tr>
+<tr><td>report.html</td><td>適合閱讀的報告</td></tr>
+<tr><td>repair_prompt.md</td><td>開始修復調查所需的背景</td></tr>
+<tr><td>repair_plan.json / .md</td><td>修復順序與對象</td></tr>
+<tr><td>automation_plan.json / .md</td><td>依工具能力安排的工作計畫</td></tr>
+<tr><td>retest_plan.json</td><td>複測計畫</td></tr>
+<tr><td>repro_bundle.zip</td><td>重現資料包</td></tr>
+</table></div>
+<p>產生計畫不等於執行計畫。修改 C 原始碼或 ROM 後，須重新執行編譯器、模擬器與 SARAKURA。</p>
+<h2 id="7-規則目錄-篩選與涵蓋情況">7. 規則目錄、篩選與涵蓋情況</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura catalog gb --json
+sarakura catalog fc --json
+sarakura pack-plan gb
+sarakura coverage gb --events .\out\gb_events.jsonl --out .\out\coverage.json</code></pre></div>
+<p><code>catalog</code> 列出診斷規則，<code>pack-plan</code> 依領域分組，<code>coverage</code> 檢查對應事件是否曾被觀察到。目錄中有規則，不保證目前模擬器會產生該事件。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura gb analyze --metadata .\out\build.json --events .\out\gb_events.jsonl --out .\out\ppu_report --diagnostic-pack ppu --min-severity warn --fail-on error</code></pre></div>
+<p><code>--diagnostic-rule</code> 選擇事件名稱或規則 ID，<code>--phase</code> 選階段，<code>--diagnostic-pack</code> 選領域。篩掉診斷不等於解決問題。</p>
+<h2 id="8-比較修改前後">8. 比較修改前後</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura baseline-delta --baseline .\out\before --current .\out\after --out .\out\delta --markdown .\out\delta --fail-on-new error --fail-on-regression error --enforce</code></pre></div>
+<p>結果分為新增、已解決、改善、持續存在和退步。請區分原有問題與新引入問題。比較時固定輸入、影格數及診斷篩選條件。</p>
+<h2 id="9-格式驗證與-CI">9. 格式驗證與 CI</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura validate .\out\report\ai_diagnostics.json --strict
+sarakura ci-summary --diagnostics .\out\report --fail-on error --enforce
+sarakura schema export --out .\out\schemas</code></pre></div>
+<p>持續整合會自動執行可重現的檢查。<code>ci-summary</code> 只有加上 <code>--enforce</code> 才改變程序結束碼，否則需讀取 JSON 判定。analyze 的 <code>--fail-on error</code> 在有錯誤時傳回非零結束碼；預設 <code>never</code> 不會因診斷而失敗，因此 CI 要明確選擇政策。選擇 <code>warn</code> 時，警告也會觸發失敗。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura ci-summary --diagnostics .\out\report --fail-on error --enforce
+if ($LASTEXITCODE -ne 0) { throw "The diagnostic failure condition was met" }</code></pre></div>
+<p>結構描述驗證成功，只確認了資料格式。遊戲是否符合設計，仍需要輸入、畫面和聲音測試。</p>
+<h2 id="10-處理重現資料">10. 處理重現資料</h2>
+<p><code>normalize-events</code> 正規化事件紀錄，<code>inspect-repro</code> 檢查重現包。分享前請確認資料屬於目標 ROM，且包含必要輸入步驟。<code>--allow-project-labels</code> 會明確保留專案衍生標籤與識別碼。</p>
+<h2 id="11-最小練習輸入">11. 最小練習輸入</h2>
+<p>手冊附有小型 GB／FC 建置中繼資料與事件範例。可開啟 <a href="../verification/sarakura-gb-synthetic.html">GB 合成報告</a>或 <a href="../verification/sarakura-fc-synthetic.html">FC 合成報告</a>。<code>samples/sarakura_demo.ps1</code> 示範分析流程。這些是為學習格式而構造的輸入，不是從真實 ROM 擷取的證據；實測應使用 KOKURA 或 KUROSAKI 記錄的事件。</p>
+<h2 id="12-一次修復與複測循環">12. 一次修復與複測循環</h2>
+<ol>
+<li>以同一 ROM 和輸入重現問題，保留日誌與畫面。</li>
+<li>用 SARAKURA 整理候選原因，閱讀相關原始碼。</li>
+<li>針對原因做集中修改。</li>
+<li>重新建置並執行相同操作。</li>
+<li>將 baseline-delta 與圖像、聲音、遊戲行為一起比較。</li>
+</ol>
+<p>每輪維持小範圍，才能清楚理解各項修改與結果的關係。</p></section><h2 id="commands">命令語法參考</h2><p>下方說明取自本原始碼版本，可查詢選用引數、預設值與允許值。請將範例輸入檔名換成自己的檔案。實際工具回應保留原文。</p><details class="command searchable" id="cmd-sarakura"><summary><code>sarakura </code></summary><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>SARAKURA diagnostic translation CLI
+
+Usage: sarakura.exe &lt;COMMAND&gt;
+
+Commands:
+  gb                
+  fc                
+  validate          
+  compare           
+  catalog           
+  inspect-events    
+  inspect-metadata  
+  retest-plan       
+  emitter-check     
+  normalize-events  
+  ci-summary        
+  coverage          
+  pack-plan         
+  repair-plan       
+  automation-plan   
+  baseline-delta    
+  schema            
+  inspect-repro     
+  help              Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version</code></pre></div></details><details class="command searchable" id="cmd-sarakura-gb"><summary><code>sarakura gb</code></summary><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe gb &lt;COMMAND&gt;
+
+Commands:
+  analyze  
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-gb-analyze"><summary><code>sarakura gb analyze</code> — 收集 Game Boy 診斷</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura gb analyze --metadata out/build.json --events out/events.jsonl --out out/report --fail-on error</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe gb analyze [OPTIONS] --metadata &lt;METADATA&gt; --events &lt;EVENTS&gt; --out &lt;OUT&gt;
+
+Options:
+      --metadata &lt;METADATA&gt;
+          
+      --events &lt;EVENTS&gt;
+          
+      --out &lt;OUT&gt;
+          
+      --frames &lt;FRAMES&gt;
+          [default: 300]
+      --diagnostic-summary-limit &lt;DIAGNOSTIC_SUMMARY_LIMIT&gt;
+          [default: 200]
+      --diagnostic-rule &lt;DIAGNOSTIC_RULES&gt;
+          Analyze only this event_type or catalog ID. Can be repeated
+      --phase &lt;PHASE&gt;
+          Analyze only this phase, for example MVP-1. Can be repeated
+      --diagnostic-pack &lt;DIAGNOSTIC_PACKS&gt;
+          Analyze only this diagnostic pack/domain, for example core, ppu, audio, mapper, fds. Can be repeated
+      --min-severity &lt;MIN_SEVERITY&gt;
+          Keep only diagnostics at or above this severity [possible values: error, warn, info]
+      --fail-on &lt;FAIL_ON&gt;
+          Return a non-zero exit code if diagnostics at or above this severity remain [default: never] [possible values: never, error, warn, info]
+      --no-report
+          Do not emit report.html
+      --no-repro-bundle
+          Do not emit repro_bundle.zip
+      --allow-project-labels
+          Preserve project build labels, paths, and source identifiers in output
+  -h, --help
+          Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-fc"><summary><code>sarakura fc</code></summary><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe fc &lt;COMMAND&gt;
+
+Commands:
+  analyze  
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-fc-analyze"><summary><code>sarakura fc analyze</code> — 收集 FC 診斷</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura fc analyze --metadata out/build.json --events out/events.jsonl --out out/report --fail-on error</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe fc analyze [OPTIONS] --metadata &lt;METADATA&gt; --events &lt;EVENTS&gt; --out &lt;OUT&gt;
+
+Options:
+      --metadata &lt;METADATA&gt;
+          
+      --events &lt;EVENTS&gt;
+          
+      --out &lt;OUT&gt;
+          
+      --frames &lt;FRAMES&gt;
+          [default: 300]
+      --diagnostic-summary-limit &lt;DIAGNOSTIC_SUMMARY_LIMIT&gt;
+          [default: 200]
+      --diagnostic-rule &lt;DIAGNOSTIC_RULES&gt;
+          Analyze only this event_type or catalog ID. Can be repeated
+      --phase &lt;PHASE&gt;
+          Analyze only this phase, for example MVP-1. Can be repeated
+      --diagnostic-pack &lt;DIAGNOSTIC_PACKS&gt;
+          Analyze only this diagnostic pack/domain, for example core, ppu, audio, mapper, fds. Can be repeated
+      --min-severity &lt;MIN_SEVERITY&gt;
+          Keep only diagnostics at or above this severity [possible values: error, warn, info]
+      --fail-on &lt;FAIL_ON&gt;
+          Return a non-zero exit code if diagnostics at or above this severity remain [default: never] [possible values: never, error, warn, info]
+      --no-report
+          Do not emit report.html
+      --no-repro-bundle
+          Do not emit repro_bundle.zip
+      --allow-project-labels
+          Preserve project build labels, paths, and source identifiers in output
+  -h, --help
+          Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-validate"><summary><code>sarakura validate</code> — 驗證診斷格式</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura validate out/report/ai_diagnostics.json --strict</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe validate [OPTIONS] &lt;PATH&gt;
+
+Arguments:
+  &lt;PATH&gt;  
+
+Options:
+      --strict  
+  -h, --help    Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-compare"><summary><code>sarakura compare</code> — 比較兩組診斷結果</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura compare --before out/before --after out/after --out out/comparison</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe compare --before &lt;BEFORE&gt; --after &lt;AFTER&gt; --out &lt;OUT&gt;
+
+Options:
+      --before &lt;BEFORE&gt;  Directory containing ai_diagnostics.json, or an ai_diagnostics.json file
+      --after &lt;AFTER&gt;    Directory containing ai_diagnostics.json, or an ai_diagnostics.json file
+      --out &lt;OUT&gt;        
+  -h, --help             Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-catalog"><summary><code>sarakura catalog</code> — 列出診斷規則</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura catalog gb --json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe catalog [OPTIONS] &lt;PLATFORM&gt;
+
+Arguments:
+  &lt;PLATFORM&gt;  [possible values: gb, fc]
+
+Options:
+      --json  Emit JSON instead of a Markdown table
+  -h, --help  Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-inspect-events"><summary><code>sarakura inspect-events</code> — 彙整事件</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura inspect-events --events out/events.jsonl</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe inspect-events [OPTIONS] --events &lt;EVENTS&gt;
+
+Options:
+      --events &lt;EVENTS&gt;  
+      --out &lt;OUT&gt;        Optional path to write the JSON inspection summary
+      --json             Emit JSON to stdout instead of a compact text summary
+  -h, --help             Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-inspect-metadata"><summary><code>sarakura inspect-metadata</code> — 檢查建置資訊</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura inspect-metadata --metadata out/build.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe inspect-metadata [OPTIONS] --metadata &lt;METADATA&gt;
+
+Options:
+      --metadata &lt;METADATA&gt;  
+      --out &lt;OUT&gt;            Optional path to write the JSON inspection summary
+      --json                 Emit JSON to stdout instead of a compact text summary
+  -h, --help                 Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-retest-plan"><summary><code>sarakura retest-plan</code> — 產生複測計畫</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura retest-plan --diagnostics out/report --out out/retest.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe retest-plan [OPTIONS] --diagnostics &lt;DIAGNOSTICS&gt;
+
+Options:
+      --diagnostics &lt;DIAGNOSTICS&gt;  Directory containing ai_diagnostics.json, or an ai_diagnostics.json file
+      --out &lt;OUT&gt;                  Optional path to write retest_plan.json. If omitted, JSON is printed to stdout
+  -h, --help                       Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-emitter-check"><summary><code>sarakura emitter-check</code> — 檢查事件產生端契約</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura emitter-check gb --metadata out/build.json --events out/events.jsonl --strict</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe emitter-check [OPTIONS] --events &lt;EVENTS&gt; &lt;PLATFORM&gt;
+
+Arguments:
+  &lt;PLATFORM&gt;  [possible values: gb, fc]
+
+Options:
+      --metadata &lt;METADATA&gt;      
+      --events &lt;EVENTS&gt;          
+      --strict                   Fail when compatibility warnings are found
+      --check-snapshot-refs      Check that snapshot_ref paths exist
+      --check-trace-window-refs  Check that trace_window_ref paths exist
+      --base-dir &lt;BASE_DIR&gt;      Base directory for snapshot_ref and trace_window_ref existence checks
+      --out &lt;OUT&gt;                Optional path to write the compatibility summary JSON
+  -h, --help                     Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-normalize-events"><summary><code>sarakura normalize-events</code> — 正規化事件格式</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura normalize-events --events out/events.jsonl --out out/normalized.jsonl</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe normalize-events [OPTIONS] --events &lt;EVENTS&gt; --out &lt;OUT&gt;
+
+Options:
+      --events &lt;EVENTS&gt;  
+      --out &lt;OUT&gt;        
+      --json-array       Also write a pretty JSON array next to the JSONL output for fixture review
+  -h, --help             Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-ci-summary"><summary><code>sarakura ci-summary</code> — 判斷 CI 失敗條件</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura ci-summary --diagnostics out/report --fail-on error --enforce</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe ci-summary [OPTIONS] --diagnostics &lt;DIAGNOSTICS&gt;
+
+Options:
+      --diagnostics &lt;DIAGNOSTICS&gt;  Directory containing ai_diagnostics.json, or an ai_diagnostics.json file
+      --fail-on &lt;FAIL_ON&gt;          CI policy. `error` fails only on errors, `warn` fails on errors or warnings [default: error] [possible values: never, error, warn, info]
+      --out &lt;OUT&gt;                  Optional path to write sarakura_ci_summary.json
+      --enforce                    Return a non-zero exit code when the CI policy fails
+  -h, --help                       Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-coverage"><summary><code>sarakura coverage</code> — 列出已觀察規則</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura coverage gb --events out/events.jsonl --out out/coverage.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe coverage [OPTIONS] --events &lt;EVENTS&gt; &lt;PLATFORM&gt;
+
+Arguments:
+  &lt;PLATFORM&gt;  [possible values: gb, fc]
+
+Options:
+      --events &lt;EVENTS&gt;  
+      --out &lt;OUT&gt;        Optional path to write catalog coverage JSON. If a directory is given, diagnostic_coverage.json is created inside it
+      --json             Emit JSON to stdout instead of a compact text summary
+  -h, --help             Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-pack-plan"><summary><code>sarakura pack-plan</code> — 依領域查看規則計畫</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura pack-plan gb</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe pack-plan [OPTIONS] &lt;PLATFORM&gt;
+
+Arguments:
+  &lt;PLATFORM&gt;  [possible values: gb, fc]
+
+Options:
+      --out &lt;OUT&gt;  Optional path to write pack plan JSON. If a directory is given, diagnostic_pack_plan.json is created inside it
+      --json       Emit JSON to stdout instead of a Markdown summary
+  -h, --help       Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-repair-plan"><summary><code>sarakura repair-plan</code> — 產生修復計畫</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura repair-plan --diagnostics out/report --out out/repair.json --markdown out/repair.md</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe repair-plan [OPTIONS] --diagnostics &lt;DIAGNOSTICS&gt;
+
+Options:
+      --diagnostics &lt;DIAGNOSTICS&gt;  Directory containing ai_diagnostics.json, or an ai_diagnostics.json file
+      --out &lt;OUT&gt;                  Optional path to write repair_plan.json. If omitted, JSON is printed to stdout
+      --markdown &lt;MARKDOWN&gt;        Optional path to write repair_plan.md. If a directory is given, repair_plan.md is created inside it
+  -h, --help                       Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-automation-plan"><summary><code>sarakura automation-plan</code> — 將計畫與工具能力配對</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura automation-plan --diagnostics out/report --tool kokura --out out/automation.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe automation-plan [OPTIONS] --diagnostics &lt;DIAGNOSTICS&gt;
+
+Options:
+      --diagnostics &lt;DIAGNOSTICS&gt;    Directory containing ai_diagnostics.json, or an ai_diagnostics.json file
+      --tool &lt;TOOL&gt;                  Tool name for generated commands. Use auto, kokura, or kurosaki [default: auto]
+      --out &lt;OUT&gt;                    Optional path to write automation_plan.json. If omitted, JSON is printed to stdout
+      --markdown &lt;MARKDOWN&gt;          Optional path to write automation_plan.md. If a directory is given, automation_plan.md is created inside it
+      --capabilities &lt;CAPABILITIES&gt;  Optional SARAKURA tool capability JSON. Unsupported options are omitted from generated commands
+  -h, --help                         Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-baseline-delta"><summary><code>sarakura baseline-delta</code> — 量測相對基準的改善與退步</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura baseline-delta --baseline out/before --current out/after --out out/delta --markdown out/delta</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe baseline-delta [OPTIONS] --baseline &lt;BASELINE&gt; --current &lt;CURRENT&gt;
+
+Options:
+      --baseline &lt;BASELINE&gt;
+          Baseline directory containing ai_diagnostics.json, or an ai_diagnostics.json file
+      --current &lt;CURRENT&gt;
+          Current directory containing ai_diagnostics.json, or an ai_diagnostics.json file
+      --out &lt;OUT&gt;
+          Optional path to write baseline_delta.json. If omitted, JSON is printed to stdout
+      --markdown &lt;MARKDOWN&gt;
+          Optional path to write baseline_delta.md. If a directory is given, baseline_delta.md is created inside it
+      --fail-on-new &lt;FAIL_ON_NEW&gt;
+          Fail when new diagnostics at or above this severity are introduced [default: error] [possible values: never, error, warn, info]
+      --fail-on-regression &lt;FAIL_ON_REGRESSION&gt;
+          Fail when existing diagnostics regress at or above this severity [default: error] [possible values: never, error, warn, info]
+      --enforce
+          Return a non-zero exit code when the baseline policy fails
+  -h, --help
+          Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-schema"><summary><code>sarakura schema</code></summary><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe schema &lt;COMMAND&gt;
+
+Commands:
+  export  
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-schema-export"><summary><code>sarakura schema export</code> — 匯出 JSON 結構描述</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura schema export --out out/schemas</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe schema export [OPTIONS] --out &lt;OUT&gt;
+
+Options:
+      --out &lt;OUT&gt;            
+      --manifest &lt;MANIFEST&gt;  
+  -h, --help                 Print help</code></pre></div></details><details class="command searchable" id="cmd-sarakura-inspect-repro"><summary><code>sarakura inspect-repro</code> — 檢查重現資料包</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>sarakura inspect-repro out/report/repro_bundle.zip --json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">複製</button><pre><code>Usage: sarakura.exe inspect-repro [OPTIONS] &lt;BUNDLE&gt;
+
+Arguments:
+  &lt;BUNDLE&gt;  
+
+Options:
+      --out &lt;OUT&gt;  
+      --json       
+  -h, --help       Print help</code></pre></div></details><footer>原始碼版本 2026-09-14 • <a href="index.html">目錄</a> • <a href="verification.html">驗證</a> • <a href="../reference/inventory.json">快照指紋</a><br/>範例建置、模擬器執行及預期結果比對分別記錄。</footer></main></div><script src="../assets/manual.js"></script></body></html>

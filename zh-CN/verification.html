@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>验证记录 — KITAQ 系列手册</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">跳至正文</a><header class="mast"><a href="index.html">KITAQ <span>开发系统</span></a><div>用户手册 <b>2026.09</b></div></header><nav aria-label="选择语言" class="languages"><a href="../en/verification.html" hreflang="en" lang="en">English</a> <a href="../verification.html" hreflang="ja" lang="ja">日本語</a> <a href="../ko/verification.html" hreflang="ko" lang="ko">한국어</a> <a aria-current="page" href="../zh-CN/verification.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a href="../zh-TW/verification.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/verification.html" hreflang="es" lang="es">Español</a> <a href="../pt/verification.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/verification.html" hreflang="fr" lang="fr">Français</a> <a href="../de/verification.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="选择分卷"><a href="index.html">目录</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 库</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 库</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">搜索本卷</label><input id="search" placeholder="例如：input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="本卷目录" class="toc"><a href="#scope">验证范围</a><a href="#result-gb_hello">gb_hello</a><a href="#result-gb_arithmetic">gb_arithmetic</a><a href="#result-gb_control">gb_control</a><a href="#result-gb_aggregate">gb_aggregate</a><a href="#result-gb_bits_memory">gb_bits_memory</a><a href="#result-gb_input">gb_input</a><a href="#result-gb_fixed">gb_fixed</a><a href="#result-gb_entity">gb_entity</a><a href="#result-gb_debug">gb_debug</a><a href="#result-gb_chain">gb_chain</a><a href="#result-fc_hello">fc_hello</a><a href="#result-fc_arithmetic">fc_arithmetic</a><a href="#result-fc_control">fc_control</a><a href="#result-fc_aggregate">fc_aggregate</a><a href="#result-fc_bits_memory">fc_bits_memory</a><a href="#result-fc_input">fc_input</a><a href="#result-fc_fixed">fc_fixed</a><a href="#result-fc_entity">fc_entity</a><a href="#result-fc_debug">fc_debug</a><a href="#result-fc_chain">fc_chain</a><a href="#result-gb_cgb_palette">gb_cgb_palette</a><a href="#result-gb_scroll">gb_scroll</a><a href="#result-gb_vram_queue">gb_vram_queue</a><a href="#result-gb_sprite">gb_sprite</a><a href="#result-gb_rng">gb_rng</a><a href="#result-gb_flags">gb_flags</a><a href="#result-gb_circle">gb_circle</a><a href="#result-fc_scroll">fc_scroll</a><a href="#result-fc_vram_queue">fc_vram_queue</a><a href="#result-fc_sprite">fc_sprite</a><a href="#result-fc_sound">fc_sound</a><a href="#result-gb_sound">gb_sound</a><a href="#result-gb_font">gb_font</a><a href="#result-fc_font">fc_font</a><a href="#result-gb_system">gb_system</a><a href="#result-gb_scene">gb_scene</a><a href="#result-fc_system">fc_system</a><a href="#result-fc_scene">fc_scene</a><a href="#result-gb_camera">gb_camera</a><a href="#result-gb_rle">gb_rle</a><a href="#result-gb_board">gb_board</a><a href="#result-gb_physics">gb_physics</a><a href="#result-gb_link">gb_link</a><a href="#result-gb_bank">gb_bank</a><a href="#result-gb_asset">gb_asset</a><a href="#result-gb_danmaku">gb_danmaku</a><a href="#result-fc_subpixel">fc_subpixel</a><a href="#visual_checks-json">像素值与字形比较</a><a href="#workflow-json">诊断工作流程</a><a href="#compiler_tests-json">编译器回归检查</a><a href="#browser_checks-json">历史浏览器显示检查</a><a href="#site_checks-json">HTML 结构与链接</a><a href="#bilingual_checks-json">日英完整版本检查</a><a href="#english_browser_checks-json">英语版浏览器检查</a></nav><button class="print" type="button">打印本卷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 参考版</p><h1>验证记录</h1><p class="subtitle">构建、运行与画面记录</p><div class="edition">从第一行代码，到运行、观察和复测。<br/>源码快照：2026 年 9 月 14 日 · 简体中文版：2026 年 9 月 14 日</div></div><h2 id="scope">验证范围</h2><p>以下记录对应 9 月 12 日源码快照。两款编译器和 KUROSAKI CLI 从收集源码构建；KOKURA 与 SARAKURA 使用清单中记录指纹的本地可执行文件。检查不涵盖所有功能、外设或真实硬件。</p><p>每个条目记录编译、模拟器运行 120 帧及其截图。像素比较是独立证据。退出码为零，不足以证明输入、声音或游戏行为正确。后续发布构建与工作区测试在 <a href="../PUBLICATION_CHECKS.md">发布检查记录</a>中另行记录。翻译手册时并未重新执行全部历史观察。</p><section id="gb_hello"><h2 id="result-gb_hello">gb_hello</h2><p>构建退出码：0 / 运行状态：executed</p><p>显示 HELLO WORLD 和 042</p><img alt="gb_hello 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_hello.png"/><p><a href="../verification/gb_hello-build.txt">构建日志</a> / <a href="../verification/gb_hello-runtime.txt">运行日志</a></p></section><section id="gb_arithmetic"><h2 id="result-gb_arithmetic">gb_arithmetic</h2><p>构建退出码：0 / 运行状态：executed</p><p>030</p><img alt="gb_arithmetic 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_arithmetic.png"/><p><a href="../verification/gb_arithmetic-build.txt">构建日志</a> / <a href="../verification/gb_arithmetic-runtime.txt">运行日志</a></p></section><section id="gb_control"><h2 id="result-gb_control">gb_control</h2><p>构建退出码：0 / 运行状态：executed</p><p>042</p><img alt="gb_control 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_control.png"/><p><a href="../verification/gb_control-build.txt">构建日志</a> / <a href="../verification/gb_control-runtime.txt">运行日志</a></p></section><section id="gb_aggregate"><h2 id="result-gb_aggregate">gb_aggregate</h2><p>构建退出码：0 / 运行状态：executed</p><p>042</p><img alt="gb_aggregate 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_aggregate.png"/><p><a href="../verification/gb_aggregate-build.txt">构建日志</a> / <a href="../verification/gb_aggregate-runtime.txt">运行日志</a></p></section><section id="gb_bits_memory"><h2 id="result-gb_bits_memory">gb_bits_memory</h2><p>构建退出码：0 / 运行状态：executed</p><p>010</p><img alt="gb_bits_memory 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_bits_memory.png"/><p><a href="../verification/gb_bits_memory-build.txt">构建日志</a> / <a href="../verification/gb_bits_memory-runtime.txt">运行日志</a></p></section><section id="gb_input"><h2 id="result-gb_input">gb_input</h2><p>构建退出码：0 / 运行状态：executed</p><p>初始为 000，每次新按下 A 增加一次</p><img alt="gb_input 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_input.png"/><p><a href="../verification/gb_input-build.txt">构建日志</a> / <a href="../verification/gb_input-runtime.txt">运行日志</a></p></section><section id="gb_fixed"><h2 id="result-gb_fixed">gb_fixed</h2><p>构建退出码：0 / 运行状态：executed</p><p>012</p><img alt="gb_fixed 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_fixed.png"/><p><a href="../verification/gb_fixed-build.txt">构建日志</a> / <a href="../verification/gb_fixed-runtime.txt">运行日志</a></p></section><section id="gb_entity"><h2 id="result-gb_entity">gb_entity</h2><p>构建退出码：0 / 运行状态：executed</p><p>001</p><img alt="gb_entity 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_entity.png"/><p><a href="../verification/gb_entity-build.txt">构建日志</a> / <a href="../verification/gb_entity-runtime.txt">运行日志</a></p></section><section id="gb_debug"><h2 id="result-gb_debug">gb_debug</h2><p>构建退出码：0 / 运行状态：executed</p><p>001，跟踪日志记录 HP=42</p><img alt="gb_debug 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_debug.png"/><p><a href="../verification/gb_debug-build.txt">构建日志</a> / <a href="../verification/gb_debug-runtime.txt">运行日志</a></p></section><section id="gb_chain"><h2 id="result-gb_chain">gb_chain</h2><p>构建退出码：0 / 运行状态：executed</p><p>042，历史中包含 (20,30)</p><img alt="gb_chain 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_chain.png"/><p><a href="../verification/gb_chain-build.txt">构建日志</a> / <a href="../verification/gb_chain-runtime.txt">运行日志</a></p></section><section id="fc_hello"><h2 id="result-fc_hello">fc_hello</h2><p>构建退出码：0 / 运行状态：executed</p><p>显示 HELLO WORLD 和 042</p><img alt="fc_hello 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_hello.png"/><p><a href="../verification/fc_hello-build.txt">构建日志</a> / <a href="../verification/fc_hello-runtime.txt">运行日志</a></p></section><section id="fc_arithmetic"><h2 id="result-fc_arithmetic">fc_arithmetic</h2><p>构建退出码：0 / 运行状态：executed</p><p>030</p><img alt="fc_arithmetic 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_arithmetic.png"/><p><a href="../verification/fc_arithmetic-build.txt">构建日志</a> / <a href="../verification/fc_arithmetic-runtime.txt">运行日志</a></p></section><section id="fc_control"><h2 id="result-fc_control">fc_control</h2><p>构建退出码：0 / 运行状态：executed</p><p>042</p><img alt="fc_control 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_control.png"/><p><a href="../verification/fc_control-build.txt">构建日志</a> / <a href="../verification/fc_control-runtime.txt">运行日志</a></p></section><section id="fc_aggregate"><h2 id="result-fc_aggregate">fc_aggregate</h2><p>构建退出码：0 / 运行状态：executed</p><p>042</p><img alt="fc_aggregate 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_aggregate.png"/><p><a href="../verification/fc_aggregate-build.txt">构建日志</a> / <a href="../verification/fc_aggregate-runtime.txt">运行日志</a></p></section><section id="fc_bits_memory"><h2 id="result-fc_bits_memory">fc_bits_memory</h2><p>构建退出码：0 / 运行状态：executed</p><p>010</p><img alt="fc_bits_memory 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_bits_memory.png"/><p><a href="../verification/fc_bits_memory-build.txt">构建日志</a> / <a href="../verification/fc_bits_memory-runtime.txt">运行日志</a></p></section><section id="fc_input"><h2 id="result-fc_input">fc_input</h2><p>构建退出码：0 / 运行状态：executed</p><p>初始为 000，每次新按下 A 增加一次</p><img alt="fc_input 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_input.png"/><p><a href="../verification/fc_input-build.txt">构建日志</a> / <a href="../verification/fc_input-runtime.txt">运行日志</a></p></section><section id="fc_fixed"><h2 id="result-fc_fixed">fc_fixed</h2><p>构建退出码：0 / 运行状态：executed</p><p>012</p><img alt="fc_fixed 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_fixed.png"/><p><a href="../verification/fc_fixed-build.txt">构建日志</a> / <a href="../verification/fc_fixed-runtime.txt">运行日志</a></p></section><section id="fc_entity"><h2 id="result-fc_entity">fc_entity</h2><p>构建退出码：0 / 运行状态：executed</p><p>001</p><img alt="fc_entity 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_entity.png"/><p><a href="../verification/fc_entity-build.txt">构建日志</a> / <a href="../verification/fc_entity-runtime.txt">运行日志</a></p></section><section id="fc_debug"><h2 id="result-fc_debug">fc_debug</h2><p>构建退出码：0 / 运行状态：executed</p><p>001，跟踪日志记录 HP=42</p><img alt="fc_debug 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_debug.png"/><p><a href="../verification/fc_debug-build.txt">构建日志</a> / <a href="../verification/fc_debug-runtime.txt">运行日志</a></p></section><section id="fc_chain"><h2 id="result-fc_chain">fc_chain</h2><p>构建退出码：0 / 运行状态：executed</p><p>042，历史中包含 (20,30)</p><img alt="fc_chain 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_chain.png"/><p><a href="../verification/fc_chain-build.txt">构建日志</a> / <a href="../verification/fc_chain-runtime.txt">运行日志</a></p></section><section id="gb_cgb_palette"><h2 id="result-gb_cgb_palette">gb_cgb_palette</h2><p>构建退出码：0 / 运行状态：executed</p><p>CGB 模式下，白底紫色 042</p><img alt="gb_cgb_palette 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_cgb_palette.png"/><p><a href="../verification/gb_cgb_palette-build.txt">构建日志</a> / <a href="../verification/gb_cgb_palette-runtime.txt">运行日志</a></p></section><section id="gb_scroll"><h2 id="result-gb_scroll">gb_scroll</h2><p>构建退出码：0 / 运行状态：executed</p><p>SCX 增加时标题向左移动</p><img alt="gb_scroll 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_scroll.png"/><p><a href="../verification/gb_scroll-build.txt">构建日志</a> / <a href="../verification/gb_scroll-runtime.txt">运行日志</a></p></section><section id="gb_vram_queue"><h2 id="result-gb_vram_queue">gb_vram_queue</h2><p>构建退出码：0 / 运行状态：executed</p><p>在 (3,8) 显示 4</p><img alt="gb_vram_queue 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_vram_queue.png"/><p><a href="../verification/gb_vram_queue-build.txt">构建日志</a> / <a href="../verification/gb_vram_queue-runtime.txt">运行日志</a></p></section><section id="gb_sprite"><h2 id="result-gb_sprite">gb_sprite</h2><p>构建退出码：0 / 运行状态：executed</p><p>在精灵位置显示字母 A</p><img alt="gb_sprite 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_sprite.png"/><p><a href="../verification/gb_sprite-build.txt">构建日志</a> / <a href="../verification/gb_sprite-runtime.txt">运行日志</a></p></section><section id="gb_rng"><h2 id="result-gb_rng">gb_rng</h2><p>构建退出码：0 / 运行状态：executed</p><p>数值范围 000～009；相同种子重复同一序列</p><img alt="gb_rng 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_rng.png"/><p><a href="../verification/gb_rng-build.txt">构建日志</a> / <a href="../verification/gb_rng-runtime.txt">运行日志</a></p></section><section id="gb_flags"><h2 id="result-gb_flags">gb_flags</h2><p>构建退出码：0 / 运行状态：executed</p><p>001</p><img alt="gb_flags 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_flags.png"/><p><a href="../verification/gb_flags-build.txt">构建日志</a> / <a href="../verification/gb_flags-runtime.txt">运行日志</a></p></section><section id="gb_circle"><h2 id="result-gb_circle">gb_circle</h2><p>构建退出码：0 / 运行状态：executed</p><p>步进一次后为 042；本例使用整数像素</p><img alt="gb_circle 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_circle.png"/><p><a href="../verification/gb_circle-build.txt">构建日志</a> / <a href="../verification/gb_circle-runtime.txt">运行日志</a></p></section><section id="fc_scroll"><h2 id="result-fc_scroll">fc_scroll</h2><p>构建退出码：0 / 运行状态：executed</p><p>标题水平滚动</p><img alt="fc_scroll 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_scroll.png"/><p><a href="../verification/fc_scroll-build.txt">构建日志</a> / <a href="../verification/fc_scroll-runtime.txt">运行日志</a></p></section><section id="fc_vram_queue"><h2 id="result-fc_vram_queue">fc_vram_queue</h2><p>构建退出码：0 / 运行状态：executed</p><p>在 (3,8) 显示 4</p><img alt="fc_vram_queue 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_vram_queue.png"/><p><a href="../verification/fc_vram_queue-build.txt">构建日志</a> / <a href="../verification/fc_vram_queue-runtime.txt">运行日志</a></p></section><section id="fc_sprite"><h2 id="result-fc_sprite">fc_sprite</h2><p>构建退出码：0 / 运行状态：executed</p><p>屏幕上显示一个精灵</p><img alt="fc_sprite 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_sprite.png"/><p><a href="../verification/fc_sprite-build.txt">构建日志</a> / <a href="../verification/fc_sprite-runtime.txt">运行日志</a></p></section><section id="fc_sound"><h2 id="result-fc_sound">fc_sound</h2><p>构建退出码：0 / 运行状态：executed</p><p>显示 042 并发出脉冲音</p><img alt="fc_sound 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_sound.png"/><p><a href="../verification/fc_sound-build.txt">构建日志</a> / <a href="../verification/fc_sound-runtime.txt">运行日志</a></p></section><section id="gb_sound"><h2 id="result-gb_sound">gb_sound</h2><p>构建退出码：0 / 运行状态：executed</p><p>显示 042 并发出短脉冲音</p><img alt="gb_sound 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_sound.png"/><p><a href="../verification/gb_sound-build.txt">构建日志</a> / <a href="../verification/gb_sound-runtime.txt">运行日志</a></p></section><section id="gb_font"><h2 id="result-gb_font">gb_font</h2><p>构建退出码：0 / 运行状态：executed</p><p>显示大写、小写、数字以及全部 30 个符号</p><img alt="gb_font 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_font.png"/><p><a href="../verification/gb_font-build.txt">构建日志</a> / <a href="../verification/gb_font-runtime.txt">运行日志</a></p></section><section id="fc_font"><h2 id="result-fc_font">fc_font</h2><p>构建退出码：0 / 运行状态：executed</p><p>显示大写、小写、数字以及全部 30 个符号</p><img alt="fc_font 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_font.png"/><p><a href="../verification/fc_font-build.txt">构建日志</a> / <a href="../verification/fc_font-runtime.txt">运行日志</a></p></section><section id="gb_system"><h2 id="result-gb_system">gb_system</h2><p>构建退出码：0 / 运行状态：executed</p><p>002</p><img alt="gb_system 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_system.png"/><p><a href="../verification/gb_system-build.txt">构建日志</a> / <a href="../verification/gb_system-runtime.txt">运行日志</a></p></section><section id="gb_scene"><h2 id="result-gb_scene">gb_scene</h2><p>构建退出码：0 / 运行状态：executed</p><p>001，未注册回调</p><img alt="gb_scene 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_scene.png"/><p><a href="../verification/gb_scene-build.txt">构建日志</a> / <a href="../verification/gb_scene-runtime.txt">运行日志</a></p></section><section id="fc_system"><h2 id="result-fc_system">fc_system</h2><p>构建退出码：0 / 运行状态：executed</p><p>002</p><img alt="fc_system 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_system.png"/><p><a href="../verification/fc_system-build.txt">构建日志</a> / <a href="../verification/fc_system-runtime.txt">运行日志</a></p></section><section id="fc_scene"><h2 id="result-fc_scene">fc_scene</h2><p>构建退出码：0 / 运行状态：executed</p><p>001，未注册回调</p><img alt="fc_scene 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_scene.png"/><p><a href="../verification/fc_scene-build.txt">构建日志</a> / <a href="../verification/fc_scene-runtime.txt">运行日志</a></p></section><section id="gb_camera"><h2 id="result-gb_camera">gb_camera</h2><p>构建退出码：0 / 运行状态：executed</p><p>042，即世界 x=52 减去镜头 x=10</p><img alt="gb_camera 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_camera.png"/><p><a href="../verification/gb_camera-build.txt">构建日志</a> / <a href="../verification/gb_camera-runtime.txt">运行日志</a></p></section><section id="gb_rle"><h2 id="result-gb_rle">gb_rle</h2><p>构建退出码：0 / 运行状态：executed</p><p>042，三个字节各为 42</p><img alt="gb_rle 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_rle.png"/><p><a href="../verification/gb_rle-build.txt">构建日志</a> / <a href="../verification/gb_rle-runtime.txt">运行日志</a></p></section><section id="gb_board"><h2 id="result-gb_board">gb_board</h2><p>构建退出码：0 / 运行状态：executed</p><p>042</p><img alt="gb_board 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_board.png"/><p><a href="../verification/gb_board-build.txt">构建日志</a> / <a href="../verification/gb_board-runtime.txt">运行日志</a></p></section><section id="gb_physics"><h2 id="result-gb_physics">gb_physics</h2><p>构建退出码：0 / 运行状态：executed</p><p>042，整数像素坐标</p><img alt="gb_physics 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_physics.png"/><p><a href="../verification/gb_physics-build.txt">构建日志</a> / <a href="../verification/gb_physics-runtime.txt">运行日志</a></p></section><section id="gb_link"><h2 id="result-gb_link">gb_link</h2><p>构建退出码：0 / 运行状态：executed</p><p>未连接时为 255，超时为 000，连接时显示对端值</p><img alt="gb_link 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_link.png"/><p><a href="../verification/gb_link-build.txt">构建日志</a> / <a href="../verification/gb_link-runtime.txt">运行日志</a></p></section><section id="gb_bank"><h2 id="result-gb_bank">gb_bank</h2><p>构建退出码：0 / 运行状态：executed</p><p>042，从 bank 0 的固定 ROM 复制数据</p><img alt="gb_bank 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_bank.png"/><p><a href="../verification/gb_bank-build.txt">构建日志</a> / <a href="../verification/gb_bank-runtime.txt">运行日志</a></p></section><section id="gb_asset"><h2 id="result-gb_asset">gb_asset</h2><p>构建退出码：0 / 运行状态：executed</p><p>042</p><img alt="gb_asset 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_asset.png"/><p><a href="../verification/gb_asset-build.txt">构建日志</a> / <a href="../verification/gb_asset-runtime.txt">运行日志</a></p></section><section id="gb_danmaku"><h2 id="result-gb_danmaku">gb_danmaku</h2><p>构建退出码：0 / 运行状态：executed</p><p>001，数值对象池示例，不使用子弹背景合成</p><img alt="gb_danmaku 的模拟器截图" class="screen" loading="lazy" src="../verification/gb_danmaku.png"/><p><a href="../verification/gb_danmaku-build.txt">构建日志</a> / <a href="../verification/gb_danmaku-runtime.txt">运行日志</a></p></section><section id="fc_subpixel"><h2 id="result-fc_subpixel">fc_subpixel</h2><p>构建退出码：0 / 运行状态：executed</p><p>042，游戏使用头文件常量显式积分</p><img alt="fc_subpixel 的模拟器截图" class="screen" loading="lazy" src="../verification/fc_subpixel.png"/><p><a href="../verification/fc_subpixel-build.txt">构建日志</a> / <a href="../verification/fc_subpixel-runtime.txt">运行日志</a></p></section><h2 id="visual_checks-json">像素值与字形比较</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">复制</button><pre><code>[
+  {
+    "id": "gb_hello",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_arithmetic",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "030",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_control",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_aggregate",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_bits_memory",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "010",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_input",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "000",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_fixed",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "012",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_entity",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_debug",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_chain",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_system",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "002",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_scene",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_hello",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_arithmetic",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "030",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_control",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_aggregate",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_bits_memory",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "010",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_input",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "000",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_fixed",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "012",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_entity",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_debug",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_chain",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_system",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "002",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_scene",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_camera",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_rle",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_board",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_physics",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_link",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "255",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_bank",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_asset",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_danmaku",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_subpixel",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_cgb_palette",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_vram_queue",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "4",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_flags",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_circle",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_vram_queue",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "4",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_sound",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_sound",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_input_pressed",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 5,
+    "expected_text": "ABCDEFGHIJKLMNOP",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 6,
+    "expected_text": "QRSTUVWXYZ",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 8,
+    "expected_text": "0123456789",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 10,
+    "expected_text": "abcdefghijklmnop",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 11,
+    "expected_text": "qrstuvwxyz",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 13,
+    "expected_text": "!#$%&amp;'()*+,-./",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 14,
+    "expected_text": ":;&lt;=&gt;?@[]^_`{}~",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 16,
+    "tile_y": 13,
+    "expected_text": "\"",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_input_pressed",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 5,
+    "expected_text": "ABCDEFGHIJKLMNOP",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 6,
+    "expected_text": "QRSTUVWXYZ",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 8,
+    "expected_text": "0123456789",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 10,
+    "expected_text": "abcdefghijklmnop",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 11,
+    "expected_text": "qrstuvwxyz",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 13,
+    "expected_text": "!#$%&amp;'()*+,-./",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 14,
+    "expected_text": ":;&lt;=&gt;?@[]^_`{}~",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 16,
+    "tile_y": 13,
+    "expected_text": "\"",
+    "status": "passed",
+    "errors": []
+  }
+]</code></pre></div><h2 id="workflow-json">诊断工作流程</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">复制</button><pre><code>[
+  {
+    "id": "sarakura-gb-synthetic",
+    "tool": "sarakura",
+    "arguments": [
+      "gb",
+      "analyze",
+      "--metadata",
+      "[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\gb\\build.json",
+      "--events",
+      "[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\gb\\events.jsonl",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-gb",
+      "--fail-on",
+      "never",
+      "--no-repro-bundle"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed",
+    "verified_date": "2026-09-12",
+    "report_language": "en"
+  },
+  {
+    "id": "sarakura-gb-validate",
+    "tool": "sarakura",
+    "arguments": [
+      "validate",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-gb\\ai_diagnostics.json",
+      "--strict"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "sarakura-gb-ci",
+    "tool": "sarakura",
+    "arguments": [
+      "ci-summary",
+      "--diagnostics",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-gb",
+      "--fail-on",
+      "error",
+      "--enforce"
+    ],
+    "exit_code": 1,
+    "expected_exit_codes": [
+      1
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "sarakura-gb-real",
+    "tool": "sarakura",
+    "arguments": [
+      "gb",
+      "analyze",
+      "--metadata",
+      "[WORKSPACE]\\manual\\_manual_work\\gb_hello\\build.json",
+      "--events",
+      "[WORKSPACE]\\manual\\_manual_work\\gb_hello\\diag",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\real-gb",
+      "--fail-on",
+      "never",
+      "--no-repro-bundle"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed",
+    "verified_date": "2026-09-12",
+    "report_language": "en"
+  },
+  {
+    "id": "sarakura-fc-synthetic",
+    "tool": "sarakura",
+    "arguments": [
+      "fc",
+      "analyze",
+      "--metadata",
+      "[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\fc\\build.json",
+      "--events",
+      "[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\fc\\events.jsonl",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-fc",
+      "--fail-on",
+      "never",
+      "--no-repro-bundle"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed",
+    "verified_date": "2026-09-12",
+    "report_language": "en"
+  },
+  {
+    "id": "sarakura-fc-validate",
+    "tool": "sarakura",
+    "arguments": [
+      "validate",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-fc\\ai_diagnostics.json",
+      "--strict"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "sarakura-fc-ci",
+    "tool": "sarakura",
+    "arguments": [
+      "ci-summary",
+      "--diagnostics",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-fc",
+      "--fail-on",
+      "error",
+      "--enforce"
+    ],
+    "exit_code": 1,
+    "expected_exit_codes": [
+      1
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "sarakura-fc-real",
+    "tool": "sarakura",
+    "arguments": [
+      "fc",
+      "analyze",
+      "--metadata",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\build.json",
+      "--events",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\events.jsonl",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\real-fc",
+      "--fail-on",
+      "never",
+      "--no-repro-bundle"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed",
+    "verified_date": "2026-09-12",
+    "report_language": "en"
+  },
+  {
+    "id": "kurosaki-inspect",
+    "tool": "kurosaki",
+    "arguments": [
+      "inspect-rom",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\rom.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-disasm",
+    "tool": "kurosaki",
+    "arguments": [
+      "disasm",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--bytes",
+      "64",
+      "--text",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\reset.txt"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-decompile",
+    "tool": "kurosaki",
+    "arguments": [
+      "decompile",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--max-instructions",
+      "64",
+      "--format",
+      "markdown",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\decompile.md"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-trace",
+    "tool": "kurosaki",
+    "arguments": [
+      "trace",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--frames",
+      "2",
+      "--cpu",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\trace.jsonl"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-snapshot-save",
+    "tool": "kurosaki",
+    "arguments": [
+      "snapshot-save",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--frames",
+      "60",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\state.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-snapshot-load",
+    "tool": "kurosaki",
+    "arguments": [
+      "snapshot-load",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\state.json",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\loaded.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-snapshot-resume",
+    "tool": "kurosaki",
+    "arguments": [
+      "snapshot-resume",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\state.json",
+      "--frames",
+      "2",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\resumed.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-replay-record",
+    "tool": "kurosaki",
+    "arguments": [
+      "replay-record",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--frames",
+      "60",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\replay.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-replay-run",
+    "tool": "kurosaki",
+    "arguments": [
+      "replay-run",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\replay.json",
+      "--verify",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\replay-result.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-mapper-test",
+    "tool": "kurosaki",
+    "arguments": [
+      "mapper-test",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\mapper-test.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-pad",
+    "tool": "kurosaki",
+    "arguments": [
+      "run",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_input\\program.nes",
+      "--frames",
+      "120",
+      "--pad1",
+      "1",
+      "--png",
+      "[WORKSPACE]\\kitaq-docs\\verification\\fc_input_pressed.png",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\pad.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kokura-pad",
+    "tool": "kokura",
+    "arguments": [
+      "[WORKSPACE]\\manual\\_manual_work\\gb_input\\program.gb",
+      "--run-frames",
+      "120",
+      "--input-script",
+      "NONE:30;A:2;NONE:88",
+      "--png",
+      "[WORKSPACE]\\kitaq-docs\\verification\\gb_input_pressed.png",
+      "--dump-report",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\gb-pad.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-audio",
+    "tool": "kurosaki",
+    "arguments": [
+      "audio-export",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_sound\\program.nes",
+      "--frames",
+      "120",
+      "--wav",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\fc-audio.wav",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\fc-audio.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "gb-audio-pcm",
+    "frames": 133196,
+    "sample_rate": 65536,
+    "channels": 2,
+    "peak": 7730,
+    "rms": 1406.811,
+    "nonzero_samples": 13204,
+    "status": "passed",
+    "scope": "PCM generated and non-silent; no subjective timbre or hardware claim"
+  },
+  {
+    "id": "fc-audio-pcm",
+    "frames": 88055,
+    "sample_rate": 44100,
+    "channels": 1,
+    "peak": 6721,
+    "rms": 3338.903,
+    "nonzero_samples": 87490,
+    "status": "passed",
+    "scope": "PCM generated and non-silent; no subjective timbre or hardware claim"
+  }
+]</code></pre></div><h2 id="compiler_tests-json">编译器回归检查</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">复制</button><pre><code>{
+  "kitaqgb": {
+    "regression_suite_tests": 16,
+    "passed": 16,
+    "new_regression": "test_kitaqgb_jump_label_scope.py",
+    "new_regression_modes": ["-O0", "-O1"],
+    "before_fix": "both modes failed compilation at Branch out of range",
+    "after_fix": "both modes compiled and matched KOKURA RAM expectations",
+    "log": "gb-regression-suite.txt"
+  },
+  "kitaqfc": {
+    "new_regression": "test_kitaqfc_call_temps.py",
+    "modes": ["-O0", "-O1"],
+    "expected_values_per_mode": 12,
+    "before_fix": "both modes failed KUROSAKI RAM comparisons",
+    "after_fix": "both modes matched all expected values",
+    "log": "fc-regression.txt"
+  },
+  "portable_scripts": {
+    "build.ps1": "gb_hello and fc_scene selected with comma-separated PowerShell arguments; both built successfully",
+    "sarakura_demo.ps1": "GB and FC synthetic reports generated and schema validated"
+  }
+}</code></pre></div><h2 id="browser_checks-json">历史浏览器显示检查</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">复制</button><pre><code>{
+  "browser": "Codex in-app browser",
+  "checks": [
+    {"check": "Desktop index visual inspection", "status": "passed"},
+    {"check": "390 x 844 mobile index visual inspection", "status": "passed"},
+    {"check": "Desktop library page body width equals viewport (1265 px)", "status": "passed"},
+    {"check": "entity_create hash opens the matching API entry", "status": "passed"},
+    {"check": "entity_create search filters to 8 matching entries", "status": "passed"},
+    {"check": "Copy button writes the selected entity_create declaration", "status": "passed"}
+  ],
+  "print": "Print CSS and details expansion implemented; physical printing not tested"
+}</code></pre></div><h2 id="site_checks-json">HTML 结构与链接</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">复制</button><pre><code>{
+  "main_html_pages": 9,
+  "english_html_pages": 9,
+  "synthetic_report_pages": 2,
+  "local_links_checked": 1938,
+  "api_entries": 1029,
+  "sample_programs": 47,
+  "successful_builds": 47,
+  "emulator_runs": 47,
+  "errors": [],
+  "status": "passed"
+}</code></pre></div><h2 id="bilingual_checks-json">日英完整版本检查</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">复制</button><pre><code>{
+  "checked_on": "2026-09-13",
+  "japanese_pages": 9,
+  "english_pages": 9,
+  "api_entries_per_language": 1029,
+  "shared_complete_samples": 47,
+  "local_links_checked": 1949,
+  "status": "passed",
+  "errors": [],
+  "original_source_and_recorded_output": "Preserved verbatim, including original-language comments."
+}</code></pre></div><h2 id="english_browser_checks-json">英语版浏览器检查</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">复制</button><pre><code>{
+  "date": "2026-09-13",
+  "browser": "Microsoft Edge, isolated headless session",
+  "english_pages_loaded": [
+    "fc-library.html",
+    "gb-library.html",
+    "index.html",
+    "kitaqfc.html",
+    "kitaqgb.html",
+    "kokura.html",
+    "kurosaki.html",
+    "sarakura.html",
+    "verification.html"
+  ],
+  "search_result": "Reference/examples: 6 / Text: 0",
+  "anchor_reveal": "passed",
+  "print_expand_restore": "passed",
+  "language_switch_both_directions": "passed",
+  "desktop_width": 1440,
+  "mobile_width": 390,
+  "errors": [],
+  "status": "passed"
+}</code></pre></div><footer>源码版本 2026-09-14 • <a href="index.html">目录</a> • <a href="verification.html">验证</a> • <a href="../reference/inventory.json">快照指纹</a><br/>示例构建、模拟器执行与预期结果比较分别记录。</footer></main></div><script src="../assets/manual.js"></script></body></html>

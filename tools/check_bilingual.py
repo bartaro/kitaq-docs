@@ -3,6 +3,8 @@ from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlsplit, unquote
 import json,re
+from datetime import date
+from languages import LANGUAGES
 S=Path(__file__).resolve().parents[1]
 class Page(HTMLParser):
     def __init__(self,p):
@@ -18,7 +20,8 @@ class Page(HTMLParser):
     def handle_endtag(self,t):
         if t=='pre':self.pre-=1
     def handle_data(self,d):
-        if not self.pre and re.search('[\u3040-\u30ff\u3400-\u9fff]',d) and d.strip()!='日本語':self.prose.append(d)
+        # Language selectors deliberately use each language's own spelling.
+        if not self.pre and re.search('[\u3040-\u30ff\u3400-\u9fff]',d) and d.strip() not in (*LANGUAGES.values(), '北九 (キタキュー, Kitakyū)'):self.prose.append(d)
 def main():
     pages={p.resolve():Page(p) for p in S.rglob('*.html')};errors=[];links=0
     names=['index','kitaqgb','gb-library','kokura','kitaqfc','fc-library','kurosaki','sarakura','verification']
@@ -41,7 +44,7 @@ def main():
             elif u.fragment and target in pages and unquote(u.fragment) not in pages[target].ids:errors.append({'page':str(p.relative_to(S)),'missing_anchor':link})
     api=sum(len(json.loads((S/'reference'/(p+'-api.json')).read_text(encoding='utf-8'))['records']) for p in ('gb','fc'))
     manifest=json.loads((S/'samples/manifest.json').read_text(encoding='utf-8'))
-    report={'checked_on':'2026-09-13','japanese_pages':9,'english_pages':9,'api_entries_per_language':api,'shared_complete_samples':len(manifest),'local_links_checked':links,'status':'passed' if not errors else 'failed','errors':errors,'original_source_and_recorded_output':'Preserved verbatim, including original-language comments.'}
+    report={'checked_on':date.today().isoformat(),'japanese_pages':9,'english_pages':9,'api_entries_per_language':api,'shared_complete_samples':len(manifest),'local_links_checked':links,'status':'passed' if not errors else 'failed','errors':errors,'original_source_and_recorded_output':'Preserved verbatim, including original-language comments.'}
     (S/'verification/bilingual_checks.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps(report,ensure_ascii=True))
     if errors:raise SystemExit(1)

@@ -1,12 +1,111 @@
 # KITAQ SERIES Manuals
 
+<!-- manual-language-links:start -->
+| Language / 言語 | HTML |
+| --- | --- |
+| English | [KITAQGB](https://bartaro.github.io/kitaq-docs/en/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/en/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/en/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/en/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/en/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/en/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/en/sarakura.html) |
+| 日本語 | [KITAQGB](https://bartaro.github.io/kitaq-docs/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/sarakura.html) |
+| 한국어 | [KITAQGB](https://bartaro.github.io/kitaq-docs/ko/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/ko/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/ko/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/ko/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/ko/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/ko/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/ko/sarakura.html) |
+| 简体中文 | [KITAQGB](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/zh-CN/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/zh-CN/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/zh-CN/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/zh-CN/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/zh-CN/sarakura.html) |
+| 繁體中文 | [KITAQGB](https://bartaro.github.io/kitaq-docs/zh-TW/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/zh-TW/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/zh-TW/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/zh-TW/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/zh-TW/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/zh-TW/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/zh-TW/sarakura.html) |
+| Español | [KITAQGB](https://bartaro.github.io/kitaq-docs/es/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/es/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/es/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/es/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/es/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/es/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/es/sarakura.html) |
+| Português (Brasil) | [KITAQGB](https://bartaro.github.io/kitaq-docs/pt/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/pt/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/pt/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/pt/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/pt/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/pt/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/pt/sarakura.html) |
+| Français | [KITAQGB](https://bartaro.github.io/kitaq-docs/fr/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/fr/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/fr/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/fr/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/fr/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/fr/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/fr/sarakura.html) |
+| Deutsch | [KITAQGB](https://bartaro.github.io/kitaq-docs/de/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/de/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/de/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/de/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/de/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/de/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/de/sarakura.html) |
+<!-- manual-language-links:end -->
+
+
+[English](#english) | [日本語](#japanese) | [한국어](README.ko.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [Español](README.es.md) | [Português (Brasil)](README.pt-BR.md) | [Français](README.fr.md) | [Deutsch](README.de.md)
+
+<a name="english"></a>
+
+## English
+
+[Japanese manuals](https://bartaro.github.io/kitaq-docs/) / [English manuals](https://bartaro.github.io/kitaq-docs/en/) / [Source checkout and layout](GITHUB_SETUP.md)
+
+### HTML manuals
+
+Seven complete volumes are available in nine languages, with source references updated on September 14, 2026. Every edition contains the same 1,053 API entries and 47 complete sample programs. Open `en/index.html` for English or `index.html` for Japanese; each volume provides language navigation. Historical build and execution records describe the version tested at the time. Updating source references does not rerun those tests.
+
+Original source excerpts and captured tool output are preserved verbatim. See [GitHub setup](GITHUB_SETUP.md) and [publication checks](PUBLICATION_CHECKS.md). The HTML files support offline reading, searching within a volume, copying code and printing.
+
+| File | Contents |
+|---|---|
+| kitaqgb.html | KITAQGB syntax, compiler intrinsics and builds |
+| gb-library.html | KITAQGB libraries |
+| kokura.html | KOKURA execution, input, observation and recording |
+| kitaqfc.html | KITAQFC syntax, compiler intrinsics and builds |
+| fc-library.html | KITAQFC libraries |
+| kurosaki.html | KUROSAKI execution, saving and analysis |
+| sarakura.html | SARAKURA diagnostics and retesting |
+| verification.html | Recorded builds, execution and pixel comparisons |
+
+The contents page and the beginning of volume 1 explain the two meanings of the name and acknowledge NORCAL. Letters, digits and symbols use the supplied `samples/assets/ascii.c`. GB assets are reordered into ASCII order; FC assets are converted to NES bitplanes. The glyph shapes are unchanged.
+
+The prose, additional samples and generation tools use the MIT License. On September 12, 2026, the author confirmed that the supplied 92 glyphs are original work and may be published under MIT. Excerpts from the original software retain their copyright notices. Redistribute [third-party notices](THIRD_PARTY_NOTICES.md) and the applicable licenses together.
+
+The manuals include the [English license](LICENSE) and a [Japanese reference translation](LICENSE.ja). [Third-party notices](THIRD_PARTY_NOTICES.md) link to the Japanese licenses of the individual tools. The English original takes precedence if the translations differ. Software binary distributions also require the separate licenses of their dependencies. Permission to publish these manuals does not mean that every tool and dependency can be redistributed under MIT alone.
+
+### Build the samples
+
+Clone the repositories as siblings under one parent directory and run the following commands from that parent. See [GITHUB_SETUP.md](GITHUB_SETUP.md) for the layout. Use the supplied compilers or rebuild them using the manual instructions; this edition includes compiler fixes.
+
+```powershell
+.\kitaq-docs\samples\build.ps1 -Only gb_hello,fc_hello
+.\kitaq-docs\samples\build.ps1
+```
+
+For another source location, set `-Root "absolute path to the source tree"`. Select executables stored elsewhere with `-GbCompiler` and `-FcCompiler`. Generated ROMs and logs go to `samples/out/<sample-id>` by default. This manual package contains no compiler executables, commercial ROMs or BIOS files.
+
+`samples/api-fragments` contains code fragments that require initialization and valid arguments in their surrounding programs. The batch ROM build covers the 47 programs in `samples/manifest.json`. Each volume distinguishes declaration-only APIs, unexecuted fragments and features not verified on physical hardware.
+
+### Publish on GitHub
+
+1. Place this folder's contents at the repository root or inside a `docs` folder.
+2. Upload `index.html`, all seven volumes, `verification.html`, the language directories, `assets`, `samples`, `reference`, `verification`, the README and license notices together. Include `.nojekyll`.
+3. In GitHub Settings → Pages → Build and deployment, set Source to Deploy from a branch.
+4. Select the uploaded branch and `/ (root)` or `/docs`, then save.
+5. After publication completes, open the URL shown in Pages and check the contents and volume links.
+
+See [GitHub's publishing-source instructions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site). `manual/_manual_work` is a local build and verification workspace and is excluded from publication.
+
+### Edit and update
+
+Japanese prose lives in `tools/chapters.py`, English prose in `tools/en/*.md`, English generation in `tools/generate_en.py`, API dictionaries and page generation in `tools/generate.py`, and styling in `assets/manual.css`. Use Python to update the manuals.
+
+```powershell
+python -B kitaq-docs/tools/collect.py
+python -B kitaq-docs/tools/make_samples.py
+python -B kitaq-docs/tools/catalog.py
+python -B kitaq-docs/tools/generate.py
+python -B kitaq-docs/tools/generate_en.py
+foreach ($language in @('ko','zh-CN','zh-TW','es','pt','fr','de')) {
+    python -B kitaq-docs/tools/generate_i18n.py --language $language
+    if ($LASTEXITCODE -ne 0) { throw "Manual generation failed: $language" }
+}
+python -B kitaq-docs/tools/check_site.py
+python -B kitaq-docs/tools/check_bilingual.py
+```
+
+Source collection and builds require the original source trees and their tools. Font conversion and pixel comparisons use Pillow. Reading the HTML requires neither Python nor a server. After changing source code or executables, do not reuse old verification results as evidence of the new version. See [compiler changes](verification/compiler_fixes.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+
+### Scope of this source publication
+
+KOKURA-GUI, KUROSAKI-GUI and PLITA are excluded from this upload. The published sources and manuals cover the CLI, core and integration APIs.
+
+---
+
+<a name="japanese"></a>
+
+## 日本語
+
 [日本語 / Japanese](https://bartaro.github.io/kitaq-docs/) / [English](https://bartaro.github.io/kitaq-docs/en/) / [ソースの取得と配置](GITHUB_SETUP.md)
 
-## 日本語・英語HTMLマニュアル / Japanese and English HTML manuals
+### 9言語のHTMLマニュアル
 
-2026年9月12日のソースを基準にした7冊を、日本語と英語で収録しています。英語版は2026年9月13日に作成しました。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。
+7冊を9言語で収録し、ソースの説明を2026年9月14日時点の内容に更新しました。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。過去のビルド・実行記録は当時の版に対する結果であり、説明の更新だけでこれらの試験を再実行したことにはなりません。
 
-Seven complete volumes are available in both languages, with the same 1,029 API entries and 47 sample programs. Open `en/index.html` for English or `index.html` for Japanese. Original source excerpts and recorded tool output are preserved verbatim. See [GitHub setup](GITHUB_SETUP.md) and [publication checks](PUBLICATION_CHECKS.md).
+全言語に同じ1,053件のAPIと47本の完成サンプルを収録しています。元のソース抜粋とツール出力は原文のまま保持しています。[取得・配置手順](GITHUB_SETUP.md)と[公開時の確認記録](PUBLICATION_CHECKS.md)も参照してください。
 `index.html` を開いてください。オフラインで閲覧・巻内検索・コードのコピー・印刷ができます。
 
 | ファイル | 内容 |
@@ -28,10 +127,10 @@ GBではASCII順へ並べ、FCではNESのビットプレーン形式へ変換�
 マニュアルのライセンスは[英語原文](LICENSE)と[日本語参考訳](LICENSE.ja)を同梱しています。各ソフトの日本語版へのリンクは[権利表記](THIRD_PARTY_NOTICES.md)にあります。解釈に相違がある場合は英語原文を優先します。
 ソフト本体のバイナリ配布では依存クレート等の別ライセンスも必要です。このマニュアルの公開許諾と、全ソフト・全依存物がMITだけで再配布できるという判断は異なります。
 
-## サンプルをビルド
+### サンプルをビルド
 
 各リポジトリを同じ親フォルダーの直下にcloneし、その親フォルダーから実行します。配置は [GITHUB_SETUP.md](GITHUB_SETUP.md) を参照してください。
-先に各コンパイラをマニュアルの手順でビルドしてください。本版にはコンパイラ修正も含まれます。
+配布済みコンパイラを使うか、マニュアルの手順で再ビルドしてください。本版にはコンパイラ修正も含まれます。
 
 ```powershell
 .\kitaq-docs\samples\build.ps1 -Only gb_hello,fc_hello
@@ -47,10 +146,10 @@ EXEを別配置にしている場合は `-GbCompiler` / `-FcCompiler` で選べ�
 一括ROMビルドの対象は `samples/manifest.json` の47プログラムです。
 宣言のみのAPI、実行していない断片、実機未確認の機能は各巻で区別しています。
 
-## GitHubへ置く
+### GitHubへ置く
 
 1. このフォルダーの内容を、公開するリポジトリのルート、または `docs` フォルダーへ置きます。
-2. `index.html`、7冊、`verification.html`、`assets`、`samples`、`reference`、`verification`、READMEと権利表記を一緒にアップロードします。`.nojekyll` も含めます。
+2. `index.html`、7冊、`verification.html`、各言語のフォルダー、`assets`、`samples`、`reference`、`verification`、READMEと権利表記を一緒にアップロードします。`.nojekyll` も含めます。
 3. GitHubの Settings → Pages → Build and deployment で、Sourceを Deploy from a branch にします。
 4. アップロード先のブランチと `/ (root)` または `/docs` を選び、Saveします。
 5. 公開処理が完了したら、Pages欄に表示されたURLから目次と各巻のリンクを確かめます。
@@ -58,28 +157,29 @@ EXEを別配置にしている場合は `-GbCompiler` / `-FcCompiler` で選べ�
 手順の根拠：[GitHub公式の公開元設定](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)。
 `manual/_manual_work` はローカルのビルド・検証作業領域で、公開対象には含めません。
 
-## 編集と更新
+### 編集と更新
 
 日本語本文は `tools/chapters.py`、英語本文は `tools/en/*.md`、英語版生成は `tools/generate_en.py`、API辞典とページ生成は `tools/generate.py`、
 見た目は `assets/manual.css` にあります。Pythonで更新できます。
 
 ```powershell
-python kitaq-docs/tools/collect.py
-python kitaq-docs/tools/make_samples.py
-python kitaq-docs/tools/catalog.py
-python kitaq-docs/tools/verify_samples.py --runtime
-python kitaq-docs/tools/workflow.py
-python kitaq-docs/tools/check_pixels.py
-python kitaq-docs/tools/generate.py
-python kitaq-docs/tools/generate_en.py
-python kitaq-docs/tools/check_site.py
-python kitaq-docs/tools/check_bilingual.py
+python -B kitaq-docs/tools/collect.py
+python -B kitaq-docs/tools/make_samples.py
+python -B kitaq-docs/tools/catalog.py
+python -B kitaq-docs/tools/generate.py
+python -B kitaq-docs/tools/generate_en.py
+foreach ($language in @('ko','zh-CN','zh-TW','es','pt','fr','de')) {
+    python -B kitaq-docs/tools/generate_i18n.py --language $language
+    if ($LASTEXITCODE -ne 0) { throw "Manual generation failed: $language" }
+}
+python -B kitaq-docs/tools/check_site.py
+python -B kitaq-docs/tools/check_bilingual.py
 ```
 
 ソース採取・ビルドには元のソースツリーと各ツールが必要です。字体変換・画面照合にはPillowを使用します。
 単なるHTML閲覧にはPythonもサーバーも不要です。ソースやEXEを更新したら、古い検証結果をそのまま流用しないでください。
 変更内容は [compiler_fixes.md](verification/compiler_fixes.md)、権利表記は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。
 
-## 今回のソース公開範囲
+### 今回のソース公開範囲
 
 KOKURA-GUI、KUROSAKI-GUI、PLITAは今回のアップロード対象外です。今回の公開ソースとマニュアルはCLI・コア・連携APIを対象としています。本体・CLI・連携APIを利用してください。

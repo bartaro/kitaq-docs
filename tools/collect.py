@@ -1,6 +1,7 @@
 """Refresh the manual's source/CLI inventory. Run from any directory."""
 from pathlib import Path
 import hashlib, json, re, subprocess
+from datetime import date
 
 SITE = Path(__file__).resolve().parents[1]
 ROOT = SITE.parent
@@ -13,16 +14,25 @@ TOOLS = {
  'kurosaki': ROOT/'kurosaki/kurosaki.exe',
  'sarakura': ROOT/'sarakura/sarakura.exe',
 }
-for _name, _path in {'kitaqgb': WORK/'gb_compiler/kitaqgb.exe', 'kitaqfc': WORK/'fc_compiler/kitaqfc.exe', 'kurosaki': WORK/'kurosaki_target/debug/kurosaki.exe'}.items():
- if _path.exists(): TOOLS[_name] = _path
+# Inventory only the executables shipped at repository roots; cached test builds
+# must never silently replace the tools whose help and hashes are published.
 def read(p): return p.read_text(encoding='utf-8-sig', errors='replace')
 def cli(name, args):
  p=subprocess.run([str(TOOLS[name]),*args], cwd=WORK, capture_output=True, timeout=45)
  return {'argv':args, 'exit_code':p.returncode, 'text':(p.stdout+p.stderr).decode('utf-8',errors='replace').replace(str(ROOT),'[WORKSPACE]')}
 def main():
- data={'date':'2026-09-12','tools':{},'sources':[]}
+ missing=[str(path) for path in TOOLS.values() if not path.is_file()]
+ if missing:raise FileNotFoundError('Build the release executables first: '+', '.join(missing))
+ data={'date':date.today().isoformat(),'scope':'Current source and distributed executable inventory; historical runtime records retain their own provenance.','tools':{},'sources':[]}
+ # Retain earlier recorded executable fingerprints when refreshing current help.
+ inventory_path=SITE/'reference/inventory.json'
+ previous=json.loads(read(inventory_path)) if inventory_path.exists() else {}
+ history=previous.get('historical_tool_inventories',[])
+ if previous.get('tools'):
+  snapshot={'date':previous.get('date'),'tools':{name:{'path':entry['path'],'sha256':entry['sha256']} for name,entry in previous['tools'].items()}}
+  if snapshot not in history:history.append(snapshot)
+ data['historical_tool_inventories']=history
  for name,path in TOOLS.items():
-  if not path.exists(): continue
   first=cli(name,['--help'])
   entry={'path':path.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'help':[first]}
   if name in ('kurosaki','sarakura'):
@@ -41,7 +51,7 @@ def main():
   for path in sorted((ROOT/dirname).iterdir()):
    if path.is_file() and path.suffix in ('.cs','.c','.h','.rs','.json','.md','.toml'):
     data['sources'].append({'path':path.relative_to(ROOT).as_posix(),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
- (SITE/'reference/inventory.json').write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
+ inventory_path.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
  for name,entry in data['tools'].items():
   (WORK/(name+'-help.txt')).write_text('\n\n'.join(' '.join(x['argv'])+'\n'+x['text'] for x in entry['help']),encoding='utf-8')
 if __name__=='__main__': main()

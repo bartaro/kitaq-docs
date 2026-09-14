@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>검증 기록 — KITAQ 시리즈 설명서</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">본문으로 건너뛰기</a><header class="mast"><a href="index.html">KITAQ <span>개발 시스템</span></a><div>사용 설명서 <b>2026.09</b></div></header><nav aria-label="언어 선택" class="languages"><a href="../en/verification.html" hreflang="en" lang="en">English</a> <a href="../verification.html" hreflang="ja" lang="ja">日本語</a> <a aria-current="page" href="../ko/verification.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/verification.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a href="../zh-TW/verification.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/verification.html" hreflang="es" lang="es">Español</a> <a href="../pt/verification.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/verification.html" hreflang="fr" lang="fr">Français</a> <a href="../de/verification.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="권 선택"><a href="index.html">목차</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 라이브러리</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 라이브러리</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">이 권에서 검색</label><input id="search" placeholder="예: input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="이 권의 목차" class="toc"><a href="#scope">검증 범위</a><a href="#result-gb_hello">gb_hello</a><a href="#result-gb_arithmetic">gb_arithmetic</a><a href="#result-gb_control">gb_control</a><a href="#result-gb_aggregate">gb_aggregate</a><a href="#result-gb_bits_memory">gb_bits_memory</a><a href="#result-gb_input">gb_input</a><a href="#result-gb_fixed">gb_fixed</a><a href="#result-gb_entity">gb_entity</a><a href="#result-gb_debug">gb_debug</a><a href="#result-gb_chain">gb_chain</a><a href="#result-fc_hello">fc_hello</a><a href="#result-fc_arithmetic">fc_arithmetic</a><a href="#result-fc_control">fc_control</a><a href="#result-fc_aggregate">fc_aggregate</a><a href="#result-fc_bits_memory">fc_bits_memory</a><a href="#result-fc_input">fc_input</a><a href="#result-fc_fixed">fc_fixed</a><a href="#result-fc_entity">fc_entity</a><a href="#result-fc_debug">fc_debug</a><a href="#result-fc_chain">fc_chain</a><a href="#result-gb_cgb_palette">gb_cgb_palette</a><a href="#result-gb_scroll">gb_scroll</a><a href="#result-gb_vram_queue">gb_vram_queue</a><a href="#result-gb_sprite">gb_sprite</a><a href="#result-gb_rng">gb_rng</a><a href="#result-gb_flags">gb_flags</a><a href="#result-gb_circle">gb_circle</a><a href="#result-fc_scroll">fc_scroll</a><a href="#result-fc_vram_queue">fc_vram_queue</a><a href="#result-fc_sprite">fc_sprite</a><a href="#result-fc_sound">fc_sound</a><a href="#result-gb_sound">gb_sound</a><a href="#result-gb_font">gb_font</a><a href="#result-fc_font">fc_font</a><a href="#result-gb_system">gb_system</a><a href="#result-gb_scene">gb_scene</a><a href="#result-fc_system">fc_system</a><a href="#result-fc_scene">fc_scene</a><a href="#result-gb_camera">gb_camera</a><a href="#result-gb_rle">gb_rle</a><a href="#result-gb_board">gb_board</a><a href="#result-gb_physics">gb_physics</a><a href="#result-gb_link">gb_link</a><a href="#result-gb_bank">gb_bank</a><a href="#result-gb_asset">gb_asset</a><a href="#result-gb_danmaku">gb_danmaku</a><a href="#result-fc_subpixel">fc_subpixel</a><a href="#visual_checks-json">픽셀 값과 글꼴 비교</a><a href="#workflow-json">진단 작업 흐름</a><a href="#compiler_tests-json">컴파일러 회귀 검사</a><a href="#browser_checks-json">과거 브라우저 표시 검사</a><a href="#site_checks-json">HTML 구조와 링크</a><a href="#bilingual_checks-json">일본어·영어 전체 판본 검사</a><a href="#english_browser_checks-json">영어판 브라우저 검사</a></nav><button class="print" type="button">이 권 인쇄</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 참고 판본</p><h1>검증 기록</h1><p class="subtitle">빌드·실행·화면 기록</p><div class="edition">첫 코드 한 줄부터 실행, 관찰, 재시험까지.<br/>소스 스냅샷: 2026년 9월 14일 · 한국어판: 2026년 9월 14일</div></div><h2 id="scope">검증 범위</h2><p>아래 기록은 9월 12일 소스 스냅샷에 해당합니다. 두 컴파일러와 KUROSAKI CLI는 수집한 소스에서 빌드했습니다. KOKURA와 SARAKURA는 목록에 식별 정보를 기록한 로컬 실행 파일을 사용했습니다. 모든 기능, 주변기기, 실기를 검사한 것은 아닙니다.</p><p>각 항목은 빌드, 에뮬레이터 120프레임 실행, 화면을 기록합니다. 픽셀 비교는 별도의 증거입니다. 종료 코드 0만으로 입력·소리·게임 동작이 올바르다고 입증할 수는 없습니다. 이후 공개용 빌드와 작업 폴더 검사는  <a href="../PUBLICATION_CHECKS.md">공개 시 확인 기록</a>에 별도로 기록되어 있습니다. 설명서 번역 과정에서 과거의 모든 관찰을 다시 수행한 것은 아닙니다.</p><section id="gb_hello"><h2 id="result-gb_hello">gb_hello</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>HELLO WORLD와 042 표시</p><img alt="gb_hello의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_hello.png"/><p><a href="../verification/gb_hello-build.txt">빌드 로그</a> / <a href="../verification/gb_hello-runtime.txt">실행 로그</a></p></section><section id="gb_arithmetic"><h2 id="result-gb_arithmetic">gb_arithmetic</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>030</p><img alt="gb_arithmetic의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_arithmetic.png"/><p><a href="../verification/gb_arithmetic-build.txt">빌드 로그</a> / <a href="../verification/gb_arithmetic-runtime.txt">실행 로그</a></p></section><section id="gb_control"><h2 id="result-gb_control">gb_control</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_control의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_control.png"/><p><a href="../verification/gb_control-build.txt">빌드 로그</a> / <a href="../verification/gb_control-runtime.txt">실행 로그</a></p></section><section id="gb_aggregate"><h2 id="result-gb_aggregate">gb_aggregate</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_aggregate의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_aggregate.png"/><p><a href="../verification/gb_aggregate-build.txt">빌드 로그</a> / <a href="../verification/gb_aggregate-runtime.txt">실행 로그</a></p></section><section id="gb_bits_memory"><h2 id="result-gb_bits_memory">gb_bits_memory</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>010</p><img alt="gb_bits_memory의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_bits_memory.png"/><p><a href="../verification/gb_bits_memory-build.txt">빌드 로그</a> / <a href="../verification/gb_bits_memory-runtime.txt">실행 로그</a></p></section><section id="gb_input"><h2 id="result-gb_input">gb_input</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>처음에는 000이며, A를 새로 누를 때마다 한 번 증가합니다</p><img alt="gb_input의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_input.png"/><p><a href="../verification/gb_input-build.txt">빌드 로그</a> / <a href="../verification/gb_input-runtime.txt">실행 로그</a></p></section><section id="gb_fixed"><h2 id="result-gb_fixed">gb_fixed</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>012</p><img alt="gb_fixed의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_fixed.png"/><p><a href="../verification/gb_fixed-build.txt">빌드 로그</a> / <a href="../verification/gb_fixed-runtime.txt">실행 로그</a></p></section><section id="gb_entity"><h2 id="result-gb_entity">gb_entity</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001</p><img alt="gb_entity의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_entity.png"/><p><a href="../verification/gb_entity-build.txt">빌드 로그</a> / <a href="../verification/gb_entity-runtime.txt">실행 로그</a></p></section><section id="gb_debug"><h2 id="result-gb_debug">gb_debug</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 트레이스 로그에 HP=42 기록</p><img alt="gb_debug의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_debug.png"/><p><a href="../verification/gb_debug-build.txt">빌드 로그</a> / <a href="../verification/gb_debug-runtime.txt">실행 로그</a></p></section><section id="gb_chain"><h2 id="result-gb_chain">gb_chain</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 이력에 (20,30) 포함</p><img alt="gb_chain의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_chain.png"/><p><a href="../verification/gb_chain-build.txt">빌드 로그</a> / <a href="../verification/gb_chain-runtime.txt">실행 로그</a></p></section><section id="fc_hello"><h2 id="result-fc_hello">fc_hello</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>HELLO WORLD와 042 표시</p><img alt="fc_hello의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_hello.png"/><p><a href="../verification/fc_hello-build.txt">빌드 로그</a> / <a href="../verification/fc_hello-runtime.txt">실행 로그</a></p></section><section id="fc_arithmetic"><h2 id="result-fc_arithmetic">fc_arithmetic</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>030</p><img alt="fc_arithmetic의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_arithmetic.png"/><p><a href="../verification/fc_arithmetic-build.txt">빌드 로그</a> / <a href="../verification/fc_arithmetic-runtime.txt">실행 로그</a></p></section><section id="fc_control"><h2 id="result-fc_control">fc_control</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="fc_control의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_control.png"/><p><a href="../verification/fc_control-build.txt">빌드 로그</a> / <a href="../verification/fc_control-runtime.txt">실행 로그</a></p></section><section id="fc_aggregate"><h2 id="result-fc_aggregate">fc_aggregate</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="fc_aggregate의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_aggregate.png"/><p><a href="../verification/fc_aggregate-build.txt">빌드 로그</a> / <a href="../verification/fc_aggregate-runtime.txt">실행 로그</a></p></section><section id="fc_bits_memory"><h2 id="result-fc_bits_memory">fc_bits_memory</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>010</p><img alt="fc_bits_memory의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_bits_memory.png"/><p><a href="../verification/fc_bits_memory-build.txt">빌드 로그</a> / <a href="../verification/fc_bits_memory-runtime.txt">실행 로그</a></p></section><section id="fc_input"><h2 id="result-fc_input">fc_input</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>처음에는 000이며, A를 새로 누를 때마다 한 번 증가합니다</p><img alt="fc_input의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_input.png"/><p><a href="../verification/fc_input-build.txt">빌드 로그</a> / <a href="../verification/fc_input-runtime.txt">실행 로그</a></p></section><section id="fc_fixed"><h2 id="result-fc_fixed">fc_fixed</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>012</p><img alt="fc_fixed의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_fixed.png"/><p><a href="../verification/fc_fixed-build.txt">빌드 로그</a> / <a href="../verification/fc_fixed-runtime.txt">실행 로그</a></p></section><section id="fc_entity"><h2 id="result-fc_entity">fc_entity</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001</p><img alt="fc_entity의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_entity.png"/><p><a href="../verification/fc_entity-build.txt">빌드 로그</a> / <a href="../verification/fc_entity-runtime.txt">실행 로그</a></p></section><section id="fc_debug"><h2 id="result-fc_debug">fc_debug</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 트레이스 로그에 HP=42 기록</p><img alt="fc_debug의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_debug.png"/><p><a href="../verification/fc_debug-build.txt">빌드 로그</a> / <a href="../verification/fc_debug-runtime.txt">실행 로그</a></p></section><section id="fc_chain"><h2 id="result-fc_chain">fc_chain</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 이력에 (20,30) 포함</p><img alt="fc_chain의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_chain.png"/><p><a href="../verification/fc_chain-build.txt">빌드 로그</a> / <a href="../verification/fc_chain-runtime.txt">실행 로그</a></p></section><section id="gb_cgb_palette"><h2 id="result-gb_cgb_palette">gb_cgb_palette</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>CGB 모드에서 흰 바탕에 보라색 042 표시</p><img alt="gb_cgb_palette의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_cgb_palette.png"/><p><a href="../verification/gb_cgb_palette-build.txt">빌드 로그</a> / <a href="../verification/gb_cgb_palette-runtime.txt">실행 로그</a></p></section><section id="gb_scroll"><h2 id="result-gb_scroll">gb_scroll</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>SCX가 증가하면서 제목이 왼쪽으로 이동</p><img alt="gb_scroll의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_scroll.png"/><p><a href="../verification/gb_scroll-build.txt">빌드 로그</a> / <a href="../verification/gb_scroll-runtime.txt">실행 로그</a></p></section><section id="gb_vram_queue"><h2 id="result-gb_vram_queue">gb_vram_queue</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>좌표 (3,8)에 4 표시</p><img alt="gb_vram_queue의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_vram_queue.png"/><p><a href="../verification/gb_vram_queue-build.txt">빌드 로그</a> / <a href="../verification/gb_vram_queue-runtime.txt">실행 로그</a></p></section><section id="gb_sprite"><h2 id="result-gb_sprite">gb_sprite</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>스프라이트 위치에 문자 A 표시</p><img alt="gb_sprite의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_sprite.png"/><p><a href="../verification/gb_sprite-build.txt">빌드 로그</a> / <a href="../verification/gb_sprite-runtime.txt">실행 로그</a></p></section><section id="gb_rng"><h2 id="result-gb_rng">gb_rng</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>000~009의 값, 같은 시드에서는 같은 순서 반복</p><img alt="gb_rng의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_rng.png"/><p><a href="../verification/gb_rng-build.txt">빌드 로그</a> / <a href="../verification/gb_rng-runtime.txt">실행 로그</a></p></section><section id="gb_flags"><h2 id="result-gb_flags">gb_flags</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001</p><img alt="gb_flags의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_flags.png"/><p><a href="../verification/gb_flags-build.txt">빌드 로그</a> / <a href="../verification/gb_flags-runtime.txt">실행 로그</a></p></section><section id="gb_circle"><h2 id="result-gb_circle">gb_circle</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>한 단계 후 042, 이 예제는 정수 픽셀 단위 사용</p><img alt="gb_circle의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_circle.png"/><p><a href="../verification/gb_circle-build.txt">빌드 로그</a> / <a href="../verification/gb_circle-runtime.txt">실행 로그</a></p></section><section id="fc_scroll"><h2 id="result-fc_scroll">fc_scroll</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>제목이 가로로 스크롤됨</p><img alt="fc_scroll의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_scroll.png"/><p><a href="../verification/fc_scroll-build.txt">빌드 로그</a> / <a href="../verification/fc_scroll-runtime.txt">실행 로그</a></p></section><section id="fc_vram_queue"><h2 id="result-fc_vram_queue">fc_vram_queue</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>좌표 (3,8)에 4 표시</p><img alt="fc_vram_queue의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_vram_queue.png"/><p><a href="../verification/fc_vram_queue-build.txt">빌드 로그</a> / <a href="../verification/fc_vram_queue-runtime.txt">실행 로그</a></p></section><section id="fc_sprite"><h2 id="result-fc_sprite">fc_sprite</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>화면에 스프라이트 표시</p><img alt="fc_sprite의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_sprite.png"/><p><a href="../verification/fc_sprite-build.txt">빌드 로그</a> / <a href="../verification/fc_sprite-runtime.txt">실행 로그</a></p></section><section id="fc_sound"><h2 id="result-fc_sound">fc_sound</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042 표시와 펄스음</p><img alt="fc_sound의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_sound.png"/><p><a href="../verification/fc_sound-build.txt">빌드 로그</a> / <a href="../verification/fc_sound-runtime.txt">실행 로그</a></p></section><section id="gb_sound"><h2 id="result-gb_sound">gb_sound</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042 표시와 짧은 펄스음</p><img alt="gb_sound의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_sound.png"/><p><a href="../verification/gb_sound-build.txt">빌드 로그</a> / <a href="../verification/gb_sound-runtime.txt">실행 로그</a></p></section><section id="gb_font"><h2 id="result-gb_font">gb_font</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>대문자, 소문자, 숫자, 제공된 기호 30개 모두 표시</p><img alt="gb_font의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_font.png"/><p><a href="../verification/gb_font-build.txt">빌드 로그</a> / <a href="../verification/gb_font-runtime.txt">실행 로그</a></p></section><section id="fc_font"><h2 id="result-fc_font">fc_font</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>대문자, 소문자, 숫자, 제공된 기호 30개 모두 표시</p><img alt="fc_font의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_font.png"/><p><a href="../verification/fc_font-build.txt">빌드 로그</a> / <a href="../verification/fc_font-runtime.txt">실행 로그</a></p></section><section id="gb_system"><h2 id="result-gb_system">gb_system</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>002</p><img alt="gb_system의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_system.png"/><p><a href="../verification/gb_system-build.txt">빌드 로그</a> / <a href="../verification/gb_system-runtime.txt">실행 로그</a></p></section><section id="gb_scene"><h2 id="result-gb_scene">gb_scene</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 콜백은 등록하지 않음</p><img alt="gb_scene의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_scene.png"/><p><a href="../verification/gb_scene-build.txt">빌드 로그</a> / <a href="../verification/gb_scene-runtime.txt">실행 로그</a></p></section><section id="fc_system"><h2 id="result-fc_system">fc_system</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>002</p><img alt="fc_system의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_system.png"/><p><a href="../verification/fc_system-build.txt">빌드 로그</a> / <a href="../verification/fc_system-runtime.txt">실행 로그</a></p></section><section id="fc_scene"><h2 id="result-fc_scene">fc_scene</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 콜백은 등록하지 않음</p><img alt="fc_scene의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_scene.png"/><p><a href="../verification/fc_scene-build.txt">빌드 로그</a> / <a href="../verification/fc_scene-runtime.txt">실행 로그</a></p></section><section id="gb_camera"><h2 id="result-gb_camera">gb_camera</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 월드 x=52에서 카메라 x=10을 뺀 값</p><img alt="gb_camera의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_camera.png"/><p><a href="../verification/gb_camera-build.txt">빌드 로그</a> / <a href="../verification/gb_camera-runtime.txt">실행 로그</a></p></section><section id="gb_rle"><h2 id="result-gb_rle">gb_rle</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 세 바이트의 값이 각각 42</p><img alt="gb_rle의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_rle.png"/><p><a href="../verification/gb_rle-build.txt">빌드 로그</a> / <a href="../verification/gb_rle-runtime.txt">실행 로그</a></p></section><section id="gb_board"><h2 id="result-gb_board">gb_board</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_board의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_board.png"/><p><a href="../verification/gb_board-build.txt">빌드 로그</a> / <a href="../verification/gb_board-runtime.txt">실행 로그</a></p></section><section id="gb_physics"><h2 id="result-gb_physics">gb_physics</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 정수 픽셀 좌표</p><img alt="gb_physics의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_physics.png"/><p><a href="../verification/gb_physics-build.txt">빌드 로그</a> / <a href="../verification/gb_physics-runtime.txt">실행 로그</a></p></section><section id="gb_link"><h2 id="result-gb_link">gb_link</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>미연결 시 255, 시간 초과 시 000, 연결되면 상대 기기의 값</p><img alt="gb_link의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_link.png"/><p><a href="../verification/gb_link-build.txt">빌드 로그</a> / <a href="../verification/gb_link-runtime.txt">실행 로그</a></p></section><section id="gb_bank"><h2 id="result-gb_bank">gb_bank</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 뱅크 0의 고정 ROM 데이터 복사</p><img alt="gb_bank의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_bank.png"/><p><a href="../verification/gb_bank-build.txt">빌드 로그</a> / <a href="../verification/gb_bank-runtime.txt">실행 로그</a></p></section><section id="gb_asset"><h2 id="result-gb_asset">gb_asset</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_asset의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_asset.png"/><p><a href="../verification/gb_asset-build.txt">빌드 로그</a> / <a href="../verification/gb_asset-runtime.txt">실행 로그</a></p></section><section id="gb_danmaku"><h2 id="result-gb_danmaku">gb_danmaku</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 수치 기반 풀 예제이며 탄환 배경 합성기는 사용하지 않음</p><img alt="gb_danmaku의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_danmaku.png"/><p><a href="../verification/gb_danmaku-build.txt">빌드 로그</a> / <a href="../verification/gb_danmaku-runtime.txt">실행 로그</a></p></section><section id="fc_subpixel"><h2 id="result-fc_subpixel">fc_subpixel</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 헤더 상수를 사용하여 게임 측에서 직접 적분</p><img alt="fc_subpixel의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_subpixel.png"/><p><a href="../verification/fc_subpixel-build.txt">빌드 로그</a> / <a href="../verification/fc_subpixel-runtime.txt">실행 로그</a></p></section><h2 id="visual_checks-json">픽셀 값과 글꼴 비교</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">복사</button><pre><code>[
+  {
+    "id": "gb_hello",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_arithmetic",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "030",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_control",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_aggregate",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_bits_memory",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "010",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_input",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "000",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_fixed",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "012",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_entity",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_debug",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_chain",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_system",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "002",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_scene",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_hello",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_arithmetic",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "030",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_control",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_aggregate",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_bits_memory",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "010",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_input",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "000",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_fixed",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "012",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_entity",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_debug",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_chain",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_system",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "002",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_scene",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_camera",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_rle",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_board",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_physics",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_link",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "255",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_bank",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_asset",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_danmaku",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_subpixel",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_cgb_palette",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_vram_queue",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "4",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_flags",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_circle",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_vram_queue",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "4",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_sound",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_sound",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "042",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_input_pressed",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 5,
+    "expected_text": "ABCDEFGHIJKLMNOP",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 6,
+    "expected_text": "QRSTUVWXYZ",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 8,
+    "expected_text": "0123456789",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 10,
+    "expected_text": "abcdefghijklmnop",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 11,
+    "expected_text": "qrstuvwxyz",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 13,
+    "expected_text": "!#$%&amp;'()*+,-./",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 2,
+    "tile_y": 14,
+    "expected_text": ":;&lt;=&gt;?@[]^_`{}~",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "gb_font",
+    "tile_x": 16,
+    "tile_y": 13,
+    "expected_text": "\"",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_input_pressed",
+    "tile_x": 3,
+    "tile_y": 8,
+    "expected_text": "001",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 5,
+    "expected_text": "ABCDEFGHIJKLMNOP",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 6,
+    "expected_text": "QRSTUVWXYZ",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 8,
+    "expected_text": "0123456789",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 10,
+    "expected_text": "abcdefghijklmnop",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 11,
+    "expected_text": "qrstuvwxyz",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 13,
+    "expected_text": "!#$%&amp;'()*+,-./",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 2,
+    "tile_y": 14,
+    "expected_text": ":;&lt;=&gt;?@[]^_`{}~",
+    "status": "passed",
+    "errors": []
+  },
+  {
+    "id": "fc_font",
+    "tile_x": 16,
+    "tile_y": 13,
+    "expected_text": "\"",
+    "status": "passed",
+    "errors": []
+  }
+]</code></pre></div><h2 id="workflow-json">진단 작업 흐름</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">복사</button><pre><code>[
+  {
+    "id": "sarakura-gb-synthetic",
+    "tool": "sarakura",
+    "arguments": [
+      "gb",
+      "analyze",
+      "--metadata",
+      "[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\gb\\build.json",
+      "--events",
+      "[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\gb\\events.jsonl",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-gb",
+      "--fail-on",
+      "never",
+      "--no-repro-bundle"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed",
+    "verified_date": "2026-09-12",
+    "report_language": "en"
+  },
+  {
+    "id": "sarakura-gb-validate",
+    "tool": "sarakura",
+    "arguments": [
+      "validate",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-gb\\ai_diagnostics.json",
+      "--strict"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "sarakura-gb-ci",
+    "tool": "sarakura",
+    "arguments": [
+      "ci-summary",
+      "--diagnostics",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-gb",
+      "--fail-on",
+      "error",
+      "--enforce"
+    ],
+    "exit_code": 1,
+    "expected_exit_codes": [
+      1
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "sarakura-gb-real",
+    "tool": "sarakura",
+    "arguments": [
+      "gb",
+      "analyze",
+      "--metadata",
+      "[WORKSPACE]\\manual\\_manual_work\\gb_hello\\build.json",
+      "--events",
+      "[WORKSPACE]\\manual\\_manual_work\\gb_hello\\diag",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\real-gb",
+      "--fail-on",
+      "never",
+      "--no-repro-bundle"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed",
+    "verified_date": "2026-09-12",
+    "report_language": "en"
+  },
+  {
+    "id": "sarakura-fc-synthetic",
+    "tool": "sarakura",
+    "arguments": [
+      "fc",
+      "analyze",
+      "--metadata",
+      "[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\fc\\build.json",
+      "--events",
+      "[WORKSPACE]\\kitaq-docs\\samples\\sarakura\\fc\\events.jsonl",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-fc",
+      "--fail-on",
+      "never",
+      "--no-repro-bundle"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed",
+    "verified_date": "2026-09-12",
+    "report_language": "en"
+  },
+  {
+    "id": "sarakura-fc-validate",
+    "tool": "sarakura",
+    "arguments": [
+      "validate",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-fc\\ai_diagnostics.json",
+      "--strict"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "sarakura-fc-ci",
+    "tool": "sarakura",
+    "arguments": [
+      "ci-summary",
+      "--diagnostics",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\synthetic-fc",
+      "--fail-on",
+      "error",
+      "--enforce"
+    ],
+    "exit_code": 1,
+    "expected_exit_codes": [
+      1
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "sarakura-fc-real",
+    "tool": "sarakura",
+    "arguments": [
+      "fc",
+      "analyze",
+      "--metadata",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\build.json",
+      "--events",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\events.jsonl",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\real-fc",
+      "--fail-on",
+      "never",
+      "--no-repro-bundle"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed",
+    "verified_date": "2026-09-12",
+    "report_language": "en"
+  },
+  {
+    "id": "kurosaki-inspect",
+    "tool": "kurosaki",
+    "arguments": [
+      "inspect-rom",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\rom.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-disasm",
+    "tool": "kurosaki",
+    "arguments": [
+      "disasm",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--bytes",
+      "64",
+      "--text",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\reset.txt"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-decompile",
+    "tool": "kurosaki",
+    "arguments": [
+      "decompile",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--max-instructions",
+      "64",
+      "--format",
+      "markdown",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\decompile.md"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-trace",
+    "tool": "kurosaki",
+    "arguments": [
+      "trace",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--frames",
+      "2",
+      "--cpu",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\trace.jsonl"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-snapshot-save",
+    "tool": "kurosaki",
+    "arguments": [
+      "snapshot-save",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--frames",
+      "60",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\state.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-snapshot-load",
+    "tool": "kurosaki",
+    "arguments": [
+      "snapshot-load",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\state.json",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\loaded.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-snapshot-resume",
+    "tool": "kurosaki",
+    "arguments": [
+      "snapshot-resume",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\state.json",
+      "--frames",
+      "2",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\resumed.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-replay-record",
+    "tool": "kurosaki",
+    "arguments": [
+      "replay-record",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--frames",
+      "60",
+      "--out",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\replay.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-replay-run",
+    "tool": "kurosaki",
+    "arguments": [
+      "replay-run",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\replay.json",
+      "--verify",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\replay-result.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-mapper-test",
+    "tool": "kurosaki",
+    "arguments": [
+      "mapper-test",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_hello\\program.nes",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\mapper-test.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-pad",
+    "tool": "kurosaki",
+    "arguments": [
+      "run",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_input\\program.nes",
+      "--frames",
+      "120",
+      "--pad1",
+      "1",
+      "--png",
+      "[WORKSPACE]\\kitaq-docs\\verification\\fc_input_pressed.png",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\pad.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kokura-pad",
+    "tool": "kokura",
+    "arguments": [
+      "[WORKSPACE]\\manual\\_manual_work\\gb_input\\program.gb",
+      "--run-frames",
+      "120",
+      "--input-script",
+      "NONE:30;A:2;NONE:88",
+      "--png",
+      "[WORKSPACE]\\kitaq-docs\\verification\\gb_input_pressed.png",
+      "--dump-report",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\gb-pad.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "kurosaki-audio",
+    "tool": "kurosaki",
+    "arguments": [
+      "audio-export",
+      "[WORKSPACE]\\manual\\_manual_work\\fc_sound\\program.nes",
+      "--frames",
+      "120",
+      "--wav",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\fc-audio.wav",
+      "--json",
+      "[WORKSPACE]\\manual\\_manual_work\\workflow\\fc-audio.json"
+    ],
+    "exit_code": 0,
+    "expected_exit_codes": [
+      0
+    ],
+    "status": "passed"
+  },
+  {
+    "id": "gb-audio-pcm",
+    "frames": 133196,
+    "sample_rate": 65536,
+    "channels": 2,
+    "peak": 7730,
+    "rms": 1406.811,
+    "nonzero_samples": 13204,
+    "status": "passed",
+    "scope": "PCM generated and non-silent; no subjective timbre or hardware claim"
+  },
+  {
+    "id": "fc-audio-pcm",
+    "frames": 88055,
+    "sample_rate": 44100,
+    "channels": 1,
+    "peak": 6721,
+    "rms": 3338.903,
+    "nonzero_samples": 87490,
+    "status": "passed",
+    "scope": "PCM generated and non-silent; no subjective timbre or hardware claim"
+  }
+]</code></pre></div><h2 id="compiler_tests-json">컴파일러 회귀 검사</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">복사</button><pre><code>{
+  "kitaqgb": {
+    "regression_suite_tests": 16,
+    "passed": 16,
+    "new_regression": "test_kitaqgb_jump_label_scope.py",
+    "new_regression_modes": ["-O0", "-O1"],
+    "before_fix": "both modes failed compilation at Branch out of range",
+    "after_fix": "both modes compiled and matched KOKURA RAM expectations",
+    "log": "gb-regression-suite.txt"
+  },
+  "kitaqfc": {
+    "new_regression": "test_kitaqfc_call_temps.py",
+    "modes": ["-O0", "-O1"],
+    "expected_values_per_mode": 12,
+    "before_fix": "both modes failed KUROSAKI RAM comparisons",
+    "after_fix": "both modes matched all expected values",
+    "log": "fc-regression.txt"
+  },
+  "portable_scripts": {
+    "build.ps1": "gb_hello and fc_scene selected with comma-separated PowerShell arguments; both built successfully",
+    "sarakura_demo.ps1": "GB and FC synthetic reports generated and schema validated"
+  }
+}</code></pre></div><h2 id="browser_checks-json">과거 브라우저 표시 검사</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">복사</button><pre><code>{
+  "browser": "Codex in-app browser",
+  "checks": [
+    {"check": "Desktop index visual inspection", "status": "passed"},
+    {"check": "390 x 844 mobile index visual inspection", "status": "passed"},
+    {"check": "Desktop library page body width equals viewport (1265 px)", "status": "passed"},
+    {"check": "entity_create hash opens the matching API entry", "status": "passed"},
+    {"check": "entity_create search filters to 8 matching entries", "status": "passed"},
+    {"check": "Copy button writes the selected entity_create declaration", "status": "passed"}
+  ],
+  "print": "Print CSS and details expansion implemented; physical printing not tested"
+}</code></pre></div><h2 id="site_checks-json">HTML 구조와 링크</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">복사</button><pre><code>{
+  "main_html_pages": 9,
+  "english_html_pages": 9,
+  "synthetic_report_pages": 2,
+  "local_links_checked": 1938,
+  "api_entries": 1029,
+  "sample_programs": 47,
+  "successful_builds": 47,
+  "emulator_runs": 47,
+  "errors": [],
+  "status": "passed"
+}</code></pre></div><h2 id="bilingual_checks-json">일본어·영어 전체 판본 검사</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">복사</button><pre><code>{
+  "checked_on": "2026-09-13",
+  "japanese_pages": 9,
+  "english_pages": 9,
+  "api_entries_per_language": 1029,
+  "shared_complete_samples": 47,
+  "local_links_checked": 1949,
+  "status": "passed",
+  "errors": [],
+  "original_source_and_recorded_output": "Preserved verbatim, including original-language comments."
+}</code></pre></div><h2 id="english_browser_checks-json">영어판 브라우저 검사</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">복사</button><pre><code>{
+  "date": "2026-09-13",
+  "browser": "Microsoft Edge, isolated headless session",
+  "english_pages_loaded": [
+    "fc-library.html",
+    "gb-library.html",
+    "index.html",
+    "kitaqfc.html",
+    "kitaqgb.html",
+    "kokura.html",
+    "kurosaki.html",
+    "sarakura.html",
+    "verification.html"
+  ],
+  "search_result": "Reference/examples: 6 / Text: 0",
+  "anchor_reveal": "passed",
+  "print_expand_restore": "passed",
+  "language_switch_both_directions": "passed",
+  "desktop_width": 1440,
+  "mobile_width": 390,
+  "errors": [],
+  "status": "passed"
+}</code></pre></div><footer>소스 기준일 2026-09-14 • <a href="index.html">목차</a> • <a href="verification.html">검증</a> • <a href="../reference/inventory.json">스냅샷 식별 정보</a><br/>예제 빌드, 에뮬레이터 실행, 기대 결과 대조는 별도로 기록합니다.</footer></main></div><script src="../assets/manual.js"></script></body></html>

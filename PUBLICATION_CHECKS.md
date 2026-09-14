@@ -1,11 +1,69 @@
-# Publication checks — September 12–13, 2026
+# Publication checks
 
-This repository contains seven manuals in Japanese and English, plus a contents
-page and verification page for each language. Both editions share 1,029 API
-records, 47 complete sample programs, source excerpts and recorded evidence.
-The source snapshot is September 12; the English edition was prepared September 13.
+## Source and documentation update — September 14, 2026
 
-## Checks on the curated publication source trees
+The seven manuals, contents page and verification page are provided in English,
+Japanese, Korean, Simplified Chinese, Traditional Chinese, Spanish, Brazilian
+Portuguese, French and German: 81 manual pages. All editions share 1,053 API
+records (677 GB, 376 FC) and 47 complete sample programs. Four FC declarations
+have no implementation in the published library; the reference marks them as
+such. Argument-passing fragments are not standalone programs or runtime proof.
+
+The API records and bundled examples were refreshed from the reviewed public
+source trees. `verification/sample_sources.json` records the synchronized source
+hashes. `verification/font_conversion.json` verifies all 92 original glyphs and
+the complete GB/NES output arrays, preserving the pixel indices.
+
+The current whole-site check passed 14,157 local links and anchors. The ten
+primary READMEs link directly to the corresponding software/library volumes in
+the requested language order. The source-comment review covers 429 public source
+files across the five software repositories; it does not certify every feature
+or every physical device. Later code changes still require focused checks.
+
+Documentation maintenance does not rerun build or emulator tests. The historical
+sample records below retain their original scope. Build results must be tied to
+the source and executable used; a fresh source hash alone is not runtime proof.
+
+### Final executable checks
+
+All five Windows Release executables were built from the reviewed publication
+sources. KITAQGB built without warnings; KITAQFC retained 17 existing
+unassigned-field warnings. Each software repository records its binary and
+source hashes in `BINARY_BUILD.json`.
+
+- All 47 current samples (29 GB, 18 FC) compiled and ran for 120 emulator frames.
+  [Current run records](verification/current/samples.json) include source,
+  compiler, ROM and emulator hashes. These are bounded runs with no controller
+  input, not complete gameplay or peripheral tests.
+- [56 pixel checks](verification/current/visual_checks.json) passed for the
+  expected numeric displays and original font glyphs.
+- [Seven additional language editions](verification/current/localized_browser_checks.json)
+  preserved code and reference IDs on all 63 pages. Search, copy, anchor
+  expansion, print restoration and representative desktop/mobile layouts passed.
+- KOKURA passed two focused tests: release reporting does not invent completed
+  validation, and a neutral synthetic observation condition parses correctly.
+- SARAKURA generated English reports for 50 built-in GB rules and 74 built-in FC
+  rules, plus an unmapped event on each platform. Strict diagnostic validation,
+  encoded HTML evidence names and matching bundled HTML passed.
+
+To run fresh sample and pixel checks without replacing the historical records:
+
+```powershell
+python -B kitaq-docs/tools/verify_samples.py --runtime
+python -B kitaq-docs/tools/check_pixels.py
+```
+
+Fresh results go to `verification/current`. HTML regeneration alone does not run
+these checks. The browser checks cover the documented controls and selected
+layouts; they do not establish that every expanded API entry was visually read.
+
+## Historical publication checks — September 12–13, 2026
+
+The initial publication supplied Japanese and English editions with 1,029 API
+records and 47 complete sample programs. The following build and test counts
+refer to that publication, before the September 14 source corrections.
+
+### Checks on the initial curated publication source trees
 
 - KITAQGB Release build: passed, no warnings.
 - KITAQFC Release build: passed, 17 existing unassigned-field warnings.
@@ -25,9 +83,9 @@ not imply that all runtime checks or physical-hardware tests were repeated.
 Individual API fragments and declaration-only APIs are explicitly distinguished
 from the 47 complete programs.
 
-## Website checks
+### Initial website checks
 
-Run `python tools/check_bilingual.py` from this repository to check English and
+Run `python -B tools/check_bilingual.py` from this repository to check English and
 Japanese page coverage, API/sample/command IDs, local links and fragments, and
 untranslated English prose outside verbatim source and recorded output.
 Results are written to `verification/bilingual_checks.json`.

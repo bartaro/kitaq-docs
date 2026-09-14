@@ -1,3 +1,4 @@
+from languages import language_nav
 """Generate the complete English edition from the shared source inventory.
 
 Hand-edited prose lives in tools/en. Original source excerpts and captured help
@@ -15,9 +16,9 @@ BOOKS = [(k,n,t,s) for (k,n,t,_),s in zip(g.BOOKS,[
     'Game Boy C programming','Tools for building a game','Run, observe and record',
     'Famicom C programming','NES libraries and devices','NES and FDS execution and analysis',
     'Diagnostics, comparison and retesting'])]
-ORIGIN = """**KITAQGB has a double meaning.** The first is **Kernel-Informed Toolchain for AI-Quality Game Boy Development**: a toolchain grounded in a deep understanding of the target machine, intended to support both human programmers and generative AI.
+ORIGIN = """**KITAQGB has a double meaning.** **Kernel-Informed Toolchain for AI-Quality Game Boy Development** expresses the goal of a toolchain that understands its target machine and supports both human programmers and generative AI.
 
-The second is **Kids' Imagination Transformed into Actual Quests in Game Boy Forests**. It expresses the wish to turn small ideas, sketches and AI-assisted prototypes into adventures that people can actually play. Both meanings come from the README supplied by the author."""
+**KITAQ + GB** also combines **Game Boy** with **KITAQ**, representing **Kitakyushu**, a city in **Fukuoka Prefecture, Japan**. KITAQ comes from the city's nickname **北九 (キタキュー, Kitakyū)**. For English speakers, the pronunciation guide is **kee-tah-KYOO**, IPA **/ˌkiːtɑːˈkjuː/**; the final Q sounds like the English letter Q. Read KITAQGB as **kee-tah-KYOO jee bee**, saying G and B separately."""
 MODULES = dict(zip(g.MODULES, [
     'Startup, frame counts, waits and interrupts','Button state, press, release and repeat',
     'OBJ allocation, positioning, metasprites and animation','Queued VRAM updates and transfer',
@@ -31,7 +32,7 @@ MODULES = dict(zip(g.MODULES, [
     'Serial communication and logical packets','DMG-07 external-clock communication',
     'Boards, move lists and undo','2D motion and collision','Circle physics',
     '3D AABB physics','Wireframes for DMG','Color wireframes for CGB',
-    'X-style wireframes for DMG','Bullet pools, fans, hits and grazing',
+    'Monochrome 128x120 wireframes for DMG','Bullet pools, fans, hits and grazing',
     'Compiler intrinsics','Basic integer types','Umbrella library header',
     'C helpers for NMI, OAM and PPU transfer','PPU display declarations','Direct PPU operations',
     'VRAM queues processed by NMI','NES palettes','Nametable attributes','Rectangular tilemap operations',
@@ -42,7 +43,7 @@ MODULES = dict(zip(g.MODULES, [
     'MIDI input and output interface','Mapper banks and IRQs','FDS disk operations','Loading FDS files',
     'FDS overlay code','FDS save declarations','FDS wavetable audio','VRC6 expansion audio',
     'VRC7 FM audio','Fast integer arithmetic','Fixed-point intrinsic interface','Lookup tables',
-    'Game-oriented operation macros']))
+    'Game-oriented operation macros','Wireframes for DMG']))
 assert len(MODULES) == len(g.MODULES)
 SPECIAL = dict(zip(g.SPECIAL, [
     'The low eight bits hold current keys; the high eight bits hold newly pressed keys. Supply the previous state to detect edges.',
@@ -99,7 +100,9 @@ def page(key,title,subtitle,body):
     body = re.sub(r'(href|src)="(samples/|verification/|reference/|assets/)',r'\1="../\2',body)
     nav = '<a href="index.html">Contents</a>'+''.join('<a '+('aria-current="page" ' if key==k else '')+'href="'+k+'.html"><b>'+n+'</b> '+E(t)+'</a>' for k,n,t,s in BOOKS)
     toc = ''.join('<a href="#'+i+'">'+re.sub('<[^>]+>','',t)+'</a>' for i,t in re.findall(r'<h2 id="([^"]+)">(.*?)</h2>',body))
-    text = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>'+E(title)+' — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="../assets/manual.css"></head><body><a class="skip" href="#main">Skip to content</a><header class="mast"><a href="index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER\'S MANUAL <b>2026.09</b> · <a href="../'+key+'.html" lang="ja" hreflang="ja">日本語</a></div></header><div class="layout"><aside><nav aria-label="Select a volume">'+nav+'</nav><label class="searchlabel" for="search">Search this volume</label><input type="search" id="search" placeholder="e.g. input / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="Volume contents">'+toc+'</nav><button class="print" type="button">Print this volume</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>'+E(title)+'</h1><p class="subtitle">'+E(subtitle)+'</p><div class="edition">From your first line to execution, observation and retesting.<br>Source snapshot: September 12, 2026 · English edition: September 13, 2026</div></div>'+body+'<footer>Source edition 2026-09-12 • <a href="index.html">Contents</a> • <a href="verification.html">Verification</a> • <a href="../reference/inventory.json">Snapshot fingerprints</a><br>Sample builds, emulator execution and expected-result comparisons are recorded separately.</footer></main></div><script src="../assets/manual.js"></script></body></html>'
+    text = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>'+E(title)+' — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="../assets/manual.css"></head><body><a class="skip" href="#main">Skip to content</a><header class="mast"><a href="index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER\'S MANUAL <b>2026.09</b> · <a href="../'+key+'.html" lang="ja" hreflang="ja">日本語</a></div></header><div class="layout"><aside><nav aria-label="Select a volume">'+nav+'</nav><label class="searchlabel" for="search">Search this volume</label><input type="search" id="search" placeholder="e.g. input / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="Volume contents">'+toc+'</nav><button class="print" type="button">Print this volume</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>'+E(title)+'</h1><p class="subtitle">'+E(subtitle)+'</p><div class="edition">From your first line to execution, observation and retesting.<br>Source snapshot: September 14, 2026 · English edition: September 14, 2026</div></div>'+body+'<footer>Source edition 2026-09-14 • <a href="index.html">Contents</a> • <a href="verification.html">Verification</a> • <a href="../reference/inventory.json">Snapshot fingerprints</a><br>Sample builds, emulator execution and expected-result comparisons are recorded separately.</footer></main></div><script src="../assets/manual.js"></script></body></html>'
+    text = text.replace(' · <a href="../'+key+'.html" lang="ja" hreflang="ja">日本語</a>', '')
+    text = text.replace('</header>', '</header>'+language_nav(key,'en'), 1)
     dest=S/'en'/(key+'.html');dest.parent.mkdir(exist_ok=True);dest.write_text(text,encoding='utf-8')
 
 def samples_section(platform,manifest):

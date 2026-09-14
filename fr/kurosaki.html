@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>KUROSAKI — MANUEL DE LA SÉRIE KITAQ</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">Aller au contenu</a><header class="mast"><a href="index.html">KITAQ <span>SYSTÈME DE DÉVELOPPEMENT</span></a><div>MANUEL D'UTILISATION <b>2026.09</b></div></header><nav aria-label="Langues" class="languages"><a href="../en/kurosaki.html" hreflang="en" lang="en">English</a> <a href="../kurosaki.html" hreflang="ja" lang="ja">日本語</a> <a href="../ko/kurosaki.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/kurosaki.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a href="../zh-TW/kurosaki.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/kurosaki.html" hreflang="es" lang="es">Español</a> <a href="../pt/kurosaki.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a aria-current="page" href="../fr/kurosaki.html" hreflang="fr" lang="fr">Français</a> <a href="../de/kurosaki.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="Choisir un volume"><a href="index.html">Sommaire</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> BIBLIOTHÈQUE KITAQGB</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> BIBLIOTHÈQUE KITAQFC</a><a aria-current="page" href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">Rechercher dans ce volume</label><input id="search" placeholder="ex. input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="Sommaire du volume" class="toc"><a href="#Outil-Windows-prêt-à-l-emploi">Outil Windows prêt à l'emploi</a><a href="#1-À-quoi-sert-KUROSAKI">1. À quoi sert KUROSAKI ?</a><a href="#2-Compiler-et-démarrer">2. Compiler et démarrer</a><a href="#3-Vérifier-le-mapper-et-la-carte">3. Vérifier le mapper et la carte</a><a href="#4-Commandes-des-manettes">4. Commandes des manettes</a><a href="#5-Instantanés-et-rejeu">5. Instantanés et rejeu</a><a href="#6-Traces-diagnostics-et-profils">6. Traces, diagnostics et profils</a><a href="#7-Enregistrer-le-son-et-les-images">7. Enregistrer le son et les images</a><a href="#8-Désassemblage-et-décompilation">8. Désassemblage et décompilation</a><a href="#9-Raccorder-SARAKURA">9. Raccorder SARAKURA</a><a href="#10-Périmètre-de-publication">10. Périmètre de publication</a><a href="#11-FDS-et-RAM-de-sauvegarde">11. FDS et RAM de sauvegarde</a><a href="#commands">Référence de syntaxe des commandes</a></nav><button class="print" type="button">Imprimer ce volume</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • ÉDITION DE RÉFÉRENCE</p><h1>KUROSAKI</h1><p class="subtitle">Exécution et analyse NES et FDS</p><div class="edition">De votre première ligne à l'exécution, à l'observation et aux nouveaux tests.<br/>Copie des sources : 14 septembre 2026 · Édition anglaise de référence : 14 septembre 2026</div></div><section class="authored"><h2 id="Outil-Windows-prêt-à-l-emploi">Outil Windows prêt à l'emploi</h2>
+<p>Le dépôt contient désormais <code>kurosaki.exe</code> à sa racine. Téléchargez l'archive ZIP du dépôt et conservez les mentions de licence avec l'exécutable. Cet outil Windows x64 en ligne de commande ne nécessite aucune installation de Rust, Python ou .NET pour fonctionner. Les étapes de compilation ci-dessous servent à le reconstruire depuis les sources. Le code propre au projet est proposé par DAISUKE OBA sous licence MIT ; les conditions des dépendances sont conservées dans BINARY_NOTICES.md et licenses/.</p>
+<h2 id="1-À-quoi-sert-KUROSAKI">1. À quoi sert KUROSAKI ?</h2>
+<p>KUROSAKI est un émulateur d'observation NES/Famicom/FDS capable de lire les informations de KITAQFC. Son outil en ligne de commande inspecte les ROM, exécute les logiciels, enregistre l'audio, produit des diagnostics, sauvegarde des états, rejoue les commandes, désassemble les instructions et décompile des fonctions candidates. L'étendue des implémentations de mappers varie : commencez par examiner la ROM et les informations de prise en charge.</p>
+<h2 id="2-Compiler-et-démarrer">2. Compiler et démarrer</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>Push-Location .\kurosaki
+.\scripts\build.ps1
+.\kurosaki.exe --help
+Pop-Location</code></pre></div>
+<p>Les commandes courtes <code>kurosaki</code> ci-dessous supposent que le dossier de l'exécutable figure dans PATH. Sinon, remplacez le nom de commande par <code>&amp; "chemin complet de l'exécutable"</code>.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki inspect-rom .\out\hello.nes --json .\out\rom.json
+kurosaki run .\out\hello.nes --frames 120 --png .\out\hello.png --json .\out\run.json</code></pre></div>
+<p>Utilisez la ROM hello du volume 4 pour vérifier l'affichage du texte. <code>inspect-rom</code> examine un en-tête ; <code>run</code> fait avancer l'exécution du processeur et du PPU. Une inspection réussie ne garantit pas une exécution réussie.</p>
+<h2 id="3-Vérifier-le-mapper-et-la-carte">3. Vérifier le mapper et la carte</h2>
+<p><code>mapper-list</code> répertorie les types de mappers enregistrés, <code>mapper-info</code> décrit un type et <code>audit-board</code> vérifie les contraintes de la carte. Le numéro de mapper relie l'en-tête de la ROM à des hypothèses sur le câblage physique. Un nom ne suffit pas à établir la capacité, la présence de CHR-RAM ou le comportement des banques fixes.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki mapper-list
+kurosaki mapper-info 4
+kurosaki audit-board .\out\surom.nes --expected-board surom512 --json .\out\board.json</code></pre></div>
+<p><code>--allow-unimplemented</code> autorise la poursuite de l'observation malgré des éléments non implémentés. Une exécution avec cette option ne prouve pas leur prise en charge.</p>
+<h2 id="4-Commandes-des-manettes">4. Commandes des manettes</h2>
+<p><code>run --pad1</code> et <code>--pad2</code> utilisent les masques bruts NES : A=1, B=2, SELECT=4, START=8, UP=16, DOWN=32, LEFT=64 et RIGHT=128. Additionnez les valeurs pour appuyer simultanément sur plusieurs boutons.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki run .\out\game.nes --frames 120 --pad1 1 --png .\out\held_a.png --json .\out\held_a.json</code></pre></div>
+<p>Cette commande maintient A pendant 120 images. Utilisez le rejeu pour des actions ordonnées, comme passer du titre au démarrage puis confirmer. L'exemple CLI <code>replay-record</code> enregistre une exécution de référence sans saisie interactive ; il ne correspond pas à l'enregistrement d'une personne utilisant une interface graphique.</p>
+<h2 id="5-Instantanés-et-rejeu">5. Instantanés et rejeu</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki snapshot-save .\out\game.nes --frames 120 --out .\out\title.kss.json
+kurosaki snapshot-load .\out\title.kss.json
+kurosaki replay-record .\out\game.nes --frames 120 --out .\out\baseline.replay.json
+kurosaki replay-run .\out\game.nes .\out\baseline.replay.json --json .\out\replay.json</code></pre></div>
+<p>Les états permettant une reprise utilisent les instantanés de version 2. Conservez la correspondance entre le SHA-256 de la ROM et son état. <code>snapshot-resume</code> poursuit l'exécution depuis un point sauvegardé. <code>snapshot-rebase</code> transfère explicitement un état vers une autre ROM compatible, selon un contrat fourni. Réutiliser sans vérification un ancien état après avoir modifié le code ou le placement RAM est risqué ; reproduisez normalement les mêmes actions depuis le démarrage.</p>
+<h2 id="6-Traces-diagnostics-et-profils">6. Traces, diagnostics et profils</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki trace .\out\game.nes --frames 2 --cpu --ppu --apu --mapper --nmi --dma --out .\out\trace.jsonl
+kurosaki diagnose .\out\game.nes --frames 120 --out .\out\diagnostics.json --md .\out\diagnostics.md
+kurosaki profile .\out\game.nes --frames 120 --out .\out\profile.json</code></pre></div>
+<p>Une trace enregistre ce qui s'est passé dans le temps ; les diagnostics signalent les observations correspondant à des règles ; un profil montre où l'exécution s'est concentrée. Quelques images autour d'une anomalie sont généralement plus faciles à examiner qu'une longue trace complète.</p>
+<p>Fournissez le JSON de débogage de la compilation correspondante avec <code>--kitaqfc-debug</code>. Une observation dépourvue d'informations de lignes source ne doit pas être présentée comme une trace complète au niveau du source.</p>
+<h2 id="7-Enregistrer-le-son-et-les-images">7. Enregistrer le son et les images</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki audio-export .\out\sound.nes --frames 180 --wav .\out\sound.wav --json .\out\audio.json
+kurosaki run .\out\game.nes --frames 120 --png .\out\frame.png --snapshot .\out\frame.kss.json --json .\out\frame.json</code></pre></div>
+<p>Les changements de registres, le PCM généré et un son conforme à l'attente sont trois vérifications distinctes. Notez le mapper lors des tests audio, qu'ils concernent les canaux intégrés ou une extension. Un PNG unique ne prouve ni le mouvement ni la réaction aux commandes ; conservez aussi les états et les entrées qui le précèdent et le suivent.</p>
+<h2 id="8-Désassemblage-et-décompilation">8. Désassemblage et décompilation</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki disasm .\out\game.nes --bytes 256 --text .\out\reset.txt
+kurosaki decompile .\out\game.nes --format markdown --out .\out\decompile.md</code></pre></div>
+<p><code>disasm</code> produit des suites d'instructions. <code>decompile</code> produit des limites de fonctions candidates, des graphes de flot de contrôle, des références et du pseudocode. En présence de banques commutables, une adresse processeur ne suffit pas à identifier une position physique dans la ROM. Fournissez au besoin l'état du mapper avec <code>--snapshot</code> et étayez l'analyse par des traces d'exécution ou des annotations. Il ne s'agit pas d'une restitution parfaite du source d'origine.</p>
+<h2 id="9-Raccorder-SARAKURA">9. Raccorder SARAKURA</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki run .\out\game.nes --frames 300 --emit-diagnostics .\out\kurosaki_events.jsonl --json .\out\run.json
+sarakura fc analyze --metadata .\out\build.json --events .\out\kurosaki_events.jsonl --out .\out\fc_report --fail-on error</code></pre></div>
+<p>Comme dans KOKURA, <code>--emit-diagnostics</code> de KUROSAKI reçoit un <strong>chemin de fichier JSONL</strong>. Distinguez les traces processeur des fichiers d'événements de diagnostic.</p>
+<h2 id="10-Périmètre-de-publication">10. Périmètre de publication</h2>
+<p>KUROSAKI-GUI reste non publié. Ce manuel porte sur l'outil en ligne de commande et ses API d'intégration.</p>
+<h2 id="11-FDS-et-RAM-de-sauvegarde">11. FDS et RAM de sauvegarde</h2>
+<p><code>fds-inspect</code> examine la structure du disque ; <code>export-assets</code> exporte les ressources. Testez le FDS séparément des cartouches NES, car le démarrage, le BIOS et les accès disque ont des exigences différentes. Les fichiers de sauvegarde sur pile <code>.sav</code> et les instantanés <code>.kss.json</code> ont des rôles distincts ; utilisez une disposition de sauvegarde prise en charge par l'implémentation.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki battery-export .\out\game.nes .\out\title.kss.json --out .\out\save.sav
+kurosaki battery-run .\out\game.nes --sav .\out\save.sav --frames 120 --save-out .\out\next.sav --png .\out\battery.png</code></pre></div>
+<p><code>battery-export</code> extrait la RAM de sauvegarde brute d'une ROM et d'un instantané correspondants. <code>battery-run</code> charge cette RAM et démarre à la mise sous tension ; il ne restaure pas l'état d'exécution interrompue du processeur ou du PPU. Indiquez la sortie avec <code>--save-out</code>. Ces opérations nécessitent une ROM prise en charge disposant de RAM de sauvegarde et ne s'appliquent pas à tous les exercices.</p></section><h2 id="commands">Référence de syntaxe des commandes</h2><p>L'aide ci-dessous a été enregistrée pour cette édition des sources. Consultez-la pour les arguments facultatifs, les valeurs par défaut et les valeurs acceptées. Remplacez les noms de fichiers illustratifs par vos propres sorties. Les réponses enregistrées des outils conservent leur texte d'origine.</p><details class="command searchable" id="cmd-kurosaki"><summary><code>kurosaki </code></summary><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>KITAQFC-aware clean-room NES observation emulator CLI
+
+Usage: kurosaki.exe &lt;COMMAND&gt;
+
+Commands:
+  battery-export   Export raw battery RAM from a matching snapshot (not a snapshot file)
+  battery-run      Cold boot with an explicit battery file; no implicit save-file writes
+  inspect-rom      
+  audit-board      
+  run              
+  trace            
+  audio-export     
+  profile          
+  diagnose         
+  replay-record    
+  replay-run       
+  snapshot-save    
+  snapshot-load    
+  snapshot-rebase  Rebind a reviewed v2 snapshot to an explicitly allowlisted compatible ROM
+  snapshot-resume  
+  diff             
+  decompile        Recover bounded function CFGs and readable pseudocode from a mapper context
+  disasm           
+  mapper-test      
+  fds-inspect      
+  export-assets    
+  report           
+  mapper-list      
+  mapper-info      
+  help             Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-battery-export"><summary><code>kurosaki battery-export</code> — Exporter la RAM brute de sauvegarde sur pile depuis un état sauvegardé</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki battery-export out/game.nes out/state.kss.json --out out/save.sav</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Export raw battery RAM from a matching snapshot (not a snapshot file)
+
+Usage: kurosaki.exe battery-export --out &lt;OUT&gt; &lt;ROM&gt; &lt;SNAPSHOT&gt;
+
+Arguments:
+  &lt;ROM&gt;       
+  &lt;SNAPSHOT&gt;  
+
+Options:
+      --out &lt;OUT&gt;  
+  -h, --help       Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-battery-run"><summary><code>kurosaki battery-run</code> — Démarrer avec la RAM sauvegardée</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki battery-run out/game.nes --sav out/save.sav --frames 120 --png out/loaded.png --save-out out/next.sav</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Cold boot with an explicit battery file; no implicit save-file writes
+
+Usage: kurosaki.exe battery-run [OPTIONS] --sav &lt;SAV&gt; &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --sav &lt;SAV&gt;            
+      --frames &lt;FRAMES&gt;      [default: 600]
+      --replay &lt;REPLAY&gt;      
+      --json &lt;JSON&gt;          
+      --snapshot &lt;SNAPSHOT&gt;  
+      --png &lt;PNG&gt;            
+      --save-out &lt;SAVE_OUT&gt;  
+  -h, --help                 Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-inspect-rom"><summary><code>kurosaki inspect-rom</code> — Examiner l'en-tête de la ROM</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki inspect-rom out/game.nes --json out/rom.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe inspect-rom [OPTIONS] &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --json &lt;JSON&gt;  
+      --md &lt;MD&gt;      
+  -h, --help         Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-audit-board"><summary><code>kurosaki audit-board</code> — Vérifier les exigences de la carte</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki audit-board out/game.nes --expected-board surom512 --json out/board.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe audit-board [OPTIONS] &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --expected-board &lt;EXPECTED_BOARD&gt;  [default: surom512]
+      --metadata &lt;METADATA&gt;              
+      --json &lt;JSON&gt;                      
+  -h, --help                             Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-run"><summary><code>kurosaki run</code> — Exécuter un nombre fixe d'images</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki run out/game.nes --frames 120 --png out/game.png --json out/run.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe run [OPTIONS] &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --frames &lt;FRAMES&gt;                                  [default: 1]
+      --max-instructions &lt;MAX_INSTRUCTIONS&gt;              
+      --headless                                         
+      --state-hash &lt;STATE_HASH&gt;                          
+      --json &lt;JSON&gt;                                      
+      --md &lt;MD&gt;                                          
+      --png &lt;PNG&gt;                                        
+      --snapshot &lt;SNAPSHOT&gt;                              
+      --observe-json &lt;OBSERVE_JSON&gt;                      
+      --trace-jsonl &lt;TRACE_JSONL&gt;                        
+      --emit-diagnostics &lt;EMIT_DIAGNOSTICS&gt;              
+      --repro-bundle &lt;REPRO_BUNDLE&gt;                      
+      --break-on-diagnostic &lt;BREAK_ON_DIAGNOSTIC&gt;        
+      --png-on-diagnostic &lt;PNG_ON_DIAGNOSTIC&gt;            
+      --snapshot-on-diagnostic &lt;SNAPSHOT_ON_DIAGNOSTIC&gt;  
+      --kitaqfc-debug &lt;KITAQFC_DEBUG&gt;                    
+      --allow-unimplemented                              
+      --pad1 &lt;PAD1&gt;                                      [default: 0]
+      --pad2 &lt;PAD2&gt;                                      [default: 0]
+  -h, --help                                             Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-trace"><summary><code>kurosaki trace</code> — Enregistrer une trace chronologique des événements</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki trace out/game.nes --frames 2 --cpu --ppu --out out/trace.jsonl</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe trace [OPTIONS] --out &lt;OUT&gt; &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --frames &lt;FRAMES&gt;                [default: 1]
+      --out &lt;OUT&gt;                      
+      --cpu                            
+      --mem-read                       
+      --mem-write                      
+      --ppu                            
+      --apu                            
+      --mapper                         
+      --nmi                            
+      --dma                            
+      --full                           
+      --kitaqfc-debug &lt;KITAQFC_DEBUG&gt;  
+      --allow-unimplemented            
+      --pad1 &lt;PAD1&gt;                    [default: 0]
+      --pad2 &lt;PAD2&gt;                    [default: 0]
+  -h, --help                           Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-audio-export"><summary><code>kurosaki audio-export</code> — Enregistrer l'audio PCM en WAV</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki audio-export out/game.nes --frames 120 --wav out/audio.wav</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe audio-export [OPTIONS] --wav &lt;WAV&gt; &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --frames &lt;FRAMES&gt;      [default: 60]
+      --wav &lt;WAV&gt;            
+      --json &lt;JSON&gt;          
+      --allow-unimplemented  
+      --trace-audio          
+      --pad1 &lt;PAD1&gt;          [default: 0]
+      --pad2 &lt;PAD2&gt;          [default: 0]
+  -h, --help                 Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-profile"><summary><code>kurosaki profile</code> — Repérer les zones où se concentre l'exécution</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki profile out/game.nes --frames 120 --out out/profile.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe profile [OPTIONS] &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --frames &lt;FRAMES&gt;                [default: 60]
+      --out &lt;OUT&gt;                      
+      --md &lt;MD&gt;                        
+      --kitaqfc-debug &lt;KITAQFC_DEBUG&gt;  
+      --allow-unimplemented            
+  -h, --help                           Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-diagnose"><summary><code>kurosaki diagnose</code> — Produire des diagnostics statiques et d'exécution</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki diagnose out/game.nes --frames 120 --out out/diagnostics.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe diagnose [OPTIONS] &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --frames &lt;FRAMES&gt;
+          [default: 0]
+      --out &lt;OUT&gt;
+          
+      --md &lt;MD&gt;
+          
+      --emit-diagnostics &lt;EMIT_DIAGNOSTICS&gt;
+          
+      --check &lt;CHECK&gt;
+          [possible values: ppu, nmi, mapper, apu, abi, input, fds, asset]
+      --kitaqfc-debug &lt;KITAQFC_DEBUG&gt;
+          
+      --allow-unimplemented
+          
+      --pad1 &lt;PAD1&gt;
+          [default: 0]
+      --pad2 &lt;PAD2&gt;
+          [default: 0]
+  -h, --help
+          Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-replay-record"><summary><code>kurosaki replay-record</code> — Enregistrer un rejeu de référence</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki replay-record out/game.nes --frames 120 --out out/replay.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe replay-record [OPTIONS] --out &lt;OUT&gt; &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --frames &lt;FRAMES&gt;      [default: 60]
+      --out &lt;OUT&gt;            
+      --allow-unimplemented  
+  -h, --help                 Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-replay-run"><summary><code>kurosaki replay-run</code> — Exécuter une séquence d'entrées enregistrée</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki replay-run out/game.nes out/replay.json --json out/replay-result.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe replay-run [OPTIONS] &lt;ROM&gt; &lt;REPLAY&gt;
+
+Arguments:
+  &lt;ROM&gt;     
+  &lt;REPLAY&gt;  
+
+Options:
+      --load-snapshot &lt;LOAD_SNAPSHOT&gt;
+          Restore this version-2 snapshot before applying the replay timeline. With this option, --frames and trace bounds are absolute emulator frames
+      --frames &lt;FRAMES&gt;
+          
+      --verify
+          
+      --json &lt;JSON&gt;
+          
+      --png &lt;PNG&gt;
+          
+      --snapshot &lt;SNAPSHOT&gt;
+          
+      --observe-json &lt;OBSERVE_JSON&gt;
+          
+      --wav &lt;WAV&gt;
+          
+      --trace-jsonl &lt;TRACE_JSONL&gt;
+          
+      --trace-start-frame &lt;TRACE_START_FRAME&gt;
+          
+      --trace-end-frame-exclusive &lt;TRACE_END_FRAME_EXCLUSIVE&gt;
+          
+      --cpu
+          
+      --mem-read
+          
+      --mem-write
+          
+      --ppu
+          
+      --apu
+          
+      --mapper
+          
+      --nmi
+          
+      --dma
+          
+      --full
+          
+      --allow-unimplemented
+          
+  -h, --help
+          Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-snapshot-save"><summary><code>kurosaki snapshot-save</code> — Sauvegarder l'état de la machine</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki snapshot-save out/game.nes --frames 120 --out out/state.kss.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe snapshot-save [OPTIONS] --out &lt;OUT&gt; &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --frames &lt;FRAMES&gt;      [default: 1]
+      --out &lt;OUT&gt;            
+      --allow-unimplemented  
+      --pad1 &lt;PAD1&gt;          [default: 0]
+      --pad2 &lt;PAD2&gt;          [default: 0]
+  -h, --help                 Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-snapshot-load"><summary><code>kurosaki snapshot-load</code> — Examiner un fichier d'état</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki snapshot-load out/state.kss.json --json out/state-summary.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe snapshot-load [OPTIONS] &lt;SNAPSHOT&gt;
+
+Arguments:
+  &lt;SNAPSHOT&gt;  
+
+Options:
+      --json &lt;JSON&gt;  
+  -h, --help         Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-snapshot-rebase"><summary><code>kurosaki snapshot-rebase</code> — Transférer l'état vers une ROM autorisée par un contrat de compatibilité</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki snapshot-rebase out/before.nes out/after.nes out/state.kss.json --contract out/compatibility.json --out out/rebased.kss.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Rebind a reviewed v2 snapshot to an explicitly allowlisted compatible ROM
+
+Usage: kurosaki.exe snapshot-rebase [OPTIONS] --contract &lt;CONTRACT&gt; --out &lt;OUT&gt; &lt;SOURCE_ROM&gt; &lt;TARGET_ROM&gt; &lt;SNAPSHOT&gt;
+
+Arguments:
+  &lt;SOURCE_ROM&gt;  
+  &lt;TARGET_ROM&gt;  
+  &lt;SNAPSHOT&gt;    
+
+Options:
+      --contract &lt;CONTRACT&gt;               
+      --prg-ram-patch &lt;ADDRESS=FILE&gt;      
+      --cpu-ram-patch &lt;ADDRESS=HEXBYTES&gt;  
+      --out &lt;OUT&gt;                         
+      --json &lt;JSON&gt;                       
+  -h, --help                              Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-snapshot-resume"><summary><code>kurosaki snapshot-resume</code> — Reprendre depuis un état sauvegardé</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki snapshot-resume out/game.nes out/state.kss.json --frames 60 --json out/resumed.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe snapshot-resume [OPTIONS] &lt;ROM&gt; &lt;SNAPSHOT&gt;
+
+Arguments:
+  &lt;ROM&gt;       
+  &lt;SNAPSHOT&gt;  
+
+Options:
+      --reset-at-start               Reset the CPU after restoring the snapshot while retaining mapper RAM
+      --frames &lt;FRAMES&gt;              [default: 1]
+      --out &lt;OUT&gt;                    
+      --json &lt;JSON&gt;                  
+      --png &lt;PNG&gt;                    
+      --observe-json &lt;OBSERVE_JSON&gt;  
+      --trace-jsonl &lt;TRACE_JSONL&gt;    
+      --cpu                          
+      --mem-read                     
+      --mem-write                    
+      --ppu                          
+      --apu                          
+      --mapper                       
+      --nmi                          
+      --dma                          
+      --full                         
+      --allow-unimplemented          
+      --pad1 &lt;PAD1&gt;                  [default: 0]
+      --pad2 &lt;PAD2&gt;                  [default: 0]
+  -h, --help                         Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-diff"><summary><code>kurosaki diff</code> — Comparer des résultats sauvegardés</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki diff --before out/before.kss.json --after out/after.kss.json --json out/diff.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe diff [OPTIONS] --before &lt;BEFORE&gt; --after &lt;AFTER&gt;
+
+Options:
+      --before &lt;BEFORE&gt;  
+      --after &lt;AFTER&gt;    
+      --json &lt;JSON&gt;      
+      --md &lt;MD&gt;          
+  -h, --help             Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-decompile"><summary><code>kurosaki decompile</code> — Retrouver des fonctions, des graphes de flot de contrôle et du pseudocode</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki decompile out/game.nes --format markdown --out out/decompile.md</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Recover bounded function CFGs and readable pseudocode from a mapper context
+
+Usage: kurosaki.exe decompile [OPTIONS] &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --out &lt;OUT&gt;
+          Write the rendered report here; stdout is used when omitted
+      --format &lt;FORMAT&gt;
+          [default: json] [possible values: json, markdown, text]
+      --function &lt;FUNCTIONS&gt;
+          Function name or Bnnn:$AAAA physical PRG-bank selector. Repeatable
+      --all
+          Also start a bounded candidate analysis at $8000 in every physical 8 KiB PRG bank
+      --annotations &lt;ANNOTATIONS&gt;
+          JSON annotation sidecar. ROM.decompile.json is loaded automatically when present
+      --snapshot &lt;SNAPSHOT&gt;
+          Restore a version-2 snapshot before capturing the PRG-bank windows
+      --trace-jsonl &lt;TRACE_JSONL&gt;
+          KUROSAKI trace JSONL to overlay exact physical-bank/PC hit counts
+      --max-instructions &lt;MAX_INSTRUCTIONS&gt;
+          Per-function static-analysis cap, preventing data from causing unbounded output [default: 2048]
+  -h, --help
+          Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-disasm"><summary><code>kurosaki disasm</code> — Afficher les instructions du processeur</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki disasm out/game.nes --bytes 256 --text out/disasm.txt</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe disasm [OPTIONS] &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --bytes &lt;BYTES&gt;              [default: 256]
+      --start &lt;START&gt;              CPU address in decimal or with a 0x/$ hexadecimal prefix
+      --snapshot &lt;SNAPSHOT&gt;        Restore a version 2 snapshot before reading mapped CPU bytes
+      --prg-bank-8k &lt;PRG_BANK_8K&gt;  Read one exact physical 8 KiB PRG-ROM bank, independent of mapper state
+      --json &lt;JSON&gt;                
+      --text &lt;TEXT&gt;                
+  -h, --help                       Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-mapper-test"><summary><code>kurosaki mapper-test</code> — Observer le comportement du mapper</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki mapper-test out/game.nes --json out/mapper-test.json</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe mapper-test [OPTIONS] &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --json &lt;JSON&gt;  
+  -h, --help         Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-fds-inspect"><summary><code>kurosaki fds-inspect</code> — Examiner la structure du disque</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki fds-inspect out/game.fds</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe fds-inspect [OPTIONS] &lt;DISK&gt;
+
+Arguments:
+  &lt;DISK&gt;  
+
+Options:
+      --json &lt;JSON&gt;  
+  -h, --help         Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-export-assets"><summary><code>kurosaki export-assets</code> — Exporter les ressources d'une ROM</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki export-assets out/game.nes --out out/assets</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe export-assets --out &lt;OUT&gt; &lt;ROM&gt;
+
+Arguments:
+  &lt;ROM&gt;  
+
+Options:
+      --out &lt;OUT&gt;  
+  -h, --help       Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-report"><summary><code>kurosaki report</code> — Créer un rapport à partir d'observations sauvegardées</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki report out/run.json --md out/report.md</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe report --md &lt;MD&gt; &lt;INPUT&gt;
+
+Arguments:
+  &lt;INPUT&gt;  
+
+Options:
+      --md &lt;MD&gt;  
+  -h, --help     Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-mapper-list"><summary><code>kurosaki mapper-list</code> — Lister les mappers enregistrés</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki mapper-list</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe mapper-list [OPTIONS]
+
+Options:
+      --all          
+      --json &lt;JSON&gt;  
+      --md &lt;MD&gt;      
+  -h, --help         Print help</code></pre></div></details><details class="command searchable" id="cmd-kurosaki-mapper-info"><summary><code>kurosaki mapper-info</code> — Décrire un mapper</summary><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>kurosaki mapper-info 4</code></pre></div><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kurosaki.exe mapper-info [OPTIONS] &lt;MAPPER&gt;
+
+Arguments:
+  &lt;MAPPER&gt;  
+
+Options:
+      --json &lt;JSON&gt;  
+  -h, --help         Print help</code></pre></div></details><footer>Édition source 2026-09-14 • <a href="index.html">Sommaire</a> • <a href="verification.html">Vérification</a> • <a href="../reference/inventory.json">Empreintes de la copie de référence</a><br/>Les compilations d'exemples, les exécutions dans l'émulateur et les comparaisons aux résultats attendus sont consignées séparément.</footer></main></div><script src="../assets/manual.js"></script></body></html>

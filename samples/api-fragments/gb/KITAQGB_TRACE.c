@@ -1,3 +1,3 @@
 // Usage fragment, not a standalone ROM.
-// Declaration source: lib/debug.h
+// Declaration source: kitaqgb/lib/debug.h
 KITAQGB_TRACE(name, value);

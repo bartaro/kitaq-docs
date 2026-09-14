@@ -1,5 +1,5 @@
 // Usage fragment, not a standalone ROM.
-// Declaration source: kitaqfc_project/kitaqfc/lib/intrinsics.h
+// Declaration source: kitaqfc/lib/intrinsics.h
 void example_ppu_data(u8 value) {
     __ppu_data(value);
 }

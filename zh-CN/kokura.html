@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>KOKURA — KITAQ 系列手册</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">跳至正文</a><header class="mast"><a href="index.html">KITAQ <span>开发系统</span></a><div>用户手册 <b>2026.09</b></div></header><nav aria-label="选择语言" class="languages"><a href="../en/kokura.html" hreflang="en" lang="en">English</a> <a href="../kokura.html" hreflang="ja" lang="ja">日本語</a> <a href="../ko/kokura.html" hreflang="ko" lang="ko">한국어</a> <a aria-current="page" href="../zh-CN/kokura.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a href="../zh-TW/kokura.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/kokura.html" hreflang="es" lang="es">Español</a> <a href="../pt/kokura.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/kokura.html" hreflang="fr" lang="fr">Français</a> <a href="../de/kokura.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="选择分卷"><a href="index.html">目录</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 库</a><a aria-current="page" href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 库</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">搜索本卷</label><input id="search" placeholder="例如：input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="本卷目录" class="toc"><a href="#已构建的-Windows-CLI">已构建的 Windows CLI</a><a href="#1-KOKURA-的用途">1. KOKURA 的用途</a><a href="#2-构建并运行第一个-ROM">2. 构建并运行第一个 ROM</a><a href="#3-选择-DMG-或-CGB">3. 选择 DMG 或 CGB</a><a href="#4-提供输入">4. 提供输入</a><a href="#5-图像-视频和音频">5. 图像、视频和音频</a><a href="#6-保存与恢复状态">6. 保存与恢复状态</a><a href="#7-观察符号与内存">7. 观察符号与内存</a><a href="#8-停止条件-重放与逆向分析">8. 停止条件、重放与逆向分析</a><a href="#9-将诊断交给-SARAKURA">9. 将诊断交给 SARAKURA</a><a href="#10-通信工作">10. 通信工作</a><a href="#11-外部应用集成">11. 外部应用集成</a><a href="#12-按顺序阅读报告">12. 按顺序阅读报告</a><a href="#commands">命令语法参考</a></nav><button class="print" type="button">打印本卷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 参考版</p><h1>KOKURA</h1><p class="subtitle">运行、观察与记录</p><div class="edition">从第一行代码，到运行、观察和复测。<br/>源码快照：2026 年 9 月 14 日 · 简体中文版：2026 年 9 月 14 日</div></div><section class="authored"><h2 id="已构建的-Windows-CLI">已构建的 Windows CLI</h2>
+<p>仓库根目录包含 <code>kokura-cli.exe</code>。下载仓库 ZIP，并把许可声明与可执行文件一起保留。这个 Windows x64 CLI 运行时不需要安装 Rust、Python 或 .NET。下面的构建步骤用于从源码重新生成程序。独立项目代码由 DAISUKE OBA 以 MIT 许可提供；依赖条件保留在 <code>BINARY_NOTICES.md</code> 和 <code>licenses/</code> 中。</p>
+<h2 id="1-KOKURA-的用途">1. KOKURA 的用途</h2>
+<p>KOKURA 模拟 GB/CGB 软件，记录图像、音频、CPU 执行、内存、bank、输入和诊断事件。本手册使用当前文件名 <code>kokura-cli.exe</code>；不要把旧资料中的 <code>kokuradbg</code> 当作本版可执行文件名称。</p>
+<h2 id="2-构建并运行第一个-ROM">2. 构建并运行第一个 ROM</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>Push-Location .\kokura
+.\scripts\build.ps1
+Pop-Location
+.\kokura\kokura-cli.exe .\out\hello.gb --run-frames 120 --png .\out\hello.png --dump-report .\out\hello.json</code></pre></div>
+<p>安装 Rust 和 Cargo。只需要 CLI 时，构建指定 crate 即可。先使用第 1 卷的 hello ROM。默认只运行一帧，应通过 <code>--run-frames</code> 指定到达目标场景所需帧数。这里计算的是模拟帧，不是实际等待秒数。</p>
+<h2 id="3-选择-DMG-或-CGB">3. 选择 DMG 或 CGB</h2>
+<p><code>--hardware auto</code> 是默认设置，也可明确选择 <code>dmg</code> 或 <code>cgb</code>。双模式 ROM 应在两种模式下测试。CGB 专用 ROM 拒绝在 DMG 模式启动，本身并不构成模拟器故障。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gbc --hardware cgb --run-frames 180 --png .\out\cgb.png</code></pre></div>
+<h2 id="4-提供输入">4. 提供输入</h2>
+<p><code>--input</code> 持续按住同时输入的按钮组合，<code>--input-seq</code> 按时间提供一串输入。按钮名称为 <code>A,B,START,SELECT,UP,DOWN,LEFT,RIGHT</code>；松开区间使用 <code>NONE</code>。PowerShell 中含分号的输入序列要加引号。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --input-seq "NONE:30;A:1;NONE:89" --png .\out\after_a.png --dump-report .\out\after_a.json</code></pre></div>
+<p>测试“新按下”时应包含松开区间。按住 A 120 帧与按 A 120 次并不相同。输入计数课程中，上述序列应只让计数增加一次。</p>
+<h2 id="5-图像-视频和音频">5. 图像、视频和音频</h2>
+<p><code>--png</code> 保存最终画面；<code>--screenshot</code> 配合 <code>--screenshot-frames</code> 捕获指定帧；<code>--record-video</code> 记录视频，<code>--record-wav</code> 记录音频。不使用 APU 的 hello 程序生成无声 WAV 是正常情况。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>.\kokura\kokura-cli.exe .\out\sound.gb --run-frames 180 --record-wav .\out\sound.wav --record-wav-frames 1:180 --png .\out\sound.png
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 180 --record-video .\out\play.gif --record-video-frames 30:120</code></pre></div>
+<p>范围写作 <code>start:end</code>。请保留报告，以区分已加载状态中的累计帧号和本次运行位置。声音是否可听、音高、断音、削波要分别检查。模拟器录音不证明与实机逐样本一致。</p>
+<h2 id="6-保存与恢复状态">6. 保存与恢复状态</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --save-state .\out\title.kqs
+.\kokura\kokura-cli.exe .\out\game.gb --load-state .\out\title.kqs --input START --run-frames 30 --save-state .\out\started.kqs --png .\out\started.png</code></pre></div>
+<p>通常应使用相同 ROM 和模拟器版本。模拟器状态不同于游戏自身存档；CLI 的 KQS 与 C API 的 JSON 状态也不是同一种格式，改扩展名不能使它们互换。</p>
+<h2 id="7-观察符号与内存">7. 观察符号与内存</h2>
+<p>ROM 旁的 <code>.map</code>、<code>.source_map.txt</code>、<code>.dbg2.json</code>、<code>.build_report.json</code> 可被自动识别。请保留与 ROM 同次构建的辅助文件，其他构建的文件会误导观察。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --symbols .\out\game.map --watch-window wram:0xC000:0x40 --run-frames 60 --dump-report .\out\watch.json</code></pre></div>
+<p><code>wram</code> 是观察窗口名称，0xC000 是起始地址，0x40 是长度。较小窗口更容易找到变化的变量。<code>--watch-baseline-mode</code> 选择与初始值、前一帧或命名基准比较。</p>
+<h2 id="8-停止条件-重放与逆向分析">8. 停止条件、重放与逆向分析</h2>
+<p><code>--breakpoint</code>、<code>--watchpoint</code>、<code>--run-until</code>、<code>--snapshot-at</code> 按条件停止或保存。它们各自的参数小语法不同，请看下方参考和实际帮助。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --replay-interval 1 --replay-max-checkpoints 120 --dump-replay-tape .\out\baseline.replay.json --dump-report .\out\baseline.json
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --replay-interval 1 --compare-replay-tape .\out\baseline.replay.json --dump-report .\out\compare.json</code></pre></div>
+<p>先找到第一次分歧，再缩小到附近区间。<code>--decompile-out</code> 产生伪代码与控制流信息，<code>--disassemble-out</code> 显示 CPU 指令。反编译不能完整恢复原来的 C 代码和变量名。</p>
+<h2 id="9-将诊断交给-SARAKURA">9. 将诊断交给 SARAKURA</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --run-frames 300 --emit-diagnostics .\out\gb_events.jsonl --dump-report .\out\run.json
+.\sarakura\target\debug\sarakura.exe gb analyze --metadata .\out\build.json --events .\out\gb_events.jsonl --out .\out\gb_report --fail-on error</code></pre></div>
+<p>KOKURA 的 <code>--emit-diagnostics</code> 接收 <strong>JSONL 文件名</strong>，例如 <code>out/gb_events.jsonl</code>。普通运行报告 JSON、CPU 跟踪 JSONL 都不等于诊断事件输入。</p>
+<h2 id="10-通信工作">10. 通信工作</h2>
+<p><code>pair</code> 模拟两台机器；<code>four_player_adapter</code> 是主机选择通信伙伴的逻辑结构；<code>dmg07</code> 模拟物理 DMG-07 协议。通过 <code>--link-job</code> 传入工作 JSON，或使用 <code>--link-topology</code>、<code>--link-session</code> 配置会话。</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>.\kokura\kokura-cli.exe --link-topology pair --run-frames 120 --link-session "name=p1|slot=0|rom=out/host.gb|input=NONE" --link-session "name=p2|slot=1|rom=out/peer.gb|input=NONE" --dump-report .\out\pair.json</code></pre></div>
+<p>各 ROM 必须实现通信。运行两个普通 hello 程序，并不构成通信库测试。记录各会话的 ROM、槽位、输入和状态，并注明哪些实际设备行为仍未验证。</p>
+<h2 id="11-外部应用集成">11. 外部应用集成</h2>
+<p>公开 C ABI 位于 <code>kokura-capi</code>；Python 可通过提供的桥接代码和 Python crate 访问。调查集成问题前，先建立最小 CLI 复现步骤。</p>
+<h2 id="12-按顺序阅读报告">12. 按顺序阅读报告</h2>
+<p>先检查执行帧数与停止原因，再看画面、输入结果、声音、错误与警告以及性能分析。无输入地长时间停留在标题画面，可能自然产生静止画面或重复 PC 警告。应结合目标场景判断，不要机械地把每条警告当作故障。</p></section><h2 id="commands">命令语法参考</h2><p>下方帮助取自本源码版本，可查询可选参数、默认值和允许值。请将示例输入文件名换成自己的文件。实际工具响应保留原文。</p><details class="command searchable" id="cmd-kokura"><summary><code>kokura </code></summary><div class="codebox"><span class="lang">help</span><button class="copy" type="button">复制</button><pre><code>Usage: kokura-cli.exe [OPTIONS] [ROM]
+
+Arguments:
+  [ROM]  
+
+Options:
+      --hardware &lt;HARDWARE&gt;
+          [default: auto] [possible values: auto, dmg, cgb]
+      --job &lt;JOB&gt;
+          
+      --link-job &lt;LINK_JOB&gt;
+          
+      --link-topology &lt;LINK_TOPOLOGY&gt;
+          
+      --link-initial-peer-slot &lt;LINK_INITIAL_PEER_SLOT&gt;
+          
+      --link-session &lt;LINK_SESSIONS&gt;
+          
+      --regression-matrix &lt;REGRESSION_MATRIX&gt;
+          
+      --run-frames &lt;RUN_FRAMES&gt;
+          [default: 1]
+      --input &lt;INPUT&gt;
+          
+      --input-seq &lt;INPUT_SEQ&gt;
+          
+      --load-state &lt;LOAD_STATE&gt;
+          
+      --resume-state &lt;RESUME_STATE&gt;
+          
+      --save-state &lt;SAVE_STATE&gt;
+          
+      --dump-report &lt;DUMP_REPORT&gt;
+          
+      --dump-replay-tape &lt;DUMP_REPLAY_TAPE&gt;
+          
+      --compare-replay-tape &lt;COMPARE_REPLAY_TAPE&gt;
+          
+      --snapshot-on-replay-mismatch &lt;SNAPSHOT_ON_REPLAY_MISMATCH&gt;
+          
+      --screenshot &lt;SCREENSHOT&gt;
+          
+      --png &lt;PNG&gt;
+          
+      --snapshot &lt;SNAPSHOT&gt;
+          
+      --trace-jsonl &lt;TRACE_JSONL&gt;
+          
+      --diagnostics-jsonl &lt;DIAGNOSTICS_JSONL&gt;
+          
+      --repro-bundle &lt;REPRO_BUNDLE&gt;
+          
+      --png-on-diagnostic &lt;PNG_ON_DIAGNOSTIC&gt;
+          
+      --snapshot-on-diagnostic &lt;SNAPSHOT_ON_DIAGNOSTIC&gt;
+          
+      --break-on-diagnostic &lt;BREAK_ON_DIAGNOSTIC&gt;
+          
+      --input-script &lt;INPUT_SCRIPT&gt;
+          
+      --screenshot-frames &lt;SCREENSHOT_FRAMES&gt;
+          
+      --record-wav &lt;RECORD_WAV&gt;
+          
+      --record-wav-frames &lt;RECORD_WAV_FRAMES&gt;
+          
+      --record-video &lt;RECORD_VIDEO&gt;
+          
+      --record-video-frames &lt;RECORD_VIDEO_FRAMES&gt;
+          
+      --audio-buffer-frames &lt;AUDIO_BUFFER_FRAMES&gt;
+          
+      --symbols &lt;SYMBOLS&gt;
+          
+      --source-map &lt;SOURCE_MAP&gt;
+          
+      --toolchain-metadata &lt;TOOLCHAIN_METADATA&gt;
+          
+      --watch-window &lt;WATCH_WINDOWS&gt;
+          
+      --watch-baseline-mode &lt;WATCH_BASELINE_MODE&gt;
+          [default: initial] [possible values: initial, previous-frame, named]
+      --watch-baseline-tag &lt;WATCH_BASELINE_TAG&gt;
+          
+      --capture-watch-baseline &lt;CAPTURE_WATCH_BASELINE&gt;
+          
+      --watch-fields &lt;WATCH_FIELDS&gt;
+          
+      --report-sections &lt;REPORT_SECTIONS&gt;
+          
+      --report-minimal &lt;REPORT_MINIMAL&gt;
+          
+      --snapshot-at &lt;SNAPSHOT_AT&gt;
+          
+      --run-until &lt;RUN_UNTIL&gt;
+          
+      --trace-point &lt;TRACE_POINTS&gt;
+          
+      --timeline-out &lt;TIMELINE_OUT&gt;
+          
+      --timeline-format &lt;TIMELINE_FORMAT&gt;
+          [default: jsonl] [possible values: jsonl, csv]
+      --breakpoint &lt;BREAKPOINTS&gt;
+          
+      --watchpoint &lt;WATCHPOINTS&gt;
+          
+      --stop-on-mmio &lt;STOP_ON_MMIO&gt;
+          
+      --stop-on-irq &lt;STOP_ON_IRQ&gt;
+          
+      --stop-on-dma &lt;STOP_ON_DMA&gt;
+          
+      --replay-interval &lt;REPLAY_INTERVAL&gt;
+          
+      --replay-max-checkpoints &lt;REPLAY_MAX_CHECKPOINTS&gt;
+          
+      --rewind-on-stop-frames &lt;REWIND_ON_STOP_FRAMES&gt;
+          
+      --stop-on-divergence
+          
+      --compare-replay-watch-only
+          
+      --decompile-out &lt;DECOMPILE_OUT&gt;
+          
+      --decompile-format &lt;DECOMPILE_FORMAT&gt;
+          [default: json] [possible values: json, markdown, text]
+      --decompile-function &lt;DECOMPILE_FUNCTIONS&gt;
+          
+      --decompile-all
+          
+      --decompile-annotations &lt;DECOMPILE_ANNOTATIONS&gt;
+          
+      --decompile-trace &lt;DECOMPILE_TRACE&gt;
+          
+      --disassemble-out &lt;DISASSEMBLE_OUT&gt;
+          
+      --disassemble-format &lt;DISASSEMBLE_FORMAT&gt;
+          [default: text] [possible values: json, markdown, text]
+      --disassemble-range &lt;DISASSEMBLE_RANGES&gt;
+          
+      --emit-diagnostics &lt;EMIT_DIAGNOSTICS&gt;
+          
+      --diagnostic-pack &lt;DIAGNOSTIC_PACK&gt;
+          
+      --diagnostic-rule &lt;DIAGNOSTIC_RULES&gt;
+          
+      --diagnostic-summary-limit &lt;DIAGNOSTIC_SUMMARY_LIMIT&gt;
+          
+  -h, --help
+          Print help</code></pre></div></details><footer>源码版本 2026-09-14 • <a href="index.html">目录</a> • <a href="verification.html">验证</a> • <a href="../reference/inventory.json">快照指纹</a><br/>示例构建、模拟器执行与预期结果比较分别记录。</footer></main></div><script src="../assets/manual.js"></script></body></html>

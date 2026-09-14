@@ -2,6 +2,7 @@ from pathlib import Path
 import re,json,html,shutil
 from collect import ROOT,SITE,read
 from chapters import TEXT,BOOKS
+from languages import language_nav
 E=html.escape
 def slug(t):return re.sub(r'[^\w-]+','-',t).strip('-')
 def code(t,lang='c'):return '<div class="codebox"><span class="lang">'+lang+'</span><button class="copy" type="button">コピー</button><pre><code>'+E(t.strip())+'</code></pre></div>'
@@ -52,7 +53,7 @@ MODULES={
 'cgb_tile':'CGBのタイル番号と属性','scroll':'背景・ウィンドウ・分割スクロール','raster':'帯・行単位のスクロール表','camera':'世界座標と表示範囲の変換',
 'link':'シリアル通信と論理パケット','link_dmg07':'DMG-07の外部クロック通信','slg':'盤面、手の一覧とundo','physics2d':'2Dの運動と衝突',
 'physics2d_circle':'円同士の物理計算','physics3d':'3DのAABB物理計算','wire3d':'DMG向けワイヤーフレーム','wire3d_cgb':'CGB専用の色付きワイヤーフレーム',
-'x3d':'DMGのX風ワイヤーフレーム','danmaku':'弾プール・扇状生成・被弾とグレイズ','intrinsics':'コンパイラ組み込み命令','core':'基本の整数型',
+'dmg3d':'DMGの128×120モノクロワイヤーフレーム','danmaku':'弾プール・扇状生成・被弾とグレイズ','intrinsics':'コンパイラ組み込み命令','core':'基本の整数型',
 'fc':'ライブラリをまとめて読むヘッダー','runtime':'NMI、OAM、PPU転送のCヘルパー','ppu':'PPU画面操作の宣言','ppu_direct':'直接PPUへ書く操作',
 'vram_queue':'NMIで処理するVRAMキュー','palette':'NESのパレット操作','attribute':'ネームテーブル属性','tilemap':'タイルマップの矩形操作',
 'nametable_asset':'ネームテーブル用素材と配置','metasprite':'複数OBJをまとめた画像','oam':'OAMシャドウ操作','oam_fair':'優先順位付きスプライト交替表示',
@@ -60,7 +61,7 @@ MODULES={
 'pad':'NESコントローラー入力','zapper':'光線銃の入力窓口','keyboard':'キーボードの走査','rob':'ROB制御','mic':'マイク入力','midi':'MIDI入出力の窓口',
 'mapper':'マッパーのバンクとIRQ','fds':'FDSディスク操作','fds_file':'FDSファイルのロード','fds_overlay':'FDSのオーバーレイコード',
 'fds_save':'FDS保存の宣言','fds_sound':'FDS波形音源','vrc6_sound':'VRC6拡張音源','vrc7_sound':'VRC7 FM音源',
-'math_fast':'高速な整数計算','math_fixed':'固定小数点計算の組み込み窓口','math_lut':'ルックアップテーブル','nes_game':'ゲーム向け操作名のマクロ',
+'math_fast':'高速な整数計算','math_fixed':'固定小数点計算の組み込み窓口','math_lut':'ルックアップテーブル','nes_game':'ゲーム向け操作名のマクロ','wire3d_dmg':'DMG向けワイヤーフレーム',
 }
 SPECIAL={
 '__readpadex':'下位8ビットは現在のキー、上位8ビットは新規押下。前回値を渡してエッジを求めます。',
@@ -109,8 +110,8 @@ def page(key,title,subtitle,body):
  nav='<a href="'+depth+'index.html">総合目次</a>'+''.join('<a '+('aria-current="page" ' if key==k else '')+'href="'+depth+k+'.html"><b>'+num+'</b> '+E(name)+'</a>' for k,num,name,sub in BOOKS)
  headings=re.findall(r'<h2 id="([^"]+)">(.*?)</h2>',body)
  toc=''.join('<a href="#'+id+'">'+re.sub('<[^>]+>','',t)+'</a>' for id,t in headings)
- text='''<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>'''+E(title)+''' — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="'''+depth+'''assets/manual.css"></head><body><a class="skip" href="#main">本文へ</a><header class="mast"><a href="'''+depth+'''index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER'S MANUAL <b>2026.09</b></div></header><div class="layout"><aside><nav aria-label="巻の選択">'''+nav+'''</nav><label class="searchlabel" for="search">この巻を検索</label><input type="search" id="search" placeholder="例：入力 / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="この巻の目次">'''+toc+'''</nav><button class="print" type="button">この巻を印刷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>'''+E(title)+'''</h1><p class="subtitle">'''+E(subtitle)+'''</p><div class="edition">初めての一行から、実行・観測・再テストまで。<br>ローカルソース採取：2026年9月12日</div></div>'''+body+'''<footer>2026-09-12版 • <a href="'''+depth+'''index.html">総合目次</a> • <a href="'''+depth+'''verification.html">検証記録</a> • <a href="'''+depth+'''reference/inventory.json">版の指紋</a><br>サンプルのビルド・エミュレータ実行・期待値照合は別項目として記録します。</footer></main></div><script src="'''+depth+'''assets/manual.js"></script></body></html>'''
- text=text.replace('</b></div></header>', '</b> · <a href="en/'+key+'.html" lang="en" hreflang="en">English</a></div></header>')
+ text='''<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>'''+E(title)+''' — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="'''+depth+'''assets/manual.css"></head><body><a class="skip" href="#main">本文へ</a><header class="mast"><a href="'''+depth+'''index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER'S MANUAL <b>2026.09</b></div></header><div class="layout"><aside><nav aria-label="巻の選択">'''+nav+'''</nav><label class="searchlabel" for="search">この巻を検索</label><input type="search" id="search" placeholder="例：入力 / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="この巻の目次">'''+toc+'''</nav><button class="print" type="button">この巻を印刷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>'''+E(title)+'''</h1><p class="subtitle">'''+E(subtitle)+'''</p><div class="edition">初めての一行から、実行・観測・再テストまで。<br>ローカルソース採取：2026年9月14日</div></div>'''+body+'''<footer>2026-09-14版 • <a href="'''+depth+'''index.html">総合目次</a> • <a href="'''+depth+'''verification.html">検証記録</a> • <a href="'''+depth+'''reference/inventory.json">版の指紋</a><br>サンプルのビルド・エミュレータ実行・期待値照合は別項目として記録します。</footer></main></div><script src="'''+depth+'''assets/manual.js"></script></body></html>'''
+ text=text.replace('</header>', '</header>'+language_nav(key,'ja','言語'), 1)
  dest=SITE/(key+'.html');dest.parent.mkdir(exist_ok=True,parents=True);dest.write_text(text,encoding='utf-8')
 
 def samples_section(platform,manifest):
@@ -259,7 +260,7 @@ def main():
   page(key,title,sub,body)
  # Verification is generated from recorded outcomes rather than aspirational claims.
  results=json.loads(read(SITE/'verification/samples.json')) if (SITE/'verification/samples.json').exists() else []
- body='<h2 id="scope">今回の確認範囲</h2><p>コンパイラ2種とKUROSAKI CLIは採取した現在のソースからビルドしました。KOKURAとSARAKURAは同梱inventoryに指紋を記録したローカル実行ファイルを使用しています。全機能・全周辺機器・実機の試験ではありません。</p><p>各サンプルのコンパイル終了コード、120フレームのエミュレータ実行、画面は以下です。期待値の画素照合は別の結果がある場合に明示します。終了コード0だけで入力・音・ゲーム挙動の正常を証明したとはしません。</p>'
+ body='<h2 id="scope">今回の確認範囲</h2><p>以下は9月12日時点のソースに対する検証記録です。コンパイラ2種とKUROSAKI CLIは当時のソースからビルドし、KOKURAとSARAKURAはローカルの実行ファイルを使用しました。全機能・全周辺機器・実機の試験ではありません。後日のソース更新や翻訳だけで、ここにある実行結果を再確認したことにはなりません。公開用の追加確認は <a href="PUBLICATION_CHECKS.md">publication checks</a> に記録しています。</p><p>各サンプルのコンパイル終了コード、120フレームのエミュレータ実行、画面は以下です。期待値の画素照合は別の結果がある場合に明示します。終了コード0だけで入力・音・ゲーム挙動の正常を証明したとはしません。</p>'
  for r in results:
   id=r['id'];body+='<section id="'+id+'"><h2 id="result-'+id+'">'+id+'</h2><p>ビルド終了コード：'+E(str(r['build_exit']))+' ／ 実行：'+E(r['runtime'])+'</p><p>'+E(r.get('expected',''))+'</p>'
   if (SITE/'verification'/(id+'.png')).exists():body+='<img class="screen" loading="lazy" src="verification/'+id+'.png" alt="'+id+' のエミュレータ実行画面">'

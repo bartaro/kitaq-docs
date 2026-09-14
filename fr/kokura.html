@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>KOKURA — MANUEL DE LA SÉRIE KITAQ</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">Aller au contenu</a><header class="mast"><a href="index.html">KITAQ <span>SYSTÈME DE DÉVELOPPEMENT</span></a><div>MANUEL D'UTILISATION <b>2026.09</b></div></header><nav aria-label="Langues" class="languages"><a href="../en/kokura.html" hreflang="en" lang="en">English</a> <a href="../kokura.html" hreflang="ja" lang="ja">日本語</a> <a href="../ko/kokura.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/kokura.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a href="../zh-TW/kokura.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/kokura.html" hreflang="es" lang="es">Español</a> <a href="../pt/kokura.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a aria-current="page" href="../fr/kokura.html" hreflang="fr" lang="fr">Français</a> <a href="../de/kokura.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="Choisir un volume"><a href="index.html">Sommaire</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> BIBLIOTHÈQUE KITAQGB</a><a aria-current="page" href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> BIBLIOTHÈQUE KITAQFC</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">Rechercher dans ce volume</label><input id="search" placeholder="ex. input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="Sommaire du volume" class="toc"><a href="#Outil-Windows-prêt-à-l-emploi">Outil Windows prêt à l'emploi</a><a href="#1-À-quoi-sert-KOKURA">1. À quoi sert KOKURA ?</a><a href="#2-Compiler-et-lancer-votre-première-ROM">2. Compiler et lancer votre première ROM</a><a href="#3-Choisir-DMG-ou-CGB">3. Choisir DMG ou CGB</a><a href="#4-Fournir-des-commandes">4. Fournir des commandes</a><a href="#5-Images-vidéo-et-audio">5. Images, vidéo et audio</a><a href="#6-Sauvegarder-et-reprendre-un-état">6. Sauvegarder et reprendre un état</a><a href="#7-Observer-les-symboles-et-la-mémoire">7. Observer les symboles et la mémoire</a><a href="#8-Conditions-d-arrêt-rejeu-et-rétroanalyse">8. Conditions d'arrêt, rejeu et rétroanalyse</a><a href="#9-Envoyer-les-diagnostics-à-SARAKURA">9. Envoyer les diagnostics à SARAKURA</a><a href="#10-Tâches-de-communication">10. Tâches de communication</a><a href="#11-Applications-externes">11. Applications externes</a><a href="#12-Lire-les-rapports-dans-l-ordre">12. Lire les rapports dans l'ordre</a><a href="#commands">Référence de syntaxe des commandes</a></nav><button class="print" type="button">Imprimer ce volume</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • ÉDITION DE RÉFÉRENCE</p><h1>KOKURA</h1><p class="subtitle">Exécuter, observer et enregistrer</p><div class="edition">De votre première ligne à l'exécution, à l'observation et aux nouveaux tests.<br/>Copie des sources : 14 septembre 2026 · Édition anglaise de référence : 14 septembre 2026</div></div><section class="authored"><h2 id="Outil-Windows-prêt-à-l-emploi">Outil Windows prêt à l'emploi</h2>
+<p>Le dépôt contient désormais <code>kokura-cli.exe</code> à sa racine. Téléchargez l'archive ZIP du dépôt et conservez les mentions de licence avec l'exécutable. Cet outil Windows x64 en ligne de commande ne nécessite aucune installation de Rust, Python ou .NET pour fonctionner. Les étapes de compilation ci-dessous servent à le reconstruire depuis les sources. Le code propre au projet est proposé par DAISUKE OBA sous licence MIT ; les conditions des dépendances sont conservées dans BINARY_NOTICES.md et licenses/.</p>
+<h2 id="1-À-quoi-sert-KOKURA">1. À quoi sert KOKURA ?</h2>
+<p>KOKURA émule les logiciels GB/CGB et enregistre des observations sur l'image, le son, l'exécution du processeur, la mémoire, les banques, les commandes et les événements de diagnostic. Ce manuel utilise le nom actuel <code>kokura-cli.exe</code> ; les anciennes références à <code>kokuradbg</code> ne désignent pas nécessairement l'exécutable de cette distribution.</p>
+<h2 id="2-Compiler-et-lancer-votre-première-ROM">2. Compiler et lancer votre première ROM</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>Push-Location .\kokura
+.\scripts\build.ps1
+Pop-Location
+.\kokura\kokura-cli.exe .\out\hello.gb --run-frames 120 --png .\out\hello.png --dump-report .\out\hello.json</code></pre></div>
+<p>Installez Rust et Cargo. Compilez la crate indiquée si vous n'avez besoin que de l'outil en ligne de commande. Utilisez la ROM hello du volume 1. Le nombre d'images par défaut est un ; précisez <code>--run-frames</code> pour atteindre la scène souhaitée. Cette valeur compte des images émulées, pas des secondes d'attente.</p>
+<h2 id="3-Choisir-DMG-ou-CGB">3. Choisir DMG ou CGB</h2>
+<p><code>--hardware auto</code> est le réglage par défaut ; <code>dmg</code> et <code>cgb</code> imposent un modèle. Testez les ROM à deux modes sur les deux modèles. Le refus de démarrage d'une ROM réservée à la CGB en mode DMG n'indique pas, à lui seul, une panne de l'émulateur.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gbc --hardware cgb --run-frames 180 --png .\out\cgb.png</code></pre></div>
+<h2 id="4-Fournir-des-commandes">4. Fournir des commandes</h2>
+<p><code>--input</code> maintient une combinaison de boutons simultanés ; <code>--input-seq</code> fournit une séquence dans le temps. Les noms sont <code>A,B,START,SELECT,UP,DOWN,LEFT,RIGHT</code> ; utilisez <code>NONE</code> pour les intervalles sans bouton appuyé. Dans PowerShell, entourez de guillemets les séquences contenant des points-virgules.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --input-seq "NONE:30;A:1;NONE:89" --png .\out\after_a.png --dump-report .\out\after_a.json</code></pre></div>
+<p>Prévoyez un intervalle de relâchement pour tester les nouveaux appuis. Maintenir A pendant 120 images n'équivaut pas à appuyer 120 fois sur A. Avec l'exercice du compteur d'appuis, la séquence ci-dessus doit incrémenter le compteur une seule fois.</p>
+<h2 id="5-Images-vidéo-et-audio">5. Images, vidéo et audio</h2>
+<p><code>--png</code> enregistre l'écran final. <code>--screenshot</code>, associé à <code>--screenshot-frames</code>, capture les images choisies. <code>--record-video</code> enregistre une vidéo et <code>--record-wav</code> l'audio. Il est normal d'obtenir un WAV silencieux à partir d'un programme hello qui n'utilise pas l'APU.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>.\kokura\kokura-cli.exe .\out\sound.gb --run-frames 180 --record-wav .\out\sound.wav --record-wav-frames 1:180 --png .\out\sound.png
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 180 --record-video .\out\play.gif --record-video-frames 30:120</code></pre></div>
+<p>Les plages s'écrivent <code>start:end</code>. Conservez le rapport pour distinguer les numéros d'images accumulés dans un état chargé des positions dans l'exécution courante. Vérifiez séparément le son audible, la hauteur, les coupures et l'écrêtage. Un enregistrement d'émulateur ne prouve pas une égalité échantillon par échantillon avec le matériel physique.</p>
+<h2 id="6-Sauvegarder-et-reprendre-un-état">6. Sauvegarder et reprendre un état</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --save-state .\out\title.kqs
+.\kokura\kokura-cli.exe .\out\game.gb --load-state .\out\title.kqs --input START --run-frames 30 --save-state .\out\started.kqs --png .\out\started.png</code></pre></div>
+<p>Utilisez normalement la même ROM et la même version de l'émulateur. Un état d'émulateur diffère de la sauvegarde propre au jeu. Les fichiers KQS de l'outil en ligne de commande et les états JSON de l'API C sont des formats distincts ; changer leur extension ne les rend pas interchangeables.</p>
+<h2 id="7-Observer-les-symboles-et-la-mémoire">7. Observer les symboles et la mémoire</h2>
+<p>Les fichiers annexes <code>.map</code>, <code>.source_map.txt</code>, <code>.dbg2.json</code> et <code>.build_report.json</code> peuvent être détectés à côté de la ROM. Conservez chaque ROM avec les fichiers de sa compilation : ceux d'une autre version peuvent conduire à des observations trompeuses.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --symbols .\out\game.map --watch-window wram:0xC000:0x40 --run-frames 60 --dump-report .\out\watch.json</code></pre></div>
+<p><code>wram</code> est le nom de la fenêtre d'observation, 0xC000 son adresse de départ et 0x40 sa longueur. De petites fenêtres facilitent l'identification des variables modifiées. <code>--watch-baseline-mode</code> choisit une comparaison avec les valeurs initiales, l'image précédente ou une référence nommée.</p>
+<h2 id="8-Conditions-d-arrêt-rejeu-et-rétroanalyse">8. Conditions d'arrêt, rejeu et rétroanalyse</h2>
+<p><code>--breakpoint</code>, <code>--watchpoint</code>, <code>--run-until</code> et <code>--snapshot-at</code> arrêtent ou sauvegardent l'exécution selon des conditions. La syntaxe de leurs arguments diffère ; consultez la référence et l'aide enregistrée ci-dessous.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --replay-interval 1 --replay-max-checkpoints 120 --dump-replay-tape .\out\baseline.replay.json --dump-report .\out\baseline.json
+.\kokura\kokura-cli.exe .\out\game.gb --run-frames 120 --replay-interval 1 --compare-replay-tape .\out\baseline.replay.json --dump-report .\out\compare.json</code></pre></div>
+<p>Repérez la première divergence, puis observez un intervalle plus court autour d'elle. <code>--decompile-out</code> produit du pseudocode et des informations de flot de contrôle ; <code>--disassemble-out</code> affiche les instructions du processeur. La décompilation ne restaure pas parfaitement le code C d'origine ni les noms des variables.</p>
+<h2 id="9-Envoyer-les-diagnostics-à-SARAKURA">9. Envoyer les diagnostics à SARAKURA</h2>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>.\kokura\kokura-cli.exe .\out\game.gb --run-frames 300 --emit-diagnostics .\out\gb_events.jsonl --dump-report .\out\run.json
+.\sarakura\target\debug\sarakura.exe gb analyze --metadata .\out\build.json --events .\out\gb_events.jsonl --out .\out\gb_report --fail-on error</code></pre></div>
+<p>Dans KOKURA, <code>--emit-diagnostics</code> reçoit un <strong>nom de fichier JSONL</strong>, par exemple <code>out/gb_events.jsonl</code>. Un rapport d'exécution JSON ordinaire ou une trace processeur JSONL ne constitue pas la même entrée qu'un fichier d'événements de diagnostic.</p>
+<h2 id="10-Tâches-de-communication">10. Tâches de communication</h2>
+<p><code>pair</code> modélise deux machines. <code>four_player_adapter</code> organise des échanges logiques dans lesquels l'hôte sélectionne son correspondant. <code>dmg07</code> modélise le protocole physique DMG-07. Fournissez une tâche JSON à <code>--link-job</code> ou configurez les sessions avec <code>--link-topology</code> et <code>--link-session</code>.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copier</button><pre><code>.\kokura\kokura-cli.exe --link-topology pair --run-frames 120 --link-session "name=p1|slot=0|rom=out/host.gb|input=NONE" --link-session "name=p2|slot=1|rom=out/peer.gb|input=NONE" --dump-report .\out\pair.json</code></pre></div>
+<p>Chaque ROM doit implémenter la communication. Exécuter deux programmes hello ordinaires ne teste pas la bibliothèque de liaison. Consignez la ROM, l'emplacement, les commandes et l'état de chaque session, et indiquez les comportements du périphérique physique qui restent non testés.</p>
+<h2 id="11-Applications-externes">11. Applications externes</h2>
+<p>L'ABI C publiée se trouve dans <code>kokura-capi</code> ; l'accès Python est fourni par la passerelle et la crate Python. Établissez une reproduction minimale en ligne de commande avant d'examiner un problème d'intégration.</p>
+<h2 id="12-Lire-les-rapports-dans-l-ordre">12. Lire les rapports dans l'ordre</h2>
+<p>Vérifiez d'abord le nombre d'images exécutées et le motif d'arrêt, puis l'écran, le résultat des commandes, le son, les erreurs et avertissements, et enfin le profil. Une longue observation d'un écran titre sans aucune entrée peut naturellement produire des avertissements d'écran statique ou de compteur ordinal répété. Comparez les avertissements à la scène attendue au lieu de considérer mécaniquement chacun d'eux comme une anomalie.</p></section><h2 id="commands">Référence de syntaxe des commandes</h2><p>L'aide ci-dessous a été enregistrée pour cette édition des sources. Consultez-la pour les arguments facultatifs, les valeurs par défaut et les valeurs acceptées. Remplacez les noms de fichiers illustratifs par vos propres sorties. Les réponses enregistrées des outils conservent leur texte d'origine.</p><details class="command searchable" id="cmd-kokura"><summary><code>kokura </code></summary><div class="codebox"><span class="lang">help</span><button class="copy" type="button">Copier</button><pre><code>Usage: kokura-cli.exe [OPTIONS] [ROM]
+
+Arguments:
+  [ROM]  
+
+Options:
+      --hardware &lt;HARDWARE&gt;
+          [default: auto] [possible values: auto, dmg, cgb]
+      --job &lt;JOB&gt;
+          
+      --link-job &lt;LINK_JOB&gt;
+          
+      --link-topology &lt;LINK_TOPOLOGY&gt;
+          
+      --link-initial-peer-slot &lt;LINK_INITIAL_PEER_SLOT&gt;
+          
+      --link-session &lt;LINK_SESSIONS&gt;
+          
+      --regression-matrix &lt;REGRESSION_MATRIX&gt;
+          
+      --run-frames &lt;RUN_FRAMES&gt;
+          [default: 1]
+      --input &lt;INPUT&gt;
+          
+      --input-seq &lt;INPUT_SEQ&gt;
+          
+      --load-state &lt;LOAD_STATE&gt;
+          
+      --resume-state &lt;RESUME_STATE&gt;
+          
+      --save-state &lt;SAVE_STATE&gt;
+          
+      --dump-report &lt;DUMP_REPORT&gt;
+          
+      --dump-replay-tape &lt;DUMP_REPLAY_TAPE&gt;
+          
+      --compare-replay-tape &lt;COMPARE_REPLAY_TAPE&gt;
+          
+      --snapshot-on-replay-mismatch &lt;SNAPSHOT_ON_REPLAY_MISMATCH&gt;
+          
+      --screenshot &lt;SCREENSHOT&gt;
+          
+      --png &lt;PNG&gt;
+          
+      --snapshot &lt;SNAPSHOT&gt;
+          
+      --trace-jsonl &lt;TRACE_JSONL&gt;
+          
+      --diagnostics-jsonl &lt;DIAGNOSTICS_JSONL&gt;
+          
+      --repro-bundle &lt;REPRO_BUNDLE&gt;
+          
+      --png-on-diagnostic &lt;PNG_ON_DIAGNOSTIC&gt;
+          
+      --snapshot-on-diagnostic &lt;SNAPSHOT_ON_DIAGNOSTIC&gt;
+          
+      --break-on-diagnostic &lt;BREAK_ON_DIAGNOSTIC&gt;
+          
+      --input-script &lt;INPUT_SCRIPT&gt;
+          
+      --screenshot-frames &lt;SCREENSHOT_FRAMES&gt;
+          
+      --record-wav &lt;RECORD_WAV&gt;
+          
+      --record-wav-frames &lt;RECORD_WAV_FRAMES&gt;
+          
+      --record-video &lt;RECORD_VIDEO&gt;
+          
+      --record-video-frames &lt;RECORD_VIDEO_FRAMES&gt;
+          
+      --audio-buffer-frames &lt;AUDIO_BUFFER_FRAMES&gt;
+          
+      --symbols &lt;SYMBOLS&gt;
+          
+      --source-map &lt;SOURCE_MAP&gt;
+          
+      --toolchain-metadata &lt;TOOLCHAIN_METADATA&gt;
+          
+      --watch-window &lt;WATCH_WINDOWS&gt;
+          
+      --watch-baseline-mode &lt;WATCH_BASELINE_MODE&gt;
+          [default: initial] [possible values: initial, previous-frame, named]
+      --watch-baseline-tag &lt;WATCH_BASELINE_TAG&gt;
+          
+      --capture-watch-baseline &lt;CAPTURE_WATCH_BASELINE&gt;
+          
+      --watch-fields &lt;WATCH_FIELDS&gt;
+          
+      --report-sections &lt;REPORT_SECTIONS&gt;
+          
+      --report-minimal &lt;REPORT_MINIMAL&gt;
+          
+      --snapshot-at &lt;SNAPSHOT_AT&gt;
+          
+      --run-until &lt;RUN_UNTIL&gt;
+          
+      --trace-point &lt;TRACE_POINTS&gt;
+          
+      --timeline-out &lt;TIMELINE_OUT&gt;
+          
+      --timeline-format &lt;TIMELINE_FORMAT&gt;
+          [default: jsonl] [possible values: jsonl, csv]
+      --breakpoint &lt;BREAKPOINTS&gt;
+          
+      --watchpoint &lt;WATCHPOINTS&gt;
+          
+      --stop-on-mmio &lt;STOP_ON_MMIO&gt;
+          
+      --stop-on-irq &lt;STOP_ON_IRQ&gt;
+          
+      --stop-on-dma &lt;STOP_ON_DMA&gt;
+          
+      --replay-interval &lt;REPLAY_INTERVAL&gt;
+          
+      --replay-max-checkpoints &lt;REPLAY_MAX_CHECKPOINTS&gt;
+          
+      --rewind-on-stop-frames &lt;REWIND_ON_STOP_FRAMES&gt;
+          
+      --stop-on-divergence
+          
+      --compare-replay-watch-only
+          
+      --decompile-out &lt;DECOMPILE_OUT&gt;
+          
+      --decompile-format &lt;DECOMPILE_FORMAT&gt;
+          [default: json] [possible values: json, markdown, text]
+      --decompile-function &lt;DECOMPILE_FUNCTIONS&gt;
+          
+      --decompile-all
+          
+      --decompile-annotations &lt;DECOMPILE_ANNOTATIONS&gt;
+          
+      --decompile-trace &lt;DECOMPILE_TRACE&gt;
+          
+      --disassemble-out &lt;DISASSEMBLE_OUT&gt;
+          
+      --disassemble-format &lt;DISASSEMBLE_FORMAT&gt;
+          [default: text] [possible values: json, markdown, text]
+      --disassemble-range &lt;DISASSEMBLE_RANGES&gt;
+          
+      --emit-diagnostics &lt;EMIT_DIAGNOSTICS&gt;
+          
+      --diagnostic-pack &lt;DIAGNOSTIC_PACK&gt;
+          
+      --diagnostic-rule &lt;DIAGNOSTIC_RULES&gt;
+          
+      --diagnostic-summary-limit &lt;DIAGNOSTIC_SUMMARY_LIMIT&gt;
+          
+  -h, --help
+          Print help</code></pre></div></details><footer>Édition source 2026-09-14 • <a href="index.html">Sommaire</a> • <a href="verification.html">Vérification</a> • <a href="../reference/inventory.json">Empreintes de la copie de référence</a><br/>Les compilations d'exemples, les exécutions dans l'émulateur et les comparaisons aux résultats attendus sont consignées séparément.</footer></main></div><script src="../assets/manual.js"></script></body></html>

@@ -30,7 +30,7 @@ Language syntax, compiler intrinsics, library functions and command-line operati
 The 26 uppercase letters, 10 digits, 26 lowercase letters and 30 symbols come from the author's [ascii.c](samples/assets/ascii.c). No additional glyph shapes were invented. The original 92 glyphs are preserved; see the [conversion map](verification/font_conversion.json) and [tile atlas](verification/font_source_atlas.png). Space uses an empty tile. Backslash and the vertical bar are absent from the supplied font and display as blanks. `gb_font.c` and `fc_font.c` display every supplied glyph.
 
 ## Edition and verification
-This edition is based on the **local source snapshot of September 12, 2026**. “Latest” refers to that snapshot, not automatic tracking of future GitHub changes. The reference inventory records source and executable fingerprints. Historical README claims about support or verification are not automatically treated as current guarantees.
+This edition is based on the **local source snapshot of September 14, 2026**. “Latest” refers to that snapshot, not automatic tracking of future GitHub changes. The reference inventory records source and executable fingerprints. Historical README claims about support or verification are not automatically treated as current guarantees.
 
 A successful build means a ROM was produced. An execution check means an emulator advanced through the specified frames. Pixel comparisons, input behavior and sound checks are recorded separately. This is not a guarantee of compatibility with every peripheral or physical console; warnings remain visible in the logs.
 

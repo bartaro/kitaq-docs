@@ -55,7 +55,7 @@ The music-stream commands `AUDIO_CMD_NOTE` and `AUDIO_CMD_SET_INST` retain a his
 The basic CH1 effect stream reads note/volume pairs per frame and ends on note 0. CH3 uses a different marker and format. See `gb_sound.c`. Fades advance during `Audio_Update`; stopping updates also stops a fade.
 
 ## 8. VBlank IRQ music
-`audio_vblank.c` is a separate driver arrangement. Each event contains five bytes: `delay, ch2_note, ch1_note, ch3_note, ch4_noise_param`. It supports directly referenced fixed-bank songs and banked songs replenished into a WRAM queue. Ordinary `audio.c` streams cannot be passed unchanged.
+`audio_vblank.c` uses a separate playback format. Timed records contain five bytes: `delay, ch2_note, ch1_note, ch3_note, ch4_noise_param`. The driver reads directly addressable songs or consumes a WRAM queue; the public library does not include a queue-refill routine. Your game must supply the producer and coordinate its writes with the ISR. `LOOP` is recognized only in direct streams, and `IMMEDIATE` only in queue mode. Ordinary `audio.c` streams cannot be passed unchanged.
 
 {{CODE:2}}
 
@@ -64,9 +64,15 @@ The patch sets the VBlank vector at 0x0040 and updates the checksum. Apply it on
 ## 9. Fixed point, physics and 3D
 In `fixed.h` Q8.8 arithmetic, 256 means 1.0 and 128 means 0.5. `gb_fixed.c` demonstrates `fix_from_int`, `fix_mul` and `fix_to_int`. Design value ranges before implementing calculations to avoid overflow.
 
-`physics2d` handles rectangles, `physics2d_circle` handles circles, and `physics3d` handles 3D AABBs. Allocate and initialize world/body arrays, set velocity or gravity, then step the simulation. Rectangle positions and velocities use integer pixels and pixels per frame; inverse mass and friction coefficients use Q8. The circle example likewise uses integer position 40 and velocity 2. Inverse mass 0 denotes a fixed body. See `gb_circle.c` and the structure declarations for each coefficient's units.
+`physics2d` handles rectangles, `physics2d_circle` circles, and `physics3d` 3D AABBs. Initialize caller-owned world/body arrays, set velocity or gravity, then step the simulation. Use consistent position and per-step velocity units; the library performs no implicit pixel conversion. The circle example uses position 40 and velocity 2. A zero inverse mass denotes a static body. Check each coefficient and intermediate arithmetic range in the headers. In particular, the legacy `kq2d_body_apply_friction` casts its coefficient to a signed byte: values 128–255 are negative, not ordinary unsigned Q8 damping. See `gb_circle.c` for a complete step example.
 
-`wire3d` provides a DMG 128-by-120 wireframe path, `x3d` an X-style 1bpp path, and `wire3d_cgb` a CGB color path. They differ in WRAM, VRAM and transfer requirements. Reserve each renderer's screen and memory regions explicitly rather than combining them blindly. The CGB path uses double speed and DMA and requires `--cgb=cgb_only`.
+`wire3d_dmg` is a monochrome wireframe renderer for Game Boy. Select 128 × 96 with `wire3d_dmg_96.c`, or 128 × 120 with `wire3d_dmg.c`, and use `Wire3DDMG_*`. The old `wire3d` and `dmg3d` files remain compatibility entries for those respective profiles. Compile only one entry. `wire3d_cgb` retains its name and remains the separate color renderer. Reserve each renderer's RAM, VRAM and display regions explicitly. The two monochrome renderers reject depth-crossing edges rather than clipping them. Their scene occlusion uses face bounding rectangles and five samples along each line, so it is an approximation rather than per-pixel depth testing. The CGB path uses double speed and DMA and requires `--cgb=cgb_only`.
+
+`Wire3DDMG_BeginFrame` (`WIRE3D_DMG_HEIGHT=96`) clears the stage. `Wire3DDMG_BeginFrame` (`WIRE3D_DMG_HEIGHT=120`) only resets occlusion state: DMG3D consumes and clears staged bytes during upload. Dirty transfer includes the previous frame's tiles to erase old pixels. Its auxiliary transfer shares part of the main stage; it is not an independent buffer. Match the frame sequence to the renderer you use.
+
+For CGB lines, use colors 1, 2 and 3. Normal 128 × 96 lines combine color bits, so overlapping colors 1 and 2 become color 3. Color 0 does not erase a line. Clear the frame or use the dedicated erasing functions. Normal `Wire3DCGB_DrawLine2D` and model drawing do not record sparse upload bounds: use `Wire3DCGB_DrawLineClipped2D` for lines that need this tracking, or call `Wire3DCGB_InvalidateFrameHistory` to include the entire viewport in the next sparse upload.
+
+The 160 × 144 mode allocates at most 127 tiles per frame. An allocation failure or an out-of-range coordinate in its fast line path sets `Wire3DCGB_GetFullScreenOverflow()` and suppresses further pixel writes until the next frame reset. Keep vertices within the selected viewport. Triangle-mask padding stops at X=127 in 128 × 96 mode and X=159 in full-screen mode. Follow the API notes for WRAM bank mapping, especially when using full-screen or FastMap functions.
 
 ## 10. Scenes, object pools and bullet patterns
 `scene` manages states such as title, play and pause; `entity` provides a fixed-capacity object pool; `chain` stores coordinate history for a snake, train or rope. Check allocation failure values such as 0xFF before using the pointer returned by `entity_get`.
@@ -89,3 +95,5 @@ Logical `Link4_*` operations and physical Nintendo DMG-07 `LinkDmg07_*` operatio
 `BankPtr` combines a bank number with a pointer. `far_data_read` reads another bank's assets into RAM. The asset module associates IDs with descriptors; the game remains responsible for lifetimes, banks and sizes.
 
 `debug_trace_u8` and `debug_trace_u16` record values in RAM; `debug_assert_fail` records a diagnostic code. These are not `printf` calls to a PC console. Inspect the records through emulator memory observation. `gb_debug.c` records HP=42.
+
+`vram_get_queue_capacity()` returns the total number of command slots (32 by default). `vram_get_queue_free()` returns the number of unused slots, and `vram_get_queue_used()` returns the occupied count. One queued operation takes one slot regardless of its transfer size. These queries describe the transfer queue, not unused hardware VRAM.

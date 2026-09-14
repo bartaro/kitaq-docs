@@ -51,3 +51,5 @@ FDS services are divided among `fds_file`, `fds_overlay`, `fds_save` and `fds_so
 
 ## 10. Reference entries and examples
 The dictionary below follows public headers and distinguishes functions, function-like macros and aliases. Full headers also expose structures and constants. Declaration-only APIs, stored-only callbacks and specialized device interfaces are identified separately from verified ordinary operations. Source comments are retained verbatim for accurate comparison with the implementation.
+
+`vram_get_queue_capacity()` returns the total command-buffer capacity (128 bytes). `vram_get_queue_free()` returns the remaining bytes: total capacity minus `vram_get_queue_used()`. These are encoded command bytes, including metadata, not available space in hardware VRAM. A single-tile write needs 4 bytes, a fill needs 5, and a pointer-based copy needs 6. Check space before committing; NMI can consume a committed queue asynchronously.

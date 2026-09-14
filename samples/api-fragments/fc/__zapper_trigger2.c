@@ -1,3 +1,3 @@
 // Usage fragment, not a standalone ROM.
-// Declaration source: kitaqfc_project/kitaqfc/lib/intrinsics.h
+// Declaration source: kitaqfc/lib/intrinsics.h
 __zapper_trigger2();

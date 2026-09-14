@@ -4,10 +4,44 @@ import re, json, html
 from collect import ROOT,SITE,read
 
 def clean(t):
- return re.sub(r'/\*.*?\*/|//[^\n]*',lambda m: re.sub(r'[^\n]',' ',m[0]),t,flags=re.S)
-DECL=re.compile(r'(?m)^[ \t]*((?:(?:[A-Za-z_]\w*)[ \t*]+)+)([A-Za-z_]\w*)[ \t]*\(([^;{}]*)\)\s*(;|\{)')
-def definitions(p):
- t=read(p);ct=clean(t);out=[]
+ # Preserve offsets while masking comments and literals. Braces and function
+ # names inside a string are data, not syntax or a real call site.
+ return re.sub(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|/\*.*?\*/|//[^\n]*',lambda m: re.sub(r'[^\n]',' ',m[0]),t,flags=re.S)
+DECL=re.compile(r'(?m)^[ \t]*((?:(?:[A-Za-z_]\w*)[ \t\r\n*]+)+)([A-Za-z_]\w*)[ \t]*\(([^;{}]*)\)\s*(;|\{)')
+
+def declaration_name_offsets(cleaned):
+ return {m.start(2) for m in DECL.finditer(cleaned)
+         if not m[1].strip().startswith(('return','typedef','if','else','while','for'))}
+def renderer_profile(text, height):
+ # Mask inactive profile branches without changing source line numbers. Other
+ # preprocessor guards remain intact; this is not a general C preprocessor.
+ active=True;stack=[];out=[]
+ for line in text.splitlines(keepends=True):
+  directive=re.match(r'\s*#(if|ifdef|ifndef|else|endif)\b(.*)',line)
+  keep=active
+  if directive:
+   op,expr=directive.groups()
+   if op in ('if','ifdef','ifndef'):
+    match=re.fullmatch(r'\s*WIRE3D_DMG_HEIGHT\s*==\s*(96|120)\s*',expr) if op=='if' else None
+    condition=height==int(match[1]) if match else True
+    stack.append((active,bool(match),condition))
+    if match:active=active and condition;keep=False
+   elif op=='else':
+    parent,handled,condition=stack[-1]
+    if handled:active=parent and not condition;keep=False
+   elif op=='endif':
+    parent,handled,condition=stack.pop()
+    if handled:keep=False
+    active=parent
+  out.append(line if keep else '\n' if line.endswith('\n') else '')
+ assert not stack
+ return ''.join(out)
+
+def definitions(p, height=None):
+ t=read(p)
+ if p.name in ('wire3d_dmg.c','wire3d_dmg.h'):
+  t=renderer_profile(t,120 if height is None else height)
+ ct=clean(t);out=[]
  for m in DECL.finditer(ct):
   ret,name,args,end=m.groups()
   if ret.strip().startswith(('return','typedef','if','else','while','for')):continue
@@ -32,7 +66,7 @@ def collect(platform):
  comp=ROOT/('kitaqgb/kitaqgb' if platform=='gb' else 'kitaqfc/kitaqfc')
  headers=list(sorted(lib.glob('*.h')))
  impl={}
- for f in [*lib.glob('*.c'),*headers]:
+ for f in [*lib.glob('*.c'),*lib.glob('*.inc'),*headers]:
   for r in definitions(f):
    if r['body']:impl.setdefault(r['name'],r)
  records={}
@@ -49,6 +83,36 @@ def collect(platform):
    name,args,body=m.groups()
    if name in records:continue
    records[name]=dict(name=name,ret='macro',args=args,signature=m[0],path=f.relative_to(ROOT).as_posix(),line=text.count('\n',0,m.start())+1,comment='',body='',kind='macro',module=f.stem,definition=None,availability='macro')
+ if platform=='gb':
+  # Expose both compile-time contracts, including the 96-line-only APIs. The
+  # primary signature is 120-line where available; original notes identify each
+  # profile and the implementation excerpt retains the actual conditional code.
+  header=lib/'wire3d_dmg.h';body=lib/'wire3d_dmg.c'
+  variants={height:{r['name']:r for r in definitions(header,height)} for height in (96,120)}
+  bodies={height:{r['name']:r for r in definitions(body,height) if r['body']} for height in (96,120)}
+  for name in variants[96].keys() | variants[120].keys():
+   heights=[h for h in (96,120) if name in variants[h]]
+   selected=120 if 120 in heights else 96
+   r=dict(variants[selected][name]);r.update(module='wire3d_dmg',availability='implementation',definition=bodies[selected].get(name))
+   r['comment']='\n\n'.join('WIRE3D_DMG_HEIGHT = '+str(h)+'\n'+variants[h][name]['signature']+'\n'+variants[h][name]['comment'] for h in heights)
+   r['profiles']=heights
+   if len(heights)==2 and r['definition']:
+    d=dict(r['definition'])
+    d['body']='#if WIRE3D_DMG_HEIGHT == 96\n'+bodies[96][name]['body']+'\n#else\n'+bodies[120][name]['body']+'\n#endif'
+    r['definition']=d
+   records[name]=r
+  # Legacy object-like macros alias real functions. Resolve these explicitly;
+  # otherwise a header-only alias would disappear from the source dictionary.
+  for stem,height in [('wire3d',96),('dmg3d',120)]:
+   p=lib/(stem+'.h');text=read(p)
+   for match in re.finditer(r'(?m)^#define\s+(\w+)\s+(Wire3DDMG_\w+)\s*$',text):
+    old,new=match.groups()
+    if new not in variants[height]:continue
+    r=dict(variants[height][new])
+    r.update(name=old,signature=r['signature'].replace(new,old),module=stem,path=p.relative_to(ROOT).as_posix(),
+             line=text.count('\n',0,match.start())+1,availability='implementation',definition=bodies[height].get(new),
+             comment='Compatibility alias: '+new+'; WIRE3D_DMG_HEIGHT = '+str(height)+'.\n'+r['comment'])
+    records[old]=r
  source=read(comp/'CodeGenerator.cs')
  if platform=='gb':
   names=set(re.findall(r'funcName\s*==\s*"(__\w+)"',source))
@@ -59,25 +123,28 @@ def collect(platform):
   records[name]=dict(name=name,ret='',args='',signature='',path=(comp/'CodeGenerator.cs').relative_to(ROOT).as_posix(),line=source[:source.find('"'+name+'"')].count('\n')+1,comment='',body='',kind='intrinsic',module='intrinsics',definition=None,availability='compiler')
  # Prefer original manual programs, then small repository examples and regression fixtures.
  candidates=list((SITE/'samples').glob(platform+'_*.c'))
+ # Published examples are siblings of lib, not siblings of all six repositories.
+ # Using ROOT/examples silently missed the programs shipped with each compiler.
+ repo=lib.parent
+ candidates+=list((repo/'examples').glob('*.c'))
  if platform=='gb':
-  candidates+=list((ROOT/'examples').glob('*.c'))+list((ROOT/'tests/fixtures').glob('*.c'))+list((ROOT/'examples/beginner_samples').glob('*.c'))
+  candidates+=list((repo/'tests/fixtures').glob('*.c'))+list((repo/'examples/beginner_samples').glob('*.c'))
  else:candidates+=list(comp.glob('*smoke.c'))+list((comp/'tests').rglob('*.c'))
- candidates+=list(lib.glob('*.c'))
+ candidates+=list(lib.glob('*.c'))+list(lib.glob('*.inc'))
  candidates=list(dict.fromkeys(candidates))
  texts=[]
  for f in candidates:
   t=read(f)
   if len(t)>250000:continue
-  texts.append((f,t,clean(t)))
+  ct=clean(t)
+  texts.append((f,t,ct,declaration_name_offsets(ct)))
  for r in records.values():
   name=r['name'];examples=[]
-  for f,t,ct in texts:
+  for f,t,ct,declarations in texts:
    pat=re.compile(r'\b'+re.escape(name)+r'\s*\(')
    for m in pat.finditer(ct):
-    start=t.rfind('\n',0,m.start())+1
-    prefix=ct[start:m.start()].strip()
     # Exclude a declaration/definition rather than falsely presenting it as a call.
-    if re.match(r'^(?:(?:static|extern|inline|void|u8|u16|s8|s16|unsigned|char|short|int|const|__stackcall|[A-Z]\w*)\s+|\*)+$',prefix):continue
+    if m.start() in declarations:continue
     line=t.count('\n',0,m.start())+1
     lines=t.splitlines();excerpt='\n'.join(lines[max(0,line-3):min(len(lines),line+4)])
     examples.append(dict(path=f.relative_to(ROOT).as_posix(),line=line,code=excerpt))
@@ -86,7 +153,7 @@ def collect(platform):
   r['example']=examples[0] if examples else None
   # Prototypes for GB intrinsics can be declared in their actual source call sites.
   if not r['signature']:
-   for f,t,ct in texts:
+   for f,t,ct,declarations in texts:
     ds=[d for d in definitions(f) if d['name']==name and not d['body']]
     if ds:
      r.update({k:ds[0][k] for k in ('signature','ret','args')});break
