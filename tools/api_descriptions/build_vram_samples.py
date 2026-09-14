@@ -140,5 +140,6 @@ for platform in ['gb','fc']:
           'FC_COMMIT':'__vramq_commit();','RESTORE_SCROLL':'__scroll_set(0,0);'}
     text=body
     for key,value in replacements.items():text=text.replace(key,value)
-    (SITE/'samples/api-examples'/platform/'vram_queue_shapes.c').write_text(prefix+text,encoding='utf-8')
+    text='\n'.join(line.rstrip() for line in (prefix+text).splitlines())+'\n'
+    (SITE/'samples/api-examples'/platform/'vram_queue_shapes.c').write_text(text,encoding='utf-8')
 print('Two visual queue examples and an original geometric CHR extension written.')

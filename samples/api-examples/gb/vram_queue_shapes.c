@@ -51,7 +51,7 @@ void main() {
     // Reading the latch again does not clear it.
     if (vram_get_overflowed()!=1) failures++;
     // example:vram_get_overflowed:end
-    
+
     vram_flush_now();
     if (vram_get_queue_used()!=0 || vram_get_overflowed()!=1) failures++;
     check_result=vram_queue_tile(0,17,0);
@@ -105,10 +105,10 @@ void main() {
     if (used+available!=capacity) failures++;
     // example:vram_get_queue_free:end
     if (capacity!=EXPECTED_CAPACITY || used!=EXPECTED_USED) failures++;
-    
+
     // example:vram_flush_now:start
     // Rendering is stopped here. On FC, commit readiness before direct execution.
-    
+
     vram_flush_now();
     after_flush=vram_get_queue_used();
     if (after_flush!=0) failures++;
@@ -117,7 +117,7 @@ void main() {
     check_result=vram_queue_tile(18,10,1);
     // example:vram_flush:start
     vram_flush(); // One small write through the VBlank/NMI path.
-    
+
     if (vram_get_queue_used()!=0) failures++;
     // example:vram_flush:end
     if (vram_get_overflowed()!=0) failures++;
