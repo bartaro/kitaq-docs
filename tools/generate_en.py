@@ -16,11 +16,11 @@ BOOKS = [(k,n,t,s) for (k,n,t,_),s in zip(g.BOOKS,[
     'Game Boy C programming','Tools for building a game','Run, observe and record',
     'Famicom C programming','NES libraries and devices','NES and FDS execution and analysis',
     'Diagnostics, comparison and retesting'])]
-ORIGIN = """**NORCAL takes its name from Northern California.** Following that geographical naming idea, KITAQGB’s author, DAISUKE OBA, chose **Kitakyushu**, the city where he was born and raised, as the basis for the name KITAQGB.
+ORIGIN = """NORCAL takes its name from Northern California. Inspired by this geographical naming, the author named KITAQGB after Kitakyushu, the city where they were born and raised. KITAQ + GB combines Game Boy with KITAQ, the nickname of Kitakyushu in Fukuoka Prefecture, Japan: **北九 (キタキュー, Kitakyū)**. Pronounce KITAQ as **kee-tah-KYOO**, IPA **/ˌkiːtɑːˈkjuː/**. The final Q sounds like the English letter Q. Read KITAQGB as **kee-tah-KYOO jee bee**, pronouncing G and B separately.
 
-**KITAQGB has a double meaning.** **Kernel-Informed Toolchain for AI-Quality Game Boy Development** expresses the goal of a toolchain that understands its target machine and supports both human programmers and generative AI.
+The name KITAQGB has two meanings. **Kernel-Informed Toolchain for AI-Quality Game Boy Development** expresses the goal of a toolchain that understands its target machine and supports both human programmers and generative AI.
 
-**KITAQ + GB** also combines **Game Boy** with **KITAQ**, representing **Kitakyushu**, a city in **Fukuoka Prefecture, Japan**. KITAQ comes from the city's nickname **北九 (キタキュー, Kitakyū)**. For English speakers, the pronunciation guide is **kee-tah-KYOO**, IPA **/ˌkiːtɑːˈkjuː/**; the final Q sounds like the English letter Q. Read KITAQGB as **kee-tah-KYOO jee bee**, saying G and B separately."""
+The other meaning is **Kids' Imagination Transformed into Actual Quests in Game Boy Forests**: a tool that turns children’s imagination into real adventures in the forests of Game Boy. It expresses the creative wish to turn small ideas, sketches and AI-assisted prototypes into adventures people can actually play."""
 MODULES = dict(zip(g.MODULES, [
     'Startup, frame counts, waits and interrupts','Button state, press, release and repeat',
     'OBJ allocation, positioning, metasprites and animation','Queued VRAM updates and transfer',
