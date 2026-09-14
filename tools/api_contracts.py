@@ -130,6 +130,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_entity_examples(contracts))
     proofs.update(verified_input_examples(contracts))
     proofs.update(verified_padrepeat_examples(contracts))
+    proofs.update(verified_expansion_examples(contracts))
     for key in proofs:
         contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
     coverage = []
@@ -215,6 +216,23 @@ def verified_padrepeat_examples(contracts):
     return verified
 
 
+def verified_expansion_examples(contracts):
+    path = SITE/'verification/api-expansion-input/results.json'
+    if not path.exists(): return {}
+    run = json.loads(path.read_text(encoding='utf-8'))
+    if not run['passed']: return {}
+    verified = {}
+    for key,contract in contracts.items():
+        if contract['review']!='expansion-source-20260915': continue
+        if run['source']!=contract['example']['program']:
+            raise ValueError('Expansion example source mismatch: '+key)
+        for file,expected in [(run['source'],run['source_sha256']),(run['image'],run['image_sha256'])]:
+            if hashlib.sha256((SITE/file).read_bytes()).hexdigest()!=expected:
+                raise ValueError('Expansion example evidence changed: '+file)
+        verified[key]={'api':key.split(':')[1],'kind':'expansion-input','runs':[run]}
+    return verified
+
+
 def verified_tile_examples(contracts):
     path = SITE / 'verification/api-tiles/results.json'
     if not path.exists(): return {}
@@ -270,7 +288,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input']:
                 block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
                     block.append('<figure><img class="screen" loading="lazy" src="'+prefix+run['image']+'" alt="'+html.escape(name+': '+run['mode'].upper(),quote=True)+'"><figcaption>'+run['mode'].upper()+'</figcaption></figure>')
