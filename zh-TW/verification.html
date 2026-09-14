@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>驗證紀錄 — KITAQ 系列手冊</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">跳至本文</a><header class="mast"><a href="index.html">KITAQ <span>開發系統</span></a><div>使用手冊 <b>2026.09</b></div></header><nav aria-label="選擇語言" class="languages"><a href="../en/verification.html" hreflang="en" lang="en">English</a> <a href="../verification.html" hreflang="ja" lang="ja">日本語</a> <a href="../ko/verification.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/verification.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a aria-current="page" href="../zh-TW/verification.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/verification.html" hreflang="es" lang="es">Español</a> <a href="../pt/verification.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/verification.html" hreflang="fr" lang="fr">Français</a> <a href="../de/verification.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="選擇分卷"><a href="index.html">目錄</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 函式庫</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 函式庫</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">搜尋本卷</label><input id="search" placeholder="例如：input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="本卷目錄" class="toc"><a href="#scope">驗證範圍</a><a href="#result-gb_hello">gb_hello</a><a href="#result-gb_arithmetic">gb_arithmetic</a><a href="#result-gb_control">gb_control</a><a href="#result-gb_aggregate">gb_aggregate</a><a href="#result-gb_bits_memory">gb_bits_memory</a><a href="#result-gb_input">gb_input</a><a href="#result-gb_fixed">gb_fixed</a><a href="#result-gb_entity">gb_entity</a><a href="#result-gb_debug">gb_debug</a><a href="#result-gb_chain">gb_chain</a><a href="#result-fc_hello">fc_hello</a><a href="#result-fc_arithmetic">fc_arithmetic</a><a href="#result-fc_control">fc_control</a><a href="#result-fc_aggregate">fc_aggregate</a><a href="#result-fc_bits_memory">fc_bits_memory</a><a href="#result-fc_input">fc_input</a><a href="#result-fc_fixed">fc_fixed</a><a href="#result-fc_entity">fc_entity</a><a href="#result-fc_debug">fc_debug</a><a href="#result-fc_chain">fc_chain</a><a href="#result-gb_cgb_palette">gb_cgb_palette</a><a href="#result-gb_scroll">gb_scroll</a><a href="#result-gb_vram_queue">gb_vram_queue</a><a href="#result-gb_sprite">gb_sprite</a><a href="#result-gb_rng">gb_rng</a><a href="#result-gb_flags">gb_flags</a><a href="#result-gb_circle">gb_circle</a><a href="#result-fc_scroll">fc_scroll</a><a href="#result-fc_vram_queue">fc_vram_queue</a><a href="#result-fc_sprite">fc_sprite</a><a href="#result-fc_sound">fc_sound</a><a href="#result-gb_sound">gb_sound</a><a href="#result-gb_font">gb_font</a><a href="#result-fc_font">fc_font</a><a href="#result-gb_system">gb_system</a><a href="#result-gb_scene">gb_scene</a><a href="#result-fc_system">fc_system</a><a href="#result-fc_scene">fc_scene</a><a href="#result-gb_camera">gb_camera</a><a href="#result-gb_rle">gb_rle</a><a href="#result-gb_board">gb_board</a><a href="#result-gb_physics">gb_physics</a><a href="#result-gb_link">gb_link</a><a href="#result-gb_bank">gb_bank</a><a href="#result-gb_asset">gb_asset</a><a href="#result-gb_danmaku">gb_danmaku</a><a href="#result-fc_subpixel">fc_subpixel</a><a href="#visual_checks-json">像素值與字形比對</a><a href="#workflow-json">診斷工作流程</a><a href="#compiler_tests-json">編譯器迴歸檢查</a><a href="#browser_checks-json">瀏覽器顯示檢查</a><a href="#site_checks-json">HTML 結構與連結</a><a href="#bilingual_checks-json">日英完整版本檢查</a><a href="#english_browser_checks-json">英文版瀏覽器檢查</a></nav><button class="print" type="button">列印本卷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 參考版</p><h1>驗證紀錄</h1><p class="subtitle">建置、執行與畫面紀錄</p><div class="edition">從第一行程式，到執行、觀察與複測。<br/>原始碼快照：2026 年 9 月 14 日 · 繁體中文版：2026 年 9 月 14 日</div></div><h2 id="scope">驗證範圍</h2><p>以下紀錄對應 9 月 12 日原始碼快照。兩款編譯器和 KUROSAKI CLI 從收集的原始碼建置；KOKURA 與 SARAKURA 使用清單中記錄指紋的本機執行檔。檢查未涵蓋所有功能、周邊或實體硬體。</p><p>每個項目記錄編譯、模擬器執行 120 個影格及其畫面。像素比對是獨立證據。結束碼為零，仍不足以證明輸入、聲音或遊戲行為正確。建置與執行驗證記錄在 <a href="../PUBLICATION_CHECKS.md">發布檢查紀錄</a>中，包含測試輸入與條件。</p><section id="gb_hello"><h2 id="result-gb_hello">gb_hello</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示 HELLO WORLD 和 042</p><img alt="gb_hello 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_hello.png"/><p><a href="../verification/gb_hello-build.txt">建置日誌</a> / <a href="../verification/gb_hello-runtime.txt">執行日誌</a></p></section><section id="gb_arithmetic"><h2 id="result-gb_arithmetic">gb_arithmetic</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>030</p><img alt="gb_arithmetic 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_arithmetic.png"/><p><a href="../verification/gb_arithmetic-build.txt">建置日誌</a> / <a href="../verification/gb_arithmetic-runtime.txt">執行日誌</a></p></section><section id="gb_control"><h2 id="result-gb_control">gb_control</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="gb_control 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_control.png"/><p><a href="../verification/gb_control-build.txt">建置日誌</a> / <a href="../verification/gb_control-runtime.txt">執行日誌</a></p></section><section id="gb_aggregate"><h2 id="result-gb_aggregate">gb_aggregate</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="gb_aggregate 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_aggregate.png"/><p><a href="../verification/gb_aggregate-build.txt">建置日誌</a> / <a href="../verification/gb_aggregate-runtime.txt">執行日誌</a></p></section><section id="gb_bits_memory"><h2 id="result-gb_bits_memory">gb_bits_memory</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>010</p><img alt="gb_bits_memory 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_bits_memory.png"/><p><a href="../verification/gb_bits_memory-build.txt">建置日誌</a> / <a href="../verification/gb_bits_memory-runtime.txt">執行日誌</a></p></section><section id="gb_input"><h2 id="result-gb_input">gb_input</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>初始為 000，每次新按下 A 增加一次</p><img alt="gb_input 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_input.png"/><p><a href="../verification/gb_input-build.txt">建置日誌</a> / <a href="../verification/gb_input-runtime.txt">執行日誌</a></p></section><section id="gb_fixed"><h2 id="result-gb_fixed">gb_fixed</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>012</p><img alt="gb_fixed 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_fixed.png"/><p><a href="../verification/gb_fixed-build.txt">建置日誌</a> / <a href="../verification/gb_fixed-runtime.txt">執行日誌</a></p></section><section id="gb_entity"><h2 id="result-gb_entity">gb_entity</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001</p><img alt="gb_entity 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_entity.png"/><p><a href="../verification/gb_entity-build.txt">建置日誌</a> / <a href="../verification/gb_entity-runtime.txt">執行日誌</a></p></section><section id="gb_debug"><h2 id="result-gb_debug">gb_debug</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，追蹤日誌記錄 HP=42</p><img alt="gb_debug 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_debug.png"/><p><a href="../verification/gb_debug-build.txt">建置日誌</a> / <a href="../verification/gb_debug-runtime.txt">執行日誌</a></p></section><section id="gb_chain"><h2 id="result-gb_chain">gb_chain</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，歷史中包含 (20,30)</p><img alt="gb_chain 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_chain.png"/><p><a href="../verification/gb_chain-build.txt">建置日誌</a> / <a href="../verification/gb_chain-runtime.txt">執行日誌</a></p></section><section id="fc_hello"><h2 id="result-fc_hello">fc_hello</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示 HELLO WORLD 和 042</p><img alt="fc_hello 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_hello.png"/><p><a href="../verification/fc_hello-build.txt">建置日誌</a> / <a href="../verification/fc_hello-runtime.txt">執行日誌</a></p></section><section id="fc_arithmetic"><h2 id="result-fc_arithmetic">fc_arithmetic</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>030</p><img alt="fc_arithmetic 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_arithmetic.png"/><p><a href="../verification/fc_arithmetic-build.txt">建置日誌</a> / <a href="../verification/fc_arithmetic-runtime.txt">執行日誌</a></p></section><section id="fc_control"><h2 id="result-fc_control">fc_control</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="fc_control 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_control.png"/><p><a href="../verification/fc_control-build.txt">建置日誌</a> / <a href="../verification/fc_control-runtime.txt">執行日誌</a></p></section><section id="fc_aggregate"><h2 id="result-fc_aggregate">fc_aggregate</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="fc_aggregate 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_aggregate.png"/><p><a href="../verification/fc_aggregate-build.txt">建置日誌</a> / <a href="../verification/fc_aggregate-runtime.txt">執行日誌</a></p></section><section id="fc_bits_memory"><h2 id="result-fc_bits_memory">fc_bits_memory</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>010</p><img alt="fc_bits_memory 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_bits_memory.png"/><p><a href="../verification/fc_bits_memory-build.txt">建置日誌</a> / <a href="../verification/fc_bits_memory-runtime.txt">執行日誌</a></p></section><section id="fc_input"><h2 id="result-fc_input">fc_input</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>初始為 000，每次新按下 A 增加一次</p><img alt="fc_input 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_input.png"/><p><a href="../verification/fc_input-build.txt">建置日誌</a> / <a href="../verification/fc_input-runtime.txt">執行日誌</a></p></section><section id="fc_fixed"><h2 id="result-fc_fixed">fc_fixed</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>012</p><img alt="fc_fixed 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_fixed.png"/><p><a href="../verification/fc_fixed-build.txt">建置日誌</a> / <a href="../verification/fc_fixed-runtime.txt">執行日誌</a></p></section><section id="fc_entity"><h2 id="result-fc_entity">fc_entity</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001</p><img alt="fc_entity 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_entity.png"/><p><a href="../verification/fc_entity-build.txt">建置日誌</a> / <a href="../verification/fc_entity-runtime.txt">執行日誌</a></p></section><section id="fc_debug"><h2 id="result-fc_debug">fc_debug</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，追蹤日誌記錄 HP=42</p><img alt="fc_debug 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_debug.png"/><p><a href="../verification/fc_debug-build.txt">建置日誌</a> / <a href="../verification/fc_debug-runtime.txt">執行日誌</a></p></section><section id="fc_chain"><h2 id="result-fc_chain">fc_chain</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，歷史中包含 (20,30)</p><img alt="fc_chain 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_chain.png"/><p><a href="../verification/fc_chain-build.txt">建置日誌</a> / <a href="../verification/fc_chain-runtime.txt">執行日誌</a></p></section><section id="gb_cgb_palette"><h2 id="result-gb_cgb_palette">gb_cgb_palette</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>CGB 模式下，白底紫色 042</p><img alt="gb_cgb_palette 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_cgb_palette.png"/><p><a href="../verification/gb_cgb_palette-build.txt">建置日誌</a> / <a href="../verification/gb_cgb_palette-runtime.txt">執行日誌</a></p></section><section id="gb_scroll"><h2 id="result-gb_scroll">gb_scroll</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>SCX 增加時標題向左移動</p><img alt="gb_scroll 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_scroll.png"/><p><a href="../verification/gb_scroll-build.txt">建置日誌</a> / <a href="../verification/gb_scroll-runtime.txt">執行日誌</a></p></section><section id="gb_vram_queue"><h2 id="result-gb_vram_queue">gb_vram_queue</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>在 (3,8) 顯示 4</p><img alt="gb_vram_queue 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_vram_queue.png"/><p><a href="../verification/gb_vram_queue-build.txt">建置日誌</a> / <a href="../verification/gb_vram_queue-runtime.txt">執行日誌</a></p></section><section id="gb_sprite"><h2 id="result-gb_sprite">gb_sprite</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>在精靈位置顯示字母 A</p><img alt="gb_sprite 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_sprite.png"/><p><a href="../verification/gb_sprite-build.txt">建置日誌</a> / <a href="../verification/gb_sprite-runtime.txt">執行日誌</a></p></section><section id="gb_rng"><h2 id="result-gb_rng">gb_rng</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>數值範圍 000～009；相同種子重現相同序列</p><img alt="gb_rng 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_rng.png"/><p><a href="../verification/gb_rng-build.txt">建置日誌</a> / <a href="../verification/gb_rng-runtime.txt">執行日誌</a></p></section><section id="gb_flags"><h2 id="result-gb_flags">gb_flags</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001</p><img alt="gb_flags 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_flags.png"/><p><a href="../verification/gb_flags-build.txt">建置日誌</a> / <a href="../verification/gb_flags-runtime.txt">執行日誌</a></p></section><section id="gb_circle"><h2 id="result-gb_circle">gb_circle</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>推進一步後為 042；本例使用整數像素</p><img alt="gb_circle 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_circle.png"/><p><a href="../verification/gb_circle-build.txt">建置日誌</a> / <a href="../verification/gb_circle-runtime.txt">執行日誌</a></p></section><section id="fc_scroll"><h2 id="result-fc_scroll">fc_scroll</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>標題水平捲動</p><img alt="fc_scroll 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_scroll.png"/><p><a href="../verification/fc_scroll-build.txt">建置日誌</a> / <a href="../verification/fc_scroll-runtime.txt">執行日誌</a></p></section><section id="fc_vram_queue"><h2 id="result-fc_vram_queue">fc_vram_queue</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>在 (3,8) 顯示 4</p><img alt="fc_vram_queue 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_vram_queue.png"/><p><a href="../verification/fc_vram_queue-build.txt">建置日誌</a> / <a href="../verification/fc_vram_queue-runtime.txt">執行日誌</a></p></section><section id="fc_sprite"><h2 id="result-fc_sprite">fc_sprite</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>畫面上顯示一個精靈</p><img alt="fc_sprite 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_sprite.png"/><p><a href="../verification/fc_sprite-build.txt">建置日誌</a> / <a href="../verification/fc_sprite-runtime.txt">執行日誌</a></p></section><section id="fc_sound"><h2 id="result-fc_sound">fc_sound</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示 042 並發出脈衝音</p><img alt="fc_sound 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_sound.png"/><p><a href="../verification/fc_sound-build.txt">建置日誌</a> / <a href="../verification/fc_sound-runtime.txt">執行日誌</a></p></section><section id="gb_sound"><h2 id="result-gb_sound">gb_sound</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示 042 並發出短脈衝音</p><img alt="gb_sound 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_sound.png"/><p><a href="../verification/gb_sound-build.txt">建置日誌</a> / <a href="../verification/gb_sound-runtime.txt">執行日誌</a></p></section><section id="gb_font"><h2 id="result-gb_font">gb_font</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示大寫、小寫、數字及全部 30 個符號</p><img alt="gb_font 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_font.png"/><p><a href="../verification/gb_font-build.txt">建置日誌</a> / <a href="../verification/gb_font-runtime.txt">執行日誌</a></p></section><section id="fc_font"><h2 id="result-fc_font">fc_font</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示大寫、小寫、數字及全部 30 個符號</p><img alt="fc_font 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_font.png"/><p><a href="../verification/fc_font-build.txt">建置日誌</a> / <a href="../verification/fc_font-runtime.txt">執行日誌</a></p></section><section id="gb_system"><h2 id="result-gb_system">gb_system</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>002</p><img alt="gb_system 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_system.png"/><p><a href="../verification/gb_system-build.txt">建置日誌</a> / <a href="../verification/gb_system-runtime.txt">執行日誌</a></p></section><section id="gb_scene"><h2 id="result-gb_scene">gb_scene</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，未註冊回呼</p><img alt="gb_scene 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_scene.png"/><p><a href="../verification/gb_scene-build.txt">建置日誌</a> / <a href="../verification/gb_scene-runtime.txt">執行日誌</a></p></section><section id="fc_system"><h2 id="result-fc_system">fc_system</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>002</p><img alt="fc_system 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_system.png"/><p><a href="../verification/fc_system-build.txt">建置日誌</a> / <a href="../verification/fc_system-runtime.txt">執行日誌</a></p></section><section id="fc_scene"><h2 id="result-fc_scene">fc_scene</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，未註冊回呼</p><img alt="fc_scene 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_scene.png"/><p><a href="../verification/fc_scene-build.txt">建置日誌</a> / <a href="../verification/fc_scene-runtime.txt">執行日誌</a></p></section><section id="gb_camera"><h2 id="result-gb_camera">gb_camera</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，即世界 x=52 減去鏡頭 x=10</p><img alt="gb_camera 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_camera.png"/><p><a href="../verification/gb_camera-build.txt">建置日誌</a> / <a href="../verification/gb_camera-runtime.txt">執行日誌</a></p></section><section id="gb_rle"><h2 id="result-gb_rle">gb_rle</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，三個位元組各為 42</p><img alt="gb_rle 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_rle.png"/><p><a href="../verification/gb_rle-build.txt">建置日誌</a> / <a href="../verification/gb_rle-runtime.txt">執行日誌</a></p></section><section id="gb_board"><h2 id="result-gb_board">gb_board</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="gb_board 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_board.png"/><p><a href="../verification/gb_board-build.txt">建置日誌</a> / <a href="../verification/gb_board-runtime.txt">執行日誌</a></p></section><section id="gb_physics"><h2 id="result-gb_physics">gb_physics</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，整數像素座標</p><img alt="gb_physics 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_physics.png"/><p><a href="../verification/gb_physics-build.txt">建置日誌</a> / <a href="../verification/gb_physics-runtime.txt">執行日誌</a></p></section><section id="gb_link"><h2 id="result-gb_link">gb_link</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>未連線為 255，逾時為 000，連線時顯示對端值</p><img alt="gb_link 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_link.png"/><p><a href="../verification/gb_link-build.txt">建置日誌</a> / <a href="../verification/gb_link-runtime.txt">執行日誌</a></p></section><section id="gb_bank"><h2 id="result-gb_bank">gb_bank</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，從 bank 0 固定 ROM 複製資料</p><img alt="gb_bank 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_bank.png"/><p><a href="../verification/gb_bank-build.txt">建置日誌</a> / <a href="../verification/gb_bank-runtime.txt">執行日誌</a></p></section><section id="gb_asset"><h2 id="result-gb_asset">gb_asset</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="gb_asset 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_asset.png"/><p><a href="../verification/gb_asset-build.txt">建置日誌</a> / <a href="../verification/gb_asset-runtime.txt">執行日誌</a></p></section><section id="gb_danmaku"><h2 id="result-gb_danmaku">gb_danmaku</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，數值物件池範例，不使用子彈背景合成</p><img alt="gb_danmaku 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_danmaku.png"/><p><a href="../verification/gb_danmaku-build.txt">建置日誌</a> / <a href="../verification/gb_danmaku-runtime.txt">執行日誌</a></p></section><section id="fc_subpixel"><h2 id="result-fc_subpixel">fc_subpixel</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，遊戲使用標頭常數明確進行積分</p><img alt="fc_subpixel 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_subpixel.png"/><p><a href="../verification/fc_subpixel-build.txt">建置日誌</a> / <a href="../verification/fc_subpixel-runtime.txt">執行日誌</a></p></section><h2 id="visual_checks-json">像素值與字形比對</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">複製</button><pre><code>[
+<html lang="zh-TW"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>驗證紀錄 — KITAQ 系列手冊</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">跳至本文</a><header class="mast"><a href="index.html">KITAQ <span>開發系統</span></a><div>使用手冊 <b>2026.09</b></div></header><nav aria-label="選擇語言" class="languages"><a href="../en/verification.html" hreflang="en" lang="en">English</a> <a href="../verification.html" hreflang="ja" lang="ja">日本語</a> <a href="../ko/verification.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/verification.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a aria-current="page" href="../zh-TW/verification.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/verification.html" hreflang="es" lang="es">Español</a> <a href="../pt/verification.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/verification.html" hreflang="fr" lang="fr">Français</a> <a href="../de/verification.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="選擇分卷"><a href="index.html">目錄</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 函式庫</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 函式庫</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">搜尋本卷</label><input id="search" placeholder="例如：input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="本卷目錄" class="toc"><a href="#scope">驗證範圍</a><a href="#result-gb_hello">gb_hello</a><a href="#result-gb_arithmetic">gb_arithmetic</a><a href="#result-gb_control">gb_control</a><a href="#result-gb_aggregate">gb_aggregate</a><a href="#result-gb_bits_memory">gb_bits_memory</a><a href="#result-gb_input">gb_input</a><a href="#result-gb_fixed">gb_fixed</a><a href="#result-gb_entity">gb_entity</a><a href="#result-gb_debug">gb_debug</a><a href="#result-gb_chain">gb_chain</a><a href="#result-fc_hello">fc_hello</a><a href="#result-fc_arithmetic">fc_arithmetic</a><a href="#result-fc_control">fc_control</a><a href="#result-fc_aggregate">fc_aggregate</a><a href="#result-fc_bits_memory">fc_bits_memory</a><a href="#result-fc_input">fc_input</a><a href="#result-fc_fixed">fc_fixed</a><a href="#result-fc_entity">fc_entity</a><a href="#result-fc_debug">fc_debug</a><a href="#result-fc_chain">fc_chain</a><a href="#result-gb_cgb_palette">gb_cgb_palette</a><a href="#result-gb_scroll">gb_scroll</a><a href="#result-gb_vram_queue">gb_vram_queue</a><a href="#result-gb_sprite">gb_sprite</a><a href="#result-gb_rng">gb_rng</a><a href="#result-gb_flags">gb_flags</a><a href="#result-gb_circle">gb_circle</a><a href="#result-fc_scroll">fc_scroll</a><a href="#result-fc_vram_queue">fc_vram_queue</a><a href="#result-fc_sprite">fc_sprite</a><a href="#result-fc_sound">fc_sound</a><a href="#result-gb_sound">gb_sound</a><a href="#result-gb_font">gb_font</a><a href="#result-fc_font">fc_font</a><a href="#result-gb_system">gb_system</a><a href="#result-gb_scene">gb_scene</a><a href="#result-fc_system">fc_system</a><a href="#result-fc_scene">fc_scene</a><a href="#result-gb_camera">gb_camera</a><a href="#result-gb_rle">gb_rle</a><a href="#result-gb_board">gb_board</a><a href="#result-gb_physics">gb_physics</a><a href="#result-gb_link">gb_link</a><a href="#result-gb_bank">gb_bank</a><a href="#result-gb_asset">gb_asset</a><a href="#result-gb_danmaku">gb_danmaku</a><a href="#result-fc_subpixel">fc_subpixel</a><a href="#visual_checks-json">像素值與字形比對</a><a href="#workflow-json">診斷工作流程</a><a href="#compiler_tests-json">編譯器迴歸檢查</a><a href="#browser_checks-json">瀏覽器顯示檢查</a><a href="#site_checks-json">HTML 結構與連結</a><a href="#bilingual_checks-json">日英完整版本檢查</a><a href="#english_browser_checks-json">英文版瀏覽器檢查</a><!-- api-verification:start --><a href="#api-verification">API 範例的預期影像與驗證結果</a><!-- api-verification:end --></nav><button class="print" type="button">列印本卷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 參考版</p><h1>驗證紀錄</h1><p class="subtitle">建置、執行與畫面紀錄</p><div class="edition">從第一行程式，到執行、觀察與複測。<br/>原始碼快照：2026 年 9 月 14 日 · 繁體中文版：2026 年 9 月 14 日</div></div><h2 id="scope">驗證範圍</h2><p>以下紀錄對應 9 月 12 日原始碼快照。兩款編譯器和 KUROSAKI CLI 從收集的原始碼建置；KOKURA 與 SARAKURA 使用清單中記錄指紋的本機執行檔。檢查未涵蓋所有功能、周邊或實體硬體。</p><p>每個項目記錄編譯、模擬器執行 120 個影格及其畫面。像素比對是獨立證據。結束碼為零，仍不足以證明輸入、聲音或遊戲行為正確。建置與執行驗證記錄在 <a href="../PUBLICATION_CHECKS.md">發布檢查紀錄</a>中，包含測試輸入與條件。</p><section id="gb_hello"><h2 id="result-gb_hello">gb_hello</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示 HELLO WORLD 和 042</p><img alt="gb_hello 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_hello.png"/><p><a href="../verification/gb_hello-build.txt">建置日誌</a> / <a href="../verification/gb_hello-runtime.txt">執行日誌</a></p></section><section id="gb_arithmetic"><h2 id="result-gb_arithmetic">gb_arithmetic</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>030</p><img alt="gb_arithmetic 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_arithmetic.png"/><p><a href="../verification/gb_arithmetic-build.txt">建置日誌</a> / <a href="../verification/gb_arithmetic-runtime.txt">執行日誌</a></p></section><section id="gb_control"><h2 id="result-gb_control">gb_control</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="gb_control 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_control.png"/><p><a href="../verification/gb_control-build.txt">建置日誌</a> / <a href="../verification/gb_control-runtime.txt">執行日誌</a></p></section><section id="gb_aggregate"><h2 id="result-gb_aggregate">gb_aggregate</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="gb_aggregate 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_aggregate.png"/><p><a href="../verification/gb_aggregate-build.txt">建置日誌</a> / <a href="../verification/gb_aggregate-runtime.txt">執行日誌</a></p></section><section id="gb_bits_memory"><h2 id="result-gb_bits_memory">gb_bits_memory</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>010</p><img alt="gb_bits_memory 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_bits_memory.png"/><p><a href="../verification/gb_bits_memory-build.txt">建置日誌</a> / <a href="../verification/gb_bits_memory-runtime.txt">執行日誌</a></p></section><section id="gb_input"><h2 id="result-gb_input">gb_input</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>初始為 000，每次新按下 A 增加一次</p><img alt="gb_input 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_input.png"/><p><a href="../verification/gb_input-build.txt">建置日誌</a> / <a href="../verification/gb_input-runtime.txt">執行日誌</a></p></section><section id="gb_fixed"><h2 id="result-gb_fixed">gb_fixed</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>012</p><img alt="gb_fixed 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_fixed.png"/><p><a href="../verification/gb_fixed-build.txt">建置日誌</a> / <a href="../verification/gb_fixed-runtime.txt">執行日誌</a></p></section><section id="gb_entity"><h2 id="result-gb_entity">gb_entity</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001</p><img alt="gb_entity 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_entity.png"/><p><a href="../verification/gb_entity-build.txt">建置日誌</a> / <a href="../verification/gb_entity-runtime.txt">執行日誌</a></p></section><section id="gb_debug"><h2 id="result-gb_debug">gb_debug</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，追蹤日誌記錄 HP=42</p><img alt="gb_debug 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_debug.png"/><p><a href="../verification/gb_debug-build.txt">建置日誌</a> / <a href="../verification/gb_debug-runtime.txt">執行日誌</a></p></section><section id="gb_chain"><h2 id="result-gb_chain">gb_chain</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，歷史中包含 (20,30)</p><img alt="gb_chain 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_chain.png"/><p><a href="../verification/gb_chain-build.txt">建置日誌</a> / <a href="../verification/gb_chain-runtime.txt">執行日誌</a></p></section><section id="fc_hello"><h2 id="result-fc_hello">fc_hello</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示 HELLO WORLD 和 042</p><img alt="fc_hello 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_hello.png"/><p><a href="../verification/fc_hello-build.txt">建置日誌</a> / <a href="../verification/fc_hello-runtime.txt">執行日誌</a></p></section><section id="fc_arithmetic"><h2 id="result-fc_arithmetic">fc_arithmetic</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>030</p><img alt="fc_arithmetic 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_arithmetic.png"/><p><a href="../verification/fc_arithmetic-build.txt">建置日誌</a> / <a href="../verification/fc_arithmetic-runtime.txt">執行日誌</a></p></section><section id="fc_control"><h2 id="result-fc_control">fc_control</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="fc_control 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_control.png"/><p><a href="../verification/fc_control-build.txt">建置日誌</a> / <a href="../verification/fc_control-runtime.txt">執行日誌</a></p></section><section id="fc_aggregate"><h2 id="result-fc_aggregate">fc_aggregate</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="fc_aggregate 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_aggregate.png"/><p><a href="../verification/fc_aggregate-build.txt">建置日誌</a> / <a href="../verification/fc_aggregate-runtime.txt">執行日誌</a></p></section><section id="fc_bits_memory"><h2 id="result-fc_bits_memory">fc_bits_memory</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>010</p><img alt="fc_bits_memory 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_bits_memory.png"/><p><a href="../verification/fc_bits_memory-build.txt">建置日誌</a> / <a href="../verification/fc_bits_memory-runtime.txt">執行日誌</a></p></section><section id="fc_input"><h2 id="result-fc_input">fc_input</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>初始為 000，每次新按下 A 增加一次</p><img alt="fc_input 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_input.png"/><p><a href="../verification/fc_input-build.txt">建置日誌</a> / <a href="../verification/fc_input-runtime.txt">執行日誌</a></p></section><section id="fc_fixed"><h2 id="result-fc_fixed">fc_fixed</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>012</p><img alt="fc_fixed 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_fixed.png"/><p><a href="../verification/fc_fixed-build.txt">建置日誌</a> / <a href="../verification/fc_fixed-runtime.txt">執行日誌</a></p></section><section id="fc_entity"><h2 id="result-fc_entity">fc_entity</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001</p><img alt="fc_entity 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_entity.png"/><p><a href="../verification/fc_entity-build.txt">建置日誌</a> / <a href="../verification/fc_entity-runtime.txt">執行日誌</a></p></section><section id="fc_debug"><h2 id="result-fc_debug">fc_debug</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，追蹤日誌記錄 HP=42</p><img alt="fc_debug 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_debug.png"/><p><a href="../verification/fc_debug-build.txt">建置日誌</a> / <a href="../verification/fc_debug-runtime.txt">執行日誌</a></p></section><section id="fc_chain"><h2 id="result-fc_chain">fc_chain</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，歷史中包含 (20,30)</p><img alt="fc_chain 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_chain.png"/><p><a href="../verification/fc_chain-build.txt">建置日誌</a> / <a href="../verification/fc_chain-runtime.txt">執行日誌</a></p></section><section id="gb_cgb_palette"><h2 id="result-gb_cgb_palette">gb_cgb_palette</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>CGB 模式下，白底紫色 042</p><img alt="gb_cgb_palette 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_cgb_palette.png"/><p><a href="../verification/gb_cgb_palette-build.txt">建置日誌</a> / <a href="../verification/gb_cgb_palette-runtime.txt">執行日誌</a></p></section><section id="gb_scroll"><h2 id="result-gb_scroll">gb_scroll</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>SCX 增加時標題向左移動</p><img alt="gb_scroll 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_scroll.png"/><p><a href="../verification/gb_scroll-build.txt">建置日誌</a> / <a href="../verification/gb_scroll-runtime.txt">執行日誌</a></p></section><section id="gb_vram_queue"><h2 id="result-gb_vram_queue">gb_vram_queue</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>在 (3,8) 顯示 4</p><img alt="gb_vram_queue 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_vram_queue.png"/><p><a href="../verification/gb_vram_queue-build.txt">建置日誌</a> / <a href="../verification/gb_vram_queue-runtime.txt">執行日誌</a></p></section><section id="gb_sprite"><h2 id="result-gb_sprite">gb_sprite</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>在精靈位置顯示字母 A</p><img alt="gb_sprite 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_sprite.png"/><p><a href="../verification/gb_sprite-build.txt">建置日誌</a> / <a href="../verification/gb_sprite-runtime.txt">執行日誌</a></p></section><section id="gb_rng"><h2 id="result-gb_rng">gb_rng</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>數值範圍 000～009；相同種子重現相同序列</p><img alt="gb_rng 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_rng.png"/><p><a href="../verification/gb_rng-build.txt">建置日誌</a> / <a href="../verification/gb_rng-runtime.txt">執行日誌</a></p></section><section id="gb_flags"><h2 id="result-gb_flags">gb_flags</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001</p><img alt="gb_flags 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_flags.png"/><p><a href="../verification/gb_flags-build.txt">建置日誌</a> / <a href="../verification/gb_flags-runtime.txt">執行日誌</a></p></section><section id="gb_circle"><h2 id="result-gb_circle">gb_circle</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>推進一步後為 042；本例使用整數像素</p><img alt="gb_circle 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_circle.png"/><p><a href="../verification/gb_circle-build.txt">建置日誌</a> / <a href="../verification/gb_circle-runtime.txt">執行日誌</a></p></section><section id="fc_scroll"><h2 id="result-fc_scroll">fc_scroll</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>標題水平捲動</p><img alt="fc_scroll 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_scroll.png"/><p><a href="../verification/fc_scroll-build.txt">建置日誌</a> / <a href="../verification/fc_scroll-runtime.txt">執行日誌</a></p></section><section id="fc_vram_queue"><h2 id="result-fc_vram_queue">fc_vram_queue</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>在 (3,8) 顯示 4</p><img alt="fc_vram_queue 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_vram_queue.png"/><p><a href="../verification/fc_vram_queue-build.txt">建置日誌</a> / <a href="../verification/fc_vram_queue-runtime.txt">執行日誌</a></p></section><section id="fc_sprite"><h2 id="result-fc_sprite">fc_sprite</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>畫面上顯示一個精靈</p><img alt="fc_sprite 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_sprite.png"/><p><a href="../verification/fc_sprite-build.txt">建置日誌</a> / <a href="../verification/fc_sprite-runtime.txt">執行日誌</a></p></section><section id="fc_sound"><h2 id="result-fc_sound">fc_sound</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示 042 並發出脈衝音</p><img alt="fc_sound 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_sound.png"/><p><a href="../verification/fc_sound-build.txt">建置日誌</a> / <a href="../verification/fc_sound-runtime.txt">執行日誌</a></p></section><section id="gb_sound"><h2 id="result-gb_sound">gb_sound</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示 042 並發出短脈衝音</p><img alt="gb_sound 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_sound.png"/><p><a href="../verification/gb_sound-build.txt">建置日誌</a> / <a href="../verification/gb_sound-runtime.txt">執行日誌</a></p></section><section id="gb_font"><h2 id="result-gb_font">gb_font</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示大寫、小寫、數字及全部 30 個符號</p><img alt="gb_font 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_font.png"/><p><a href="../verification/gb_font-build.txt">建置日誌</a> / <a href="../verification/gb_font-runtime.txt">執行日誌</a></p></section><section id="fc_font"><h2 id="result-fc_font">fc_font</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>顯示大寫、小寫、數字及全部 30 個符號</p><img alt="fc_font 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_font.png"/><p><a href="../verification/fc_font-build.txt">建置日誌</a> / <a href="../verification/fc_font-runtime.txt">執行日誌</a></p></section><section id="gb_system"><h2 id="result-gb_system">gb_system</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>002</p><img alt="gb_system 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_system.png"/><p><a href="../verification/gb_system-build.txt">建置日誌</a> / <a href="../verification/gb_system-runtime.txt">執行日誌</a></p></section><section id="gb_scene"><h2 id="result-gb_scene">gb_scene</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，未註冊回呼</p><img alt="gb_scene 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_scene.png"/><p><a href="../verification/gb_scene-build.txt">建置日誌</a> / <a href="../verification/gb_scene-runtime.txt">執行日誌</a></p></section><section id="fc_system"><h2 id="result-fc_system">fc_system</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>002</p><img alt="fc_system 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_system.png"/><p><a href="../verification/fc_system-build.txt">建置日誌</a> / <a href="../verification/fc_system-runtime.txt">執行日誌</a></p></section><section id="fc_scene"><h2 id="result-fc_scene">fc_scene</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，未註冊回呼</p><img alt="fc_scene 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_scene.png"/><p><a href="../verification/fc_scene-build.txt">建置日誌</a> / <a href="../verification/fc_scene-runtime.txt">執行日誌</a></p></section><section id="gb_camera"><h2 id="result-gb_camera">gb_camera</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，即世界 x=52 減去鏡頭 x=10</p><img alt="gb_camera 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_camera.png"/><p><a href="../verification/gb_camera-build.txt">建置日誌</a> / <a href="../verification/gb_camera-runtime.txt">執行日誌</a></p></section><section id="gb_rle"><h2 id="result-gb_rle">gb_rle</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，三個位元組各為 42</p><img alt="gb_rle 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_rle.png"/><p><a href="../verification/gb_rle-build.txt">建置日誌</a> / <a href="../verification/gb_rle-runtime.txt">執行日誌</a></p></section><section id="gb_board"><h2 id="result-gb_board">gb_board</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="gb_board 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_board.png"/><p><a href="../verification/gb_board-build.txt">建置日誌</a> / <a href="../verification/gb_board-runtime.txt">執行日誌</a></p></section><section id="gb_physics"><h2 id="result-gb_physics">gb_physics</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，整數像素座標</p><img alt="gb_physics 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_physics.png"/><p><a href="../verification/gb_physics-build.txt">建置日誌</a> / <a href="../verification/gb_physics-runtime.txt">執行日誌</a></p></section><section id="gb_link"><h2 id="result-gb_link">gb_link</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>未連線為 255，逾時為 000，連線時顯示對端值</p><img alt="gb_link 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_link.png"/><p><a href="../verification/gb_link-build.txt">建置日誌</a> / <a href="../verification/gb_link-runtime.txt">執行日誌</a></p></section><section id="gb_bank"><h2 id="result-gb_bank">gb_bank</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，從 bank 0 固定 ROM 複製資料</p><img alt="gb_bank 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_bank.png"/><p><a href="../verification/gb_bank-build.txt">建置日誌</a> / <a href="../verification/gb_bank-runtime.txt">執行日誌</a></p></section><section id="gb_asset"><h2 id="result-gb_asset">gb_asset</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042</p><img alt="gb_asset 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_asset.png"/><p><a href="../verification/gb_asset-build.txt">建置日誌</a> / <a href="../verification/gb_asset-runtime.txt">執行日誌</a></p></section><section id="gb_danmaku"><h2 id="result-gb_danmaku">gb_danmaku</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>001，數值物件池範例，不使用子彈背景合成</p><img alt="gb_danmaku 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/gb_danmaku.png"/><p><a href="../verification/gb_danmaku-build.txt">建置日誌</a> / <a href="../verification/gb_danmaku-runtime.txt">執行日誌</a></p></section><section id="fc_subpixel"><h2 id="result-fc_subpixel">fc_subpixel</h2><p>建置結束碼：0 / 執行狀態：executed</p><p>042，遊戲使用標頭常數明確進行積分</p><img alt="fc_subpixel 的模擬器畫面擷取" class="screen" loading="lazy" src="../verification/fc_subpixel.png"/><p><a href="../verification/fc_subpixel-build.txt">建置日誌</a> / <a href="../verification/fc_subpixel-runtime.txt">執行日誌</a></p></section><h2 id="visual_checks-json">像素值與字形比對</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">複製</button><pre><code>[
   {
     "id": "gb_hello",
     "tile_x": 3,
@@ -958,4 +958,1592 @@
   "mobile_width": 390,
   "errors": [],
   "status": "passed"
-}</code></pre></div><footer>原始碼版本 2026-09-14 • <a href="index.html">目錄</a> • <a href="verification.html">驗證</a> • <a href="../reference/inventory.json">快照指紋</a><br/>範例建置、模擬器執行及預期結果比對分別記錄。</footer></main></div><script src="../assets/manual.js"></script></body></html>
+}</code></pre></div><!-- api-verification:start --><h2 id="api-verification">API 範例的預期影像與驗證結果</h2><p>每個圖塊範例程式均已建置，並在 KOKURA 的 DMG、CGB 模式下各執行 90 影格。驗證將顯示的圖塊排列及周圍空白與附帶字型的像素比較，同時檢查預期文字顏色與畫面結果。ROM 也會讀回目標圖塊編號與屬性進行比較。結束碼 0 並非唯一通過條件。這些範例在 LCD 關閉時寫入，本次未測試實機或 LCD 開啟時的傳輸時序。</p><section id="api-gb-__settile"><h3><code>__settile</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>目標位址固定為 <code>0x9800 + 32*y + x</code>，不會跟隨 LCDC 的背景或視窗地圖設定。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile-dmg.png" alt="__settile — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile-cgb.png" alt="__settile — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile.c">完整範例程式</a> · <a href="../verification/api-tiles/__settile-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settile&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:32.612244+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;bccf8cba4cc64d49e0596ab4579785d7c13763083abec74e340f6e1a2778b566&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;56af5792da875a0c5d75efa3b7241519786520f1949e6a8dc5cba1f09b62e592&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_unsafe"><h3><code>__settile_unsafe</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>目標位址固定為 <code>0x9800 + 32*y + x</code>，不會跟隨 LCDC 的背景或視窗地圖設定。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_unsafe-dmg.png" alt="__settile_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_unsafe-cgb.png" alt="__settile_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settile_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settile_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:38.546339+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;e0d699a339bf96422040acd0880c8f48b082354f5eeeaf5c7a5f0800e94fec07&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;56eb3515ce3ad42ea7aa37ce84b5af6d5d4d808d7176d65a10d4a6840d61cece&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_fast"><h3><code>__settile_fast</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>目標位址固定為 <code>0x9800 + 32*y + x</code>，不會跟隨 LCDC 的背景或視窗地圖設定。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_fast-dmg.png" alt="__settile_fast — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_fast-cgb.png" alt="__settile_fast — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_fast.c">完整範例程式</a> · <a href="../verification/api-tiles/__settile_fast-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settile_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:43.964284+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;47d0f7afda3fbc0f4ef0c6bdfd923d6830915cfa5e2ae8a5b06967841a7efd1c&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;28bcd6161077a425d0126e2cb72aadb1e09dc84005a753c95dff2a7db1fd700c&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileat"><h3><code>__settileat</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>以 <code>base</code> 指定地圖起始位址 <code>0x9800</code> 或 <code>0x9C00</code>；位元組位址為 <code>base + 32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileat-dmg.png" alt="__settileat — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileat-cgb.png" alt="__settileat — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileat.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileat-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileat&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:49.923690+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;1a73ef77cb4df63fad8d2da856ee9e778e48a28836acfa40f9cf1d7002652ab4&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;1164d72a43203079b4f27f661db7b21fb5a7153cfe2535002789cab67bbf7c81&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileat_unsafe"><h3><code>__settileat_unsafe</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>以 <code>base</code> 指定地圖起始位址 <code>0x9800</code> 或 <code>0x9C00</code>；位元組位址為 <code>base + 32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileat_unsafe-dmg.png" alt="__settileat_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileat_unsafe-cgb.png" alt="__settileat_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileat_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileat_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileat_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:55.302383+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;e96daddb831a029776e6158f55f26b76e0675ac0d00459eeaf08c18aeaf3b84c&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;f6023a824d62f6755b276d634b696e0744ddb7edd1abec4a1e3dbf06204ba7b7&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg"><h3><code>__settilebg</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>寫入 LCDC 位元 3 所選的背景地圖：0 對應 <code>0x9800</code>，1 對應 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg-dmg.png" alt="__settilebg — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg-cgb.png" alt="__settilebg — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebg-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:00.697137+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d7acb7ca93d020a2436bcfd815ebaa27adc8997a04883c773cf7c5416eaaa9fe&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;5ddec6aa59513b4bd80d3016e552ffb7b281caca7e3c6649fa37454fd8f2aea5&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_xy"><h3><code>__settile_xy</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>寫入 LCDC 位元 3 所選的背景地圖：0 對應 <code>0x9800</code>，1 對應 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_xy-dmg.png" alt="__settile_xy — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_xy-cgb.png" alt="__settile_xy — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_xy.c">完整範例程式</a> · <a href="../verification/api-tiles/__settile_xy-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settile_xy&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:05.913272+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;4a0b8b3e8f0d6785b38738a86c55d99ec52ed314ca8d951a5bf53a565d31de14&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;5ddec6aa59513b4bd80d3016e552ffb7b281caca7e3c6649fa37454fd8f2aea5&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg_unsafe"><h3><code>__settilebg_unsafe</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>寫入 LCDC 位元 3 所選的背景地圖：0 對應 <code>0x9800</code>，1 對應 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg_unsafe-dmg.png" alt="__settilebg_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg_unsafe-cgb.png" alt="__settilebg_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebg_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:11.289165+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;c0dc4202e08cfbbfb579333075d6140b4ed3d9c234a9dab770394dbbea642f28&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;91e9dfe0fba1d5d33efb0fbe29a9d6045c3e937f57ca0e87e68aff00945f4c43&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewin"><h3><code>__settilewin</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>寫入 LCDC 位元 6 選用的視窗地圖：0 為 <code>0x9800</code>，1 為 <code>0x9C00</code>。<code>x,y</code> 是地圖座標，不是視窗在畫面上的位置。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewin-dmg.png" alt="__settilewin — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewin-cgb.png" alt="__settilewin — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewin.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilewin-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilewin&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:18.169478+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;309ab917fc3b2a9c7d9c783dc182459e78ac95deb5c538d20a0648e65abd6c06&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3ab0d00fbcdc96fa97c4070dcac53398d29d271a5f11d54f2dfbb29480a39b6d&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewin_unsafe"><h3><code>__settilewin_unsafe</code></h3><p>將圖塊編號寫入圖塊地圖的一個格子。這是選用既有圖塊圖像，不會修改像素資料。</p><p>寫入 LCDC 位元 6 選用的視窗地圖：0 為 <code>0x9800</code>，1 為 <code>0x9C00</code>。<code>x,y</code> 是地圖座標，不是視窗在畫面上的位置。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewin_unsafe-dmg.png" alt="__settilewin_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewin_unsafe-cgb.png" alt="__settilewin_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewin_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilewin_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilewin_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:25.313483+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;0534d9c266b21c09f8b57a486a200773bd99706965a0fc715cff0d2fcaf5e9a3&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3dbf7a4dc8d68e2451796a5dca464ca97c4861505da97c3bea3d5cbbcdf4f445&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr"><h3><code>__settileattr</code></h3><p>只修改 CGB 屬性位元組，不更動圖塊編號。屬性可指定調色盤、圖塊圖像 bank、水平或垂直翻轉及優先順序。</p><p>目標位址固定為 <code>0x9800 + 32*y + x</code>，不會跟隨 LCDC 的背景或視窗地圖設定。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr-dmg.png" alt="__settileattr — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr-cgb.png" alt="__settileattr — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileattr.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileattr-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:30.875787+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d156d816e64b3201f31e572572a3fe6b939579089b7ff009eb11b41717f15c1c&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;eb2387bb6a0a2287a7783d356fe9af9e182bda35e40b49ad0f69a56b1a9c51e9&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr_unsafe"><h3><code>__settileattr_unsafe</code></h3><p>只修改 CGB 屬性位元組，不更動圖塊編號。屬性可指定調色盤、圖塊圖像 bank、水平或垂直翻轉及優先順序。</p><p>目標位址固定為 <code>0x9800 + 32*y + x</code>，不會跟隨 LCDC 的背景或視窗地圖設定。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_unsafe-dmg.png" alt="__settileattr_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_unsafe-cgb.png" alt="__settileattr_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileattr_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileattr_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:36.255800+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;8cefb06e61295e326ed6fd27b1c8e742f60ce90548a5bf4e33a592a73fef91ec&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;b3be880175fe6b43b89e9c41beadcaff4873cd17fe021d2e8baf38b82333c151&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatattr"><h3><code>__settileatattr</code></h3><p>只修改 CGB 屬性位元組，不更動圖塊編號。屬性可指定調色盤、圖塊圖像 bank、水平或垂直翻轉及優先順序。</p><p>以 <code>base</code> 指定地圖起始位址 <code>0x9800</code> 或 <code>0x9C00</code>；位元組位址為 <code>base + 32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatattr-dmg.png" alt="__settileatattr — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatattr-cgb.png" alt="__settileatattr — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileatattr.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileatattr-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileatattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:41.523042+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;68ede8ad916afd6dfe93198dbc6cae41240e23ab42eb76d290bd7e3604c56f69&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;cef51d1adb0126935d4679d91e91a345f4390eaf49c33f1a2f741949a1e1628a&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatattr_unsafe"><h3><code>__settileatattr_unsafe</code></h3><p>只修改 CGB 屬性位元組，不更動圖塊編號。屬性可指定調色盤、圖塊圖像 bank、水平或垂直翻轉及優先順序。</p><p>以 <code>base</code> 指定地圖起始位址 <code>0x9800</code> 或 <code>0x9C00</code>；位元組位址為 <code>base + 32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatattr_unsafe-dmg.png" alt="__settileatattr_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatattr_unsafe-cgb.png" alt="__settileatattr_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileatattr_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileatattr_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileatattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:47.418398+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;bf7e9c75bd18c6e7c665cbb582178d2f199996b473c487f01bf6573bbc823faa&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;c64ef44c13bb75d8ff3bf13c8f38135f51153bdffb4bb6e897be585f7aa7000b&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgattr"><h3><code>__settilebgattr</code></h3><p>只修改 CGB 屬性位元組，不更動圖塊編號。屬性可指定調色盤、圖塊圖像 bank、水平或垂直翻轉及優先順序。</p><p>寫入 LCDC 位元 3 所選的背景地圖：0 對應 <code>0x9800</code>，1 對應 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgattr-dmg.png" alt="__settilebgattr — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgattr-cgb.png" alt="__settilebgattr — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebgattr.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebgattr-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:53.252001+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;001047351696329fca1f07608ce8f22807c2b4e67126c3b5c668bce2e66b7cf5&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;61c8f8ca4d9a5f3aa0992bb603626b455b182876bc80d9e47f8cbac06a097e0b&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgattr_unsafe"><h3><code>__settilebgattr_unsafe</code></h3><p>只修改 CGB 屬性位元組，不更動圖塊編號。屬性可指定調色盤、圖塊圖像 bank、水平或垂直翻轉及優先順序。</p><p>寫入 LCDC 位元 3 所選的背景地圖：0 對應 <code>0x9800</code>，1 對應 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgattr_unsafe-dmg.png" alt="__settilebgattr_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgattr_unsafe-cgb.png" alt="__settilebgattr_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebgattr_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebgattr_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:58.684339+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;bcff9982c1bd9a1e6b5749417711db602abaa07bce86d11c10bcc0d1fd7a20e6&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3161ce48c5330ad8f568b9c1a0c4e102b48a3d84a926b0909120fbcf6201c771&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewinattr"><h3><code>__settilewinattr</code></h3><p>只修改 CGB 屬性位元組，不更動圖塊編號。屬性可指定調色盤、圖塊圖像 bank、水平或垂直翻轉及優先順序。</p><p>寫入 LCDC 位元 6 選用的視窗地圖：0 為 <code>0x9800</code>，1 為 <code>0x9C00</code>。<code>x,y</code> 是地圖座標，不是視窗在畫面上的位置。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewinattr-dmg.png" alt="__settilewinattr — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewinattr-cgb.png" alt="__settilewinattr — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewinattr.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilewinattr-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilewinattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:03.972540+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;781778c4e61209f01f449031cc1839735b009504423b02bfe64be803dadef1d4&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3ff46df981caa21e93f10786da732b51d609e43a1c4b41aeaa9af40ae2893609&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewinattr_unsafe"><h3><code>__settilewinattr_unsafe</code></h3><p>只修改 CGB 屬性位元組，不更動圖塊編號。屬性可指定調色盤、圖塊圖像 bank、水平或垂直翻轉及優先順序。</p><p>寫入 LCDC 位元 6 選用的視窗地圖：0 為 <code>0x9800</code>，1 為 <code>0x9C00</code>。<code>x,y</code> 是地圖座標，不是視窗在畫面上的位置。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewinattr_unsafe-dmg.png" alt="__settilewinattr_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewinattr_unsafe-cgb.png" alt="__settilewinattr_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewinattr_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilewinattr_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilewinattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:09.282499+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;0c3462d90b23e6d5e51bc99d23556f4920afdc6d73cd810b2e0f4585dbadd3fa&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;14e07311feb2191d00dd5d3b3073bb01c3d322257e787e422c16efdf7a9629f3&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb"><h3><code>__settilecgb</code></h3><p>依序寫入圖塊編號與 CGB 屬性。DMG 只寫入編號。CGB 呼叫前請選取 VRAM bank 0；屬性寫入 bank 1，結束時為 <code>VBK=0</code>。</p><p>目標位址固定為 <code>0x9800 + 32*y + x</code>，不會跟隨 LCDC 的背景或視窗地圖設定。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb-dmg.png" alt="__settilecgb — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb-cgb.png" alt="__settilecgb — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilecgb.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilecgb-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:14.666020+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;769fe4f203cf3d512cc6239c54b57911723e09c7f4d6eacc27eca24b4e951564&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;bc767b386beaa91232008c8aa7bd20e767c69b34079bc9d5b66643075aa97d6e&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb_unsafe"><h3><code>__settilecgb_unsafe</code></h3><p>依序寫入圖塊編號與 CGB 屬性。DMG 只寫入編號。CGB 呼叫前請選取 VRAM bank 0；屬性寫入 bank 1，結束時為 <code>VBK=0</code>。</p><p>目標位址固定為 <code>0x9800 + 32*y + x</code>，不會跟隨 LCDC 的背景或視窗地圖設定。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_unsafe-dmg.png" alt="__settilecgb_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_unsafe-cgb.png" alt="__settilecgb_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilecgb_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilecgb_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:20.733676+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;73a044ce64133717c6add155167bc2422aa6c1467fb0638bf85d9abc91ba7c88&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;74dd48b043d24bf73ce3135d1df9301a6b920e0604bd95fa39390ec31126f575&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatcgb"><h3><code>__settileatcgb</code></h3><p>依序寫入圖塊編號與 CGB 屬性。DMG 只寫入編號。CGB 呼叫前請選取 VRAM bank 0；屬性寫入 bank 1，結束時為 <code>VBK=0</code>。</p><p>以 <code>base</code> 指定地圖起始位址 <code>0x9800</code> 或 <code>0x9C00</code>；位元組位址為 <code>base + 32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatcgb-dmg.png" alt="__settileatcgb — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatcgb-cgb.png" alt="__settileatcgb — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileatcgb.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileatcgb-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileatcgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:26.033985+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;14901f539e2dd3912bb1e3208d3e4d56c1ff023348ea14959f024e7fbc7c6560&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;4d51855690280a3d2d260619b0e6471d993d79bf9e1c513b5bd9bb656cf22947&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatcgb_unsafe"><h3><code>__settileatcgb_unsafe</code></h3><p>依序寫入圖塊編號與 CGB 屬性。DMG 只寫入編號。CGB 呼叫前請選取 VRAM bank 0；屬性寫入 bank 1，結束時為 <code>VBK=0</code>。</p><p>以 <code>base</code> 指定地圖起始位址 <code>0x9800</code> 或 <code>0x9C00</code>；位元組位址為 <code>base + 32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatcgb_unsafe-dmg.png" alt="__settileatcgb_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatcgb_unsafe-cgb.png" alt="__settileatcgb_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileatcgb_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileatcgb_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileatcgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:31.406331+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;0aaa6d28c209b4971bb95178238ca0de8f93deb95719f63552f64cf738a48957&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;c2023e7c8965a61372a305c21a852afd4e6974f121fd28efb035e45ea75d7723&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgcgb"><h3><code>__settilebgcgb</code></h3><p>依序寫入圖塊編號與 CGB 屬性。DMG 只寫入編號。CGB 呼叫前請選取 VRAM bank 0；屬性寫入 bank 1，結束時為 <code>VBK=0</code>。</p><p>寫入 LCDC 位元 3 所選的背景地圖：0 對應 <code>0x9800</code>，1 對應 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgcgb-dmg.png" alt="__settilebgcgb — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgcgb-cgb.png" alt="__settilebgcgb — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebgcgb.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebgcgb-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgcgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:36.704045+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;6d6e3f77c70090421293b72bc1e42900b718735d59050c8435c138ca097340ef&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;038546ba62d254dd0e61b95375ad4228877b80bb936a781bdccd531e60aa42d8&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgcgb_unsafe"><h3><code>__settilebgcgb_unsafe</code></h3><p>依序寫入圖塊編號與 CGB 屬性。DMG 只寫入編號。CGB 呼叫前請選取 VRAM bank 0；屬性寫入 bank 1，結束時為 <code>VBK=0</code>。</p><p>寫入 LCDC 位元 3 所選的背景地圖：0 對應 <code>0x9800</code>，1 對應 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgcgb_unsafe-dmg.png" alt="__settilebgcgb_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgcgb_unsafe-cgb.png" alt="__settilebgcgb_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebgcgb_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebgcgb_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgcgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:42.097355+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;b044247160b163212cd3aceccfd17e4ecd0b37806403ac0a20306b3639daa832&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;81858efb24421e1b8898174c83f2af1112341e8b7e1b33e1ac96b24ab8c0242e&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewincgb"><h3><code>__settilewincgb</code></h3><p>依序寫入圖塊編號與 CGB 屬性。DMG 只寫入編號。CGB 呼叫前請選取 VRAM bank 0；屬性寫入 bank 1，結束時為 <code>VBK=0</code>。</p><p>寫入 LCDC 位元 6 選用的視窗地圖：0 為 <code>0x9800</code>，1 為 <code>0x9C00</code>。<code>x,y</code> 是地圖座標，不是視窗在畫面上的位置。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewincgb-dmg.png" alt="__settilewincgb — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewincgb-cgb.png" alt="__settilewincgb — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewincgb.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilewincgb-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilewincgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:47.588698+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;02d8f3c46d9319baf60569988fb07512430db544e1537465bd0de43c569eede0&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;a545b1afc7435ecdb430374665cffdf8b2f7f52bf4b30ad454be2a0eaa958522&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewincgb_unsafe"><h3><code>__settilewincgb_unsafe</code></h3><p>依序寫入圖塊編號與 CGB 屬性。DMG 只寫入編號。CGB 呼叫前請選取 VRAM bank 0；屬性寫入 bank 1，結束時為 <code>VBK=0</code>。</p><p>寫入 LCDC 位元 6 選用的視窗地圖：0 為 <code>0x9800</code>，1 為 <code>0x9C00</code>。<code>x,y</code> 是地圖座標，不是視窗在畫面上的位置。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A</pre><p>CGB 上的 <code>A</code> 為藍色：屬性值 2 選擇範例設定的藍色調色盤。DMG 不套用 CGB 屬性，因此同一字元為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewincgb_unsafe-dmg.png" alt="__settilewincgb_unsafe — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewincgb_unsafe-cgb.png" alt="__settilewincgb_unsafe — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewincgb_unsafe.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilewincgb_unsafe-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilewincgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:59.139106+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d0299f3e70fc0fab8897ccea7177f5e3cb096ef25eaa844b16f83c3d68f739df&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;ab552a4b4e183f06de0007624402c4d5ec7b5ac3741a95a5cd79c5b6277b2897&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_bulk"><h3><code>__settile_bulk</code></h3><p>從 <code>src</code> 複製連續的 <code>count</code> 個圖塊編號位元組到 VRAM 位址 <code>dest</code>。數量以位元組計算，不是圖塊圖像數，也不調整列間距。</p><p>必要時等待 VRAM 可寫入。LCD 開啟時的路徑會暫停中斷，結束後可能啟用中斷；不保證保留呼叫前的中斷狀態，也不保證在一次 VBlank 內完成。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>ABC</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_bulk-dmg.png" alt="__settile_bulk — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_bulk-cgb.png" alt="__settile_bulk — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_bulk.c">完整範例程式</a> · <a href="../verification/api-tiles/__settile_bulk-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settile_bulk&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:09.999907+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;55e2f2f4a9151ecdb5521ce8a7764a18f0abff02862b2f707ebe946dcec4745a&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;e4276c1918520a03c41172014b34b9e61ea9cc1c4e30e3f6f4456d35c7c7847f&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0,
+      0,
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_bulk_fast"><h3><code>__settile_bulk_fast</code></h3><p>從 <code>src</code> 複製連續的 <code>count</code> 個圖塊編號位元組到 VRAM 位址 <code>dest</code>。數量以位元組計算，不是圖塊圖像數，也不調整列間距。</p><p>不等待 VRAM 可寫入。請在 LCD 關閉時使用，或由呼叫端確保整段傳輸都位於可寫入時間內。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>ABC</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_bulk_fast-dmg.png" alt="__settile_bulk_fast — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_bulk_fast-cgb.png" alt="__settile_bulk_fast — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_bulk_fast.c">完整範例程式</a> · <a href="../verification/api-tiles/__settile_bulk_fast-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settile_bulk_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:21.181526+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;5f582ad91f12d9343a4e3358e0027ab288aa9284c257d1651a309e74f9caace2&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;6a7caf5ec0e64771e0cb1703c8fba35d7f00b7374826edd039e66c3cc2f12446&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0,
+      0,
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr_bulk"><h3><code>__settileattr_bulk</code></h3><p>將 <code>src</code> 中連續的 <code>count</code> 個 CGB 屬性位元組複製到 VRAM bank 1 的 <code>dest</code>。圖塊編號不變；<code>dest</code> 是位址，不是座標組。</p><p>必要時等待 VRAM 可寫入。LCD 開啟時的路徑會暫停中斷，結束後可能啟用中斷；不保證保留呼叫前的中斷狀態，也不保證在一次 VBlank 內完成。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>ABC</pre><p>CGB 上，屬性位元組 <code>1,2,3</code> 分別選擇三個預設調色盤，使 <code>A</code> 為紅色、<code>B</code> 為藍色、<code>C</code> 為綠色。DMG 上三個字元均為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_bulk-dmg.png" alt="__settileattr_bulk — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_bulk-cgb.png" alt="__settileattr_bulk — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileattr_bulk.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileattr_bulk-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr_bulk&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:31.140838+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;cd7ae589260c1fd75bd2d68a27e18663a01556187fcdb2cda923b4269acb1b76&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;c5548de809bac055058ca09629876e676c180bb462054996f1bddb7ecaa0921f&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr_bulk_fast"><h3><code>__settileattr_bulk_fast</code></h3><p>將 <code>src</code> 中連續的 <code>count</code> 個 CGB 屬性位元組複製到 VRAM bank 1 的 <code>dest</code>。圖塊編號不變；<code>dest</code> 是位址，不是座標組。</p><p>不等待 VRAM 可寫入。請在 LCD 關閉時使用，或由呼叫端確保整段傳輸都位於可寫入時間內。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>ABC</pre><p>CGB 上，屬性位元組 <code>1,2,3</code> 分別選擇三個預設調色盤，使 <code>A</code> 為紅色、<code>B</code> 為藍色、<code>C</code> 為綠色。DMG 上三個字元均為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_bulk_fast-dmg.png" alt="__settileattr_bulk_fast — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_bulk_fast-cgb.png" alt="__settileattr_bulk_fast — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileattr_bulk_fast.c">完整範例程式</a> · <a href="../verification/api-tiles/__settileattr_bulk_fast-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr_bulk_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:40.822314+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;84fcf9b8f45bba0382563da8adba76ec3851c4e4d0f0f10b9405e46990ab6c6a&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;b58a2a1f08842fd1f3493da6545e0b42528898c3a8bb981ebfc64085b030c52d&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb_bulk"><h3><code>__settilecgb_bulk</code></h3><p>分別從 <code>tile_src</code> 與 <code>attr_src</code> 複製 <code>count</code> 個編號、屬性位元組，目標皆從 <code>dest</code> 開始。兩者須使用獨立陣列，不是交錯排列。</p><p>必要時等待 VRAM 可寫入。LCD 開啟時的路徑會暫停中斷，結束後可能啟用中斷；不保證保留呼叫前的中斷狀態，也不保證在一次 VBlank 內完成。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>ABC</pre><p>CGB 上，屬性位元組 <code>1,2,3</code> 分別選擇三個預設調色盤，使 <code>A</code> 為紅色、<code>B</code> 為藍色、<code>C</code> 為綠色。DMG 上三個字元均為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_bulk-dmg.png" alt="__settilecgb_bulk — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_bulk-cgb.png" alt="__settilecgb_bulk — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilecgb_bulk.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilecgb_bulk-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb_bulk&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:48.092163+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d2f65cff1cc32f44a332ccbd49cbfb0fa155400426ae1348da60703e47ab429b&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;5831fc67201abb6a62385c27f2a49fae859d6226f1d8952dfb889e19e14cf481&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb_bulk_fast"><h3><code>__settilecgb_bulk_fast</code></h3><p>分別從 <code>tile_src</code> 與 <code>attr_src</code> 複製 <code>count</code> 個編號、屬性位元組，目標皆從 <code>dest</code> 開始。兩者須使用獨立陣列，不是交錯排列。</p><p>不等待 VRAM 可寫入。請在 LCD 關閉時使用，或由呼叫端確保整段傳輸都位於可寫入時間內。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>ABC</pre><p>CGB 上，屬性位元組 <code>1,2,3</code> 分別選擇三個預設調色盤，使 <code>A</code> 為紅色、<code>B</code> 為藍色、<code>C</code> 為綠色。DMG 上三個字元均為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_bulk_fast-dmg.png" alt="__settilecgb_bulk_fast — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_bulk_fast-cgb.png" alt="__settilecgb_bulk_fast — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilecgb_bulk_fast.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilecgb_bulk_fast-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb_bulk_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:56.215527+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;ae638e2c82824c5e8b8190e93675fdf7be9557a9142c1022b8da27cb310b9da9&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;f3160b2161e88ffd46b6760e0e72b213b069231fe90dc21a8c93c628df6d5625&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_rect"><h3><code>__settile_rect</code></h3><p>以同一圖塊編號填滿 LCDC 所選背景地圖中寬 <code>w</code>、高 <code>h</code> 的矩形。列間距為 32 位元組；這是重複放置同一圖塊，而非複製影像陣列。</p><p>必要時等待 VRAM 可寫入。LCD 開啟時的路徑會暫停中斷，結束後可能啟用中斷；不保證保留呼叫前的中斷狀態，也不保證在一次 VBlank 內完成。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>AAA
+AAA</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_rect-dmg.png" alt="__settile_rect — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_rect-cgb.png" alt="__settile_rect — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_rect.c">完整範例程式</a> · <a href="../verification/api-tiles/__settile_rect-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settile_rect&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:03.371313+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;cb59c8399faf3e42c6cebf9ea6e394c940d143894ed682dc9049c3d18897d271&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;30ca762ef1b2992e8f7372bfccd5eae296c76afbcddf8702d4c3aaea3d30b843&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;AAA&quot;,
+      &quot;AAA&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_row"><h3><code>__settile_row</code></h3><p>將 <code>src</code> 中連續的 <code>len</code> 個圖塊編號，從 LCDC 所選背景地圖的 <code>(x,y)</code> 起向右複製。每複製一個圖塊，來源與目標位址各增加一位元組。</p><p>必要時等待 VRAM 可寫入。LCD 開啟時的路徑會暫停中斷，結束後可能啟用中斷；不保證保留呼叫前的中斷狀態，也不保證在一次 VBlank 內完成。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>ABC</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_row-dmg.png" alt="__settile_row — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_row-cgb.png" alt="__settile_row — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_row.c">完整範例程式</a> · <a href="../verification/api-tiles/__settile_row-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settile_row&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:08.852207+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;2e96976e09d585e12ade26116f63eee9342c7bc4f127be3766d20007a0cdc12a&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;d2b36f2ccc4ee842dfc3e6a2269bacc39578077f56e8ae3a7630c70918555559&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_col"><h3><code>__settile_col</code></h3><p>將 <code>src</code> 中連續的 <code>len</code> 個圖塊編號，從 LCDC 所選背景地圖的 <code>(x,y)</code> 起向下複製。來源位址每次增加一位元組，目標位址增加 32 位元組。</p><p>必要時等待 VRAM 可寫入。LCD 開啟時的路徑會暫停中斷，結束後可能啟用中斷；不保證保留呼叫前的中斷狀態，也不保證在一次 VBlank 內完成。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>A
+B
+C</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_col-dmg.png" alt="__settile_col — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_col-cgb.png" alt="__settile_col — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_col.c">完整範例程式</a> · <a href="../verification/api-tiles/__settile_col-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settile_col&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:14.439621+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;86a1bb088a838863598f4daf0a31cb09fae81820b3775b63a1740d1486037c84&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;628f606f20841db9156ad872c36584682fe1c5ccb6ad6f64baace5923365e1e6&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;,
+      &quot;B&quot;,
+      &quot;C&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilemap_rect"><h3><code>__settilemap_rect</code></h3><p>將緊密排列的 <code>w*h</code> 個圖塊編號複製到 <code>base</code> 指定地圖中以 <code>(x,y)</code> 為起點的矩形。來源資料每列 <code>w</code> 位元組，目標列間距為 32 位元組。</p><p>必要時等待 VRAM 可寫入。LCD 開啟時的路徑會暫停中斷，結束後可能啟用中斷；不保證保留呼叫前的中斷狀態，也不保證在一次 VBlank 內完成。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=3)</code>、像素座標 <code>(16,24)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>ABC
+DEF</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilemap_rect-dmg.png" alt="__settilemap_rect — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilemap_rect-cgb.png" alt="__settilemap_rect — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=3)`、像素座標 `(16,24)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilemap_rect.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilemap_rect-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilemap_rect&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:19.882384+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;c4523137584f564a4dc63a6082a6601dd5f4af2cd013cf425a4b00d1f5203828&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;25a4cdabf98121eae9da968f86abaac42bb8edc8964cb70ad944c26fe99fed15&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;,
+      &quot;DEF&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16_buf"><h3><code>__settilebg16_buf</code></h3><p>在 RAM 圖塊地圖緩衝區寫入一個 16×16 像素單元。四個 8×8 圖塊編號上排為 <code>tile,tile+1</code>，下排為 <code>tile+2,tile+3</code>，超過 255 後回繞。不傳輸至 VRAM。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=2)</code>、像素座標 <code>(16,16)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>AB
+CD</pre><p>圖塊座標 <code>(2,2)</code> 處顯示上排 <code>AB</code>、下排 <code>CD</code>，即單元座標 <code>(1,1)</code> 的一個 16×16 像素單元。緩衝區寫入範例先確認 RAM 準備操作未改變 VRAM，再傳輸；傳輸函式範例則先逐位元組設定 RAM 資料，再執行傳輸。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16_buf-dmg.png" alt="__settilebg16_buf — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=2)`、像素座標 `(16,16)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16_buf-cgb.png" alt="__settilebg16_buf — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=2)`、像素座標 `(16,16)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg16_buf.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebg16_buf-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16_buf&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:07.662576+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;3e9037de0b0dc53e779fe6c434f8e0a7083d280a6b7a49e5372aa07b1c03cd34&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;fef0a18c75a1cc8d7f31729ab684b1122ad04b35736b58592ba99e357a9e8c07&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16cgb_buf"><h3><code>__settilebg16cgb_buf</code></h3><p>在 RAM 圖塊地圖緩衝區寫入一個 16×16 像素單元。四個 8×8 圖塊編號上排為 <code>tile,tile+1</code>，下排為 <code>tile+2,tile+3</code>，超過 255 後回繞。不傳輸至 VRAM。</p><p>也會在獨立屬性緩衝區的對應四個單元寫入相同的 <code>attr</code>。兩個緩衝區均為一般 RAM，因此 DMG 也會執行此準備操作。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=2)</code>、像素座標 <code>(16,16)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>AB
+CD</pre><p>圖塊座標 <code>(2,2)</code> 處顯示上排 <code>AB</code>、下排 <code>CD</code>，即單元座標 <code>(1,1)</code> 的一個 16×16 像素單元。緩衝區寫入範例先確認 RAM 準備操作未改變 VRAM，再傳輸；傳輸函式範例則先逐位元組設定 RAM 資料，再執行傳輸。</p><p>CGB 上四個單元的屬性皆為 2，因此四個字元皆為藍色；DMG 上為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16cgb_buf-dmg.png" alt="__settilebg16cgb_buf — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=2)`、像素座標 `(16,16)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16cgb_buf-cgb.png" alt="__settilebg16cgb_buf — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=2)`、像素座標 `(16,16)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg16cgb_buf.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebg16cgb_buf-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16cgb_buf&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:13.079566+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;f3923a5e471b93a76499204adfa736260a1d408e5bfdca019c1855ab0a5c9901&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;7a2d3dac2973007ecde9486b9462802a236f82ffd736169333cf67d1c651de32&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16_flush"><h3><code>__settilebg16_flush</code></h3><p>將 RAM 緩衝區中相鄰的兩列圖塊傳輸到 LCDC 所選背景地圖。來源偏移為 <code>64*y + x</code>，從該列及其下方相隔 32 位元組的一列各複製 <code>count</code> 位元組。</p><p>必要時等待 VRAM 可寫入。LCD 開啟時的路徑會暫停中斷，結束後可能啟用中斷；不保證保留呼叫前的中斷狀態，也不保證在一次 VBlank 內完成。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=2)</code>、像素座標 <code>(16,16)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>AB
+CD</pre><p>圖塊座標 <code>(2,2)</code> 處顯示上排 <code>AB</code>、下排 <code>CD</code>，即單元座標 <code>(1,1)</code> 的一個 16×16 像素單元。緩衝區寫入範例先確認 RAM 準備操作未改變 VRAM，再傳輸；傳輸函式範例則先逐位元組設定 RAM 資料，再執行傳輸。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16_flush-dmg.png" alt="__settilebg16_flush — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=2)`、像素座標 `(16,16)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16_flush-cgb.png" alt="__settilebg16_flush — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=2)`、像素座標 `(16,16)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg16_flush.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebg16_flush-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16_flush&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:20.580860+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;10af35dae038de72fbd9762fe0c963d62732bef7869fe1ea849d413d9c4475ce&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;56b35b065ccc3c8236126853868ad0e75eeaa5691fb7622038980a0dffc54697&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16cgb_flush"><h3><code>__settilebg16cgb_flush</code></h3><p>將 RAM 緩衝區中相鄰的兩列圖塊傳輸到 LCDC 所選背景地圖。來源偏移為 <code>64*y + x</code>，從該列及其下方相隔 32 位元組的一列各複製 <code>count</code> 位元組。</p><p>依序寫入圖塊編號與 CGB 屬性。DMG 只寫入編號。CGB 呼叫前請選取 VRAM bank 0；屬性寫入 bank 1，結束時為 <code>VBK=0</code>。</p><p>預期影像：以下圖塊排列從圖塊座標 <code>(x=2, y=2)</code>、像素座標 <code>(16,16)</code> 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。</p><pre>AB
+CD</pre><p>圖塊座標 <code>(2,2)</code> 處顯示上排 <code>AB</code>、下排 <code>CD</code>，即單元座標 <code>(1,1)</code> 的一個 16×16 像素單元。緩衝區寫入範例先確認 RAM 準備操作未改變 VRAM，再傳輸；傳輸函式範例則先逐位元組設定 RAM 資料，再執行傳輸。</p><p>CGB 上四個單元的屬性皆為 2，因此四個字元皆為藍色；DMG 上為黑色。</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16cgb_flush-dmg.png" alt="__settilebg16cgb_flush — DMG: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=2)`、像素座標 `(16,16)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16cgb_flush-cgb.png" alt="__settilebg16cgb_flush — CGB: 預期影像：以下圖塊排列從圖塊座標 `(x=2, y=2)`、像素座標 `(16,16)` 開始顯示。每個字元占一個 8×8 圖塊。由上至下、由左至右閱讀，周圍圖塊保持空白。"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg16cgb_flush.c">完整範例程式</a> · <a href="../verification/api-tiles/__settilebg16cgb_flush-build.txt">建置記錄</a></p><details><summary>檢查紀錄</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16cgb_flush&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:32.632696+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;af0df566da58a115b51f04309c79e9fe1444bdf4cefc0e0407c8912b99304799&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;d33f3abd0ce84bb90b9ff0f03cca9108980ba68c517857a34ea5e9888ad5a962&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-entity_init"><h3><code>entity_init</code></h3><p>初始化實體池的所有槽位。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>GB 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_init: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">建置記錄</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_init: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-gb-entity_create"><h3><code>entity_create</code></h3><p>依指定類型與位置配置實體，回傳可重用的 ID；沒有空位時回傳 <code>0xFF</code>。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>GB 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_create: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">建置記錄</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_create: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-gb-entity_destroy"><h3><code>entity_destroy</code></h3><p>釋放 <code>id</code> 對應的實體槽位；保留的資料會在重新配置時初始化。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>GB 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_destroy: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">建置記錄</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_destroy: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-gb-entity_get"><h3><code>entity_get</code></h3><p>回傳有效使用中實體的指標；ID 無效或未使用時回傳 null。池內空間可能再次配置。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>GB 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_get: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">建置記錄</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_get: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-gb-entity_update_all"><h3><code>entity_update_all</code></h3><p>依 ID 遞增順序走訪使用中槽位，對每個呼叫一次 <code>fn(id)</code>。移動、碰撞或計時器邏輯由回呼實作，池本身不提供這些邏輯。回呼為 null 時不執行任何操作。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>GB 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_update_all: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">建置記錄</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_update_all: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-gb-entity_draw_all"><h3><code>entity_draw_all</code></h3><p>走訪使用中實體，將每個 ID 傳給繪圖回呼。走訪方式與 <code>entity_update_all</code> 相同；只有回呼提交繪圖資料時，才會繪製精靈或像素。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>GB 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_draw_all: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">建置記錄</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_draw_all: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-gb-entity_count_active"><h3><code>entity_count_active</code></h3><p>回傳使用中的實體槽位數，不改變狀態。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>GB 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_count_active: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">建置記錄</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_count_active: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-gb-entity_clear_all"><h3><code>entity_clear_all</code></h3><p>釋放所有實體，重設各欄位，包括未配置精靈的標記。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>GB 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_clear_all: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">建置記錄</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_clear_all: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-fc-entity_init"><h3><code>entity_init</code></h3><p>初始化實體池的所有槽位。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>FC 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_init: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-fc-entity_create"><h3><code>entity_create</code></h3><p>依指定類型與位置配置實體，回傳可重用的 ID；沒有空位時回傳 <code>0xFF</code>。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>FC 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_create: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-fc-entity_destroy"><h3><code>entity_destroy</code></h3><p>釋放 <code>id</code> 對應的實體槽位；保留的資料會在重新配置時初始化。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>FC 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_destroy: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-fc-entity_get"><h3><code>entity_get</code></h3><p>回傳有效使用中實體的指標；ID 無效或未使用時回傳 null。池內空間可能再次配置。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>FC 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_get: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-fc-entity_update_all"><h3><code>entity_update_all</code></h3><p>依 ID 遞增順序走訪使用中槽位，對每個呼叫一次 <code>fn(id)</code>。移動、碰撞或計時器邏輯由回呼實作，池本身不提供這些邏輯。回呼為 null 時不執行任何操作。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>FC 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_update_all: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-fc-entity_draw_all"><h3><code>entity_draw_all</code></h3><p>走訪使用中實體，將每個 ID 傳給繪圖回呼。走訪方式與 <code>entity_update_all</code> 相同；只有回呼提交繪圖資料時，才會繪製精靈或像素。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>FC 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_draw_all: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-fc-entity_count_active"><h3><code>entity_count_active</code></h3><p>回傳使用中的實體槽位數，不改變狀態。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>FC 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_count_active: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><section id="api-fc-entity_clear_all"><h3><code>entity_clear_all</code></h3><p>釋放所有實體，重設各欄位，包括未配置精靈的標記。</p><p>完整程式用於理解可重用槽位的生命週期。請搭配標籤閱讀數字：配置兩個實體後為 <code>CREATED 002</code>，釋放第一個後為 <code>AFTER FREE 001</code>，重用最小空閒 ID 時為 <code>REUSED ID 000</code>，清空池後為 <code>AFTER CLEAR 000</code>。也會檢查釋放後的查詢為 null，以及重新配置後欄位已重設。<code>FAILED CHECKS 000</code> 表示這些檢查符合預期。</p><p>FC 走訪會對兩個使用中實體分別呼叫回呼，顯示 <code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code>。範例更新回呼將兩者向右移動一個圖塊，繪圖回呼將代表兩個物件的 <code>A</code> 放在圖塊 <code>(3,12)</code>、<code>B</code> 放在 <code>(7,12)</code>。這些是回呼繪製的背景字型圖塊，並非自動配置的精靈。</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_clear_all: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">建置記錄</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">完整範例程式</a> · <a href="../verification/api-entity/results.json">檢查紀錄</a></p></section><!-- api-verification:end --><footer>原始碼版本 2026-09-14 • <a href="index.html">目錄</a> • <a href="verification.html">驗證</a> • <a href="../reference/inventory.json">快照指紋</a><br/>範例建置、模擬器執行及預期結果比對分別記錄。</footer></main></div><script src="../assets/manual.js"></script></body></html>

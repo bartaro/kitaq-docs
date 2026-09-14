@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>검증 기록 — KITAQ 시리즈 설명서</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">본문으로 건너뛰기</a><header class="mast"><a href="index.html">KITAQ <span>개발 시스템</span></a><div>사용 설명서 <b>2026.09</b></div></header><nav aria-label="언어 선택" class="languages"><a href="../en/verification.html" hreflang="en" lang="en">English</a> <a href="../verification.html" hreflang="ja" lang="ja">日本語</a> <a aria-current="page" href="../ko/verification.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/verification.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a href="../zh-TW/verification.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/verification.html" hreflang="es" lang="es">Español</a> <a href="../pt/verification.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/verification.html" hreflang="fr" lang="fr">Français</a> <a href="../de/verification.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="권 선택"><a href="index.html">목차</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 라이브러리</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 라이브러리</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">이 권에서 검색</label><input id="search" placeholder="예: input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="이 권의 목차" class="toc"><a href="#scope">검증 범위</a><a href="#result-gb_hello">gb_hello</a><a href="#result-gb_arithmetic">gb_arithmetic</a><a href="#result-gb_control">gb_control</a><a href="#result-gb_aggregate">gb_aggregate</a><a href="#result-gb_bits_memory">gb_bits_memory</a><a href="#result-gb_input">gb_input</a><a href="#result-gb_fixed">gb_fixed</a><a href="#result-gb_entity">gb_entity</a><a href="#result-gb_debug">gb_debug</a><a href="#result-gb_chain">gb_chain</a><a href="#result-fc_hello">fc_hello</a><a href="#result-fc_arithmetic">fc_arithmetic</a><a href="#result-fc_control">fc_control</a><a href="#result-fc_aggregate">fc_aggregate</a><a href="#result-fc_bits_memory">fc_bits_memory</a><a href="#result-fc_input">fc_input</a><a href="#result-fc_fixed">fc_fixed</a><a href="#result-fc_entity">fc_entity</a><a href="#result-fc_debug">fc_debug</a><a href="#result-fc_chain">fc_chain</a><a href="#result-gb_cgb_palette">gb_cgb_palette</a><a href="#result-gb_scroll">gb_scroll</a><a href="#result-gb_vram_queue">gb_vram_queue</a><a href="#result-gb_sprite">gb_sprite</a><a href="#result-gb_rng">gb_rng</a><a href="#result-gb_flags">gb_flags</a><a href="#result-gb_circle">gb_circle</a><a href="#result-fc_scroll">fc_scroll</a><a href="#result-fc_vram_queue">fc_vram_queue</a><a href="#result-fc_sprite">fc_sprite</a><a href="#result-fc_sound">fc_sound</a><a href="#result-gb_sound">gb_sound</a><a href="#result-gb_font">gb_font</a><a href="#result-fc_font">fc_font</a><a href="#result-gb_system">gb_system</a><a href="#result-gb_scene">gb_scene</a><a href="#result-fc_system">fc_system</a><a href="#result-fc_scene">fc_scene</a><a href="#result-gb_camera">gb_camera</a><a href="#result-gb_rle">gb_rle</a><a href="#result-gb_board">gb_board</a><a href="#result-gb_physics">gb_physics</a><a href="#result-gb_link">gb_link</a><a href="#result-gb_bank">gb_bank</a><a href="#result-gb_asset">gb_asset</a><a href="#result-gb_danmaku">gb_danmaku</a><a href="#result-fc_subpixel">fc_subpixel</a><a href="#visual_checks-json">픽셀 값과 글꼴 비교</a><a href="#workflow-json">진단 작업 흐름</a><a href="#compiler_tests-json">컴파일러 회귀 검사</a><a href="#browser_checks-json">브라우저 표시 검사</a><a href="#site_checks-json">HTML 구조와 링크</a><a href="#bilingual_checks-json">일본어·영어 전체 판본 검사</a><a href="#english_browser_checks-json">영어판 브라우저 검사</a></nav><button class="print" type="button">이 권 인쇄</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 참고 판본</p><h1>검증 기록</h1><p class="subtitle">빌드·실행·화면 기록</p><div class="edition">첫 코드 한 줄부터 실행, 관찰, 재시험까지.<br/>소스 스냅샷: 2026년 9월 14일 · 한국어판: 2026년 9월 14일</div></div><h2 id="scope">검증 범위</h2><p>아래 기록은 9월 12일 소스 스냅샷에 해당합니다. 두 컴파일러와 KUROSAKI CLI는 수집한 소스에서 빌드했습니다. KOKURA와 SARAKURA는 목록에 식별 정보를 기록한 로컬 실행 파일을 사용했습니다. 모든 기능, 주변기기, 실기를 검사한 것은 아닙니다.</p><p>각 항목은 빌드, 에뮬레이터 120프레임 실행, 화면을 기록합니다. 픽셀 비교는 별도의 증거입니다. 종료 코드 0만으로 입력·소리·게임 동작이 올바르다고 입증할 수는 없습니다. 빌드 및 실행 검증은  <a href="../PUBLICATION_CHECKS.md">공개 시 확인 기록</a>에서 시험 입력과 조건을 확인할 수 있습니다.</p><section id="gb_hello"><h2 id="result-gb_hello">gb_hello</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>HELLO WORLD와 042 표시</p><img alt="gb_hello의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_hello.png"/><p><a href="../verification/gb_hello-build.txt">빌드 로그</a> / <a href="../verification/gb_hello-runtime.txt">실행 로그</a></p></section><section id="gb_arithmetic"><h2 id="result-gb_arithmetic">gb_arithmetic</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>030</p><img alt="gb_arithmetic의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_arithmetic.png"/><p><a href="../verification/gb_arithmetic-build.txt">빌드 로그</a> / <a href="../verification/gb_arithmetic-runtime.txt">실행 로그</a></p></section><section id="gb_control"><h2 id="result-gb_control">gb_control</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_control의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_control.png"/><p><a href="../verification/gb_control-build.txt">빌드 로그</a> / <a href="../verification/gb_control-runtime.txt">실행 로그</a></p></section><section id="gb_aggregate"><h2 id="result-gb_aggregate">gb_aggregate</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_aggregate의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_aggregate.png"/><p><a href="../verification/gb_aggregate-build.txt">빌드 로그</a> / <a href="../verification/gb_aggregate-runtime.txt">실행 로그</a></p></section><section id="gb_bits_memory"><h2 id="result-gb_bits_memory">gb_bits_memory</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>010</p><img alt="gb_bits_memory의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_bits_memory.png"/><p><a href="../verification/gb_bits_memory-build.txt">빌드 로그</a> / <a href="../verification/gb_bits_memory-runtime.txt">실행 로그</a></p></section><section id="gb_input"><h2 id="result-gb_input">gb_input</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>처음에는 000이며, A를 새로 누를 때마다 한 번 증가합니다</p><img alt="gb_input의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_input.png"/><p><a href="../verification/gb_input-build.txt">빌드 로그</a> / <a href="../verification/gb_input-runtime.txt">실행 로그</a></p></section><section id="gb_fixed"><h2 id="result-gb_fixed">gb_fixed</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>012</p><img alt="gb_fixed의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_fixed.png"/><p><a href="../verification/gb_fixed-build.txt">빌드 로그</a> / <a href="../verification/gb_fixed-runtime.txt">실행 로그</a></p></section><section id="gb_entity"><h2 id="result-gb_entity">gb_entity</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001</p><img alt="gb_entity의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_entity.png"/><p><a href="../verification/gb_entity-build.txt">빌드 로그</a> / <a href="../verification/gb_entity-runtime.txt">실행 로그</a></p></section><section id="gb_debug"><h2 id="result-gb_debug">gb_debug</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 트레이스 로그에 HP=42 기록</p><img alt="gb_debug의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_debug.png"/><p><a href="../verification/gb_debug-build.txt">빌드 로그</a> / <a href="../verification/gb_debug-runtime.txt">실행 로그</a></p></section><section id="gb_chain"><h2 id="result-gb_chain">gb_chain</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 이력에 (20,30) 포함</p><img alt="gb_chain의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_chain.png"/><p><a href="../verification/gb_chain-build.txt">빌드 로그</a> / <a href="../verification/gb_chain-runtime.txt">실행 로그</a></p></section><section id="fc_hello"><h2 id="result-fc_hello">fc_hello</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>HELLO WORLD와 042 표시</p><img alt="fc_hello의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_hello.png"/><p><a href="../verification/fc_hello-build.txt">빌드 로그</a> / <a href="../verification/fc_hello-runtime.txt">실행 로그</a></p></section><section id="fc_arithmetic"><h2 id="result-fc_arithmetic">fc_arithmetic</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>030</p><img alt="fc_arithmetic의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_arithmetic.png"/><p><a href="../verification/fc_arithmetic-build.txt">빌드 로그</a> / <a href="../verification/fc_arithmetic-runtime.txt">실행 로그</a></p></section><section id="fc_control"><h2 id="result-fc_control">fc_control</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="fc_control의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_control.png"/><p><a href="../verification/fc_control-build.txt">빌드 로그</a> / <a href="../verification/fc_control-runtime.txt">실행 로그</a></p></section><section id="fc_aggregate"><h2 id="result-fc_aggregate">fc_aggregate</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="fc_aggregate의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_aggregate.png"/><p><a href="../verification/fc_aggregate-build.txt">빌드 로그</a> / <a href="../verification/fc_aggregate-runtime.txt">실행 로그</a></p></section><section id="fc_bits_memory"><h2 id="result-fc_bits_memory">fc_bits_memory</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>010</p><img alt="fc_bits_memory의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_bits_memory.png"/><p><a href="../verification/fc_bits_memory-build.txt">빌드 로그</a> / <a href="../verification/fc_bits_memory-runtime.txt">실행 로그</a></p></section><section id="fc_input"><h2 id="result-fc_input">fc_input</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>처음에는 000이며, A를 새로 누를 때마다 한 번 증가합니다</p><img alt="fc_input의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_input.png"/><p><a href="../verification/fc_input-build.txt">빌드 로그</a> / <a href="../verification/fc_input-runtime.txt">실행 로그</a></p></section><section id="fc_fixed"><h2 id="result-fc_fixed">fc_fixed</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>012</p><img alt="fc_fixed의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_fixed.png"/><p><a href="../verification/fc_fixed-build.txt">빌드 로그</a> / <a href="../verification/fc_fixed-runtime.txt">실행 로그</a></p></section><section id="fc_entity"><h2 id="result-fc_entity">fc_entity</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001</p><img alt="fc_entity의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_entity.png"/><p><a href="../verification/fc_entity-build.txt">빌드 로그</a> / <a href="../verification/fc_entity-runtime.txt">실행 로그</a></p></section><section id="fc_debug"><h2 id="result-fc_debug">fc_debug</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 트레이스 로그에 HP=42 기록</p><img alt="fc_debug의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_debug.png"/><p><a href="../verification/fc_debug-build.txt">빌드 로그</a> / <a href="../verification/fc_debug-runtime.txt">실행 로그</a></p></section><section id="fc_chain"><h2 id="result-fc_chain">fc_chain</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 이력에 (20,30) 포함</p><img alt="fc_chain의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_chain.png"/><p><a href="../verification/fc_chain-build.txt">빌드 로그</a> / <a href="../verification/fc_chain-runtime.txt">실행 로그</a></p></section><section id="gb_cgb_palette"><h2 id="result-gb_cgb_palette">gb_cgb_palette</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>CGB 모드에서 흰 바탕에 보라색 042 표시</p><img alt="gb_cgb_palette의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_cgb_palette.png"/><p><a href="../verification/gb_cgb_palette-build.txt">빌드 로그</a> / <a href="../verification/gb_cgb_palette-runtime.txt">실행 로그</a></p></section><section id="gb_scroll"><h2 id="result-gb_scroll">gb_scroll</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>SCX가 증가하면서 제목이 왼쪽으로 이동</p><img alt="gb_scroll의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_scroll.png"/><p><a href="../verification/gb_scroll-build.txt">빌드 로그</a> / <a href="../verification/gb_scroll-runtime.txt">실행 로그</a></p></section><section id="gb_vram_queue"><h2 id="result-gb_vram_queue">gb_vram_queue</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>좌표 (3,8)에 4 표시</p><img alt="gb_vram_queue의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_vram_queue.png"/><p><a href="../verification/gb_vram_queue-build.txt">빌드 로그</a> / <a href="../verification/gb_vram_queue-runtime.txt">실행 로그</a></p></section><section id="gb_sprite"><h2 id="result-gb_sprite">gb_sprite</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>스프라이트 위치에 문자 A 표시</p><img alt="gb_sprite의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_sprite.png"/><p><a href="../verification/gb_sprite-build.txt">빌드 로그</a> / <a href="../verification/gb_sprite-runtime.txt">실행 로그</a></p></section><section id="gb_rng"><h2 id="result-gb_rng">gb_rng</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>000~009의 값, 같은 시드에서는 같은 순서 반복</p><img alt="gb_rng의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_rng.png"/><p><a href="../verification/gb_rng-build.txt">빌드 로그</a> / <a href="../verification/gb_rng-runtime.txt">실행 로그</a></p></section><section id="gb_flags"><h2 id="result-gb_flags">gb_flags</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001</p><img alt="gb_flags의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_flags.png"/><p><a href="../verification/gb_flags-build.txt">빌드 로그</a> / <a href="../verification/gb_flags-runtime.txt">실행 로그</a></p></section><section id="gb_circle"><h2 id="result-gb_circle">gb_circle</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>한 단계 후 042, 이 예제는 정수 픽셀 단위 사용</p><img alt="gb_circle의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_circle.png"/><p><a href="../verification/gb_circle-build.txt">빌드 로그</a> / <a href="../verification/gb_circle-runtime.txt">실행 로그</a></p></section><section id="fc_scroll"><h2 id="result-fc_scroll">fc_scroll</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>제목이 가로로 스크롤됨</p><img alt="fc_scroll의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_scroll.png"/><p><a href="../verification/fc_scroll-build.txt">빌드 로그</a> / <a href="../verification/fc_scroll-runtime.txt">실행 로그</a></p></section><section id="fc_vram_queue"><h2 id="result-fc_vram_queue">fc_vram_queue</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>좌표 (3,8)에 4 표시</p><img alt="fc_vram_queue의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_vram_queue.png"/><p><a href="../verification/fc_vram_queue-build.txt">빌드 로그</a> / <a href="../verification/fc_vram_queue-runtime.txt">실행 로그</a></p></section><section id="fc_sprite"><h2 id="result-fc_sprite">fc_sprite</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>화면에 스프라이트 표시</p><img alt="fc_sprite의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_sprite.png"/><p><a href="../verification/fc_sprite-build.txt">빌드 로그</a> / <a href="../verification/fc_sprite-runtime.txt">실행 로그</a></p></section><section id="fc_sound"><h2 id="result-fc_sound">fc_sound</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042 표시와 펄스음</p><img alt="fc_sound의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_sound.png"/><p><a href="../verification/fc_sound-build.txt">빌드 로그</a> / <a href="../verification/fc_sound-runtime.txt">실행 로그</a></p></section><section id="gb_sound"><h2 id="result-gb_sound">gb_sound</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042 표시와 짧은 펄스음</p><img alt="gb_sound의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_sound.png"/><p><a href="../verification/gb_sound-build.txt">빌드 로그</a> / <a href="../verification/gb_sound-runtime.txt">실행 로그</a></p></section><section id="gb_font"><h2 id="result-gb_font">gb_font</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>대문자, 소문자, 숫자, 제공된 기호 30개 모두 표시</p><img alt="gb_font의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_font.png"/><p><a href="../verification/gb_font-build.txt">빌드 로그</a> / <a href="../verification/gb_font-runtime.txt">실행 로그</a></p></section><section id="fc_font"><h2 id="result-fc_font">fc_font</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>대문자, 소문자, 숫자, 제공된 기호 30개 모두 표시</p><img alt="fc_font의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_font.png"/><p><a href="../verification/fc_font-build.txt">빌드 로그</a> / <a href="../verification/fc_font-runtime.txt">실행 로그</a></p></section><section id="gb_system"><h2 id="result-gb_system">gb_system</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>002</p><img alt="gb_system의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_system.png"/><p><a href="../verification/gb_system-build.txt">빌드 로그</a> / <a href="../verification/gb_system-runtime.txt">실행 로그</a></p></section><section id="gb_scene"><h2 id="result-gb_scene">gb_scene</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 콜백은 등록하지 않음</p><img alt="gb_scene의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_scene.png"/><p><a href="../verification/gb_scene-build.txt">빌드 로그</a> / <a href="../verification/gb_scene-runtime.txt">실행 로그</a></p></section><section id="fc_system"><h2 id="result-fc_system">fc_system</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>002</p><img alt="fc_system의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_system.png"/><p><a href="../verification/fc_system-build.txt">빌드 로그</a> / <a href="../verification/fc_system-runtime.txt">실행 로그</a></p></section><section id="fc_scene"><h2 id="result-fc_scene">fc_scene</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 콜백은 등록하지 않음</p><img alt="fc_scene의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_scene.png"/><p><a href="../verification/fc_scene-build.txt">빌드 로그</a> / <a href="../verification/fc_scene-runtime.txt">실행 로그</a></p></section><section id="gb_camera"><h2 id="result-gb_camera">gb_camera</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 월드 x=52에서 카메라 x=10을 뺀 값</p><img alt="gb_camera의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_camera.png"/><p><a href="../verification/gb_camera-build.txt">빌드 로그</a> / <a href="../verification/gb_camera-runtime.txt">실행 로그</a></p></section><section id="gb_rle"><h2 id="result-gb_rle">gb_rle</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 세 바이트의 값이 각각 42</p><img alt="gb_rle의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_rle.png"/><p><a href="../verification/gb_rle-build.txt">빌드 로그</a> / <a href="../verification/gb_rle-runtime.txt">실행 로그</a></p></section><section id="gb_board"><h2 id="result-gb_board">gb_board</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_board의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_board.png"/><p><a href="../verification/gb_board-build.txt">빌드 로그</a> / <a href="../verification/gb_board-runtime.txt">실행 로그</a></p></section><section id="gb_physics"><h2 id="result-gb_physics">gb_physics</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 정수 픽셀 좌표</p><img alt="gb_physics의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_physics.png"/><p><a href="../verification/gb_physics-build.txt">빌드 로그</a> / <a href="../verification/gb_physics-runtime.txt">실행 로그</a></p></section><section id="gb_link"><h2 id="result-gb_link">gb_link</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>미연결 시 255, 시간 초과 시 000, 연결되면 상대 기기의 값</p><img alt="gb_link의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_link.png"/><p><a href="../verification/gb_link-build.txt">빌드 로그</a> / <a href="../verification/gb_link-runtime.txt">실행 로그</a></p></section><section id="gb_bank"><h2 id="result-gb_bank">gb_bank</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 뱅크 0의 고정 ROM 데이터 복사</p><img alt="gb_bank의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_bank.png"/><p><a href="../verification/gb_bank-build.txt">빌드 로그</a> / <a href="../verification/gb_bank-runtime.txt">실행 로그</a></p></section><section id="gb_asset"><h2 id="result-gb_asset">gb_asset</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_asset의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_asset.png"/><p><a href="../verification/gb_asset-build.txt">빌드 로그</a> / <a href="../verification/gb_asset-runtime.txt">실행 로그</a></p></section><section id="gb_danmaku"><h2 id="result-gb_danmaku">gb_danmaku</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 수치 기반 풀 예제이며 탄환 배경 합성기는 사용하지 않음</p><img alt="gb_danmaku의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_danmaku.png"/><p><a href="../verification/gb_danmaku-build.txt">빌드 로그</a> / <a href="../verification/gb_danmaku-runtime.txt">실행 로그</a></p></section><section id="fc_subpixel"><h2 id="result-fc_subpixel">fc_subpixel</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 헤더 상수를 사용하여 게임 측에서 직접 적분</p><img alt="fc_subpixel의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_subpixel.png"/><p><a href="../verification/fc_subpixel-build.txt">빌드 로그</a> / <a href="../verification/fc_subpixel-runtime.txt">실행 로그</a></p></section><h2 id="visual_checks-json">픽셀 값과 글꼴 비교</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">복사</button><pre><code>[
+<html lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>검증 기록 — KITAQ 시리즈 설명서</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">본문으로 건너뛰기</a><header class="mast"><a href="index.html">KITAQ <span>개발 시스템</span></a><div>사용 설명서 <b>2026.09</b></div></header><nav aria-label="언어 선택" class="languages"><a href="../en/verification.html" hreflang="en" lang="en">English</a> <a href="../verification.html" hreflang="ja" lang="ja">日本語</a> <a aria-current="page" href="../ko/verification.html" hreflang="ko" lang="ko">한국어</a> <a href="../zh-CN/verification.html" hreflang="zh-CN" lang="zh-CN">简体中文</a> <a href="../zh-TW/verification.html" hreflang="zh-TW" lang="zh-TW">繁體中文</a> <a href="../es/verification.html" hreflang="es" lang="es">Español</a> <a href="../pt/verification.html" hreflang="pt-BR" lang="pt-BR">Português (Brasil)</a> <a href="../fr/verification.html" hreflang="fr" lang="fr">Français</a> <a href="../de/verification.html" hreflang="de" lang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="권 선택"><a href="index.html">목차</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB 라이브러리</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC 라이브러리</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">이 권에서 검색</label><input id="search" placeholder="예: input / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="이 권의 목차" class="toc"><a href="#scope">검증 범위</a><a href="#result-gb_hello">gb_hello</a><a href="#result-gb_arithmetic">gb_arithmetic</a><a href="#result-gb_control">gb_control</a><a href="#result-gb_aggregate">gb_aggregate</a><a href="#result-gb_bits_memory">gb_bits_memory</a><a href="#result-gb_input">gb_input</a><a href="#result-gb_fixed">gb_fixed</a><a href="#result-gb_entity">gb_entity</a><a href="#result-gb_debug">gb_debug</a><a href="#result-gb_chain">gb_chain</a><a href="#result-fc_hello">fc_hello</a><a href="#result-fc_arithmetic">fc_arithmetic</a><a href="#result-fc_control">fc_control</a><a href="#result-fc_aggregate">fc_aggregate</a><a href="#result-fc_bits_memory">fc_bits_memory</a><a href="#result-fc_input">fc_input</a><a href="#result-fc_fixed">fc_fixed</a><a href="#result-fc_entity">fc_entity</a><a href="#result-fc_debug">fc_debug</a><a href="#result-fc_chain">fc_chain</a><a href="#result-gb_cgb_palette">gb_cgb_palette</a><a href="#result-gb_scroll">gb_scroll</a><a href="#result-gb_vram_queue">gb_vram_queue</a><a href="#result-gb_sprite">gb_sprite</a><a href="#result-gb_rng">gb_rng</a><a href="#result-gb_flags">gb_flags</a><a href="#result-gb_circle">gb_circle</a><a href="#result-fc_scroll">fc_scroll</a><a href="#result-fc_vram_queue">fc_vram_queue</a><a href="#result-fc_sprite">fc_sprite</a><a href="#result-fc_sound">fc_sound</a><a href="#result-gb_sound">gb_sound</a><a href="#result-gb_font">gb_font</a><a href="#result-fc_font">fc_font</a><a href="#result-gb_system">gb_system</a><a href="#result-gb_scene">gb_scene</a><a href="#result-fc_system">fc_system</a><a href="#result-fc_scene">fc_scene</a><a href="#result-gb_camera">gb_camera</a><a href="#result-gb_rle">gb_rle</a><a href="#result-gb_board">gb_board</a><a href="#result-gb_physics">gb_physics</a><a href="#result-gb_link">gb_link</a><a href="#result-gb_bank">gb_bank</a><a href="#result-gb_asset">gb_asset</a><a href="#result-gb_danmaku">gb_danmaku</a><a href="#result-fc_subpixel">fc_subpixel</a><a href="#visual_checks-json">픽셀 값과 글꼴 비교</a><a href="#workflow-json">진단 작업 흐름</a><a href="#compiler_tests-json">컴파일러 회귀 검사</a><a href="#browser_checks-json">브라우저 표시 검사</a><a href="#site_checks-json">HTML 구조와 링크</a><a href="#bilingual_checks-json">일본어·영어 전체 판본 검사</a><a href="#english_browser_checks-json">영어판 브라우저 검사</a><!-- api-verification:start --><a href="#api-verification">API 예제의 예상 이미지와 검증 결과</a><!-- api-verification:end --></nav><button class="print" type="button">이 권 인쇄</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • 참고 판본</p><h1>검증 기록</h1><p class="subtitle">빌드·실행·화면 기록</p><div class="edition">첫 코드 한 줄부터 실행, 관찰, 재시험까지.<br/>소스 스냅샷: 2026년 9월 14일 · 한국어판: 2026년 9월 14일</div></div><h2 id="scope">검증 범위</h2><p>아래 기록은 9월 12일 소스 스냅샷에 해당합니다. 두 컴파일러와 KUROSAKI CLI는 수집한 소스에서 빌드했습니다. KOKURA와 SARAKURA는 목록에 식별 정보를 기록한 로컬 실행 파일을 사용했습니다. 모든 기능, 주변기기, 실기를 검사한 것은 아닙니다.</p><p>각 항목은 빌드, 에뮬레이터 120프레임 실행, 화면을 기록합니다. 픽셀 비교는 별도의 증거입니다. 종료 코드 0만으로 입력·소리·게임 동작이 올바르다고 입증할 수는 없습니다. 빌드 및 실행 검증은  <a href="../PUBLICATION_CHECKS.md">공개 시 확인 기록</a>에서 시험 입력과 조건을 확인할 수 있습니다.</p><section id="gb_hello"><h2 id="result-gb_hello">gb_hello</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>HELLO WORLD와 042 표시</p><img alt="gb_hello의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_hello.png"/><p><a href="../verification/gb_hello-build.txt">빌드 로그</a> / <a href="../verification/gb_hello-runtime.txt">실행 로그</a></p></section><section id="gb_arithmetic"><h2 id="result-gb_arithmetic">gb_arithmetic</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>030</p><img alt="gb_arithmetic의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_arithmetic.png"/><p><a href="../verification/gb_arithmetic-build.txt">빌드 로그</a> / <a href="../verification/gb_arithmetic-runtime.txt">실행 로그</a></p></section><section id="gb_control"><h2 id="result-gb_control">gb_control</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_control의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_control.png"/><p><a href="../verification/gb_control-build.txt">빌드 로그</a> / <a href="../verification/gb_control-runtime.txt">실행 로그</a></p></section><section id="gb_aggregate"><h2 id="result-gb_aggregate">gb_aggregate</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_aggregate의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_aggregate.png"/><p><a href="../verification/gb_aggregate-build.txt">빌드 로그</a> / <a href="../verification/gb_aggregate-runtime.txt">실행 로그</a></p></section><section id="gb_bits_memory"><h2 id="result-gb_bits_memory">gb_bits_memory</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>010</p><img alt="gb_bits_memory의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_bits_memory.png"/><p><a href="../verification/gb_bits_memory-build.txt">빌드 로그</a> / <a href="../verification/gb_bits_memory-runtime.txt">실행 로그</a></p></section><section id="gb_input"><h2 id="result-gb_input">gb_input</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>처음에는 000이며, A를 새로 누를 때마다 한 번 증가합니다</p><img alt="gb_input의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_input.png"/><p><a href="../verification/gb_input-build.txt">빌드 로그</a> / <a href="../verification/gb_input-runtime.txt">실행 로그</a></p></section><section id="gb_fixed"><h2 id="result-gb_fixed">gb_fixed</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>012</p><img alt="gb_fixed의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_fixed.png"/><p><a href="../verification/gb_fixed-build.txt">빌드 로그</a> / <a href="../verification/gb_fixed-runtime.txt">실행 로그</a></p></section><section id="gb_entity"><h2 id="result-gb_entity">gb_entity</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001</p><img alt="gb_entity의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_entity.png"/><p><a href="../verification/gb_entity-build.txt">빌드 로그</a> / <a href="../verification/gb_entity-runtime.txt">실행 로그</a></p></section><section id="gb_debug"><h2 id="result-gb_debug">gb_debug</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 트레이스 로그에 HP=42 기록</p><img alt="gb_debug의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_debug.png"/><p><a href="../verification/gb_debug-build.txt">빌드 로그</a> / <a href="../verification/gb_debug-runtime.txt">실행 로그</a></p></section><section id="gb_chain"><h2 id="result-gb_chain">gb_chain</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 이력에 (20,30) 포함</p><img alt="gb_chain의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_chain.png"/><p><a href="../verification/gb_chain-build.txt">빌드 로그</a> / <a href="../verification/gb_chain-runtime.txt">실행 로그</a></p></section><section id="fc_hello"><h2 id="result-fc_hello">fc_hello</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>HELLO WORLD와 042 표시</p><img alt="fc_hello의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_hello.png"/><p><a href="../verification/fc_hello-build.txt">빌드 로그</a> / <a href="../verification/fc_hello-runtime.txt">실행 로그</a></p></section><section id="fc_arithmetic"><h2 id="result-fc_arithmetic">fc_arithmetic</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>030</p><img alt="fc_arithmetic의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_arithmetic.png"/><p><a href="../verification/fc_arithmetic-build.txt">빌드 로그</a> / <a href="../verification/fc_arithmetic-runtime.txt">실행 로그</a></p></section><section id="fc_control"><h2 id="result-fc_control">fc_control</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="fc_control의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_control.png"/><p><a href="../verification/fc_control-build.txt">빌드 로그</a> / <a href="../verification/fc_control-runtime.txt">실행 로그</a></p></section><section id="fc_aggregate"><h2 id="result-fc_aggregate">fc_aggregate</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="fc_aggregate의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_aggregate.png"/><p><a href="../verification/fc_aggregate-build.txt">빌드 로그</a> / <a href="../verification/fc_aggregate-runtime.txt">실행 로그</a></p></section><section id="fc_bits_memory"><h2 id="result-fc_bits_memory">fc_bits_memory</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>010</p><img alt="fc_bits_memory의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_bits_memory.png"/><p><a href="../verification/fc_bits_memory-build.txt">빌드 로그</a> / <a href="../verification/fc_bits_memory-runtime.txt">실행 로그</a></p></section><section id="fc_input"><h2 id="result-fc_input">fc_input</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>처음에는 000이며, A를 새로 누를 때마다 한 번 증가합니다</p><img alt="fc_input의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_input.png"/><p><a href="../verification/fc_input-build.txt">빌드 로그</a> / <a href="../verification/fc_input-runtime.txt">실행 로그</a></p></section><section id="fc_fixed"><h2 id="result-fc_fixed">fc_fixed</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>012</p><img alt="fc_fixed의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_fixed.png"/><p><a href="../verification/fc_fixed-build.txt">빌드 로그</a> / <a href="../verification/fc_fixed-runtime.txt">실행 로그</a></p></section><section id="fc_entity"><h2 id="result-fc_entity">fc_entity</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001</p><img alt="fc_entity의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_entity.png"/><p><a href="../verification/fc_entity-build.txt">빌드 로그</a> / <a href="../verification/fc_entity-runtime.txt">실행 로그</a></p></section><section id="fc_debug"><h2 id="result-fc_debug">fc_debug</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 트레이스 로그에 HP=42 기록</p><img alt="fc_debug의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_debug.png"/><p><a href="../verification/fc_debug-build.txt">빌드 로그</a> / <a href="../verification/fc_debug-runtime.txt">실행 로그</a></p></section><section id="fc_chain"><h2 id="result-fc_chain">fc_chain</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 이력에 (20,30) 포함</p><img alt="fc_chain의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_chain.png"/><p><a href="../verification/fc_chain-build.txt">빌드 로그</a> / <a href="../verification/fc_chain-runtime.txt">실행 로그</a></p></section><section id="gb_cgb_palette"><h2 id="result-gb_cgb_palette">gb_cgb_palette</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>CGB 모드에서 흰 바탕에 보라색 042 표시</p><img alt="gb_cgb_palette의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_cgb_palette.png"/><p><a href="../verification/gb_cgb_palette-build.txt">빌드 로그</a> / <a href="../verification/gb_cgb_palette-runtime.txt">실행 로그</a></p></section><section id="gb_scroll"><h2 id="result-gb_scroll">gb_scroll</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>SCX가 증가하면서 제목이 왼쪽으로 이동</p><img alt="gb_scroll의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_scroll.png"/><p><a href="../verification/gb_scroll-build.txt">빌드 로그</a> / <a href="../verification/gb_scroll-runtime.txt">실행 로그</a></p></section><section id="gb_vram_queue"><h2 id="result-gb_vram_queue">gb_vram_queue</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>좌표 (3,8)에 4 표시</p><img alt="gb_vram_queue의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_vram_queue.png"/><p><a href="../verification/gb_vram_queue-build.txt">빌드 로그</a> / <a href="../verification/gb_vram_queue-runtime.txt">실행 로그</a></p></section><section id="gb_sprite"><h2 id="result-gb_sprite">gb_sprite</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>스프라이트 위치에 문자 A 표시</p><img alt="gb_sprite의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_sprite.png"/><p><a href="../verification/gb_sprite-build.txt">빌드 로그</a> / <a href="../verification/gb_sprite-runtime.txt">실행 로그</a></p></section><section id="gb_rng"><h2 id="result-gb_rng">gb_rng</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>000~009의 값, 같은 시드에서는 같은 순서 반복</p><img alt="gb_rng의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_rng.png"/><p><a href="../verification/gb_rng-build.txt">빌드 로그</a> / <a href="../verification/gb_rng-runtime.txt">실행 로그</a></p></section><section id="gb_flags"><h2 id="result-gb_flags">gb_flags</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001</p><img alt="gb_flags의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_flags.png"/><p><a href="../verification/gb_flags-build.txt">빌드 로그</a> / <a href="../verification/gb_flags-runtime.txt">실행 로그</a></p></section><section id="gb_circle"><h2 id="result-gb_circle">gb_circle</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>한 단계 후 042, 이 예제는 정수 픽셀 단위 사용</p><img alt="gb_circle의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_circle.png"/><p><a href="../verification/gb_circle-build.txt">빌드 로그</a> / <a href="../verification/gb_circle-runtime.txt">실행 로그</a></p></section><section id="fc_scroll"><h2 id="result-fc_scroll">fc_scroll</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>제목이 가로로 스크롤됨</p><img alt="fc_scroll의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_scroll.png"/><p><a href="../verification/fc_scroll-build.txt">빌드 로그</a> / <a href="../verification/fc_scroll-runtime.txt">실행 로그</a></p></section><section id="fc_vram_queue"><h2 id="result-fc_vram_queue">fc_vram_queue</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>좌표 (3,8)에 4 표시</p><img alt="fc_vram_queue의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_vram_queue.png"/><p><a href="../verification/fc_vram_queue-build.txt">빌드 로그</a> / <a href="../verification/fc_vram_queue-runtime.txt">실행 로그</a></p></section><section id="fc_sprite"><h2 id="result-fc_sprite">fc_sprite</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>화면에 스프라이트 표시</p><img alt="fc_sprite의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_sprite.png"/><p><a href="../verification/fc_sprite-build.txt">빌드 로그</a> / <a href="../verification/fc_sprite-runtime.txt">실행 로그</a></p></section><section id="fc_sound"><h2 id="result-fc_sound">fc_sound</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042 표시와 펄스음</p><img alt="fc_sound의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_sound.png"/><p><a href="../verification/fc_sound-build.txt">빌드 로그</a> / <a href="../verification/fc_sound-runtime.txt">실행 로그</a></p></section><section id="gb_sound"><h2 id="result-gb_sound">gb_sound</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042 표시와 짧은 펄스음</p><img alt="gb_sound의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_sound.png"/><p><a href="../verification/gb_sound-build.txt">빌드 로그</a> / <a href="../verification/gb_sound-runtime.txt">실행 로그</a></p></section><section id="gb_font"><h2 id="result-gb_font">gb_font</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>대문자, 소문자, 숫자, 제공된 기호 30개 모두 표시</p><img alt="gb_font의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_font.png"/><p><a href="../verification/gb_font-build.txt">빌드 로그</a> / <a href="../verification/gb_font-runtime.txt">실행 로그</a></p></section><section id="fc_font"><h2 id="result-fc_font">fc_font</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>대문자, 소문자, 숫자, 제공된 기호 30개 모두 표시</p><img alt="fc_font의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_font.png"/><p><a href="../verification/fc_font-build.txt">빌드 로그</a> / <a href="../verification/fc_font-runtime.txt">실행 로그</a></p></section><section id="gb_system"><h2 id="result-gb_system">gb_system</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>002</p><img alt="gb_system의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_system.png"/><p><a href="../verification/gb_system-build.txt">빌드 로그</a> / <a href="../verification/gb_system-runtime.txt">실행 로그</a></p></section><section id="gb_scene"><h2 id="result-gb_scene">gb_scene</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 콜백은 등록하지 않음</p><img alt="gb_scene의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_scene.png"/><p><a href="../verification/gb_scene-build.txt">빌드 로그</a> / <a href="../verification/gb_scene-runtime.txt">실행 로그</a></p></section><section id="fc_system"><h2 id="result-fc_system">fc_system</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>002</p><img alt="fc_system의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_system.png"/><p><a href="../verification/fc_system-build.txt">빌드 로그</a> / <a href="../verification/fc_system-runtime.txt">실행 로그</a></p></section><section id="fc_scene"><h2 id="result-fc_scene">fc_scene</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 콜백은 등록하지 않음</p><img alt="fc_scene의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_scene.png"/><p><a href="../verification/fc_scene-build.txt">빌드 로그</a> / <a href="../verification/fc_scene-runtime.txt">실행 로그</a></p></section><section id="gb_camera"><h2 id="result-gb_camera">gb_camera</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 월드 x=52에서 카메라 x=10을 뺀 값</p><img alt="gb_camera의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_camera.png"/><p><a href="../verification/gb_camera-build.txt">빌드 로그</a> / <a href="../verification/gb_camera-runtime.txt">실행 로그</a></p></section><section id="gb_rle"><h2 id="result-gb_rle">gb_rle</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 세 바이트의 값이 각각 42</p><img alt="gb_rle의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_rle.png"/><p><a href="../verification/gb_rle-build.txt">빌드 로그</a> / <a href="../verification/gb_rle-runtime.txt">실행 로그</a></p></section><section id="gb_board"><h2 id="result-gb_board">gb_board</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_board의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_board.png"/><p><a href="../verification/gb_board-build.txt">빌드 로그</a> / <a href="../verification/gb_board-runtime.txt">실행 로그</a></p></section><section id="gb_physics"><h2 id="result-gb_physics">gb_physics</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 정수 픽셀 좌표</p><img alt="gb_physics의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_physics.png"/><p><a href="../verification/gb_physics-build.txt">빌드 로그</a> / <a href="../verification/gb_physics-runtime.txt">실행 로그</a></p></section><section id="gb_link"><h2 id="result-gb_link">gb_link</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>미연결 시 255, 시간 초과 시 000, 연결되면 상대 기기의 값</p><img alt="gb_link의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_link.png"/><p><a href="../verification/gb_link-build.txt">빌드 로그</a> / <a href="../verification/gb_link-runtime.txt">실행 로그</a></p></section><section id="gb_bank"><h2 id="result-gb_bank">gb_bank</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 뱅크 0의 고정 ROM 데이터 복사</p><img alt="gb_bank의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_bank.png"/><p><a href="../verification/gb_bank-build.txt">빌드 로그</a> / <a href="../verification/gb_bank-runtime.txt">실행 로그</a></p></section><section id="gb_asset"><h2 id="result-gb_asset">gb_asset</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042</p><img alt="gb_asset의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_asset.png"/><p><a href="../verification/gb_asset-build.txt">빌드 로그</a> / <a href="../verification/gb_asset-runtime.txt">실행 로그</a></p></section><section id="gb_danmaku"><h2 id="result-gb_danmaku">gb_danmaku</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>001, 수치 기반 풀 예제이며 탄환 배경 합성기는 사용하지 않음</p><img alt="gb_danmaku의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/gb_danmaku.png"/><p><a href="../verification/gb_danmaku-build.txt">빌드 로그</a> / <a href="../verification/gb_danmaku-runtime.txt">실행 로그</a></p></section><section id="fc_subpixel"><h2 id="result-fc_subpixel">fc_subpixel</h2><p>빌드 종료 코드: 0 / 실행 상태: executed</p><p>042, 헤더 상수를 사용하여 게임 측에서 직접 적분</p><img alt="fc_subpixel의 에뮬레이터 화면" class="screen" loading="lazy" src="../verification/fc_subpixel.png"/><p><a href="../verification/fc_subpixel-build.txt">빌드 로그</a> / <a href="../verification/fc_subpixel-runtime.txt">실행 로그</a></p></section><h2 id="visual_checks-json">픽셀 값과 글꼴 비교</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">복사</button><pre><code>[
   {
     "id": "gb_hello",
     "tile_x": 3,
@@ -958,4 +958,1592 @@
   "mobile_width": 390,
   "errors": [],
   "status": "passed"
-}</code></pre></div><footer>소스 기준일 2026-09-14 • <a href="index.html">목차</a> • <a href="verification.html">검증</a> • <a href="../reference/inventory.json">스냅샷 식별 정보</a><br/>예제 빌드, 에뮬레이터 실행, 기대 결과 대조는 별도로 기록합니다.</footer></main></div><script src="../assets/manual.js"></script></body></html>
+}</code></pre></div><!-- api-verification:start --><h2 id="api-verification">API 예제의 예상 이미지와 검증 결과</h2><p>각 타일 예제 프로그램을 빌드한 뒤 KOKURA의 DMG·CGB 모드에서 각각 90프레임 실행했습니다. 표시된 타일 패턴과 주변 공백을 제공된 폰트의 픽셀과 비교하고, 글자색과 화면의 결과 표시도 확인합니다. ROM 안에서도 대상 타일 번호와 속성을 다시 읽어 비교합니다. 종료 코드 0만으로 합격 처리하지 않습니다. 이 예제는 LCD가 꺼진 상태에서 쓰며, 실기기와 LCD 동작 중 전송 타이밍은 이번 시험 범위에 포함되지 않습니다.</p><section id="api-gb-__settile"><h3><code>__settile</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>대상 주소는 항상 <code>0x9800 + 32*y + x</code>입니다. LCDC의 배경·윈도 맵 선택과는 무관합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile-dmg.png" alt="__settile — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile-cgb.png" alt="__settile — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settile-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settile&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:32.612244+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;bccf8cba4cc64d49e0596ab4579785d7c13763083abec74e340f6e1a2778b566&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;56af5792da875a0c5d75efa3b7241519786520f1949e6a8dc5cba1f09b62e592&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_unsafe"><h3><code>__settile_unsafe</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>대상 주소는 항상 <code>0x9800 + 32*y + x</code>입니다. LCDC의 배경·윈도 맵 선택과는 무관합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_unsafe-dmg.png" alt="__settile_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_unsafe-cgb.png" alt="__settile_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settile_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settile_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:38.546339+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;e0d699a339bf96422040acd0880c8f48b082354f5eeeaf5c7a5f0800e94fec07&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;56eb3515ce3ad42ea7aa37ce84b5af6d5d4d808d7176d65a10d4a6840d61cece&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_fast"><h3><code>__settile_fast</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>대상 주소는 항상 <code>0x9800 + 32*y + x</code>입니다. LCDC의 배경·윈도 맵 선택과는 무관합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_fast-dmg.png" alt="__settile_fast — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_fast-cgb.png" alt="__settile_fast — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_fast.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settile_fast-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settile_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:43.964284+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;47d0f7afda3fbc0f4ef0c6bdfd923d6830915cfa5e2ae8a5b06967841a7efd1c&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;28bcd6161077a425d0126e2cb72aadb1e09dc84005a753c95dff2a7db1fd700c&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileat"><h3><code>__settileat</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileat-dmg.png" alt="__settileat — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileat-cgb.png" alt="__settileat — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileat.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileat-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileat&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:49.923690+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;1a73ef77cb4df63fad8d2da856ee9e778e48a28836acfa40f9cf1d7002652ab4&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;1164d72a43203079b4f27f661db7b21fb5a7153cfe2535002789cab67bbf7c81&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileat_unsafe"><h3><code>__settileat_unsafe</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileat_unsafe-dmg.png" alt="__settileat_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileat_unsafe-cgb.png" alt="__settileat_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileat_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileat_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileat_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:55.302383+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;e96daddb831a029776e6158f55f26b76e0675ac0d00459eeaf08c18aeaf3b84c&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;f6023a824d62f6755b276d634b696e0744ddb7edd1abec4a1e3dbf06204ba7b7&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg"><h3><code>__settilebg</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg-dmg.png" alt="__settilebg — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg-cgb.png" alt="__settilebg — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebg-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:00.697137+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d7acb7ca93d020a2436bcfd815ebaa27adc8997a04883c773cf7c5416eaaa9fe&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;5ddec6aa59513b4bd80d3016e552ffb7b281caca7e3c6649fa37454fd8f2aea5&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_xy"><h3><code>__settile_xy</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_xy-dmg.png" alt="__settile_xy — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_xy-cgb.png" alt="__settile_xy — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_xy.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settile_xy-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settile_xy&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:05.913272+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;4a0b8b3e8f0d6785b38738a86c55d99ec52ed314ca8d951a5bf53a565d31de14&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;5ddec6aa59513b4bd80d3016e552ffb7b281caca7e3c6649fa37454fd8f2aea5&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg_unsafe"><h3><code>__settilebg_unsafe</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg_unsafe-dmg.png" alt="__settilebg_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg_unsafe-cgb.png" alt="__settilebg_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebg_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:11.289165+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;c0dc4202e08cfbbfb579333075d6140b4ed3d9c234a9dab770394dbbea642f28&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;91e9dfe0fba1d5d33efb0fbe29a9d6045c3e937f57ca0e87e68aff00945f4c43&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewin"><h3><code>__settilewin</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>LCDC 비트 6이 선택한 윈도 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>입니다. <code>x,y</code>는 맵 좌표이며 화면의 윈도 위치가 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewin-dmg.png" alt="__settilewin — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewin-cgb.png" alt="__settilewin — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewin.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilewin-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilewin&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:18.169478+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;309ab917fc3b2a9c7d9c783dc182459e78ac95deb5c538d20a0648e65abd6c06&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3ab0d00fbcdc96fa97c4070dcac53398d29d271a5f11d54f2dfbb29480a39b6d&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewin_unsafe"><h3><code>__settilewin_unsafe</code></h3><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>LCDC 비트 6이 선택한 윈도 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>입니다. <code>x,y</code>는 맵 좌표이며 화면의 윈도 위치가 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewin_unsafe-dmg.png" alt="__settilewin_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewin_unsafe-cgb.png" alt="__settilewin_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewin_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilewin_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilewin_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:25.313483+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;0534d9c266b21c09f8b57a486a200773bd99706965a0fc715cff0d2fcaf5e9a3&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3dbf7a4dc8d68e2451796a5dca464ca97c4861505da97c3bea3d5cbbcdf4f445&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr"><h3><code>__settileattr</code></h3><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p>대상 주소는 항상 <code>0x9800 + 32*y + x</code>입니다. LCDC의 배경·윈도 맵 선택과는 무관합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr-dmg.png" alt="__settileattr — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr-cgb.png" alt="__settileattr — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileattr.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileattr-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:30.875787+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d156d816e64b3201f31e572572a3fe6b939579089b7ff009eb11b41717f15c1c&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;eb2387bb6a0a2287a7783d356fe9af9e182bda35e40b49ad0f69a56b1a9c51e9&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr_unsafe"><h3><code>__settileattr_unsafe</code></h3><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p>대상 주소는 항상 <code>0x9800 + 32*y + x</code>입니다. LCDC의 배경·윈도 맵 선택과는 무관합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_unsafe-dmg.png" alt="__settileattr_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_unsafe-cgb.png" alt="__settileattr_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileattr_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileattr_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:36.255800+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;8cefb06e61295e326ed6fd27b1c8e742f60ce90548a5bf4e33a592a73fef91ec&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;b3be880175fe6b43b89e9c41beadcaff4873cd17fe021d2e8baf38b82333c151&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatattr"><h3><code>__settileatattr</code></h3><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatattr-dmg.png" alt="__settileatattr — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatattr-cgb.png" alt="__settileatattr — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileatattr.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileatattr-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileatattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:41.523042+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;68ede8ad916afd6dfe93198dbc6cae41240e23ab42eb76d290bd7e3604c56f69&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;cef51d1adb0126935d4679d91e91a345f4390eaf49c33f1a2f741949a1e1628a&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatattr_unsafe"><h3><code>__settileatattr_unsafe</code></h3><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatattr_unsafe-dmg.png" alt="__settileatattr_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatattr_unsafe-cgb.png" alt="__settileatattr_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileatattr_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileatattr_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileatattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:47.418398+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;bf7e9c75bd18c6e7c665cbb582178d2f199996b473c487f01bf6573bbc823faa&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;c64ef44c13bb75d8ff3bf13c8f38135f51153bdffb4bb6e897be585f7aa7000b&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgattr"><h3><code>__settilebgattr</code></h3><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgattr-dmg.png" alt="__settilebgattr — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgattr-cgb.png" alt="__settilebgattr — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebgattr.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebgattr-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:53.252001+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;001047351696329fca1f07608ce8f22807c2b4e67126c3b5c668bce2e66b7cf5&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;61c8f8ca4d9a5f3aa0992bb603626b455b182876bc80d9e47f8cbac06a097e0b&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgattr_unsafe"><h3><code>__settilebgattr_unsafe</code></h3><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgattr_unsafe-dmg.png" alt="__settilebgattr_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgattr_unsafe-cgb.png" alt="__settilebgattr_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebgattr_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebgattr_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:58.684339+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;bcff9982c1bd9a1e6b5749417711db602abaa07bce86d11c10bcc0d1fd7a20e6&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3161ce48c5330ad8f568b9c1a0c4e102b48a3d84a926b0909120fbcf6201c771&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewinattr"><h3><code>__settilewinattr</code></h3><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p>LCDC 비트 6이 선택한 윈도 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>입니다. <code>x,y</code>는 맵 좌표이며 화면의 윈도 위치가 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewinattr-dmg.png" alt="__settilewinattr — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewinattr-cgb.png" alt="__settilewinattr — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewinattr.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilewinattr-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilewinattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:03.972540+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;781778c4e61209f01f449031cc1839735b009504423b02bfe64be803dadef1d4&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3ff46df981caa21e93f10786da732b51d609e43a1c4b41aeaa9af40ae2893609&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewinattr_unsafe"><h3><code>__settilewinattr_unsafe</code></h3><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p>LCDC 비트 6이 선택한 윈도 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>입니다. <code>x,y</code>는 맵 좌표이며 화면의 윈도 위치가 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewinattr_unsafe-dmg.png" alt="__settilewinattr_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewinattr_unsafe-cgb.png" alt="__settilewinattr_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewinattr_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilewinattr_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilewinattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:09.282499+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;0c3462d90b23e6d5e51bc99d23556f4920afdc6d73cd810b2e0f4585dbadd3fa&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;14e07311feb2191d00dd5d3b3073bb01c3d322257e787e422c16efdf7a9629f3&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb"><h3><code>__settilecgb</code></h3><p>타일 번호와 CGB 속성을 함께 씁니다. DMG에서는 번호만 씁니다. CGB에서는 뱅크 0을 선택한 뒤 호출하세요. 속성은 뱅크 1에 쓰며 마지막에는 <code>VBK=0</code>이 됩니다.</p><p>대상 주소는 항상 <code>0x9800 + 32*y + x</code>입니다. LCDC의 배경·윈도 맵 선택과는 무관합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb-dmg.png" alt="__settilecgb — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb-cgb.png" alt="__settilecgb — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilecgb.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilecgb-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:14.666020+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;769fe4f203cf3d512cc6239c54b57911723e09c7f4d6eacc27eca24b4e951564&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;bc767b386beaa91232008c8aa7bd20e767c69b34079bc9d5b66643075aa97d6e&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb_unsafe"><h3><code>__settilecgb_unsafe</code></h3><p>타일 번호와 CGB 속성을 함께 씁니다. DMG에서는 번호만 씁니다. CGB에서는 뱅크 0을 선택한 뒤 호출하세요. 속성은 뱅크 1에 쓰며 마지막에는 <code>VBK=0</code>이 됩니다.</p><p>대상 주소는 항상 <code>0x9800 + 32*y + x</code>입니다. LCDC의 배경·윈도 맵 선택과는 무관합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_unsafe-dmg.png" alt="__settilecgb_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_unsafe-cgb.png" alt="__settilecgb_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilecgb_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilecgb_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:20.733676+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;73a044ce64133717c6add155167bc2422aa6c1467fb0638bf85d9abc91ba7c88&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;74dd48b043d24bf73ce3135d1df9301a6b920e0604bd95fa39390ec31126f575&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatcgb"><h3><code>__settileatcgb</code></h3><p>타일 번호와 CGB 속성을 함께 씁니다. DMG에서는 번호만 씁니다. CGB에서는 뱅크 0을 선택한 뒤 호출하세요. 속성은 뱅크 1에 쓰며 마지막에는 <code>VBK=0</code>이 됩니다.</p><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatcgb-dmg.png" alt="__settileatcgb — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatcgb-cgb.png" alt="__settileatcgb — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileatcgb.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileatcgb-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileatcgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:26.033985+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;14901f539e2dd3912bb1e3208d3e4d56c1ff023348ea14959f024e7fbc7c6560&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;4d51855690280a3d2d260619b0e6471d993d79bf9e1c513b5bd9bb656cf22947&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatcgb_unsafe"><h3><code>__settileatcgb_unsafe</code></h3><p>타일 번호와 CGB 속성을 함께 씁니다. DMG에서는 번호만 씁니다. CGB에서는 뱅크 0을 선택한 뒤 호출하세요. 속성은 뱅크 1에 쓰며 마지막에는 <code>VBK=0</code>이 됩니다.</p><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatcgb_unsafe-dmg.png" alt="__settileatcgb_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileatcgb_unsafe-cgb.png" alt="__settileatcgb_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileatcgb_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileatcgb_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileatcgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:31.406331+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;0aaa6d28c209b4971bb95178238ca0de8f93deb95719f63552f64cf738a48957&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;c2023e7c8965a61372a305c21a852afd4e6974f121fd28efb035e45ea75d7723&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgcgb"><h3><code>__settilebgcgb</code></h3><p>타일 번호와 CGB 속성을 함께 씁니다. DMG에서는 번호만 씁니다. CGB에서는 뱅크 0을 선택한 뒤 호출하세요. 속성은 뱅크 1에 쓰며 마지막에는 <code>VBK=0</code>이 됩니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgcgb-dmg.png" alt="__settilebgcgb — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgcgb-cgb.png" alt="__settilebgcgb — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebgcgb.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebgcgb-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgcgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:36.704045+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;6d6e3f77c70090421293b72bc1e42900b718735d59050c8435c138ca097340ef&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;038546ba62d254dd0e61b95375ad4228877b80bb936a781bdccd531e60aa42d8&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgcgb_unsafe"><h3><code>__settilebgcgb_unsafe</code></h3><p>타일 번호와 CGB 속성을 함께 씁니다. DMG에서는 번호만 씁니다. CGB에서는 뱅크 0을 선택한 뒤 호출하세요. 속성은 뱅크 1에 쓰며 마지막에는 <code>VBK=0</code>이 됩니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgcgb_unsafe-dmg.png" alt="__settilebgcgb_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebgcgb_unsafe-cgb.png" alt="__settilebgcgb_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebgcgb_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebgcgb_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgcgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:42.097355+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;b044247160b163212cd3aceccfd17e4ecd0b37806403ac0a20306b3639daa832&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;81858efb24421e1b8898174c83f2af1112341e8b7e1b33e1ac96b24ab8c0242e&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewincgb"><h3><code>__settilewincgb</code></h3><p>타일 번호와 CGB 속성을 함께 씁니다. DMG에서는 번호만 씁니다. CGB에서는 뱅크 0을 선택한 뒤 호출하세요. 속성은 뱅크 1에 쓰며 마지막에는 <code>VBK=0</code>이 됩니다.</p><p>LCDC 비트 6이 선택한 윈도 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>입니다. <code>x,y</code>는 맵 좌표이며 화면의 윈도 위치가 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewincgb-dmg.png" alt="__settilewincgb — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewincgb-cgb.png" alt="__settilewincgb — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewincgb.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilewincgb-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilewincgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:47.588698+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;02d8f3c46d9319baf60569988fb07512430db544e1537465bd0de43c569eede0&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;a545b1afc7435ecdb430374665cffdf8b2f7f52bf4b30ad454be2a0eaa958522&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewincgb_unsafe"><h3><code>__settilewincgb_unsafe</code></h3><p>타일 번호와 CGB 속성을 함께 씁니다. DMG에서는 번호만 씁니다. CGB에서는 뱅크 0을 선택한 뒤 호출하세요. 속성은 뱅크 1에 쓰며 마지막에는 <code>VBK=0</code>이 됩니다.</p><p>LCDC 비트 6이 선택한 윈도 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>입니다. <code>x,y</code>는 맵 좌표이며 화면의 윈도 위치가 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A</pre><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewincgb_unsafe-dmg.png" alt="__settilewincgb_unsafe — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilewincgb_unsafe-cgb.png" alt="__settilewincgb_unsafe — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilewincgb_unsafe.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilewincgb_unsafe-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilewincgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:59.139106+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d0299f3e70fc0fab8897ccea7177f5e3cb096ef25eaa844b16f83c3d68f739df&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;ab552a4b4e183f06de0007624402c4d5ec7b5ac3741a95a5cd79c5b6277b2897&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_bulk"><h3><code>__settile_bulk</code></h3><p><code>src</code>의 연속 타일 번호 <code>count</code>바이트를 VRAM 주소 <code>dest</code>로 복사합니다. 타일 이미지 개수가 아닌 바이트 수이며 행 간격을 따로 조정하지 않습니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>ABC</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_bulk-dmg.png" alt="__settile_bulk — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_bulk-cgb.png" alt="__settile_bulk — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_bulk.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settile_bulk-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settile_bulk&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:09.999907+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;55e2f2f4a9151ecdb5521ce8a7764a18f0abff02862b2f707ebe946dcec4745a&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;e4276c1918520a03c41172014b34b9e61ea9cc1c4e30e3f6f4456d35c7c7847f&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0,
+      0,
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_bulk_fast"><h3><code>__settile_bulk_fast</code></h3><p><code>src</code>의 연속 타일 번호 <code>count</code>바이트를 VRAM 주소 <code>dest</code>로 복사합니다. 타일 이미지 개수가 아닌 바이트 수이며 행 간격을 따로 조정하지 않습니다.</p><p>VRAM 접근을 기다리지 않습니다. LCD가 꺼져 있거나 전체 전송을 마칠 수 있는 쓰기 가능 시간을 호출자가 확보했을 때 사용하세요.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>ABC</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_bulk_fast-dmg.png" alt="__settile_bulk_fast — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_bulk_fast-cgb.png" alt="__settile_bulk_fast — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_bulk_fast.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settile_bulk_fast-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settile_bulk_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:21.181526+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;5f582ad91f12d9343a4e3358e0027ab288aa9284c257d1651a309e74f9caace2&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;6a7caf5ec0e64771e0cb1703c8fba35d7f00b7374826edd039e66c3cc2f12446&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0,
+      0,
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr_bulk"><h3><code>__settileattr_bulk</code></h3><p><code>src</code>의 CGB 속성 <code>count</code>바이트를 VRAM 뱅크 1의 <code>dest</code>에 연속 복사합니다. 타일 번호는 유지하며 <code>dest</code>는 좌표가 아닌 바이트 주소입니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>ABC</pre><p>CGB에서는 속성 배열 <code>1,2,3</code>이 각각 준비된 팔레트를 선택하여 <code>A</code>는 빨간색, <code>B</code>는 파란색, <code>C</code>는 초록색이 됩니다. DMG에서는 세 문자 모두 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_bulk-dmg.png" alt="__settileattr_bulk — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_bulk-cgb.png" alt="__settileattr_bulk — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileattr_bulk.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileattr_bulk-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr_bulk&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:31.140838+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;cd7ae589260c1fd75bd2d68a27e18663a01556187fcdb2cda923b4269acb1b76&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;c5548de809bac055058ca09629876e676c180bb462054996f1bddb7ecaa0921f&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr_bulk_fast"><h3><code>__settileattr_bulk_fast</code></h3><p><code>src</code>의 CGB 속성 <code>count</code>바이트를 VRAM 뱅크 1의 <code>dest</code>에 연속 복사합니다. 타일 번호는 유지하며 <code>dest</code>는 좌표가 아닌 바이트 주소입니다.</p><p>VRAM 접근을 기다리지 않습니다. LCD가 꺼져 있거나 전체 전송을 마칠 수 있는 쓰기 가능 시간을 호출자가 확보했을 때 사용하세요.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>ABC</pre><p>CGB에서는 속성 배열 <code>1,2,3</code>이 각각 준비된 팔레트를 선택하여 <code>A</code>는 빨간색, <code>B</code>는 파란색, <code>C</code>는 초록색이 됩니다. DMG에서는 세 문자 모두 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_bulk_fast-dmg.png" alt="__settileattr_bulk_fast — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settileattr_bulk_fast-cgb.png" alt="__settileattr_bulk_fast — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settileattr_bulk_fast.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settileattr_bulk_fast-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr_bulk_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:40.822314+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;84fcf9b8f45bba0382563da8adba76ec3851c4e4d0f0f10b9405e46990ab6c6a&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;b58a2a1f08842fd1f3493da6545e0b42528898c3a8bb981ebfc64085b030c52d&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb_bulk"><h3><code>__settilecgb_bulk</code></h3><p><code>tile_src</code>의 타일 번호와 <code>attr_src</code>의 속성을 각각 <code>count</code>바이트씩 <code>dest</code>에서 시작하는 같은 맵 범위로 옮깁니다. 두 값은 교차 배열이 아니라 별도 배열입니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>ABC</pre><p>CGB에서는 속성 배열 <code>1,2,3</code>이 각각 준비된 팔레트를 선택하여 <code>A</code>는 빨간색, <code>B</code>는 파란색, <code>C</code>는 초록색이 됩니다. DMG에서는 세 문자 모두 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_bulk-dmg.png" alt="__settilecgb_bulk — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_bulk-cgb.png" alt="__settilecgb_bulk — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilecgb_bulk.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilecgb_bulk-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb_bulk&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:48.092163+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d2f65cff1cc32f44a332ccbd49cbfb0fa155400426ae1348da60703e47ab429b&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;5831fc67201abb6a62385c27f2a49fae859d6226f1d8952dfb889e19e14cf481&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb_bulk_fast"><h3><code>__settilecgb_bulk_fast</code></h3><p><code>tile_src</code>의 타일 번호와 <code>attr_src</code>의 속성을 각각 <code>count</code>바이트씩 <code>dest</code>에서 시작하는 같은 맵 범위로 옮깁니다. 두 값은 교차 배열이 아니라 별도 배열입니다.</p><p>VRAM 접근을 기다리지 않습니다. LCD가 꺼져 있거나 전체 전송을 마칠 수 있는 쓰기 가능 시간을 호출자가 확보했을 때 사용하세요.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>ABC</pre><p>CGB에서는 속성 배열 <code>1,2,3</code>이 각각 준비된 팔레트를 선택하여 <code>A</code>는 빨간색, <code>B</code>는 파란색, <code>C</code>는 초록색이 됩니다. DMG에서는 세 문자 모두 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_bulk_fast-dmg.png" alt="__settilecgb_bulk_fast — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilecgb_bulk_fast-cgb.png" alt="__settilecgb_bulk_fast — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilecgb_bulk_fast.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilecgb_bulk_fast-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb_bulk_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:56.215527+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;ae638e2c82824c5e8b8190e93675fdf7be9557a9142c1022b8da27cb310b9da9&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;f3160b2161e88ffd46b6760e0e72b213b069231fe90dc21a8c93c628df6d5625&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_rect"><h3><code>__settile_rect</code></h3><p>LCDC로 선택한 BG 맵에서 너비 <code>w</code>, 높이 <code>h</code>의 사각형을 같은 타일 번호로 채웁니다. 행 간격은 32바이트입니다. 이미지 배열을 복사하지 않고 같은 타일을 반복 배치합니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>AAA
+AAA</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_rect-dmg.png" alt="__settile_rect — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_rect-cgb.png" alt="__settile_rect — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_rect.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settile_rect-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settile_rect&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:03.371313+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;cb59c8399faf3e42c6cebf9ea6e394c940d143894ed682dc9049c3d18897d271&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;30ca762ef1b2992e8f7372bfccd5eae296c76afbcddf8702d4c3aaea3d30b843&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;AAA&quot;,
+      &quot;AAA&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_row"><h3><code>__settile_row</code></h3><p><code>src</code>의 연속된 타일 번호 <code>len</code>개를 LCDC로 선택한 BG 맵의 <code>(x,y)</code>부터 오른쪽으로 복사합니다. 원본과 대상 주소가 타일마다 1바이트씩 증가합니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>ABC</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_row-dmg.png" alt="__settile_row — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_row-cgb.png" alt="__settile_row — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_row.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settile_row-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settile_row&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:08.852207+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;2e96976e09d585e12ade26116f63eee9342c7bc4f127be3766d20007a0cdc12a&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;d2b36f2ccc4ee842dfc3e6a2269bacc39578077f56e8ae3a7630c70918555559&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_col"><h3><code>__settile_col</code></h3><p><code>src</code>의 연속된 타일 번호 <code>len</code>개를 LCDC로 선택한 BG 맵의 <code>(x,y)</code>부터 아래로 복사합니다. 원본은 1바이트, 대상은 32바이트씩 증가합니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>A
+B
+C</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_col-dmg.png" alt="__settile_col — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settile_col-cgb.png" alt="__settile_col — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settile_col.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settile_col-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settile_col&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:14.439621+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;86a1bb088a838863598f4daf0a31cb09fae81820b3775b63a1740d1486037c84&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;628f606f20841db9156ad872c36584682fe1c5ccb6ad6f64baace5923365e1e6&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;,
+      &quot;B&quot;,
+      &quot;C&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilemap_rect"><h3><code>__settilemap_rect</code></h3><p>빈틈없이 배열된 <code>w*h</code>개의 타일 번호를 <code>base</code>로 지정한 맵의 <code>(x,y)</code>에 사각형으로 복사합니다. 원본 행은 <code>w</code>바이트이며 대상 행 간격은 32바이트입니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>ABC
+DEF</pre><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilemap_rect-dmg.png" alt="__settilemap_rect — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilemap_rect-cgb.png" alt="__settilemap_rect — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=3)`, 픽셀 좌표 `(16,24)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilemap_rect.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilemap_rect-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilemap_rect&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:19.882384+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;c4523137584f564a4dc63a6082a6601dd5f4af2cd013cf425a4b00d1f5203828&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;25a4cdabf98121eae9da968f86abaac42bb8edc8964cb70ad944c26fe99fed15&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;,
+      &quot;DEF&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16_buf"><h3><code>__settilebg16_buf</code></h3><p>RAM 타일 맵 버퍼에 16×16픽셀 셀을 씁니다. 8×8 타일 네 개의 번호는 위쪽이 <code>tile,tile+1</code>, 아래쪽이 <code>tile+2,tile+3</code>이며 256에서 순환합니다. VRAM 전송은 하지 않습니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=2)</code>, 픽셀 좌표 <code>(16,16)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>AB
+CD</pre><p>타일 좌표 <code>(2,2)</code>에 위쪽 <code>AB</code>, 아래쪽 <code>CD</code>가 표시됩니다. 셀 좌표 <code>(1,1)</code>에 해당하는 16×16픽셀 셀 하나입니다. 버퍼 쓰기 예제는 RAM 준비가 VRAM을 바꾸지 않는지 확인한 뒤 전송합니다. 전송 함수 예제는 RAM 바이트를 직접 설정한 뒤 전송합니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16_buf-dmg.png" alt="__settilebg16_buf — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=2)`, 픽셀 좌표 `(16,16)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16_buf-cgb.png" alt="__settilebg16_buf — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=2)`, 픽셀 좌표 `(16,16)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg16_buf.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebg16_buf-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16_buf&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:07.662576+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;3e9037de0b0dc53e779fe6c434f8e0a7083d280a6b7a49e5372aa07b1c03cd34&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;fef0a18c75a1cc8d7f31729ab684b1122ad04b35736b58592ba99e357a9e8c07&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16cgb_buf"><h3><code>__settilebg16cgb_buf</code></h3><p>RAM 타일 맵 버퍼에 16×16픽셀 셀을 씁니다. 8×8 타일 네 개의 번호는 위쪽이 <code>tile,tile+1</code>, 아래쪽이 <code>tile+2,tile+3</code>이며 256에서 순환합니다. VRAM 전송은 하지 않습니다.</p><p>별도의 속성 버퍼에서 대응하는 네 셀 모두에 같은 <code>attr</code> 바이트를 씁니다. 두 버퍼 모두 일반 RAM이므로 DMG에서도 이 준비 작업이 실행됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=2)</code>, 픽셀 좌표 <code>(16,16)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>AB
+CD</pre><p>타일 좌표 <code>(2,2)</code>에 위쪽 <code>AB</code>, 아래쪽 <code>CD</code>가 표시됩니다. 셀 좌표 <code>(1,1)</code>에 해당하는 16×16픽셀 셀 하나입니다. 버퍼 쓰기 예제는 RAM 준비가 VRAM을 바꾸지 않는지 확인한 뒤 전송합니다. 전송 함수 예제는 RAM 바이트를 직접 설정한 뒤 전송합니다.</p><p>CGB에서는 네 셀의 속성이 모두 2여서 네 문자 모두 파란색입니다. DMG에서는 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16cgb_buf-dmg.png" alt="__settilebg16cgb_buf — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=2)`, 픽셀 좌표 `(16,16)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16cgb_buf-cgb.png" alt="__settilebg16cgb_buf — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=2)`, 픽셀 좌표 `(16,16)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg16cgb_buf.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebg16cgb_buf-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16cgb_buf&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:13.079566+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;f3923a5e471b93a76499204adfa736260a1d408e5bfdca019c1855ab0a5c9901&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;7a2d3dac2973007ecde9486b9462802a236f82ffd736169333cf67d1c651de32&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16_flush"><h3><code>__settilebg16_flush</code></h3><p>RAM 버퍼의 인접한 타일 두 행을 LCDC로 선택한 BG 맵으로 전송합니다. 원본 오프셋은 <code>64*y + x</code>이며 그 행과 32바이트 아래 행에서 각각 <code>count</code>바이트를 복사합니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=2)</code>, 픽셀 좌표 <code>(16,16)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>AB
+CD</pre><p>타일 좌표 <code>(2,2)</code>에 위쪽 <code>AB</code>, 아래쪽 <code>CD</code>가 표시됩니다. 셀 좌표 <code>(1,1)</code>에 해당하는 16×16픽셀 셀 하나입니다. 버퍼 쓰기 예제는 RAM 준비가 VRAM을 바꾸지 않는지 확인한 뒤 전송합니다. 전송 함수 예제는 RAM 바이트를 직접 설정한 뒤 전송합니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16_flush-dmg.png" alt="__settilebg16_flush — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=2)`, 픽셀 좌표 `(16,16)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16_flush-cgb.png" alt="__settilebg16_flush — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=2)`, 픽셀 좌표 `(16,16)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg16_flush.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebg16_flush-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16_flush&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:20.580860+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;10af35dae038de72fbd9762fe0c963d62732bef7869fe1ea849d413d9c4475ce&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;56b35b065ccc3c8236126853868ad0e75eeaa5691fb7622038980a0dffc54697&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16cgb_flush"><h3><code>__settilebg16cgb_flush</code></h3><p>RAM 버퍼의 인접한 타일 두 행을 LCDC로 선택한 BG 맵으로 전송합니다. 원본 오프셋은 <code>64*y + x</code>이며 그 행과 32바이트 아래 행에서 각각 <code>count</code>바이트를 복사합니다.</p><p>타일 번호와 CGB 속성을 함께 씁니다. DMG에서는 번호만 씁니다. CGB에서는 뱅크 0을 선택한 뒤 호출하세요. 속성은 뱅크 1에 쓰며 마지막에는 <code>VBK=0</code>이 됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=2)</code>, 픽셀 좌표 <code>(16,16)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><pre>AB
+CD</pre><p>타일 좌표 <code>(2,2)</code>에 위쪽 <code>AB</code>, 아래쪽 <code>CD</code>가 표시됩니다. 셀 좌표 <code>(1,1)</code>에 해당하는 16×16픽셀 셀 하나입니다. 버퍼 쓰기 예제는 RAM 준비가 VRAM을 바꾸지 않는지 확인한 뒤 전송합니다. 전송 함수 예제는 RAM 바이트를 직접 설정한 뒤 전송합니다.</p><p>CGB에서는 네 셀의 속성이 모두 2여서 네 문자 모두 파란색입니다. DMG에서는 검은색입니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16cgb_flush-dmg.png" alt="__settilebg16cgb_flush — DMG: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=2)`, 픽셀 좌표 `(16,16)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="../verification/api-tiles/__settilebg16cgb_flush-cgb.png" alt="__settilebg16cgb_flush — CGB: 예상 이미지: 다음 타일 패턴이 타일 좌표 `(x=2, y=2)`, 픽셀 좌표 `(16,16)`에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다."><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/__settilebg16cgb_flush.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-tiles/__settilebg16cgb_flush-build.txt">빌드 로그</a></p><details><summary>검사 기록</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16cgb_flush&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:32.632696+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;af0df566da58a115b51f04309c79e9fe1444bdf4cefc0e0407c8912b99304799&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;d33f3abd0ce84bb90b9ff0f03cca9108980ba68c517857a34ea5e9888ad5a962&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-entity_init"><h3><code>entity_init</code></h3><p>엔티티 풀의 모든 슬롯을 초기화합니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>GB 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_init: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">빌드 로그</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_init: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-gb-entity_create"><h3><code>entity_create</code></h3><p>지정한 종류와 좌표로 엔티티를 할당하고 재사용 가능한 ID를 반환합니다. 빈 슬롯이 없으면 <code>0xFF</code>입니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>GB 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_create: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">빌드 로그</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_create: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-gb-entity_destroy"><h3><code>entity_destroy</code></h3><p><code>id</code>의 엔티티 슬롯을 해제합니다. 저장된 데이터는 다시 할당할 때 초기화됩니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>GB 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_destroy: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">빌드 로그</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_destroy: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-gb-entity_get"><h3><code>entity_get</code></h3><p>사용 중인 유효 ID의 엔티티 포인터를 반환하며, 그 외에는 null입니다. 해당 저장 공간은 재사용됩니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>GB 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_get: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">빌드 로그</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_get: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-gb-entity_update_all"><h3><code>entity_update_all</code></h3><p>ID 오름차순으로 활성 슬롯을 살펴보고 각각 <code>fn(id)</code>를 한 번 호출합니다. 이동·충돌·타이머 로직은 콜백에 작성하며 풀은 이 로직을 제공하지 않습니다. 콜백이 null이면 아무것도 하지 않습니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>GB 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_update_all: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">빌드 로그</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_update_all: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-gb-entity_draw_all"><h3><code>entity_draw_all</code></h3><p>활성 엔티티를 순회하며 각 ID를 그리기 콜백에 전달합니다. 순회 방식은 <code>entity_update_all</code>과 같습니다. 콜백이 그리기 데이터를 제출하지 않으면 스프라이트나 픽셀은 그려지지 않습니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>GB 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_draw_all: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">빌드 로그</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_draw_all: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-gb-entity_count_active"><h3><code>entity_count_active</code></h3><p>엔티티 상태를 바꾸지 않고 사용 중인 슬롯 수를 반환합니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>GB 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_count_active: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">빌드 로그</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_count_active: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-gb-entity_clear_all"><h3><code>entity_clear_all</code></h3><p>모든 엔티티를 해제하고 스프라이트 미할당 표시를 포함한 필드를 초기화합니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>GB 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_clear_all: DMG"><figcaption>DMG</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_dmg/build.txt">빌드 로그</a></p><figure><img class="screen" loading="lazy" src="../verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_clear_all: CGB"><figcaption>CGB</figcaption></figure><p><a href="../verification/api-entity/gb/entity_pool_cgb/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/gb/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-fc-entity_init"><h3><code>entity_init</code></h3><p>엔티티 풀의 모든 슬롯을 초기화합니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>FC 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_init: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-fc-entity_create"><h3><code>entity_create</code></h3><p>지정한 종류와 좌표로 엔티티를 할당하고 재사용 가능한 ID를 반환합니다. 빈 슬롯이 없으면 <code>0xFF</code>입니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>FC 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_create: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-fc-entity_destroy"><h3><code>entity_destroy</code></h3><p><code>id</code>의 엔티티 슬롯을 해제합니다. 저장된 데이터는 다시 할당할 때 초기화됩니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>FC 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_destroy: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-fc-entity_get"><h3><code>entity_get</code></h3><p>사용 중인 유효 ID의 엔티티 포인터를 반환하며, 그 외에는 null입니다. 해당 저장 공간은 재사용됩니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>FC 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_get: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-fc-entity_update_all"><h3><code>entity_update_all</code></h3><p>ID 오름차순으로 활성 슬롯을 살펴보고 각각 <code>fn(id)</code>를 한 번 호출합니다. 이동·충돌·타이머 로직은 콜백에 작성하며 풀은 이 로직을 제공하지 않습니다. 콜백이 null이면 아무것도 하지 않습니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>FC 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_update_all: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-fc-entity_draw_all"><h3><code>entity_draw_all</code></h3><p>활성 엔티티를 순회하며 각 ID를 그리기 콜백에 전달합니다. 순회 방식은 <code>entity_update_all</code>과 같습니다. 콜백이 그리기 데이터를 제출하지 않으면 스프라이트나 픽셀은 그려지지 않습니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>FC 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_draw_all: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-fc-entity_count_active"><h3><code>entity_count_active</code></h3><p>엔티티 상태를 바꾸지 않고 사용 중인 슬롯 수를 반환합니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>FC 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_count_active: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><section id="api-fc-entity_clear_all"><h3><code>entity_clear_all</code></h3><p>모든 엔티티를 해제하고 스프라이트 미할당 표시를 포함한 필드를 초기화합니다.</p><p>전체 프로그램은 재사용되는 풀 슬롯의 수명 주기를 보여 줍니다. 숫자는 라벨과 함께 읽으세요. 두 개를 할당하면 <code>CREATED 002</code>, 첫 번째를 해제하면 <code>AFTER FREE 001</code>, 가장 작은 빈 ID를 재사용하면 <code>REUSED ID 000</code>, 전체를 해제하면 <code>AFTER CLEAR 000</code>입니다. 해제 후 조회가 null인지, 재할당 시 필드가 초기화되는지도 검사합니다. <code>FAILED CHECKS 000</code>은 기대값과 일치했다는 뜻입니다.</p><p>FC 순회는 활성 엔티티 두 개에 각각 콜백을 호출하므로 <code>UPDATE CALLS 002</code>, <code>DRAW CALLS 002</code>가 됩니다. 예제의 갱신 콜백은 둘을 오른쪽으로 한 타일 이동합니다. 그리기 콜백은 두 객체를 나타내는 <code>A</code>를 타일 <code>(3,12)</code>, <code>B</code>를 <code>(7,12)</code>에 놓습니다. 콜백이 그린 배경 글자 타일이며 자동 할당된 스프라이트가 아닙니다.</p><figure><img class="screen" loading="lazy" src="../verification/api-entity/fc/entity_pool/screen.png" alt="entity_clear_all: NROM"><figcaption>NROM</figcaption></figure><p><a href="../verification/api-entity/fc/entity_pool/build.txt">빌드 로그</a></p><p><a href="../samples/api-examples/fc/entity_pool.c">사용 예의 전체 프로그램</a> · <a href="../verification/api-entity/results.json">검사 기록</a></p></section><!-- api-verification:end --><footer>소스 기준일 2026-09-14 • <a href="index.html">목차</a> • <a href="verification.html">검증</a> • <a href="../reference/inventory.json">스냅샷 식별 정보</a><br/>예제 빌드, 에뮬레이터 실행, 기대 결과 대조는 별도로 기록합니다.</footer></main></div><script src="../assets/manual.js"></script></body></html>

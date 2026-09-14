@@ -1,0 +1,466 @@
+{
+  "gb:entity_init": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_init"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_defaults"
+    ],
+    "record_sha256": "1d5267f239333a4333b6b9b52472697c3aaaba5ed6321fd20ab62cbb420c50de",
+    "example": {
+      "code": "entity_init();\nif (entity_count_active() != 0) { failures++; }",
+      "program": "samples/api-examples/gb/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\gb\\entity_pool.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_gb"
+      ]
+    }
+  },
+  "gb:entity_create": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_create"
+    ],
+    "args": [
+      [
+        "type",
+        [
+          "entity_type"
+        ]
+      ],
+      [
+        "x, y",
+        [
+          "entity_coordinates"
+        ]
+      ]
+    ],
+    "returns": [
+      "entity_id_result"
+    ],
+    "notes": [
+      "entity_capacity"
+    ],
+    "record_sha256": "8b6d039ce54f6e15eb85f9211a0543817ce2eec328ecb75da8e47c3ee628420a",
+    "example": {
+      "code": "first = entity_create(1, 2, 12);\nsecond = entity_create(2, 6, 12);\nif (first == 0xFF || second == 0xFF) { failures++; }",
+      "program": "samples/api-examples/gb/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\gb\\entity_pool.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_gb"
+      ]
+    }
+  },
+  "gb:entity_destroy": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_destroy"
+    ],
+    "args": [
+      [
+        "id",
+        [
+          "entity_slot_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_ownership"
+    ],
+    "record_sha256": "4b1260df8ed1104e0e477c7bdc7dc0e5e0755af76b7eb5ca411a8fd1dbf72d7e",
+    "example": {
+      "code": "entity_destroy(first);\nafter_free = entity_count_active();\nif (entity_get(first) != 0 || after_free != 1) { failures++; }",
+      "program": "samples/api-examples/gb/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\gb\\entity_pool.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_gb"
+      ]
+    }
+  },
+  "gb:entity_get": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_get"
+    ],
+    "args": [
+      [
+        "id",
+        [
+          "entity_slot_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "entity_pointer_result"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_ownership"
+    ],
+    "record_sha256": "5c03647f695a6cfef5d53b5737d368111930f24002d9cf0580c50e053478ce44",
+    "example": {
+      "code": "current_entity = entity_get(first);\nif (current_entity != 0) { current_entity->vx = 5; }\nelse { failures++; }",
+      "program": "samples/api-examples/gb/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\gb\\entity_pool.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_gb"
+      ]
+    }
+  },
+  "gb:entity_update_all": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_update_gb"
+    ],
+    "args": [
+      [
+        "fn",
+        [
+          "entity_callback_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_callback_order"
+    ],
+    "record_sha256": "84c0508f1458ba1ed394a42fdef37b7a48f1f9715e18a5124dd3616109ec5e7c",
+    "example": {
+      "code": "void demo_update(u8 id) {\n    Entity* entity;\n    entity = entity_get(id);\n    if (entity != 0) { entity->x = entity->x + 1; update_calls++; }\n}\n\n// From main(), after creating two entities:\nupdate_calls = 0;\nentity_update_all(demo_update);\nautomatic_updates = update_calls;\nif (automatic_updates != 2) { failures++; }",
+      "program": "samples/api-examples/gb/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\gb\\entity_pool.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_gb"
+      ]
+    }
+  },
+  "gb:entity_draw_all": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_draw_gb"
+    ],
+    "args": [
+      [
+        "fn",
+        [
+          "entity_callback_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_callback_order"
+    ],
+    "record_sha256": "c84cde8e971f8099d1ef9d7c3c5454acf39c1e47dd2c8dea8d5c47af4bbd400c",
+    "example": {
+      "code": "void demo_draw(u8 id) {\n    Entity* entity;\n    entity = entity_get(id);\n    if (entity != 0) {\n        m_put((u8)entity->x, (u8)entity->y, (u8)('A' + entity->type - 1));\n        draw_calls++;\n    }\n}\n\n// From main(), after creating two entities:\ndraw_calls = 0;\nentity_draw_all(demo_draw);\nautomatic_draws = draw_calls;\nif (automatic_draws != 2) { failures++; }",
+      "program": "samples/api-examples/gb/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\gb\\entity_pool.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_gb"
+      ]
+    }
+  },
+  "gb:entity_count_active": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_count_active"
+    ],
+    "args": [],
+    "returns": [
+      "entity_count_result"
+    ],
+    "notes": [
+      "entity_capacity"
+    ],
+    "record_sha256": "a707b5750f27d6d36619ee4cf1c7c942f577ea9a799671e0b44b24ac65ce719e",
+    "example": {
+      "code": "created = entity_count_active();\nif (created != 2) { failures++; }",
+      "program": "samples/api-examples/gb/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\gb\\entity_pool.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_gb"
+      ]
+    }
+  },
+  "gb:entity_clear_all": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_clear_all"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_defaults"
+    ],
+    "record_sha256": "24be608e13211d5a8c6bb068db6cc6a2e8f5a720691b3e09d655e8afced594c0",
+    "example": {
+      "code": "entity_clear_all();\nafter_clear = entity_count_active();\nif (after_clear != 0 || entity_get(reused) != 0) { failures++; }",
+      "program": "samples/api-examples/gb/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\gb\\entity_pool.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_gb"
+      ]
+    }
+  },
+  "fc:entity_init": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_init"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_defaults"
+    ],
+    "record_sha256": "f29202b16c0fe8286319ed21feadcfa5e447da6b8758fd19ba6578d44f795c68",
+    "example": {
+      "code": "entity_init();\nif (entity_count_active() != 0) { failures++; }",
+      "program": "samples/api-examples/fc/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\fc\\entity_pool.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_fc"
+      ]
+    }
+  },
+  "fc:entity_create": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_create"
+    ],
+    "args": [
+      [
+        "type",
+        [
+          "entity_type"
+        ]
+      ],
+      [
+        "x, y",
+        [
+          "entity_coordinates"
+        ]
+      ]
+    ],
+    "returns": [
+      "entity_id_result"
+    ],
+    "notes": [
+      "entity_capacity"
+    ],
+    "record_sha256": "0881614463f4899283e5acb8e946d1620d0c064e75a295b2888a160d296ddce5",
+    "example": {
+      "code": "first = entity_create(1, 2, 12);\nsecond = entity_create(2, 6, 12);\nif (first == 0xFF || second == 0xFF) { failures++; }",
+      "program": "samples/api-examples/fc/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\fc\\entity_pool.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_fc"
+      ]
+    }
+  },
+  "fc:entity_destroy": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_destroy"
+    ],
+    "args": [
+      [
+        "id",
+        [
+          "entity_slot_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_ownership"
+    ],
+    "record_sha256": "b5e549a48a04ec8c18b790beb778e4dd932296955b282cc6a5e9c8aee2e5d72e",
+    "example": {
+      "code": "entity_destroy(first);\nafter_free = entity_count_active();\nif (entity_get(first) != 0 || after_free != 1) { failures++; }",
+      "program": "samples/api-examples/fc/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\fc\\entity_pool.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_fc"
+      ]
+    }
+  },
+  "fc:entity_get": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_get"
+    ],
+    "args": [
+      [
+        "id",
+        [
+          "entity_slot_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "entity_pointer_result"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_ownership"
+    ],
+    "record_sha256": "36243921e70baa6c5856894f47913dba1f45cf345923e392649c58ed72a296c9",
+    "example": {
+      "code": "current_entity = entity_get(first);\nif (current_entity != 0) { current_entity->vx = 5; }\nelse { failures++; }",
+      "program": "samples/api-examples/fc/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\fc\\entity_pool.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_fc"
+      ]
+    }
+  },
+  "fc:entity_update_all": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_update_fc"
+    ],
+    "args": [
+      [
+        "fn",
+        [
+          "entity_fc_callback_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_callback_order",
+      "entity_fc_bank"
+    ],
+    "record_sha256": "5403d8a02e8b3a6b3758dfc9af726959d87d8597c9b5a0c39705da9de9d70a4c",
+    "example": {
+      "code": "void demo_update(u8 id) {\n    Entity* entity;\n    entity = entity_get(id);\n    if (entity != 0) { entity->x = entity->x + 1; update_calls++; }\n}\n\n// From main(), after creating two entities:\nupdate_calls = 0;\nentity_update_all(demo_update);\nautomatic_updates = update_calls;\nif (automatic_updates != 2) { failures++; }",
+      "program": "samples/api-examples/fc/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\fc\\entity_pool.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_fc"
+      ]
+    }
+  },
+  "fc:entity_draw_all": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_draw_fc"
+    ],
+    "args": [
+      [
+        "fn",
+        [
+          "entity_fc_callback_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_callback_order",
+      "entity_fc_bank"
+    ],
+    "record_sha256": "0cbebc342e6cf08967842e9e1a368b12b9e6e0c28d9b6a36ddf8a94e82892b1a",
+    "example": {
+      "code": "void demo_draw(u8 id) {\n    Entity* entity;\n    entity = entity_get(id);\n    if (entity != 0) {\n        m_put((u8)entity->x, (u8)entity->y, (u8)('A' + entity->type - 1));\n        draw_calls++;\n    }\n}\n\n// From main(), after creating two entities:\ndraw_calls = 0;\nentity_draw_all(demo_draw);\nautomatic_draws = draw_calls;\nif (automatic_draws != 2) { failures++; }",
+      "program": "samples/api-examples/fc/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\fc\\entity_pool.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_fc"
+      ]
+    }
+  },
+  "fc:entity_count_active": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_count_active"
+    ],
+    "args": [],
+    "returns": [
+      "entity_count_result"
+    ],
+    "notes": [
+      "entity_capacity"
+    ],
+    "record_sha256": "95bf38821f061e4e439bbc3ca09021118c0eb15b3deb168ef233fe49db73af1d",
+    "example": {
+      "code": "created = entity_count_active();\nif (created != 2) { failures++; }",
+      "program": "samples/api-examples/fc/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\fc\\entity_pool.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_fc"
+      ]
+    }
+  },
+  "fc:entity_clear_all": {
+    "review": "entity-source-20260914",
+    "purpose": [
+      "entity_clear_all"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "entity_capacity",
+      "entity_defaults"
+    ],
+    "record_sha256": "c8f328647ca4d8b232b24f365fb83bdb3e83b7e3fc2909d097a8792de1b51a4b",
+    "example": {
+      "code": "entity_clear_all();\nafter_clear = entity_count_active();\nif (after_clear != 0 || entity_get(reused) != 0) { failures++; }",
+      "program": "samples/api-examples/fc/entity_pool.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\entity.c .\\kitaq-docs\\samples\\api-examples\\fc\\entity_pool.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\entity_pool.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm",
+      "expected": [
+        "entity_example_lifecycle",
+        "entity_example_fc"
+      ]
+    }
+  }
+}

@@ -272,5 +272,7 @@ def main():
  page('verification','VERIFICATION','ビルド・実行・表示の確認記録',body)
  from generate_prompts import publish
  publish('ja')
+ from api_contracts import publish as publish_api_contracts
+ publish_api_contracts('ja')
  print('Generated 10 Japanese HTML pages including development prompts')
 if __name__=='__main__':main()

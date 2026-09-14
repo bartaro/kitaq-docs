@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>VERIFICATION — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="assets/manual.css"></head><body><a class="skip" href="#main">本文へ</a><header class="mast"><a href="index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER'S MANUAL <b>2026.09</b></div></header><nav class="languages" aria-label="言語"><a href="en/verification.html" lang="en" hreflang="en">English</a> <a href="verification.html" lang="ja" hreflang="ja" aria-current="page">日本語</a> <a href="ko/verification.html" lang="ko" hreflang="ko">한국어</a> <a href="zh-CN/verification.html" lang="zh-CN" hreflang="zh-CN">简体中文</a> <a href="zh-TW/verification.html" lang="zh-TW" hreflang="zh-TW">繁體中文</a> <a href="es/verification.html" lang="es" hreflang="es">Español</a> <a href="pt/verification.html" lang="pt-BR" hreflang="pt-BR">Português (Brasil)</a> <a href="fr/verification.html" lang="fr" hreflang="fr">Français</a> <a href="de/verification.html" lang="de" hreflang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="巻の選択"><a href="index.html">総合目次</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB LIBRARY</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC LIBRARY</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">この巻を検索</label><input type="search" id="search" placeholder="例：入力 / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="この巻の目次"><a href="#scope">今回の確認範囲</a><a href="#result-gb_hello">gb_hello</a><a href="#result-gb_arithmetic">gb_arithmetic</a><a href="#result-gb_control">gb_control</a><a href="#result-gb_aggregate">gb_aggregate</a><a href="#result-gb_bits_memory">gb_bits_memory</a><a href="#result-gb_input">gb_input</a><a href="#result-gb_fixed">gb_fixed</a><a href="#result-gb_entity">gb_entity</a><a href="#result-gb_debug">gb_debug</a><a href="#result-gb_chain">gb_chain</a><a href="#result-fc_hello">fc_hello</a><a href="#result-fc_arithmetic">fc_arithmetic</a><a href="#result-fc_control">fc_control</a><a href="#result-fc_aggregate">fc_aggregate</a><a href="#result-fc_bits_memory">fc_bits_memory</a><a href="#result-fc_input">fc_input</a><a href="#result-fc_fixed">fc_fixed</a><a href="#result-fc_entity">fc_entity</a><a href="#result-fc_debug">fc_debug</a><a href="#result-fc_chain">fc_chain</a><a href="#result-gb_cgb_palette">gb_cgb_palette</a><a href="#result-gb_scroll">gb_scroll</a><a href="#result-gb_vram_queue">gb_vram_queue</a><a href="#result-gb_sprite">gb_sprite</a><a href="#result-gb_rng">gb_rng</a><a href="#result-gb_flags">gb_flags</a><a href="#result-gb_circle">gb_circle</a><a href="#result-fc_scroll">fc_scroll</a><a href="#result-fc_vram_queue">fc_vram_queue</a><a href="#result-fc_sprite">fc_sprite</a><a href="#result-fc_sound">fc_sound</a><a href="#result-gb_sound">gb_sound</a><a href="#result-gb_font">gb_font</a><a href="#result-fc_font">fc_font</a><a href="#result-gb_system">gb_system</a><a href="#result-gb_scene">gb_scene</a><a href="#result-fc_system">fc_system</a><a href="#result-fc_scene">fc_scene</a><a href="#result-gb_camera">gb_camera</a><a href="#result-gb_rle">gb_rle</a><a href="#result-gb_board">gb_board</a><a href="#result-gb_physics">gb_physics</a><a href="#result-gb_link">gb_link</a><a href="#result-gb_bank">gb_bank</a><a href="#result-gb_asset">gb_asset</a><a href="#result-gb_danmaku">gb_danmaku</a><a href="#result-fc_subpixel">fc_subpixel</a><a href="#visual_checks-json">サンプル画面の数値・字体照合</a><a href="#workflow-json">診断ワークフロー</a><a href="#compiler_tests-json">コンパイラ修正の回帰試験</a><a href="#browser_checks-json">ブラウザーでの表示確認</a><a href="#site_checks-json">HTML構造とリンク</a></nav><button class="print" type="button">この巻を印刷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>VERIFICATION</h1><p class="subtitle">ビルド・実行・表示の確認記録</p><div class="edition">初めての一行から、実行・観測・再テストまで。<br>ローカルソース採取：2026年9月14日</div></div><h2 id="scope">今回の確認範囲</h2><p>以下は9月12日時点のソースに対する検証記録です。コンパイラ2種とKUROSAKI CLIは記録したソースからビルドし、KOKURAとSARAKURAはローカルの実行ファイルを使用しました。全機能・全周辺機器・実機の試験ではありません。公開するソースと実行ファイルのビルド・実行検証は <a href="PUBLICATION_CHECKS.md">publication checks</a> に記録しています。</p><p>各サンプルのコンパイル終了コード、120フレームのエミュレータ実行、画面は以下です。期待値の画素照合は別の結果がある場合に明示します。終了コード0だけで入力・音・ゲーム挙動の正常を証明したとはしません。</p><section id="gb_hello"><h2 id="result-gb_hello">gb_hello</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>HELLO WORLD and 042</p><img class="screen" loading="lazy" src="verification/gb_hello.png" alt="gb_hello のエミュレータ実行画面"><p><a href="verification/gb_hello-build.txt">ビルドログ</a> ／ <a href="verification/gb_hello-runtime.txt">実行ログ</a></p></section><section id="gb_arithmetic"><h2 id="result-gb_arithmetic">gb_arithmetic</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>030</p><img class="screen" loading="lazy" src="verification/gb_arithmetic.png" alt="gb_arithmetic のエミュレータ実行画面"><p><a href="verification/gb_arithmetic-build.txt">ビルドログ</a> ／ <a href="verification/gb_arithmetic-runtime.txt">実行ログ</a></p></section><section id="gb_control"><h2 id="result-gb_control">gb_control</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_control.png" alt="gb_control のエミュレータ実行画面"><p><a href="verification/gb_control-build.txt">ビルドログ</a> ／ <a href="verification/gb_control-runtime.txt">実行ログ</a></p></section><section id="gb_aggregate"><h2 id="result-gb_aggregate">gb_aggregate</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_aggregate.png" alt="gb_aggregate のエミュレータ実行画面"><p><a href="verification/gb_aggregate-build.txt">ビルドログ</a> ／ <a href="verification/gb_aggregate-runtime.txt">実行ログ</a></p></section><section id="gb_bits_memory"><h2 id="result-gb_bits_memory">gb_bits_memory</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>010</p><img class="screen" loading="lazy" src="verification/gb_bits_memory.png" alt="gb_bits_memory のエミュレータ実行画面"><p><a href="verification/gb_bits_memory-build.txt">ビルドログ</a> ／ <a href="verification/gb_bits_memory-runtime.txt">実行ログ</a></p></section><section id="gb_input"><h2 id="result-gb_input">gb_input</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>000 initially; A increments once per press</p><img class="screen" loading="lazy" src="verification/gb_input.png" alt="gb_input のエミュレータ実行画面"><p><a href="verification/gb_input-build.txt">ビルドログ</a> ／ <a href="verification/gb_input-runtime.txt">実行ログ</a></p></section><section id="gb_fixed"><h2 id="result-gb_fixed">gb_fixed</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>012</p><img class="screen" loading="lazy" src="verification/gb_fixed.png" alt="gb_fixed のエミュレータ実行画面"><p><a href="verification/gb_fixed-build.txt">ビルドログ</a> ／ <a href="verification/gb_fixed-runtime.txt">実行ログ</a></p></section><section id="gb_entity"><h2 id="result-gb_entity">gb_entity</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001</p><img class="screen" loading="lazy" src="verification/gb_entity.png" alt="gb_entity のエミュレータ実行画面"><p><a href="verification/gb_entity-build.txt">ビルドログ</a> ／ <a href="verification/gb_entity-runtime.txt">実行ログ</a></p></section><section id="gb_debug"><h2 id="result-gb_debug">gb_debug</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; trace log contains HP=42</p><img class="screen" loading="lazy" src="verification/gb_debug.png" alt="gb_debug のエミュレータ実行画面"><p><a href="verification/gb_debug-build.txt">ビルドログ</a> ／ <a href="verification/gb_debug-runtime.txt">実行ログ</a></p></section><section id="gb_chain"><h2 id="result-gb_chain">gb_chain</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; history contains (20,30)</p><img class="screen" loading="lazy" src="verification/gb_chain.png" alt="gb_chain のエミュレータ実行画面"><p><a href="verification/gb_chain-build.txt">ビルドログ</a> ／ <a href="verification/gb_chain-runtime.txt">実行ログ</a></p></section><section id="fc_hello"><h2 id="result-fc_hello">fc_hello</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>HELLO WORLD and 042</p><img class="screen" loading="lazy" src="verification/fc_hello.png" alt="fc_hello のエミュレータ実行画面"><p><a href="verification/fc_hello-build.txt">ビルドログ</a> ／ <a href="verification/fc_hello-runtime.txt">実行ログ</a></p></section><section id="fc_arithmetic"><h2 id="result-fc_arithmetic">fc_arithmetic</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>030</p><img class="screen" loading="lazy" src="verification/fc_arithmetic.png" alt="fc_arithmetic のエミュレータ実行画面"><p><a href="verification/fc_arithmetic-build.txt">ビルドログ</a> ／ <a href="verification/fc_arithmetic-runtime.txt">実行ログ</a></p></section><section id="fc_control"><h2 id="result-fc_control">fc_control</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/fc_control.png" alt="fc_control のエミュレータ実行画面"><p><a href="verification/fc_control-build.txt">ビルドログ</a> ／ <a href="verification/fc_control-runtime.txt">実行ログ</a></p></section><section id="fc_aggregate"><h2 id="result-fc_aggregate">fc_aggregate</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/fc_aggregate.png" alt="fc_aggregate のエミュレータ実行画面"><p><a href="verification/fc_aggregate-build.txt">ビルドログ</a> ／ <a href="verification/fc_aggregate-runtime.txt">実行ログ</a></p></section><section id="fc_bits_memory"><h2 id="result-fc_bits_memory">fc_bits_memory</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>010</p><img class="screen" loading="lazy" src="verification/fc_bits_memory.png" alt="fc_bits_memory のエミュレータ実行画面"><p><a href="verification/fc_bits_memory-build.txt">ビルドログ</a> ／ <a href="verification/fc_bits_memory-runtime.txt">実行ログ</a></p></section><section id="fc_input"><h2 id="result-fc_input">fc_input</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>000 initially; A increments once per press</p><img class="screen" loading="lazy" src="verification/fc_input.png" alt="fc_input のエミュレータ実行画面"><p><a href="verification/fc_input-build.txt">ビルドログ</a> ／ <a href="verification/fc_input-runtime.txt">実行ログ</a></p></section><section id="fc_fixed"><h2 id="result-fc_fixed">fc_fixed</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>012</p><img class="screen" loading="lazy" src="verification/fc_fixed.png" alt="fc_fixed のエミュレータ実行画面"><p><a href="verification/fc_fixed-build.txt">ビルドログ</a> ／ <a href="verification/fc_fixed-runtime.txt">実行ログ</a></p></section><section id="fc_entity"><h2 id="result-fc_entity">fc_entity</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001</p><img class="screen" loading="lazy" src="verification/fc_entity.png" alt="fc_entity のエミュレータ実行画面"><p><a href="verification/fc_entity-build.txt">ビルドログ</a> ／ <a href="verification/fc_entity-runtime.txt">実行ログ</a></p></section><section id="fc_debug"><h2 id="result-fc_debug">fc_debug</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; trace log contains HP=42</p><img class="screen" loading="lazy" src="verification/fc_debug.png" alt="fc_debug のエミュレータ実行画面"><p><a href="verification/fc_debug-build.txt">ビルドログ</a> ／ <a href="verification/fc_debug-runtime.txt">実行ログ</a></p></section><section id="fc_chain"><h2 id="result-fc_chain">fc_chain</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; history contains (20,30)</p><img class="screen" loading="lazy" src="verification/fc_chain.png" alt="fc_chain のエミュレータ実行画面"><p><a href="verification/fc_chain-build.txt">ビルドログ</a> ／ <a href="verification/fc_chain-runtime.txt">実行ログ</a></p></section><section id="gb_cgb_palette"><h2 id="result-gb_cgb_palette">gb_cgb_palette</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 in purple on white; CGB mode</p><img class="screen" loading="lazy" src="verification/gb_cgb_palette.png" alt="gb_cgb_palette のエミュレータ実行画面"><p><a href="verification/gb_cgb_palette-build.txt">ビルドログ</a> ／ <a href="verification/gb_cgb_palette-runtime.txt">実行ログ</a></p></section><section id="gb_scroll"><h2 id="result-gb_scroll">gb_scroll</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>title moves left as SCX increases</p><img class="screen" loading="lazy" src="verification/gb_scroll.png" alt="gb_scroll のエミュレータ実行画面"><p><a href="verification/gb_scroll-build.txt">ビルドログ</a> ／ <a href="verification/gb_scroll-runtime.txt">実行ログ</a></p></section><section id="gb_vram_queue"><h2 id="result-gb_vram_queue">gb_vram_queue</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>4 at (3,8)</p><img class="screen" loading="lazy" src="verification/gb_vram_queue.png" alt="gb_vram_queue のエミュレータ実行画面"><p><a href="verification/gb_vram_queue-build.txt">ビルドログ</a> ／ <a href="verification/gb_vram_queue-runtime.txt">実行ログ</a></p></section><section id="gb_sprite"><h2 id="result-gb_sprite">gb_sprite</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>letter A at sprite position</p><img class="screen" loading="lazy" src="verification/gb_sprite.png" alt="gb_sprite のエミュレータ実行画面"><p><a href="verification/gb_sprite-build.txt">ビルドログ</a> ／ <a href="verification/gb_sprite-runtime.txt">実行ログ</a></p></section><section id="gb_rng"><h2 id="result-gb_rng">gb_rng</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>value 000 through 009; same seed repeats</p><img class="screen" loading="lazy" src="verification/gb_rng.png" alt="gb_rng のエミュレータ実行画面"><p><a href="verification/gb_rng-build.txt">ビルドログ</a> ／ <a href="verification/gb_rng-runtime.txt">実行ログ</a></p></section><section id="gb_flags"><h2 id="result-gb_flags">gb_flags</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001</p><img class="screen" loading="lazy" src="verification/gb_flags.png" alt="gb_flags のエミュレータ実行画面"><p><a href="verification/gb_flags-build.txt">ビルドログ</a> ／ <a href="verification/gb_flags-runtime.txt">実行ログ</a></p></section><section id="gb_circle"><h2 id="result-gb_circle">gb_circle</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 after one step; this example uses integer pixels</p><img class="screen" loading="lazy" src="verification/gb_circle.png" alt="gb_circle のエミュレータ実行画面"><p><a href="verification/gb_circle-build.txt">ビルドログ</a> ／ <a href="verification/gb_circle-runtime.txt">実行ログ</a></p></section><section id="fc_scroll"><h2 id="result-fc_scroll">fc_scroll</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>title scrolls horizontally</p><img class="screen" loading="lazy" src="verification/fc_scroll.png" alt="fc_scroll のエミュレータ実行画面"><p><a href="verification/fc_scroll-build.txt">ビルドログ</a> ／ <a href="verification/fc_scroll-runtime.txt">実行ログ</a></p></section><section id="fc_vram_queue"><h2 id="result-fc_vram_queue">fc_vram_queue</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>4 at (3,8)</p><img class="screen" loading="lazy" src="verification/fc_vram_queue.png" alt="fc_vram_queue のエミュレータ実行画面"><p><a href="verification/fc_vram_queue-build.txt">ビルドログ</a> ／ <a href="verification/fc_vram_queue-runtime.txt">実行ログ</a></p></section><section id="fc_sprite"><h2 id="result-fc_sprite">fc_sprite</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>A sprite on screen</p><img class="screen" loading="lazy" src="verification/fc_sprite.png" alt="fc_sprite のエミュレータ実行画面"><p><a href="verification/fc_sprite-build.txt">ビルドログ</a> ／ <a href="verification/fc_sprite-runtime.txt">実行ログ</a></p></section><section id="fc_sound"><h2 id="result-fc_sound">fc_sound</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 and a pulse tone</p><img class="screen" loading="lazy" src="verification/fc_sound.png" alt="fc_sound のエミュレータ実行画面"><p><a href="verification/fc_sound-build.txt">ビルドログ</a> ／ <a href="verification/fc_sound-runtime.txt">実行ログ</a></p></section><section id="gb_sound"><h2 id="result-gb_sound">gb_sound</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 and a short pulse tone</p><img class="screen" loading="lazy" src="verification/gb_sound.png" alt="gb_sound のエミュレータ実行画面"><p><a href="verification/gb_sound-build.txt">ビルドログ</a> ／ <a href="verification/gb_sound-runtime.txt">実行ログ</a></p></section><section id="gb_font"><h2 id="result-gb_font">gb_font</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>Uppercase, lowercase, numbers and all 30 supplied punctuation glyphs</p><img class="screen" loading="lazy" src="verification/gb_font.png" alt="gb_font のエミュレータ実行画面"><p><a href="verification/gb_font-build.txt">ビルドログ</a> ／ <a href="verification/gb_font-runtime.txt">実行ログ</a></p></section><section id="fc_font"><h2 id="result-fc_font">fc_font</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>Uppercase, lowercase, numbers and all 30 supplied punctuation glyphs</p><img class="screen" loading="lazy" src="verification/fc_font.png" alt="fc_font のエミュレータ実行画面"><p><a href="verification/fc_font-build.txt">ビルドログ</a> ／ <a href="verification/fc_font-runtime.txt">実行ログ</a></p></section><section id="gb_system"><h2 id="result-gb_system">gb_system</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>002</p><img class="screen" loading="lazy" src="verification/gb_system.png" alt="gb_system のエミュレータ実行画面"><p><a href="verification/gb_system-build.txt">ビルドログ</a> ／ <a href="verification/gb_system-runtime.txt">実行ログ</a></p></section><section id="gb_scene"><h2 id="result-gb_scene">gb_scene</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; no callbacks registered</p><img class="screen" loading="lazy" src="verification/gb_scene.png" alt="gb_scene のエミュレータ実行画面"><p><a href="verification/gb_scene-build.txt">ビルドログ</a> ／ <a href="verification/gb_scene-runtime.txt">実行ログ</a></p></section><section id="fc_system"><h2 id="result-fc_system">fc_system</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>002</p><img class="screen" loading="lazy" src="verification/fc_system.png" alt="fc_system のエミュレータ実行画面"><p><a href="verification/fc_system-build.txt">ビルドログ</a> ／ <a href="verification/fc_system-runtime.txt">実行ログ</a></p></section><section id="fc_scene"><h2 id="result-fc_scene">fc_scene</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; no callbacks registered</p><img class="screen" loading="lazy" src="verification/fc_scene.png" alt="fc_scene のエミュレータ実行画面"><p><a href="verification/fc_scene-build.txt">ビルドログ</a> ／ <a href="verification/fc_scene-runtime.txt">実行ログ</a></p></section><section id="gb_camera"><h2 id="result-gb_camera">gb_camera</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042: world x=52 minus camera x=10</p><img class="screen" loading="lazy" src="verification/gb_camera.png" alt="gb_camera のエミュレータ実行画面"><p><a href="verification/gb_camera-build.txt">ビルドログ</a> ／ <a href="verification/gb_camera-runtime.txt">実行ログ</a></p></section><section id="gb_rle"><h2 id="result-gb_rle">gb_rle</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; three bytes each equal to 42</p><img class="screen" loading="lazy" src="verification/gb_rle.png" alt="gb_rle のエミュレータ実行画面"><p><a href="verification/gb_rle-build.txt">ビルドログ</a> ／ <a href="verification/gb_rle-runtime.txt">実行ログ</a></p></section><section id="gb_board"><h2 id="result-gb_board">gb_board</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_board.png" alt="gb_board のエミュレータ実行画面"><p><a href="verification/gb_board-build.txt">ビルドログ</a> ／ <a href="verification/gb_board-runtime.txt">実行ログ</a></p></section><section id="gb_physics"><h2 id="result-gb_physics">gb_physics</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042: integer pixel coordinates</p><img class="screen" loading="lazy" src="verification/gb_physics.png" alt="gb_physics のエミュレータ実行画面"><p><a href="verification/gb_physics-build.txt">ビルドログ</a> ／ <a href="verification/gb_physics-runtime.txt">実行ログ</a></p></section><section id="gb_link"><h2 id="result-gb_link">gb_link</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>255 for disconnected link; 000 if timeout; peer value when connected</p><img class="screen" loading="lazy" src="verification/gb_link.png" alt="gb_link のエミュレータ実行画面"><p><a href="verification/gb_link-build.txt">ビルドログ</a> ／ <a href="verification/gb_link-runtime.txt">実行ログ</a></p></section><section id="gb_bank"><h2 id="result-gb_bank">gb_bank</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; bank 0 fixed-ROM data copy</p><img class="screen" loading="lazy" src="verification/gb_bank.png" alt="gb_bank のエミュレータ実行画面"><p><a href="verification/gb_bank-build.txt">ビルドログ</a> ／ <a href="verification/gb_bank-runtime.txt">実行ログ</a></p></section><section id="gb_asset"><h2 id="result-gb_asset">gb_asset</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_asset.png" alt="gb_asset のエミュレータ実行画面"><p><a href="verification/gb_asset-build.txt">ビルドログ</a> ／ <a href="verification/gb_asset-runtime.txt">実行ログ</a></p></section><section id="gb_danmaku"><h2 id="result-gb_danmaku">gb_danmaku</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; numeric pool example, no bullet BG compositor</p><img class="screen" loading="lazy" src="verification/gb_danmaku.png" alt="gb_danmaku のエミュレータ実行画面"><p><a href="verification/gb_danmaku-build.txt">ビルドログ</a> ／ <a href="verification/gb_danmaku-runtime.txt">実行ログ</a></p></section><section id="fc_subpixel"><h2 id="result-fc_subpixel">fc_subpixel</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; explicit game-side integration using header constants</p><img class="screen" loading="lazy" src="verification/fc_subpixel.png" alt="fc_subpixel のエミュレータ実行画面"><p><a href="verification/fc_subpixel-build.txt">ビルドログ</a> ／ <a href="verification/fc_subpixel-runtime.txt">実行ログ</a></p></section><h2 id="visual_checks-json">サンプル画面の数値・字体照合</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">コピー</button><pre><code>[
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>VERIFICATION — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="assets/manual.css"></head><body><a class="skip" href="#main">本文へ</a><header class="mast"><a href="index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER'S MANUAL <b>2026.09</b></div></header><nav class="languages" aria-label="言語"><a href="en/verification.html" lang="en" hreflang="en">English</a> <a href="verification.html" lang="ja" hreflang="ja" aria-current="page">日本語</a> <a href="ko/verification.html" lang="ko" hreflang="ko">한국어</a> <a href="zh-CN/verification.html" lang="zh-CN" hreflang="zh-CN">简体中文</a> <a href="zh-TW/verification.html" lang="zh-TW" hreflang="zh-TW">繁體中文</a> <a href="es/verification.html" lang="es" hreflang="es">Español</a> <a href="pt/verification.html" lang="pt-BR" hreflang="pt-BR">Português (Brasil)</a> <a href="fr/verification.html" lang="fr" hreflang="fr">Français</a> <a href="de/verification.html" lang="de" hreflang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="巻の選択"><a href="index.html">総合目次</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB LIBRARY</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC LIBRARY</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">この巻を検索</label><input type="search" id="search" placeholder="例：入力 / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="この巻の目次"><a href="#scope">今回の確認範囲</a><a href="#result-gb_hello">gb_hello</a><a href="#result-gb_arithmetic">gb_arithmetic</a><a href="#result-gb_control">gb_control</a><a href="#result-gb_aggregate">gb_aggregate</a><a href="#result-gb_bits_memory">gb_bits_memory</a><a href="#result-gb_input">gb_input</a><a href="#result-gb_fixed">gb_fixed</a><a href="#result-gb_entity">gb_entity</a><a href="#result-gb_debug">gb_debug</a><a href="#result-gb_chain">gb_chain</a><a href="#result-fc_hello">fc_hello</a><a href="#result-fc_arithmetic">fc_arithmetic</a><a href="#result-fc_control">fc_control</a><a href="#result-fc_aggregate">fc_aggregate</a><a href="#result-fc_bits_memory">fc_bits_memory</a><a href="#result-fc_input">fc_input</a><a href="#result-fc_fixed">fc_fixed</a><a href="#result-fc_entity">fc_entity</a><a href="#result-fc_debug">fc_debug</a><a href="#result-fc_chain">fc_chain</a><a href="#result-gb_cgb_palette">gb_cgb_palette</a><a href="#result-gb_scroll">gb_scroll</a><a href="#result-gb_vram_queue">gb_vram_queue</a><a href="#result-gb_sprite">gb_sprite</a><a href="#result-gb_rng">gb_rng</a><a href="#result-gb_flags">gb_flags</a><a href="#result-gb_circle">gb_circle</a><a href="#result-fc_scroll">fc_scroll</a><a href="#result-fc_vram_queue">fc_vram_queue</a><a href="#result-fc_sprite">fc_sprite</a><a href="#result-fc_sound">fc_sound</a><a href="#result-gb_sound">gb_sound</a><a href="#result-gb_font">gb_font</a><a href="#result-fc_font">fc_font</a><a href="#result-gb_system">gb_system</a><a href="#result-gb_scene">gb_scene</a><a href="#result-fc_system">fc_system</a><a href="#result-fc_scene">fc_scene</a><a href="#result-gb_camera">gb_camera</a><a href="#result-gb_rle">gb_rle</a><a href="#result-gb_board">gb_board</a><a href="#result-gb_physics">gb_physics</a><a href="#result-gb_link">gb_link</a><a href="#result-gb_bank">gb_bank</a><a href="#result-gb_asset">gb_asset</a><a href="#result-gb_danmaku">gb_danmaku</a><a href="#result-fc_subpixel">fc_subpixel</a><a href="#visual_checks-json">サンプル画面の数値・字体照合</a><a href="#workflow-json">診断ワークフロー</a><a href="#compiler_tests-json">コンパイラ修正の回帰試験</a><a href="#browser_checks-json">ブラウザーでの表示確認</a><a href="#site_checks-json">HTML構造とリンク</a><!-- api-verification:start --><a href="#api-verification">APIサンプルの期待画像と検証結果</a><!-- api-verification:end --></nav><button class="print" type="button">この巻を印刷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>VERIFICATION</h1><p class="subtitle">ビルド・実行・表示の確認記録</p><div class="edition">初めての一行から、実行・観測・再テストまで。<br>ローカルソース採取：2026年9月14日</div></div><h2 id="scope">今回の確認範囲</h2><p>以下は9月12日時点のソースに対する検証記録です。コンパイラ2種とKUROSAKI CLIは記録したソースからビルドし、KOKURAとSARAKURAはローカルの実行ファイルを使用しました。全機能・全周辺機器・実機の試験ではありません。公開するソースと実行ファイルのビルド・実行検証は <a href="PUBLICATION_CHECKS.md">publication checks</a> に記録しています。</p><p>各サンプルのコンパイル終了コード、120フレームのエミュレータ実行、画面は以下です。期待値の画素照合は別の結果がある場合に明示します。終了コード0だけで入力・音・ゲーム挙動の正常を証明したとはしません。</p><section id="gb_hello"><h2 id="result-gb_hello">gb_hello</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>HELLO WORLD and 042</p><img class="screen" loading="lazy" src="verification/gb_hello.png" alt="gb_hello のエミュレータ実行画面"><p><a href="verification/gb_hello-build.txt">ビルドログ</a> ／ <a href="verification/gb_hello-runtime.txt">実行ログ</a></p></section><section id="gb_arithmetic"><h2 id="result-gb_arithmetic">gb_arithmetic</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>030</p><img class="screen" loading="lazy" src="verification/gb_arithmetic.png" alt="gb_arithmetic のエミュレータ実行画面"><p><a href="verification/gb_arithmetic-build.txt">ビルドログ</a> ／ <a href="verification/gb_arithmetic-runtime.txt">実行ログ</a></p></section><section id="gb_control"><h2 id="result-gb_control">gb_control</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_control.png" alt="gb_control のエミュレータ実行画面"><p><a href="verification/gb_control-build.txt">ビルドログ</a> ／ <a href="verification/gb_control-runtime.txt">実行ログ</a></p></section><section id="gb_aggregate"><h2 id="result-gb_aggregate">gb_aggregate</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_aggregate.png" alt="gb_aggregate のエミュレータ実行画面"><p><a href="verification/gb_aggregate-build.txt">ビルドログ</a> ／ <a href="verification/gb_aggregate-runtime.txt">実行ログ</a></p></section><section id="gb_bits_memory"><h2 id="result-gb_bits_memory">gb_bits_memory</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>010</p><img class="screen" loading="lazy" src="verification/gb_bits_memory.png" alt="gb_bits_memory のエミュレータ実行画面"><p><a href="verification/gb_bits_memory-build.txt">ビルドログ</a> ／ <a href="verification/gb_bits_memory-runtime.txt">実行ログ</a></p></section><section id="gb_input"><h2 id="result-gb_input">gb_input</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>000 initially; A increments once per press</p><img class="screen" loading="lazy" src="verification/gb_input.png" alt="gb_input のエミュレータ実行画面"><p><a href="verification/gb_input-build.txt">ビルドログ</a> ／ <a href="verification/gb_input-runtime.txt">実行ログ</a></p></section><section id="gb_fixed"><h2 id="result-gb_fixed">gb_fixed</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>012</p><img class="screen" loading="lazy" src="verification/gb_fixed.png" alt="gb_fixed のエミュレータ実行画面"><p><a href="verification/gb_fixed-build.txt">ビルドログ</a> ／ <a href="verification/gb_fixed-runtime.txt">実行ログ</a></p></section><section id="gb_entity"><h2 id="result-gb_entity">gb_entity</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001</p><img class="screen" loading="lazy" src="verification/gb_entity.png" alt="gb_entity のエミュレータ実行画面"><p><a href="verification/gb_entity-build.txt">ビルドログ</a> ／ <a href="verification/gb_entity-runtime.txt">実行ログ</a></p></section><section id="gb_debug"><h2 id="result-gb_debug">gb_debug</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; trace log contains HP=42</p><img class="screen" loading="lazy" src="verification/gb_debug.png" alt="gb_debug のエミュレータ実行画面"><p><a href="verification/gb_debug-build.txt">ビルドログ</a> ／ <a href="verification/gb_debug-runtime.txt">実行ログ</a></p></section><section id="gb_chain"><h2 id="result-gb_chain">gb_chain</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; history contains (20,30)</p><img class="screen" loading="lazy" src="verification/gb_chain.png" alt="gb_chain のエミュレータ実行画面"><p><a href="verification/gb_chain-build.txt">ビルドログ</a> ／ <a href="verification/gb_chain-runtime.txt">実行ログ</a></p></section><section id="fc_hello"><h2 id="result-fc_hello">fc_hello</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>HELLO WORLD and 042</p><img class="screen" loading="lazy" src="verification/fc_hello.png" alt="fc_hello のエミュレータ実行画面"><p><a href="verification/fc_hello-build.txt">ビルドログ</a> ／ <a href="verification/fc_hello-runtime.txt">実行ログ</a></p></section><section id="fc_arithmetic"><h2 id="result-fc_arithmetic">fc_arithmetic</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>030</p><img class="screen" loading="lazy" src="verification/fc_arithmetic.png" alt="fc_arithmetic のエミュレータ実行画面"><p><a href="verification/fc_arithmetic-build.txt">ビルドログ</a> ／ <a href="verification/fc_arithmetic-runtime.txt">実行ログ</a></p></section><section id="fc_control"><h2 id="result-fc_control">fc_control</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/fc_control.png" alt="fc_control のエミュレータ実行画面"><p><a href="verification/fc_control-build.txt">ビルドログ</a> ／ <a href="verification/fc_control-runtime.txt">実行ログ</a></p></section><section id="fc_aggregate"><h2 id="result-fc_aggregate">fc_aggregate</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/fc_aggregate.png" alt="fc_aggregate のエミュレータ実行画面"><p><a href="verification/fc_aggregate-build.txt">ビルドログ</a> ／ <a href="verification/fc_aggregate-runtime.txt">実行ログ</a></p></section><section id="fc_bits_memory"><h2 id="result-fc_bits_memory">fc_bits_memory</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>010</p><img class="screen" loading="lazy" src="verification/fc_bits_memory.png" alt="fc_bits_memory のエミュレータ実行画面"><p><a href="verification/fc_bits_memory-build.txt">ビルドログ</a> ／ <a href="verification/fc_bits_memory-runtime.txt">実行ログ</a></p></section><section id="fc_input"><h2 id="result-fc_input">fc_input</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>000 initially; A increments once per press</p><img class="screen" loading="lazy" src="verification/fc_input.png" alt="fc_input のエミュレータ実行画面"><p><a href="verification/fc_input-build.txt">ビルドログ</a> ／ <a href="verification/fc_input-runtime.txt">実行ログ</a></p></section><section id="fc_fixed"><h2 id="result-fc_fixed">fc_fixed</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>012</p><img class="screen" loading="lazy" src="verification/fc_fixed.png" alt="fc_fixed のエミュレータ実行画面"><p><a href="verification/fc_fixed-build.txt">ビルドログ</a> ／ <a href="verification/fc_fixed-runtime.txt">実行ログ</a></p></section><section id="fc_entity"><h2 id="result-fc_entity">fc_entity</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001</p><img class="screen" loading="lazy" src="verification/fc_entity.png" alt="fc_entity のエミュレータ実行画面"><p><a href="verification/fc_entity-build.txt">ビルドログ</a> ／ <a href="verification/fc_entity-runtime.txt">実行ログ</a></p></section><section id="fc_debug"><h2 id="result-fc_debug">fc_debug</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; trace log contains HP=42</p><img class="screen" loading="lazy" src="verification/fc_debug.png" alt="fc_debug のエミュレータ実行画面"><p><a href="verification/fc_debug-build.txt">ビルドログ</a> ／ <a href="verification/fc_debug-runtime.txt">実行ログ</a></p></section><section id="fc_chain"><h2 id="result-fc_chain">fc_chain</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; history contains (20,30)</p><img class="screen" loading="lazy" src="verification/fc_chain.png" alt="fc_chain のエミュレータ実行画面"><p><a href="verification/fc_chain-build.txt">ビルドログ</a> ／ <a href="verification/fc_chain-runtime.txt">実行ログ</a></p></section><section id="gb_cgb_palette"><h2 id="result-gb_cgb_palette">gb_cgb_palette</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 in purple on white; CGB mode</p><img class="screen" loading="lazy" src="verification/gb_cgb_palette.png" alt="gb_cgb_palette のエミュレータ実行画面"><p><a href="verification/gb_cgb_palette-build.txt">ビルドログ</a> ／ <a href="verification/gb_cgb_palette-runtime.txt">実行ログ</a></p></section><section id="gb_scroll"><h2 id="result-gb_scroll">gb_scroll</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>title moves left as SCX increases</p><img class="screen" loading="lazy" src="verification/gb_scroll.png" alt="gb_scroll のエミュレータ実行画面"><p><a href="verification/gb_scroll-build.txt">ビルドログ</a> ／ <a href="verification/gb_scroll-runtime.txt">実行ログ</a></p></section><section id="gb_vram_queue"><h2 id="result-gb_vram_queue">gb_vram_queue</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>4 at (3,8)</p><img class="screen" loading="lazy" src="verification/gb_vram_queue.png" alt="gb_vram_queue のエミュレータ実行画面"><p><a href="verification/gb_vram_queue-build.txt">ビルドログ</a> ／ <a href="verification/gb_vram_queue-runtime.txt">実行ログ</a></p></section><section id="gb_sprite"><h2 id="result-gb_sprite">gb_sprite</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>letter A at sprite position</p><img class="screen" loading="lazy" src="verification/gb_sprite.png" alt="gb_sprite のエミュレータ実行画面"><p><a href="verification/gb_sprite-build.txt">ビルドログ</a> ／ <a href="verification/gb_sprite-runtime.txt">実行ログ</a></p></section><section id="gb_rng"><h2 id="result-gb_rng">gb_rng</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>value 000 through 009; same seed repeats</p><img class="screen" loading="lazy" src="verification/gb_rng.png" alt="gb_rng のエミュレータ実行画面"><p><a href="verification/gb_rng-build.txt">ビルドログ</a> ／ <a href="verification/gb_rng-runtime.txt">実行ログ</a></p></section><section id="gb_flags"><h2 id="result-gb_flags">gb_flags</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001</p><img class="screen" loading="lazy" src="verification/gb_flags.png" alt="gb_flags のエミュレータ実行画面"><p><a href="verification/gb_flags-build.txt">ビルドログ</a> ／ <a href="verification/gb_flags-runtime.txt">実行ログ</a></p></section><section id="gb_circle"><h2 id="result-gb_circle">gb_circle</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 after one step; this example uses integer pixels</p><img class="screen" loading="lazy" src="verification/gb_circle.png" alt="gb_circle のエミュレータ実行画面"><p><a href="verification/gb_circle-build.txt">ビルドログ</a> ／ <a href="verification/gb_circle-runtime.txt">実行ログ</a></p></section><section id="fc_scroll"><h2 id="result-fc_scroll">fc_scroll</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>title scrolls horizontally</p><img class="screen" loading="lazy" src="verification/fc_scroll.png" alt="fc_scroll のエミュレータ実行画面"><p><a href="verification/fc_scroll-build.txt">ビルドログ</a> ／ <a href="verification/fc_scroll-runtime.txt">実行ログ</a></p></section><section id="fc_vram_queue"><h2 id="result-fc_vram_queue">fc_vram_queue</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>4 at (3,8)</p><img class="screen" loading="lazy" src="verification/fc_vram_queue.png" alt="fc_vram_queue のエミュレータ実行画面"><p><a href="verification/fc_vram_queue-build.txt">ビルドログ</a> ／ <a href="verification/fc_vram_queue-runtime.txt">実行ログ</a></p></section><section id="fc_sprite"><h2 id="result-fc_sprite">fc_sprite</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>A sprite on screen</p><img class="screen" loading="lazy" src="verification/fc_sprite.png" alt="fc_sprite のエミュレータ実行画面"><p><a href="verification/fc_sprite-build.txt">ビルドログ</a> ／ <a href="verification/fc_sprite-runtime.txt">実行ログ</a></p></section><section id="fc_sound"><h2 id="result-fc_sound">fc_sound</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 and a pulse tone</p><img class="screen" loading="lazy" src="verification/fc_sound.png" alt="fc_sound のエミュレータ実行画面"><p><a href="verification/fc_sound-build.txt">ビルドログ</a> ／ <a href="verification/fc_sound-runtime.txt">実行ログ</a></p></section><section id="gb_sound"><h2 id="result-gb_sound">gb_sound</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042 and a short pulse tone</p><img class="screen" loading="lazy" src="verification/gb_sound.png" alt="gb_sound のエミュレータ実行画面"><p><a href="verification/gb_sound-build.txt">ビルドログ</a> ／ <a href="verification/gb_sound-runtime.txt">実行ログ</a></p></section><section id="gb_font"><h2 id="result-gb_font">gb_font</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>Uppercase, lowercase, numbers and all 30 supplied punctuation glyphs</p><img class="screen" loading="lazy" src="verification/gb_font.png" alt="gb_font のエミュレータ実行画面"><p><a href="verification/gb_font-build.txt">ビルドログ</a> ／ <a href="verification/gb_font-runtime.txt">実行ログ</a></p></section><section id="fc_font"><h2 id="result-fc_font">fc_font</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>Uppercase, lowercase, numbers and all 30 supplied punctuation glyphs</p><img class="screen" loading="lazy" src="verification/fc_font.png" alt="fc_font のエミュレータ実行画面"><p><a href="verification/fc_font-build.txt">ビルドログ</a> ／ <a href="verification/fc_font-runtime.txt">実行ログ</a></p></section><section id="gb_system"><h2 id="result-gb_system">gb_system</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>002</p><img class="screen" loading="lazy" src="verification/gb_system.png" alt="gb_system のエミュレータ実行画面"><p><a href="verification/gb_system-build.txt">ビルドログ</a> ／ <a href="verification/gb_system-runtime.txt">実行ログ</a></p></section><section id="gb_scene"><h2 id="result-gb_scene">gb_scene</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; no callbacks registered</p><img class="screen" loading="lazy" src="verification/gb_scene.png" alt="gb_scene のエミュレータ実行画面"><p><a href="verification/gb_scene-build.txt">ビルドログ</a> ／ <a href="verification/gb_scene-runtime.txt">実行ログ</a></p></section><section id="fc_system"><h2 id="result-fc_system">fc_system</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>002</p><img class="screen" loading="lazy" src="verification/fc_system.png" alt="fc_system のエミュレータ実行画面"><p><a href="verification/fc_system-build.txt">ビルドログ</a> ／ <a href="verification/fc_system-runtime.txt">実行ログ</a></p></section><section id="fc_scene"><h2 id="result-fc_scene">fc_scene</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; no callbacks registered</p><img class="screen" loading="lazy" src="verification/fc_scene.png" alt="fc_scene のエミュレータ実行画面"><p><a href="verification/fc_scene-build.txt">ビルドログ</a> ／ <a href="verification/fc_scene-runtime.txt">実行ログ</a></p></section><section id="gb_camera"><h2 id="result-gb_camera">gb_camera</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042: world x=52 minus camera x=10</p><img class="screen" loading="lazy" src="verification/gb_camera.png" alt="gb_camera のエミュレータ実行画面"><p><a href="verification/gb_camera-build.txt">ビルドログ</a> ／ <a href="verification/gb_camera-runtime.txt">実行ログ</a></p></section><section id="gb_rle"><h2 id="result-gb_rle">gb_rle</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; three bytes each equal to 42</p><img class="screen" loading="lazy" src="verification/gb_rle.png" alt="gb_rle のエミュレータ実行画面"><p><a href="verification/gb_rle-build.txt">ビルドログ</a> ／ <a href="verification/gb_rle-runtime.txt">実行ログ</a></p></section><section id="gb_board"><h2 id="result-gb_board">gb_board</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_board.png" alt="gb_board のエミュレータ実行画面"><p><a href="verification/gb_board-build.txt">ビルドログ</a> ／ <a href="verification/gb_board-runtime.txt">実行ログ</a></p></section><section id="gb_physics"><h2 id="result-gb_physics">gb_physics</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042: integer pixel coordinates</p><img class="screen" loading="lazy" src="verification/gb_physics.png" alt="gb_physics のエミュレータ実行画面"><p><a href="verification/gb_physics-build.txt">ビルドログ</a> ／ <a href="verification/gb_physics-runtime.txt">実行ログ</a></p></section><section id="gb_link"><h2 id="result-gb_link">gb_link</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>255 for disconnected link; 000 if timeout; peer value when connected</p><img class="screen" loading="lazy" src="verification/gb_link.png" alt="gb_link のエミュレータ実行画面"><p><a href="verification/gb_link-build.txt">ビルドログ</a> ／ <a href="verification/gb_link-runtime.txt">実行ログ</a></p></section><section id="gb_bank"><h2 id="result-gb_bank">gb_bank</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; bank 0 fixed-ROM data copy</p><img class="screen" loading="lazy" src="verification/gb_bank.png" alt="gb_bank のエミュレータ実行画面"><p><a href="verification/gb_bank-build.txt">ビルドログ</a> ／ <a href="verification/gb_bank-runtime.txt">実行ログ</a></p></section><section id="gb_asset"><h2 id="result-gb_asset">gb_asset</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042</p><img class="screen" loading="lazy" src="verification/gb_asset.png" alt="gb_asset のエミュレータ実行画面"><p><a href="verification/gb_asset-build.txt">ビルドログ</a> ／ <a href="verification/gb_asset-runtime.txt">実行ログ</a></p></section><section id="gb_danmaku"><h2 id="result-gb_danmaku">gb_danmaku</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>001; numeric pool example, no bullet BG compositor</p><img class="screen" loading="lazy" src="verification/gb_danmaku.png" alt="gb_danmaku のエミュレータ実行画面"><p><a href="verification/gb_danmaku-build.txt">ビルドログ</a> ／ <a href="verification/gb_danmaku-runtime.txt">実行ログ</a></p></section><section id="fc_subpixel"><h2 id="result-fc_subpixel">fc_subpixel</h2><p>ビルド終了コード：0 ／ 実行：executed</p><p>042; explicit game-side integration using header constants</p><img class="screen" loading="lazy" src="verification/fc_subpixel.png" alt="fc_subpixel のエミュレータ実行画面"><p><a href="verification/fc_subpixel-build.txt">ビルドログ</a> ／ <a href="verification/fc_subpixel-runtime.txt">実行ログ</a></p></section><h2 id="visual_checks-json">サンプル画面の数値・字体照合</h2><div class="codebox"><span class="lang">json</span><button class="copy" type="button">コピー</button><pre><code>[
   {
     &quot;id&quot;: &quot;gb_hello&quot;,
     &quot;tile_x&quot;: 3,
@@ -925,4 +925,1592 @@
   &quot;historical_emulator_runs&quot;: 47,
   &quot;errors&quot;: [],
   &quot;status&quot;: &quot;passed&quot;
-}</code></pre></div><footer>2026-09-14版 • <a href="index.html">総合目次</a> • <a href="verification.html">検証記録</a> • <a href="reference/inventory.json">版の指紋</a><br>サンプルのビルド・エミュレータ実行・期待値照合は別項目として記録します。</footer></main></div><script src="assets/manual.js"></script></body></html>
+}</code></pre></div><!-- api-verification:start --><h2 id="api-verification">APIサンプルの期待画像と検証結果</h2><p>タイル操作の各プログラムをビルドし、KOKURAのDMG・CGB両モードで90フレーム実行しました。表示したタイル配置と周囲の空白を付属フォントの画素と照合し、文字色と画面の結果表示も確認しています。ROM内でも書き込み先のタイル番号・属性を読み戻して比較します。終了コード0だけを合格条件にはしていません。この例の書き込みはLCD停止中です。実機と、LCD動作中の転送タイミングは今回の試験対象ではありません。</p><section id="api-gb-__settile"><h3><code>__settile</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>書き込み先は常に <code>0x9800 + 32*y + x</code> です。LCDCで選んだBG・ウィンドウ用マップには追従しません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile-dmg.png" alt="__settile — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile-cgb.png" alt="__settile — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settile.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settile-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settile&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:32.612244+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;bccf8cba4cc64d49e0596ab4579785d7c13763083abec74e340f6e1a2778b566&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;56af5792da875a0c5d75efa3b7241519786520f1949e6a8dc5cba1f09b62e592&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_unsafe"><h3><code>__settile_unsafe</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>書き込み先は常に <code>0x9800 + 32*y + x</code> です。LCDCで選んだBG・ウィンドウ用マップには追従しません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_unsafe-dmg.png" alt="__settile_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_unsafe-cgb.png" alt="__settile_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settile_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settile_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settile_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:38.546339+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;e0d699a339bf96422040acd0880c8f48b082354f5eeeaf5c7a5f0800e94fec07&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;56eb3515ce3ad42ea7aa37ce84b5af6d5d4d808d7176d65a10d4a6840d61cece&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_fast"><h3><code>__settile_fast</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>書き込み先は常に <code>0x9800 + 32*y + x</code> です。LCDCで選んだBG・ウィンドウ用マップには追従しません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_fast-dmg.png" alt="__settile_fast — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_fast-cgb.png" alt="__settile_fast — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settile_fast.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settile_fast-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settile_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:43.964284+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;47d0f7afda3fbc0f4ef0c6bdfd923d6830915cfa5e2ae8a5b06967841a7efd1c&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;28bcd6161077a425d0126e2cb72aadb1e09dc84005a753c95dff2a7db1fd700c&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileat"><h3><code>__settileat</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileat-dmg.png" alt="__settileat — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileat-cgb.png" alt="__settileat — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileat.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileat-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileat&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:49.923690+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;1a73ef77cb4df63fad8d2da856ee9e778e48a28836acfa40f9cf1d7002652ab4&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;1164d72a43203079b4f27f661db7b21fb5a7153cfe2535002789cab67bbf7c81&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileat_unsafe"><h3><code>__settileat_unsafe</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileat_unsafe-dmg.png" alt="__settileat_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileat_unsafe-cgb.png" alt="__settileat_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileat_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileat_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileat_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:24:55.302383+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;e96daddb831a029776e6158f55f26b76e0675ac0d00459eeaf08c18aeaf3b84c&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;f6023a824d62f6755b276d634b696e0744ddb7edd1abec4a1e3dbf06204ba7b7&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg"><h3><code>__settilebg</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg-dmg.png" alt="__settilebg — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg-cgb.png" alt="__settilebg — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebg.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebg-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:00.697137+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d7acb7ca93d020a2436bcfd815ebaa27adc8997a04883c773cf7c5416eaaa9fe&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;5ddec6aa59513b4bd80d3016e552ffb7b281caca7e3c6649fa37454fd8f2aea5&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_xy"><h3><code>__settile_xy</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_xy-dmg.png" alt="__settile_xy — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_xy-cgb.png" alt="__settile_xy — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settile_xy.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settile_xy-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settile_xy&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:05.913272+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;4a0b8b3e8f0d6785b38738a86c55d99ec52ed314ca8d951a5bf53a565d31de14&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;5ddec6aa59513b4bd80d3016e552ffb7b281caca7e3c6649fa37454fd8f2aea5&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg_unsafe"><h3><code>__settilebg_unsafe</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg_unsafe-dmg.png" alt="__settilebg_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg_unsafe-cgb.png" alt="__settilebg_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebg_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebg_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:11.289165+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;c0dc4202e08cfbbfb579333075d6140b4ed3d9c234a9dab770394dbbea642f28&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;91e9dfe0fba1d5d33efb0fbe29a9d6045c3e937f57ca0e87e68aff00945f4c43&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewin"><h3><code>__settilewin</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>LCDCのビット6で選択中のウィンドウマップへ書き込みます。0なら <code>0x9800</code>、1なら <code>0x9C00</code> です。<code>x,y</code> はマップ内の座標であり、画面上のウィンドウ位置ではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewin-dmg.png" alt="__settilewin — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewin-cgb.png" alt="__settilewin — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilewin.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilewin-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilewin&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:18.169478+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;309ab917fc3b2a9c7d9c783dc182459e78ac95deb5c538d20a0648e65abd6c06&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3ab0d00fbcdc96fa97c4070dcac53398d29d271a5f11d54f2dfbb29480a39b6d&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewin_unsafe"><h3><code>__settilewin_unsafe</code></h3><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>LCDCのビット6で選択中のウィンドウマップへ書き込みます。0なら <code>0x9800</code>、1なら <code>0x9C00</code> です。<code>x,y</code> はマップ内の座標であり、画面上のウィンドウ位置ではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewin_unsafe-dmg.png" alt="__settilewin_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewin_unsafe-cgb.png" alt="__settilewin_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilewin_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilewin_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilewin_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:25.313483+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;0534d9c266b21c09f8b57a486a200773bd99706965a0fc715cff0d2fcaf5e9a3&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3dbf7a4dc8d68e2451796a5dca464ca97c4861505da97c3bea3d5cbbcdf4f445&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr"><h3><code>__settileattr</code></h3><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p>書き込み先は常に <code>0x9800 + 32*y + x</code> です。LCDCで選んだBG・ウィンドウ用マップには追従しません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileattr-dmg.png" alt="__settileattr — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileattr-cgb.png" alt="__settileattr — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileattr.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileattr-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:30.875787+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d156d816e64b3201f31e572572a3fe6b939579089b7ff009eb11b41717f15c1c&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;eb2387bb6a0a2287a7783d356fe9af9e182bda35e40b49ad0f69a56b1a9c51e9&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr_unsafe"><h3><code>__settileattr_unsafe</code></h3><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p>書き込み先は常に <code>0x9800 + 32*y + x</code> です。LCDCで選んだBG・ウィンドウ用マップには追従しません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileattr_unsafe-dmg.png" alt="__settileattr_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileattr_unsafe-cgb.png" alt="__settileattr_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileattr_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileattr_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:36.255800+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;8cefb06e61295e326ed6fd27b1c8e742f60ce90548a5bf4e33a592a73fef91ec&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;b3be880175fe6b43b89e9c41beadcaff4873cd17fe021d2e8baf38b82333c151&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatattr"><h3><code>__settileatattr</code></h3><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileatattr-dmg.png" alt="__settileatattr — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileatattr-cgb.png" alt="__settileatattr — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileatattr.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileatattr-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileatattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:41.523042+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;68ede8ad916afd6dfe93198dbc6cae41240e23ab42eb76d290bd7e3604c56f69&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;cef51d1adb0126935d4679d91e91a345f4390eaf49c33f1a2f741949a1e1628a&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatattr_unsafe"><h3><code>__settileatattr_unsafe</code></h3><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileatattr_unsafe-dmg.png" alt="__settileatattr_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileatattr_unsafe-cgb.png" alt="__settileatattr_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileatattr_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileatattr_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileatattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:47.418398+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;bf7e9c75bd18c6e7c665cbb582178d2f199996b473c487f01bf6573bbc823faa&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;c64ef44c13bb75d8ff3bf13c8f38135f51153bdffb4bb6e897be585f7aa7000b&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgattr"><h3><code>__settilebgattr</code></h3><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebgattr-dmg.png" alt="__settilebgattr — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebgattr-cgb.png" alt="__settilebgattr — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebgattr.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebgattr-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:53.252001+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;001047351696329fca1f07608ce8f22807c2b4e67126c3b5c668bce2e66b7cf5&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;61c8f8ca4d9a5f3aa0992bb603626b455b182876bc80d9e47f8cbac06a097e0b&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgattr_unsafe"><h3><code>__settilebgattr_unsafe</code></h3><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebgattr_unsafe-dmg.png" alt="__settilebgattr_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebgattr_unsafe-cgb.png" alt="__settilebgattr_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebgattr_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebgattr_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:25:58.684339+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;bcff9982c1bd9a1e6b5749417711db602abaa07bce86d11c10bcc0d1fd7a20e6&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3161ce48c5330ad8f568b9c1a0c4e102b48a3d84a926b0909120fbcf6201c771&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewinattr"><h3><code>__settilewinattr</code></h3><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p>LCDCのビット6で選択中のウィンドウマップへ書き込みます。0なら <code>0x9800</code>、1なら <code>0x9C00</code> です。<code>x,y</code> はマップ内の座標であり、画面上のウィンドウ位置ではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewinattr-dmg.png" alt="__settilewinattr — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewinattr-cgb.png" alt="__settilewinattr — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilewinattr.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilewinattr-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilewinattr&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:03.972540+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;781778c4e61209f01f449031cc1839735b009504423b02bfe64be803dadef1d4&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;3ff46df981caa21e93f10786da732b51d609e43a1c4b41aeaa9af40ae2893609&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewinattr_unsafe"><h3><code>__settilewinattr_unsafe</code></h3><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p>LCDCのビット6で選択中のウィンドウマップへ書き込みます。0なら <code>0x9800</code>、1なら <code>0x9C00</code> です。<code>x,y</code> はマップ内の座標であり、画面上のウィンドウ位置ではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewinattr_unsafe-dmg.png" alt="__settilewinattr_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewinattr_unsafe-cgb.png" alt="__settilewinattr_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilewinattr_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilewinattr_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilewinattr_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:09.282499+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;0c3462d90b23e6d5e51bc99d23556f4920afdc6d73cd810b2e0f4585dbadd3fa&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;14e07311feb2191d00dd5d3b3073bb01c3d322257e787e422c16efdf7a9629f3&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb"><h3><code>__settilecgb</code></h3><p>タイル番号とCGB属性を続けて書き込みます。DMGではタイル番号だけを書きます。CGBではVRAMバンク0を選んでから呼び出してください。属性はバンク1へ書き、終了時は <code>VBK=0</code> になります。</p><p>書き込み先は常に <code>0x9800 + 32*y + x</code> です。LCDCで選んだBG・ウィンドウ用マップには追従しません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilecgb-dmg.png" alt="__settilecgb — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilecgb-cgb.png" alt="__settilecgb — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilecgb.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilecgb-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:14.666020+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;769fe4f203cf3d512cc6239c54b57911723e09c7f4d6eacc27eca24b4e951564&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;bc767b386beaa91232008c8aa7bd20e767c69b34079bc9d5b66643075aa97d6e&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb_unsafe"><h3><code>__settilecgb_unsafe</code></h3><p>タイル番号とCGB属性を続けて書き込みます。DMGではタイル番号だけを書きます。CGBではVRAMバンク0を選んでから呼び出してください。属性はバンク1へ書き、終了時は <code>VBK=0</code> になります。</p><p>書き込み先は常に <code>0x9800 + 32*y + x</code> です。LCDCで選んだBG・ウィンドウ用マップには追従しません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilecgb_unsafe-dmg.png" alt="__settilecgb_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilecgb_unsafe-cgb.png" alt="__settilecgb_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilecgb_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilecgb_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:20.733676+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;73a044ce64133717c6add155167bc2422aa6c1467fb0638bf85d9abc91ba7c88&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;74dd48b043d24bf73ce3135d1df9301a6b920e0604bd95fa39390ec31126f575&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatcgb"><h3><code>__settileatcgb</code></h3><p>タイル番号とCGB属性を続けて書き込みます。DMGではタイル番号だけを書きます。CGBではVRAMバンク0を選んでから呼び出してください。属性はバンク1へ書き、終了時は <code>VBK=0</code> になります。</p><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileatcgb-dmg.png" alt="__settileatcgb — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileatcgb-cgb.png" alt="__settileatcgb — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileatcgb.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileatcgb-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileatcgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:26.033985+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;14901f539e2dd3912bb1e3208d3e4d56c1ff023348ea14959f024e7fbc7c6560&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;4d51855690280a3d2d260619b0e6471d993d79bf9e1c513b5bd9bb656cf22947&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileatcgb_unsafe"><h3><code>__settileatcgb_unsafe</code></h3><p>タイル番号とCGB属性を続けて書き込みます。DMGではタイル番号だけを書きます。CGBではVRAMバンク0を選んでから呼び出してください。属性はバンク1へ書き、終了時は <code>VBK=0</code> になります。</p><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileatcgb_unsafe-dmg.png" alt="__settileatcgb_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileatcgb_unsafe-cgb.png" alt="__settileatcgb_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileatcgb_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileatcgb_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileatcgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:31.406331+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;0aaa6d28c209b4971bb95178238ca0de8f93deb95719f63552f64cf738a48957&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;c2023e7c8965a61372a305c21a852afd4e6974f121fd28efb035e45ea75d7723&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgcgb"><h3><code>__settilebgcgb</code></h3><p>タイル番号とCGB属性を続けて書き込みます。DMGではタイル番号だけを書きます。CGBではVRAMバンク0を選んでから呼び出してください。属性はバンク1へ書き、終了時は <code>VBK=0</code> になります。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebgcgb-dmg.png" alt="__settilebgcgb — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebgcgb-cgb.png" alt="__settilebgcgb — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebgcgb.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebgcgb-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgcgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:36.704045+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;6d6e3f77c70090421293b72bc1e42900b718735d59050c8435c138ca097340ef&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;038546ba62d254dd0e61b95375ad4228877b80bb936a781bdccd531e60aa42d8&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebgcgb_unsafe"><h3><code>__settilebgcgb_unsafe</code></h3><p>タイル番号とCGB属性を続けて書き込みます。DMGではタイル番号だけを書きます。CGBではVRAMバンク0を選んでから呼び出してください。属性はバンク1へ書き、終了時は <code>VBK=0</code> になります。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebgcgb_unsafe-dmg.png" alt="__settilebgcgb_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebgcgb_unsafe-cgb.png" alt="__settilebgcgb_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebgcgb_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebgcgb_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebgcgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:42.097355+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;b044247160b163212cd3aceccfd17e4ecd0b37806403ac0a20306b3639daa832&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;81858efb24421e1b8898174c83f2af1112341e8b7e1b33e1ac96b24ab8c0242e&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewincgb"><h3><code>__settilewincgb</code></h3><p>タイル番号とCGB属性を続けて書き込みます。DMGではタイル番号だけを書きます。CGBではVRAMバンク0を選んでから呼び出してください。属性はバンク1へ書き、終了時は <code>VBK=0</code> になります。</p><p>LCDCのビット6で選択中のウィンドウマップへ書き込みます。0なら <code>0x9800</code>、1なら <code>0x9C00</code> です。<code>x,y</code> はマップ内の座標であり、画面上のウィンドウ位置ではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewincgb-dmg.png" alt="__settilewincgb — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewincgb-cgb.png" alt="__settilewincgb — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilewincgb.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilewincgb-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilewincgb&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:47.588698+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;02d8f3c46d9319baf60569988fb07512430db544e1537465bd0de43c569eede0&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;a545b1afc7435ecdb430374665cffdf8b2f7f52bf4b30ad454be2a0eaa958522&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilewincgb_unsafe"><h3><code>__settilewincgb_unsafe</code></h3><p>タイル番号とCGB属性を続けて書き込みます。DMGではタイル番号だけを書きます。CGBではVRAMバンク0を選んでから呼び出してください。属性はバンク1へ書き、終了時は <code>VBK=0</code> になります。</p><p>LCDCのビット6で選択中のウィンドウマップへ書き込みます。0なら <code>0x9800</code>、1なら <code>0x9C00</code> です。<code>x,y</code> はマップ内の座標であり、画面上のウィンドウ位置ではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A</pre><p>CGBでは、属性値2によりサンプルで用意した青のパレットが選ばれ、<code>A</code> が青く表示されます。DMGではCGB属性を適用しないので、同じ文字が黒く表示されます。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewincgb_unsafe-dmg.png" alt="__settilewincgb_unsafe — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilewincgb_unsafe-cgb.png" alt="__settilewincgb_unsafe — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilewincgb_unsafe.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilewincgb_unsafe-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilewincgb_unsafe&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:26:59.139106+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d0299f3e70fc0fab8897ccea7177f5e3cb096ef25eaa844b16f83c3d68f739df&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;ab552a4b4e183f06de0007624402c4d5ec7b5ac3741a95a5cd79c5b6277b2897&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_bulk"><h3><code>__settile_bulk</code></h3><p><code>src</code> から <code>dest</code> のVRAMアドレスへ、連続するタイル番号を <code>count</code> バイトコピーします。個々のタイル画像を転送する命令ではありません。行末での折り返し調整も行いません。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>ABC</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_bulk-dmg.png" alt="__settile_bulk — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_bulk-cgb.png" alt="__settile_bulk — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settile_bulk.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settile_bulk-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settile_bulk&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:09.999907+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;55e2f2f4a9151ecdb5521ce8a7764a18f0abff02862b2f707ebe946dcec4745a&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;e4276c1918520a03c41172014b34b9e61ea9cc1c4e30e3f6f4456d35c7c7847f&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0,
+      0,
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_bulk_fast"><h3><code>__settile_bulk_fast</code></h3><p><code>src</code> から <code>dest</code> のVRAMアドレスへ、連続するタイル番号を <code>count</code> バイトコピーします。個々のタイル画像を転送する命令ではありません。行末での折り返し調整も行いません。</p><p>VRAMアクセス待ちは行いません。LCD停止中か、転送全体が収まる書き込み可能時間を呼び出し側で確保した場合に使用してください。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>ABC</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_bulk_fast-dmg.png" alt="__settile_bulk_fast — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_bulk_fast-cgb.png" alt="__settile_bulk_fast — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settile_bulk_fast.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settile_bulk_fast-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settile_bulk_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:21.181526+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;5f582ad91f12d9343a4e3358e0027ab288aa9284c257d1651a309e74f9caace2&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;6a7caf5ec0e64771e0cb1703c8fba35d7f00b7374826edd039e66c3cc2f12446&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0,
+      0,
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr_bulk"><h3><code>__settileattr_bulk</code></h3><p><code>src</code> のCGB属性を <code>count</code> バイト、VRAMバンク1の <code>dest</code> へ連続コピーします。タイル番号は変更しません。<code>dest</code> は <code>(x,y)</code> 座標ではなくアドレスです。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>ABC</pre><p>CGBでは、属性列 <code>1,2,3</code> がそれぞれ用意したパレットを選び、<code>A</code> は赤、<code>B</code> は青、<code>C</code> は緑になります。DMGでは3文字とも黒です。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileattr_bulk-dmg.png" alt="__settileattr_bulk — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileattr_bulk-cgb.png" alt="__settileattr_bulk — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileattr_bulk.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileattr_bulk-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr_bulk&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:31.140838+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;cd7ae589260c1fd75bd2d68a27e18663a01556187fcdb2cda923b4269acb1b76&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;c5548de809bac055058ca09629876e676c180bb462054996f1bddb7ecaa0921f&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settileattr_bulk_fast"><h3><code>__settileattr_bulk_fast</code></h3><p><code>src</code> のCGB属性を <code>count</code> バイト、VRAMバンク1の <code>dest</code> へ連続コピーします。タイル番号は変更しません。<code>dest</code> は <code>(x,y)</code> 座標ではなくアドレスです。</p><p>VRAMアクセス待ちは行いません。LCD停止中か、転送全体が収まる書き込み可能時間を呼び出し側で確保した場合に使用してください。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>ABC</pre><p>CGBでは、属性列 <code>1,2,3</code> がそれぞれ用意したパレットを選び、<code>A</code> は赤、<code>B</code> は青、<code>C</code> は緑になります。DMGでは3文字とも黒です。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileattr_bulk_fast-dmg.png" alt="__settileattr_bulk_fast — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settileattr_bulk_fast-cgb.png" alt="__settileattr_bulk_fast — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settileattr_bulk_fast.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settileattr_bulk_fast-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settileattr_bulk_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:40.822314+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;84fcf9b8f45bba0382563da8adba76ec3851c4e4d0f0f10b9405e46990ab6c6a&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;b58a2a1f08842fd1f3493da6545e0b42528898c3a8bb981ebfc64085b030c52d&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb_bulk"><h3><code>__settilecgb_bulk</code></h3><p><code>tile_src</code> のタイル番号と <code>attr_src</code> の属性を、それぞれ <code>count</code> バイトずつ <code>dest</code> から同じマップ範囲へ転送します。番号と属性は交互に並べず、別々の配列で渡します。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>ABC</pre><p>CGBでは、属性列 <code>1,2,3</code> がそれぞれ用意したパレットを選び、<code>A</code> は赤、<code>B</code> は青、<code>C</code> は緑になります。DMGでは3文字とも黒です。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilecgb_bulk-dmg.png" alt="__settilecgb_bulk — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilecgb_bulk-cgb.png" alt="__settilecgb_bulk — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilecgb_bulk.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilecgb_bulk-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb_bulk&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:48.092163+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;d2f65cff1cc32f44a332ccbd49cbfb0fa155400426ae1348da60703e47ab429b&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;5831fc67201abb6a62385c27f2a49fae859d6226f1d8952dfb889e19e14cf481&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilecgb_bulk_fast"><h3><code>__settilecgb_bulk_fast</code></h3><p><code>tile_src</code> のタイル番号と <code>attr_src</code> の属性を、それぞれ <code>count</code> バイトずつ <code>dest</code> から同じマップ範囲へ転送します。番号と属性は交互に並べず、別々の配列で渡します。</p><p>VRAMアクセス待ちは行いません。LCD停止中か、転送全体が収まる書き込み可能時間を呼び出し側で確保した場合に使用してください。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>ABC</pre><p>CGBでは、属性列 <code>1,2,3</code> がそれぞれ用意したパレットを選び、<code>A</code> は赤、<code>B</code> は青、<code>C</code> は緑になります。DMGでは3文字とも黒です。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilecgb_bulk_fast-dmg.png" alt="__settilecgb_bulk_fast — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilecgb_bulk_fast-cgb.png" alt="__settilecgb_bulk_fast — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilecgb_bulk_fast.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilecgb_bulk_fast-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilecgb_bulk_fast&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:27:56.215527+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;ae638e2c82824c5e8b8190e93675fdf7be9557a9142c1022b8da27cb310b9da9&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;f3160b2161e88ffd46b6760e0e72b213b069231fe90dc21a8c93c628df6d5625&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      1,
+      2,
+      3
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_rect"><h3><code>__settile_rect</code></h3><p>LCDCで選択したBGマップの幅 <code>w</code>、高さ <code>h</code> の矩形を、同じタイル番号で埋めます。行の間隔は32バイトです。画像の配列をコピーする処理ではなく、同じタイルを繰り返し配置します。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>AAA
+AAA</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_rect-dmg.png" alt="__settile_rect — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_rect-cgb.png" alt="__settile_rect — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settile_rect.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settile_rect-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settile_rect&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:03.371313+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;cb59c8399faf3e42c6cebf9ea6e394c940d143894ed682dc9049c3d18897d271&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;30ca762ef1b2992e8f7372bfccd5eae296c76afbcddf8702d4c3aaea3d30b843&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;AAA&quot;,
+      &quot;AAA&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_row"><h3><code>__settile_row</code></h3><p><code>src</code> の連続するタイル番号を、LCDCで選んだBGマップの <code>(x,y)</code> から右へ <code>len</code> 個コピーします。コピー元・先は1タイルごとに1バイト進みます。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>ABC</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_row-dmg.png" alt="__settile_row — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_row-cgb.png" alt="__settile_row — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settile_row.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settile_row-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settile_row&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:08.852207+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;2e96976e09d585e12ade26116f63eee9342c7bc4f127be3766d20007a0cdc12a&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;d2b36f2ccc4ee842dfc3e6a2269bacc39578077f56e8ae3a7630c70918555559&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settile_col"><h3><code>__settile_col</code></h3><p><code>src</code> の連続するタイル番号を、LCDCで選んだBGマップの <code>(x,y)</code> から下へ <code>len</code> 個コピーします。コピー元は1バイト、コピー先は32バイトずつ進みます。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>A
+B
+C</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_col-dmg.png" alt="__settile_col — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settile_col-cgb.png" alt="__settile_col — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settile_col.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settile_col-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settile_col&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:14.439621+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;86a1bb088a838863598f4daf0a31cb09fae81820b3775b63a1740d1486037c84&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;628f606f20841db9156ad872c36584682fe1c5ccb6ad6f64baace5923365e1e6&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;A&quot;,
+      &quot;B&quot;,
+      &quot;C&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilemap_rect"><h3><code>__settilemap_rect</code></h3><p>隙間なく並んだ <code>w*h</code> 個のタイル番号を、<code>base</code> で指定したマップの <code>(x,y)</code> から矩形としてコピーします。コピー元は1行 <code>w</code> バイト、コピー先の行間隔は32バイトです。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>ABC
+DEF</pre><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilemap_rect-dmg.png" alt="__settilemap_rect — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilemap_rect-cgb.png" alt="__settilemap_rect — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=3)`、ピクセル座標 `(16,24)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilemap_rect.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilemap_rect-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilemap_rect&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:28:19.882384+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;c4523137584f564a4dc63a6082a6601dd5f4af2cd013cf425a4b00d1f5203828&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;25a4cdabf98121eae9da968f86abaac42bb8edc8964cb70ad944c26fe99fed15&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 3,
+    &quot;rows&quot;: [
+      &quot;ABC&quot;,
+      &quot;DEF&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16_buf"><h3><code>__settilebg16_buf</code></h3><p>RAM上のタイルマップバッファに16×16ピクセルのセルを書き込みます。8×8タイル4枚の番号は上段が <code>tile,tile+1</code>、下段が <code>tile+2,tile+3</code> で、256で折り返します。VRAMへの転送は行いません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=2)</code>、ピクセル座標 <code>(16,16)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>AB
+CD</pre><p>タイル座標 <code>(2,2)</code> に、上段 <code>AB</code>、下段 <code>CD</code> が表示されます。これはセル座標 <code>(1,1)</code> の16×16ピクセル1セルです。バッファ書き込みの例ではRAM上の準備でVRAMが変化しないことを確認してから転送します。転送関数の例では、先にRAMの各バイトを設定してから転送します。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg16_buf-dmg.png" alt="__settilebg16_buf — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=2)`、ピクセル座標 `(16,16)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg16_buf-cgb.png" alt="__settilebg16_buf — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=2)`、ピクセル座標 `(16,16)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebg16_buf.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebg16_buf-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16_buf&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:07.662576+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;3e9037de0b0dc53e779fe6c434f8e0a7083d280a6b7a49e5372aa07b1c03cd34&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;fef0a18c75a1cc8d7f31729ab684b1122ad04b35736b58592ba99e357a9e8c07&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16cgb_buf"><h3><code>__settilebg16cgb_buf</code></h3><p>RAM上のタイルマップバッファに16×16ピクセルのセルを書き込みます。8×8タイル4枚の番号は上段が <code>tile,tile+1</code>、下段が <code>tile+2,tile+3</code> で、256で折り返します。VRAMへの転送は行いません。</p><p>別の属性バッファの対応する4セルにも、同じ <code>attr</code> を書き込みます。どちらも通常のRAMなので、DMG上でもバッファの準備処理は行われます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=2)</code>、ピクセル座標 <code>(16,16)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>AB
+CD</pre><p>タイル座標 <code>(2,2)</code> に、上段 <code>AB</code>、下段 <code>CD</code> が表示されます。これはセル座標 <code>(1,1)</code> の16×16ピクセル1セルです。バッファ書き込みの例ではRAM上の準備でVRAMが変化しないことを確認してから転送します。転送関数の例では、先にRAMの各バイトを設定してから転送します。</p><p>CGBでは4セルの属性がすべて2なので、4文字とも青くなります。DMGでは黒です。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg16cgb_buf-dmg.png" alt="__settilebg16cgb_buf — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=2)`、ピクセル座標 `(16,16)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg16cgb_buf-cgb.png" alt="__settilebg16cgb_buf — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=2)`、ピクセル座標 `(16,16)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebg16cgb_buf.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebg16cgb_buf-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16cgb_buf&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:13.079566+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;f3923a5e471b93a76499204adfa736260a1d408e5bfdca019c1855ab0a5c9901&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;7a2d3dac2973007ecde9486b9462802a236f82ffd736169333cf67d1c651de32&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16_flush"><h3><code>__settilebg16_flush</code></h3><p>RAMバッファから隣接するタイル2行を、LCDCで選んだBGマップへ転送します。コピー元は <code>64*y + x</code> バイト目で、その行と32バイト下の行から、それぞれ <code>count</code> バイトコピーします。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=2)</code>、ピクセル座標 <code>(16,16)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>AB
+CD</pre><p>タイル座標 <code>(2,2)</code> に、上段 <code>AB</code>、下段 <code>CD</code> が表示されます。これはセル座標 <code>(1,1)</code> の16×16ピクセル1セルです。バッファ書き込みの例ではRAM上の準備でVRAMが変化しないことを確認してから転送します。転送関数の例では、先にRAMの各バイトを設定してから転送します。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg16_flush-dmg.png" alt="__settilebg16_flush — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=2)`、ピクセル座標 `(16,16)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg16_flush-cgb.png" alt="__settilebg16_flush — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=2)`、ピクセル座標 `(16,16)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebg16_flush.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebg16_flush-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16_flush&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:20.580860+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;10af35dae038de72fbd9762fe0c963d62732bef7869fe1ea849d413d9c4475ce&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;56b35b065ccc3c8236126853868ad0e75eeaa5691fb7622038980a0dffc54697&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      0
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-__settilebg16cgb_flush"><h3><code>__settilebg16cgb_flush</code></h3><p>RAMバッファから隣接するタイル2行を、LCDCで選んだBGマップへ転送します。コピー元は <code>64*y + x</code> バイト目で、その行と32バイト下の行から、それぞれ <code>count</code> バイトコピーします。</p><p>タイル番号とCGB属性を続けて書き込みます。DMGではタイル番号だけを書きます。CGBではVRAMバンク0を選んでから呼び出してください。属性はバンク1へ書き、終了時は <code>VBK=0</code> になります。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=2)</code>、ピクセル座標 <code>(16,16)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><pre>AB
+CD</pre><p>タイル座標 <code>(2,2)</code> に、上段 <code>AB</code>、下段 <code>CD</code> が表示されます。これはセル座標 <code>(1,1)</code> の16×16ピクセル1セルです。バッファ書き込みの例ではRAM上の準備でVRAMが変化しないことを確認してから転送します。転送関数の例では、先にRAMの各バイトを設定してから転送します。</p><p>CGBでは4セルの属性がすべて2なので、4文字とも青くなります。DMGでは黒です。</p><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg16cgb_flush-dmg.png" alt="__settilebg16cgb_flush — DMG: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=2)`、ピクセル座標 `(16,16)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>DMG</figcaption></figure><figure><img class="screen" loading="lazy" src="verification/api-tiles/__settilebg16cgb_flush-cgb.png" alt="__settilebg16cgb_flush — CGB: 期待画像：次のタイル配置が、タイル座標 `(x=2, y=2)`、ピクセル座標 `(16,16)` から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/__settilebg16cgb_flush.c">使用例の完全なプログラム</a> · <a href="verification/api-tiles/__settilebg16cgb_flush-build.txt">ビルドログ</a></p><details><summary>検査記録</summary><pre>{
+  &quot;api&quot;: &quot;__settilebg16cgb_flush&quot;,
+  &quot;checked_at&quot;: &quot;2026-09-14T13:30:32.632696+00:00&quot;,
+  &quot;source_sha256&quot;: &quot;af0df566da58a115b51f04309c79e9fe1444bdf4cefc0e0407c8912b99304799&quot;,
+  &quot;build_exit&quot;: 0,
+  &quot;runs&quot;: [
+    {
+      &quot;hardware&quot;: &quot;dmg&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    },
+    {
+      &quot;hardware&quot;: &quot;cgb&quot;,
+      &quot;exit&quot;: 0,
+      &quot;result_text_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_pixel_mismatches&quot;: 0,
+      &quot;drawn_pattern_color_mismatches&quot;: 0,
+      &quot;frames_executed&quot;: 90,
+      &quot;stop_reason&quot;: null,
+      &quot;unsupported_opcodes&quot;: []
+    }
+  ],
+  &quot;rom_sha256&quot;: &quot;d33f3abd0ce84bb90b9ff0f03cca9108980ba68c517857a34ea5e9888ad5a962&quot;,
+  &quot;expected_image&quot;: {
+    &quot;x&quot;: 2,
+    &quot;y&quot;: 2,
+    &quot;rows&quot;: [
+      &quot;AB&quot;,
+      &quot;CD&quot;
+    ],
+    &quot;cgb_colors&quot;: [
+      2
+    ]
+  },
+  &quot;passed&quot;: true
+}</pre></details></section><section id="api-gb-entity_init"><h3><code>entity_init</code></h3><p>エンティティプールの全スロットを初期化します。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>GB版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_init: DMG"><figcaption>DMG</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_dmg/build.txt">ビルドログ</a></p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_init: CGB"><figcaption>CGB</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_cgb/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/gb/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-gb-entity_create"><h3><code>entity_create</code></h3><p>指定した種類・座標でエンティティを確保し、再利用可能なIDを返します。空きがなければ <code>0xFF</code> です。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>GB版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_create: DMG"><figcaption>DMG</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_dmg/build.txt">ビルドログ</a></p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_create: CGB"><figcaption>CGB</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_cgb/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/gb/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-gb-entity_destroy"><h3><code>entity_destroy</code></h3><p><code>id</code> のエンティティを解放します。保持データは直ちには消さず、再確保時に初期化します。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>GB版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_destroy: DMG"><figcaption>DMG</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_dmg/build.txt">ビルドログ</a></p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_destroy: CGB"><figcaption>CGB</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_cgb/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/gb/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-gb-entity_get"><h3><code>entity_get</code></h3><p>有効で使用中のIDならエンティティへのポインタを返し、それ以外はnullを返します。指す領域はプール内で再利用されます。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>GB版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_get: DMG"><figcaption>DMG</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_dmg/build.txt">ビルドログ</a></p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_get: CGB"><figcaption>CGB</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_cgb/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/gb/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-gb-entity_update_all"><h3><code>entity_update_all</code></h3><p>IDの小さい順に使用中スロットを調べ、各スロットで <code>fn(id)</code> を1回呼びます。移動・衝突・タイマーなどの処理はコールバック側に書きます。プール自体はその処理を提供しません。コールバックがnullなら何もしません。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>GB版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_update_all: DMG"><figcaption>DMG</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_dmg/build.txt">ビルドログ</a></p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_update_all: CGB"><figcaption>CGB</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_cgb/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/gb/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-gb-entity_draw_all"><h3><code>entity_draw_all</code></h3><p>使用中のエンティティを巡回し、各IDを描画コールバックに渡します。巡回方法は <code>entity_update_all</code> と同じです。コールバックが描画データを書き込まなければ、スプライトや画素は描画されません。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>GB版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_draw_all: DMG"><figcaption>DMG</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_dmg/build.txt">ビルドログ</a></p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_draw_all: CGB"><figcaption>CGB</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_cgb/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/gb/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-gb-entity_count_active"><h3><code>entity_count_active</code></h3><p>エンティティの状態を変えずに、使用中スロットの数を返します。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>GB版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_count_active: DMG"><figcaption>DMG</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_dmg/build.txt">ビルドログ</a></p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_count_active: CGB"><figcaption>CGB</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_cgb/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/gb/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-gb-entity_clear_all"><h3><code>entity_clear_all</code></h3><p>全エンティティを解放し、スプライト未割当の印を含む各項目を初期値へ戻します。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>GB版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_dmg/screen.png" alt="entity_clear_all: DMG"><figcaption>DMG</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_dmg/build.txt">ビルドログ</a></p><figure><img class="screen" loading="lazy" src="verification/api-entity/gb/entity_pool_cgb/screen.png" alt="entity_clear_all: CGB"><figcaption>CGB</figcaption></figure><p><a href="verification/api-entity/gb/entity_pool_cgb/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/gb/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-fc-entity_init"><h3><code>entity_init</code></h3><p>エンティティプールの全スロットを初期化します。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>FC版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/fc/entity_pool/screen.png" alt="entity_init: NROM"><figcaption>NROM</figcaption></figure><p><a href="verification/api-entity/fc/entity_pool/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/fc/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-fc-entity_create"><h3><code>entity_create</code></h3><p>指定した種類・座標でエンティティを確保し、再利用可能なIDを返します。空きがなければ <code>0xFF</code> です。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>FC版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/fc/entity_pool/screen.png" alt="entity_create: NROM"><figcaption>NROM</figcaption></figure><p><a href="verification/api-entity/fc/entity_pool/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/fc/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-fc-entity_destroy"><h3><code>entity_destroy</code></h3><p><code>id</code> のエンティティを解放します。保持データは直ちには消さず、再確保時に初期化します。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>FC版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/fc/entity_pool/screen.png" alt="entity_destroy: NROM"><figcaption>NROM</figcaption></figure><p><a href="verification/api-entity/fc/entity_pool/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/fc/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-fc-entity_get"><h3><code>entity_get</code></h3><p>有効で使用中のIDならエンティティへのポインタを返し、それ以外はnullを返します。指す領域はプール内で再利用されます。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>FC版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/fc/entity_pool/screen.png" alt="entity_get: NROM"><figcaption>NROM</figcaption></figure><p><a href="verification/api-entity/fc/entity_pool/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/fc/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-fc-entity_update_all"><h3><code>entity_update_all</code></h3><p>IDの小さい順に使用中スロットを調べ、各スロットで <code>fn(id)</code> を1回呼びます。移動・衝突・タイマーなどの処理はコールバック側に書きます。プール自体はその処理を提供しません。コールバックがnullなら何もしません。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>FC版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/fc/entity_pool/screen.png" alt="entity_update_all: NROM"><figcaption>NROM</figcaption></figure><p><a href="verification/api-entity/fc/entity_pool/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/fc/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-fc-entity_draw_all"><h3><code>entity_draw_all</code></h3><p>使用中のエンティティを巡回し、各IDを描画コールバックに渡します。巡回方法は <code>entity_update_all</code> と同じです。コールバックが描画データを書き込まなければ、スプライトや画素は描画されません。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>FC版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/fc/entity_pool/screen.png" alt="entity_draw_all: NROM"><figcaption>NROM</figcaption></figure><p><a href="verification/api-entity/fc/entity_pool/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/fc/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-fc-entity_count_active"><h3><code>entity_count_active</code></h3><p>エンティティの状態を変えずに、使用中スロットの数を返します。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>FC版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/fc/entity_pool/screen.png" alt="entity_count_active: NROM"><figcaption>NROM</figcaption></figure><p><a href="verification/api-entity/fc/entity_pool/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/fc/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><section id="api-fc-entity_clear_all"><h3><code>entity_clear_all</code></h3><p>全エンティティを解放し、スプライト未割当の印を含む各項目を初期値へ戻します。</p><p>完全なプログラムでは、再利用されるプールのスロットがどう変化するかを学びます。数字はラベルと組み合わせて読んでください。2個確保すると <code>CREATED 002</code>、1個目を解放すると <code>AFTER FREE 001</code>、最小の空きIDを再利用すると <code>REUSED ID 000</code>、全解放後は <code>AFTER CLEAR 000</code> です。解放後の取得がnullになることと、再確保時にフィールドが初期化されることも確認します。<code>FAILED CHECKS 000</code> は期待値に一致したことを表します。</p><p>FC版の巡回は使用中の2個に対してそれぞれコールバックを呼ぶので、<code>UPDATE CALLS 002</code>、<code>DRAW CALLS 002</code> になります。サンプルの更新コールバックは両方を右へ1タイル動かします。描画コールバックは2個の物体を表す <code>A</code> をタイル <code>(3,12)</code>、<code>B</code> を <code>(7,12)</code> に置きます。コールバックが描いた背景の文字タイルであり、自動確保されたスプライトではありません。</p><figure><img class="screen" loading="lazy" src="verification/api-entity/fc/entity_pool/screen.png" alt="entity_clear_all: NROM"><figcaption>NROM</figcaption></figure><p><a href="verification/api-entity/fc/entity_pool/build.txt">ビルドログ</a></p><p><a href="samples/api-examples/fc/entity_pool.c">使用例の完全なプログラム</a> · <a href="verification/api-entity/results.json">検査記録</a></p></section><!-- api-verification:end --><footer>2026-09-14版 • <a href="index.html">総合目次</a> • <a href="verification.html">検証記録</a> • <a href="reference/inventory.json">版の指紋</a><br>サンプルのビルド・エミュレータ実行・期待値照合は別項目として記録します。</footer></main></div><script src="assets/manual.js"></script></body></html>

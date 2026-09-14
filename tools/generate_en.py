@@ -230,6 +230,8 @@ def main():
     verification()
     from generate_prompts import publish
     publish('en')
+    from api_contracts import publish as publish_api_contracts
+    publish_api_contracts('en')
     print('Generated 10 English HTML pages including development prompts')
 
 if __name__=='__main__':main()

@@ -62,6 +62,7 @@ def make_page(lang,key,messages,inspect=False):
     source=(S/'en'/(key+'.html')).read_text(encoding='utf-8')
     # Prompt navigation is authored separately for each language, after translation.
     source=re.sub(r'<!-- loop-prompts:start -->.*?<!-- loop-prompts:end -->','',source,flags=re.S)
+    source=re.sub(r'<!-- api-verification:start -->.*?<!-- api-verification:end -->','',source,flags=re.S)
     soup=BeautifulSoup(source,'html.parser')
     # Replace the source edition's navigation instead of duplicating it.
     for navigation in soup.select('nav.languages'):navigation.decompose()
@@ -92,6 +93,7 @@ def make_page(lang,key,messages,inspect=False):
         section.extend(list(rendered.contents));start.insert_after(section)
     # Strings inside original source excerpts, command output and identifiers stay verbatim.
     for node in list(soup.find_all(string=True)):
+        if node.find_parent(attrs={'data-api-contract':True}):continue
         if node.find_parent(['pre','code','script','style']):continue
         if node.find_parent(class_='authored'):continue
         if str(node).lower()=='html':continue
@@ -141,6 +143,8 @@ def main():
         for key in BOOKS:make_page(lang,key,messages)
         from generate_prompts import publish
         publish(lang)
+        from api_contracts import publish as publish_api_contracts
+        publish_api_contracts(lang)
     stale=S/'tools/i18n'/lang/'missing.json'
     if stale.exists():stale.unlink()
     print(f'{lang}: 9 pages '+('ready to generate' if args.inspect else 'generated')+'; all reference prose translated')
