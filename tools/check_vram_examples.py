@@ -30,7 +30,7 @@ def geometry_errors(image,platform,mode):
             errors+=expected!=ink
             if expected:
                 color='black' if platform=='gb' else 'white'
-                if mode=='cgb':
+                if mode=='cgb' or platform=='fc':
                     tx,ty=x//8,y//8
                     if ty==2 or ty==10:color='red'
                     elif ty==8:color='red' if tx<5 else ('blue' if tx<8 else 'green')

@@ -116,7 +116,7 @@ def main():
     report = {'scope':'LCD-off tile addressing, data and CGB attributes; no LCD-on timing or hardware claim',
               'compiler_sha256':hashlib.sha256(compiler.read_bytes()).hexdigest(),
               'emulator_sha256':hashlib.sha256(emulator.read_bytes()).hexdigest(),
-              'shared_source_sha256':{name:hashlib.sha256((SITE/'samples'/name).read_bytes()).hexdigest() for name in ['gb_common.h','gb_tile_example.h','font_gb.h']}}
+              'shared_source_sha256':{name:hashlib.sha256((SITE/'samples'/name).read_bytes()).hexdigest() for name in ['gb_common.h','gb_tile_example.h','gb_tile_color_example.h','font_gb.h']}}
     for key, contract in contracts.items():
         name = key.split(':',1)[1]
         if args.only and name not in args.only: continue

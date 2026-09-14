@@ -738,17 +738,17 @@ expect_color(1,27,31);</code></pre></div><p>这是一段调用示例。放入完
 // new pixel data. The destination is always `0x9800 + 32*y + x`, regardless of which
 // maps LCDC selects for the background and window.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C62, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:31</p><div class="original"><b>声明注释（原文）</b><pre>Write a tile number to map 9800, waiting for VRAM access when necessary.</pre></div></details></details><details class="api searchable" id="api-__settile_bulk" data-api-contract="tile-source-20260914"><summary><code>__settile_bulk</code></summary><p>从 <code>src</code> 向 VRAM 字节地址 <code>dest</code> 复制连续的 <code>count</code> 个图块编号字节。数量以字节计，不是图块图像数；不调整行跨度。</p><p>必要时等待 VRAM 可写。LCD 开启时的路径会屏蔽中断，并可能在结束后启用中断；不保证保留调用前的中断状态，也不保证在一次 VBlank 内完成。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settile_bulk(u16 dest, const u8* src, u8 count);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>dest</code></dt><dd><p>起始 VRAM 字节地址。地图使用 <code>0x9800–0x9FFF</code> 范围，整个传输应位于目标地图内。</p></dd><dt><code>src</code></dt><dd><p>位于 RAM 或当前可见 ROM bank 中的连续字节。图块流保存图块编号，属性流保存 CGB 属性字节。函数立即复制，不保留指针。</p></dd><dt><code>count</code></dt><dd><p>字节数，范围 0～255。为 0 时不复制；源数据至少要有这么多可读字节。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>复制结束前，必须确保源缓冲区及其 ROM 库始终可读。无返回值。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settile_bulk
 // Copy `count` consecutive tile-number bytes from `src` to the VRAM byte address `dest`.
 // The count is in bytes, not tile-image units; no row-stride adjustment is made. Waits
@@ -756,90 +756,90 @@ void main() {
 // enable interrupts afterward; it is not a promise to preserve the caller&#x27;s interrupt
 // state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 const u8 example_attrs[] = {1,2,3};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_bulk(0x9862, example_tiles, 3);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9863, 0) != &#x27;B&#x27;) { failures++; }
     if (tile_example_read(0x9864, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9865, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_bulk.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_bulk.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_bulk.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_bulk.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_bulk">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:48</p><div class="original"><b>声明注释（原文）</b><pre>Copy count sequential bytes to dest using the current VRAM bank and access-checked transfer.</pre></div></details></details><details class="api searchable" id="api-__settile_bulk_fast" data-api-contract="tile-source-20260914"><summary><code>__settile_bulk_fast</code></summary><p>从 <code>src</code> 向 VRAM 字节地址 <code>dest</code> 复制连续的 <code>count</code> 个图块编号字节。数量以字节计，不是图块图像数；不调整行跨度。</p><p>不等待 VRAM 可写。只能在 LCD 关闭时，或由调用方确保整个传输都处于可写时间段时使用。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settile_bulk_fast(u16 dest, const u8* src, u8 count);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>dest</code></dt><dd><p>起始 VRAM 字节地址。地图使用 <code>0x9800–0x9FFF</code> 范围，整个传输应位于目标地图内。</p></dd><dt><code>src</code></dt><dd><p>位于 RAM 或当前可见 ROM bank 中的连续字节。图块流保存图块编号，属性流保存 CGB 属性字节。函数立即复制，不保留指针。</p></dd><dt><code>count</code></dt><dd><p>字节数，范围 0～255。为 0 时不复制；源数据至少要有这么多可读字节。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>复制结束前，必须确保源缓冲区及其 ROM 库始终可读。无返回值。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settile_bulk_fast
 // Copy `count` consecutive tile-number bytes from `src` to the VRAM byte address `dest`.
 // The count is in bytes, not tile-image units; no row-stride adjustment is made. Does
 // not wait for VRAM access. Call only while the LCD is off or within a caller-managed
 // writable interval with enough time for the whole transfer.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 const u8 example_attrs[] = {1,2,3};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_bulk_fast(0x9862, example_tiles, 3);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9863, 0) != &#x27;B&#x27;) { failures++; }
     if (tile_example_read(0x9864, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9865, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_bulk_fast.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_bulk_fast.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_bulk_fast.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_bulk_fast.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_bulk_fast">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:50</p><div class="original"><b>声明注释（原文）</b><pre>Copy count sequential bytes to dest without VRAM access waits; retain source-bank visibility.</pre></div></details></details><details class="api searchable" id="api-__settile_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settile_unsafe</code></summary><p>向图块地图的一个单元写入图块编号。这是在选择已有图块图像，不会修改像素数据。</p><p>目标地址始终为 <code>0x9800 + 32*y + x</code>，不随 LCDC 的背景或窗口地图选择而改变。</p><p>不等待 VRAM 可写。只能在 LCD 关闭时，或由调用方确保整个传输都处于可写时间段时使用。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settile_unsafe(u8 x, u8 y, u8 tile);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>tile</code></dt><dd><p>0～255 的图块编号。LCDC 位 4 决定编号如何寻址图块图像数据；这不是 VRAM 字节地址。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settile_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. The destination is always `0x9800 + 32*y + x`, regardless of which
 // maps LCDC selects for the background and window.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_unsafe(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C62, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_unsafe.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_unsafe.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_unsafe">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:33</p><div class="original"><b>声明注释（原文）</b><pre>Write a tile number to map 9800 without waiting for writable VRAM.</pre></div></details></details><details class="api searchable" id="api-__settileat" data-api-contract="tile-source-20260914"><summary><code>__settileat</code></summary><p>向图块地图的一个单元写入图块编号。这是在选择已有图块图像，不会修改像素数据。</p><p>用 <code>base</code> 指定地图起始地址 <code>0x9800</code> 或 <code>0x9C00</code>；字节地址为 <code>base + 32*y + x</code>。</p><p>必要时等待 VRAM 可写。LCD 开启时的路径会屏蔽中断，并可能在结束后启用中断；不保证保留调用前的中断状态，也不保证在一次 VBlank 内完成。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settileat(u16 base, u8 x, u8 y, u8 tile);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p>用 <code>base</code> 指定地图起始地址 <code>0x9800</code> 或 <code>0x9C00</code>；字节地址为 <code>base + 32*y + x</code>。</p></dd><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>tile</code></dt><dd><p>0～255 的图块编号。LCDC 位 4 决定编号如何寻址图块图像数据；这不是 VRAM 字节地址。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settileat
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. `base` explicitly selects the map (`0x9800` or `0x9C00`); the byte
 // address is `base + 32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settileat(0x9C00, 2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settileat.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settileat.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settileat.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settileat.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settileat">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:35</p><div class="original"><b>声明注释（原文）</b><pre>Write at base+32*y+x with VRAM access checks; supply a valid tile-map base.</pre></div></details></details><details class="api searchable" id="api-__settileat_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settileat_unsafe</code></summary><p>向图块地图的一个单元写入图块编号。这是在选择已有图块图像，不会修改像素数据。</p><p>用 <code>base</code> 指定地图起始地址 <code>0x9800</code> 或 <code>0x9C00</code>；字节地址为 <code>base + 32*y + x</code>。</p><p>不等待 VRAM 可写。只能在 LCD 关闭时，或由调用方确保整个传输都处于可写时间段时使用。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settileat_unsafe(u16 base, u8 x, u8 y, u8 tile);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p>用 <code>base</code> 指定地图起始地址 <code>0x9800</code> 或 <code>0x9C00</code>；字节地址为 <code>base + 32*y + x</code>。</p></dd><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>tile</code></dt><dd><p>0～255 的图块编号。LCDC 位 4 决定编号如何寻址图块图像数据；这不是 VRAM 字节地址。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settileat_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. `base` explicitly selects the map (`0x9800` or `0x9C00`); the byte
 // address is `base + 32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settileat_unsafe(0x9C00, 2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settileat_unsafe.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settileat_unsafe.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settileat_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settileat_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settileat_unsafe">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:37</p><div class="original"><b>声明注释（原文）</b><pre>Use an explicit map base without waiting for VRAM access.</pre></div></details></details><details class="api searchable" id="api-__settileatattr" data-api-contract="tile-source-20260914"><summary><code>__settileatattr</code></summary><p>只修改 CGB 属性字节，保留图块编号。属性指定调色板、图块图像库、水平或垂直翻转和优先级。</p><p>用 <code>base</code> 指定地图起始地址 <code>0x9800</code> 或 <code>0x9C00</code>；字节地址为 <code>base + 32*y + x</code>。</p><p>必要时等待 VRAM 可写。LCD 开启时的路径会屏蔽中断，并可能在结束后启用中断；不保证保留调用前的中断状态，也不保证在一次 VBlank 内完成。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settileatattr(u16 base, u8 x, u8 y, u8 attr);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p>用 <code>base</code> 指定地图起始地址 <code>0x9800</code> 或 <code>0x9C00</code>；字节地址为 <code>base + 32*y + x</code>。</p></dd><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>attr</code></dt><dd><p>CGB 属性字节：位 0～2 选择调色板 0～7，位 3 选择图像数据 bank，位 5、6 分别控制水平和垂直翻转，位 7 设置背景／窗口优先级。未使用的位 4 应为 0。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>CGB 上切到 VRAM 库 1 写入属性，结束时置 <code>VBK=0</code>。DMG 上不执行属性写入。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settileatattr
 // Write only the CGB attribute byte; leave the tile number unchanged. Attribute bits
 // select palette, tile-data bank, flips and priority. `base` explicitly selects the map
@@ -1008,33 +1008,33 @@ void main() {
 // new pixel data. LCDC bit 3 selects the background map: zero uses `0x9800`, one uses
 // `0x9C00`. The destination is that base plus `32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilebg(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:43</p><div class="original"><b>声明注释（原文）</b><pre>Select the background map from LCDC bit 3, then write with access checks.</pre></div></details></details><details class="api searchable" id="api-__settilebg_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settilebg_unsafe</code></summary><p>向图块地图的一个单元写入图块编号。这是在选择已有图块图像，不会修改像素数据。</p><p>写入 LCDC 位 3 当前选择的背景地图：0 对应 <code>0x9800</code>，1 对应 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>不等待 VRAM 可写。只能在 LCD 关闭时，或由调用方确保整个传输都处于可写时间段时使用。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settilebg_unsafe(u8 x, u8 y, u8 tile);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>tile</code></dt><dd><p>0～255 的图块编号。LCDC 位 4 决定编号如何寻址图块图像数据；这不是 VRAM 字节地址。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settilebg_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. LCDC bit 3 selects the background map: zero uses `0x9800`, one uses
 // `0x9C00`. The destination is that base plus `32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilebg_unsafe(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg_unsafe.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg_unsafe.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg_unsafe">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:45</p><div class="original"><b>声明注释（原文）</b><pre>Select the LCDC background map and write without access waits.</pre></div></details></details><details class="api searchable" id="api-__settilebgattr" data-api-contract="tile-source-20260914"><summary><code>__settilebgattr</code></summary><p>只修改 CGB 属性字节，保留图块编号。属性指定调色板、图块图像库、水平或垂直翻转和优先级。</p><p>写入 LCDC 位 3 当前选择的背景地图：0 对应 <code>0x9800</code>，1 对应 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>必要时等待 VRAM 可写。LCD 开启时的路径会屏蔽中断，并可能在结束后启用中断；不保证保留调用前的中断状态，也不保证在一次 VBlank 内完成。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settilebgattr(u8 x, u8 y, u8 attr);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>attr</code></dt><dd><p>CGB 属性字节：位 0～2 选择调色板 0～7，位 3 选择图像数据 bank，位 5、6 分别控制水平和垂直翻转，位 7 设置背景／窗口优先级。未使用的位 4 应为 0。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>CGB 上切到 VRAM 库 1 写入属性，结束时置 <code>VBK=0</code>。DMG 上不执行属性写入。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settilebgattr
 // Write only the CGB attribute byte; leave the tile number unchanged. Attribute bits
 // select palette, tile-data bank, flips and priority. LCDC bit 3 selects the background
@@ -1203,33 +1203,33 @@ void main() {
 // new pixel data. LCDC bit 6 selects the window map: zero uses `0x9800`, one uses
 // `0x9C00`. These are map coordinates, not the window&#x27;s screen position.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilewin(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewin.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewin.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewin.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewin.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewin">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:39</p><div class="original"><b>声明注释（原文）</b><pre>Select the window map from LCDC bit 6, then write a tile with access checks.</pre></div></details></details><details class="api searchable" id="api-__settilewin_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settilewin_unsafe</code></summary><p>向图块地图的一个单元写入图块编号。这是在选择已有图块图像，不会修改像素数据。</p><p>写入 LCDC 位 6 选择的窗口地图：0 为 <code>0x9800</code>，1 为 <code>0x9C00</code>。<code>x,y</code> 是地图坐标，不是窗口在屏幕上的位置。</p><p>不等待 VRAM 可写。只能在 LCD 关闭时，或由调用方确保整个传输都处于可写时间段时使用。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settilewin_unsafe(u8 x, u8 y, u8 tile);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>tile</code></dt><dd><p>0～255 的图块编号。LCDC 位 4 决定编号如何寻址图块图像数据；这不是 VRAM 字节地址。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settilewin_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. LCDC bit 6 selects the window map: zero uses `0x9800`, one uses
 // `0x9C00`. These are map coordinates, not the window&#x27;s screen position.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilewin_unsafe(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewin_unsafe.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewin_unsafe.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewin_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewin_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewin_unsafe">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:41</p><div class="original"><b>声明注释（原文）</b><pre>Select the LCDC window map and write without access waits.</pre></div></details></details><details class="api searchable" id="api-__settilewinattr" data-api-contract="tile-source-20260914"><summary><code>__settilewinattr</code></summary><p>只修改 CGB 属性字节，保留图块编号。属性指定调色板、图块图像库、水平或垂直翻转和优先级。</p><p>写入 LCDC 位 6 选择的窗口地图：0 为 <code>0x9800</code>，1 为 <code>0x9C00</code>。<code>x,y</code> 是地图坐标，不是窗口在屏幕上的位置。</p><p>必要时等待 VRAM 可写。LCD 开启时的路径会屏蔽中断，并可能在结束后启用中断；不保证保留调用前的中断状态，也不保证在一次 VBlank 内完成。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settilewinattr(u8 x, u8 y, u8 attr);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>attr</code></dt><dd><p>CGB 属性字节：位 0～2 选择调色板 0～7，位 3 选择图像数据 bank，位 5、6 分别控制水平和垂直翻转，位 7 设置背景／窗口优先级。未使用的位 4 应为 0。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>CGB 上切到 VRAM 库 1 写入属性，结束时置 <code>VBK=0</code>。DMG 上不执行属性写入。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settilewinattr
 // Write only the CGB attribute byte; leave the tile number unchanged. Attribute bits
 // select palette, tile-data bank, flips and priority. LCDC bit 6 selects the window map:
@@ -2233,18 +2233,18 @@ if (funcName == &quot;__readpadbtn&quot;)
 // new pixel data. The destination is always `0x9800 + 32*y + x`, regardless of which
 // maps LCDC selects for the background and window.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 void __settile_fast(u8 x, u8 y, u8 tile);
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_fast(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C62, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_fast.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_fast.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_fast.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_fast.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_fast">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:9189</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
                 if (args.Length != 3) Error(expr, &quot;__settile_unsafe requires 3 arguments&quot;);
 
@@ -2292,7 +2292,7 @@ void main() {
 // `tile,tile+1` on top and `tile+2,tile+3` below. Values wrap at 256. This does not
 // transfer anything to VRAM.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 u8 example_tiles[1024];
 u8 example_attrs[1024];
 void __memset(void* dest, u8 value, u16 len);
@@ -2304,7 +2304,7 @@ void __settilebg16cgb_flush(const u8* tilebuf, const u8* attrbuf, u8 y, u8 x, u8
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __memset(example_tiles, 0, 1024);
     __memset(example_attrs, 0, 1024);
     __settilebg16_buf(example_tiles, 1, 1, &#x27;A&#x27;);
@@ -2320,7 +2320,7 @@ void main() {
     if (example_tiles[99] != &#x27;D&#x27;) { failures++; }
     if (tile_example_read(0x9C44, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>图块坐标 <code>(2,2)</code> 处显示上排 <code>AB</code>、下排 <code>CD</code>，即单元坐标 <code>(1,1)</code> 的一个 16×16 像素单元。缓冲区写入示例先确认 RAM 准备操作未改变 VRAM，再传输；传输函数示例则先逐字节设置 RAM 数据，再执行传输。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=2)</code>、像素坐标 <code>(16,16)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>AB
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>图块坐标 <code>(2,2)</code> 处显示上排 <code>AB</code>、下排 <code>CD</code>，即单元坐标 <code>(1,1)</code> 的一个 16×16 像素单元。缓冲区写入示例先确认 RAM 准备操作未改变 VRAM，再传输；传输函数示例则先逐字节设置 RAM 数据，再执行传输。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=2)</code>、像素坐标 <code>(16,16)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>AB
 CD</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg16_buf.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg16_buf.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg16_buf.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg16_buf">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10432</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
                 if (args.Length != 4) Error(expr, &quot;__settilebg16_buf requires 4 arguments&quot;);
@@ -2356,7 +2356,7 @@ CD</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg16_buf.c"
 // interrupt masking and can enable interrupts afterward; it is not a promise to preserve
 // the caller&#x27;s interrupt state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 u8 example_tiles[1024];
 u8 example_attrs[1024];
 void __memset(void* dest, u8 value, u16 len);
@@ -2368,7 +2368,7 @@ void __settilebg16cgb_flush(const u8* tilebuf, const u8* attrbuf, u8 y, u8 x, u8
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __memset(example_tiles, 0, 1024);
     __memset(example_attrs, 0, 1024);
     example_tiles[66]=&#x27;A&#x27;; example_tiles[67]=&#x27;B&#x27;;
@@ -2382,7 +2382,7 @@ void main() {
     if (example_tiles[99] != &#x27;D&#x27;) { failures++; }
     if (tile_example_read(0x9C44, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>图块坐标 <code>(2,2)</code> 处显示上排 <code>AB</code>、下排 <code>CD</code>，即单元坐标 <code>(1,1)</code> 的一个 16×16 像素单元。缓冲区写入示例先确认 RAM 准备操作未改变 VRAM，再传输；传输函数示例则先逐字节设置 RAM 数据，再执行传输。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=2)</code>、像素坐标 <code>(16,16)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>AB
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>图块坐标 <code>(2,2)</code> 处显示上排 <code>AB</code>、下排 <code>CD</code>，即单元坐标 <code>(1,1)</code> 的一个 16×16 像素单元。缓冲区写入示例先确认 RAM 准备操作未改变 VRAM，再传输；传输函数示例则先逐字节设置 RAM 数据，再执行传输。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=2)</code>、像素坐标 <code>(16,16)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>AB
 CD</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg16_flush.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg16_flush.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg16_flush.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg16_flush">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10449</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
                 if (args.Length != 4) Error(expr, &quot;__settilebg16_flush requires 4 arguments&quot;);
@@ -2996,19 +2996,19 @@ void Camera_ApplyBgBuffered(const Camera8_8* cam)</code></pre></div><p class="so
 // and can enable interrupts afterward; it is not a promise to preserve the caller&#x27;s
 // interrupt state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_col(2, 3, example_tiles, 3);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9CA2, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9C63, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A
 B
 C</code></pre></div><p><a href="../samples/api-examples/gb/__settile_col.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_col.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_col.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_col">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/rpg.h:156</p></details></details><details class="api searchable" id="api-__settile_rect" data-api-contract="tile-source-20260914"><summary><code>__settile_rect</code></summary><p>用同一个图块编号填充 LCDC 所选背景地图中宽 <code>w</code>、高 <code>h</code> 的矩形。行间距为 32 字节；这是重复铺放同一图块，而非复制图像数组。</p><p>必要时等待 VRAM 可写。LCD 开启时的路径会屏蔽中断，并可能在结束后启用中断；不保证保留调用前的中断状态，也不保证在一次 VBlank 内完成。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settile_rect(u8 x, u8 y, u8 w, u8 h, u8 tile);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>w, h</code></dt><dd><p>以 8×8 图块为单位的宽和高。须满足 <code>x+w &lt;= 32</code>、<code>y+h &lt;= 32</code>。任一维为 0 时不写入。</p></dd><dt><code>tile</code></dt><dd><p>0～255 的图块编号。LCDC 位 4 决定编号如何寻址图块图像数据；这不是 VRAM 字节地址。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settile_rect
@@ -3018,18 +3018,18 @@ C</code></pre></div><p><a href="../samples/api-examples/gb/__settile_col.c">完�
 // interrupts afterward; it is not a promise to preserve the caller&#x27;s interrupt state or
 // to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_rect(2, 3, 3, 2, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C84, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C65, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>AAA
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>AAA
 AAA</code></pre></div><p><a href="../samples/api-examples/gb/__settile_rect.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_rect.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_rect.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_rect">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/rpg.h:154</p></details></details><details class="api searchable" id="api-__settile_row" data-api-contract="tile-source-20260914"><summary><code>__settile_row</code></summary><p>将 <code>src</code> 中连续的 <code>len</code> 个图块编号，从 LCDC 所选背景地图的 <code>(x,y)</code> 起向右复制。每复制一个图块，源和目标地址各增加一字节。</p><p>必要时等待 VRAM 可写。LCD 开启时的路径会屏蔽中断，并可能在结束后启用中断；不保证保留调用前的中断状态，也不保证在一次 VBlank 内完成。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settile_row(u8 x, u8 y, const u8* src, u8 len);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>src</code></dt><dd><p>位于 RAM 或当前可见 ROM bank 中的连续字节。图块流保存图块编号，属性流保存 CGB 属性字节。函数立即复制，不保留指针。</p></dd><dt><code>len</code></dt><dd><p>字节数，范围 0～255。为 0 时不复制；源数据至少要有这么多可读字节。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>横向复制应满足 <code>x+len &lt;= 32</code>，纵向复制应满足 <code>y+len &lt;= 32</code>。不会在地图边缘自动回绕坐标。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settile_row
 // Copy `len` successive tile numbers from `src` horizontally, starting at `(x,y)` in the
@@ -3038,35 +3038,35 @@ AAA</code></pre></div><p><a href="../samples/api-examples/gb/__settile_rect.c">�
 // interrupts afterward; it is not a promise to preserve the caller&#x27;s interrupt state or
 // to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_row(2, 3, example_tiles, 3);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C64, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9C82, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_row.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_row.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_row.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_row.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_row">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/rpg.h:155</p></details></details><details class="api searchable" id="api-__settile_xy" data-api-contract="tile-source-20260914"><summary><code>__settile_xy</code></summary><p>向图块地图的一个单元写入图块编号。这是在选择已有图块图像，不会修改像素数据。</p><p>写入 LCDC 位 3 当前选择的背景地图：0 对应 <code>0x9800</code>，1 对应 <code>0x9C00</code>，再加上 <code>32*y + x</code>。</p><p>必要时等待 VRAM 可写。LCD 开启时的路径会屏蔽中断，并可能在结束后启用中断；不保证保留调用前的中断状态，也不保证在一次 VBlank 内完成。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settile_xy(u8 x, u8 y, u8 tile);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>tile</code></dt><dd><p>0～255 的图块编号。LCDC 位 4 决定编号如何寻址图块图像数据；这不是 VRAM 字节地址。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settile_xy
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. LCDC bit 3 selects the background map: zero uses `0x9800`, one uses
 // `0x9C00`. The destination is that base plus `32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_xy(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_xy.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_xy.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_xy.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_xy.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_xy">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/rpg.h:153</p></details></details><details class="api searchable" id="api-__settilemap_rect" data-api-contract="tile-source-20260914"><summary><code>__settilemap_rect</code></summary><p>将紧密排列的 <code>w*h</code> 个图块编号复制到 <code>base</code> 指定地图中以 <code>(x,y)</code> 为起点的矩形。源数据每行 <code>w</code> 字节，目标行间距为 32 字节。</p><p>必要时等待 VRAM 可写。LCD 开启时的路径会屏蔽中断，并可能在结束后启用中断；不保证保留调用前的中断状态，也不保证在一次 VBlank 内完成。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __settilemap_rect(u16 base, u8 x, u8 y, u8 w, u8 h, const u8* src);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p>用 <code>base</code> 指定地图起始地址 <code>0x9800</code> 或 <code>0x9C00</code>；字节地址为 <code>base + 32*y + x</code>。</p></dd><dt><code>x, y</code></dt><dd><p>以 8×8 图块为单位的坐标，各为 0～31。整个写入范围必须位于 32×32 地图内；不会自动裁剪坐标。</p></dd><dt><code>w, h</code></dt><dd><p>以 8×8 图块为单位的宽和高。须满足 <code>x+w &lt;= 32</code>、<code>y+h &lt;= 32</code>。任一维为 0 时不写入。</p></dd><dt><code>src</code></dt><dd><p>位于 RAM 或当前可见 ROM bank 中的连续字节。图块流保存图块编号，属性流保存 CGB 属性字节。函数立即复制，不保留指针。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用条件与限制</h4><p>图块编号写入当前选中的 VRAM 库。CGB 上应选择编号所在的库 0；此调用不会代为切换库。</p><p>示例使用 <code>gb_common.h</code>。<code>m_init()</code> 将附带 ASCII 字体加载到与字符编码相同的图块编号。<code>m_wait(); M_LCDC=0;</code> 在 VBlank 中关闭 LCD，以便进行无需等待的传输。最后的 LCDC 值选择显示地图。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>// __settilemap_rect
 // Copy a tightly packed `w*h` array of tile numbers to a rectangle at `(x,y)` in the map
 // selected by `base`. Source rows have `w` bytes; destination rows have a 32-byte
@@ -3074,19 +3074,19 @@ void main() {
 // and can enable interrupts afterward; it is not a promise to preserve the caller&#x27;s
 // interrupt state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;,&#x27;D&#x27;,&#x27;E&#x27;,&#x27;F&#x27;};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilemap_rect(0x9C00, 2, 3, 3, 2, example_tiles);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C84, 0) != &#x27;F&#x27;) { failures++; }
     if (tile_example_read(0x9C65, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>ABC
+}</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>在 CGB 上，示例字符和结果文字以白底蓝字显示。初始化时将调色板 0 的绘制颜色设为蓝色，不修改图块映射的属性。在 DMG 上，相同字符显示为白底黑字。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>ABC
 DEF</code></pre></div><p><a href="../samples/api-examples/gb/__settilemap_rect.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilemap_rect.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilemap_rect.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilemap_rect">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/rpg.h:158</p></details></details><details class="api searchable" id="api-__tile_addr"><summary><code>__tile_addr</code><span class="badge">编译器内建函数</span></summary><p>执行参数指定的操作。模块：随机数、文字、地图、保存及 RPG/ADV/SLG 功能。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u16 __tile_addr(u16 base, u8 x, u8 y);</code></pre></div><p><b>参数，从左到右： </b>u16 base, u8 x, u8 y。数组和指针需要足够空间，并在处理结束前保持有效。</p><p><b>返回类型： </b><code>u16</code>。值的含义及成功、失败返回值，以原始说明和实现中的返回条件为准。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u16 example_tile_addr(u16 base, u8 x, u8 y) {
     return __tile_addr(base, x, y);

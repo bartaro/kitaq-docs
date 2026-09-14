@@ -1,5 +1,8 @@
 // Learn deferred VRAM writes, retained source pointers and queue capacity units.
 #include "fc_common.h"
+// Palette groups identify the geometry; queue records still contain only tile writes.
+__prg_rom u8 queue_palette[16]={0x0F,0x30,0x10,0x30,0x0F,0x26,0x26,0x26,0x0F,0x22,0x22,0x22,0x0F,0x2A,0x2A,0x2A};
+__prg_rom u8 queue_attributes[64]={64,16,0,0,0,0,0,0,136,34,12,3,0,0,0,0,4,9,12,15,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 #define MAP_BASE 0x2000
 #define EXPECTED_CAPACITY 128
 #define EXPECTED_USED 52
@@ -27,6 +30,8 @@ void show(u8 row,const u8* label,u8 value) {
 void main() {
     m_init(); m_wait();
     __ppu_ctrl_set(0); __ppu_mask_set(0);
+    __palette_bg_load(queue_palette);
+    __vram_write(0x23C0,queue_attributes,64);
     failures=0;
     block[0]=0; block[1]=2; block[2]=3;
     block[3]=3; block[4]=0; block[5]=2;

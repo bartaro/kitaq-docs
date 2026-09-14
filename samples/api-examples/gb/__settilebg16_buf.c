@@ -3,7 +3,7 @@
 // `tile,tile+1` on top and `tile+2,tile+3` below. Values wrap at 256. This does not
 // transfer anything to VRAM.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include "gb_tile_example.h"
+#include "gb_tile_color_example.h"
 u8 example_tiles[1024];
 u8 example_attrs[1024];
 void __memset(void* dest, u8 value, u16 len);
@@ -15,7 +15,7 @@ void __settilebg16cgb_flush(const u8* tilebuf, const u8* attrbuf, u8 y, u8 x, u8
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __memset(example_tiles, 0, 1024);
     __memset(example_attrs, 0, 1024);
     __settilebg16_buf(example_tiles, 1, 1, 'A');

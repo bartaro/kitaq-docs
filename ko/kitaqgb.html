@@ -738,17 +738,17 @@ expect_color(1,27,31);</code></pre></div><p>호출 부분을 보여 주는 코�
 // new pixel data. The destination is always `0x9800 + 32*y + x`, regardless of which
 // maps LCDC selects for the background and window.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C62, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:31</p><div class="original"><b>선언 주석 원문</b><pre>Write a tile number to map 9800, waiting for VRAM access when necessary.</pre></div></details></details><details class="api searchable" id="api-__settile_bulk" data-api-contract="tile-source-20260914"><summary><code>__settile_bulk</code></summary><p><code>src</code>의 연속 타일 번호 <code>count</code>바이트를 VRAM 주소 <code>dest</code>로 복사합니다. 타일 이미지 개수가 아닌 바이트 수이며 행 간격을 따로 조정하지 않습니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settile_bulk(u16 dest, const u8* src, u8 count);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>dest</code></dt><dd><p>첫 VRAM 바이트 주소입니다. 맵에는 <code>0x9800~0x9FFF</code> 범위를 사용하고 전송 전체가 해당 맵 안에 들어가도록 하세요.</p></dd><dt><code>src</code></dt><dd><p>RAM 또는 현재 읽을 수 있는 ROM 뱅크에 연속으로 놓인 데이터입니다. 타일 배열에는 타일 번호, 속성 배열에는 CGB 속성을 넣습니다. 즉시 복사하며 포인터를 보관하지 않습니다.</p></dd><dt><code>count</code></dt><dd><p>바이트 수이며 0~255입니다. 0이면 복사하지 않습니다. 이 수만큼 읽을 수 있는 원본 데이터를 준비하세요.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>복사가 끝날 때까지 원본 버퍼와 해당 ROM 뱅크를 읽을 수 있게 유지하세요. 반환값은 없습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settile_bulk
 // Copy `count` consecutive tile-number bytes from `src` to the VRAM byte address `dest`.
 // The count is in bytes, not tile-image units; no row-stride adjustment is made. Waits
@@ -756,90 +756,90 @@ void main() {
 // enable interrupts afterward; it is not a promise to preserve the caller&#x27;s interrupt
 // state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 const u8 example_attrs[] = {1,2,3};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_bulk(0x9862, example_tiles, 3);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9863, 0) != &#x27;B&#x27;) { failures++; }
     if (tile_example_read(0x9864, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9865, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_bulk.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_bulk.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_bulk.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_bulk.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_bulk">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:48</p><div class="original"><b>선언 주석 원문</b><pre>Copy count sequential bytes to dest using the current VRAM bank and access-checked transfer.</pre></div></details></details><details class="api searchable" id="api-__settile_bulk_fast" data-api-contract="tile-source-20260914"><summary><code>__settile_bulk_fast</code></summary><p><code>src</code>의 연속 타일 번호 <code>count</code>바이트를 VRAM 주소 <code>dest</code>로 복사합니다. 타일 이미지 개수가 아닌 바이트 수이며 행 간격을 따로 조정하지 않습니다.</p><p>VRAM 접근을 기다리지 않습니다. LCD가 꺼져 있거나 전체 전송을 마칠 수 있는 쓰기 가능 시간을 호출자가 확보했을 때 사용하세요.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settile_bulk_fast(u16 dest, const u8* src, u8 count);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>dest</code></dt><dd><p>첫 VRAM 바이트 주소입니다. 맵에는 <code>0x9800~0x9FFF</code> 범위를 사용하고 전송 전체가 해당 맵 안에 들어가도록 하세요.</p></dd><dt><code>src</code></dt><dd><p>RAM 또는 현재 읽을 수 있는 ROM 뱅크에 연속으로 놓인 데이터입니다. 타일 배열에는 타일 번호, 속성 배열에는 CGB 속성을 넣습니다. 즉시 복사하며 포인터를 보관하지 않습니다.</p></dd><dt><code>count</code></dt><dd><p>바이트 수이며 0~255입니다. 0이면 복사하지 않습니다. 이 수만큼 읽을 수 있는 원본 데이터를 준비하세요.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>복사가 끝날 때까지 원본 버퍼와 해당 ROM 뱅크를 읽을 수 있게 유지하세요. 반환값은 없습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settile_bulk_fast
 // Copy `count` consecutive tile-number bytes from `src` to the VRAM byte address `dest`.
 // The count is in bytes, not tile-image units; no row-stride adjustment is made. Does
 // not wait for VRAM access. Call only while the LCD is off or within a caller-managed
 // writable interval with enough time for the whole transfer.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 const u8 example_attrs[] = {1,2,3};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_bulk_fast(0x9862, example_tiles, 3);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9863, 0) != &#x27;B&#x27;) { failures++; }
     if (tile_example_read(0x9864, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9865, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_bulk_fast.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_bulk_fast.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_bulk_fast.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_bulk_fast.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_bulk_fast">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:50</p><div class="original"><b>선언 주석 원문</b><pre>Copy count sequential bytes to dest without VRAM access waits; retain source-bank visibility.</pre></div></details></details><details class="api searchable" id="api-__settile_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settile_unsafe</code></summary><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>대상 주소는 항상 <code>0x9800 + 32*y + x</code>입니다. LCDC의 배경·윈도 맵 선택과는 무관합니다.</p><p>VRAM 접근을 기다리지 않습니다. LCD가 꺼져 있거나 전체 전송을 마칠 수 있는 쓰기 가능 시간을 호출자가 확보했을 때 사용하세요.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settile_unsafe(u8 x, u8 y, u8 tile);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>tile</code></dt><dd><p>0~255의 타일 번호입니다. 번호가 타일 이미지 데이터를 가리키는 방식은 LCDC 비트 4로 결정됩니다. VRAM 바이트 주소가 아닙니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settile_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. The destination is always `0x9800 + 32*y + x`, regardless of which
 // maps LCDC selects for the background and window.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_unsafe(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C62, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_unsafe.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_unsafe.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_unsafe">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:33</p><div class="original"><b>선언 주석 원문</b><pre>Write a tile number to map 9800 without waiting for writable VRAM.</pre></div></details></details><details class="api searchable" id="api-__settileat" data-api-contract="tile-source-20260914"><summary><code>__settileat</code></summary><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settileat(u16 base, u8 x, u8 y, u8 tile);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p></dd><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>tile</code></dt><dd><p>0~255의 타일 번호입니다. 번호가 타일 이미지 데이터를 가리키는 방식은 LCDC 비트 4로 결정됩니다. VRAM 바이트 주소가 아닙니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settileat
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. `base` explicitly selects the map (`0x9800` or `0x9C00`); the byte
 // address is `base + 32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settileat(0x9C00, 2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settileat.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settileat.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settileat.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settileat.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settileat">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:35</p><div class="original"><b>선언 주석 원문</b><pre>Write at base+32*y+x with VRAM access checks; supply a valid tile-map base.</pre></div></details></details><details class="api searchable" id="api-__settileat_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settileat_unsafe</code></summary><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p><p>VRAM 접근을 기다리지 않습니다. LCD가 꺼져 있거나 전체 전송을 마칠 수 있는 쓰기 가능 시간을 호출자가 확보했을 때 사용하세요.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settileat_unsafe(u16 base, u8 x, u8 y, u8 tile);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p></dd><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>tile</code></dt><dd><p>0~255의 타일 번호입니다. 번호가 타일 이미지 데이터를 가리키는 방식은 LCDC 비트 4로 결정됩니다. VRAM 바이트 주소가 아닙니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settileat_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. `base` explicitly selects the map (`0x9800` or `0x9C00`); the byte
 // address is `base + 32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settileat_unsafe(0x9C00, 2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settileat_unsafe.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settileat_unsafe.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settileat_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settileat_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settileat_unsafe">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:37</p><div class="original"><b>선언 주석 원문</b><pre>Use an explicit map base without waiting for VRAM access.</pre></div></details></details><details class="api searchable" id="api-__settileatattr" data-api-contract="tile-source-20260914"><summary><code>__settileatattr</code></summary><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settileatattr(u16 base, u8 x, u8 y, u8 attr);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p></dd><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>attr</code></dt><dd><p>CGB 속성 바이트입니다. 비트 0~2는 팔레트 0~7, 비트 3은 이미지 데이터 뱅크, 비트 5·6은 좌우·상하 반전, 비트 7은 BG·윈도 우선순위입니다. 사용하지 않는 비트 4는 0으로 두세요.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>CGB에서는 VRAM 뱅크 1에 쓴 뒤 <code>VBK=0</code>으로 끝납니다. DMG에서는 속성을 쓰지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settileatattr
 // Write only the CGB attribute byte; leave the tile number unchanged. Attribute bits
 // select palette, tile-data bank, flips and priority. `base` explicitly selects the map
@@ -1008,33 +1008,33 @@ void main() {
 // new pixel data. LCDC bit 3 selects the background map: zero uses `0x9800`, one uses
 // `0x9C00`. The destination is that base plus `32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilebg(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:43</p><div class="original"><b>선언 주석 원문</b><pre>Select the background map from LCDC bit 3, then write with access checks.</pre></div></details></details><details class="api searchable" id="api-__settilebg_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settilebg_unsafe</code></summary><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>VRAM 접근을 기다리지 않습니다. LCD가 꺼져 있거나 전체 전송을 마칠 수 있는 쓰기 가능 시간을 호출자가 확보했을 때 사용하세요.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settilebg_unsafe(u8 x, u8 y, u8 tile);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>tile</code></dt><dd><p>0~255의 타일 번호입니다. 번호가 타일 이미지 데이터를 가리키는 방식은 LCDC 비트 4로 결정됩니다. VRAM 바이트 주소가 아닙니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settilebg_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. LCDC bit 3 selects the background map: zero uses `0x9800`, one uses
 // `0x9C00`. The destination is that base plus `32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilebg_unsafe(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg_unsafe.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg_unsafe.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg_unsafe">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:45</p><div class="original"><b>선언 주석 원문</b><pre>Select the LCDC background map and write without access waits.</pre></div></details></details><details class="api searchable" id="api-__settilebgattr" data-api-contract="tile-source-20260914"><summary><code>__settilebgattr</code></summary><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settilebgattr(u8 x, u8 y, u8 attr);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>attr</code></dt><dd><p>CGB 속성 바이트입니다. 비트 0~2는 팔레트 0~7, 비트 3은 이미지 데이터 뱅크, 비트 5·6은 좌우·상하 반전, 비트 7은 BG·윈도 우선순위입니다. 사용하지 않는 비트 4는 0으로 두세요.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>CGB에서는 VRAM 뱅크 1에 쓴 뒤 <code>VBK=0</code>으로 끝납니다. DMG에서는 속성을 쓰지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settilebgattr
 // Write only the CGB attribute byte; leave the tile number unchanged. Attribute bits
 // select palette, tile-data bank, flips and priority. LCDC bit 3 selects the background
@@ -1203,33 +1203,33 @@ void main() {
 // new pixel data. LCDC bit 6 selects the window map: zero uses `0x9800`, one uses
 // `0x9C00`. These are map coordinates, not the window&#x27;s screen position.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilewin(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewin.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewin.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewin.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewin.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewin">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:39</p><div class="original"><b>선언 주석 원문</b><pre>Select the window map from LCDC bit 6, then write a tile with access checks.</pre></div></details></details><details class="api searchable" id="api-__settilewin_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settilewin_unsafe</code></summary><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>LCDC 비트 6이 선택한 윈도 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>입니다. <code>x,y</code>는 맵 좌표이며 화면의 윈도 위치가 아닙니다.</p><p>VRAM 접근을 기다리지 않습니다. LCD가 꺼져 있거나 전체 전송을 마칠 수 있는 쓰기 가능 시간을 호출자가 확보했을 때 사용하세요.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settilewin_unsafe(u8 x, u8 y, u8 tile);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>tile</code></dt><dd><p>0~255의 타일 번호입니다. 번호가 타일 이미지 데이터를 가리키는 방식은 LCDC 비트 4로 결정됩니다. VRAM 바이트 주소가 아닙니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settilewin_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. LCDC bit 6 selects the window map: zero uses `0x9800`, one uses
 // `0x9C00`. These are map coordinates, not the window&#x27;s screen position.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilewin_unsafe(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewin_unsafe.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewin_unsafe.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewin_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewin_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewin_unsafe">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:41</p><div class="original"><b>선언 주석 원문</b><pre>Select the LCDC window map and write without access waits.</pre></div></details></details><details class="api searchable" id="api-__settilewinattr" data-api-contract="tile-source-20260914"><summary><code>__settilewinattr</code></summary><p>CGB 속성 바이트만 바꾸고 타일 번호는 유지합니다. 속성은 팔레트, 타일 이미지 뱅크, 좌우·상하 반전과 우선순위를 지정합니다.</p><p>LCDC 비트 6이 선택한 윈도 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>입니다. <code>x,y</code>는 맵 좌표이며 화면의 윈도 위치가 아닙니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settilewinattr(u8 x, u8 y, u8 attr);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>attr</code></dt><dd><p>CGB 속성 바이트입니다. 비트 0~2는 팔레트 0~7, 비트 3은 이미지 데이터 뱅크, 비트 5·6은 좌우·상하 반전, 비트 7은 BG·윈도 우선순위입니다. 사용하지 않는 비트 4는 0으로 두세요.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>CGB에서는 VRAM 뱅크 1에 쓴 뒤 <code>VBK=0</code>으로 끝납니다. DMG에서는 속성을 쓰지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settilewinattr
 // Write only the CGB attribute byte; leave the tile number unchanged. Attribute bits
 // select palette, tile-data bank, flips and priority. LCDC bit 6 selects the window map:
@@ -2233,18 +2233,18 @@ if (funcName == &quot;__readpadbtn&quot;)
 // new pixel data. The destination is always `0x9800 + 32*y + x`, regardless of which
 // maps LCDC selects for the background and window.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 void __settile_fast(u8 x, u8 y, u8 tile);
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_fast(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C62, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_fast.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_fast.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_fast.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_fast.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_fast">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:9189</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
                 if (args.Length != 3) Error(expr, &quot;__settile_unsafe requires 3 arguments&quot;);
 
@@ -2292,7 +2292,7 @@ void main() {
 // `tile,tile+1` on top and `tile+2,tile+3` below. Values wrap at 256. This does not
 // transfer anything to VRAM.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 u8 example_tiles[1024];
 u8 example_attrs[1024];
 void __memset(void* dest, u8 value, u16 len);
@@ -2304,7 +2304,7 @@ void __settilebg16cgb_flush(const u8* tilebuf, const u8* attrbuf, u8 y, u8 x, u8
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __memset(example_tiles, 0, 1024);
     __memset(example_attrs, 0, 1024);
     __settilebg16_buf(example_tiles, 1, 1, &#x27;A&#x27;);
@@ -2320,7 +2320,7 @@ void main() {
     if (example_tiles[99] != &#x27;D&#x27;) { failures++; }
     if (tile_example_read(0x9C44, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>타일 좌표 <code>(2,2)</code>에 위쪽 <code>AB</code>, 아래쪽 <code>CD</code>가 표시됩니다. 셀 좌표 <code>(1,1)</code>에 해당하는 16×16픽셀 셀 하나입니다. 버퍼 쓰기 예제는 RAM 준비가 VRAM을 바꾸지 않는지 확인한 뒤 전송합니다. 전송 함수 예제는 RAM 바이트를 직접 설정한 뒤 전송합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=2)</code>, 픽셀 좌표 <code>(16,16)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>AB
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>타일 좌표 <code>(2,2)</code>에 위쪽 <code>AB</code>, 아래쪽 <code>CD</code>가 표시됩니다. 셀 좌표 <code>(1,1)</code>에 해당하는 16×16픽셀 셀 하나입니다. 버퍼 쓰기 예제는 RAM 준비가 VRAM을 바꾸지 않는지 확인한 뒤 전송합니다. 전송 함수 예제는 RAM 바이트를 직접 설정한 뒤 전송합니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=2)</code>, 픽셀 좌표 <code>(16,16)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>AB
 CD</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg16_buf.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg16_buf.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg16_buf.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg16_buf">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10432</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
                 if (args.Length != 4) Error(expr, &quot;__settilebg16_buf requires 4 arguments&quot;);
@@ -2356,7 +2356,7 @@ CD</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg16_buf.c"
 // interrupt masking and can enable interrupts afterward; it is not a promise to preserve
 // the caller&#x27;s interrupt state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 u8 example_tiles[1024];
 u8 example_attrs[1024];
 void __memset(void* dest, u8 value, u16 len);
@@ -2368,7 +2368,7 @@ void __settilebg16cgb_flush(const u8* tilebuf, const u8* attrbuf, u8 y, u8 x, u8
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __memset(example_tiles, 0, 1024);
     __memset(example_attrs, 0, 1024);
     example_tiles[66]=&#x27;A&#x27;; example_tiles[67]=&#x27;B&#x27;;
@@ -2382,7 +2382,7 @@ void main() {
     if (example_tiles[99] != &#x27;D&#x27;) { failures++; }
     if (tile_example_read(0x9C44, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>타일 좌표 <code>(2,2)</code>에 위쪽 <code>AB</code>, 아래쪽 <code>CD</code>가 표시됩니다. 셀 좌표 <code>(1,1)</code>에 해당하는 16×16픽셀 셀 하나입니다. 버퍼 쓰기 예제는 RAM 준비가 VRAM을 바꾸지 않는지 확인한 뒤 전송합니다. 전송 함수 예제는 RAM 바이트를 직접 설정한 뒤 전송합니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=2)</code>, 픽셀 좌표 <code>(16,16)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>AB
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>타일 좌표 <code>(2,2)</code>에 위쪽 <code>AB</code>, 아래쪽 <code>CD</code>가 표시됩니다. 셀 좌표 <code>(1,1)</code>에 해당하는 16×16픽셀 셀 하나입니다. 버퍼 쓰기 예제는 RAM 준비가 VRAM을 바꾸지 않는지 확인한 뒤 전송합니다. 전송 함수 예제는 RAM 바이트를 직접 설정한 뒤 전송합니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=2)</code>, 픽셀 좌표 <code>(16,16)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>AB
 CD</code></pre></div><p><a href="../samples/api-examples/gb/__settilebg16_flush.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg16_flush.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg16_flush.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg16_flush">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10449</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
                 if (args.Length != 4) Error(expr, &quot;__settilebg16_flush requires 4 arguments&quot;);
@@ -2996,19 +2996,19 @@ void Camera_ApplyBgBuffered(const Camera8_8* cam)</code></pre></div><p class="so
 // and can enable interrupts afterward; it is not a promise to preserve the caller&#x27;s
 // interrupt state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_col(2, 3, example_tiles, 3);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9CA2, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9C63, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A
 B
 C</code></pre></div><p><a href="../samples/api-examples/gb/__settile_col.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_col.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_col.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_col">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/rpg.h:156</p></details></details><details class="api searchable" id="api-__settile_rect" data-api-contract="tile-source-20260914"><summary><code>__settile_rect</code></summary><p>LCDC로 선택한 BG 맵에서 너비 <code>w</code>, 높이 <code>h</code>의 사각형을 같은 타일 번호로 채웁니다. 행 간격은 32바이트입니다. 이미지 배열을 복사하지 않고 같은 타일을 반복 배치합니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settile_rect(u8 x, u8 y, u8 w, u8 h, u8 tile);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>w, h</code></dt><dd><p>8×8 타일 단위의 너비와 높이입니다. <code>x+w &lt;= 32</code>, <code>y+h &lt;= 32</code>를 지키세요. 어느 하나가 0이면 쓰지 않습니다.</p></dd><dt><code>tile</code></dt><dd><p>0~255의 타일 번호입니다. 번호가 타일 이미지 데이터를 가리키는 방식은 LCDC 비트 4로 결정됩니다. VRAM 바이트 주소가 아닙니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settile_rect
@@ -3018,18 +3018,18 @@ C</code></pre></div><p><a href="../samples/api-examples/gb/__settile_col.c">사�
 // interrupts afterward; it is not a promise to preserve the caller&#x27;s interrupt state or
 // to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_rect(2, 3, 3, 2, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C84, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C65, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>AAA
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>AAA
 AAA</code></pre></div><p><a href="../samples/api-examples/gb/__settile_rect.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_rect.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_rect.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_rect">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/rpg.h:154</p></details></details><details class="api searchable" id="api-__settile_row" data-api-contract="tile-source-20260914"><summary><code>__settile_row</code></summary><p><code>src</code>의 연속된 타일 번호 <code>len</code>개를 LCDC로 선택한 BG 맵의 <code>(x,y)</code>부터 오른쪽으로 복사합니다. 원본과 대상 주소가 타일마다 1바이트씩 증가합니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settile_row(u8 x, u8 y, const u8* src, u8 len);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>src</code></dt><dd><p>RAM 또는 현재 읽을 수 있는 ROM 뱅크에 연속으로 놓인 데이터입니다. 타일 배열에는 타일 번호, 속성 배열에는 CGB 속성을 넣습니다. 즉시 복사하며 포인터를 보관하지 않습니다.</p></dd><dt><code>len</code></dt><dd><p>바이트 수이며 0~255입니다. 0이면 복사하지 않습니다. 이 수만큼 읽을 수 있는 원본 데이터를 준비하세요.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>가로 복사는 <code>x+len &lt;= 32</code>, 세로 복사는 <code>y+len &lt;= 32</code>를 지키세요. 맵 가장자리에서 좌표가 자동으로 순환하지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settile_row
 // Copy `len` successive tile numbers from `src` horizontally, starting at `(x,y)` in the
@@ -3038,35 +3038,35 @@ AAA</code></pre></div><p><a href="../samples/api-examples/gb/__settile_rect.c">�
 // interrupts afterward; it is not a promise to preserve the caller&#x27;s interrupt state or
 // to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_row(2, 3, example_tiles, 3);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C64, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9C82, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_row.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>ABC</code></pre></div><p><a href="../samples/api-examples/gb/__settile_row.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_row.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_row.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_row">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/rpg.h:155</p></details></details><details class="api searchable" id="api-__settile_xy" data-api-contract="tile-source-20260914"><summary><code>__settile_xy</code></summary><p>타일 맵의 한 셀에 타일 번호를 씁니다. 이미 등록된 타일 이미지를 선택하며 픽셀 데이터는 바꾸지 않습니다.</p><p>LCDC 비트 3이 선택한 배경 맵을 사용합니다. 0이면 <code>0x9800</code>, 1이면 <code>0x9C00</code>에 <code>32*y + x</code>를 더합니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settile_xy(u8 x, u8 y, u8 tile);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>tile</code></dt><dd><p>0~255의 타일 번호입니다. 번호가 타일 이미지 데이터를 가리키는 방식은 LCDC 비트 4로 결정됩니다. VRAM 바이트 주소가 아닙니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settile_xy
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. LCDC bit 3 selects the background map: zero uses `0x9800`, one uses
 // `0x9C00`. The destination is that base plus `32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_xy(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_xy.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settile_xy.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_xy.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_xy.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_xy">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/rpg.h:153</p></details></details><details class="api searchable" id="api-__settilemap_rect" data-api-contract="tile-source-20260914"><summary><code>__settilemap_rect</code></summary><p>빈틈없이 배열된 <code>w*h</code>개의 타일 번호를 <code>base</code>로 지정한 맵의 <code>(x,y)</code>에 사각형으로 복사합니다. 원본 행은 <code>w</code>바이트이며 대상 행 간격은 32바이트입니다.</p><p>필요하면 VRAM 쓰기가 가능한 시점까지 기다립니다. LCD가 켜진 경로는 인터럽트를 제어하며 이후 활성화할 수 있습니다. 호출 전 인터럽트 상태 유지나 한 번의 VBlank 안에 끝남을 보장하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __settilemap_rect(u16 base, u8 x, u8 y, u8 w, u8 h, const u8* src);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p><code>base</code>로 맵 시작 주소 <code>0x9800</code> 또는 <code>0x9C00</code>을 지정합니다. 실제 주소는 <code>base + 32*y + x</code>입니다.</p></dd><dt><code>x, y</code></dt><dd><p>8×8 타일 단위의 좌표이며 각각 0~31입니다. 쓰기 범위 전체가 32×32 맵 안에 들어가야 합니다. 좌표를 자동으로 잘라 주지 않습니다.</p></dd><dt><code>w, h</code></dt><dd><p>8×8 타일 단위의 너비와 높이입니다. <code>x+w &lt;= 32</code>, <code>y+h &lt;= 32</code>를 지키세요. 어느 하나가 0이면 쓰지 않습니다.</p></dd><dt><code>src</code></dt><dd><p>RAM 또는 현재 읽을 수 있는 ROM 뱅크에 연속으로 놓인 데이터입니다. 타일 배열에는 타일 번호, 속성 배열에는 CGB 속성을 넣습니다. 즉시 복사하며 포인터를 보관하지 않습니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 조건과 제한</h4><p>타일 번호는 현재 선택된 VRAM 뱅크에 씁니다. CGB에서는 타일 번호용 뱅크 0을 선택하세요. 이 호출은 뱅크를 바꾸지 않습니다.</p><p>예제는 <code>gb_common.h</code>를 사용합니다. <code>m_init()</code>은 제공된 ASCII 폰트를 문자 코드와 같은 타일 번호로 불러옵니다. <code>m_wait(); M_LCDC=0;</code>은 VBlank 중 LCD를 꺼 대기 없는 전송을 준비합니다. 마지막 LCDC 값으로 표시할 맵을 선택합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>// __settilemap_rect
 // Copy a tightly packed `w*h` array of tile numbers to a rectangle at `(x,y)` in the map
 // selected by `base`. Source rows have `w` bytes; destination rows have a 32-byte
@@ -3074,19 +3074,19 @@ void main() {
 // and can enable interrupts afterward; it is not a promise to preserve the caller&#x27;s
 // interrupt state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;,&#x27;D&#x27;,&#x27;E&#x27;,&#x27;F&#x27;};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilemap_rect(0x9C00, 2, 3, 3, 2, example_tiles);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C84, 0) != &#x27;F&#x27;) { failures++; }
     if (tile_example_read(0x9C65, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>ABC
+}</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 예제 문자와 결과 문구가 흰 바탕에 파란색으로 표시됩니다. 초기 설정에서 팔레트 0의 글자색을 파란색으로 지정하며, 타일 맵 속성은 변경하지 않습니다. DMG에서는 같은 문자가 흰 바탕에 검은색으로 표시됩니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>ABC
 DEF</code></pre></div><p><a href="../samples/api-examples/gb/__settilemap_rect.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilemap_rect.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilemap_rect.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilemap_rect">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/rpg.h:158</p></details></details><details class="api searchable" id="api-__tile_addr"><summary><code>__tile_addr</code><span class="badge">컴파일러 내장 함수</span></summary><p>인수로 지정한 작업을 수행합니다. 모듈: 난수, 문자, 맵, 저장, RPG·ADV·SLG 기능. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u16 __tile_addr(u16 base, u8 x, u8 y);</code></pre></div><p><b>인수, 왼쪽부터: </b>u16 base, u8 x, u8 y. 배열과 포인터는 충분한 저장 공간을 확보하고 처리가 끝날 때까지 유효하게 유지하세요.</p><p><b>반환 자료형: </b><code>u16</code>. 값의 의미와 성공·실패 반환값은 원문 주석과 구현의 반환 조건에서 확인하세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u16 example_tile_addr(u16 base, u8 x, u8 y) {
     return __tile_addr(base, x, y);

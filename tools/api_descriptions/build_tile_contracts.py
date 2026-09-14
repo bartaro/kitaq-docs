@@ -29,6 +29,12 @@ def add(name, purpose, args, notes, operation, assertions, map1, declarations=''
                + '\n'.join('    ' + line for line in operation.splitlines()) + '\n'
                + '\n'.join('    if (' + test + ') { failures++; }' for test in assertions) + '\n'
                + '    tile_example_finish(failures, ' + str(int(map1)) + ');\n}\n')
+    # A blue palette-zero ink makes CGB tile-number writes visible without
+    # introducing attribute writes into the operation under test.
+    if not colors or all(color == 0 for color in colors):
+        program = program.replace('"gb_tile_example.h"', '"gb_tile_color_example.h"')
+        program = program.replace('tile_example_begin();', 'tile_color_example_begin();')
+        colors = [2]
     destination = SITE / path
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(program, encoding='utf-8', newline='\n')
@@ -161,6 +167,11 @@ for name, attributes, flush in buffer_rows:
     contracts['gb:' + name]['syntax'] = syntax
     contracts['gb:' + name]['example']['expected'] = ['tile_test_expected', 'tile_quad_example']
     if attributes: contracts['gb:' + name]['example']['expected'].append('tile_quad_blue')
+
+# State the actual CGB setup alongside the image, including in the buffer examples.
+for contract in contracts.values():
+    if 'gb_tile_color_example.h' in contract['example']['code']:
+        contract['example']['expected'].append('tile_default_blue')
 
 # Preserve the exact inventory fingerprint and the source files reviewed for this batch.
 records = json.loads((SITE/'reference/gb-api.json').read_text(encoding='utf-8'))['records']

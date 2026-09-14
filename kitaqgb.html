@@ -734,17 +734,17 @@ expect_color(1,27,31);</code></pre></div><p>呼び出し部分のコード例で
 // new pixel data. The destination is always `0x9800 + 32*y + x`, regardless of which
 // maps LCDC selects for the background and window.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C62, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settile.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settile.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:31</p><div class="original"><b>宣言の注記（原文）</b><pre>Write a tile number to map 9800, waiting for VRAM access when necessary.</pre></div></details></details><details class="api searchable" id="api-__settile_bulk" data-api-contract="tile-source-20260914"><summary><code>__settile_bulk</code></summary><p><code>src</code> から <code>dest</code> のVRAMアドレスへ、連続するタイル番号を <code>count</code> バイトコピーします。個々のタイル画像を転送する命令ではありません。行末での折り返し調整も行いません。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settile_bulk(u16 dest, const u8* src, u8 count);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>dest</code></dt><dd><p>先頭のVRAMバイトアドレスです。マップには <code>0x9800～0x9FFF</code> の範囲を使い、転送全体が目的のマップ内に収まるようにしてください。</p></dd><dt><code>src</code></dt><dd><p>RAMまたは参照可能なROMバンク上に、隙間なく並べたデータです。タイル列にはタイル番号、属性列にはCGB属性を格納します。その場でコピーし、ポインタは保存しません。</p></dd><dt><code>count</code></dt><dd><p>バイト数で、0～255です。0なら何も転送しません。転送数以上の読み取り可能なデータを用意してください。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>コピーが終わるまで、元バッファとそのROMバンクを読み取り可能な状態に保ってください。戻り値はありません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settile_bulk
 // Copy `count` consecutive tile-number bytes from `src` to the VRAM byte address `dest`.
 // The count is in bytes, not tile-image units; no row-stride adjustment is made. Waits
@@ -752,90 +752,90 @@ void main() {
 // enable interrupts afterward; it is not a promise to preserve the caller&#x27;s interrupt
 // state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 const u8 example_attrs[] = {1,2,3};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_bulk(0x9862, example_tiles, 3);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9863, 0) != &#x27;B&#x27;) { failures++; }
     if (tile_example_read(0x9864, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9865, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>ABC</code></pre></div><p><a href="samples/api-examples/gb/__settile_bulk.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>ABC</code></pre></div><p><a href="samples/api-examples/gb/__settile_bulk.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_bulk.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_bulk.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_bulk">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:48</p><div class="original"><b>宣言の注記（原文）</b><pre>Copy count sequential bytes to dest using the current VRAM bank and access-checked transfer.</pre></div></details></details><details class="api searchable" id="api-__settile_bulk_fast" data-api-contract="tile-source-20260914"><summary><code>__settile_bulk_fast</code></summary><p><code>src</code> から <code>dest</code> のVRAMアドレスへ、連続するタイル番号を <code>count</code> バイトコピーします。個々のタイル画像を転送する命令ではありません。行末での折り返し調整も行いません。</p><p>VRAMアクセス待ちは行いません。LCD停止中か、転送全体が収まる書き込み可能時間を呼び出し側で確保した場合に使用してください。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settile_bulk_fast(u16 dest, const u8* src, u8 count);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>dest</code></dt><dd><p>先頭のVRAMバイトアドレスです。マップには <code>0x9800～0x9FFF</code> の範囲を使い、転送全体が目的のマップ内に収まるようにしてください。</p></dd><dt><code>src</code></dt><dd><p>RAMまたは参照可能なROMバンク上に、隙間なく並べたデータです。タイル列にはタイル番号、属性列にはCGB属性を格納します。その場でコピーし、ポインタは保存しません。</p></dd><dt><code>count</code></dt><dd><p>バイト数で、0～255です。0なら何も転送しません。転送数以上の読み取り可能なデータを用意してください。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>コピーが終わるまで、元バッファとそのROMバンクを読み取り可能な状態に保ってください。戻り値はありません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settile_bulk_fast
 // Copy `count` consecutive tile-number bytes from `src` to the VRAM byte address `dest`.
 // The count is in bytes, not tile-image units; no row-stride adjustment is made. Does
 // not wait for VRAM access. Call only while the LCD is off or within a caller-managed
 // writable interval with enough time for the whole transfer.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 const u8 example_attrs[] = {1,2,3};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_bulk_fast(0x9862, example_tiles, 3);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9863, 0) != &#x27;B&#x27;) { failures++; }
     if (tile_example_read(0x9864, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9865, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>ABC</code></pre></div><p><a href="samples/api-examples/gb/__settile_bulk_fast.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>ABC</code></pre></div><p><a href="samples/api-examples/gb/__settile_bulk_fast.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_bulk_fast.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_bulk_fast.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_bulk_fast">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:50</p><div class="original"><b>宣言の注記（原文）</b><pre>Copy count sequential bytes to dest without VRAM access waits; retain source-bank visibility.</pre></div></details></details><details class="api searchable" id="api-__settile_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settile_unsafe</code></summary><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>書き込み先は常に <code>0x9800 + 32*y + x</code> です。LCDCで選んだBG・ウィンドウ用マップには追従しません。</p><p>VRAMアクセス待ちは行いません。LCD停止中か、転送全体が収まる書き込み可能時間を呼び出し側で確保した場合に使用してください。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settile_unsafe(u8 x, u8 y, u8 tile);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>tile</code></dt><dd><p>0～255のタイル番号です。番号から画像データを参照する方式はLCDCのビット4で決まります。VRAMのバイトアドレスではありません。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settile_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. The destination is always `0x9800 + 32*y + x`, regardless of which
 // maps LCDC selects for the background and window.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_unsafe(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C62, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settile_unsafe.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settile_unsafe.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_unsafe">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:33</p><div class="original"><b>宣言の注記（原文）</b><pre>Write a tile number to map 9800 without waiting for writable VRAM.</pre></div></details></details><details class="api searchable" id="api-__settileat" data-api-contract="tile-source-20260914"><summary><code>__settileat</code></summary><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settileat(u16 base, u8 x, u8 y, u8 tile);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p></dd><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>tile</code></dt><dd><p>0～255のタイル番号です。番号から画像データを参照する方式はLCDCのビット4で決まります。VRAMのバイトアドレスではありません。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settileat
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. `base` explicitly selects the map (`0x9800` or `0x9C00`); the byte
 // address is `base + 32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settileat(0x9C00, 2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settileat.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settileat.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settileat.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settileat.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settileat">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:35</p><div class="original"><b>宣言の注記（原文）</b><pre>Write at base+32*y+x with VRAM access checks; supply a valid tile-map base.</pre></div></details></details><details class="api searchable" id="api-__settileat_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settileat_unsafe</code></summary><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p><p>VRAMアクセス待ちは行いません。LCD停止中か、転送全体が収まる書き込み可能時間を呼び出し側で確保した場合に使用してください。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settileat_unsafe(u16 base, u8 x, u8 y, u8 tile);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p></dd><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>tile</code></dt><dd><p>0～255のタイル番号です。番号から画像データを参照する方式はLCDCのビット4で決まります。VRAMのバイトアドレスではありません。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settileat_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. `base` explicitly selects the map (`0x9800` or `0x9C00`); the byte
 // address is `base + 32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settileat_unsafe(0x9C00, 2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settileat_unsafe.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settileat_unsafe.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settileat_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settileat_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settileat_unsafe">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:37</p><div class="original"><b>宣言の注記（原文）</b><pre>Use an explicit map base without waiting for VRAM access.</pre></div></details></details><details class="api searchable" id="api-__settileatattr" data-api-contract="tile-source-20260914"><summary><code>__settileatattr</code></summary><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settileatattr(u16 base, u8 x, u8 y, u8 attr);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p></dd><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>attr</code></dt><dd><p>CGBの属性バイトです。ビット0～2はパレット0～7、ビット3は画像データのバンク、ビット5・6は左右・上下反転、ビット7はBG・ウィンドウの優先度です。未使用のビット4は0にしてください。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>CGBではVRAMバンク1へ切り替えて属性を書き、終了時は <code>VBK=0</code> にします。DMGでは属性の書き込みを行いません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settileatattr
 // Write only the CGB attribute byte; leave the tile number unchanged. Attribute bits
 // select palette, tile-data bank, flips and priority. `base` explicitly selects the map
@@ -1004,33 +1004,33 @@ void main() {
 // new pixel data. LCDC bit 3 selects the background map: zero uses `0x9800`, one uses
 // `0x9C00`. The destination is that base plus `32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilebg(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settilebg.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settilebg.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:43</p><div class="original"><b>宣言の注記（原文）</b><pre>Select the background map from LCDC bit 3, then write with access checks.</pre></div></details></details><details class="api searchable" id="api-__settilebg_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settilebg_unsafe</code></summary><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>VRAMアクセス待ちは行いません。LCD停止中か、転送全体が収まる書き込み可能時間を呼び出し側で確保した場合に使用してください。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settilebg_unsafe(u8 x, u8 y, u8 tile);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>tile</code></dt><dd><p>0～255のタイル番号です。番号から画像データを参照する方式はLCDCのビット4で決まります。VRAMのバイトアドレスではありません。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settilebg_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. LCDC bit 3 selects the background map: zero uses `0x9800`, one uses
 // `0x9C00`. The destination is that base plus `32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilebg_unsafe(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settilebg_unsafe.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settilebg_unsafe.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg_unsafe">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:45</p><div class="original"><b>宣言の注記（原文）</b><pre>Select the LCDC background map and write without access waits.</pre></div></details></details><details class="api searchable" id="api-__settilebgattr" data-api-contract="tile-source-20260914"><summary><code>__settilebgattr</code></summary><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settilebgattr(u8 x, u8 y, u8 attr);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>attr</code></dt><dd><p>CGBの属性バイトです。ビット0～2はパレット0～7、ビット3は画像データのバンク、ビット5・6は左右・上下反転、ビット7はBG・ウィンドウの優先度です。未使用のビット4は0にしてください。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>CGBではVRAMバンク1へ切り替えて属性を書き、終了時は <code>VBK=0</code> にします。DMGでは属性の書き込みを行いません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settilebgattr
 // Write only the CGB attribute byte; leave the tile number unchanged. Attribute bits
 // select palette, tile-data bank, flips and priority. LCDC bit 3 selects the background
@@ -1199,33 +1199,33 @@ void main() {
 // new pixel data. LCDC bit 6 selects the window map: zero uses `0x9800`, one uses
 // `0x9C00`. These are map coordinates, not the window&#x27;s screen position.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilewin(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settilewin.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settilewin.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewin.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewin.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewin">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:39</p><div class="original"><b>宣言の注記（原文）</b><pre>Select the window map from LCDC bit 6, then write a tile with access checks.</pre></div></details></details><details class="api searchable" id="api-__settilewin_unsafe" data-api-contract="tile-source-20260914"><summary><code>__settilewin_unsafe</code></summary><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>LCDCのビット6で選択中のウィンドウマップへ書き込みます。0なら <code>0x9800</code>、1なら <code>0x9C00</code> です。<code>x,y</code> はマップ内の座標であり、画面上のウィンドウ位置ではありません。</p><p>VRAMアクセス待ちは行いません。LCD停止中か、転送全体が収まる書き込み可能時間を呼び出し側で確保した場合に使用してください。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settilewin_unsafe(u8 x, u8 y, u8 tile);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>tile</code></dt><dd><p>0～255のタイル番号です。番号から画像データを参照する方式はLCDCのビット4で決まります。VRAMのバイトアドレスではありません。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settilewin_unsafe
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. LCDC bit 6 selects the window map: zero uses `0x9800`, one uses
 // `0x9C00`. These are map coordinates, not the window&#x27;s screen position.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilewin_unsafe(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settilewin_unsafe.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settilewin_unsafe.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewin_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewin_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewin_unsafe">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/cgb_tile.h:41</p><div class="original"><b>宣言の注記（原文）</b><pre>Select the LCDC window map and write without access waits.</pre></div></details></details><details class="api searchable" id="api-__settilewinattr" data-api-contract="tile-source-20260914"><summary><code>__settilewinattr</code></summary><p>CGBの属性バイトだけを書き換え、タイル番号は変更しません。属性ではパレット、タイル画像のバンク、左右・上下反転、優先度を指定します。</p><p>LCDCのビット6で選択中のウィンドウマップへ書き込みます。0なら <code>0x9800</code>、1なら <code>0x9C00</code> です。<code>x,y</code> はマップ内の座標であり、画面上のウィンドウ位置ではありません。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settilewinattr(u8 x, u8 y, u8 attr);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>attr</code></dt><dd><p>CGBの属性バイトです。ビット0～2はパレット0～7、ビット3は画像データのバンク、ビット5・6は左右・上下反転、ビット7はBG・ウィンドウの優先度です。未使用のビット4は0にしてください。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>CGBではVRAMバンク1へ切り替えて属性を書き、終了時は <code>VBK=0</code> にします。DMGでは属性の書き込みを行いません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settilewinattr
 // Write only the CGB attribute byte; leave the tile number unchanged. Attribute bits
 // select palette, tile-data bank, flips and priority. LCDC bit 6 selects the window map:
@@ -2229,18 +2229,18 @@ if (funcName == &quot;__readpadbtn&quot;)
 // new pixel data. The destination is always `0x9800 + 32*y + x`, regardless of which
 // maps LCDC selects for the background and window.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 void __settile_fast(u8 x, u8 y, u8 tile);
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_fast(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9862, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C62, 0) != 0) { failures++; }
     tile_example_finish(failures, 0);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settile_fast.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settile_fast.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_fast.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_fast.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_fast">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:9189</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>{
                 if (args.Length != 3) Error(expr, &quot;__settile_unsafe requires 3 arguments&quot;);
 
@@ -2288,7 +2288,7 @@ void main() {
 // `tile,tile+1` on top and `tile+2,tile+3` below. Values wrap at 256. This does not
 // transfer anything to VRAM.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 u8 example_tiles[1024];
 u8 example_attrs[1024];
 void __memset(void* dest, u8 value, u16 len);
@@ -2300,7 +2300,7 @@ void __settilebg16cgb_flush(const u8* tilebuf, const u8* attrbuf, u8 y, u8 x, u8
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __memset(example_tiles, 0, 1024);
     __memset(example_attrs, 0, 1024);
     __settilebg16_buf(example_tiles, 1, 1, &#x27;A&#x27;);
@@ -2316,7 +2316,7 @@ void main() {
     if (example_tiles[99] != &#x27;D&#x27;) { failures++; }
     if (tile_example_read(0x9C44, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>タイル座標 <code>(2,2)</code> に、上段 <code>AB</code>、下段 <code>CD</code> が表示されます。これはセル座標 <code>(1,1)</code> の16×16ピクセル1セルです。バッファ書き込みの例ではRAM上の準備でVRAMが変化しないことを確認してから転送します。転送関数の例では、先にRAMの各バイトを設定してから転送します。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=2)</code>、ピクセル座標 <code>(16,16)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>AB
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>タイル座標 <code>(2,2)</code> に、上段 <code>AB</code>、下段 <code>CD</code> が表示されます。これはセル座標 <code>(1,1)</code> の16×16ピクセル1セルです。バッファ書き込みの例ではRAM上の準備でVRAMが変化しないことを確認してから転送します。転送関数の例では、先にRAMの各バイトを設定してから転送します。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=2)</code>、ピクセル座標 <code>(16,16)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>AB
 CD</code></pre></div><p><a href="samples/api-examples/gb/__settilebg16_buf.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg16_buf.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg16_buf.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg16_buf">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10432</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>{
                 if (args.Length != 4) Error(expr, &quot;__settilebg16_buf requires 4 arguments&quot;);
@@ -2352,7 +2352,7 @@ CD</code></pre></div><p><a href="samples/api-examples/gb/__settilebg16_buf.c">�
 // interrupt masking and can enable interrupts afterward; it is not a promise to preserve
 // the caller&#x27;s interrupt state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 u8 example_tiles[1024];
 u8 example_attrs[1024];
 void __memset(void* dest, u8 value, u16 len);
@@ -2364,7 +2364,7 @@ void __settilebg16cgb_flush(const u8* tilebuf, const u8* attrbuf, u8 y, u8 x, u8
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __memset(example_tiles, 0, 1024);
     __memset(example_attrs, 0, 1024);
     example_tiles[66]=&#x27;A&#x27;; example_tiles[67]=&#x27;B&#x27;;
@@ -2378,7 +2378,7 @@ void main() {
     if (example_tiles[99] != &#x27;D&#x27;) { failures++; }
     if (tile_example_read(0x9C44, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>タイル座標 <code>(2,2)</code> に、上段 <code>AB</code>、下段 <code>CD</code> が表示されます。これはセル座標 <code>(1,1)</code> の16×16ピクセル1セルです。バッファ書き込みの例ではRAM上の準備でVRAMが変化しないことを確認してから転送します。転送関数の例では、先にRAMの各バイトを設定してから転送します。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=2)</code>、ピクセル座標 <code>(16,16)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>AB
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>タイル座標 <code>(2,2)</code> に、上段 <code>AB</code>、下段 <code>CD</code> が表示されます。これはセル座標 <code>(1,1)</code> の16×16ピクセル1セルです。バッファ書き込みの例ではRAM上の準備でVRAMが変化しないことを確認してから転送します。転送関数の例では、先にRAMの各バイトを設定してから転送します。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=2)</code>、ピクセル座標 <code>(16,16)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>AB
 CD</code></pre></div><p><a href="samples/api-examples/gb/__settilebg16_flush.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilebg16_flush.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilebg16_flush.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilebg16_flush">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10449</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>{
                 if (args.Length != 4) Error(expr, &quot;__settilebg16_flush requires 4 arguments&quot;);
@@ -2992,19 +2992,19 @@ void Camera_ApplyBgBuffered(const Camera8_8* cam)</code></pre></div><p class="so
 // and can enable interrupts afterward; it is not a promise to preserve the caller&#x27;s
 // interrupt state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_col(2, 3, example_tiles, 3);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9CA2, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9C63, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A
 B
 C</code></pre></div><p><a href="samples/api-examples/gb/__settile_col.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_col.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_col.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_col">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/rpg.h:156</p></details></details><details class="api searchable" id="api-__settile_rect" data-api-contract="tile-source-20260914"><summary><code>__settile_rect</code></summary><p>LCDCで選択したBGマップの幅 <code>w</code>、高さ <code>h</code> の矩形を、同じタイル番号で埋めます。行の間隔は32バイトです。画像の配列をコピーする処理ではなく、同じタイルを繰り返し配置します。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settile_rect(u8 x, u8 y, u8 w, u8 h, u8 tile);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>w, h</code></dt><dd><p>8×8タイル単位の幅と高さです。<code>x+w &lt;= 32</code>、<code>y+h &lt;= 32</code> に収めてください。いずれかが0なら書き込みません。</p></dd><dt><code>tile</code></dt><dd><p>0～255のタイル番号です。番号から画像データを参照する方式はLCDCのビット4で決まります。VRAMのバイトアドレスではありません。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settile_rect
@@ -3014,18 +3014,18 @@ C</code></pre></div><p><a href="samples/api-examples/gb/__settile_col.c">使用�
 // interrupts afterward; it is not a promise to preserve the caller&#x27;s interrupt state or
 // to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_rect(2, 3, 3, 2, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C84, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C65, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>AAA
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>AAA
 AAA</code></pre></div><p><a href="samples/api-examples/gb/__settile_rect.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_rect.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_rect.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_rect">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/rpg.h:154</p></details></details><details class="api searchable" id="api-__settile_row" data-api-contract="tile-source-20260914"><summary><code>__settile_row</code></summary><p><code>src</code> の連続するタイル番号を、LCDCで選んだBGマップの <code>(x,y)</code> から右へ <code>len</code> 個コピーします。コピー元・先は1タイルごとに1バイト進みます。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settile_row(u8 x, u8 y, const u8* src, u8 len);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>src</code></dt><dd><p>RAMまたは参照可能なROMバンク上に、隙間なく並べたデータです。タイル列にはタイル番号、属性列にはCGB属性を格納します。その場でコピーし、ポインタは保存しません。</p></dd><dt><code>len</code></dt><dd><p>バイト数で、0～255です。0なら何も転送しません。転送数以上の読み取り可能なデータを用意してください。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>横方向なら <code>x+len &lt;= 32</code>、縦方向なら <code>y+len &lt;= 32</code> に収めてください。マップの端で座標を折り返す処理はありません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settile_row
 // Copy `len` successive tile numbers from `src` horizontally, starting at `(x,y)` in the
@@ -3034,35 +3034,35 @@ AAA</code></pre></div><p><a href="samples/api-examples/gb/__settile_rect.c">使�
 // interrupts afterward; it is not a promise to preserve the caller&#x27;s interrupt state or
 // to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_row(2, 3, example_tiles, 3);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C64, 0) != &#x27;C&#x27;) { failures++; }
     if (tile_example_read(0x9C82, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>ABC</code></pre></div><p><a href="samples/api-examples/gb/__settile_row.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>ABC</code></pre></div><p><a href="samples/api-examples/gb/__settile_row.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_row.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_row.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_row">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/rpg.h:155</p></details></details><details class="api searchable" id="api-__settile_xy" data-api-contract="tile-source-20260914"><summary><code>__settile_xy</code></summary><p>タイルマップの1セルにタイル番号を書き込みます。登録済みのタイル画像を選ぶ操作であり、画像の画素データは変更しません。</p><p>LCDCのビット3で選択中のBGマップへ書き込みます。ビットが0なら <code>0x9800</code>、1なら <code>0x9C00</code> を先頭とし、<code>32*y + x</code> を加えます。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settile_xy(u8 x, u8 y, u8 tile);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>tile</code></dt><dd><p>0～255のタイル番号です。番号から画像データを参照する方式はLCDCのビット4で決まります。VRAMのバイトアドレスではありません。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settile_xy
 // Write one tile-number byte to the tile map; this selects an existing tile image, not
 // new pixel data. LCDC bit 3 selects the background map: zero uses `0x9800`, one uses
 // `0x9C00`. The destination is that base plus `32*y + x`.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settile_xy(2, 3, &#x27;A&#x27;);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9862, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settile_xy.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>A</code></pre></div><p><a href="samples/api-examples/gb/__settile_xy.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settile_xy.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settile_xy.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settile_xy">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/rpg.h:153</p></details></details><details class="api searchable" id="api-__settilemap_rect" data-api-contract="tile-source-20260914"><summary><code>__settilemap_rect</code></summary><p>隙間なく並んだ <code>w*h</code> 個のタイル番号を、<code>base</code> で指定したマップの <code>(x,y)</code> から矩形としてコピーします。コピー元は1行 <code>w</code> バイト、コピー先の行間隔は32バイトです。</p><p>必要に応じてVRAMへ書き込めるタイミングを待ちます。LCD動作中の経路では割り込みを禁止・許可するため、呼び出し前の割り込み状態の保持や、1回のVBlank内での完了を保証するものではありません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __settilemap_rect(u16 base, u8 x, u8 y, u8 w, u8 h, const u8* src);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p><code>base</code> にマップ先頭の <code>0x9800</code> または <code>0x9C00</code> を指定します。書き込み先は <code>base + 32*y + x</code> です。</p></dd><dt><code>x, y</code></dt><dd><p>8×8タイル単位の座標で、それぞれ0～31です。書き込み範囲全体を32×32のマップ内に収めてください。座標の切り詰めは行いません。</p></dd><dt><code>w, h</code></dt><dd><p>8×8タイル単位の幅と高さです。<code>x+w &lt;= 32</code>、<code>y+h &lt;= 32</code> に収めてください。いずれかが0なら書き込みません。</p></dd><dt><code>src</code></dt><dd><p>RAMまたは参照可能なROMバンク上に、隙間なく並べたデータです。タイル列にはタイル番号、属性列にはCGB属性を格納します。その場でコピーし、ポインタは保存しません。</p></dd></dl><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>タイル番号の書き込みには現在選択中のVRAMバンクを使います。CGBでは通常バンク0を選んでください。この関数自体はバンクを切り替えません。</p><p>使用例は <code>gb_common.h</code> を使います。<code>m_init()</code> は付属のASCIIフォントを文字コードと同じタイル番号に読み込みます。<code>m_wait(); M_LCDC=0;</code> はVBlank中にLCDを停止し、待機なしの転送を可能にします。最後のLCDC値で表示するマップを選びます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// __settilemap_rect
 // Copy a tightly packed `w*h` array of tile numbers to a rectangle at `(x,y)` in the map
 // selected by `base`. Source rows have `w` bytes; destination rows have a 32-byte
@@ -3070,19 +3070,19 @@ void main() {
 // and can enable interrupts afterward; it is not a promise to preserve the caller&#x27;s
 // interrupt state or to finish within one VBlank.
 // Expected: FAILED CHECKS 000, with the written tile data in the selected map.
-#include &quot;gb_tile_example.h&quot;
+#include &quot;gb_tile_color_example.h&quot;
 const u8 example_tiles[] = {&#x27;A&#x27;,&#x27;B&#x27;,&#x27;C&#x27;,&#x27;D&#x27;,&#x27;E&#x27;,&#x27;F&#x27;};
 
 void main() {
     u8 failures;
     failures = 0;
-    tile_example_begin();
+    tile_color_example_begin();
     __settilemap_rect(0x9C00, 2, 3, 3, 2, example_tiles);
     if (tile_example_read(0x9C62, 0) != &#x27;A&#x27;) { failures++; }
     if (tile_example_read(0x9C84, 0) != &#x27;F&#x27;) { failures++; }
     if (tile_example_read(0x9C65, 0) != 0) { failures++; }
     tile_example_finish(failures, 1);
-}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>ABC
+}</code></pre></div><h4>期待する結果</h4><p>選択したマップに、書き込んだ文字や塗りつぶした範囲が表示されます。プログラムは書き込み先のタイル番号と、CGBでは属性も読み戻して比較し、すべて一致すると <code>FAILED CHECKS 000</code> と表示します。両マップは最初に0で埋め、対象の呼び出し前にはBG・ウィンドウを <code>0x9C00</code> に設定するため、固定マップと選択マップの違いも確認できます。書き込みはLCDを停止して行います。LCD動作中のタイミングを測定するサンプルではありません。</p><p>CGBでは、サンプルの文字と結果表示が白地に青で表示されます。準備処理でパレット0の描画色を青に設定し、タイルマップの属性は変更していません。DMGでは同じ文字が白地に黒で表示されます。</p><p>期待画像：次のタイル配置が、タイル座標 <code>(x=2, y=3)</code>、ピクセル座標 <code>(16,24)</code> から表示されます。1文字が8×8の1タイルです。上から下、左から右に読み、周囲のタイルは空白になります。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">コピー</button><pre><code>ABC
 DEF</code></pre></div><p><a href="samples/api-examples/gb/__settilemap_rect.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilemap_rect.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilemap_rect.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilemap_rect">検証結果</a></p><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/rpg.h:158</p></details></details><details class="api searchable" id="api-__tile_addr"><summary><code>__tile_addr</code><span class="badge">コンパイラ組み込み</span></summary><p>乱数、文字、マップ、セーブ、RPG/ADV/SLGに関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u16 __tile_addr(u16 base, u8 x, u8 y);</code></pre></div><p><b>引数（左から順）：</b>u16 base, u8 x, u8 y。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><p><b>戻り値の型：</b><code>u16</code>。意味・成功値・失敗値は原注記と実装のreturn条件を参照してください。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u16 example_tile_addr(u16 base, u8 x, u8 y) {
     return __tile_addr(base, x, y);

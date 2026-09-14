@@ -88,7 +88,7 @@ for platform in ['gb','fc']:
   build+=' --no-cache --no-disasm'
   contracts[platform+':'+name]={'review':'vram-source-20260915','purpose':[purpose],'args':args,'returns':returns,'notes':notes,
    'record_sha256':hashlib.sha256(json.dumps({k:records[name].get(k) for k in ['name','signature','comment','definition','implementation_excerpt']},sort_keys=True).encode()).hexdigest(),
-   'example':{'code':snippet,'program':program,'build':build,'expected':['vq_sample_checks','vq_sample_geometry','vq_sample_patterns']+(['vq_cgb_colors'] if platform=='gb' else [])}}
+   'example':{'code':snippet,'program':program,'build':build,'expected':['vq_sample_checks','vq_sample_geometry','vq_sample_patterns']+(['vq_cgb_colors'] if platform=='gb' else ['vq_fc_colors'])}}
 for filename,data in [('vram_cost_texts.json',messages),('vram_contracts.json',contracts),('vram_modules.json',modules)]:
  (HERE/filename).write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
 print('30 reviewed VRAM contracts and 2 module introductions written.')
