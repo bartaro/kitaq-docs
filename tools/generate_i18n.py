@@ -93,7 +93,7 @@ def make_page(lang,key,messages,inspect=False):
         section.extend(list(rendered.contents));start.insert_after(section)
     # Strings inside original source excerpts, command output and identifiers stay verbatim.
     for node in list(soup.find_all(string=True)):
-        if node.find_parent(attrs={'data-api-contract':True}):continue
+        if node.find_parent(attrs={'data-api-contract':True}) or node.find_parent(attrs={'data-module-contract':True}):continue
         if node.find_parent(['pre','code','script','style']):continue
         if node.find_parent(class_='authored'):continue
         if str(node).lower()=='html':continue

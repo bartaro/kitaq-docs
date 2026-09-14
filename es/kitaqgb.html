@@ -1331,13 +1331,11 @@ void main() {
     if (__cgb_is_cgb() &amp;&amp; tile_example_read(0x9862, 1) != 0) { failures++; }
     tile_example_finish(failures, 1);
 }</code></pre></div><h4>Resultado esperado</h4><p>El mapa elegido muestra los caracteres escritos o el área rellenada. El programa lee los bytes de tiles y, en CGB, los atributos; <code>FAILED CHECKS 000</code> indica que las comparaciones coinciden. Ambos mapas empiezan a cero y, antes de la llamada, BG y ventana seleccionan <code>0x9C00</code>, lo que permite distinguir el mapa fijo del seleccionado. Las escrituras se hacen con el LCD apagado; no se mide la temporización con el LCD encendido.</p><p>En CGB, la <code>A</code> es azul: el atributo 2 selecciona la paleta azul preparada por el ejemplo. En DMG, el carácter es negro porque no se aplican los atributos CGB.</p><p>Imagen esperada: el patrón siguiente empieza en las coordenadas de tile <code>(x=2, y=3)</code>, equivalentes al píxel <code>(16,24)</code>. Cada carácter ocupa un tile de 8×8. Lee de arriba abajo y de izquierda a derecha; los tiles circundantes quedan vacíos.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">Copiar</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewincgb_unsafe.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewincgb_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewincgb_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewincgb_unsafe">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/lib/cgb_tile.h:77</p><div class="original"><b>Notas de la declaración (original)</b><pre>Write tile and CGB attributes at the LCDC window map; DMG receives only the tile write. No VRAM access waits are inserted.</pre></div></details></details><h3 id="module-input">input.h — Estado, pulsación, liberación y repetición de botones</h3><details class="api searchable" id="api-__readpadex"><summary><code>__readpadex</code><span class="badge">Función intrínseca del compilador</span></summary><p>Los ocho bits inferiores contienen los botones actuales y los ocho superiores las pulsaciones nuevas. Proporciona el estado anterior para detectar los cambios.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u16 __readpadex(u8 prev_keys);</code></pre></div><p><b>Argumentos, de izquierda a derecha: </b>u8 prev_keys. Para arrays y punteros, reserva memoria suficiente y mantenla válida hasta que termine el procesamiento.</p><p><b>Tipo de retorno: </b><code>u16</code>. Las notas originales y las condiciones de retorno de la implementación definen el significado y los valores de éxito o fallo.</p><h4>Ejemplo de llamada con código de contexto</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>kq_input_prev_keys = kq_input_keys;
-    // The intrinsic packs held buttons in the low byte and new presses in the high byte.
-    kt = __readpadex(kq_input_prev_keys);
-    kq_input_keys = (u8)kt;
-    kq_input_press_keys = (u8)(kt &gt;&gt; 8);
-    kq_input_release_keys = (u8)(kq_input_prev_keys &amp; (u8)(kq_input_keys ^ 0xFF));
-    kq_input_repeat_keys = kq_input_press_keys;</code></pre></div><p class="source">Origen: kitaqgb/lib/input.c:42</p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/input.h:28</p></details><h3 id="module-intrinsics">intrinsics.h — Funciones intrínsecas del compilador</h3><details class="api searchable" id="api-__bankof"><summary><code>__bankof</code><span class="badge">Función intrínseca del compilador</span></summary><p>Obtiene el banco donde se ha situado un símbolo. No equivale a pasar una dirección numérica arbitraria.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__bankof(arg0);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__bankof(arg0);</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__bankof.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewincgb_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewincgb_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewincgb_unsafe">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/lib/cgb_tile.h:77</p><div class="original"><b>Notas de la declaración (original)</b><pre>Write tile and CGB attributes at the LCDC window map; DMG receives only the tile write. No VRAM access waits are inserted.</pre></div></details></details><h3 id="module-input">input.h — Estado, pulsación, liberación y repetición de botones</h3><!-- api-module:start --><div data-module-contract="input-source-20260915"><p>Usa <code>input_down</code> para movimiento continuo, <code>input_pressed</code> para acciones únicas, <code>input_released</code> para actuar al soltar y <code>input_repeat</code> para repetir opciones de menú. Inicializa una vez, actualiza una vez por ciclo de entrada y consulta cuando lo necesites. <code>btn_down</code>, <code>btn_pressed</code>, <code>btn_released</code> y <code>btn_repeat</code> son alias de esas cuatro consultas.</p><p>Máscaras comunes: <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>. Un bit a 1 indica que el botón está mantenido. <code>input_*</code> usa este formato en GB y FC; las funciones FC de lectura directa emplean otro orden.</p><p>Los intervalos cuentan actualizaciones, no milisegundos. Una pulsación nueva genera un pulso inmediato. Con <code>INPUT_REPEAT_DELAY=18</code> e <code>INPUT_REPEAT_RATE=5</code>, el siguiente llega 19 actualizaciones después y los demás cada 6. Cada botón tiene su contador. Aplica los mismos valores de las macros al compilar <code>input.c</code>; cambiar solo el encabezado del código llamante no reconfigura la biblioteca.</p></div><!-- api-module:end --><details class="api searchable" id="api-__readpadex" data-api-contract="input-source-20260915"><summary><code>__readpadex</code></summary><p>Lee todos los botones y los compara con la máscara anterior suministrada. Empaqueta el estado actual en el byte bajo y las nuevas pulsaciones, <code>current &amp; ~previous</code>, en el alto. No guarda un estado anterior interno ni devuelve liberaciones o repeticiones.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u16 __readpadex(u8 prev_keys);</code></pre></div><h4>Parámetros</h4><dl class="api-parameters"><dt><code>prev_keys</code></dt><dd><p>La máscara completa del <code>__readpad()</code> anterior o el byte bajo del último <code>__readpadex()</code>. Pasa 0 en la primera lectura y guarda el nuevo byte bajo para la siguiente llamada.</p></dd></dl><h4>Valor devuelto</h4><p>Un <code>u16</code>: <code>(u8)result</code> es la máscara actual y <code>(u8)(result &gt;&gt; 8)</code> la de nuevas pulsaciones. Guárdalo en una variable de 16 bits para no perder los bits de pulsación.</p><h4>Condiciones y límites</h4><p>Máscaras comunes: <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>. Un bit a 1 indica que el botón está mantenido. <code>input_*</code> usa este formato en GB y FC; las funciones FC de lectura directa emplean otro orden.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>packed_first=__readpadex(0); // First sample: current 0x11, new presses 0x11.
+current_keys=(u8)packed_first;
+press_keys=(u8)(packed_first&gt;&gt;8);
+packed_held=__readpadex(current_keys); // Held without a change: new presses are 0.</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa compara los tres formatos de máscara y el resultado que combina el estado actual con las nuevas pulsaciones. Mantén A y derecha a la vez. ALL KEYS vale 17; DIRECTIONS y BUTTONS LOW valen 1 cada uno. Con una máscara anterior de 0, EX CURRENT y EX NEW PRESS valen 17. Al pasar la máscara actual a la siguiente lectura, HELD PRESS vale 0. FAILED CHECKS debe ser 0. Los valores quedan en pantalla aunque sueltes los botones.</p><p><a href="../samples/api-examples/gb/input_raw.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpadex">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/lib/input.h:28</p></details></details><h3 id="module-intrinsics">intrinsics.h — Funciones intrínsecas del compilador</h3><details class="api searchable" id="api-__bankof"><summary><code>__bankof</code><span class="badge">Función intrínseca del compilador</span></summary><p>Obtiene el banco donde se ha situado un símbolo. No equivale a pasar una dirección numérica arbitraria.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__bankof(arg0);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__bankof(arg0);</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__bankof.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
                 if (args.Length != 1) Program.Error("__bankof(symbol) expects 1 argument");
                 if (!args[0].Match(Tag.Name, out string symName)) Program.Error("__bankof(symbol) requires a symbol name argument");
                 if (TryGetKnownRomBankForSymbol(symName, out int knownBank))
@@ -1909,66 +1907,68 @@ if (funcName == "__padrep_lr")
     AsmOperand pr_dir0        = MakeUniqueLabel("padrep_dir0");
     AsmOperand pr_have_dir    = MakeUniqueLabel("padrep_havedir");
     AsmOperand pr_first_rep   = MakeUniqueLabel("padrep_firstrep");
-    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:10708</p></details><details class="api searchable" id="api-__readpad"><summary><code>__readpad</code><span class="badge">Función intrínseca del compilador</span></summary><p>Leer un valor. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__readpad();</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__readpad();</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__readpad.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
-    if (args.Length != 0) Error(expr, "__readpad requires 0 arguments");
+    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:10708</p></details><details class="api searchable" id="api-__readpad" data-api-contract="input-source-20260915"><summary><code>__readpad</code></summary><p>Lee la cruceta y los botones de acción desde JOYP y los combina en la máscara común de 8 bits. Selecciona cada grupo, realiza dos lecturas para estabilizarlo y restaura los bits de selección a <code>0x30</code>.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __readpad();</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Valor devuelto</h4><p>Una máscara de 8 bits en formato común <code>BTN_*</code>. Puede contener varios botones a la vez; 0 significa ninguno.</p><h4>Condiciones y límites</h4><p>Máscaras comunes: <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>. Un bit a 1 indica que el botón está mantenido. <code>input_*</code> usa este formato en GB y FC; las funciones FC de lectura directa emplean otro orden.</p><p>Esta llamada obtiene una nueva lectura del hardware. No actualiza el estado guardado de <code>input_*</code> ni <code>nes_pad1_*</code>, ni genera eventos de pulsación, liberación o repetición. Guarda la lectura y compárala con tu máscara anterior cuando necesites detectar cambios.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>all_keys=__readpad(); // A + Right: 0x11, decimal 17.</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa compara los tres formatos de máscara y el resultado que combina el estado actual con las nuevas pulsaciones. Mantén A y derecha a la vez. ALL KEYS vale 17; DIRECTIONS y BUTTONS LOW valen 1 cada uno. Con una máscara anterior de 0, EX CURRENT y EX NEW PRESS valen 17. Al pasar la máscara actual a la siguiente lectura, HELD PRESS vale 0. FAILED CHECKS debe ser 0. Los valores quedan en pantalla aunque sueltes los botones.</p><p><a href="../samples/api-examples/gb/input_raw.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpad">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10537</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+    if (args.Length != 0) Error(expr, &quot;__readpad requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
     // Directions (P1=0x20)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1); // dummy reads for settle
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
-    EmitAsm("LD_C_A"); // dpad in C
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1); // dummy reads for settle
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_C_A&quot;); // dpad in C
 
     // Buttons (P1=0x10)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
     // shift into upper nibble (&lt;&lt;4)
-    EmitAsm("RLCA"); EmitAsm("RLCA"); EmitAsm("RLCA"); EmitAsm("RLCA");
-    EmitAsm("OR_C");
+    EmitAsm(&quot;RLCA&quot;); EmitAsm(&quot;RLCA&quot;); EmitAsm(&quot;RLCA&quot;); EmitAsm(&quot;RLCA&quot;);
+    EmitAsm(&quot;OR_C&quot;);
 
     // Restore P1 selection (0x30) without losing return value
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
 // 2.17 __readpaddir() -&gt; u8 in A (bits0..3 only)
 // Returns dpad nibble (Right,Left,Up,Down) with 1 when pressed.
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__readpaddir")
+if (funcName == &quot;__readpaddir&quot;)
 {
-    if (args.Length != 0) Error(expr, "__readpaddir requires 0 arguments");
+    if (args.Length != 0) Error(expr, &quot;__readpaddir requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:10537</p></details><details class="api searchable" id="api-__readpadbtn"><summary><code>__readpadbtn</code><span class="badge">Función intrínseca del compilador</span></summary><p>Leer un valor. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__readpadbtn();</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__readpadbtn();</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__readpadbtn.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
-    if (args.Length != 0) Error(expr, "__readpadbtn requires 0 arguments");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm</code></pre></div></details></details><details class="api searchable" id="api-__readpadbtn" data-api-contract="input-source-20260915"><summary><code>__readpadbtn</code></summary><p>Lee solo los botones de acción de JOYP en el nibble bajo: A=1, B=2, Select=4, Start=8. No son los valores <code>BTN_A</code> a <code>BTN_START</code>, que ocupan el nibble alto. Restaura la selección JOYP a <code>0x30</code>.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __readpadbtn();</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Valor devuelto</h4><p>Máscara de 0 a 15 en el orden indicado. Puede tener varios bits activos; comprueba un botón con <code>result &amp; bit</code>, no comparando todo el resultado con 1.</p><h4>Condiciones y límites</h4><p>Esta llamada obtiene una nueva lectura del hardware. No actualiza el estado guardado de <code>input_*</code> ni <code>nes_pad1_*</code>, ni genera eventos de pulsación, liberación o repetición. Guarda la lectura y compárala con tu máscara anterior cuando necesites detectar cambios.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>buttons=__readpadbtn(); // A: 1, not BTN_A (16).</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa compara los tres formatos de máscara y el resultado que combina el estado actual con las nuevas pulsaciones. Mantén A y derecha a la vez. ALL KEYS vale 17; DIRECTIONS y BUTTONS LOW valen 1 cada uno. Con una máscara anterior de 0, EX CURRENT y EX NEW PRESS valen 17. Al pasar la máscara actual a la siguiente lectura, HELD PRESS vale 0. FAILED CHECKS debe ser 0. Los valores quedan en pantalla aunque sueltes los botones.</p><p><a href="../samples/api-examples/gb/input_raw.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpadbtn">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10597</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+    if (args.Length != 0) Error(expr, &quot;__readpadbtn requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
 
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
@@ -1977,67 +1977,68 @@ if (funcName == "__readpaddir")
 // This mirrors the common pattern:
 // prev = keys; keys = __readpad(); trigger = keys &amp; ~prev;
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__readpadex")
+if (funcName == &quot;__readpadex&quot;)
 {
-    if (args.Length != 1) Error(expr, "__readpadex requires 1 argument (prev_keys)");
+    if (args.Length != 1) Error(expr, &quot;__readpadex requires 1 argument (prev_keys)&quot;);
 
     // prev -&gt; B
     CompileIntoA(args[0]);
-    EmitAsm("LD_B_A");
+    EmitAsm(&quot;LD_B_A&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
     // Directions (P1=0x20)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
-    EmitAsm("LD_C_A"); // dpad in C
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_C_A&quot;); // dpad in C
 
     // Buttons (P1=0x10)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1)</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:10597</p></details><details class="api searchable" id="api-__readpaddir"><summary><code>__readpaddir</code><span class="badge">Función intrínseca del compilador</span></summary><p>Leer un valor. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__readpaddir();</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__readpaddir();</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__readpaddir.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
-    if (args.Length != 0) Error(expr, "__readpaddir requires 0 arguments");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1)</code></pre></div></details></details><details class="api searchable" id="api-__readpaddir" data-api-contract="input-source-20260915"><summary><code>__readpaddir</code></summary><p>Lee solo la cruceta de JOYP. El resultado ocupa los bits 0–3: derecha=1, izquierda=2, arriba=4, abajo=8; los bits 4–7 son cero. Ignora los botones de acción y restaura la selección JOYP a <code>0x30</code>.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __readpaddir();</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Valor devuelto</h4><p>Máscara de 0 a 15 en el orden indicado. Puede tener varios bits activos; comprueba un botón con <code>result &amp; bit</code>, no comparando todo el resultado con 1.</p><h4>Condiciones y límites</h4><p>Esta llamada obtiene una nueva lectura del hardware. No actualiza el estado guardado de <code>input_*</code> ni <code>nes_pad1_*</code>, ni genera eventos de pulsación, liberación o repetición. Guarda la lectura y compárala con tu máscara anterior cuando necesites detectar cambios.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>directions=__readpaddir(); // Right: 1. The held A button is not included.</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa compara los tres formatos de máscara y el resultado que combina el estado actual con las nuevas pulsaciones. Mantén A y derecha a la vez. ALL KEYS vale 17; DIRECTIONS y BUTTONS LOW valen 1 cada uno. Con una máscara anterior de 0, EX CURRENT y EX NEW PRESS valen 17. Al pasar la máscara actual a la siguiente lectura, HELD PRESS vale 0. FAILED CHECKS debe ser 0. Los valores quedan en pantalla aunque sueltes los botones.</p><p><a href="../samples/api-examples/gb/input_raw.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpaddir">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10574</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+    if (args.Length != 0) Error(expr, &quot;__readpaddir requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
 
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
 // 2.18 __readpadbtn() -&gt; u8 in A (bits0..3 only)
 // Returns buttons nibble (A,B,Select,Start) with 1 when pressed.
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__readpadbtn")
+if (funcName == &quot;__readpadbtn&quot;)
 {
-    if (args.Length != 0) Error(expr, "__readpadbtn requires 0 arguments");
+    if (args.Length != 0) Error(expr, &quot;__readpadbtn requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
 
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
@@ -2045,7 +2046,7 @@ if (funcName == "__readpadbtn")
 // Returns: L = keys (same encoding as __readpad), H = trigger (newly pressed edge: keys &amp; ~prev).
 // This mirrors the common pattern:
 // prev = keys; keys = __readpad(); trigger = keys &amp; ~prev;
-// Treated as a c</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:10574</p></details><details class="api searchable" id="api-__sdot2_q1_7"><summary><code>__sdot2_q1_7</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__sdot2_q1_7(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de llamada con código de contexto</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>s16 kq2dc__dot_q1_7(s16 x, s16 y, s8 ax, s8 ay)
+// Treated as a c</code></pre></div></details></details><details class="api searchable" id="api-__sdot2_q1_7"><summary><code>__sdot2_q1_7</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__sdot2_q1_7(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de llamada con código de contexto</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>s16 kq2dc__dot_q1_7(s16 x, s16 y, s8 ax, s8 ay)
 {
     return (s16)__sdot2_q1_7(x, y, ax, ay);
 }

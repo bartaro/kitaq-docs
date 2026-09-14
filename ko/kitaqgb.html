@@ -1331,13 +1331,11 @@ void main() {
     if (__cgb_is_cgb() &amp;&amp; tile_example_read(0x9862, 1) != 0) { failures++; }
     tile_example_finish(failures, 1);
 }</code></pre></div><h4>예상 결과</h4><p>선택한 맵에 쓴 문자나 채운 영역이 표시됩니다. 프로그램은 대상 타일 번호와 CGB 속성을 다시 읽어 비교하며, 모두 일치하면 <code>FAILED CHECKS 000</code>을 표시합니다. 두 맵을 먼저 0으로 채우고 해당 호출 전에는 BG·윈도 맵을 <code>0x9C00</code>으로 설정하므로 고정 맵과 선택된 맵의 차이도 확인할 수 있습니다. LCD를 끈 상태에서 쓰며, LCD 동작 중의 타이밍을 측정하는 예제는 아닙니다.</p><p>CGB에서는 속성값 2가 예제에서 준비한 파란색 팔레트를 선택하므로 <code>A</code>가 파란색으로 표시됩니다. DMG에는 CGB 속성을 적용하지 않아 같은 문자가 검은색입니다.</p><p>예상 이미지: 다음 타일 패턴이 타일 좌표 <code>(x=2, y=3)</code>, 픽셀 좌표 <code>(16,24)</code>에서 시작합니다. 문자 하나는 8×8 타일 하나입니다. 위에서 아래로, 왼쪽에서 오른쪽으로 읽으며 주변 타일은 비어 있습니다.</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">복사</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewincgb_unsafe.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewincgb_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewincgb_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewincgb_unsafe">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:77</p><div class="original"><b>선언 주석 원문</b><pre>Write tile and CGB attributes at the LCDC window map; DMG receives only the tile write. No VRAM access waits are inserted.</pre></div></details></details><h3 id="module-input">input.h — 버튼 상태, 누름, 놓음, 반복 입력</h3><details class="api searchable" id="api-__readpadex"><summary><code>__readpadex</code><span class="badge">컴파일러 내장 함수</span></summary><p>하위 8비트는 현재 버튼, 상위 8비트는 새로 누른 버튼을 담습니다. 누른 순간을 검출하려면 이전 상태를 전달하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u16 __readpadex(u8 prev_keys);</code></pre></div><p><b>인수, 왼쪽부터: </b>u8 prev_keys. 배열과 포인터는 충분한 저장 공간을 확보하고 처리가 끝날 때까지 유효하게 유지하세요.</p><p><b>반환 자료형: </b><code>u16</code>. 값의 의미와 성공·실패 반환값은 원문 주석과 구현의 반환 조건에서 확인하세요.</p><h4>호출 예제 — 주변 코드가 필요한 조각</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>kq_input_prev_keys = kq_input_keys;
-    // The intrinsic packs held buttons in the low byte and new presses in the high byte.
-    kt = __readpadex(kq_input_prev_keys);
-    kq_input_keys = (u8)kt;
-    kq_input_press_keys = (u8)(kt &gt;&gt; 8);
-    kq_input_release_keys = (u8)(kq_input_prev_keys &amp; (u8)(kq_input_keys ^ 0xFF));
-    kq_input_repeat_keys = kq_input_press_keys;</code></pre></div><p class="source">출처: kitaqgb/lib/input.c:42</p><p class="source">선언·식별자 출처: kitaqgb/lib/input.h:28</p></details><h3 id="module-intrinsics">intrinsics.h — 컴파일러 내장 함수</h3><details class="api searchable" id="api-__bankof"><summary><code>__bankof</code><span class="badge">컴파일러 내장 함수</span></summary><p>심볼이 배치된 뱅크를 구합니다. 임의의 숫자 주소를 전달하는 것과는 다릅니다.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__bankof(arg0);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__bankof(arg0);</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__bankof.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewincgb_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewincgb_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewincgb_unsafe">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/cgb_tile.h:77</p><div class="original"><b>선언 주석 원문</b><pre>Write tile and CGB attributes at the LCDC window map; DMG receives only the tile write. No VRAM access waits are inserted.</pre></div></details></details><h3 id="module-input">input.h — 버튼 상태, 누름, 놓음, 반복 입력</h3><!-- api-module:start --><div data-module-contract="input-source-20260915"><p>연속 이동에는 <code>input_down</code>, 한 번 실행할 동작에는 <code>input_pressed</code>, 버튼을 뗄 때의 정지에는 <code>input_released</code>, 메뉴 반복에는 <code>input_repeat</code>를 사용합니다. 한 번 초기화하고 입력 틱마다 한 번 갱신한 뒤 필요한 만큼 조회하세요. <code>btn_down</code>, <code>btn_pressed</code>, <code>btn_released</code>, <code>btn_repeat</code>는 네 조회 함수의 별칭입니다.</p><p>공통 마스크는 <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>입니다. 1인 비트가 눌림을 뜻합니다. GB와 FC의 <code>input_*</code>는 이 형식을 쓰지만 FC의 원시 패드 함수는 비트 순서가 다릅니다.</p><p>반복 시간은 밀리초가 아니라 갱신 횟수입니다. 새로 누르면 즉시 출력하며 기본값 <code>INPUT_REPEAT_DELAY=18</code>, <code>INPUT_REPEAT_RATE=5</code>에서는 19번 뒤, 이후 6번마다 펄스가 나옵니다. 버튼별 카운터는 독립적입니다. 값을 바꾸려면 <code>input.c</code>를 컴파일할 때도 같은 매크로 값을 적용해야 합니다. 호출자 헤더만 바꿔서는 라이브러리 설정이 바뀌지 않습니다.</p></div><!-- api-module:end --><details class="api searchable" id="api-__readpadex" data-api-contract="input-source-20260915"><summary><code>__readpadex</code></summary><p>모든 버튼을 읽어 전달받은 이전 눌림 마스크와 비교합니다. 하위 바이트에 현재 마스크, 상위 바이트에 새 누름 비트 <code>current &amp; ~previous</code>를 담아 반환합니다. 이전 상태를 내부에 저장하지 않으며 뗌·반복 마스크도 반환하지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u16 __readpadex(u8 prev_keys);</code></pre></div><h4>매개변수</h4><dl class="api-parameters"><dt><code>prev_keys</code></dt><dd><p>이전 <code>__readpad()</code> 결과 또는 이전 <code>__readpadex()</code> 결과의 하위 바이트입니다. 첫 샘플에는 0을 전달하고, 다음 호출을 위해 새 하위 바이트를 저장하세요.</p></dd></dl><h4>반환값</h4><p><code>u16</code> 값입니다. <code>(u8)result</code>는 현재 마스크, <code>(u8)(result &gt;&gt; 8)</code>는 새 누름 마스크입니다. 8비트 변수에 저장하면 누름 비트가 사라지므로 16비트 변수로 받으세요.</p><h4>사용 조건과 제한</h4><p>공통 마스크는 <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>입니다. 1인 비트가 눌림을 뜻합니다. GB와 FC의 <code>input_*</code>는 이 형식을 쓰지만 FC의 원시 패드 함수는 비트 순서가 다릅니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>packed_first=__readpadex(0); // First sample: current 0x11, new presses 0x11.
+current_keys=(u8)packed_first;
+press_keys=(u8)(packed_first&gt;&gt;8);
+packed_held=__readpadex(current_keys); // Held without a change: new presses are 0.</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>세 가지 버튼 마스크 형식과 현재 상태·새 입력을 묶은 반환값을 비교하는 프로그램입니다. A와 오른쪽을 함께 누릅니다. ALL KEYS는 17이고 DIRECTIONS와 BUTTONS LOW는 각각 1입니다. 이전 마스크가 0이면 EX CURRENT와 EX NEW PRESS가 모두 17입니다. 현재 마스크를 다음 읽기에 전달하면 HELD PRESS는 0이 됩니다. FAILED CHECKS는 0이어야 합니다. 관측값은 화면에 고정되므로 버튼을 놓아도 사라지지 않습니다.</p><p><a href="../samples/api-examples/gb/input_raw.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpadex">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/lib/input.h:28</p></details></details><h3 id="module-intrinsics">intrinsics.h — 컴파일러 내장 함수</h3><details class="api searchable" id="api-__bankof"><summary><code>__bankof</code><span class="badge">컴파일러 내장 함수</span></summary><p>심볼이 배치된 뱅크를 구합니다. 임의의 숫자 주소를 전달하는 것과는 다릅니다.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__bankof(arg0);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__bankof(arg0);</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__bankof.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
                 if (args.Length != 1) Program.Error("__bankof(symbol) expects 1 argument");
                 if (!args[0].Match(Tag.Name, out string symName)) Program.Error("__bankof(symbol) requires a symbol name argument");
                 if (TryGetKnownRomBankForSymbol(symName, out int knownBank))
@@ -1909,66 +1907,68 @@ if (funcName == "__padrep_lr")
     AsmOperand pr_dir0        = MakeUniqueLabel("padrep_dir0");
     AsmOperand pr_have_dir    = MakeUniqueLabel("padrep_havedir");
     AsmOperand pr_first_rep   = MakeUniqueLabel("padrep_firstrep");
-    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:10708</p></details><details class="api searchable" id="api-__readpad"><summary><code>__readpad</code><span class="badge">컴파일러 내장 함수</span></summary><p>값을 읽습니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__readpad();</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__readpad();</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__readpad.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
-    if (args.Length != 0) Error(expr, "__readpad requires 0 arguments");
+    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:10708</p></details><details class="api searchable" id="api-__readpad" data-api-contract="input-source-20260915"><summary><code>__readpad</code></summary><p>JOYP에서 방향키와 동작 버튼을 읽어 공통 8비트 마스크로 합칩니다. 각 그룹을 선택하고 안정화를 위해 두 번 읽은 뒤 그룹 선택 비트를 <code>0x30</code>으로 되돌립니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u8 __readpad();</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>반환값</h4><p>공통 <code>BTN_*</code> 형식의 8비트 마스크입니다. 여러 버튼 비트가 동시에 설정될 수 있으며 0은 해당 버튼이 없음을 뜻합니다.</p><h4>사용 조건과 제한</h4><p>공통 마스크는 <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>입니다. 1인 비트가 눌림을 뜻합니다. GB와 FC의 <code>input_*</code>는 이 형식을 쓰지만 FC의 원시 패드 함수는 비트 순서가 다릅니다.</p><p>이 호출은 하드웨어 상태를 새로 읽습니다. <code>input_*</code>나 <code>nes_pad1_*</code>의 저장 상태는 갱신하지 않으며 누름·뗌 에지나 반복도 만들지 않습니다. 필요하면 결과를 저장하고 직접 보관한 이전 마스크와 비교해 변화를 구하세요.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>all_keys=__readpad(); // A + Right: 0x11, decimal 17.</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>세 가지 버튼 마스크 형식과 현재 상태·새 입력을 묶은 반환값을 비교하는 프로그램입니다. A와 오른쪽을 함께 누릅니다. ALL KEYS는 17이고 DIRECTIONS와 BUTTONS LOW는 각각 1입니다. 이전 마스크가 0이면 EX CURRENT와 EX NEW PRESS가 모두 17입니다. 현재 마스크를 다음 읽기에 전달하면 HELD PRESS는 0이 됩니다. FAILED CHECKS는 0이어야 합니다. 관측값은 화면에 고정되므로 버튼을 놓아도 사라지지 않습니다.</p><p><a href="../samples/api-examples/gb/input_raw.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpad">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10537</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+    if (args.Length != 0) Error(expr, &quot;__readpad requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
     // Directions (P1=0x20)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1); // dummy reads for settle
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
-    EmitAsm("LD_C_A"); // dpad in C
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1); // dummy reads for settle
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_C_A&quot;); // dpad in C
 
     // Buttons (P1=0x10)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
     // shift into upper nibble (&lt;&lt;4)
-    EmitAsm("RLCA"); EmitAsm("RLCA"); EmitAsm("RLCA"); EmitAsm("RLCA");
-    EmitAsm("OR_C");
+    EmitAsm(&quot;RLCA&quot;); EmitAsm(&quot;RLCA&quot;); EmitAsm(&quot;RLCA&quot;); EmitAsm(&quot;RLCA&quot;);
+    EmitAsm(&quot;OR_C&quot;);
 
     // Restore P1 selection (0x30) without losing return value
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
 // 2.17 __readpaddir() -&gt; u8 in A (bits0..3 only)
 // Returns dpad nibble (Right,Left,Up,Down) with 1 when pressed.
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__readpaddir")
+if (funcName == &quot;__readpaddir&quot;)
 {
-    if (args.Length != 0) Error(expr, "__readpaddir requires 0 arguments");
+    if (args.Length != 0) Error(expr, &quot;__readpaddir requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:10537</p></details><details class="api searchable" id="api-__readpadbtn"><summary><code>__readpadbtn</code><span class="badge">컴파일러 내장 함수</span></summary><p>값을 읽습니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__readpadbtn();</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__readpadbtn();</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__readpadbtn.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
-    if (args.Length != 0) Error(expr, "__readpadbtn requires 0 arguments");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm</code></pre></div></details></details><details class="api searchable" id="api-__readpadbtn" data-api-contract="input-source-20260915"><summary><code>__readpadbtn</code></summary><p>JOYP의 동작 버튼만 하위 4비트로 읽습니다. A=1, B=2, Select=4, Start=8입니다. 공통 마스크 <code>BTN_A</code>~<code>BTN_START</code>는 상위 4비트이므로 이 결과와 직접 비교하면 안 됩니다. JOYP 선택은 <code>0x30</code>으로 되돌립니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u8 __readpadbtn();</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>반환값</h4><p>위 비트 순서의 0~15 마스크입니다. 여러 비트가 설정될 수 있으므로 전체 값이 1인지 비교하지 말고 <code>result &amp; bit</code>로 특정 버튼을 확인하세요.</p><h4>사용 조건과 제한</h4><p>이 호출은 하드웨어 상태를 새로 읽습니다. <code>input_*</code>나 <code>nes_pad1_*</code>의 저장 상태는 갱신하지 않으며 누름·뗌 에지나 반복도 만들지 않습니다. 필요하면 결과를 저장하고 직접 보관한 이전 마스크와 비교해 변화를 구하세요.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>buttons=__readpadbtn(); // A: 1, not BTN_A (16).</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>세 가지 버튼 마스크 형식과 현재 상태·새 입력을 묶은 반환값을 비교하는 프로그램입니다. A와 오른쪽을 함께 누릅니다. ALL KEYS는 17이고 DIRECTIONS와 BUTTONS LOW는 각각 1입니다. 이전 마스크가 0이면 EX CURRENT와 EX NEW PRESS가 모두 17입니다. 현재 마스크를 다음 읽기에 전달하면 HELD PRESS는 0이 됩니다. FAILED CHECKS는 0이어야 합니다. 관측값은 화면에 고정되므로 버튼을 놓아도 사라지지 않습니다.</p><p><a href="../samples/api-examples/gb/input_raw.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpadbtn">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10597</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+    if (args.Length != 0) Error(expr, &quot;__readpadbtn requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
 
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
@@ -1977,67 +1977,68 @@ if (funcName == "__readpaddir")
 // This mirrors the common pattern:
 // prev = keys; keys = __readpad(); trigger = keys &amp; ~prev;
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__readpadex")
+if (funcName == &quot;__readpadex&quot;)
 {
-    if (args.Length != 1) Error(expr, "__readpadex requires 1 argument (prev_keys)");
+    if (args.Length != 1) Error(expr, &quot;__readpadex requires 1 argument (prev_keys)&quot;);
 
     // prev -&gt; B
     CompileIntoA(args[0]);
-    EmitAsm("LD_B_A");
+    EmitAsm(&quot;LD_B_A&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
     // Directions (P1=0x20)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
-    EmitAsm("LD_C_A"); // dpad in C
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_C_A&quot;); // dpad in C
 
     // Buttons (P1=0x10)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1)</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:10597</p></details><details class="api searchable" id="api-__readpaddir"><summary><code>__readpaddir</code><span class="badge">컴파일러 내장 함수</span></summary><p>값을 읽습니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__readpaddir();</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__readpaddir();</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__readpaddir.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
-    if (args.Length != 0) Error(expr, "__readpaddir requires 0 arguments");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1)</code></pre></div></details></details><details class="api searchable" id="api-__readpaddir" data-api-contract="input-source-20260915"><summary><code>__readpaddir</code></summary><p>JOYP의 방향키 그룹만 읽습니다. 결과의 비트 0~3은 오른쪽=1, 왼쪽=2, 위=4, 아래=8이며 비트 4~7은 0입니다. 동작 버튼은 무시하고 JOYP 선택을 <code>0x30</code>으로 되돌립니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u8 __readpaddir();</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>반환값</h4><p>위 비트 순서의 0~15 마스크입니다. 여러 비트가 설정될 수 있으므로 전체 값이 1인지 비교하지 말고 <code>result &amp; bit</code>로 특정 버튼을 확인하세요.</p><h4>사용 조건과 제한</h4><p>이 호출은 하드웨어 상태를 새로 읽습니다. <code>input_*</code>나 <code>nes_pad1_*</code>의 저장 상태는 갱신하지 않으며 누름·뗌 에지나 반복도 만들지 않습니다. 필요하면 결과를 저장하고 직접 보관한 이전 마스크와 비교해 변화를 구하세요.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>directions=__readpaddir(); // Right: 1. The held A button is not included.</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>세 가지 버튼 마스크 형식과 현재 상태·새 입력을 묶은 반환값을 비교하는 프로그램입니다. A와 오른쪽을 함께 누릅니다. ALL KEYS는 17이고 DIRECTIONS와 BUTTONS LOW는 각각 1입니다. 이전 마스크가 0이면 EX CURRENT와 EX NEW PRESS가 모두 17입니다. 현재 마스크를 다음 읽기에 전달하면 HELD PRESS는 0이 됩니다. FAILED CHECKS는 0이어야 합니다. 관측값은 화면에 고정되므로 버튼을 놓아도 사라지지 않습니다.</p><p><a href="../samples/api-examples/gb/input_raw.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpaddir">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10574</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+    if (args.Length != 0) Error(expr, &quot;__readpaddir requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
 
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
 // 2.18 __readpadbtn() -&gt; u8 in A (bits0..3 only)
 // Returns buttons nibble (A,B,Select,Start) with 1 when pressed.
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__readpadbtn")
+if (funcName == &quot;__readpadbtn&quot;)
 {
-    if (args.Length != 0) Error(expr, "__readpadbtn requires 0 arguments");
+    if (args.Length != 0) Error(expr, &quot;__readpadbtn requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
 
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
@@ -2045,7 +2046,7 @@ if (funcName == "__readpadbtn")
 // Returns: L = keys (same encoding as __readpad), H = trigger (newly pressed edge: keys &amp; ~prev).
 // This mirrors the common pattern:
 // prev = keys; keys = __readpad(); trigger = keys &amp; ~prev;
-// Treated as a c</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:10574</p></details><details class="api searchable" id="api-__sdot2_q1_7"><summary><code>__sdot2_q1_7</code><span class="badge">컴파일러 내장 함수</span></summary><p>인수로 지정한 작업을 수행합니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__sdot2_q1_7(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>호출 예제 — 주변 코드가 필요한 조각</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>s16 kq2dc__dot_q1_7(s16 x, s16 y, s8 ax, s8 ay)
+// Treated as a c</code></pre></div></details></details><details class="api searchable" id="api-__sdot2_q1_7"><summary><code>__sdot2_q1_7</code><span class="badge">컴파일러 내장 함수</span></summary><p>인수로 지정한 작업을 수행합니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__sdot2_q1_7(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>호출 예제 — 주변 코드가 필요한 조각</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>s16 kq2dc__dot_q1_7(s16 x, s16 y, s8 ax, s8 ay)
 {
     return (s16)__sdot2_q1_7(x, y, ax, ay);
 }

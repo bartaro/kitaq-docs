@@ -1331,13 +1331,11 @@ void main() {
     if (__cgb_is_cgb() &amp;&amp; tile_example_read(0x9862, 1) != 0) { failures++; }
     tile_example_finish(failures, 1);
 }</code></pre></div><h4>预期结果</h4><p>所选地图显示写入的字符或填充区域。程序读回目标图块编号，并在 CGB 上读回属性进行比较；<code>FAILED CHECKS 000</code> 表示比较全部通过。两张地图初始均为 0，调用前将背景／窗口地图选为 <code>0x9C00</code>，因此能区分固定地图与所选地图的写入。示例在 LCD 关闭时写入，不测量 LCD 开启时的时序。</p><p>CGB 上的 <code>A</code> 为蓝色：属性值 2 选择示例设置的蓝色调色板。DMG 不应用 CGB 属性，因此同一字符为黑色。</p><p>预期图像：以下图块排列从图块坐标 <code>(x=2, y=3)</code>、像素坐标 <code>(16,24)</code> 开始显示。每个字符占一个 8×8 图块。按从上到下、从左到右阅读，周围图块保持空白。</p><div class="codebox"><span class="lang">text</span><button class="copy" type="button">复制</button><pre><code>A</code></pre></div><p><a href="../samples/api-examples/gb/__settilewincgb_unsafe.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewincgb_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewincgb_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewincgb_unsafe">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:77</p><div class="original"><b>声明注释（原文）</b><pre>Write tile and CGB attributes at the LCDC window map; DMG receives only the tile write. No VRAM access waits are inserted.</pre></div></details></details><h3 id="module-input">input.h — 按钮状态、按下、松开与重复</h3><details class="api searchable" id="api-__readpadex"><summary><code>__readpadex</code><span class="badge">编译器内建函数</span></summary><p>低 8 位保存当前按钮，高 8 位保存新按下的按钮。请提供前次状态以检测边沿。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u16 __readpadex(u8 prev_keys);</code></pre></div><p><b>参数，从左到右： </b>u8 prev_keys。数组和指针需要足够空间，并在处理结束前保持有效。</p><p><b>返回类型： </b><code>u16</code>。值的含义及成功、失败返回值，以原始说明和实现中的返回条件为准。</p><h4>调用示例：需要外围代码的片段</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>kq_input_prev_keys = kq_input_keys;
-    // The intrinsic packs held buttons in the low byte and new presses in the high byte.
-    kt = __readpadex(kq_input_prev_keys);
-    kq_input_keys = (u8)kt;
-    kq_input_press_keys = (u8)(kt &gt;&gt; 8);
-    kq_input_release_keys = (u8)(kq_input_prev_keys &amp; (u8)(kq_input_keys ^ 0xFF));
-    kq_input_repeat_keys = kq_input_press_keys;</code></pre></div><p class="source">来源：kitaqgb/lib/input.c:42</p><p class="source">声明或标识符来源：kitaqgb/lib/input.h:28</p></details><h3 id="module-intrinsics">intrinsics.h — 编译器内建函数</h3><details class="api searchable" id="api-__bankof"><summary><code>__bankof</code><span class="badge">编译器内建函数</span></summary><p>取得符号所在的 bank。这与传递任意数值地址不同。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__bankof(arg0);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__bankof(arg0);</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__bankof.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\__settilewincgb_unsafe.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\__settilewincgb_unsafe.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__settilewincgb_unsafe">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/cgb_tile.h:77</p><div class="original"><b>声明注释（原文）</b><pre>Write tile and CGB attributes at the LCDC window map; DMG receives only the tile write. No VRAM access waits are inserted.</pre></div></details></details><h3 id="module-input">input.h — 按钮状态、按下、松开与重复</h3><!-- api-module:start --><div data-module-contract="input-source-20260915"><p>连续移动用 <code>input_down</code>，单次动作用 <code>input_pressed</code>，松开时停止用 <code>input_released</code>，菜单重复操作用 <code>input_repeat</code>。初始化一次，每个输入周期更新一次，然后按需查询。<code>btn_down</code>、<code>btn_pressed</code>、<code>btn_released</code>、<code>btn_repeat</code> 分别是这四个查询函数的别名。</p><p>通用掩码为 <code>BTN_RIGHT=0x01</code>、<code>BTN_LEFT=0x02</code>、<code>BTN_UP=0x04</code>、<code>BTN_DOWN=0x08</code>、<code>BTN_A=0x10</code>、<code>BTN_B=0x20</code>、<code>BTN_SELECT=0x40</code>、<code>BTN_START=0x80</code>。位为 1 表示按住。GB 和 FC 的 <code>input_*</code> 均使用此格式；FC 原始手柄函数的位序不同。</p><p>重复触发按更新次数计时，不是毫秒。新按下时立即触发。默认 <code>INPUT_REPEAT_DELAY=18</code>、<code>INPUT_REPEAT_RATE=5</code> 时，19 次更新后再次触发，此后每 6 次更新触发一次。各按钮独立计数。修改设置时，编译 <code>input.c</code> 也必须使用相同宏值；只修改调用方的头文件不会改变库的设置。</p></div><!-- api-module:end --><details class="api searchable" id="api-__readpadex" data-api-contract="input-source-20260915"><summary><code>__readpadex</code></summary><p>读取全部按钮并与传入的上次按住掩码比较。低字节存当前掩码，高字节存新按下的位 <code>current &amp; ~previous</code>。不在内部保存上次状态，也不返回松开或重复触发掩码。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u16 __readpadex(u8 prev_keys);</code></pre></div><h4>参数</h4><dl class="api-parameters"><dt><code>prev_keys</code></dt><dd><p>上次 <code>__readpad()</code> 的返回值，或上次 <code>__readpadex()</code> 结果的低字节。首次传 0，然后保存新的低字节供下次调用使用。</p></dd></dl><h4>返回值</h4><p>返回 <code>u16</code>：<code>(u8)result</code> 为当前掩码，<code>(u8)(result &gt;&gt; 8)</code> 为新按下掩码。必须存入 16 位变量，否则会丢失新按下的位。</p><h4>使用条件与限制</h4><p>通用掩码为 <code>BTN_RIGHT=0x01</code>、<code>BTN_LEFT=0x02</code>、<code>BTN_UP=0x04</code>、<code>BTN_DOWN=0x08</code>、<code>BTN_A=0x10</code>、<code>BTN_B=0x20</code>、<code>BTN_SELECT=0x40</code>、<code>BTN_START=0x80</code>。位为 1 表示按住。GB 和 FC 的 <code>input_*</code> 均使用此格式；FC 原始手柄函数的位序不同。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>packed_first=__readpadex(0); // First sample: current 0x11, new presses 0x11.
+current_keys=(u8)packed_first;
+press_keys=(u8)(packed_first&gt;&gt;8);
+packed_held=__readpadex(current_keys); // Held without a change: new presses are 0.</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序用于比较三种按钮掩码格式，以及将当前状态和新按下状态打包的返回值。同时按住A和右。ALL KEYS为17，DIRECTIONS和BUTTONS LOW各为1。前次掩码为0时，EX CURRENT和EX NEW PRESS均为17。将当前掩码传给下一次读取后，HELD PRESS为0。FAILED CHECKS应为0。采集到的数值会保留在屏幕上，松开按钮也不会清除。</p><p><a href="../samples/api-examples/gb/input_raw.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpadex">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/lib/input.h:28</p></details></details><h3 id="module-intrinsics">intrinsics.h — 编译器内建函数</h3><details class="api searchable" id="api-__bankof"><summary><code>__bankof</code><span class="badge">编译器内建函数</span></summary><p>取得符号所在的 bank。这与传递任意数值地址不同。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__bankof(arg0);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__bankof(arg0);</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__bankof.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
                 if (args.Length != 1) Program.Error("__bankof(symbol) expects 1 argument");
                 if (!args[0].Match(Tag.Name, out string symName)) Program.Error("__bankof(symbol) requires a symbol name argument");
                 if (TryGetKnownRomBankForSymbol(symName, out int knownBank))
@@ -1909,66 +1907,68 @@ if (funcName == "__padrep_lr")
     AsmOperand pr_dir0        = MakeUniqueLabel("padrep_dir0");
     AsmOperand pr_have_dir    = MakeUniqueLabel("padrep_havedir");
     AsmOperand pr_first_rep   = MakeUniqueLabel("padrep_firstrep");
-    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:10708</p></details><details class="api searchable" id="api-__readpad"><summary><code>__readpad</code><span class="badge">编译器内建函数</span></summary><p>读取数值。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__readpad();</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__readpad();</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__readpad.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
-    if (args.Length != 0) Error(expr, "__readpad requires 0 arguments");
+    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:10708</p></details><details class="api searchable" id="api-__readpad" data-api-contract="input-source-20260915"><summary><code>__readpad</code></summary><p>从 JOYP 读取方向键和操作按钮，合并为通用 8 位按钮掩码。依次选择各组并读取两次以等待信号稳定，最后将组选择位恢复为 <code>0x30</code>。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u8 __readpad();</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>返回值</h4><p>通用 <code>BTN_*</code> 格式的 8 位掩码。多个按钮可以同时置位；0 表示没有按钮。</p><h4>使用条件与限制</h4><p>通用掩码为 <code>BTN_RIGHT=0x01</code>、<code>BTN_LEFT=0x02</code>、<code>BTN_UP=0x04</code>、<code>BTN_DOWN=0x08</code>、<code>BTN_A=0x10</code>、<code>BTN_B=0x20</code>、<code>BTN_SELECT=0x40</code>、<code>BTN_START=0x80</code>。位为 1 表示按住。GB 和 FC 的 <code>input_*</code> 均使用此格式；FC 原始手柄函数的位序不同。</p><p>此调用重新读取硬件状态，不更新 <code>input_*</code> 或 <code>nes_pad1_*</code> 的缓存，也不生成按下、松开或重复事件。需要检测变化时，请保存读取结果，并与自己保存的上次掩码比较。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>all_keys=__readpad(); // A + Right: 0x11, decimal 17.</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序用于比较三种按钮掩码格式，以及将当前状态和新按下状态打包的返回值。同时按住A和右。ALL KEYS为17，DIRECTIONS和BUTTONS LOW各为1。前次掩码为0时，EX CURRENT和EX NEW PRESS均为17。将当前掩码传给下一次读取后，HELD PRESS为0。FAILED CHECKS应为0。采集到的数值会保留在屏幕上，松开按钮也不会清除。</p><p><a href="../samples/api-examples/gb/input_raw.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpad">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10537</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+    if (args.Length != 0) Error(expr, &quot;__readpad requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
     // Directions (P1=0x20)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1); // dummy reads for settle
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
-    EmitAsm("LD_C_A"); // dpad in C
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1); // dummy reads for settle
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_C_A&quot;); // dpad in C
 
     // Buttons (P1=0x10)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
     // shift into upper nibble (&lt;&lt;4)
-    EmitAsm("RLCA"); EmitAsm("RLCA"); EmitAsm("RLCA"); EmitAsm("RLCA");
-    EmitAsm("OR_C");
+    EmitAsm(&quot;RLCA&quot;); EmitAsm(&quot;RLCA&quot;); EmitAsm(&quot;RLCA&quot;); EmitAsm(&quot;RLCA&quot;);
+    EmitAsm(&quot;OR_C&quot;);
 
     // Restore P1 selection (0x30) without losing return value
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
 // 2.17 __readpaddir() -&gt; u8 in A (bits0..3 only)
 // Returns dpad nibble (Right,Left,Up,Down) with 1 when pressed.
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__readpaddir")
+if (funcName == &quot;__readpaddir&quot;)
 {
-    if (args.Length != 0) Error(expr, "__readpaddir requires 0 arguments");
+    if (args.Length != 0) Error(expr, &quot;__readpaddir requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:10537</p></details><details class="api searchable" id="api-__readpadbtn"><summary><code>__readpadbtn</code><span class="badge">编译器内建函数</span></summary><p>读取数值。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__readpadbtn();</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__readpadbtn();</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__readpadbtn.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
-    if (args.Length != 0) Error(expr, "__readpadbtn requires 0 arguments");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm</code></pre></div></details></details><details class="api searchable" id="api-__readpadbtn" data-api-contract="input-source-20260915"><summary><code>__readpadbtn</code></summary><p>只读取 JOYP 操作按钮组，返回低四位：A=1、B=2、Select=4、Start=8。它们不同于占高四位的通用 <code>BTN_A</code>～<code>BTN_START</code>。读取后将 JOYP 选择恢复为 <code>0x30</code>。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u8 __readpadbtn();</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>返回值</h4><p>按上述位序返回 0～15 的掩码。可能同时置多个位；应使用 <code>result &amp; bit</code> 检查某个按钮，而不是判断整个结果是否等于 1。</p><h4>使用条件与限制</h4><p>此调用重新读取硬件状态，不更新 <code>input_*</code> 或 <code>nes_pad1_*</code> 的缓存，也不生成按下、松开或重复事件。需要检测变化时，请保存读取结果，并与自己保存的上次掩码比较。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>buttons=__readpadbtn(); // A: 1, not BTN_A (16).</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序用于比较三种按钮掩码格式，以及将当前状态和新按下状态打包的返回值。同时按住A和右。ALL KEYS为17，DIRECTIONS和BUTTONS LOW各为1。前次掩码为0时，EX CURRENT和EX NEW PRESS均为17。将当前掩码传给下一次读取后，HELD PRESS为0。FAILED CHECKS应为0。采集到的数值会保留在屏幕上，松开按钮也不会清除。</p><p><a href="../samples/api-examples/gb/input_raw.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpadbtn">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10597</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+    if (args.Length != 0) Error(expr, &quot;__readpadbtn requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
 
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
@@ -1977,67 +1977,68 @@ if (funcName == "__readpaddir")
 // This mirrors the common pattern:
 // prev = keys; keys = __readpad(); trigger = keys &amp; ~prev;
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__readpadex")
+if (funcName == &quot;__readpadex&quot;)
 {
-    if (args.Length != 1) Error(expr, "__readpadex requires 1 argument (prev_keys)");
+    if (args.Length != 1) Error(expr, &quot;__readpadex requires 1 argument (prev_keys)&quot;);
 
     // prev -&gt; B
     CompileIntoA(args[0]);
-    EmitAsm("LD_B_A");
+    EmitAsm(&quot;LD_B_A&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
     // Directions (P1=0x20)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
-    EmitAsm("LD_C_A"); // dpad in C
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_C_A&quot;); // dpad in C
 
     // Buttons (P1=0x10)
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1)</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:10597</p></details><details class="api searchable" id="api-__readpaddir"><summary><code>__readpaddir</code><span class="badge">编译器内建函数</span></summary><p>读取数值。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__readpaddir();</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__readpaddir();</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__readpaddir.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
-    if (args.Length != 0) Error(expr, "__readpaddir requires 0 arguments");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1)</code></pre></div></details></details><details class="api searchable" id="api-__readpaddir" data-api-contract="input-source-20260915"><summary><code>__readpaddir</code></summary><p>只读取 JOYP 的方向键组。结果的位 0～3 为右=1、左=2、上=4、下=8，位 4～7 为 0。不包含操作按钮，读取后将 JOYP 选择恢复为 <code>0x30</code>。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u8 __readpaddir();</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>返回值</h4><p>按上述位序返回 0～15 的掩码。可能同时置多个位；应使用 <code>result &amp; bit</code> 检查某个按钮，而不是判断整个结果是否等于 1。</p><h4>使用条件与限制</h4><p>此调用重新读取硬件状态，不更新 <code>input_*</code> 或 <code>nes_pad1_*</code> 的缓存，也不生成按下、松开或重复事件。需要检测变化时，请保存读取结果，并与自己保存的上次掩码比较。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>directions=__readpaddir(); // Right: 1. The held A button is not included.</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序用于比较三种按钮掩码格式，以及将当前状态和新按下状态打包的返回值。同时按住A和右。ALL KEYS为17，DIRECTIONS和BUTTONS LOW各为1。前次掩码为0时，EX CURRENT和EX NEW PRESS均为17。将当前掩码传给下一次读取后，HELD PRESS为0。FAILED CHECKS应为0。采集到的数值会保留在屏幕上，松开按钮也不会清除。</p><p><a href="../samples/api-examples/gb/input_raw.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpaddir">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10574</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+    if (args.Length != 0) Error(expr, &quot;__readpaddir requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x20, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x20, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
 
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
 // 2.18 __readpadbtn() -&gt; u8 in A (bits0..3 only)
 // Returns buttons nibble (A,B,Select,Start) with 1 when pressed.
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__readpadbtn")
+if (funcName == &quot;__readpadbtn&quot;)
 {
-    if (args.Length != 0) Error(expr, "__readpadbtn requires 0 arguments");
+    if (args.Length != 0) Error(expr, &quot;__readpadbtn requires 0 arguments&quot;);
 
     AsmOperand p1 = new AsmOperand(0x00, AddressMode.HighMem); // P1 / JOYP
 
-    EmitAsm("LD_A_IMM", new AsmOperand(0x10, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("LDH_A_MEM", p1);
-    EmitAsm("CPL");
-    EmitAsm("AND_IMM", new AsmOperand(0x0F, AddressMode.Immediate));
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x10, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;LDH_A_MEM&quot;, p1);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x0F, AddressMode.Immediate));
 
-    EmitAsm("LD_C_A");
-    EmitAsm("LD_A_IMM", new AsmOperand(0x30, AddressMode.Immediate));
-    EmitAsm("LDH_MEM_A", p1);
-    EmitAsm("LD_A_C");
+    EmitAsm(&quot;LD_C_A&quot;);
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x30, AddressMode.Immediate));
+    EmitAsm(&quot;LDH_MEM_A&quot;, p1);
+    EmitAsm(&quot;LD_A_C&quot;);
     return;
 }
 
@@ -2045,7 +2046,7 @@ if (funcName == "__readpadbtn")
 // Returns: L = keys (same encoding as __readpad), H = trigger (newly pressed edge: keys &amp; ~prev).
 // This mirrors the common pattern:
 // prev = keys; keys = __readpad(); trigger = keys &amp; ~prev;
-// Treated as a c</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:10574</p></details><details class="api searchable" id="api-__sdot2_q1_7"><summary><code>__sdot2_q1_7</code><span class="badge">编译器内建函数</span></summary><p>执行参数指定的操作。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__sdot2_q1_7(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>调用示例：需要外围代码的片段</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>s16 kq2dc__dot_q1_7(s16 x, s16 y, s8 ax, s8 ay)
+// Treated as a c</code></pre></div></details></details><details class="api searchable" id="api-__sdot2_q1_7"><summary><code>__sdot2_q1_7</code><span class="badge">编译器内建函数</span></summary><p>执行参数指定的操作。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__sdot2_q1_7(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>调用示例：需要外围代码的片段</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>s16 kq2dc__dot_q1_7(s16 x, s16 y, s8 ax, s8 ay)
 {
     return (s16)__sdot2_q1_7(x, y, ax, ay);
 }

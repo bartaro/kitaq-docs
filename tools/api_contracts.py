@@ -128,6 +128,7 @@ def publish(language, require_complete=False):
     folder = SITE if language == 'ja' else SITE / language
     proofs = verified_tile_examples(contracts)
     proofs.update(verified_entity_examples(contracts))
+    proofs.update(verified_input_examples(contracts))
     for key in proofs:
         contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
     coverage = []
@@ -153,9 +154,46 @@ def publish(language, require_complete=False):
                 edits.append((start, end, render(by_name[name], contracts[key], language, messages, ui)))
             for start, end, replacement in reversed(edits):
                 text = text[:start] + replacement + text[end:]
+            text = render_modules(text, platform, language, messages)
             path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
     publish_verification(language, contracts, proofs, messages, ui)
     return {'reviewed': len(contracts), 'remaining': len(coverage), 'missing': coverage}
+
+
+def render_modules(text, platform, language, messages):
+    """Place reviewed library introductions directly below their module headings."""
+    text = re.sub(r'<!-- api-module:start -->.*?<!-- api-module:end -->','',text,flags=re.S)
+    index = ORDER.index(language)
+    for path in sorted(SOURCE.glob('*modules.json')):
+        for key, paragraphs in json.loads(path.read_text(encoding='utf-8')).items():
+            owner, module = key.split(':')
+            if owner != platform: continue
+            pattern = r'(<h3\b[^>]*id="module-' + re.escape(module) + r'"[^>]*>.*?</h3>)'
+            block = '<!-- api-module:start --><div data-module-contract="input-source-20260915">'
+            block += ''.join('<p>'+inline(messages[item][index])+'</p>' for item in paragraphs)
+            block += '</div><!-- api-module:end -->'
+            text = re.sub(pattern,lambda m:m[1]+block,text,count=1,flags=re.S)
+    return text
+
+
+def verified_input_examples(contracts):
+    path = SITE/'verification/api-input/results.json'
+    if not path.exists(): return {}
+    runs = json.loads(path.read_text(encoding='utf-8'))['records']
+    if len(runs)!=7 or not all(r['passed'] for r in runs): return {}
+    verified = {}
+    for key, contract in contracts.items():
+        if contract['review'] != 'input-source-20260915': continue
+        program = contract['example']['program']
+        selected = [r for r in runs if r['program']==program]
+        if len(selected)!=(2 if key.startswith('gb:') else 1):
+            raise ValueError('Missing input run: '+key)
+        for run in selected:
+            for file, expected in [(SITE/program,run['source_sha256']),(SITE/run['image'],run['image_sha256'])]:
+                if hashlib.sha256(file.read_bytes()).hexdigest()!=expected:
+                    raise ValueError('Input evidence changed: '+str(file))
+        verified[key] = {'api':key.split(':')[1],'kind':'input','runs':selected}
+    return verified
 
 
 def verified_tile_examples(contracts):
@@ -213,13 +251,14 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind')=='entity':
+            if result.get('kind') in ['entity','input']:
                 block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
                     block.append('<figure><img class="screen" loading="lazy" src="'+prefix+run['image']+'" alt="'+html.escape(name+': '+run['mode'].upper(),quote=True)+'"><figcaption>'+run['mode'].upper()+'</figcaption></figure>')
                     log = str(Path(run['image']).parent/'build.txt').replace('\\','/')
                     block.append('<p><a href="'+prefix+log+'">'+html.escape(ui['build_log'][index])+'</a></p>')
-                block.append('<p><a href="'+prefix+example['program']+'">'+html.escape(ui['download'][index])+'</a> · <a href="'+prefix+'verification/api-entity/results.json">'+html.escape(messages['verification_records'][index])+'</a></p></section>')
+                records_path = 'verification/api-'+result['kind']+'/results.json'
+                block.append('<p><a href="'+prefix+example['program']+'">'+html.escape(ui['download'][index])+'</a> · <a href="'+prefix+records_path+'">'+html.escape(messages['verification_records'][index])+'</a></p></section>')
                 continue
             diagram = example['image']
             caption = messages['tile_image_layout'][index].format(x=diagram['x'],y=diagram['y'],px=diagram['x']*8,py=diagram['y']*8)

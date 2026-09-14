@@ -1,0 +1,930 @@
+{
+  "gb:input_init": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_init_detail"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_repeat_timing"
+    ],
+    "record_sha256": "b55a5b7636f3d99e356906110d115572dcffbd239b020807acda35012477113c",
+    "example": {
+      "code": "input_init();\nif (input_current()!=0 || input_previous()!=0) failures++;",
+      "program": "samples/api-examples/gb/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_edges.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "gb:input_update": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_update_gb"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_repeat_timing"
+    ],
+    "record_sha256": "302829163d245c117303abff087b8e0ff5fc04f44085b46bd6b78f9a0b317dad",
+    "example": {
+      "code": "    input_update(); // One update per input tick, followed by any number of queries.",
+      "program": "samples/api-examples/gb/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_edges.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "gb:input_down": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_down"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "2e81fd23ed4624b6ed9d2985df621b26706033e66db667ad764a6f36a9502edb",
+    "example": {
+      "code": "    if (input_down(BTN_A)!=0) held_ticks++;",
+      "program": "samples/api-examples/gb/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_edges.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "gb:input_pressed": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_pressed"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "c348edfa899b8a9c143d99e76e8d0d08e8ab1e37b28afc53124fe0878dde6343",
+    "example": {
+      "code": "    if (input_pressed(BTN_A)!=0) {\n        press_count++; seen_press=1;\n        first_down=input_down(BTN_A); first_press=input_pressed(BTN_A);\n        first_repeat=input_repeat(BTN_A);\n        first_current=input_current(); // Only A held: BTN_A, or decimal 16.\n        first_previous=input_previous(); // No buttons in the preceding sample: 0.\n        if (first_down!=1 || first_press!=1 || first_repeat!=1) failures++;\n        if (first_current!=BTN_A || first_previous!=0) failures++;\n        if (input_down(BTN_A|BTN_B)!=1 || input_down(0)!=0) failures++;\n    }",
+      "program": "samples/api-examples/gb/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_edges.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "gb:input_released": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_released"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "1e5b05ca04367094a53efd87b6ece1c32db1dc90385995cf6950d88c88de0af2",
+    "example": {
+      "code": "    if (input_released(BTN_A)!=0) {\n        release_result=input_released(BTN_A);\n        last_current=input_current(); last_previous=input_previous();\n        if (input_down(BTN_A)!=0 || input_pressed(BTN_A)!=0 || input_repeat(BTN_A)!=0) failures++;\n        break;\n    }",
+      "program": "samples/api-examples/gb/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_edges.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "gb:input_repeat": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_repeat"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state",
+      "input_repeat_timing"
+    ],
+    "record_sha256": "16b599f0aa7565b81ab3d974948798fef1657cbaab14f77b725cc8a83468c1d6",
+    "example": {
+      "code": "    if (input_repeat(BTN_A)!=0) {\n        // The initial press is pulse 1. Defaults then wait 19 updates, followed by 6.\n        if (repeat_count==1 && held_ticks-previous_pulse!=19) failures++;\n        if (repeat_count>1 && held_ticks-previous_pulse!=6) failures++;\n        previous_pulse=held_ticks; repeat_count++;\n        if (input_repeat(BTN_A)!=1) failures++; // Reading again does not consume it.\n    }",
+      "program": "samples/api-examples/gb/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_edges.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "gb:input_current": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_current"
+    ],
+    "args": [],
+    "returns": [
+      "input_mask_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "399d417289aeb7ed4c4543f3d96346c61d62d3f6a51709a793e54b23ad88e164",
+    "example": {
+      "code": "        first_current=input_current(); // Only A held: BTN_A, or decimal 16.",
+      "program": "samples/api-examples/gb/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_edges.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "gb:input_previous": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_previous"
+    ],
+    "args": [],
+    "returns": [
+      "input_mask_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "064f2103648c2aebe809ebf8d1b0bac020905e37f200f8f3845e59130247b643",
+    "example": {
+      "code": "        first_previous=input_previous(); // No buttons in the preceding sample: 0.",
+      "program": "samples/api-examples/gb/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_edges.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "fc:input_init": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_init_detail"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_repeat_timing"
+    ],
+    "record_sha256": "f935c89c8cb662cd282af0686e1e6b67563622b43e59e5530d758dbc892cc53b",
+    "example": {
+      "code": "input_init();\nif (input_current()!=0 || input_previous()!=0) failures++;",
+      "program": "samples/api-examples/fc/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_edges.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "fc:input_update": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_update_fc"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_repeat_timing",
+      "pad_safe_retry"
+    ],
+    "record_sha256": "d445d9551e01a4ba228a91a016e8d6586aab3150ef036a97086c7b30e2b89f90",
+    "example": {
+      "code": "    input_update(); // One update per input tick, followed by any number of queries.",
+      "program": "samples/api-examples/fc/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_edges.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "fc:input_down": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_down"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "f1f08dc0acec3a2366f6316fe668bebc0cd9fb1d9d8f76ee4fb397a5e29d2b85",
+    "example": {
+      "code": "    if (input_down(BTN_A)!=0) held_ticks++;",
+      "program": "samples/api-examples/fc/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_edges.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "fc:input_pressed": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_pressed"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "bdf2bb285bd26bc3240d64c691770e341671b3421bb6966dcd30df9a15dfc7a4",
+    "example": {
+      "code": "    if (input_pressed(BTN_A)!=0) {\n        press_count++; seen_press=1;\n        first_down=input_down(BTN_A); first_press=input_pressed(BTN_A);\n        first_repeat=input_repeat(BTN_A);\n        first_current=input_current(); // Only A held: BTN_A, or decimal 16.\n        first_previous=input_previous(); // No buttons in the preceding sample: 0.\n        if (first_down!=1 || first_press!=1 || first_repeat!=1) failures++;\n        if (first_current!=BTN_A || first_previous!=0) failures++;\n        if (input_down(BTN_A|BTN_B)!=1 || input_down(0)!=0) failures++;\n    }",
+      "program": "samples/api-examples/fc/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_edges.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "fc:input_released": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_released"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "7521e260c691240abcd1634aef8a1da7ddb478f5e31b767b05fb1b0568fc7913",
+    "example": {
+      "code": "    if (input_released(BTN_A)!=0) {\n        release_result=input_released(BTN_A);\n        last_current=input_current(); last_previous=input_previous();\n        if (input_down(BTN_A)!=0 || input_pressed(BTN_A)!=0 || input_repeat(BTN_A)!=0) failures++;\n        break;\n    }",
+      "program": "samples/api-examples/fc/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_edges.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "fc:input_repeat": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_repeat"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state",
+      "input_repeat_timing"
+    ],
+    "record_sha256": "4bcb263281a6080852b0c5e1c4ac750c535254278207f3300b1b5eff2859c03a",
+    "example": {
+      "code": "    if (input_repeat(BTN_A)!=0) {\n        // The initial press is pulse 1. Defaults then wait 19 updates, followed by 6.\n        if (repeat_count==1 && held_ticks-previous_pulse!=19) failures++;\n        if (repeat_count>1 && held_ticks-previous_pulse!=6) failures++;\n        previous_pulse=held_ticks; repeat_count++;\n        if (input_repeat(BTN_A)!=1) failures++; // Reading again does not consume it.\n    }",
+      "program": "samples/api-examples/fc/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_edges.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "fc:input_current": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_current"
+    ],
+    "args": [],
+    "returns": [
+      "input_mask_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "0e563950699b7c00523e5b60abd0fbaf419908ff7dd820920b9045168d08ee2c",
+    "example": {
+      "code": "        first_current=input_current(); // Only A held: BTN_A, or decimal 16.",
+      "program": "samples/api-examples/fc/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_edges.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "fc:input_previous": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_previous"
+    ],
+    "args": [],
+    "returns": [
+      "input_mask_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "6b485637fa86b7467a85217fc621ffac837bdf0753737c6b4a6cba3d81219eaf",
+    "example": {
+      "code": "        first_previous=input_previous(); // No buttons in the preceding sample: 0.",
+      "program": "samples/api-examples/fc/input_edges.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_edges.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_edges.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    }
+  },
+  "gb:__readpad": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "gb_pad_read"
+    ],
+    "args": [],
+    "returns": [
+      "input_mask_result"
+    ],
+    "notes": [
+      "input_logical_layout",
+      "pad_snapshot_note"
+    ],
+    "record_sha256": "3250205870fc059bc95ed6cabf81af4c719c023d58a9a9fdd3b02a61e16cef4d",
+    "example": {
+      "code": "all_keys=__readpad(); // A + Right: 0x11, decimal 17.",
+      "program": "samples/api-examples/gb/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\input_raw.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "gb_raw_example"
+      ]
+    },
+    "syntax": "u8 __readpad();"
+  },
+  "gb:__readpaddir": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "gb_pad_dir"
+    ],
+    "args": [],
+    "returns": [
+      "pad_nibble_result"
+    ],
+    "notes": [
+      "pad_snapshot_note"
+    ],
+    "record_sha256": "ff178bff4518e2c0425809522e20bf615c5a1f44854743f64ed17ec3a5c184ee",
+    "example": {
+      "code": "directions=__readpaddir(); // Right: 1. The held A button is not included.",
+      "program": "samples/api-examples/gb/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\input_raw.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "gb_raw_example"
+      ]
+    },
+    "syntax": "u8 __readpaddir();"
+  },
+  "gb:__readpadbtn": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "gb_pad_btn"
+    ],
+    "args": [],
+    "returns": [
+      "pad_nibble_result"
+    ],
+    "notes": [
+      "pad_snapshot_note"
+    ],
+    "record_sha256": "5c957a62eb5d8896f72f8e8e4669e62fdd1c6cd59154f4cb24649bae2762dd5f",
+    "example": {
+      "code": "buttons=__readpadbtn(); // A: 1, not BTN_A (16).",
+      "program": "samples/api-examples/gb/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\input_raw.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "gb_raw_example"
+      ]
+    },
+    "syntax": "u8 __readpadbtn();"
+  },
+  "gb:__readpadex": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "gb_pad_ex"
+    ],
+    "args": [
+      [
+        "prev_keys",
+        [
+          "gb_pad_previous_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "gb_pad_ex_result"
+    ],
+    "notes": [
+      "input_logical_layout"
+    ],
+    "record_sha256": "5649073e52ed0175a468e55974a0230d2bfb4d9cf4f6df2d6671dda1df5329b2",
+    "example": {
+      "code": "packed_first=__readpadex(0); // First sample: current 0x11, new presses 0x11.\ncurrent_keys=(u8)packed_first;\npress_keys=(u8)(packed_first>>8);\npacked_held=__readpadex(current_keys); // Held without a change: new presses are 0.",
+      "program": "samples/api-examples/gb/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\input_raw.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "gb_raw_example"
+      ]
+    },
+    "syntax": "u16 __readpadex(u8 prev_keys);"
+  },
+  "fc:__pad_read1": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_port___pad_read1"
+    ],
+    "args": [],
+    "returns": [
+      "pad_raw_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_snapshot_note"
+    ],
+    "record_sha256": "e242c5288fe6a717f7f71a54cc4dcdbdba920218c1555457fb04fbe1a4769a98",
+    "example": {
+      "code": "raw1=__pad_read1(); // Controller 1: A (1) | Right (128) = 129.",
+      "program": "samples/api-examples/fc/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\input_raw.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_raw_example"
+      ]
+    }
+  },
+  "fc:__pad_read1_safe": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_port___pad_read1_safe"
+    ],
+    "args": [],
+    "returns": [
+      "pad_raw_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_snapshot_note",
+      "pad_safe_retry"
+    ],
+    "record_sha256": "770e9df5a7d452729cfb2e044402025982fac7574538d991dd56a923c68de09d",
+    "example": {
+      "code": "safe1=__pad_read1_safe(); // Repeat paired controller-1 reads until they agree.",
+      "program": "samples/api-examples/fc/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\input_raw.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_raw_example"
+      ]
+    }
+  },
+  "fc:nes_pad1": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_port_nes_pad1"
+    ],
+    "args": [],
+    "returns": [
+      "pad_raw_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_snapshot_note",
+      "pad_safe_retry"
+    ],
+    "record_sha256": "1c9c95e7cd6044a529756e2debc596c1e8139d59005b48a20d3a925a8899a7f6",
+    "example": {
+      "code": "alias1=nes_pad1(); // Macro for __pad_read1_safe(), using NES raw bits.",
+      "program": "samples/api-examples/fc/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\input_raw.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_raw_example"
+      ]
+    }
+  },
+  "fc:__pad_read2": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_port___pad_read2"
+    ],
+    "args": [],
+    "returns": [
+      "pad_raw_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_snapshot_note"
+    ],
+    "record_sha256": "e4ceafd9f482ffffeaffc50988c59297e363fe328b2b851c963d9742d25be5d9",
+    "example": {
+      "code": "raw2=__pad_read2(); // Controller 2: B (2) | Left (64) = 66.",
+      "program": "samples/api-examples/fc/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\input_raw.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_raw_example"
+      ]
+    }
+  },
+  "fc:__pad_read2_safe": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_port___pad_read2_safe"
+    ],
+    "args": [],
+    "returns": [
+      "pad_raw_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_snapshot_note",
+      "pad_safe_retry"
+    ],
+    "record_sha256": "16a7a13fb8bdf0539a38e6d1b8974aedd101ca63aaeea349214ff3bf9cced7c5",
+    "example": {
+      "code": "safe2=__pad_read2_safe(); // The same consistency check on controller 2.",
+      "program": "samples/api-examples/fc/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\input_raw.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_raw_example"
+      ]
+    }
+  },
+  "fc:nes_pad2": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "input_port_nes_pad2"
+    ],
+    "args": [],
+    "returns": [
+      "pad_raw_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_snapshot_note",
+      "pad_safe_retry"
+    ],
+    "record_sha256": "d64b89d78176ede5ee9aa2edf3fc4c1db1fb42193c30ca533efe30dc03120a7f",
+    "example": {
+      "code": "alias2=nes_pad2(); // Macro for __pad_read2_safe(), using NES raw bits.",
+      "program": "samples/api-examples/fc/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\input_raw.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_raw_example"
+      ]
+    }
+  },
+  "fc:__pad_buttons": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "pad_buttons_purpose"
+    ],
+    "args": [
+      [
+        "pad",
+        [
+          "pad_snapshot_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "pad_nibble_result"
+    ],
+    "notes": [
+      "pad_raw_layout"
+    ],
+    "record_sha256": "63ec3fdeff9dc2d600add0bd8543e151de8eede24124271525074664397c98cc",
+    "example": {
+      "code": "buttons=__pad_buttons(raw1); // Low nibble of 129: 1, the A button.",
+      "program": "samples/api-examples/fc/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\input_raw.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_raw_example"
+      ]
+    }
+  },
+  "fc:__pad_dirs": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "pad_dirs_purpose"
+    ],
+    "args": [
+      [
+        "pad",
+        [
+          "pad_snapshot_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "pad_dirs_result"
+    ],
+    "notes": [
+      "pad_raw_layout"
+    ],
+    "record_sha256": "52fa58f7a7359aae590cfb9294c1af6e7decfe7581c1b321ef97395f9c59abab",
+    "example": {
+      "code": "directions=__pad_dirs(raw1); // High nibble retained in place: 128, not 8.",
+      "program": "samples/api-examples/fc/input_raw.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\input_raw.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_raw.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_raw_example"
+      ]
+    }
+  },
+  "fc:nes_pad_poll": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "pad_poll_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_poll_state"
+    ],
+    "record_sha256": "c520768529f80032ae71585c77504a8c899552e0636c660842913e44c8f775a5",
+    "example": {
+      "code": "    nes_pad_poll(); // Read controller 1 and update its held/pressed/released snapshots.",
+      "program": "samples/api-examples/fc/pad_repeat.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\pad.c .\\kitaqfc\\lib\\input_repeat.c .\\kitaq-docs\\samples\\api-examples\\fc\\pad_repeat.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\pad_repeat.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_repeat_example"
+      ]
+    }
+  },
+  "fc:nes_pad_repeat_config": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "pad_repeat_config_purpose"
+    ],
+    "args": [
+      [
+        "delay",
+        [
+          "pad_repeat_delay_arg"
+        ]
+      ],
+      [
+        "interval",
+        [
+          "pad_repeat_interval_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "pad_raw_layout"
+    ],
+    "record_sha256": "c7d56f8925c4a2b76d33cba7ba6bdb1faafc22581c691231eabcf69ded96d8cc",
+    "example": {
+      "code": "nes_pad_repeat_config(3,1); // Next pulse after 4 held updates, then every 2.",
+      "program": "samples/api-examples/fc/pad_repeat.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\pad.c .\\kitaqfc\\lib\\input_repeat.c .\\kitaq-docs\\samples\\api-examples\\fc\\pad_repeat.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\pad_repeat.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_repeat_example"
+      ]
+    }
+  },
+  "fc:nes_pad_repeat_step": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "pad_repeat_step_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_poll_state"
+    ],
+    "record_sha256": "b949c0f9fa7fbe8f63f953267ed9357aff2652579d21bd903f71cdaddd55c75f",
+    "example": {
+      "code": "    nes_pad_repeat_step(); // Once after each fresh poll; getters do not advance time.",
+      "program": "samples/api-examples/fc/pad_repeat.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\pad.c .\\kitaqfc\\lib\\input_repeat.c .\\kitaq-docs\\samples\\api-examples\\fc\\pad_repeat.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\pad_repeat.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_repeat_example"
+      ]
+    }
+  },
+  "fc:nes_pad_trigger": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "nes_trigger_purpose"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "pad_raw_mask_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "pad_masked_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_poll_state"
+    ],
+    "record_sha256": "fa33dd71a06930bb51841debcd932f102a9c87bdf3db7576ae7229f30db076b7",
+    "example": {
+      "code": "    if (nes_pad_trigger(0x02)!=0) {\n        first_trigger=nes_pad_trigger(0x02); // Returns 2, not Boolean 1.\n        first_held=nes_pad_held(0x02); first_repeat=nes_pad_repeat(0x02);\n        if (first_trigger!=2 || first_held!=2 || first_repeat!=2) failures++;\n    }",
+      "program": "samples/api-examples/fc/pad_repeat.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\pad.c .\\kitaqfc\\lib\\input_repeat.c .\\kitaq-docs\\samples\\api-examples\\fc\\pad_repeat.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\pad_repeat.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_repeat_example"
+      ]
+    }
+  },
+  "fc:nes_pad_repeat": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "nes_repeat_purpose"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "pad_raw_mask_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "pad_masked_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_poll_state"
+    ],
+    "record_sha256": "1beaa0757b1fbaad30bbe11cb3db6e54a46829597a7debf4c7c5942b1f32f40e",
+    "example": {
+      "code": "    if (nes_pad_repeat(0x02)!=0) {\n        if (pulse_count==1 && held_ticks-previous_pulse!=4) failures++;\n        if (pulse_count>1 && held_ticks-previous_pulse!=2) failures++;\n        previous_pulse=held_ticks; pulse_count++;\n        if (nes_pad_repeat(0x02)!=2) failures++; // Querying again preserves the pulse.\n    }",
+      "program": "samples/api-examples/fc/pad_repeat.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\pad.c .\\kitaqfc\\lib\\input_repeat.c .\\kitaq-docs\\samples\\api-examples\\fc\\pad_repeat.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\pad_repeat.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_repeat_example"
+      ]
+    }
+  },
+  "fc:nes_pad_release": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "nes_release_purpose"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "pad_raw_mask_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "pad_masked_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_poll_state"
+    ],
+    "record_sha256": "3b8d22d49ddbe68a6fc44679748628f8cabddece661340562fc7c518b70a5374",
+    "example": {
+      "code": "    if (nes_pad_release(0x02)!=0) {\n        release_bits=nes_pad_release(0x02); // Returns the released B bit, 2.\n        if (nes_pad_held(0x02)!=0 || nes_pad_trigger(0x02)!=0 || nes_pad_repeat(0x02)!=0) failures++;\n        break;\n    }",
+      "program": "samples/api-examples/fc/pad_repeat.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\pad.c .\\kitaqfc\\lib\\input_repeat.c .\\kitaq-docs\\samples\\api-examples\\fc\\pad_repeat.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\pad_repeat.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_repeat_example"
+      ]
+    }
+  },
+  "fc:nes_pad_held": {
+    "review": "input-source-20260915",
+    "purpose": [
+      "nes_held_purpose"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "pad_raw_mask_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "pad_masked_result"
+    ],
+    "notes": [
+      "pad_raw_layout",
+      "pad_poll_state"
+    ],
+    "record_sha256": "bf1aedb3098940c55462c52ba4d60093a5703997d233a93223bc2095b981233b",
+    "example": {
+      "code": "    if (nes_pad_held(0x02)!=0) held_ticks++; // B is bit 1 in NES raw format.",
+      "program": "samples/api-examples/fc/pad_repeat.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\pad.c .\\kitaqfc\\lib\\input_repeat.c .\\kitaq-docs\\samples\\api-examples\\fc\\pad_repeat.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\pad_repeat.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "fc_repeat_example"
+      ]
+    }
+  }
+}
