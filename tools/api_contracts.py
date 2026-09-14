@@ -135,6 +135,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_vram_examples(contracts, 'vram-memory', {'gb': {'dmg', 'cgb'}}))
     proofs.update(verified_vram_examples(contracts, 'vramq', {'fc': {'nrom'}}))
     proofs.update(verified_cgb_palette_examples(contracts))
+    proofs.update(verified_cgb_dma_wram_examples(contracts))
     for key in proofs:
         contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
     coverage = []
@@ -262,6 +263,36 @@ def verified_vram_examples(contracts, family='vram', modes=None):
     return verified
 
 
+def verified_cgb_dma_wram_examples(contracts):
+    """Require the complete DMA/WRAM execution matrix and negative diagnostics."""
+    folder = SITE/'verification/api-cgb-dma-wram'
+    if not (folder/'results.json').exists() or not (folder/'diagnostics/results.json').exists(): return {}
+    runs = json.loads((folder/'results.json').read_text(encoding='utf-8'))['records']
+    expected = {('cgb_dma_shapes','cgb','dmg'),('cgb_dma_shapes','cgb','cgb'),('cgb_dma_shapes','cgb_only','cgb'),('cgb_wram_banks','cgb_only','cgb')}
+    if len(runs)!=4 or {(r['id'],r['target'],r['mode']) for r in runs}!=expected or not all(r['passed'] for r in runs): return {}
+    diagnostics = json.loads((folder/'diagnostics/results.json').read_text(encoding='utf-8'))
+    if len(diagnostics['records'])!=6 or not all(r['passed'] for r in diagnostics['records']): return {}
+    if any(run['compiler_sha256']!=diagnostics['compiler_sha256'] for run in runs):
+        raise ValueError('DMA/WRAM runtime and diagnostics use different compilers')
+    for run in diagnostics['records']:
+        if hashlib.sha256((SITE/run['source']).read_bytes()).hexdigest()!=run['source_sha256']:
+            raise ValueError('WRAM diagnostic source changed: '+run['source'])
+    result = {}
+    for key,contract in contracts.items():
+        if contract['review']!='cgb-dma-wram-source-20260915': continue
+        selected = [r for r in runs if r['source']==contract['example']['program']]
+        if not selected: raise ValueError('No DMA/WRAM evidence for '+key)
+        for run in selected:
+            files = {run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}
+            for file,expected_hash in files.items():
+                if hashlib.sha256((SITE/file).read_bytes()).hexdigest()!=expected_hash:
+                    raise ValueError('DMA/WRAM example changed: '+file)
+        result[key] = {'api':key.split(':')[1],'kind':'cgb-dma-wram','runs':selected}
+        if key in ['gb:__svbk_get','gb:__svbk_set']:
+            result[key]['diagnostics_path'] = 'verification/api-cgb-dma-wram/diagnostics/results.json'
+    return result
+
+
 def verified_cgb_palette_examples(contracts):
     """Require all four target/hardware cases and their unchanged source evidence."""
     path = SITE/'verification/api-cgb-palette/results.json'
@@ -345,14 +376,16 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram']:
                 block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
-                    caption = ('--cgb='+run['target']+' / ' if result.get('kind')=='cgb-palette' else '')+run['mode'].upper()
+                    caption = ('--cgb='+run['target']+' / ' if result.get('kind') in ['cgb-palette','cgb-dma-wram'] else '')+run['mode'].upper()
                     block.append('<figure><img class="screen" loading="lazy" src="'+prefix+run['image']+'" alt="'+html.escape(name+': '+caption,quote=True)+'"><figcaption>'+html.escape(caption)+'</figcaption></figure>')
                     log = str(Path(run['image']).parent/'build.txt').replace('\\','/')
                     block.append('<p><a href="'+prefix+log+'">'+html.escape(ui['build_log'][index])+'</a></p>')
                 records_path = 'verification/api-'+result['kind']+'/results.json'
+                if result.get('diagnostics_path'):
+                    block.append('<p><a href="'+prefix+result['diagnostics_path']+'">KQ2102 / KQ2103</a></p>')
                 block.append('<p><a href="'+prefix+example['program']+'">'+html.escape(ui['download'][index])+'</a> · <a href="'+prefix+records_path+'">'+html.escape(messages['verification_records'][index])+'</a></p></section>')
                 continue
             diagram = example['image']
