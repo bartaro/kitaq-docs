@@ -19,7 +19,7 @@
 
 ## HTML手册
 
-七册正文提供九种语言版本，源码说明已更新至2026年9月14日。各语言版均收录相同的1,053个API条目和47个完整示例程序。本地阅读时，简体中文请打开 `zh-CN/index.html`，英文打开 `en/index.html`，日文打开 `index.html`。每册均可切换语言。保留的历史构建和运行记录仅对应当时的版本；更新源码说明并不代表重新完成了这些测试。
+本套手册以2026年9月14日的源码为依据，共七册，提供九种语言版本。各语言版均包含相同的1,053个API条目和47个完整示例程序。简体中文请打开 `zh-CN/index.html`，英文打开 `en/index.html`，日文打开 `index.html`。每册均可切换语言。验证记录列明了测试所用的源码、可执行文件和条件。
 
 原始源码摘录和实际捕获的工具输出保持原文不变。另请参阅[仓库获取与目录布局](GITHUB_SETUP.md)及[发布检查记录](PUBLICATION_CHECKS.md)。HTML支持离线阅读、册内搜索、代码复制和打印。
 
@@ -70,7 +70,7 @@ python -B kitaq-docs/tools/check_site.py
 python -B kitaq-docs/tools/check_bilingual.py
 ```
 
-源码收集和构建需要原始源码树及相应工具。字体转换和像素比较使用Pillow。阅读HTML不需要Python或服务器。修改源码或可执行文件后，不要把旧验证结果作为新版本的证明。另请参阅[编译器修复记录](verification/compiler_fixes.md)和[第三方声明](THIRD_PARTY_NOTICES.md)。
+源码收集和构建需要原始源码树及相应工具。字体转换和像素比较使用Pillow。阅读HTML不需要Python或服务器。每次验证都应记录所用源码与可执行文件的哈希值。另请参阅[编译器修复记录](verification/compiler_fixes.md)和[第三方声明](THIRD_PARTY_NOTICES.md)。
 
 ## 本次源码公开范围
 

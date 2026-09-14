@@ -22,7 +22,7 @@ GENERATED = {'index':'books','verification':'scope','kokura':'commands','kurosak
 BUFFER_NOTE = '. For arrays and pointers, allocate sufficient storage and keep it valid until processing finishes.'
 PROVIDER_NOTE = '. Include the providers of any additional functions it calls.'
 PURPOSE_NOTE = '. The declaration, original notes and implementation below define exact units, terminators and return conditions.'
-ENTRY_NOTE = ' entries. Open an entry for its syntax, arguments, source notes and usage example. Calling fragments require surrounding initialization; they are not standalone ROMs. Newly supplied argument-passing examples show how prepared values reach the API, and do not establish device-level verification.'
+ENTRY_NOTE = ' entries. Open an entry for its syntax, arguments, source notes and usage example. Calling fragments require surrounding initialization; they are not standalone ROMs. Argument-passing examples show how prepared values reach the API, and do not establish device-level verification.'
 missing = set()
 
 def lookup(key, messages):

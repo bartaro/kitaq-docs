@@ -19,7 +19,7 @@ Estos enlaces abren directamente el volumen correspondiente en español.
 
 ## Manuales HTML
 
-Los siete volúmenes están disponibles en nueve idiomas. Las referencias al código fuente se actualizaron el 14 de septiembre de 2026; todas las ediciones incluyen las mismas 1.053 entradas de API y 47 programas de ejemplo completos. Para leerlos localmente, abra `es/index.html` en español, `en/index.html` en inglés o `index.html` en japonés. Puede cambiar de idioma desde cada volumen. Los registros históricos de compilación y ejecución corresponden a la versión probada en su momento; actualizar la documentación del código no equivale a repetir esas pruebas.
+Los siete volúmenes están disponibles en nueve idiomas y describen el código fuente del 14 de septiembre de 2026. Todas las ediciones incluyen las mismas 1.053 entradas de API y 47 programas de ejemplo completos. Abra `es/index.html` en español, `en/index.html` en inglés o `index.html` en japonés. Puede cambiar de idioma desde cada volumen. Los registros de verificación identifican los fuentes, los ejecutables y las condiciones de las pruebas.
 
 Los fragmentos de código originales y las salidas capturadas de las herramientas se conservan sin traducir. Consulte también la [obtención y organización de los repositorios](GITHUB_SETUP.md) y el [registro de comprobaciones de publicación](PUBLICATION_CHECKS.md). El HTML permite lectura sin conexión, búsqueda dentro de cada volumen, copia de código e impresión.
 
@@ -70,7 +70,7 @@ python -B kitaq-docs/tools/check_site.py
 python -B kitaq-docs/tools/check_bilingual.py
 ```
 
-La recopilación de fuentes y la compilación requieren el árbol original del proyecto y las herramientas correspondientes. La conversión de tipografías y la comparación de píxeles utilizan Pillow. Para leer el HTML no hace falta Python ni un servidor. Tras modificar código o ejecutables, no presente resultados de verificación antiguos como prueba de la nueva versión. Consulte también las [correcciones del compilador](verification/compiler_fixes.md) y los [avisos de terceros](THIRD_PARTY_NOTICES.md).
+La recopilación de fuentes y la compilación requieren el árbol original del proyecto y las herramientas correspondientes. La conversión de tipografías y la comparación de píxeles utilizan Pillow. Para leer el HTML no hace falta Python ni un servidor. Registre los hashes de los fuentes y los ejecutables en cada verificación. Consulte también las [correcciones del compilador](verification/compiler_fixes.md) y los [avisos de terceros](THIRD_PARTY_NOTICES.md).
 
 ## Alcance de esta publicación de código fuente
 

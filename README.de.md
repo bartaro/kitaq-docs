@@ -16,7 +16,7 @@
 
 ## HTML-Handbücher
 
-Die sieben Bände stehen in neun Sprachen zur Verfügung. Die Quellcodebeschreibungen wurden am 14. September 2026 aktualisiert; alle Ausgaben enthalten dieselben 1.053 API-Einträge und 47 vollständigen Beispielprogramme. Öffnen Sie `de/index.html` für Deutsch, `en/index.html` für Englisch oder `index.html` für Japanisch. In jedem Band können Sie die Sprache wechseln. Frühere Build- und Ausführungsprotokolle gelten für die damals geprüfte Version; eine aktualisierte Quellcodebeschreibung bedeutet nicht, dass diese Tests erneut ausgeführt wurden.
+Die sieben Bände sind in neun Sprachen verfügbar und beschreiben den Quellenstand vom 14. September 2026. Alle Ausgaben enthalten dieselben 1.053 API-Einträge und 47 vollständigen Beispielprogramme. Öffnen Sie `de/index.html` für Deutsch, `en/index.html` für Englisch oder `index.html` für Japanisch. In jedem Band können Sie die Sprache wechseln. Die Prüfprotokolle nennen die getesteten Quellen, ausführbaren Dateien und Testbedingungen.
 
 Originale Quellcodeauszüge und aufgezeichnete Werkzeugausgaben bleiben unverändert. Die HTML-Dateien lassen sich offline lesen, innerhalb eines Bandes durchsuchen und ausdrucken; Code kann direkt kopiert werden. Beachten Sie die [GitHub-Einrichtung](GITHUB_SETUP.md) und die [Veröffentlichungsprüfungen](PUBLICATION_CHECKS.md).
 

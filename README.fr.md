@@ -4,7 +4,7 @@
 
 ## Manuels HTML
 
-Les sept volumes sont disponibles en neuf langues. Les références au code source ont été mises à jour le 14 septembre 2026 ; toutes les éditions comprennent les mêmes 1 053 entrées d’API et 47 programmes d’exemple complets. Ouvrez `fr/index.html` pour le français, `en/index.html` pour l’anglais ou `index.html` pour le japonais. Chaque volume permet de changer de langue. Les anciens relevés de compilation et d’exécution concernent la version testée à l’époque ; la mise à jour de la documentation du code ne signifie pas que ces essais ont été répétés.
+Les sept volumes sont disponibles en neuf langues et décrivent les sources du 14 septembre 2026. Toutes les éditions comprennent les mêmes 1 053 entrées d’API et 47 programmes d’exemple complets. Ouvrez `fr/index.html` pour le français, `en/index.html` pour l’anglais ou `index.html` pour le japonais. Chaque volume permet de changer de langue. Les comptes rendus de vérification précisent les sources, les exécutables et les conditions des tests.
 
 Les extraits source et les sorties enregistrées des outils sont conservés sans modification. Consultez [la configuration GitHub](GITHUB_SETUP.md) et les [vérifications de publication](PUBLICATION_CHECKS.md). Les pages HTML permettent la lecture hors connexion, la recherche dans un volume, la copie du code et l'impression.
 
@@ -68,7 +68,7 @@ python -B kitaq-docs/tools/check_bilingual.py
 
 Pour régénérer le français à partir de ses textes après la génération anglaise, utilisez `python kitaq-docs/tools/generate_i18n.py --language fr`. Les traductions sont rédigées dans les fichiers ; aucun service de traduction n'est appelé. Cette génération utilise Beautiful Soup.
 
-La collecte et la compilation nécessitent les arborescences source et leurs outils. La conversion des polices et les comparaisons de pixels utilisent Pillow. Lire le HTML ne nécessite ni Python ni serveur. Après avoir modifié les sources ou les exécutables, ne réutilisez pas d'anciens résultats comme preuve de la nouvelle version. Consultez les [corrections des compilateurs](verification/compiler_fixes.md) et les [mentions de tiers](THIRD_PARTY_NOTICES.md).
+La collecte et la compilation nécessitent les arborescences source et leurs outils. La conversion des polices et les comparaisons de pixels utilisent Pillow. Lire le HTML ne nécessite ni Python ni serveur. Consignez les empreintes des sources et des exécutables pour chaque vérification. Consultez les [corrections des compilateurs](verification/compiler_fixes.md) et les [mentions de tiers](THIRD_PARTY_NOTICES.md).
 
 ## Périmètre de cette publication
 

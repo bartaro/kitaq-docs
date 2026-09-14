@@ -1,1 +1,3 @@
+**NORCAL tire son nom du nord de la Californie (Northern California).** S’inspirant de cette référence géographique, DAISUKE OBA, l’auteur de KITAQGB, a choisi **Kitakyushu**, la ville où il est né et a grandi, pour former le nom KITAQGB.
+
 Le nom **KITAQGB** a un double sens : **Kernel-Informed Toolchain for AI-Quality Game Boy Development** et **KITAQ + Game Boy**. KITAQ évoque **北九**, prononcé **キタキュー**, le surnom de Kitakyushu, ville de la préfecture de Fukuoka, au Japon. En anglais, KITAQ se prononce **kee-tah-KYOO**, soit **/ˌkiːtɑːˈkjuː/** en alphabet phonétique international : la lettre Q se lit comme son nom anglais, « cue ». KITAQGB est un fork du NORCAL de Zachtronics et conserve la mention de droit d'auteur de Keith Holman.

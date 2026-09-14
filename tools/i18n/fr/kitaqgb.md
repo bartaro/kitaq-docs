@@ -1,5 +1,9 @@
 ## 1. Découvrir KITAQGB
-KITAQGB est un compilateur de la famille C pour GB/CGB, développé à partir du NORCAL de Zachtronics. {{ORIGIN}} Il lit les fichiers C, génère les instructions du processeur et les rassemble dans une ROM. Son langage, ses bibliothèques et ses conventions d'appel diffèrent de ceux d'un compilateur C pour ordinateur de bureau.
+KITAQGB est un compilateur de la famille C pour GB/CGB, développé à partir du NORCAL de Zachtronics.
+
+{{ORIGIN}}
+
+Il lit les fichiers C, génère les instructions du processeur et les rassemble dans une ROM. Son langage, ses bibliothèques et ses conventions d'appel diffèrent de ceux d'un compilateur C pour ordinateur de bureau.
 
 La GB possède un processeur 8 bits et peu de mémoire. La plupart des graphismes utilisent des tuiles de 8 × 8 pixels. Les sprites sont de petites images que l'on positionne indépendamment. Le texte nécessite lui aussi des tuiles graphiques : il ne faut pas compter sur un affichage de texte universel intégré. Ces exemples utilisent les glyphes du fichier `ascii.c` de l'auteur, réordonnés selon les codes ASCII pour la GB sans modifier leurs pixels. L'édition FC convertit les mêmes dessins au format CHR de la NES.
 
@@ -8,7 +12,7 @@ Installez un environnement Visual Studio/MSBuild ciblant .NET Framework 4.8. Uti
 
 {{CODE:0}}
 
-Si vous utilisez un exécutable fourni séparément, conservez ensemble les fichiers de cette version. Notez l'exécutable employé : une ancienne copie à la racine d'un espace de travail peut différer de celle qui vient d'être créée dans `bin\Release`. Le projet publié copie aussi l'exécutable compilé à la racine du dépôt `kitaqgb`.
+Gardez l’exécutable et ses fichiers de configuration ensemble. Indiquez le chemin du compilateur dans les commandes pour identifier précisément le fichier utilisé. La compilation du projet copie l’exécutable à la racine du dépôt `kitaqgb`.
 
 ## 3. Votre premier programme
 Le fichier fourni `samples/gb_hello.c` utilise les fonctions d'affichage et de texte de `gb_common.h`. Conservez cet en-tête avec les fichiers de police. La directive `#include` lit les déclarations ou les définitions contenues dans un autre fichier.
@@ -103,5 +107,5 @@ Repérez le nom de fichier, la ligne et le numéro de diagnostic KQ de la premi�
 
 {{CODE:11}}
 
-## Emplacement des sources après la réorganisation
-Les sources du compilateur se trouvent désormais dans le sous-dossier portant le même nom que leur dépôt. Les anciennes indications de chemin de la référence API conservent les chemins du 12 septembre. Consultez [la réorganisation des dossiers](../GITHUB_SETUP.md) pour établir la correspondance. Les chemins de l'exécutable à la racine et de la bibliothèque restent les mêmes.
+## Emplacement des sources
+Les sources du compilateur et le fichier projet se trouvent dans le sous-dossier portant le nom du dépôt. L’exécutable est à la racine et les bibliothèques dans `lib/`. Consultez la [structure des dossiers](../GITHUB_SETUP.md) pour les chemins et les prérequis de compilation.

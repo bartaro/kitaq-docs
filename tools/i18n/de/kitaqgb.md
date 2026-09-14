@@ -1,5 +1,9 @@
 ## 1. KITAQGB kennenlernen
-KITAQGB ist ein Compiler der C-Sprachfamilie für GB/CGB, der aus Zachtronics’ NORCAL hervorgegangen ist. {{ORIGIN}} Er liest C-Dateien, erzeugt CPU-Befehle und verpackt sie in eine ROM. Sprache, Bibliotheken und Aufrufkonventionen unterscheiden sich von einem C-Compiler für Desktop-Computer.
+KITAQGB ist ein Compiler der C-Sprachfamilie für GB/CGB, der aus Zachtronics’ NORCAL hervorgegangen ist.
+
+{{ORIGIN}}
+
+Er liest C-Dateien, erzeugt CPU-Befehle und verpackt sie in eine ROM. Sprache, Bibliotheken und Aufrufkonventionen unterscheiden sich von einem C-Compiler für Desktop-Computer.
 
 Der GB besitzt eine 8-Bit-CPU und wenig Speicher. Die Bildschirmgrafik besteht überwiegend aus Kacheln mit 8 × 8 Pixeln. Sprites sind kleine Bilder, die sich unabhängig positionieren lassen. Auch Text benötigt Kachelgrafik; eine allgemeine eingebaute Textausgabe wird nicht vorausgesetzt. Die Beispiele verwenden die Glyphen aus der `ascii.c` des Autors, für GB nach ASCII-Codes angeordnet, ohne ihre Bits zu verändern. Die FC-Ausgabe überträgt dieselben Formen in das NES-CHR-Layout.
 
@@ -8,7 +12,7 @@ Installieren Sie eine Visual-Studio-/MSBuild-Umgebung für .NET Framework 4.8. V
 
 {{CODE:0}}
 
-Wenn Sie eine separat gelieferte ausführbare Datei verwenden, halten Sie die zu ihrer Version gehörenden Dateien zusammen. Notieren Sie, welche Datei Sie ausgeführt haben: Eine ältere Kopie im Hauptverzeichnis kann sich von einem neuen Build unter `bin\Release` unterscheiden. Das veröffentlichte Projekt legt seine gebaute ausführbare Datei auch im Hauptverzeichnis des `kitaqgb`-Checkouts ab.
+Bewahren Sie die ausführbare Datei zusammen mit ihren Konfigurationsdateien auf. Geben Sie in Build-Befehlen den Compilerpfad ausdrücklich an. Beim Bauen des Projekts wird die ausführbare Datei in das Hauptverzeichnis des Repositorys `kitaqgb` kopiert.
 
 ## 3. Das erste Programm
 Die mitgelieferte `samples/gb_hello.c` nutzt Bildschirm- und Texthilfen aus `gb_common.h`. Bewahren Sie diesen Header zusammen mit den Schriftdateien auf. `#include` liest Deklarationen oder Definitionen aus einer anderen Datei ein.
@@ -103,5 +107,5 @@ Beginnen Sie beim ersten Fehler mit Dateiname, Zeile und KQ-Diagnosenummer. Spä
 
 {{CODE:11}}
 
-## Quellpfade nach der Umstrukturierung
-Die Compilerquellen liegen nun im gleichnamigen Unterverzeichnis ihres Repositorys. Ältere Quellenangaben können noch die frühere Anordnung verwenden. Die [Zuordnung der Pfade](../GITHUB_SETUP.md) hilft beim Vergleich. Die Pfade der ausführbaren Datei im Hauptverzeichnis und der Bibliothek bleiben unverändert.
+## Quellpfade
+Die Compilerquellen und die Projektdatei liegen im gleichnamigen Unterverzeichnis des Repositorys. Die ausführbare Datei liegt im Hauptverzeichnis, die Bibliotheken liegen in `lib/`. Die [Verzeichnisübersicht](../GITHUB_SETUP.md) nennt die Projektpfade und Build-Voraussetzungen.

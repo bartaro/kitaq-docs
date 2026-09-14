@@ -2,7 +2,7 @@
 O repositório inclui `kokura-cli.exe` na raiz. Baixe o ZIP do repositório e mantenha os avisos de licença junto do executável. Essa ferramenta para Windows x64 não precisa de Rust, Python ou .NET para rodar. Os passos de compilação abaixo servem para reconstruí-la a partir dos fontes. O código próprio do projeto é distribuído por DAISUKE OBA sob a licença MIT; as condições das dependências estão preservadas em BINARY_NOTICES.md e licenses/.
 
 ## 1. O que o KOKURA faz
-KOKURA emula programas GB/CGB e registra observações de imagem, áudio, execução da CPU, memória, bancos, entrada e eventos de diagnóstico. Este manual usa o nome atual `kokura-cli.exe`; não presuma que referências antigas a `kokuradbg` indiquem o executável desta distribuição.
+KOKURA emula programas GB/CGB e registra observações de imagem, áudio, execução da CPU, memória, bancos, entrada e eventos de diagnóstico. O executável de linha de comando é `kokura-cli.exe`.
 
 ## 2. Compilar e executar sua primeira ROM
 {{CODE:0}}

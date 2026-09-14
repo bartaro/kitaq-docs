@@ -19,7 +19,7 @@ Os links abaixo levam diretamente ao volume em português brasileiro.
 
 ## Manuais em HTML
 
-Os sete volumes estão disponíveis em nove idiomas. As referências ao código-fonte foram atualizadas em 14 de setembro de 2026; todas as edições incluem as mesmas 1.053 entradas de API e 47 programas de exemplo completos. Para ler localmente, abra `pt/index.html` em português, `en/index.html` em inglês ou `index.html` em japonês. Cada volume permite mudar de idioma. Os registros históricos de compilação e execução correspondem à versão testada na época; atualizar a documentação do código não significa repetir esses testes.
+Os sete volumes estão disponíveis em nove idiomas e descrevem o código-fonte de 14 de setembro de 2026. Todas as edições incluem as mesmas 1.053 entradas de API e 47 programas de exemplo completos. Abra `pt/index.html` em português, `en/index.html` em inglês ou `index.html` em japonês. Cada volume permite mudar de idioma. Os registros de verificação identificam os fontes, os executáveis e as condições dos testes.
 
 Trechos dos fontes originais e saídas capturadas das ferramentas são mantidos sem alterações. Consulte as [instruções de obtenção e organização dos repositórios](GITHUB_SETUP.md) e as [verificações de publicação](PUBLICATION_CHECKS.md). Os arquivos HTML podem ser lidos offline e oferecem busca dentro do volume, cópia de código e impressão.
 

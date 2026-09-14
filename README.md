@@ -25,7 +25,7 @@
 
 ### HTML manuals
 
-Seven complete volumes are available in nine languages, with source references updated on September 14, 2026. Every edition contains the same 1,053 API entries and 47 complete sample programs. Open `en/index.html` for English or `index.html` for Japanese; each volume provides language navigation. Historical build and execution records describe the version tested at the time. Updating source references does not rerun those tests.
+Seven complete volumes are available in nine languages, based on the source snapshot of September 14, 2026. Every edition contains the same 1,053 API entries and 47 complete sample programs. Open `en/index.html` for English or `index.html` for Japanese; each volume provides language navigation. Verification records identify the tested sources, executables and conditions.
 
 Original source excerpts and captured tool output are preserved verbatim. See [GitHub setup](GITHUB_SETUP.md) and [publication checks](PUBLICATION_CHECKS.md). The HTML files support offline reading, searching within a volume, copying code and printing.
 
@@ -87,7 +87,7 @@ python -B kitaq-docs/tools/check_site.py
 python -B kitaq-docs/tools/check_bilingual.py
 ```
 
-Source collection and builds require the original source trees and their tools. Font conversion and pixel comparisons use Pillow. Reading the HTML requires neither Python nor a server. After changing source code or executables, do not reuse old verification results as evidence of the new version. See [compiler changes](verification/compiler_fixes.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+Source collection and builds require the original source trees and their tools. Font conversion and pixel comparisons use Pillow. Reading the HTML requires neither Python nor a server. Record the source and executable hashes with each verification run. See [compiler verification](verification/compiler_fixes.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
 
 ### Scope of this source publication
 
@@ -103,7 +103,7 @@ KOKURA-GUI, KUROSAKI-GUI and PLITA are excluded from this upload. The published 
 
 ### 9言語のHTMLマニュアル
 
-7冊を9言語で収録し、ソースの説明を2026年9月14日時点の内容に更新しました。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。過去のビルド・実行記録は当時の版に対する結果であり、説明の更新だけでこれらの試験を再実行したことにはなりません。
+2026年9月14日のソースに基づく7冊のマニュアルを9言語で収録しています。各言語版に共通の1,053個のAPI項目と47本の完全なサンプルプログラムがあります。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。検証記録には使用したソース、実行ファイル、試験条件を記載しています。
 
 全言語に同じ1,053件のAPIと47本の完成サンプルを収録しています。元のソース抜粋とツール出力は原文のまま保持しています。[取得・配置手順](GITHUB_SETUP.md)と[公開時の確認記録](PUBLICATION_CHECKS.md)も参照してください。
 `index.html` を開いてください。オフラインで閲覧・巻内検索・コードのコピー・印刷ができます。

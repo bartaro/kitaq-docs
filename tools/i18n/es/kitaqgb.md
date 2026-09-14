@@ -1,5 +1,9 @@
 ## 1. Conocer KITAQGB
-KITAQGB es un compilador de la familia C para GB/CGB desarrollado a partir de NORCAL, de Zachtronics. {{ORIGIN}} Lee archivos C, genera instrucciones de CPU y las empaqueta en una ROM. Su lenguaje, bibliotecas y convenciones de llamada difieren de los de un compilador de escritorio.
+KITAQGB es un compilador de la familia C para GB/CGB desarrollado a partir de NORCAL, de Zachtronics.
+
+{{ORIGIN}}
+
+Lee archivos C, genera instrucciones de CPU y las empaqueta en una ROM. Su lenguaje, bibliotecas y convenciones de llamada difieren de los de un compilador de escritorio.
 
 GB tiene una CPU de 8 bits y poca memoria. La mayoría de los gráficos usan tiles de 8×8 píxeles. Los sprites son imágenes pequeñas que pueden colocarse de forma independiente. El texto también necesita tiles: no hay que dar por sentado un sistema universal de impresión de caracteres. Los ejemplos reordenan los glifos de `ascii.c` según ASCII para GB sin cambiar sus bits; la edición FC conserva las mismas formas en disposición NES CHR.
 
@@ -8,7 +12,7 @@ Instala un entorno Visual Studio/MSBuild con soporte para .NET Framework 4.8. Us
 
 {{CODE:0}}
 
-Si utilizas un ejecutable distribuido por separado, conserva juntos los archivos de esa versión y anota cuál ejecutaste. Una copia antigua en la raíz del espacio de trabajo puede diferir de la recién generada en `bin\Release`. El proyecto publicado también copia el ejecutable a la raíz del repositorio `kitaqgb`.
+Mantén juntos el ejecutable y sus archivos de configuración. Indica la ruta del compilador en los comandos para identificar con claridad cuál se utiliza. Al compilar el proyecto, el ejecutable se copia a la raíz del repositorio `kitaqgb`.
 
 ## 3. Tu primer programa
 `samples/gb_hello.c` utiliza las funciones auxiliares de pantalla y texto de `gb_common.h`. Mantén ese encabezado junto a los archivos de la fuente. `#include` incorpora declaraciones o definiciones de otro archivo.
@@ -103,5 +107,5 @@ Empieza por el archivo, la línea y el número KQ del primer error. Los siguient
 
 {{CODE:11}}
 
-## Ubicación del código tras reorganizar el repositorio
-Las fuentes del compilador están ahora en un subdirectorio con el mismo nombre que el repositorio. Las etiquetas históricas de la referencia conservan las rutas del 12 de septiembre. Consulta la [correspondencia de rutas](../GITHUB_SETUP.md). El ejecutable raíz y las rutas de biblioteca no han cambiado.
+## Ubicación del código fuente
+El código fuente del compilador y el archivo de proyecto están en el subdirectorio que lleva el nombre del repositorio. El ejecutable está en la raíz y las bibliotecas, en `lib/`. Consulta la [estructura de directorios](../GITHUB_SETUP.md) para conocer las rutas y los requisitos de compilación.

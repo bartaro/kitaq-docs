@@ -112,7 +112,7 @@ def page(key,title,subtitle,body):
  toc=''.join('<a href="#'+id+'">'+re.sub('<[^>]+>','',t)+'</a>' for id,t in headings)
  text='''<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>'''+E(title)+''' — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="'''+depth+'''assets/manual.css"></head><body><a class="skip" href="#main">本文へ</a><header class="mast"><a href="'''+depth+'''index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER'S MANUAL <b>2026.09</b></div></header><div class="layout"><aside><nav aria-label="巻の選択">'''+nav+'''</nav><label class="searchlabel" for="search">この巻を検索</label><input type="search" id="search" placeholder="例：入力 / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="この巻の目次">'''+toc+'''</nav><button class="print" type="button">この巻を印刷</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>'''+E(title)+'''</h1><p class="subtitle">'''+E(subtitle)+'''</p><div class="edition">初めての一行から、実行・観測・再テストまで。<br>ローカルソース採取：2026年9月14日</div></div>'''+body+'''<footer>2026-09-14版 • <a href="'''+depth+'''index.html">総合目次</a> • <a href="'''+depth+'''verification.html">検証記録</a> • <a href="'''+depth+'''reference/inventory.json">版の指紋</a><br>サンプルのビルド・エミュレータ実行・期待値照合は別項目として記録します。</footer></main></div><script src="'''+depth+'''assets/manual.js"></script></body></html>'''
  text=text.replace('</header>', '</header>'+language_nav(key,'ja','言語'), 1)
- dest=SITE/(key+'.html');dest.parent.mkdir(exist_ok=True,parents=True);dest.write_text(text,encoding='utf-8')
+ dest=SITE/(key+'.html');dest.parent.mkdir(exist_ok=True,parents=True);dest.write_text(text.replace('\r\n','\n'),encoding='utf-8',newline='\n')
 
 def samples_section(platform,manifest):
  out=['<h2 id="samples">完全なサンプルプログラム</h2><p>各プログラムの本体、共通ヘッダー、指定ascii.cとその変換素材を同梱しています。説明中のm_*は本書専用ヘルパーです。ビルドと操作・期待結果を一組として参照してください。</p><p><a href="samples/build.ps1">一括ビルド用PowerShell</a> ／ <a href="verification.html">実行結果・検証画像</a></p>']
@@ -123,7 +123,7 @@ def samples_section(platform,manifest):
   cmd=exe+' '+' '.join(libprefix+'/'+f for f in d['libs'])+' kitaq-docs/samples/'+d['file']+' -I '+libprefix+' -I kitaq-docs/samples -o out/'+d['id']+('.gb' if platform=='gb' else '.nes')
   cmd+=' --profile=dev --rst-disable --stack-bank=fixed' if platform=='gb' else ' --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr'
   cmd+=' '+' '.join(d['options'])
-  
+
   if d.get('known_issue'): cmd='# 既知のビルド制限：'+d['known_issue']+'\n'+cmd
   out.append('<details class="sample searchable" id="sample-'+d['id']+'"><summary>'+E(d['title'])+' <code>'+d['file']+'</code></summary><p>期待結果：'+E(d['expected'])+'</p><p><a href="samples/'+d['file']+'" download>ソースを保存</a> ／ <a href="verification.html#'+d['id']+'">検証状況</a></p>'+code(cmd,'powershell')+code(read(SITE/'samples'/d['file']))+'</details>')
  return ''.join(out)
@@ -131,7 +131,7 @@ def samples_section(platform,manifest):
 def api_section(platform,intrinsic):
  data=json.loads(read(SITE/'reference'/(platform+'-api.json')))
  records=[r for r in data['records'] if r['name'].startswith('__')==intrinsic]
- out=['<h2 id="api">'+('組み込み命令' if intrinsic else 'ライブラリAPI')+'辞典</h2><p>全'+str(len(records))+'項目。項目名を開くと書式・引数・原注記・使用例を読めます。「呼び出し断片」は単独ROMではなく周辺の初期化が必要です。「新設した引数受け渡し例」は、引数を用意した上位コードから使うための関数例で、実機器の操作確認を意味しません。</p>']
+ out=['<h2 id="api">'+('組み込み命令' if intrinsic else 'ライブラリAPI')+'辞典</h2><p>全'+str(len(records))+'項目。項目名を開くと書式・引数・原注記・使用例を読めます。「呼び出し断片」は単独ROMではなく周辺の初期化が必要です。「引数受け渡し例」は、引数を用意した上位コードから使うための関数例で、実機器の操作確認を意味しません。</p>']
  for mod in sorted(set(r['module'] for r in records)):
   out.append('<h3 id="module-'+mod+'">'+mod+'.h — '+E(MODULES.get(mod,'組み込み機能'))+'</h3>')
   for r in sorted((r for r in records if r['module']==mod),key=lambda r:r['name'].lower()):
@@ -149,7 +149,7 @@ def api_section(platform,intrinsic):
     if 'kitaq-docs/samples/' in ex['path']:
      f=ex['path'].split('/')[-1];out.append('<p><a href="samples/'+f+'">この例の完全なプログラム</a></p>')
    else:
-    out.append('<h4>新設した引数受け渡し例</h4>'+code(r.get('new_example',r['signature']))+'<p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p>')
+    out.append('<h4>引数受け渡し例</h4>'+code(r.get('new_example',r['signature']))+'<p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p>')
     folder=SITE/'samples/api-fragments'/platform;folder.mkdir(parents=True,exist_ok=True)
     file=folder/(r['name']+'.c');file.write_text('// Usage fragment, not a standalone ROM.\n// Declaration source: '+r['path']+'\n'+r.get('new_example',r['signature'])+'\n',encoding='utf-8')
     out.append('<p><a href="samples/api-fragments/'+platform+'/'+r['name']+'.c" download>この断片を保存</a></p>')
@@ -260,7 +260,7 @@ def main():
   page(key,title,sub,body)
  # Verification is generated from recorded outcomes rather than aspirational claims.
  results=json.loads(read(SITE/'verification/samples.json')) if (SITE/'verification/samples.json').exists() else []
- body='<h2 id="scope">今回の確認範囲</h2><p>以下は9月12日時点のソースに対する検証記録です。コンパイラ2種とKUROSAKI CLIは当時のソースからビルドし、KOKURAとSARAKURAはローカルの実行ファイルを使用しました。全機能・全周辺機器・実機の試験ではありません。後日のソース更新や翻訳だけで、ここにある実行結果を再確認したことにはなりません。公開用の追加確認は <a href="PUBLICATION_CHECKS.md">publication checks</a> に記録しています。</p><p>各サンプルのコンパイル終了コード、120フレームのエミュレータ実行、画面は以下です。期待値の画素照合は別の結果がある場合に明示します。終了コード0だけで入力・音・ゲーム挙動の正常を証明したとはしません。</p>'
+ body='<h2 id="scope">今回の確認範囲</h2><p>以下は9月12日時点のソースに対する検証記録です。コンパイラ2種とKUROSAKI CLIは記録したソースからビルドし、KOKURAとSARAKURAはローカルの実行ファイルを使用しました。全機能・全周辺機器・実機の試験ではありません。公開するソースと実行ファイルのビルド・実行検証は <a href="PUBLICATION_CHECKS.md">publication checks</a> に記録しています。</p><p>各サンプルのコンパイル終了コード、120フレームのエミュレータ実行、画面は以下です。期待値の画素照合は別の結果がある場合に明示します。終了コード0だけで入力・音・ゲーム挙動の正常を証明したとはしません。</p>'
  for r in results:
   id=r['id'];body+='<section id="'+id+'"><h2 id="result-'+id+'">'+id+'</h2><p>ビルド終了コード：'+E(str(r['build_exit']))+' ／ 実行：'+E(r['runtime'])+'</p><p>'+E(r.get('expected',''))+'</p>'
   if (SITE/'verification'/(id+'.png')).exists():body+='<img class="screen" loading="lazy" src="verification/'+id+'.png" alt="'+id+' のエミュレータ実行画面">'

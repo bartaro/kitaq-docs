@@ -30,7 +30,7 @@ A sintaxe da linguagem, as funções intrínsecas do compilador, as funções de
 As 26 letras maiúsculas, 10 algarismos, 26 letras minúsculas e 30 símbolos vêm do arquivo [ascii.c](samples/assets/ascii.c) do autor. Nenhum desenho de caractere foi acrescentado. Os 92 glifos originais foram preservados; consulte o [mapa de conversão](verification/font_conversion.json) e o [atlas de tiles](verification/font_source_atlas.png). O espaço usa um tile vazio. A barra invertida e a barra vertical não fazem parte da fonte fornecida e aparecem em branco. `gb_font.c` e `fc_font.c` exibem todos os glifos disponíveis.
 
 ## Edição e verificação
-Esta edição se baseia na **cópia local do código-fonte de 14 de setembro de 2026**. “Mais recente” se refere a essa cópia, não a um acompanhamento automático das futuras alterações no GitHub. O inventário de referência registra as identificações dos fontes e dos executáveis. Afirmações de suporte ou verificação em READMEs antigos não são tratadas automaticamente como garantias atuais.
+Este manual descreve o **código-fonte de 14 de setembro de 2026**. O inventário de referência registra os hashes dos fontes e dos executáveis. Consulte os registros de verificação para conhecer as entradas, as condições e o alcance de cada teste.
 
 Uma compilação bem-sucedida significa que uma ROM foi produzida. Uma verificação de execução significa que um emulador avançou pelo número indicado de quadros. Comparações de pixels, comportamento dos controles e testes de som são registrados separadamente. Isso não garante compatibilidade com todos os periféricos ou consoles físicos; os avisos continuam disponíveis nos registros.
 

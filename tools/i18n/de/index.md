@@ -30,7 +30,7 @@ Sprachsyntax, Compiler-Intrinsics, Bibliotheksfunktionen und Kommandozeilenopera
 Die 26 Großbuchstaben, 10 Ziffern, 26 Kleinbuchstaben und 30 Sonderzeichen stammen aus der [ascii.c des Autors](samples/assets/ascii.c). Es wurden keine weiteren Zeichenformen erfunden. Die ursprünglichen 92 Glyphen sind erhalten; siehe [Zuordnung der Umwandlung](verification/font_conversion.json) und [Kachelübersicht](verification/font_source_atlas.png). Das Leerzeichen verwendet eine leere Kachel. Rückstrich und senkrechter Strich fehlen in der gelieferten Schrift und erscheinen als Leerstellen. `gb_font.c` und `fc_font.c` zeigen alle gelieferten Glyphen.
 
 ## Ausgabe und Prüfstand
-Diese Ausgabe beruht auf dem **lokalen Quellenstand vom 14. September 2026**. „Aktuell“ bezeichnet diesen Stand und keine automatische Verfolgung späterer GitHub-Änderungen. Das Referenzinventar hält Prüfsummen von Quellen und ausführbaren Dateien fest. Frühere README-Aussagen über Unterstützung oder Tests gelten nicht automatisch als aktuelle Zusagen.
+Dieses Handbuch beschreibt den **Quellenstand vom 14. September 2026**. Das Referenzinventar enthält die Prüfsummen der Quellen und ausführbaren Dateien. Eingaben, Bedingungen und Umfang der einzelnen Tests entnehmen Sie den Prüfprotokollen.
 
 Ein erfolgreicher Build bedeutet, dass eine ROM erzeugt wurde. Ein Ausführungstest bedeutet, dass ein Emulator die angegebene Zahl von Frames durchlaufen hat. Pixelvergleiche, Eingabeverhalten und Tonprüfungen werden getrennt dokumentiert. Daraus folgt keine Garantie für jedes Zubehör oder jede reale Konsole; Warnungen bleiben in den Protokollen sichtbar.
 

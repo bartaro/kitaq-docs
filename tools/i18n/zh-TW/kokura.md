@@ -2,7 +2,7 @@
 儲存庫根目錄包含 `kokura-cli.exe`。下載 ZIP 後，請將授權聲明與執行檔一起保留。這個 Windows x64 CLI 執行時不必安裝 Rust、Python 或 .NET。以下建置步驟用於從原始碼重新產生程式。獨立專案程式碼由 DAISUKE OBA 以 MIT 授權提供；相依套件條件保留於 `BINARY_NOTICES.md` 和 `licenses/`。
 
 ## 1. KOKURA 的用途
-KOKURA 模擬 GB/CGB 軟體，記錄圖像、音訊、CPU 執行、記憶體、bank、輸入與診斷事件。本手冊使用目前檔名 `kokura-cli.exe`；不要將舊資料的 `kokuradbg` 當作本版執行檔名稱。
+KOKURA 模擬 GB/CGB 軟體，記錄圖像、音訊、CPU 執行、記憶體、bank、輸入與診斷事件。命令列工具的執行檔為 `kokura-cli.exe`。
 
 ## 2. 建置並執行第一個 ROM
 {{CODE:0}}

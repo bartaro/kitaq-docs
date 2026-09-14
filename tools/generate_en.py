@@ -16,7 +16,9 @@ BOOKS = [(k,n,t,s) for (k,n,t,_),s in zip(g.BOOKS,[
     'Game Boy C programming','Tools for building a game','Run, observe and record',
     'Famicom C programming','NES libraries and devices','NES and FDS execution and analysis',
     'Diagnostics, comparison and retesting'])]
-ORIGIN = """**KITAQGB has a double meaning.** **Kernel-Informed Toolchain for AI-Quality Game Boy Development** expresses the goal of a toolchain that understands its target machine and supports both human programmers and generative AI.
+ORIGIN = """**NORCAL takes its name from Northern California.** Following that geographical naming idea, KITAQGB’s author, DAISUKE OBA, chose **Kitakyushu**, the city where he was born and raised, as the basis for the name KITAQGB.
+
+**KITAQGB has a double meaning.** **Kernel-Informed Toolchain for AI-Quality Game Boy Development** expresses the goal of a toolchain that understands its target machine and supports both human programmers and generative AI.
 
 **KITAQ + GB** also combines **Game Boy** with **KITAQ**, representing **Kitakyushu**, a city in **Fukuoka Prefecture, Japan**. KITAQ comes from the city's nickname **北九 (キタキュー, Kitakyū)**. For English speakers, the pronunciation guide is **kee-tah-KYOO**, IPA **/ˌkiːtɑːˈkjuː/**; the final Q sounds like the English letter Q. Read KITAQGB as **kee-tah-KYOO jee bee**, saying G and B separately."""
 MODULES = dict(zip(g.MODULES, [
@@ -103,7 +105,7 @@ def page(key,title,subtitle,body):
     text = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>'+E(title)+' — KITAQ SERIES MANUAL</title><link rel="stylesheet" href="../assets/manual.css"></head><body><a class="skip" href="#main">Skip to content</a><header class="mast"><a href="index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER\'S MANUAL <b>2026.09</b> · <a href="../'+key+'.html" lang="ja" hreflang="ja">日本語</a></div></header><div class="layout"><aside><nav aria-label="Select a volume">'+nav+'</nav><label class="searchlabel" for="search">Search this volume</label><input type="search" id="search" placeholder="e.g. input / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="Volume contents">'+toc+'</nav><button class="print" type="button">Print this volume</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES • REFERENCE EDITION</p><h1>'+E(title)+'</h1><p class="subtitle">'+E(subtitle)+'</p><div class="edition">From your first line to execution, observation and retesting.<br>Source snapshot: September 14, 2026 · English edition: September 14, 2026</div></div>'+body+'<footer>Source edition 2026-09-14 • <a href="index.html">Contents</a> • <a href="verification.html">Verification</a> • <a href="../reference/inventory.json">Snapshot fingerprints</a><br>Sample builds, emulator execution and expected-result comparisons are recorded separately.</footer></main></div><script src="../assets/manual.js"></script></body></html>'
     text = text.replace(' · <a href="../'+key+'.html" lang="ja" hreflang="ja">日本語</a>', '')
     text = text.replace('</header>', '</header>'+language_nav(key,'en'), 1)
-    dest=S/'en'/(key+'.html');dest.parent.mkdir(exist_ok=True);dest.write_text(text,encoding='utf-8')
+    dest=S/'en'/(key+'.html');dest.parent.mkdir(exist_ok=True);dest.write_text(text.replace('\r\n','\n'),encoding='utf-8',newline='\n')
 
 def samples_section(platform,manifest):
     out=['<h2 id="samples">Complete sample programs</h2><p>Each program, the shared headers, the supplied ascii.c and its converted assets are included. Names beginning with m_ are helpers written for these manuals. Read each build command together with its expected result and verification record. Run commands from the parent of the sibling repository folders.</p><p><a href="samples/build.ps1">Batch build script</a> / <a href="verification.html">Results and screenshots</a></p>']
@@ -124,7 +126,7 @@ def samples_section(platform,manifest):
 def api_section(platform,intrinsic):
     data=json.loads(g.read(S/'reference'/(platform+'-api.json')))
     records=[r for r in data['records'] if r['name'].startswith('__')==intrinsic]
-    out=['<h2 id="api">'+('Compiler intrinsic' if intrinsic else 'Library API')+' dictionary</h2><p>'+str(len(records))+' entries. Open an entry for its syntax, arguments, source notes and usage example. Calling fragments require surrounding initialization; they are not standalone ROMs. Newly supplied argument-passing examples show how prepared values reach the API, and do not establish device-level verification.</p><p>Source excerpts and original declaration notes are reproduced verbatim, including comments in their original language. The English explanation precedes each declaration.</p>']
+    out=['<h2 id="api">'+('Compiler intrinsic' if intrinsic else 'Library API')+' dictionary</h2><p>'+str(len(records))+' entries. Open an entry for its syntax, arguments, source notes and usage example. Calling fragments require surrounding initialization; they are not standalone ROMs. Argument-passing examples show how prepared values reach the API, and do not establish device-level verification.</p><p>Source excerpts and original declaration notes are reproduced verbatim, including comments in their original language. The English explanation precedes each declaration.</p>']
     for mod in sorted(set(r['module'] for r in records)):
         out.append('<h3 id="module-'+mod+'">'+mod+'.h — '+E(MODULES.get(mod,'Compiler functionality'))+'</h3>')
         for r in sorted((r for r in records if r['module']==mod),key=lambda r:r['name'].lower()):
@@ -140,7 +142,7 @@ def api_section(platform,intrinsic):
                 out.append('<h4>Calling example (surrounding-code fragment)</h4>'+code(ex['code'])+'<p class="source">Source: '+E(ex['path'])+':'+str(ex['line'])+'</p>')
                 if 'kitaq-docs/samples/' in ex['path']:out.append('<p><a href="samples/'+ex['path'].split('/')[-1]+'">Complete program for this example</a></p>')
             else:
-                out.append('<h4>New argument-passing example</h4>'+code(r.get('new_example',r['signature']))+'<p>Prepare object initialization, buffer sizes, ROM banks and device state in the calling code. This function fragment has not been executed in isolation.</p><p><a href="samples/api-fragments/'+platform+'/'+r['name']+'.c" download>Download this fragment</a></p>')
+                out.append('<h4>Argument-passing example</h4>'+code(r.get('new_example',r['signature']))+'<p>Prepare object initialization, buffer sizes, ROM banks and device state in the calling code. This function fragment has not been executed in isolation.</p><p><a href="samples/api-fragments/'+platform+'/'+r['name']+'.c" download>Download this fragment</a></p>')
             d=r.get('definition')
             if d:out.append('<p class="source"><b>Implementation to include: </b><code>'+E(d['path'])+'</code>:'+str(d['line'])+'. Include the providers of any additional functions it calls.</p><details><summary>Read the current implementation</summary>'+code(d['body'])+'</details>')
             elif r.get('implementation_excerpt'):out.append('<details><summary>Code generator argument checks</summary>'+code(r['implementation_excerpt'],'csharp')+'</details>')
@@ -195,7 +197,7 @@ def asm_section(platform):
     return '<h2 id="assembly">Appendix: assembly instruction index</h2><p>This table is extracted from AsmInfo.cs. It describes the compiler internal spellings and operand formats. Entries with branch destinations or memory addresses are syntax examples, not standalone programs. Consult calling conventions and code generation for preserved registers and flag changes.</p>'+table
 
 def verification():
-    body='<h2 id="scope">Verification scope</h2><p>The records below belong to the September 12 source snapshot. The two compilers and KUROSAKI CLI were built from the collected sources. KOKURA and SARAKURA used local executables fingerprinted in the inventory. These checks do not cover all features, peripherals or physical hardware.</p><p>Each entry records compilation, a 120-frame emulator run and its screenshot. Pixel comparisons are separate evidence. Exit code zero alone does not prove correct input, sound or game behavior. Publication builds and workspace tests performed later are documented in <a href="../PUBLICATION_CHECKS.md">publication checks</a>; translating the manuals did not rerun every historical observation.</p>'
+    body='<h2 id="scope">Verification scope</h2><p>The records below belong to the September 12 source snapshot. The two compilers and KUROSAKI CLI were built from the collected sources. KOKURA and SARAKURA used local executables fingerprinted in the inventory. These checks do not cover all features, peripherals or physical hardware.</p><p>Each entry records compilation, a 120-frame emulator run and its screenshot. Pixel comparisons are separate evidence. Exit code zero alone does not prove correct input, sound or game behavior. Build and runtime evidence is documented in <a href="../PUBLICATION_CHECKS.md">publication checks</a>; test inputs and conditions are recorded there.</p>'
     results=json.loads(g.read(S/'verification/samples.json'))
     for r in results:
         ident=r['id'];body+='<section id="'+ident+'"><h2 id="result-'+ident+'">'+ident+'</h2><p>Build exit code: '+E(str(r['build_exit']))+' / Runtime status: '+E(r['runtime'])+'</p><p>'+E(r.get('expected',''))+'</p>'
@@ -203,7 +205,7 @@ def verification():
         body+='<p><a href="verification/'+ident+'-build.txt">Build log</a>'
         if (S/'verification'/(ident+'-runtime.txt')).exists():body+=' / <a href="verification/'+ident+'-runtime.txt">Runtime log</a>'
         body+='</p></section>'
-    for f,t in [('visual_checks.json','Pixel values and font comparisons'),('workflow.json','Diagnostic workflow'),('compiler_tests.json','Compiler regression checks'),('browser_checks.json','Historical browser display checks'),('site_checks.json','HTML structure and links'),('bilingual_checks.json','Complete bilingual edition checks'),('english_browser_checks.json','English edition browser checks')]:
+    for f,t in [('visual_checks.json','Pixel values and font comparisons'),('workflow.json','Diagnostic workflow'),('compiler_tests.json','Compiler regression checks'),('browser_checks.json','Browser display checks'),('site_checks.json','HTML structure and links'),('bilingual_checks.json','Complete bilingual edition checks'),('english_browser_checks.json','English edition browser checks')]:
         if (S/'verification'/f).exists():body+='<h2 id="'+f.replace('.','-')+'">'+t+'</h2>'+code(g.read(S/'verification'/f),'json')
     page('verification','VERIFICATION','Build, execution and display records',body)
 

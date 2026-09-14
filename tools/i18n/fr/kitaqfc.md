@@ -66,5 +66,5 @@ Les diagnostics KQ et les commandes de développement comme `symfind`, `src2asm`
 
 Des avertissements comme KQ2421, relatif aux accès directs au PPU, peuvent apparaître même pendant une initialisation avec affichage désactivé. Ne modifiez pas une initialisation sûre uniquement pour supprimer un avertissement : examinez le moment du rendu et les journaux d'exécution. Zéro erreur et zéro avertissement sont deux résultats différents.
 
-## Emplacement des sources après la réorganisation
-Les sources du compilateur se trouvent désormais dans le sous-dossier portant le même nom que leur dépôt. Les anciennes indications de chemin de la référence API conservent les chemins du 12 septembre. Consultez [la réorganisation des dossiers](../GITHUB_SETUP.md) pour établir la correspondance. Les chemins de l'exécutable à la racine et de la bibliothèque restent les mêmes.
+## Emplacement des sources
+Les sources du compilateur et le fichier projet se trouvent dans le sous-dossier portant le nom du dépôt. L’exécutable est à la racine et les bibliothèques dans `lib/`. Consultez la [structure des dossiers](../GITHUB_SETUP.md) pour les chemins et les prérequis de compilation.

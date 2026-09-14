@@ -66,5 +66,5 @@ KQ diagnostics and developer commands such as `symfind`, `src2asm` and `romdiff`
 
 Warnings such as KQ2421 for direct PPU operations can appear even in display-off initialization. Do not disrupt safe initialization merely to eliminate a warning: inspect rendering timing and execution logs. Zero errors and zero warnings are different outcomes.
 
-## Source locations after the layout update
-The compiler source files now live in the same-named subdirectory of their repository. Historical source labels in the API reference retain the September 12 paths. See [the layout update](../GITHUB_SETUP.md) for the mapping. The root executable and library paths are unchanged.
+## Source locations
+The compiler sources and project file are in the repository’s same-named subdirectory. The executable is at the repository root, and the libraries are in `lib/`. See [the directory layout](../GITHUB_SETUP.md) for project paths and build requirements.

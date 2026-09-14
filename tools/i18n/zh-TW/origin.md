@@ -1,1 +1,3 @@
+**NORCAL的名稱源自北加利福尼亞（Northern California）。** 受到這種以地名命名的方式啟發，KITAQGB的作者DAISUKE OBA選擇了自己出生並成長的城市——**北九州市**，作為KITAQGB名稱的由來。
+
 **KITAQGB 這個名稱有兩層意思。** **Kernel-Informed Toolchain for AI-Quality Game Boy Development** 表達了理解目標機器、同時支援程式設計者與生成式 AI 的開發工具這項目標。另一層是 **KITAQ + GB**：KITAQ 代表日本**福岡縣北九州市**的暱稱**北九（キタキュー，Kitakyū）**，GB 則是 **Game Boy**。KITAQ 依日語讀作「キタキュー」；供英語使用者參考的發音為 **kee-tah-KYOO**，國際音標為 **/ˌkiːtɑːˈkjuː/**，最後的 Q 與英文字母 Q 同音。KITAQGB 讀作 **kee-tah-KYOO jee bee**，G 與 B 分別讀出字母名稱。

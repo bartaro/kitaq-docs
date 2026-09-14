@@ -66,5 +66,5 @@ KQ-Diagnosen und Entwicklerbefehle wie `symfind`, `src2asm` und `romdiff` ähnel
 
 Warnungen wie KQ2421 für direkte PPU-Operationen können auch während der Initialisierung bei ausgeschalteter Anzeige auftreten. Ändern Sie eine sichere Initialisierung nicht allein, um eine Warnung zu beseitigen. Prüfen Sie den Darstellungszeitpunkt und die Ausführungsprotokolle. Keine Fehler und keine Warnungen sind unterschiedliche Ergebnisse.
 
-## Quellpfade nach der Umstrukturierung
-Die Compilerquellen liegen im gleichnamigen Unterverzeichnis ihres Repositorys. Ältere Quellenangaben können noch die frühere Anordnung verwenden; siehe [Pfadzuordnung](../GITHUB_SETUP.md). Die Pfade der ausführbaren Datei im Hauptverzeichnis und der Bibliothek bleiben unverändert.
+## Quellpfade
+Die Compilerquellen und die Projektdatei liegen im gleichnamigen Unterverzeichnis des Repositorys. Die ausführbare Datei liegt im Hauptverzeichnis, die Bibliotheken liegen in `lib/`. Die [Verzeichnisübersicht](../GITHUB_SETUP.md) nennt die Projektpfade und Build-Voraussetzungen.

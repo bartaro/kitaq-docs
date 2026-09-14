@@ -2,7 +2,7 @@
 저장소 루트에 `kokura-cli.exe`가 들어 있습니다. ZIP을 내려받아 실행 파일과 라이선스 문서를 함께 보관하세요. Windows x64용 CLI는 실행 시 Rust, Python, .NET 설치가 필요하지 않습니다. 아래 빌드 절차는 소스에서 다시 빌드할 때 사용합니다. 독자적으로 작성한 프로젝트 코드는 DAISUKE OBA가 MIT로 제공합니다. 의존 라이브러리의 조건은 `BINARY_NOTICES.md`와 `licenses/`에 유지합니다.
 
 ## 1. KOKURA의 역할
-KOKURA는 GB/CGB 소프트웨어를 에뮬레이션하고 화면, 음향, CPU 실행, 메모리, 뱅크, 입력, 진단 이벤트를 기록합니다. 현재 실행 파일 이름은 `kokura-cli.exe`입니다. 과거 자료의 `kokuradbg`가 이번 배포본의 파일 이름이라고 생각하지 마세요.
+KOKURA는 GB/CGB 소프트웨어를 에뮬레이션하고 화면, 음향, CPU 실행, 메모리, 뱅크, 입력, 진단 이벤트를 기록합니다. 명령줄 실행 파일은 `kokura-cli.exe`입니다.
 
 ## 2. 빌드하고 첫 ROM 실행하기
 {{CODE:0}}

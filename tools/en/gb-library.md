@@ -5,7 +5,7 @@ The library is a collection of reusable C source built on KITAQGB's `__` intrins
 
 {{CODE:1}}
 
-Each API entry identifies its declaration, header, implementation and usage example. Functions without an existing example have a new argument-passing fragment. The caller must supply the buffers and objects used by such fragments. Use the complete-program section for examples that can be built into ROMs directly.
+Each API entry identifies its declaration, header, implementation and usage example. Argument-passing fragments show how to call the API; the caller must prepare the buffers and objects they use. The complete-program section contains examples that can be built directly into ROMs.
 
 ## 2. Build one game frame
 `system_init` initializes frame management. `system_wait_vblank` waits and advances the software frame number. On GB, the VBlank callback is called cooperatively by that wait function; registering it does not install a hardware interrupt handler.
@@ -50,7 +50,7 @@ Compile `audio_hwregs_gb.c`, then `audio.c`, then the game source. Do not add du
 
 `Audio_PlayMusic(bank,song)` explicitly names the music bank. `Audio_PlaySFXBanked` plays an effect from another bank. Priorities arbitrate effects sharing physical channels. GB has four physical sound channels: CH1, CH2, CH3 and CH4.
 
-The music-stream commands `AUDIO_CMD_NOTE` and `AUDIO_CMD_SET_INST` retain a historical order: **0=CH1, 1=CH2, 2=CH4, 3=CH3**. Do not confuse it with ordinary API channel constants. The header currently defines `AUDIO_NOTE_MAX=67`.
+The music-stream commands `AUDIO_CMD_NOTE` and `AUDIO_CMD_SET_INST` use this channel encoding: **0=CH1, 1=CH2, 2=CH4, 3=CH3**. Do not confuse it with ordinary API channel constants. The header currently defines `AUDIO_NOTE_MAX=67`.
 
 The basic CH1 effect stream reads note/volume pairs per frame and ends on note 0. CH3 uses a different marker and format. See `gb_sound.c`. Fades advance during `Audio_Update`; stopping updates also stops a fade.
 
@@ -64,9 +64,9 @@ The patch sets the VBlank vector at 0x0040 and updates the checksum. Apply it on
 ## 9. Fixed point, physics and 3D
 In `fixed.h` Q8.8 arithmetic, 256 means 1.0 and 128 means 0.5. `gb_fixed.c` demonstrates `fix_from_int`, `fix_mul` and `fix_to_int`. Design value ranges before implementing calculations to avoid overflow.
 
-`physics2d` handles rectangles, `physics2d_circle` circles, and `physics3d` 3D AABBs. Initialize caller-owned world/body arrays, set velocity or gravity, then step the simulation. Use consistent position and per-step velocity units; the library performs no implicit pixel conversion. The circle example uses position 40 and velocity 2. A zero inverse mass denotes a static body. Check each coefficient and intermediate arithmetic range in the headers. In particular, the legacy `kq2d_body_apply_friction` casts its coefficient to a signed byte: values 128–255 are negative, not ordinary unsigned Q8 damping. See `gb_circle.c` for a complete step example.
+`physics2d` handles rectangles, `physics2d_circle` circles, and `physics3d` 3D AABBs. Initialize caller-owned world/body arrays, set velocity or gravity, then step the simulation. Use consistent position and per-step velocity units; the library performs no implicit pixel conversion. The circle example uses position 40 and velocity 2. A zero inverse mass denotes a static body. Check each coefficient and intermediate arithmetic range in the headers. In particular, `kq2d_body_apply_friction` casts its coefficient to a signed byte: values 128–255 are negative, not ordinary unsigned Q8 damping. See `gb_circle.c` for a complete step example.
 
-`wire3d_dmg` is a monochrome wireframe renderer for Game Boy. Select 128 × 96 with `wire3d_dmg_96.c`, or 128 × 120 with `wire3d_dmg.c`, and use `Wire3DDMG_*`. The old `wire3d` and `dmg3d` files remain compatibility entries for those respective profiles. Compile only one entry. `wire3d_cgb` retains its name and remains the separate color renderer. Reserve each renderer's RAM, VRAM and display regions explicitly. The two monochrome renderers reject depth-crossing edges rather than clipping them. Their scene occlusion uses face bounding rectangles and five samples along each line, so it is an approximation rather than per-pixel depth testing. The CGB path uses double speed and DMA and requires `--cgb=cgb_only`.
+`wire3d_dmg` is a monochrome wireframe renderer for Game Boy. Select 128 × 96 with `wire3d_dmg_96.c`, or 128 × 120 with `wire3d_dmg.c`, and use `Wire3DDMG_*`. `wire3d` and `dmg3d` provide alternative entry points for the 96-line and 120-line profiles, respectively. Compile one entry point per program. `wire3d_cgb` is the dedicated color renderer. Reserve each renderer's RAM, VRAM and display regions explicitly. The two monochrome renderers reject depth-crossing edges rather than clipping them. Their scene occlusion uses face bounding rectangles and five samples along each line, so it is an approximation rather than per-pixel depth testing. The CGB path uses double speed and DMA and requires `--cgb=cgb_only`.
 
 `Wire3DDMG_BeginFrame` (`WIRE3D_DMG_HEIGHT=96`) clears the stage. `Wire3DDMG_BeginFrame` (`WIRE3D_DMG_HEIGHT=120`) only resets occlusion state: DMG3D consumes and clears staged bytes during upload. Dirty transfer includes the previous frame's tiles to erase old pixels. Its auxiliary transfer shares part of the main stage; it is not an independent buffer. Match the frame sequence to the renderer you use.
 

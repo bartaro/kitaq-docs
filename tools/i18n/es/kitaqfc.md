@@ -66,5 +66,5 @@ Los diagnósticos KQ y comandos como `symfind`, `src2asm` y `romdiff` se parecen
 
 Avisos de acceso directo a PPU, como KQ2421, pueden aparecer incluso al inicializar con la pantalla apagada. No rompas una inicialización segura solo para eliminar un aviso: revisa tiempos de renderizado y registros. Cero errores y cero avisos son resultados distintos.
 
-## Ubicación de las fuentes
-Las fuentes del compilador están en el subdirectorio que comparte el nombre del repositorio. La referencia conserva rutas históricas del 12 de septiembre. Consulta la [reorganización](../GITHUB_SETUP.md); las rutas del ejecutable raíz y de las bibliotecas no han cambiado.
+## Ubicación del código fuente
+El código fuente del compilador y el archivo de proyecto están en el subdirectorio que lleva el nombre del repositorio. El ejecutable está en la raíz y las bibliotecas, en `lib/`. Consulta la [estructura de directorios](../GITHUB_SETUP.md) para conocer las rutas y los requisitos de compilación.

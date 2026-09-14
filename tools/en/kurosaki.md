@@ -55,7 +55,7 @@ Register changes, generated PCM and correctly sounding audio are separate checks
 KUROSAKI `--emit-diagnostics` takes a **JSONL file path**, just like KOKURA. Keep CPU traces and diagnostic-event files distinct.
 
 ## 10. Publication scope
-KUROSAKI-GUI remains unpublished. The current manual covers the CLI and its integration APIs.
+This manual covers the CLI and its integration APIs.
 
 ## 11. FDS and save RAM
 `fds-inspect` examines disk structure; `export-assets` exports assets. Test FDS separately from NES cartridges because startup, BIOS and disk-access requirements differ. Battery `.sav` files and `.kss.json` snapshots serve different purposes; use a save layout supported by the implementation.

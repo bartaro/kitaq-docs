@@ -1,5 +1,9 @@
 ## 1. Meet KITAQGB
-KITAQGB is a GB/CGB C-family compiler developed from Zachtronics' NORCAL. {{ORIGIN}} It reads C files, generates CPU instructions and packages them into a ROM. Its language, libraries and calling conventions differ from those of a desktop C compiler.
+KITAQGB is a GB/CGB C-family compiler developed from Zachtronics' NORCAL.
+
+{{ORIGIN}}
+
+It reads C files, generates CPU instructions and packages them into a ROM. Its language, libraries and calling conventions differ from those of a desktop C compiler.
 
 The GB has an 8-bit CPU and limited memory. Most screen graphics use 8-by-8-pixel tiles. Sprites are small independently positioned images. Text also needs tile graphics: a built-in universal text display is not assumed. These examples use the author's `ascii.c` glyphs, rearranged by ASCII code for GB without changing their bits. The FC edition converts the same shapes to NES CHR layout.
 
@@ -8,7 +12,7 @@ Install a Visual Studio/MSBuild environment targeting .NET Framework 4.8. Use a 
 
 {{CODE:0}}
 
-If using a separately supplied executable, keep the files belonging to that version together. Record which executable you used: an old copy at a workspace root can differ from a newly built `bin\Release` copy. The published project also places its built executable in the `kitaqgb` checkout root.
+Keep the executable and its accompanying configuration files together. Use an explicit path in build commands so that the compiler is clearly identified. Building the project copies the executable to the root of the `kitaqgb` repository.
 
 ## 3. Your first program
 The supplied `samples/gb_hello.c` uses screen and text helpers from `gb_common.h`. Keep that header and the font files together. `#include` reads declarations or definitions from another file.
@@ -103,5 +107,5 @@ Read the filename, line and KQ diagnostic number at the first error. Later error
 
 {{CODE:11}}
 
-## Source locations after the layout update
-The compiler source files now live in the same-named subdirectory of their repository. Historical source labels in the API reference retain the September 12 paths. See [the layout update](../GITHUB_SETUP.md) for the mapping. The root executable and library paths are unchanged.
+## Source locations
+The compiler sources and project file are in the repository’s same-named subdirectory. The executable is at the repository root, and the libraries are in `lib/`. See [the directory layout](../GITHUB_SETUP.md) for project paths and build requirements.

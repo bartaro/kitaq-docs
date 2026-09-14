@@ -1,5 +1,9 @@
 ## 1. Conheça o KITAQGB
-KITAQGB é um compilador da família C para GB/CGB desenvolvido a partir do NORCAL, da Zachtronics. {{ORIGIN}} Ele lê arquivos C, gera instruções de CPU e organiza tudo em uma ROM. Sua linguagem, suas bibliotecas e suas convenções de chamada diferem das de um compilador C para computadores de uso geral.
+KITAQGB é um compilador da família C para GB/CGB desenvolvido a partir do NORCAL, da Zachtronics.
+
+{{ORIGIN}}
+
+Ele lê arquivos C, gera instruções de CPU e organiza tudo em uma ROM. Sua linguagem, suas bibliotecas e suas convenções de chamada diferem das de um compilador C para computadores de uso geral.
 
 O GB tem uma CPU de 8 bits e pouca memória. A maior parte dos gráficos usa tiles de 8 × 8 pixels. Sprites são imagens pequenas posicionadas de forma independente. O texto também precisa de gráficos de tiles: não há uma tela de texto universal presumida pelo compilador. Estes exemplos usam os glifos do `ascii.c` do autor, reorganizados pelos códigos ASCII para GB sem alterar seus bits. A edição FC converte os mesmos desenhos para o formato CHR do NES.
 
@@ -8,7 +12,7 @@ Instale um ambiente Visual Studio/MSBuild com suporte ao .NET Framework 4.8. Use
 
 {{CODE:0}}
 
-Se estiver usando um executável distribuído separadamente, mantenha juntos os arquivos da mesma versão. Registre qual executável usou: uma cópia antiga na raiz do espaço de trabalho pode ser diferente de uma recém-compilada em `bin\Release`. O projeto publicado também coloca o executável compilado na raiz do repositório clonado de `kitaqgb`.
+Mantenha o executável junto com seus arquivos de configuração. Informe o caminho do compilador nos comandos para deixar claro qual arquivo será usado. A compilação do projeto copia o executável para a raiz do repositório `kitaqgb`.
 
 ## 3. Seu primeiro programa
 O exemplo `samples/gb_hello.c` usa funções auxiliares de tela e texto de `gb_common.h`. Mantenha esse cabeçalho e os arquivos da fonte de caracteres na mesma estrutura de pastas. `#include` lê declarações ou definições de outro arquivo.
@@ -103,5 +107,5 @@ Leia o nome do arquivo, a linha e o número de diagnóstico KQ do primeiro erro.
 
 {{CODE:11}}
 
-## Localização dos fontes após a reorganização
-Os fontes do compilador ficam agora em uma subpasta com o mesmo nome do repositório. As referências históricas da API conservam os caminhos de 12 de setembro. Consulte o [mapeamento da reorganização](../GITHUB_SETUP.md). Os caminhos do executável na raiz e da biblioteca continuam os mesmos.
+## Localização dos fontes
+Os fontes do compilador e o arquivo de projeto ficam na subpasta com o mesmo nome do repositório. O executável fica na raiz, e as bibliotecas, em `lib/`. Consulte a [estrutura de pastas](../GITHUB_SETUP.md) para ver os caminhos e os requisitos de compilação.
