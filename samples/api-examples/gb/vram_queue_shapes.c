@@ -1,5 +1,6 @@
 // Learn deferred VRAM writes, retained source pointers and queue capacity units.
 #include "gb_tile_example.h"
+#include "vram_example_colors.h"
 const u8 shape_patterns[48]={255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,240,128,128,192,192,224,224,240,240,248,248,252,252,254,254,255,255};
 #define MAP_BASE 0x9800
 #define EXPECTED_CAPACITY 32
@@ -28,6 +29,13 @@ void show(u8 row,const u8* label,u8 value) {
 void main() {
     tile_example_begin(); M_LCDC=0;
     __vram_copy(0x8010,shape_patterns,48);
+    vram_example_color(2,2,3,1,1);
+    vram_example_color(2,4,4,3,2);
+    vram_example_color(10,4,3,2,3);
+    vram_example_color(2,8,3,1,1);
+    vram_example_color(6,8,2,1,2);
+    vram_example_color(10,8,5,1,3);
+    vram_example_color(18,10,1,1,1);
     failures=0;
     block[0]=0; block[1]=2; block[2]=3;
     block[3]=3; block[4]=0; block[5]=2;

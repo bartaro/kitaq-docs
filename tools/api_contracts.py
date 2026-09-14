@@ -132,6 +132,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_padrepeat_examples(contracts))
     proofs.update(verified_expansion_examples(contracts))
     proofs.update(verified_vram_examples(contracts))
+    proofs.update(verified_vram_examples(contracts, 'vram-memory', {'gb': {'dmg', 'cgb'}}))
     for key in proofs:
         contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
     coverage = []
@@ -234,17 +235,18 @@ def verified_expansion_examples(contracts):
     return verified
 
 
-def verified_vram_examples(contracts):
+def verified_vram_examples(contracts, family='vram', modes=None):
     """Attach only complete, unchanged GB/FC queue geometry evidence."""
-    path = SITE/'verification/api-vram/results.json'
+    modes = modes or {'gb': {'dmg', 'cgb'}, 'fc': {'nrom'}}
+    path = SITE/('verification/api-'+family+'/results.json')
     if not path.exists(): return {}
     runs = json.loads(path.read_text(encoding='utf-8'))['records']
-    if len(runs)!=3 or not all(r['passed'] for r in runs): return {}
+    if len(runs)!=sum(len(values) for values in modes.values()) or not all(r['passed'] for r in runs): return {}
     verified = {}
     for key,contract in contracts.items():
-        if contract['review']!='vram-source-20260915': continue
+        if contract['review']!=family+'-source-20260915': continue
         selected = [r for r in runs if r['platform']==key.split(':')[0]]
-        if {r['mode'] for r in selected} != ({'dmg','cgb'} if key.startswith('gb:') else {'nrom'}):
+        if {r['mode'] for r in selected} != modes[key.split(':')[0]]:
             raise ValueError('Missing VRAM hardware mode: '+key)
         for run in selected:
             if run['source']!=contract['example']['program']:
@@ -254,7 +256,7 @@ def verified_vram_examples(contracts):
             for file,expected in files.items():
                 if hashlib.sha256((SITE/file).read_bytes()).hexdigest()!=expected:
                     raise ValueError('VRAM example evidence changed: '+file)
-        verified[key]={'api':key.split(':')[1],'kind':'vram','runs':selected}
+        verified[key]={'api':key.split(':')[1],'kind':family,'runs':selected}
     return verified
 
 
@@ -313,7 +315,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory']:
                 block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
                     block.append('<figure><img class="screen" loading="lazy" src="'+prefix+run['image']+'" alt="'+html.escape(name+': '+run['mode'].upper(),quote=True)+'"><figcaption>'+run['mode'].upper()+'</figcaption></figure>')

@@ -16,7 +16,7 @@ class Text(HTMLParser):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--browser',action='store_true')
-    parser.add_argument('--suite',choices=['input','padrepeat','expansion','vram'],default='input');args=parser.parse_args()
+    parser.add_argument('--suite',choices=['input','padrepeat','expansion','vram','vram-memory'],default='input');args=parser.parse_args()
     messages,ui,contracts=api_contracts.load()
     inputs={key:value for key,value in contracts.items() if value['review']==args.suite+'-source-20260915'}
     results=[]
@@ -39,7 +39,7 @@ def main():
                     assert contract['example']['code'].strip() in content,(language,key,'sample')
                     assert 'verification.html#api-'+platform+'-'+name in card,(language,key,'proof link')
                     results.append({'language':language,'api':key,'card':'passed'})
-    assert len(results)==len(inputs)*9 and len(inputs)=={'input':35,'padrepeat':6,'expansion':6,'vram':30}[args.suite], len(results)
+    assert len(results)==len(inputs)*9 and len(inputs)=={'input':35,'padrepeat':6,'expansion':6,'vram':30,'vram-memory':9}[args.suite], len(results)
     modules=json.loads((api_contracts.SOURCE/(args.suite+'_modules.json')).read_text(encoding='utf-8')) if args.suite in ['input','vram'] else {}
     module_count=0
     for index,language in enumerate(api_contracts.ORDER):
@@ -62,6 +62,7 @@ def main():
                 cases=[('gb','kitaqgb','__readpadex'),('fc','kitaqfc','__pad_dirs'),('fc','fc-library','input_repeat'),('fc','fc-library','nes_pad_repeat_step')] if args.suite=='input' else [('gb','kitaqgb','__padrep_lr'),('gb','kitaqgb','__padrep_mask')]
                 if args.suite=='expansion':cases=[('fc','kitaqfc',name) for name in ['__pad_read1_d1','__exp_pad_read2','__mic_read2p']]
                 if args.suite=='vram':cases=[('gb','gb-library','vram_queue_bg_rect'),('fc','fc-library','vram_queue_bg_block'),('fc','fc-library','vram_flush_now')]
+                if args.suite=='vram-memory':cases=[('gb','kitaqgb',name) for name in ['__vram_copy_dma','__fill_tilemap','__vram_memset_unsafe']]
                 for platform,volume,name in cases:
                     url=(folder/(volume+'.html')).as_uri()+'#api-'+name
                     page.goto(url)
@@ -82,7 +83,7 @@ def main():
             browser.close()
     report={'cards':results,'module_introductions':module_count,'browser':browser_results,'status':'passed'}
     report_name='document_checks.json' if args.browser else 'static_document_checks.json'
-    evidence_folder={'input':'api-input','padrepeat':'api-pad-repeat','expansion':'api-expansion-input','vram':'api-vram'}[args.suite]
+    evidence_folder={'input':'api-input','padrepeat':'api-pad-repeat','expansion':'api-expansion-input','vram':'api-vram','vram-memory':'api-vram-memory'}[args.suite]
     (SITE/'verification'/evidence_folder/report_name).write_text(json.dumps(report,indent=2),encoding='utf-8')
     print(str(len(results))+' localized cards; '+str(len(browser_results))+' browser image/return checks passed.')
 

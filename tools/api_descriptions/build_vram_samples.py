@@ -131,8 +131,8 @@ void main() {
 for platform in ['gb','fc']:
     prefix='// Learn deferred VRAM writes, retained source pointers and queue capacity units.\n'
     if platform=='gb':
-        prefix+='#include "gb_tile_example.h"\nconst u8 shape_patterns[48]={'+','.join(map(str,gb_patterns))+'};\n#define MAP_BASE 0x9800\n#define EXPECTED_CAPACITY 32\n#define EXPECTED_USED 7\n#define EXPECTED_LATCHED_RETURN 1\n#define EXPECTED_SINGLE_SIZE 1\n'
-        replacements={'DEMO_BEGIN':'tile_example_begin(); M_LCDC=0;\n    __vram_copy(0x8010,shape_patterns,48);','DEMO_DISPLAY':'M_LCDC=0x91;','FC_READY_TEST':'','FC_COMMIT':'','RESTORE_SCROLL':''}
+        prefix+='#include "gb_tile_example.h"\n#include "vram_example_colors.h"\nconst u8 shape_patterns[48]={'+','.join(map(str,gb_patterns))+'};\n#define MAP_BASE 0x9800\n#define EXPECTED_CAPACITY 32\n#define EXPECTED_USED 7\n#define EXPECTED_LATCHED_RETURN 1\n#define EXPECTED_SINGLE_SIZE 1\n'
+        replacements={'DEMO_BEGIN':'tile_example_begin(); M_LCDC=0;\n    __vram_copy(0x8010,shape_patterns,48);\n    vram_example_color(2,2,3,1,1);\n    vram_example_color(2,4,4,3,2);\n    vram_example_color(10,4,3,2,3);\n    vram_example_color(2,8,3,1,1);\n    vram_example_color(6,8,2,1,2);\n    vram_example_color(10,8,5,1,3);\n    vram_example_color(18,10,1,1,1);','DEMO_DISPLAY':'M_LCDC=0x91;','FC_READY_TEST':'','FC_COMMIT':'','RESTORE_SCROLL':''}
     else:
         prefix+='#include "fc_common.h"\n#define MAP_BASE 0x2000\n#define EXPECTED_CAPACITY 128\n#define EXPECTED_USED 52\n#define EXPECTED_LATCHED_RETURN 0\n#define EXPECTED_SINGLE_SIZE 4\n'
         replacements={'DEMO_BEGIN':'m_init(); m_wait();\n    __ppu_ctrl_set(0); __ppu_mask_set(0);','DEMO_DISPLAY':'__scroll_set(0,0); __ppu_ctrl_set(0x80); __ppu_mask_set(0x0A);',
