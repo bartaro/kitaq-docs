@@ -1664,109 +1664,117 @@ if (funcName == "__readpad")
             // Signed multiply where coefficient is Q1.7 (int8 scaled by 1/128).
             // Implemented as (a*b)&gt;&gt;8 then *2 (loses 1 bit of fractional precision).
             // Useful for sin/cos rotation coefficients in [-1, 1).
-            if (funcName == "__smul16x8_q1_</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:11320</p></details><details class="api searchable" id="api-__padrep"><summary><code>__padrep</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep(arg0, arg1, arg2, arg3);</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__padrep.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
-    if (args.Length != 4) Error(expr, "__padrep requires 4 arguments (state*, keys, trigger, mask)");
+            if (funcName == "__smul16x8_q1_</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:11320</p></details><details class="api searchable" id="api-__padrep" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep</code></summary><p>Programa la repetición de una sola acción seleccionada por <code>mask</code>. Si hay botones admitidos recién pulsados, elige el bit activo de menor peso y lo devuelve inmediatamente. En caso contrario, conserva la acción activa mientras siga admitida y mantenida. Cuando termina, adopta el bit de menor peso que continúe pulsado, sin emitir un pulso inmediato. Si no queda ninguno, borra el estado de ejecución.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __padrep(u8* state, u8 keys, u8 trigger, u8 mask);</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Parámetros</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>Puntero a cinco bytes consecutivos de RAM escribible, por ejemplo <code>u8 state[5]</code>. El formato es <code>[0] bit del botón activo</code>, <code>[1] espera inicial</code>, <code>[2] intervalo</code>, <code>[3] contador de espera transcurrida</code>, <code>[4] contador de repetición transcurrida</code>. Reserva un estado para cada repetición independiente e inicialízalo antes de usarlo. No se admite un puntero nulo, un área menor de cinco bytes ni compartir el estado entre las variantes direccionales y la general.</p></dd><dt><code>keys</code></dt><dd><p>Máscara completa de botones mantenidos con el formato GB <code>BTN_*</code>. Pasa una lectura de <code>__readpad</code>, el byte bajo de <code>__readpadex</code> o <code>input_current</code>; la función de repetición no lee el hardware.</p></dd><dt><code>trigger</code></dt><dd><p>Bits recién pulsados en esta actualización, con el mismo formato que <code>keys</code>: normalmente <code>keys &amp; ~previous_keys</code> o el byte alto de <code>__readpadex</code>. Incluye solo bits presentes también en <code>keys</code>. Pasar siempre la máscara mantenida reinicia erróneamente la pulsación inicial en cada llamada.</p></dd><dt><code>mask</code></dt><dd><p>Bits de botones GB admitidos, combinados con <code>|</code>. Cero desactiva todas las acciones y borra el estado de ejecución. Varios bits permiten varios candidatos, pero la función devuelve un único bit seleccionado por llamada, no una máscara de pulsos combinados.</p></dd></dl><h4>Valor devuelto</h4><p>Cero si no corresponde emitir un pulso; en caso contrario, uno de estos valores: 1, 2, 4, 8, 16, 32, 64, 128. El resultado distinto de cero es un bit de botón, no un booleano normalizado ni un recuento de repeticiones.</p><h4>Condiciones y límites</h4><p>Máscaras comunes: <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>. Un bit a 1 indica que el botón está mantenido. <code>input_*</code> usa este formato en GB y FC; las funciones FC de lectura directa emplean otro orden.</p><p>Espera inicial de 0 a 255 llamadas a la función de repetición. Con un valor positivo N, la primera repetición mantenida ocurre exactamente N llamadas después del pulso inicial. Con 0 se omite el caso de igualdad del retardo inicial y el intervalo determina cuándo llega el primer pulso mantenido. No se mide en milisegundos.</p><p>Intervalo de las repeticiones posteriores, de 0 a 255 llamadas. Un N positivo genera un pulso cada N actualizaciones válidas de mantenimiento tras la primera repetición. Cero genera uno en cada actualización válida después de la espera inicial; en esa fase, tanto 0 como 1 dan un pulso por actualización. Si espera e intervalo son 0, cada actualización mantenida emite un pulso.</p><p>Llama a la función una vez por ciclo de entrada previsto. Cada llamada modifica el estado y no espera a VBlank. Adoptar un botón mantenido sin un bit de nueva pulsación devuelve 0 en esa llamada e inicia una nueva espera. Estas funciones eligen una acción activa por estado; <code>input_repeat</code> mantiene temporizadores independientes para los ocho botones.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>result=__padrep(actions,keys,trigger,48); // A|B: select A, the lower bit.
+    if (result!=0) action_pulses++;</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa entrega lecturas de botones predefinidas a cuatro estados independientes para mostrar cuándo se repite una acción. Con espera 3 e intervalo 2, ocho llamadas numeradas del 0 al 7 generan pulsos en 0, 3, 5 y 7. RIGHT PULSES, DOWN PULSES, ACTION PULSES y ALIAS PULSES muestran 004. Las variantes generales reciben A y B juntos y seleccionan A (16). También se comprueban la inicialización, el reinicio, la prioridad de direcciones, la liberación, la adopción de una dirección ya mantenida, los tiempos cero y un argumento con una expresión. CHECKS muestra 057 y FAILED CHECKS debe mostrar 000. Es un ejemplo determinista del procesamiento de estado; no espera a que pulses botones.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:11117</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+    if (args.Length != 4) Error(expr, &quot;__padrep requires 4 arguments (state*, keys, trigger, mask)&quot;);
 
-    AsmOperand pm_done        = MakeUniqueLabel("padrepM_done");
-    AsmOperand pm_ret0        = MakeUniqueLabel("padrepM_ret0");
-    AsmOperand pm_no_trig     = MakeUniqueLabel("padrepM_notrig");
-    AsmOperand pm_reset_all   = MakeUniqueLabel("padrepM_reset");
-    AsmOperand pm_dir0        = MakeUniqueLabel("padrepM_dir0");
-    AsmOperand pm_have_dir    = MakeUniqueLabel("padrepM_havedir");
-    AsmOperand pm_first_rep   = MakeUniqueLabel("padrepM_firstrep");
-    AsmOperand pm_ret_dir     = MakeUniqueLabel("padrepM_retdir");
-    AsmOperand pm_skip_dasinc = MakeUniqueLabel("padrepM_skipdasinc");
-    AsmOperand pm_skip_arrinc = MakeUniqueLabel("padrepM_skiparrinc");
+    AsmOperand pm_done        = MakeUniqueLabel(&quot;padrepM_done&quot;);
+    AsmOperand pm_ret0        = MakeUniqueLabel(&quot;padrepM_ret0&quot;);
+    AsmOperand pm_no_trig     = MakeUniqueLabel(&quot;padrepM_notrig&quot;);
+    AsmOperand pm_reset_all   = MakeUniqueLabel(&quot;padrepM_reset&quot;);
+    AsmOperand pm_dir0        = MakeUniqueLabel(&quot;padrepM_dir0&quot;);
+    AsmOperand pm_have_dir    = MakeUniqueLabel(&quot;padrepM_havedir&quot;);
+    AsmOperand pm_first_rep   = MakeUniqueLabel(&quot;padrepM_firstrep&quot;);
+    AsmOperand pm_ret_dir     = MakeUniqueLabel(&quot;padrepM_retdir&quot;);
+    AsmOperand pm_skip_dasinc = MakeUniqueLabel(&quot;padrepM_skipdasinc&quot;);
+    AsmOperand pm_skip_arrinc = MakeUniqueLabel(&quot;padrepM_skiparrinc&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger, E = mask
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    CompileIntoA(args[3]); EmitAsm("LD_E_A"); // mask
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    CompileIntoA(args[3]); EmitAsm(&quot;LD_E_A&quot;); // mask
+    EmitAsm(&quot;POP_HL&quot;);
 
     // trigMasked = trigger &amp; mask -&gt; D
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_E");
-    EmitAsm("LD_D_A");
-    EmitAsm("OR_A");
-    EmitAsm("JP_Z", pm_no_trig);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_E&quot;);
+    EmitAsm(&quot;LD_D_A&quot;);
+    EmitAsm(&quot;OR_A&quot;);
+    EmitAsm(&quot;JP_Z&quot;, pm_no_trig);
 
     // select = lowbit(trigMasked) = x &amp; -x
-    EmitAsm("LD_A_D");
-    EmitAsm("CPL");
-    EmitAsm("INC_A");
-    EmitAsm("AND_D");
-    EmitAsm("LD_C_A"); // save selected in C
+    EmitAsm(&quot;LD_A_D&quot;);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;INC_A&quot;);
+    EmitAsm(&quot;AND_D&quot;);
+    EmitAsm(&quot;LD_C_A&quot;); // save selected in C
 
     // dirMask=selected, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_C");
-    EmitAsm("LD_HL_A"); // [0]=selected
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); Emi</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:11117</p></details><details class="api searchable" id="api-__padrep_down"><summary><code>__padrep_down</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_down(arg0, arg1, arg2);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_down(arg0, arg1, arg2);</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_down.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
-    if (args.Length != 3) Error(expr, "__padrep_down requires 3 arguments (state*, keys, trigger)");
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=selected
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); Emi</code></pre></div></details></details><details class="api searchable" id="api-__padrep_down" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_down</code></summary><p>Avanza un paso la repetición exclusiva de abajo. Una nueva pulsación de abajo devuelve 8 inmediatamente y reinicia los contadores. Mantener abajo genera los siguientes pulsos según los tiempos del estado; soltarlo borra el estado de ejecución. Los demás botones no activan esta repetición.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __padrep_down(u8* state, u8 keys, u8 trigger);</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Parámetros</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>Puntero a cinco bytes consecutivos de RAM escribible, por ejemplo <code>u8 state[5]</code>. El formato es <code>[0] bit del botón activo</code>, <code>[1] espera inicial</code>, <code>[2] intervalo</code>, <code>[3] contador de espera transcurrida</code>, <code>[4] contador de repetición transcurrida</code>. Reserva un estado para cada repetición independiente e inicialízalo antes de usarlo. No se admite un puntero nulo, un área menor de cinco bytes ni compartir el estado entre las variantes direccionales y la general.</p></dd><dt><code>keys</code></dt><dd><p>Máscara completa de botones mantenidos con el formato GB <code>BTN_*</code>. Pasa una lectura de <code>__readpad</code>, el byte bajo de <code>__readpadex</code> o <code>input_current</code>; la función de repetición no lee el hardware.</p></dd><dt><code>trigger</code></dt><dd><p>Bits recién pulsados en esta actualización, con el mismo formato que <code>keys</code>: normalmente <code>keys &amp; ~previous_keys</code> o el byte alto de <code>__readpadex</code>. Incluye solo bits presentes también en <code>keys</code>. Pasar siempre la máscara mantenida reinicia erróneamente la pulsación inicial en cada llamada.</p></dd></dl><h4>Valor devuelto</h4><p>Cero si no corresponde emitir un pulso; en caso contrario, uno de estos valores: 8. El resultado distinto de cero es un bit de botón, no un booleano normalizado ni un recuento de repeticiones.</p><h4>Condiciones y límites</h4><p>Máscaras comunes: <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>. Un bit a 1 indica que el botón está mantenido. <code>input_*</code> usa este formato en GB y FC; las funciones FC de lectura directa emplean otro orden.</p><p>Espera inicial de 0 a 255 llamadas a la función de repetición. Con un valor positivo N, la primera repetición mantenida ocurre exactamente N llamadas después del pulso inicial. Con 0 se omite el caso de igualdad del retardo inicial y el intervalo determina cuándo llega el primer pulso mantenido. No se mide en milisegundos.</p><p>Intervalo de las repeticiones posteriores, de 0 a 255 llamadas. Un N positivo genera un pulso cada N actualizaciones válidas de mantenimiento tras la primera repetición. Cero genera uno en cada actualización válida después de la espera inicial; en esa fase, tanto 0 como 1 dan un pulso por actualización. Si espera e intervalo son 0, cada actualización mantenida emite un pulso.</p><p>Llama a la función una vez por ciclo de entrada previsto. Cada llamada modifica el estado y no espera a VBlank. Adoptar un botón mantenido sin un bit de nueva pulsación devuelve 0 en esa llamada e inicia una nueva espera. Estas funciones eligen una acción activa por estado; <code>input_repeat</code> mantiene temporizadores independientes para los ocho botones.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>result=__padrep_down(down,keys,trigger);
+    if (result!=0) down_pulses++;</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa entrega lecturas de botones predefinidas a cuatro estados independientes para mostrar cuándo se repite una acción. Con espera 3 e intervalo 2, ocho llamadas numeradas del 0 al 7 generan pulsos en 0, 3, 5 y 7. RIGHT PULSES, DOWN PULSES, ACTION PULSES y ALIAS PULSES muestran 004. Las variantes generales reciben A y B juntos y seleccionan A (16). También se comprueban la inicialización, el reinicio, la prioridad de direcciones, la liberación, la adopción de una dirección ya mantenida, los tiempos cero y un argumento con una expresión. CHECKS muestra 057 y FAILED CHECKS debe mostrar 000. Es un ejemplo determinista del procesamiento de estado; no espera a que pulses botones.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_down">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10937</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+    if (args.Length != 3) Error(expr, &quot;__padrep_down requires 3 arguments (state*, keys, trigger)&quot;);
 
-    AsmOperand pd_done        = MakeUniqueLabel("padrepD_done");
-    AsmOperand pd_ret0        = MakeUniqueLabel("padrepD_ret0");
-    AsmOperand pd_no_trig     = MakeUniqueLabel("padrepD_notrig");
-    AsmOperand pd_dir0        = MakeUniqueLabel("padrepD_dir0");
-    AsmOperand pd_have_dir    = MakeUniqueLabel("padrepD_havedir");
-    AsmOperand pd_first_rep   = MakeUniqueLabel("padrepD_firstrep");
-    AsmOperand pd_ret_dir     = MakeUniqueLabel("padrepD_retdir");
-    AsmOperand pd_skip_dasinc = MakeUniqueLabel("padrepD_skipdasinc");
-    AsmOperand pd_skip_arrinc = MakeUniqueLabel("padrepD_skiparrinc");
-    AsmOperand pd_reset_all   = MakeUniqueLabel("padrepD_reset");
+    AsmOperand pd_done        = MakeUniqueLabel(&quot;padrepD_done&quot;);
+    AsmOperand pd_ret0        = MakeUniqueLabel(&quot;padrepD_ret0&quot;);
+    AsmOperand pd_no_trig     = MakeUniqueLabel(&quot;padrepD_notrig&quot;);
+    AsmOperand pd_dir0        = MakeUniqueLabel(&quot;padrepD_dir0&quot;);
+    AsmOperand pd_have_dir    = MakeUniqueLabel(&quot;padrepD_havedir&quot;);
+    AsmOperand pd_first_rep   = MakeUniqueLabel(&quot;padrepD_firstrep&quot;);
+    AsmOperand pd_ret_dir     = MakeUniqueLabel(&quot;padrepD_retdir&quot;);
+    AsmOperand pd_skip_dasinc = MakeUniqueLabel(&quot;padrepD_skipdasinc&quot;);
+    AsmOperand pd_skip_arrinc = MakeUniqueLabel(&quot;padrepD_skiparrinc&quot;);
+    AsmOperand pd_reset_all   = MakeUniqueLabel(&quot;padrepD_reset&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    EmitAsm(&quot;POP_HL&quot;);
 
     // --- Trigger Down? (bit3 = 0x08) ---
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_IMM", new AsmOperand(0x08, AddressMode.Immediate));
-    EmitAsm("JP_Z", pd_no_trig);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x08, AddressMode.Immediate));
+    EmitAsm(&quot;JP_Z&quot;, pd_no_trig);
 
     // dirMask=0x08, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_IMM", new AsmOperand(0x08, AddressMode.Immediate));
-    EmitAsm("LD_HL_A"); // [0]=0x08
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // dasCnt=0
-    EmitAsm("INC_HL");
-    EmitAsm("LD_HL_A"); // arrCnt=0
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x08, AddressMode.Immediate));
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0x08
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // dasCnt=0
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // arrCnt=0
+    EmitAsm(&quot;POP_HL&quot;);
 
-    EmitAsm</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:10937</p></details><details class="api searchable" id="api-__padrep_init"><summary><code>__padrep_init</code><span class="badge">Función intrínseca del compilador</span></summary><p>Preparar el estado inicial. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_init(arg0, arg1, arg2);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_init(arg0, arg1, arg2);</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_init.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
-    if (args.Length != 3) Error(expr, "__padrep_init requires 3 arguments (state*, das, arr)");
+    EmitAsm</code></pre></div></details></details><details class="api searchable" id="api-__padrep_init" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_init</code></summary><p>Inicializa los cinco bytes de estado que proporciona el programa: borra la acción activa y ambos contadores, y guarda la espera inicial y el intervalo de repetición. No lee botones ni genera pulsos.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __padrep_init(u8* state, u8 das, u8 arr);</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Parámetros</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>Puntero a cinco bytes consecutivos de RAM escribible, por ejemplo <code>u8 state[5]</code>. El formato es <code>[0] bit del botón activo</code>, <code>[1] espera inicial</code>, <code>[2] intervalo</code>, <code>[3] contador de espera transcurrida</code>, <code>[4] contador de repetición transcurrida</code>. Reserva un estado para cada repetición independiente e inicialízalo antes de usarlo. No se admite un puntero nulo, un área menor de cinco bytes ni compartir el estado entre las variantes direccionales y la general.</p></dd><dt><code>das</code></dt><dd><p>Espera inicial de 0 a 255 llamadas a la función de repetición. Con un valor positivo N, la primera repetición mantenida ocurre exactamente N llamadas después del pulso inicial. Con 0 se omite el caso de igualdad del retardo inicial y el intervalo determina cuándo llega el primer pulso mantenido. No se mide en milisegundos.</p></dd><dt><code>arr</code></dt><dd><p>Intervalo de las repeticiones posteriores, de 0 a 255 llamadas. Un N positivo genera un pulso cada N actualizaciones válidas de mantenimiento tras la primera repetición. Cero genera uno en cada actualización válida después de la espera inicial; en esa fase, tanto 0 como 1 dan un pulso por actualización. Si espera e intervalo son 0, cada actualización mantenida emite un pulso.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_init(lr,3,2);
+// Active action and counters are zero; delay and interval are retained.
+expect(lr[0],0); expect(lr[1],3); expect(lr[2],2);
+expect(lr[3],0); expect(lr[4],0);</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa entrega lecturas de botones predefinidas a cuatro estados independientes para mostrar cuándo se repite una acción. Con espera 3 e intervalo 2, ocho llamadas numeradas del 0 al 7 generan pulsos en 0, 3, 5 y 7. RIGHT PULSES, DOWN PULSES, ACTION PULSES y ALIAS PULSES muestran 004. Las variantes generales reciben A y B juntos y seleccionan A (16). También se comprueban la inicialización, el reinicio, la prioridad de direcciones, la liberación, la adopción de una dirección ya mantenida, los tiempos cero y un argumento con una expresión. CHECKS muestra 057 y FAILED CHECKS debe mostrar 000. Es un ejemplo determinista del procesamiento de estado; no espera a que pulses botones.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_init">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10676</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+    if (args.Length != 3) Error(expr, &quot;__padrep_init requires 3 arguments (state*, das, arr)&quot;);
 
     // Evaluate args with register safety
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // das
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // arr
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // das
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // arr
+    EmitAsm(&quot;POP_HL&quot;);
 
     // dirMask = 0; dasCnt=0; arrCnt=0; store params
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [0]=0
-    EmitAsm("INC_HL");
-    EmitAsm("LD_A_B");
-    EmitAsm("LD_HL_A"); // [1]=das
-    EmitAsm("INC_HL");
-    EmitAsm("LD_A_C");
-    EmitAsm("LD_HL_A"); // [2]=arr
-    EmitAsm("INC_HL");
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [3]=dasCnt
-    EmitAsm("INC_HL");
-    EmitAsm("LD_HL_A"); // [4]=arrCnt
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_A_B&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [1]=das
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [2]=arr
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [3]=dasCnt
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [4]=arrCnt
     return;
 }
 
@@ -1774,119 +1782,126 @@ if (funcName == "__readpad")
 // Resets runtime counters for PadRepeatState while keeping das/arr params:
 // dirMask=0, dasCnt=0, arrCnt=0
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__padrep_reset")
+if (funcName == &quot;__padrep_reset&quot;)
 {
-    if (args.Length != 1) Error(expr, "__padrep_reset requires 1 argument (state*)");
+    if (args.Length != 1) Error(expr, &quot;__padrep_reset requires 1 argument (state*)&quot;);
 
     CompileIntoHL(args[0]);
 
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [0]=0 (dirMask)
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0 (dirMask)
 
     // [3]=0, [4]=0
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("LD_HL_A");
-    EmitAsm("INC_HL"); // -&gt; [4]
-    EmitAsm("LD_HL_A");
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;INC_HL&quot;); // -&gt; [4]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;POP_HL&quot;);
     return;
 }
 
 // __padrep_lr(state*, keys, trigger) returns Right (1), Left (2), or zero.
 // New triggers take priority, with Right selected first when both trigger bits are set.
-// Without a new</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:10676</p></details><details class="api searchable" id="api-__padrep_lr"><summary><code>__padrep_lr</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_lr(arg0, arg1, arg2);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_lr(arg0, arg1, arg2);</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_lr.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
-    if (args.Length != 3) Error(expr, "__padrep_lr requires 3 arguments (state*, keys, trigger)");
+// Without a new</code></pre></div></details></details><details class="api searchable" id="api-__padrep_lr" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_lr</code></summary><p>Avanza un paso la repetición de izquierda o derecha. Una nueva pulsación de derecha devuelve 1 de inmediato; en su defecto, una de izquierda devuelve 2. Si ambas son nuevas, gana derecha. Sin pulsaciones nuevas, mantener ambas direcciones devuelve 0 y congela los contadores; no mantener ninguna borra el estado de ejecución.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __padrep_lr(u8* state, u8 keys, u8 trigger);</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Parámetros</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>Puntero a cinco bytes consecutivos de RAM escribible, por ejemplo <code>u8 state[5]</code>. El formato es <code>[0] bit del botón activo</code>, <code>[1] espera inicial</code>, <code>[2] intervalo</code>, <code>[3] contador de espera transcurrida</code>, <code>[4] contador de repetición transcurrida</code>. Reserva un estado para cada repetición independiente e inicialízalo antes de usarlo. No se admite un puntero nulo, un área menor de cinco bytes ni compartir el estado entre las variantes direccionales y la general.</p></dd><dt><code>keys</code></dt><dd><p>Máscara completa de botones mantenidos con el formato GB <code>BTN_*</code>. Pasa una lectura de <code>__readpad</code>, el byte bajo de <code>__readpadex</code> o <code>input_current</code>; la función de repetición no lee el hardware.</p></dd><dt><code>trigger</code></dt><dd><p>Bits recién pulsados en esta actualización, con el mismo formato que <code>keys</code>: normalmente <code>keys &amp; ~previous_keys</code> o el byte alto de <code>__readpadex</code>. Incluye solo bits presentes también en <code>keys</code>. Pasar siempre la máscara mantenida reinicia erróneamente la pulsación inicial en cada llamada.</p></dd></dl><h4>Valor devuelto</h4><p>Cero si no corresponde emitir un pulso; en caso contrario, uno de estos valores: 1, 2. El resultado distinto de cero es un bit de botón, no un booleano normalizado ni un recuento de repeticiones.</p><h4>Condiciones y límites</h4><p>Máscaras comunes: <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>. Un bit a 1 indica que el botón está mantenido. <code>input_*</code> usa este formato en GB y FC; las funciones FC de lectura directa emplean otro orden.</p><p>Espera inicial de 0 a 255 llamadas a la función de repetición. Con un valor positivo N, la primera repetición mantenida ocurre exactamente N llamadas después del pulso inicial. Con 0 se omite el caso de igualdad del retardo inicial y el intervalo determina cuándo llega el primer pulso mantenido. No se mide en milisegundos.</p><p>Intervalo de las repeticiones posteriores, de 0 a 255 llamadas. Un N positivo genera un pulso cada N actualizaciones válidas de mantenimiento tras la primera repetición. Cero genera uno en cada actualización válida después de la espera inicial; en esa fase, tanto 0 como 1 dan un pulso por actualización. Si espera e intervalo son 0, cada actualización mantenida emite un pulso.</p><p>Llama a la función una vez por ciclo de entrada previsto. Cada llamada modifica el estado y no espera a VBlank. Adoptar un botón mantenido sin un bit de nueva pulsación devuelve 0 en esa llamada e inicia una nueva espera. Estas funciones eligen una acción activa por estado; <code>input_repeat</code> mantiene temporizadores independientes para los ocho botones.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>result=__padrep_lr(lr,keys,trigger);
+    if (result!=0) pulses++;</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa entrega lecturas de botones predefinidas a cuatro estados independientes para mostrar cuándo se repite una acción. Con espera 3 e intervalo 2, ocho llamadas numeradas del 0 al 7 generan pulsos en 0, 3, 5 y 7. RIGHT PULSES, DOWN PULSES, ACTION PULSES y ALIAS PULSES muestran 004. Las variantes generales reciben A y B juntos y seleccionan A (16). También se comprueban la inicialización, el reinicio, la prioridad de direcciones, la liberación, la adopción de una dirección ya mantenida, los tiempos cero y un argumento con una expresión. CHECKS muestra 057 y FAILED CHECKS debe mostrar 000. Es un ejemplo determinista del procesamiento de estado; no espera a que pulses botones.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_lr">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10732</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+    if (args.Length != 3) Error(expr, &quot;__padrep_lr requires 3 arguments (state*, keys, trigger)&quot;);
 
-    AsmOperand pr_done        = MakeUniqueLabel("padrep_done");
-    AsmOperand pr_ret0        = MakeUniqueLabel("padrep_ret0");
-    AsmOperand pr_check_left  = MakeUniqueLabel("padrep_chkL");
-    AsmOperand pr_no_trig     = MakeUniqueLabel("padrep_notrig");
-    AsmOperand pr_reset_all   = MakeUniqueLabel("padrep_reset");
-    AsmOperand pr_dir0        = MakeUniqueLabel("padrep_dir0");
-    AsmOperand pr_have_dir    = MakeUniqueLabel("padrep_havedir");
-    AsmOperand pr_first_rep   = MakeUniqueLabel("padrep_firstrep");
-    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep_retdir");
-    AsmOperand pr_skip_dasinc = MakeUniqueLabel("padrep_skipdasinc");
-    AsmOperand pr_skip_arrinc = MakeUniqueLabel("padrep_skiparrinc");
+    AsmOperand pr_done        = MakeUniqueLabel(&quot;padrep_done&quot;);
+    AsmOperand pr_ret0        = MakeUniqueLabel(&quot;padrep_ret0&quot;);
+    AsmOperand pr_check_left  = MakeUniqueLabel(&quot;padrep_chkL&quot;);
+    AsmOperand pr_no_trig     = MakeUniqueLabel(&quot;padrep_notrig&quot;);
+    AsmOperand pr_reset_all   = MakeUniqueLabel(&quot;padrep_reset&quot;);
+    AsmOperand pr_dir0        = MakeUniqueLabel(&quot;padrep_dir0&quot;);
+    AsmOperand pr_have_dir    = MakeUniqueLabel(&quot;padrep_havedir&quot;);
+    AsmOperand pr_first_rep   = MakeUniqueLabel(&quot;padrep_firstrep&quot;);
+    AsmOperand pr_ret_dir     = MakeUniqueLabel(&quot;padrep_retdir&quot;);
+    AsmOperand pr_skip_dasinc = MakeUniqueLabel(&quot;padrep_skipdasinc&quot;);
+    AsmOperand pr_skip_arrinc = MakeUniqueLabel(&quot;padrep_skiparrinc&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    EmitAsm(&quot;POP_HL&quot;);
 
     // --- Trigger Right? (bit0) ---
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_IMM", new AsmOperand(0x01, AddressMode.Immediate));
-    EmitAsm("JP_Z", pr_check_left);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x01, AddressMode.Immediate));
+    EmitAsm(&quot;JP_Z&quot;, pr_check_left);
 
     // dirMask=0x01, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_IMM", new AsmOperand(0x01, AddressMode.Immediate));
-    EmitAsm("LD_HL_A"); // [0]=0x01
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // dasCnt=0
-    EmitAsm("INC_HL");
-    EmitAsm("LD_HL_A")</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:10732</p></details><details class="api searchable" id="api-__padrep_mask"><summary><code>__padrep_mask</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_mask(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_mask(arg0, arg1, arg2, arg3);</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_mask.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
-    if (args.Length != 4) Error(expr, "__padrep requires 4 arguments (state*, keys, trigger, mask)");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x01, AddressMode.Immediate));
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0x01
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // dasCnt=0
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;)</code></pre></div></details></details><details class="api searchable" id="api-__padrep_mask" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_mask</code></summary><p><code>__padrep_mask</code> es otro nombre de <code>__padrep</code>; ambas llamadas usan la misma implementación del compilador. Comparten selección de una sola acción, tiempos, formato del estado y valores devueltos. El nombre explícito ayuda a reconocer en la llamada que la selección se hace mediante una máscara.</p><p>Programa la repetición de una sola acción seleccionada por <code>mask</code>. Si hay botones admitidos recién pulsados, elige el bit activo de menor peso y lo devuelve inmediatamente. En caso contrario, conserva la acción activa mientras siga admitida y mantenida. Cuando termina, adopta el bit de menor peso que continúe pulsado, sin emitir un pulso inmediato. Si no queda ninguno, borra el estado de ejecución.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __padrep_mask(u8* state, u8 keys, u8 trigger, u8 mask);</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Parámetros</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>Puntero a cinco bytes consecutivos de RAM escribible, por ejemplo <code>u8 state[5]</code>. El formato es <code>[0] bit del botón activo</code>, <code>[1] espera inicial</code>, <code>[2] intervalo</code>, <code>[3] contador de espera transcurrida</code>, <code>[4] contador de repetición transcurrida</code>. Reserva un estado para cada repetición independiente e inicialízalo antes de usarlo. No se admite un puntero nulo, un área menor de cinco bytes ni compartir el estado entre las variantes direccionales y la general.</p></dd><dt><code>keys</code></dt><dd><p>Máscara completa de botones mantenidos con el formato GB <code>BTN_*</code>. Pasa una lectura de <code>__readpad</code>, el byte bajo de <code>__readpadex</code> o <code>input_current</code>; la función de repetición no lee el hardware.</p></dd><dt><code>trigger</code></dt><dd><p>Bits recién pulsados en esta actualización, con el mismo formato que <code>keys</code>: normalmente <code>keys &amp; ~previous_keys</code> o el byte alto de <code>__readpadex</code>. Incluye solo bits presentes también en <code>keys</code>. Pasar siempre la máscara mantenida reinicia erróneamente la pulsación inicial en cada llamada.</p></dd><dt><code>mask</code></dt><dd><p>Bits de botones GB admitidos, combinados con <code>|</code>. Cero desactiva todas las acciones y borra el estado de ejecución. Varios bits permiten varios candidatos, pero la función devuelve un único bit seleccionado por llamada, no una máscara de pulsos combinados.</p></dd></dl><h4>Valor devuelto</h4><p>Cero si no corresponde emitir un pulso; en caso contrario, uno de estos valores: 1, 2, 4, 8, 16, 32, 64, 128. El resultado distinto de cero es un bit de botón, no un booleano normalizado ni un recuento de repeticiones.</p><h4>Condiciones y límites</h4><p>Máscaras comunes: <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>. Un bit a 1 indica que el botón está mantenido. <code>input_*</code> usa este formato en GB y FC; las funciones FC de lectura directa emplean otro orden.</p><p>Espera inicial de 0 a 255 llamadas a la función de repetición. Con un valor positivo N, la primera repetición mantenida ocurre exactamente N llamadas después del pulso inicial. Con 0 se omite el caso de igualdad del retardo inicial y el intervalo determina cuándo llega el primer pulso mantenido. No se mide en milisegundos.</p><p>Intervalo de las repeticiones posteriores, de 0 a 255 llamadas. Un N positivo genera un pulso cada N actualizaciones válidas de mantenimiento tras la primera repetición. Cero genera uno en cada actualización válida después de la espera inicial; en esa fase, tanto 0 como 1 dan un pulso por actualización. Si espera e intervalo son 0, cada actualización mantenida emite un pulso.</p><p>Llama a la función una vez por ciclo de entrada previsto. Cada llamada modifica el estado y no espera a VBlank. Adoptar un botón mantenido sin un bit de nueva pulsación devuelve 0 en esa llamada e inicia una nueva espera. Estas funciones eligen una acción activa por estado; <code>input_repeat</code> mantiene temporizadores independientes para los ocho botones.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>result=__padrep_mask(alias_state,keys,trigger,48);
+    if (result!=0) alias_pulses++;</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa entrega lecturas de botones predefinidas a cuatro estados independientes para mostrar cuándo se repite una acción. Con espera 3 e intervalo 2, ocho llamadas numeradas del 0 al 7 generan pulsos en 0, 3, 5 y 7. RIGHT PULSES, DOWN PULSES, ACTION PULSES y ALIAS PULSES muestran 004. Las variantes generales reciben A y B juntos y seleccionan A (16). También se comprueban la inicialización, el reinicio, la prioridad de direcciones, la liberación, la adopción de una dirección ya mantenida, los tiempos cero y un argumento con una expresión. CHECKS muestra 057 y FAILED CHECKS debe mostrar 000. Es un ejemplo determinista del procesamiento de estado; no espera a que pulses botones.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_mask">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:11117</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+    if (args.Length != 4) Error(expr, &quot;__padrep requires 4 arguments (state*, keys, trigger, mask)&quot;);
 
-    AsmOperand pm_done        = MakeUniqueLabel("padrepM_done");
-    AsmOperand pm_ret0        = MakeUniqueLabel("padrepM_ret0");
-    AsmOperand pm_no_trig     = MakeUniqueLabel("padrepM_notrig");
-    AsmOperand pm_reset_all   = MakeUniqueLabel("padrepM_reset");
-    AsmOperand pm_dir0        = MakeUniqueLabel("padrepM_dir0");
-    AsmOperand pm_have_dir    = MakeUniqueLabel("padrepM_havedir");
-    AsmOperand pm_first_rep   = MakeUniqueLabel("padrepM_firstrep");
-    AsmOperand pm_ret_dir     = MakeUniqueLabel("padrepM_retdir");
-    AsmOperand pm_skip_dasinc = MakeUniqueLabel("padrepM_skipdasinc");
-    AsmOperand pm_skip_arrinc = MakeUniqueLabel("padrepM_skiparrinc");
+    AsmOperand pm_done        = MakeUniqueLabel(&quot;padrepM_done&quot;);
+    AsmOperand pm_ret0        = MakeUniqueLabel(&quot;padrepM_ret0&quot;);
+    AsmOperand pm_no_trig     = MakeUniqueLabel(&quot;padrepM_notrig&quot;);
+    AsmOperand pm_reset_all   = MakeUniqueLabel(&quot;padrepM_reset&quot;);
+    AsmOperand pm_dir0        = MakeUniqueLabel(&quot;padrepM_dir0&quot;);
+    AsmOperand pm_have_dir    = MakeUniqueLabel(&quot;padrepM_havedir&quot;);
+    AsmOperand pm_first_rep   = MakeUniqueLabel(&quot;padrepM_firstrep&quot;);
+    AsmOperand pm_ret_dir     = MakeUniqueLabel(&quot;padrepM_retdir&quot;);
+    AsmOperand pm_skip_dasinc = MakeUniqueLabel(&quot;padrepM_skipdasinc&quot;);
+    AsmOperand pm_skip_arrinc = MakeUniqueLabel(&quot;padrepM_skiparrinc&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger, E = mask
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    CompileIntoA(args[3]); EmitAsm("LD_E_A"); // mask
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    CompileIntoA(args[3]); EmitAsm(&quot;LD_E_A&quot;); // mask
+    EmitAsm(&quot;POP_HL&quot;);
 
     // trigMasked = trigger &amp; mask -&gt; D
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_E");
-    EmitAsm("LD_D_A");
-    EmitAsm("OR_A");
-    EmitAsm("JP_Z", pm_no_trig);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_E&quot;);
+    EmitAsm(&quot;LD_D_A&quot;);
+    EmitAsm(&quot;OR_A&quot;);
+    EmitAsm(&quot;JP_Z&quot;, pm_no_trig);
 
     // select = lowbit(trigMasked) = x &amp; -x
-    EmitAsm("LD_A_D");
-    EmitAsm("CPL");
-    EmitAsm("INC_A");
-    EmitAsm("AND_D");
-    EmitAsm("LD_C_A"); // save selected in C
+    EmitAsm(&quot;LD_A_D&quot;);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;INC_A&quot;);
+    EmitAsm(&quot;AND_D&quot;);
+    EmitAsm(&quot;LD_C_A&quot;); // save selected in C
 
     // dirMask=selected, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_C");
-    EmitAsm("LD_HL_A"); // [0]=selected
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); Emi</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:11117</p></details><details class="api searchable" id="api-__padrep_reset"><summary><code>__padrep_reset</code><span class="badge">Función intrínseca del compilador</span></summary><p>Restablecer el estado. Módulo: Funciones intrínsecas del compilador. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_reset(arg0);</code></pre></div><p class="note">Esta sintaxis recoge el número de argumentos del generador de código. Los nombres como arg0 son marcadores explicativos, no declaraciones de tipos. Sigue el ejemplo de uso y los requisitos de la implementación.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_reset(arg0);</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_reset.c">Descargar este fragmento</a></p><details><summary>Comprobaciones de argumentos del generador de código</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
-    if (args.Length != 1) Error(expr, "__padrep_reset requires 1 argument (state*)");
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=selected
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); Emi</code></pre></div></details></details><details class="api searchable" id="api-__padrep_reset" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_reset</code></summary><p>Cancela la acción activa y pone a cero ambos contadores, conservando la espera y el intervalo configurados. Úsala al cerrar un menú o cambiar el destino de la entrada para no arrastrar la temporización de una pulsación anterior.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __padrep_reset(u8* state);</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Parámetros</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>Puntero a cinco bytes consecutivos de RAM escribible, por ejemplo <code>u8 state[5]</code>. El formato es <code>[0] bit del botón activo</code>, <code>[1] espera inicial</code>, <code>[2] intervalo</code>, <code>[3] contador de espera transcurrida</code>, <code>[4] contador de repetición transcurrida</code>. Reserva un estado para cada repetición independiente e inicialízalo antes de usarlo. No se admite un puntero nulo, un área menor de cinco bytes ni compartir el estado entre las variantes direccionales y la general.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__padrep_reset(lr);
+expect(lr[0],0); expect(lr[1],3); expect(lr[2],2);
+expect(lr[3],0); expect(lr[4],0);</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa entrega lecturas de botones predefinidas a cuatro estados independientes para mostrar cuándo se repite una acción. Con espera 3 e intervalo 2, ocho llamadas numeradas del 0 al 7 generan pulsos en 0, 3, 5 y 7. RIGHT PULSES, DOWN PULSES, ACTION PULSES y ALIAS PULSES muestran 004. Las variantes generales reciben A y B juntos y seleccionan A (16). También se comprueban la inicialización, el reinicio, la prioridad de direcciones, la liberación, la adopción de una dirección ya mantenida, los tiempos cero y un argumento con una expresión. CHECKS muestra 057 y FAILED CHECKS debe mostrar 000. Es un ejemplo determinista del procesamiento de estado; no espera a que pulses botones.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_reset">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10708</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
+    if (args.Length != 1) Error(expr, &quot;__padrep_reset requires 1 argument (state*)&quot;);
 
     CompileIntoHL(args[0]);
 
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [0]=0 (dirMask)
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0 (dirMask)
 
     // [3]=0, [4]=0
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("LD_HL_A");
-    EmitAsm("INC_HL"); // -&gt; [4]
-    EmitAsm("LD_HL_A");
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;INC_HL&quot;); // -&gt; [4]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;POP_HL&quot;);
     return;
 }
 
@@ -1894,20 +1909,20 @@ if (funcName == "__padrep_reset")
 // New triggers take priority, with Right selected first when both trigger bits are set.
 // Without a new trigger, simultaneous Left/Right holds suppress movement without resetting counters.
 // A single held direction is adopted without immediate movement when no direction is active.
-// Subsequent updates use the five-byte state's initial delay and repeat interval; ARR=0 repeats each update.
-if (funcName == "__padrep_lr")
+// Subsequent updates use the five-byte state&#x27;s initial delay and repeat interval; ARR=0 repeats each update.
+if (funcName == &quot;__padrep_lr&quot;)
 {
-    if (args.Length != 3) Error(expr, "__padrep_lr requires 3 arguments (state*, keys, trigger)");
+    if (args.Length != 3) Error(expr, &quot;__padrep_lr requires 3 arguments (state*, keys, trigger)&quot;);
 
-    AsmOperand pr_done        = MakeUniqueLabel("padrep_done");
-    AsmOperand pr_ret0        = MakeUniqueLabel("padrep_ret0");
-    AsmOperand pr_check_left  = MakeUniqueLabel("padrep_chkL");
-    AsmOperand pr_no_trig     = MakeUniqueLabel("padrep_notrig");
-    AsmOperand pr_reset_all   = MakeUniqueLabel("padrep_reset");
-    AsmOperand pr_dir0        = MakeUniqueLabel("padrep_dir0");
-    AsmOperand pr_have_dir    = MakeUniqueLabel("padrep_havedir");
-    AsmOperand pr_first_rep   = MakeUniqueLabel("padrep_firstrep");
-    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep</code></pre></div></details><p class="source">Origen de la declaración o del identificador: kitaqgb/kitaqgb/CodeGenerator.cs:10708</p></details><details class="api searchable" id="api-__readpad" data-api-contract="input-source-20260915"><summary><code>__readpad</code></summary><p>Lee la cruceta y los botones de acción desde JOYP y los combina en la máscara común de 8 bits. Selecciona cada grupo, realiza dos lecturas para estabilizarlo y restaura los bits de selección a <code>0x30</code>.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __readpad();</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Valor devuelto</h4><p>Una máscara de 8 bits en formato común <code>BTN_*</code>. Puede contener varios botones a la vez; 0 significa ninguno.</p><h4>Condiciones y límites</h4><p>Máscaras comunes: <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>. Un bit a 1 indica que el botón está mantenido. <code>input_*</code> usa este formato en GB y FC; las funciones FC de lectura directa emplean otro orden.</p><p>Esta llamada obtiene una nueva lectura del hardware. No actualiza el estado guardado de <code>input_*</code> ni <code>nes_pad1_*</code>, ni genera eventos de pulsación, liberación o repetición. Guarda la lectura y compárala con tu máscara anterior cuando necesites detectar cambios.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>all_keys=__readpad(); // A + Right: 0x11, decimal 17.</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa compara los tres formatos de máscara y el resultado que combina el estado actual con las nuevas pulsaciones. Mantén A y derecha a la vez. ALL KEYS vale 17; DIRECTIONS y BUTTONS LOW valen 1 cada uno. Con una máscara anterior de 0, EX CURRENT y EX NEW PRESS valen 17. Al pasar la máscara actual a la siguiente lectura, HELD PRESS vale 0. FAILED CHECKS debe ser 0. Los valores quedan en pantalla aunque sueltes los botones.</p><p><a href="../samples/api-examples/gb/input_raw.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+    AsmOperand pr_done        = MakeUniqueLabel(&quot;padrep_done&quot;);
+    AsmOperand pr_ret0        = MakeUniqueLabel(&quot;padrep_ret0&quot;);
+    AsmOperand pr_check_left  = MakeUniqueLabel(&quot;padrep_chkL&quot;);
+    AsmOperand pr_no_trig     = MakeUniqueLabel(&quot;padrep_notrig&quot;);
+    AsmOperand pr_reset_all   = MakeUniqueLabel(&quot;padrep_reset&quot;);
+    AsmOperand pr_dir0        = MakeUniqueLabel(&quot;padrep_dir0&quot;);
+    AsmOperand pr_have_dir    = MakeUniqueLabel(&quot;padrep_havedir&quot;);
+    AsmOperand pr_first_rep   = MakeUniqueLabel(&quot;padrep_firstrep&quot;);
+    AsmOperand pr_ret_dir     = MakeUniqueLabel(&quot;padrep</code></pre></div></details></details><details class="api searchable" id="api-__readpad" data-api-contract="input-source-20260915"><summary><code>__readpad</code></summary><p>Lee la cruceta y los botones de acción desde JOYP y los combina en la máscara común de 8 bits. Selecciona cada grupo, realiza dos lecturas para estabilizarlo y restaura los bits de selección a <code>0x30</code>.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __readpad();</code></pre></div><p>Los nombres de parámetros explican la función intrínseca del compilador; no constituyen un prototipo C adicional.</p><h4>Valor devuelto</h4><p>Una máscara de 8 bits en formato común <code>BTN_*</code>. Puede contener varios botones a la vez; 0 significa ninguno.</p><h4>Condiciones y límites</h4><p>Máscaras comunes: <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>. Un bit a 1 indica que el botón está mantenido. <code>input_*</code> usa este formato en GB y FC; las funciones FC de lectura directa emplean otro orden.</p><p>Esta llamada obtiene una nueva lectura del hardware. No actualiza el estado guardado de <code>input_*</code> ni <code>nes_pad1_*</code>, ni genera eventos de pulsación, liberación o repetición. Guarda la lectura y compárala con tu máscara anterior cuando necesites detectar cambios.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>all_keys=__readpad(); // A + Right: 0x11, decimal 17.</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>Este programa compara los tres formatos de máscara y el resultado que combina el estado actual con las nuevas pulsaciones. Mantén A y derecha a la vez. ALL KEYS vale 17; DIRECTIONS y BUTTONS LOW valen 1 cada uno. Con una máscara anterior de 0, EX CURRENT y EX NEW PRESS valen 17. Al pasar la máscara actual a la siguiente lectura, HELD PRESS vale 0. FAILED CHECKS debe ser 0. Los valores quedan en pantalla aunque sueltes los botones.</p><p><a href="../samples/api-examples/gb/input_raw.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpad">Resultados de verificación</a></p><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10537</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>{
     if (args.Length != 0) Error(expr, &quot;__readpad requires 0 arguments&quot;);
 

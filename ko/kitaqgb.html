@@ -1664,109 +1664,117 @@ if (funcName == "__readpad")
             // Signed multiply where coefficient is Q1.7 (int8 scaled by 1/128).
             // Implemented as (a*b)&gt;&gt;8 then *2 (loses 1 bit of fractional precision).
             // Useful for sin/cos rotation coefficients in [-1, 1).
-            if (funcName == "__smul16x8_q1_</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:11320</p></details><details class="api searchable" id="api-__padrep"><summary><code>__padrep</code><span class="badge">컴파일러 내장 함수</span></summary><p>인수로 지정한 작업을 수행합니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep(arg0, arg1, arg2, arg3);</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__padrep.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
-    if (args.Length != 4) Error(expr, "__padrep requires 4 arguments (state*, keys, trigger, mask)");
+            if (funcName == "__smul16x8_q1_</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:11320</p></details><details class="api searchable" id="api-__padrep" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep</code></summary><p><code>mask</code>로 지정한 버튼 중 하나를 골라 반복합니다. 대상 버튼을 새로 누르면 켜진 비트 중 가장 낮은 비트를 선택해 즉시 반환합니다. 그렇지 않으면 현재 동작이 대상에 포함되고 계속 눌려 있는 동안 유지합니다. 그 동작이 끝나면 남은 눌림 비트 중 가장 낮은 비트를 선택하되 즉시 펄스를 내지는 않습니다. 대상 버튼이 모두 놓이면 실행 상태를 지웁니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u8 __padrep(u8* state, u8 keys, u8 trigger, u8 mask);</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>매개변수</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>쓰기 가능한 연속된 RAM 5바이트의 포인터입니다. 예를 들어 <code>u8 state[5]</code>를 준비합니다. 배치는 <code>[0] 선택된 버튼 비트</code>, <code>[1] 초기 대기 시간</code>, <code>[2] 반복 간격</code>, <code>[3] 초기 대기 경과 카운터</code>, <code>[4] 반복 경과 카운터</code>입니다. 독립적인 반복 처리마다 별도의 상태를 준비하고 사용 전에 초기화하세요. 널 포인터, 5바이트 미만의 영역, 방향 전용 처리와 범용 처리 간의 상태 공유는 지원하지 않습니다.</p></dd><dt><code>keys</code></dt><dd><p>GB의 <code>BTN_*</code> 비트 배치로 표현한 현재 전체 눌림 마스크입니다. <code>__readpad</code>, <code>__readpadex</code>의 하위 바이트 또는 <code>input_current</code>에서 얻은 값을 전달합니다. 반복 함수 자체는 하드웨어를 읽지 않습니다.</p></dd><dt><code>trigger</code></dt><dd><p>이번 갱신에서 새로 눌린 비트를 <code>keys</code>와 같은 배치로 전달합니다. 보통 <code>keys &amp; ~previous_keys</code> 또는 <code>__readpadex</code>의 상위 바이트입니다. <code>keys</code>에도 있는 비트만 포함해야 합니다. 매번 눌림 마스크를 그대로 전달하면 호출마다 새 입력으로 처리되어 초기 대기가 다시 시작됩니다.</p></dd><dt><code>mask</code></dt><dd><p>대상 GB 버튼 비트를 <code>|</code>로 조합합니다. 0은 모든 동작을 비활성화하고 실행 상태를 지웁니다. 여러 비트를 지정하면 후보가 늘어나지만, 한 번의 호출에서는 선택된 한 비트만 반환하며 여러 동작의 펄스 마스크를 합쳐 반환하지 않습니다.</p></dd></dl><h4>반환값</h4><p>동작 펄스가 없으면 0, 있으면 1, 2, 4, 8, 16, 32, 64, 128 중 하나입니다. 0이 아닌 값은 버튼 비트이며, 0과 1로 정규화된 논리값이나 반복 횟수가 아닙니다.</p><h4>사용 조건과 제한</h4><p>공통 마스크는 <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>입니다. 1인 비트가 눌림을 뜻합니다. GB와 FC의 <code>input_*</code>는 이 형식을 쓰지만 FC의 원시 패드 함수는 비트 순서가 다릅니다.</p><p>초기 대기 시간으로, 반복 함수 호출 횟수 0~255를 지정합니다. 양수 N이면 첫 입력 펄스에서 정확히 N회 호출 뒤에 첫 장기 누름 반복이 발생합니다. 0이면 초기 대기 시간과의 일치 분기를 건너뛰므로 반복 간격이 첫 반복 시점을 결정합니다. 밀리초 단위가 아닙니다.</p><p>이후 반복 간격으로 0~255회 호출을 지정합니다. 양수 N이면 첫 반복 이후 대상 버튼을 누른 상태의 갱신 N회마다 펄스가 발생합니다. 0은 초기 대기가 끝난 뒤 대상 갱신마다 발생하므로, 이 단계에서는 0과 1 모두 매번 펄스를 반환합니다. 대기 시간과 간격이 모두 0이면 누르고 있는 매 갱신에서 펄스가 발생합니다.</p><p>입력 처리 주기마다 한 번 호출하세요. 호출할 때마다 상태가 바뀌며 VBlank를 기다리지 않습니다. 새 입력 비트 없이 이미 눌린 버튼을 선택하면 그 호출에서는 0을 반환하고 새 대기를 시작합니다. 이 함수들은 상태 하나당 동작 하나를 선택합니다. 반면 <code>input_repeat</code>는 8개 버튼마다 독립적인 타이머를 사용합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>result=__padrep(actions,keys,trigger,48); // A|B: select A, the lower bit.
+    if (result!=0) action_pulses++;</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>정해진 버튼 상태를 네 개의 독립적인 상태에 입력하여 어느 호출에서 반복이 발생하는지 보여 주는 프로그램입니다. 대기 3, 간격 2로 0~7번의 여덟 호출을 실행하면 0, 3, 5, 7번에서 펄스가 발생합니다. 따라서 RIGHT PULSES, DOWN PULSES, ACTION PULSES, ALIAS PULSES는 모두 004입니다. 범용 처리는 A와 B를 함께 받아 A(16)를 선택합니다. 초기화, 재설정, 양방향 우선순위, 놓기, 이미 눌린 방향의 선택, 시간값 0, 식 인수도 검사합니다. CHECKS는 057, FAILED CHECKS는 000이어야 합니다. 고정 입력으로 상태 처리를 설명하는 예제이며 실제 버튼 입력을 기다리지 않습니다.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:11117</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+    if (args.Length != 4) Error(expr, &quot;__padrep requires 4 arguments (state*, keys, trigger, mask)&quot;);
 
-    AsmOperand pm_done        = MakeUniqueLabel("padrepM_done");
-    AsmOperand pm_ret0        = MakeUniqueLabel("padrepM_ret0");
-    AsmOperand pm_no_trig     = MakeUniqueLabel("padrepM_notrig");
-    AsmOperand pm_reset_all   = MakeUniqueLabel("padrepM_reset");
-    AsmOperand pm_dir0        = MakeUniqueLabel("padrepM_dir0");
-    AsmOperand pm_have_dir    = MakeUniqueLabel("padrepM_havedir");
-    AsmOperand pm_first_rep   = MakeUniqueLabel("padrepM_firstrep");
-    AsmOperand pm_ret_dir     = MakeUniqueLabel("padrepM_retdir");
-    AsmOperand pm_skip_dasinc = MakeUniqueLabel("padrepM_skipdasinc");
-    AsmOperand pm_skip_arrinc = MakeUniqueLabel("padrepM_skiparrinc");
+    AsmOperand pm_done        = MakeUniqueLabel(&quot;padrepM_done&quot;);
+    AsmOperand pm_ret0        = MakeUniqueLabel(&quot;padrepM_ret0&quot;);
+    AsmOperand pm_no_trig     = MakeUniqueLabel(&quot;padrepM_notrig&quot;);
+    AsmOperand pm_reset_all   = MakeUniqueLabel(&quot;padrepM_reset&quot;);
+    AsmOperand pm_dir0        = MakeUniqueLabel(&quot;padrepM_dir0&quot;);
+    AsmOperand pm_have_dir    = MakeUniqueLabel(&quot;padrepM_havedir&quot;);
+    AsmOperand pm_first_rep   = MakeUniqueLabel(&quot;padrepM_firstrep&quot;);
+    AsmOperand pm_ret_dir     = MakeUniqueLabel(&quot;padrepM_retdir&quot;);
+    AsmOperand pm_skip_dasinc = MakeUniqueLabel(&quot;padrepM_skipdasinc&quot;);
+    AsmOperand pm_skip_arrinc = MakeUniqueLabel(&quot;padrepM_skiparrinc&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger, E = mask
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    CompileIntoA(args[3]); EmitAsm("LD_E_A"); // mask
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    CompileIntoA(args[3]); EmitAsm(&quot;LD_E_A&quot;); // mask
+    EmitAsm(&quot;POP_HL&quot;);
 
     // trigMasked = trigger &amp; mask -&gt; D
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_E");
-    EmitAsm("LD_D_A");
-    EmitAsm("OR_A");
-    EmitAsm("JP_Z", pm_no_trig);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_E&quot;);
+    EmitAsm(&quot;LD_D_A&quot;);
+    EmitAsm(&quot;OR_A&quot;);
+    EmitAsm(&quot;JP_Z&quot;, pm_no_trig);
 
     // select = lowbit(trigMasked) = x &amp; -x
-    EmitAsm("LD_A_D");
-    EmitAsm("CPL");
-    EmitAsm("INC_A");
-    EmitAsm("AND_D");
-    EmitAsm("LD_C_A"); // save selected in C
+    EmitAsm(&quot;LD_A_D&quot;);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;INC_A&quot;);
+    EmitAsm(&quot;AND_D&quot;);
+    EmitAsm(&quot;LD_C_A&quot;); // save selected in C
 
     // dirMask=selected, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_C");
-    EmitAsm("LD_HL_A"); // [0]=selected
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); Emi</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:11117</p></details><details class="api searchable" id="api-__padrep_down"><summary><code>__padrep_down</code><span class="badge">컴파일러 내장 함수</span></summary><p>인수로 지정한 작업을 수행합니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_down(arg0, arg1, arg2);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_down(arg0, arg1, arg2);</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_down.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
-    if (args.Length != 3) Error(expr, "__padrep_down requires 3 arguments (state*, keys, trigger)");
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=selected
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); Emi</code></pre></div></details></details><details class="api searchable" id="api-__padrep_down" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_down</code></summary><p>아래쪽만 대상으로 반복 상태를 한 번 진행합니다. 아래쪽을 새로 누르면 즉시 8을 반환하고 카운터를 다시 시작합니다. 계속 누르면 설정된 간격에 따라 펄스가 발생하며, 놓으면 실행 상태를 지웁니다. 다른 버튼으로는 이 반복 동작을 시작할 수 없습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u8 __padrep_down(u8* state, u8 keys, u8 trigger);</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>매개변수</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>쓰기 가능한 연속된 RAM 5바이트의 포인터입니다. 예를 들어 <code>u8 state[5]</code>를 준비합니다. 배치는 <code>[0] 선택된 버튼 비트</code>, <code>[1] 초기 대기 시간</code>, <code>[2] 반복 간격</code>, <code>[3] 초기 대기 경과 카운터</code>, <code>[4] 반복 경과 카운터</code>입니다. 독립적인 반복 처리마다 별도의 상태를 준비하고 사용 전에 초기화하세요. 널 포인터, 5바이트 미만의 영역, 방향 전용 처리와 범용 처리 간의 상태 공유는 지원하지 않습니다.</p></dd><dt><code>keys</code></dt><dd><p>GB의 <code>BTN_*</code> 비트 배치로 표현한 현재 전체 눌림 마스크입니다. <code>__readpad</code>, <code>__readpadex</code>의 하위 바이트 또는 <code>input_current</code>에서 얻은 값을 전달합니다. 반복 함수 자체는 하드웨어를 읽지 않습니다.</p></dd><dt><code>trigger</code></dt><dd><p>이번 갱신에서 새로 눌린 비트를 <code>keys</code>와 같은 배치로 전달합니다. 보통 <code>keys &amp; ~previous_keys</code> 또는 <code>__readpadex</code>의 상위 바이트입니다. <code>keys</code>에도 있는 비트만 포함해야 합니다. 매번 눌림 마스크를 그대로 전달하면 호출마다 새 입력으로 처리되어 초기 대기가 다시 시작됩니다.</p></dd></dl><h4>반환값</h4><p>동작 펄스가 없으면 0, 있으면 8 중 하나입니다. 0이 아닌 값은 버튼 비트이며, 0과 1로 정규화된 논리값이나 반복 횟수가 아닙니다.</p><h4>사용 조건과 제한</h4><p>공통 마스크는 <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>입니다. 1인 비트가 눌림을 뜻합니다. GB와 FC의 <code>input_*</code>는 이 형식을 쓰지만 FC의 원시 패드 함수는 비트 순서가 다릅니다.</p><p>초기 대기 시간으로, 반복 함수 호출 횟수 0~255를 지정합니다. 양수 N이면 첫 입력 펄스에서 정확히 N회 호출 뒤에 첫 장기 누름 반복이 발생합니다. 0이면 초기 대기 시간과의 일치 분기를 건너뛰므로 반복 간격이 첫 반복 시점을 결정합니다. 밀리초 단위가 아닙니다.</p><p>이후 반복 간격으로 0~255회 호출을 지정합니다. 양수 N이면 첫 반복 이후 대상 버튼을 누른 상태의 갱신 N회마다 펄스가 발생합니다. 0은 초기 대기가 끝난 뒤 대상 갱신마다 발생하므로, 이 단계에서는 0과 1 모두 매번 펄스를 반환합니다. 대기 시간과 간격이 모두 0이면 누르고 있는 매 갱신에서 펄스가 발생합니다.</p><p>입력 처리 주기마다 한 번 호출하세요. 호출할 때마다 상태가 바뀌며 VBlank를 기다리지 않습니다. 새 입력 비트 없이 이미 눌린 버튼을 선택하면 그 호출에서는 0을 반환하고 새 대기를 시작합니다. 이 함수들은 상태 하나당 동작 하나를 선택합니다. 반면 <code>input_repeat</code>는 8개 버튼마다 독립적인 타이머를 사용합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>result=__padrep_down(down,keys,trigger);
+    if (result!=0) down_pulses++;</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>정해진 버튼 상태를 네 개의 독립적인 상태에 입력하여 어느 호출에서 반복이 발생하는지 보여 주는 프로그램입니다. 대기 3, 간격 2로 0~7번의 여덟 호출을 실행하면 0, 3, 5, 7번에서 펄스가 발생합니다. 따라서 RIGHT PULSES, DOWN PULSES, ACTION PULSES, ALIAS PULSES는 모두 004입니다. 범용 처리는 A와 B를 함께 받아 A(16)를 선택합니다. 초기화, 재설정, 양방향 우선순위, 놓기, 이미 눌린 방향의 선택, 시간값 0, 식 인수도 검사합니다. CHECKS는 057, FAILED CHECKS는 000이어야 합니다. 고정 입력으로 상태 처리를 설명하는 예제이며 실제 버튼 입력을 기다리지 않습니다.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_down">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10937</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+    if (args.Length != 3) Error(expr, &quot;__padrep_down requires 3 arguments (state*, keys, trigger)&quot;);
 
-    AsmOperand pd_done        = MakeUniqueLabel("padrepD_done");
-    AsmOperand pd_ret0        = MakeUniqueLabel("padrepD_ret0");
-    AsmOperand pd_no_trig     = MakeUniqueLabel("padrepD_notrig");
-    AsmOperand pd_dir0        = MakeUniqueLabel("padrepD_dir0");
-    AsmOperand pd_have_dir    = MakeUniqueLabel("padrepD_havedir");
-    AsmOperand pd_first_rep   = MakeUniqueLabel("padrepD_firstrep");
-    AsmOperand pd_ret_dir     = MakeUniqueLabel("padrepD_retdir");
-    AsmOperand pd_skip_dasinc = MakeUniqueLabel("padrepD_skipdasinc");
-    AsmOperand pd_skip_arrinc = MakeUniqueLabel("padrepD_skiparrinc");
-    AsmOperand pd_reset_all   = MakeUniqueLabel("padrepD_reset");
+    AsmOperand pd_done        = MakeUniqueLabel(&quot;padrepD_done&quot;);
+    AsmOperand pd_ret0        = MakeUniqueLabel(&quot;padrepD_ret0&quot;);
+    AsmOperand pd_no_trig     = MakeUniqueLabel(&quot;padrepD_notrig&quot;);
+    AsmOperand pd_dir0        = MakeUniqueLabel(&quot;padrepD_dir0&quot;);
+    AsmOperand pd_have_dir    = MakeUniqueLabel(&quot;padrepD_havedir&quot;);
+    AsmOperand pd_first_rep   = MakeUniqueLabel(&quot;padrepD_firstrep&quot;);
+    AsmOperand pd_ret_dir     = MakeUniqueLabel(&quot;padrepD_retdir&quot;);
+    AsmOperand pd_skip_dasinc = MakeUniqueLabel(&quot;padrepD_skipdasinc&quot;);
+    AsmOperand pd_skip_arrinc = MakeUniqueLabel(&quot;padrepD_skiparrinc&quot;);
+    AsmOperand pd_reset_all   = MakeUniqueLabel(&quot;padrepD_reset&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    EmitAsm(&quot;POP_HL&quot;);
 
     // --- Trigger Down? (bit3 = 0x08) ---
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_IMM", new AsmOperand(0x08, AddressMode.Immediate));
-    EmitAsm("JP_Z", pd_no_trig);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x08, AddressMode.Immediate));
+    EmitAsm(&quot;JP_Z&quot;, pd_no_trig);
 
     // dirMask=0x08, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_IMM", new AsmOperand(0x08, AddressMode.Immediate));
-    EmitAsm("LD_HL_A"); // [0]=0x08
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // dasCnt=0
-    EmitAsm("INC_HL");
-    EmitAsm("LD_HL_A"); // arrCnt=0
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x08, AddressMode.Immediate));
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0x08
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // dasCnt=0
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // arrCnt=0
+    EmitAsm(&quot;POP_HL&quot;);
 
-    EmitAsm</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:10937</p></details><details class="api searchable" id="api-__padrep_init"><summary><code>__padrep_init</code><span class="badge">컴파일러 내장 함수</span></summary><p>초기 상태를 준비합니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_init(arg0, arg1, arg2);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_init(arg0, arg1, arg2);</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_init.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
-    if (args.Length != 3) Error(expr, "__padrep_init requires 3 arguments (state*, das, arr)");
+    EmitAsm</code></pre></div></details></details><details class="api searchable" id="api-__padrep_init" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_init</code></summary><p>호출자가 준비한 5바이트 반복 상태를 초기화합니다. 선택된 동작과 두 카운터를 0으로 만들고, 지정한 초기 대기 시간과 반복 간격을 저장합니다. 버튼을 읽거나 반복 펄스를 만들지는 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __padrep_init(u8* state, u8 das, u8 arr);</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>매개변수</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>쓰기 가능한 연속된 RAM 5바이트의 포인터입니다. 예를 들어 <code>u8 state[5]</code>를 준비합니다. 배치는 <code>[0] 선택된 버튼 비트</code>, <code>[1] 초기 대기 시간</code>, <code>[2] 반복 간격</code>, <code>[3] 초기 대기 경과 카운터</code>, <code>[4] 반복 경과 카운터</code>입니다. 독립적인 반복 처리마다 별도의 상태를 준비하고 사용 전에 초기화하세요. 널 포인터, 5바이트 미만의 영역, 방향 전용 처리와 범용 처리 간의 상태 공유는 지원하지 않습니다.</p></dd><dt><code>das</code></dt><dd><p>초기 대기 시간으로, 반복 함수 호출 횟수 0~255를 지정합니다. 양수 N이면 첫 입력 펄스에서 정확히 N회 호출 뒤에 첫 장기 누름 반복이 발생합니다. 0이면 초기 대기 시간과의 일치 분기를 건너뛰므로 반복 간격이 첫 반복 시점을 결정합니다. 밀리초 단위가 아닙니다.</p></dd><dt><code>arr</code></dt><dd><p>이후 반복 간격으로 0~255회 호출을 지정합니다. 양수 N이면 첫 반복 이후 대상 버튼을 누른 상태의 갱신 N회마다 펄스가 발생합니다. 0은 초기 대기가 끝난 뒤 대상 갱신마다 발생하므로, 이 단계에서는 0과 1 모두 매번 펄스를 반환합니다. 대기 시간과 간격이 모두 0이면 누르고 있는 매 갱신에서 펄스가 발생합니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_init(lr,3,2);
+// Active action and counters are zero; delay and interval are retained.
+expect(lr[0],0); expect(lr[1],3); expect(lr[2],2);
+expect(lr[3],0); expect(lr[4],0);</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>정해진 버튼 상태를 네 개의 독립적인 상태에 입력하여 어느 호출에서 반복이 발생하는지 보여 주는 프로그램입니다. 대기 3, 간격 2로 0~7번의 여덟 호출을 실행하면 0, 3, 5, 7번에서 펄스가 발생합니다. 따라서 RIGHT PULSES, DOWN PULSES, ACTION PULSES, ALIAS PULSES는 모두 004입니다. 범용 처리는 A와 B를 함께 받아 A(16)를 선택합니다. 초기화, 재설정, 양방향 우선순위, 놓기, 이미 눌린 방향의 선택, 시간값 0, 식 인수도 검사합니다. CHECKS는 057, FAILED CHECKS는 000이어야 합니다. 고정 입력으로 상태 처리를 설명하는 예제이며 실제 버튼 입력을 기다리지 않습니다.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_init">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10676</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+    if (args.Length != 3) Error(expr, &quot;__padrep_init requires 3 arguments (state*, das, arr)&quot;);
 
     // Evaluate args with register safety
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // das
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // arr
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // das
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // arr
+    EmitAsm(&quot;POP_HL&quot;);
 
     // dirMask = 0; dasCnt=0; arrCnt=0; store params
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [0]=0
-    EmitAsm("INC_HL");
-    EmitAsm("LD_A_B");
-    EmitAsm("LD_HL_A"); // [1]=das
-    EmitAsm("INC_HL");
-    EmitAsm("LD_A_C");
-    EmitAsm("LD_HL_A"); // [2]=arr
-    EmitAsm("INC_HL");
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [3]=dasCnt
-    EmitAsm("INC_HL");
-    EmitAsm("LD_HL_A"); // [4]=arrCnt
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_A_B&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [1]=das
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [2]=arr
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [3]=dasCnt
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [4]=arrCnt
     return;
 }
 
@@ -1774,119 +1782,126 @@ if (funcName == "__readpad")
 // Resets runtime counters for PadRepeatState while keeping das/arr params:
 // dirMask=0, dasCnt=0, arrCnt=0
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__padrep_reset")
+if (funcName == &quot;__padrep_reset&quot;)
 {
-    if (args.Length != 1) Error(expr, "__padrep_reset requires 1 argument (state*)");
+    if (args.Length != 1) Error(expr, &quot;__padrep_reset requires 1 argument (state*)&quot;);
 
     CompileIntoHL(args[0]);
 
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [0]=0 (dirMask)
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0 (dirMask)
 
     // [3]=0, [4]=0
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("LD_HL_A");
-    EmitAsm("INC_HL"); // -&gt; [4]
-    EmitAsm("LD_HL_A");
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;INC_HL&quot;); // -&gt; [4]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;POP_HL&quot;);
     return;
 }
 
 // __padrep_lr(state*, keys, trigger) returns Right (1), Left (2), or zero.
 // New triggers take priority, with Right selected first when both trigger bits are set.
-// Without a new</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:10676</p></details><details class="api searchable" id="api-__padrep_lr"><summary><code>__padrep_lr</code><span class="badge">컴파일러 내장 함수</span></summary><p>인수로 지정한 작업을 수행합니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_lr(arg0, arg1, arg2);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_lr(arg0, arg1, arg2);</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_lr.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
-    if (args.Length != 3) Error(expr, "__padrep_lr requires 3 arguments (state*, keys, trigger)");
+// Without a new</code></pre></div></details></details><details class="api searchable" id="api-__padrep_lr" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_lr</code></summary><p>왼쪽 또는 오른쪽 한 동작의 반복 상태를 한 번 진행합니다. 오른쪽을 새로 누르면 즉시 1을, 그렇지 않고 왼쪽을 새로 누르면 2를 반환합니다. 둘을 동시에 새로 누르면 오른쪽이 우선합니다. 새 입력 없이 양쪽을 계속 누르면 0을 반환하고 카운터를 멈추며, 둘 다 누르지 않으면 실행 상태를 지웁니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u8 __padrep_lr(u8* state, u8 keys, u8 trigger);</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>매개변수</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>쓰기 가능한 연속된 RAM 5바이트의 포인터입니다. 예를 들어 <code>u8 state[5]</code>를 준비합니다. 배치는 <code>[0] 선택된 버튼 비트</code>, <code>[1] 초기 대기 시간</code>, <code>[2] 반복 간격</code>, <code>[3] 초기 대기 경과 카운터</code>, <code>[4] 반복 경과 카운터</code>입니다. 독립적인 반복 처리마다 별도의 상태를 준비하고 사용 전에 초기화하세요. 널 포인터, 5바이트 미만의 영역, 방향 전용 처리와 범용 처리 간의 상태 공유는 지원하지 않습니다.</p></dd><dt><code>keys</code></dt><dd><p>GB의 <code>BTN_*</code> 비트 배치로 표현한 현재 전체 눌림 마스크입니다. <code>__readpad</code>, <code>__readpadex</code>의 하위 바이트 또는 <code>input_current</code>에서 얻은 값을 전달합니다. 반복 함수 자체는 하드웨어를 읽지 않습니다.</p></dd><dt><code>trigger</code></dt><dd><p>이번 갱신에서 새로 눌린 비트를 <code>keys</code>와 같은 배치로 전달합니다. 보통 <code>keys &amp; ~previous_keys</code> 또는 <code>__readpadex</code>의 상위 바이트입니다. <code>keys</code>에도 있는 비트만 포함해야 합니다. 매번 눌림 마스크를 그대로 전달하면 호출마다 새 입력으로 처리되어 초기 대기가 다시 시작됩니다.</p></dd></dl><h4>반환값</h4><p>동작 펄스가 없으면 0, 있으면 1, 2 중 하나입니다. 0이 아닌 값은 버튼 비트이며, 0과 1로 정규화된 논리값이나 반복 횟수가 아닙니다.</p><h4>사용 조건과 제한</h4><p>공통 마스크는 <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>입니다. 1인 비트가 눌림을 뜻합니다. GB와 FC의 <code>input_*</code>는 이 형식을 쓰지만 FC의 원시 패드 함수는 비트 순서가 다릅니다.</p><p>초기 대기 시간으로, 반복 함수 호출 횟수 0~255를 지정합니다. 양수 N이면 첫 입력 펄스에서 정확히 N회 호출 뒤에 첫 장기 누름 반복이 발생합니다. 0이면 초기 대기 시간과의 일치 분기를 건너뛰므로 반복 간격이 첫 반복 시점을 결정합니다. 밀리초 단위가 아닙니다.</p><p>이후 반복 간격으로 0~255회 호출을 지정합니다. 양수 N이면 첫 반복 이후 대상 버튼을 누른 상태의 갱신 N회마다 펄스가 발생합니다. 0은 초기 대기가 끝난 뒤 대상 갱신마다 발생하므로, 이 단계에서는 0과 1 모두 매번 펄스를 반환합니다. 대기 시간과 간격이 모두 0이면 누르고 있는 매 갱신에서 펄스가 발생합니다.</p><p>입력 처리 주기마다 한 번 호출하세요. 호출할 때마다 상태가 바뀌며 VBlank를 기다리지 않습니다. 새 입력 비트 없이 이미 눌린 버튼을 선택하면 그 호출에서는 0을 반환하고 새 대기를 시작합니다. 이 함수들은 상태 하나당 동작 하나를 선택합니다. 반면 <code>input_repeat</code>는 8개 버튼마다 독립적인 타이머를 사용합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>result=__padrep_lr(lr,keys,trigger);
+    if (result!=0) pulses++;</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>정해진 버튼 상태를 네 개의 독립적인 상태에 입력하여 어느 호출에서 반복이 발생하는지 보여 주는 프로그램입니다. 대기 3, 간격 2로 0~7번의 여덟 호출을 실행하면 0, 3, 5, 7번에서 펄스가 발생합니다. 따라서 RIGHT PULSES, DOWN PULSES, ACTION PULSES, ALIAS PULSES는 모두 004입니다. 범용 처리는 A와 B를 함께 받아 A(16)를 선택합니다. 초기화, 재설정, 양방향 우선순위, 놓기, 이미 눌린 방향의 선택, 시간값 0, 식 인수도 검사합니다. CHECKS는 057, FAILED CHECKS는 000이어야 합니다. 고정 입력으로 상태 처리를 설명하는 예제이며 실제 버튼 입력을 기다리지 않습니다.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_lr">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10732</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+    if (args.Length != 3) Error(expr, &quot;__padrep_lr requires 3 arguments (state*, keys, trigger)&quot;);
 
-    AsmOperand pr_done        = MakeUniqueLabel("padrep_done");
-    AsmOperand pr_ret0        = MakeUniqueLabel("padrep_ret0");
-    AsmOperand pr_check_left  = MakeUniqueLabel("padrep_chkL");
-    AsmOperand pr_no_trig     = MakeUniqueLabel("padrep_notrig");
-    AsmOperand pr_reset_all   = MakeUniqueLabel("padrep_reset");
-    AsmOperand pr_dir0        = MakeUniqueLabel("padrep_dir0");
-    AsmOperand pr_have_dir    = MakeUniqueLabel("padrep_havedir");
-    AsmOperand pr_first_rep   = MakeUniqueLabel("padrep_firstrep");
-    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep_retdir");
-    AsmOperand pr_skip_dasinc = MakeUniqueLabel("padrep_skipdasinc");
-    AsmOperand pr_skip_arrinc = MakeUniqueLabel("padrep_skiparrinc");
+    AsmOperand pr_done        = MakeUniqueLabel(&quot;padrep_done&quot;);
+    AsmOperand pr_ret0        = MakeUniqueLabel(&quot;padrep_ret0&quot;);
+    AsmOperand pr_check_left  = MakeUniqueLabel(&quot;padrep_chkL&quot;);
+    AsmOperand pr_no_trig     = MakeUniqueLabel(&quot;padrep_notrig&quot;);
+    AsmOperand pr_reset_all   = MakeUniqueLabel(&quot;padrep_reset&quot;);
+    AsmOperand pr_dir0        = MakeUniqueLabel(&quot;padrep_dir0&quot;);
+    AsmOperand pr_have_dir    = MakeUniqueLabel(&quot;padrep_havedir&quot;);
+    AsmOperand pr_first_rep   = MakeUniqueLabel(&quot;padrep_firstrep&quot;);
+    AsmOperand pr_ret_dir     = MakeUniqueLabel(&quot;padrep_retdir&quot;);
+    AsmOperand pr_skip_dasinc = MakeUniqueLabel(&quot;padrep_skipdasinc&quot;);
+    AsmOperand pr_skip_arrinc = MakeUniqueLabel(&quot;padrep_skiparrinc&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    EmitAsm(&quot;POP_HL&quot;);
 
     // --- Trigger Right? (bit0) ---
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_IMM", new AsmOperand(0x01, AddressMode.Immediate));
-    EmitAsm("JP_Z", pr_check_left);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x01, AddressMode.Immediate));
+    EmitAsm(&quot;JP_Z&quot;, pr_check_left);
 
     // dirMask=0x01, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_IMM", new AsmOperand(0x01, AddressMode.Immediate));
-    EmitAsm("LD_HL_A"); // [0]=0x01
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // dasCnt=0
-    EmitAsm("INC_HL");
-    EmitAsm("LD_HL_A")</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:10732</p></details><details class="api searchable" id="api-__padrep_mask"><summary><code>__padrep_mask</code><span class="badge">컴파일러 내장 함수</span></summary><p>인수로 지정한 작업을 수행합니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_mask(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_mask(arg0, arg1, arg2, arg3);</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_mask.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
-    if (args.Length != 4) Error(expr, "__padrep requires 4 arguments (state*, keys, trigger, mask)");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x01, AddressMode.Immediate));
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0x01
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // dasCnt=0
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;)</code></pre></div></details></details><details class="api searchable" id="api-__padrep_mask" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_mask</code></summary><p><code>__padrep_mask</code>는 <code>__padrep</code>의 다른 이름이며 컴파일러에서 같은 구현을 사용합니다. 단일 동작 선택, 타이밍, 상태 배치와 반환값이 모두 같습니다. 호출부에서 마스크로 대상을 지정하는 반복 처리임을 명확히 드러내고 싶을 때 사용할 수 있습니다.</p><p><code>mask</code>로 지정한 버튼 중 하나를 골라 반복합니다. 대상 버튼을 새로 누르면 켜진 비트 중 가장 낮은 비트를 선택해 즉시 반환합니다. 그렇지 않으면 현재 동작이 대상에 포함되고 계속 눌려 있는 동안 유지합니다. 그 동작이 끝나면 남은 눌림 비트 중 가장 낮은 비트를 선택하되 즉시 펄스를 내지는 않습니다. 대상 버튼이 모두 놓이면 실행 상태를 지웁니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u8 __padrep_mask(u8* state, u8 keys, u8 trigger, u8 mask);</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>매개변수</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>쓰기 가능한 연속된 RAM 5바이트의 포인터입니다. 예를 들어 <code>u8 state[5]</code>를 준비합니다. 배치는 <code>[0] 선택된 버튼 비트</code>, <code>[1] 초기 대기 시간</code>, <code>[2] 반복 간격</code>, <code>[3] 초기 대기 경과 카운터</code>, <code>[4] 반복 경과 카운터</code>입니다. 독립적인 반복 처리마다 별도의 상태를 준비하고 사용 전에 초기화하세요. 널 포인터, 5바이트 미만의 영역, 방향 전용 처리와 범용 처리 간의 상태 공유는 지원하지 않습니다.</p></dd><dt><code>keys</code></dt><dd><p>GB의 <code>BTN_*</code> 비트 배치로 표현한 현재 전체 눌림 마스크입니다. <code>__readpad</code>, <code>__readpadex</code>의 하위 바이트 또는 <code>input_current</code>에서 얻은 값을 전달합니다. 반복 함수 자체는 하드웨어를 읽지 않습니다.</p></dd><dt><code>trigger</code></dt><dd><p>이번 갱신에서 새로 눌린 비트를 <code>keys</code>와 같은 배치로 전달합니다. 보통 <code>keys &amp; ~previous_keys</code> 또는 <code>__readpadex</code>의 상위 바이트입니다. <code>keys</code>에도 있는 비트만 포함해야 합니다. 매번 눌림 마스크를 그대로 전달하면 호출마다 새 입력으로 처리되어 초기 대기가 다시 시작됩니다.</p></dd><dt><code>mask</code></dt><dd><p>대상 GB 버튼 비트를 <code>|</code>로 조합합니다. 0은 모든 동작을 비활성화하고 실행 상태를 지웁니다. 여러 비트를 지정하면 후보가 늘어나지만, 한 번의 호출에서는 선택된 한 비트만 반환하며 여러 동작의 펄스 마스크를 합쳐 반환하지 않습니다.</p></dd></dl><h4>반환값</h4><p>동작 펄스가 없으면 0, 있으면 1, 2, 4, 8, 16, 32, 64, 128 중 하나입니다. 0이 아닌 값은 버튼 비트이며, 0과 1로 정규화된 논리값이나 반복 횟수가 아닙니다.</p><h4>사용 조건과 제한</h4><p>공통 마스크는 <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>입니다. 1인 비트가 눌림을 뜻합니다. GB와 FC의 <code>input_*</code>는 이 형식을 쓰지만 FC의 원시 패드 함수는 비트 순서가 다릅니다.</p><p>초기 대기 시간으로, 반복 함수 호출 횟수 0~255를 지정합니다. 양수 N이면 첫 입력 펄스에서 정확히 N회 호출 뒤에 첫 장기 누름 반복이 발생합니다. 0이면 초기 대기 시간과의 일치 분기를 건너뛰므로 반복 간격이 첫 반복 시점을 결정합니다. 밀리초 단위가 아닙니다.</p><p>이후 반복 간격으로 0~255회 호출을 지정합니다. 양수 N이면 첫 반복 이후 대상 버튼을 누른 상태의 갱신 N회마다 펄스가 발생합니다. 0은 초기 대기가 끝난 뒤 대상 갱신마다 발생하므로, 이 단계에서는 0과 1 모두 매번 펄스를 반환합니다. 대기 시간과 간격이 모두 0이면 누르고 있는 매 갱신에서 펄스가 발생합니다.</p><p>입력 처리 주기마다 한 번 호출하세요. 호출할 때마다 상태가 바뀌며 VBlank를 기다리지 않습니다. 새 입력 비트 없이 이미 눌린 버튼을 선택하면 그 호출에서는 0을 반환하고 새 대기를 시작합니다. 이 함수들은 상태 하나당 동작 하나를 선택합니다. 반면 <code>input_repeat</code>는 8개 버튼마다 독립적인 타이머를 사용합니다.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>result=__padrep_mask(alias_state,keys,trigger,48);
+    if (result!=0) alias_pulses++;</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>정해진 버튼 상태를 네 개의 독립적인 상태에 입력하여 어느 호출에서 반복이 발생하는지 보여 주는 프로그램입니다. 대기 3, 간격 2로 0~7번의 여덟 호출을 실행하면 0, 3, 5, 7번에서 펄스가 발생합니다. 따라서 RIGHT PULSES, DOWN PULSES, ACTION PULSES, ALIAS PULSES는 모두 004입니다. 범용 처리는 A와 B를 함께 받아 A(16)를 선택합니다. 초기화, 재설정, 양방향 우선순위, 놓기, 이미 눌린 방향의 선택, 시간값 0, 식 인수도 검사합니다. CHECKS는 057, FAILED CHECKS는 000이어야 합니다. 고정 입력으로 상태 처리를 설명하는 예제이며 실제 버튼 입력을 기다리지 않습니다.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_mask">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:11117</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+    if (args.Length != 4) Error(expr, &quot;__padrep requires 4 arguments (state*, keys, trigger, mask)&quot;);
 
-    AsmOperand pm_done        = MakeUniqueLabel("padrepM_done");
-    AsmOperand pm_ret0        = MakeUniqueLabel("padrepM_ret0");
-    AsmOperand pm_no_trig     = MakeUniqueLabel("padrepM_notrig");
-    AsmOperand pm_reset_all   = MakeUniqueLabel("padrepM_reset");
-    AsmOperand pm_dir0        = MakeUniqueLabel("padrepM_dir0");
-    AsmOperand pm_have_dir    = MakeUniqueLabel("padrepM_havedir");
-    AsmOperand pm_first_rep   = MakeUniqueLabel("padrepM_firstrep");
-    AsmOperand pm_ret_dir     = MakeUniqueLabel("padrepM_retdir");
-    AsmOperand pm_skip_dasinc = MakeUniqueLabel("padrepM_skipdasinc");
-    AsmOperand pm_skip_arrinc = MakeUniqueLabel("padrepM_skiparrinc");
+    AsmOperand pm_done        = MakeUniqueLabel(&quot;padrepM_done&quot;);
+    AsmOperand pm_ret0        = MakeUniqueLabel(&quot;padrepM_ret0&quot;);
+    AsmOperand pm_no_trig     = MakeUniqueLabel(&quot;padrepM_notrig&quot;);
+    AsmOperand pm_reset_all   = MakeUniqueLabel(&quot;padrepM_reset&quot;);
+    AsmOperand pm_dir0        = MakeUniqueLabel(&quot;padrepM_dir0&quot;);
+    AsmOperand pm_have_dir    = MakeUniqueLabel(&quot;padrepM_havedir&quot;);
+    AsmOperand pm_first_rep   = MakeUniqueLabel(&quot;padrepM_firstrep&quot;);
+    AsmOperand pm_ret_dir     = MakeUniqueLabel(&quot;padrepM_retdir&quot;);
+    AsmOperand pm_skip_dasinc = MakeUniqueLabel(&quot;padrepM_skipdasinc&quot;);
+    AsmOperand pm_skip_arrinc = MakeUniqueLabel(&quot;padrepM_skiparrinc&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger, E = mask
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    CompileIntoA(args[3]); EmitAsm("LD_E_A"); // mask
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    CompileIntoA(args[3]); EmitAsm(&quot;LD_E_A&quot;); // mask
+    EmitAsm(&quot;POP_HL&quot;);
 
     // trigMasked = trigger &amp; mask -&gt; D
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_E");
-    EmitAsm("LD_D_A");
-    EmitAsm("OR_A");
-    EmitAsm("JP_Z", pm_no_trig);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_E&quot;);
+    EmitAsm(&quot;LD_D_A&quot;);
+    EmitAsm(&quot;OR_A&quot;);
+    EmitAsm(&quot;JP_Z&quot;, pm_no_trig);
 
     // select = lowbit(trigMasked) = x &amp; -x
-    EmitAsm("LD_A_D");
-    EmitAsm("CPL");
-    EmitAsm("INC_A");
-    EmitAsm("AND_D");
-    EmitAsm("LD_C_A"); // save selected in C
+    EmitAsm(&quot;LD_A_D&quot;);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;INC_A&quot;);
+    EmitAsm(&quot;AND_D&quot;);
+    EmitAsm(&quot;LD_C_A&quot;); // save selected in C
 
     // dirMask=selected, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_C");
-    EmitAsm("LD_HL_A"); // [0]=selected
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); Emi</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:11117</p></details><details class="api searchable" id="api-__padrep_reset"><summary><code>__padrep_reset</code><span class="badge">컴파일러 내장 함수</span></summary><p>상태를 재설정합니다. 모듈: 컴파일러 내장 함수. 정확한 단위, 종료 표식, 반환 조건은 아래 선언, 원문 주석, 구현에서 확인하세요.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_reset(arg0);</code></pre></div><p class="note">이 문법은 코드 생성기에서 확인한 인수 개수를 나타냅니다. arg0 같은 이름은 설명용 자리표시자이며 자료형 선언이 아닙니다. 사용 예와 구현의 요구 사항을 따르세요.</p><h4>인수 전달 예제</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_reset(arg0);</code></pre></div><p>호출 코드에서 오브젝트 초기화, 버퍼 크기, ROM 뱅크, 장치 상태를 준비하세요. 이 함수 조각만을 따로 실행한 검사는 하지 않았습니다.</p><p><a download="" href="../samples/api-fragments/gb/__padrep_reset.c">코드 조각 내려받기</a></p><details><summary>코드 생성기의 인수 검사</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
-    if (args.Length != 1) Error(expr, "__padrep_reset requires 1 argument (state*)");
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=selected
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); Emi</code></pre></div></details></details><details class="api searchable" id="api-__padrep_reset" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_reset</code></summary><p>설정된 대기 시간과 간격은 유지하면서 선택된 동작을 취소하고 두 경과 카운터를 0으로 만듭니다. 메뉴를 닫거나 입력 대상을 바꿀 때 사용하면 이전에 누르고 있던 버튼의 반복 진행 상태가 다음 조작으로 이어지지 않습니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>void __padrep_reset(u8* state);</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>매개변수</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>쓰기 가능한 연속된 RAM 5바이트의 포인터입니다. 예를 들어 <code>u8 state[5]</code>를 준비합니다. 배치는 <code>[0] 선택된 버튼 비트</code>, <code>[1] 초기 대기 시간</code>, <code>[2] 반복 간격</code>, <code>[3] 초기 대기 경과 카운터</code>, <code>[4] 반복 경과 카운터</code>입니다. 독립적인 반복 처리마다 별도의 상태를 준비하고 사용 전에 초기화하세요. 널 포인터, 5바이트 미만의 영역, 방향 전용 처리와 범용 처리 간의 상태 공유는 지원하지 않습니다.</p></dd></dl><h4>반환값</h4><p>없음(<code>void</code>).</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>__padrep_reset(lr);
+expect(lr[0],0); expect(lr[1],3); expect(lr[2],2);
+expect(lr[3],0); expect(lr[4],0);</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>정해진 버튼 상태를 네 개의 독립적인 상태에 입력하여 어느 호출에서 반복이 발생하는지 보여 주는 프로그램입니다. 대기 3, 간격 2로 0~7번의 여덟 호출을 실행하면 0, 3, 5, 7번에서 펄스가 발생합니다. 따라서 RIGHT PULSES, DOWN PULSES, ACTION PULSES, ALIAS PULSES는 모두 004입니다. 범용 처리는 A와 B를 함께 받아 A(16)를 선택합니다. 초기화, 재설정, 양방향 우선순위, 놓기, 이미 눌린 방향의 선택, 시간값 0, 식 인수도 검사합니다. CHECKS는 057, FAILED CHECKS는 000이어야 합니다. 고정 입력으로 상태 처리를 설명하는 예제이며 실제 버튼 입력을 기다리지 않습니다.</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_reset">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10708</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
+    if (args.Length != 1) Error(expr, &quot;__padrep_reset requires 1 argument (state*)&quot;);
 
     CompileIntoHL(args[0]);
 
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [0]=0 (dirMask)
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0 (dirMask)
 
     // [3]=0, [4]=0
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("LD_HL_A");
-    EmitAsm("INC_HL"); // -&gt; [4]
-    EmitAsm("LD_HL_A");
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;INC_HL&quot;); // -&gt; [4]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;POP_HL&quot;);
     return;
 }
 
@@ -1894,20 +1909,20 @@ if (funcName == "__padrep_reset")
 // New triggers take priority, with Right selected first when both trigger bits are set.
 // Without a new trigger, simultaneous Left/Right holds suppress movement without resetting counters.
 // A single held direction is adopted without immediate movement when no direction is active.
-// Subsequent updates use the five-byte state's initial delay and repeat interval; ARR=0 repeats each update.
-if (funcName == "__padrep_lr")
+// Subsequent updates use the five-byte state&#x27;s initial delay and repeat interval; ARR=0 repeats each update.
+if (funcName == &quot;__padrep_lr&quot;)
 {
-    if (args.Length != 3) Error(expr, "__padrep_lr requires 3 arguments (state*, keys, trigger)");
+    if (args.Length != 3) Error(expr, &quot;__padrep_lr requires 3 arguments (state*, keys, trigger)&quot;);
 
-    AsmOperand pr_done        = MakeUniqueLabel("padrep_done");
-    AsmOperand pr_ret0        = MakeUniqueLabel("padrep_ret0");
-    AsmOperand pr_check_left  = MakeUniqueLabel("padrep_chkL");
-    AsmOperand pr_no_trig     = MakeUniqueLabel("padrep_notrig");
-    AsmOperand pr_reset_all   = MakeUniqueLabel("padrep_reset");
-    AsmOperand pr_dir0        = MakeUniqueLabel("padrep_dir0");
-    AsmOperand pr_have_dir    = MakeUniqueLabel("padrep_havedir");
-    AsmOperand pr_first_rep   = MakeUniqueLabel("padrep_firstrep");
-    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep</code></pre></div></details><p class="source">선언·식별자 출처: kitaqgb/kitaqgb/CodeGenerator.cs:10708</p></details><details class="api searchable" id="api-__readpad" data-api-contract="input-source-20260915"><summary><code>__readpad</code></summary><p>JOYP에서 방향키와 동작 버튼을 읽어 공통 8비트 마스크로 합칩니다. 각 그룹을 선택하고 안정화를 위해 두 번 읽은 뒤 그룹 선택 비트를 <code>0x30</code>으로 되돌립니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u8 __readpad();</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>반환값</h4><p>공통 <code>BTN_*</code> 형식의 8비트 마스크입니다. 여러 버튼 비트가 동시에 설정될 수 있으며 0은 해당 버튼이 없음을 뜻합니다.</p><h4>사용 조건과 제한</h4><p>공통 마스크는 <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>입니다. 1인 비트가 눌림을 뜻합니다. GB와 FC의 <code>input_*</code>는 이 형식을 쓰지만 FC의 원시 패드 함수는 비트 순서가 다릅니다.</p><p>이 호출은 하드웨어 상태를 새로 읽습니다. <code>input_*</code>나 <code>nes_pad1_*</code>의 저장 상태는 갱신하지 않으며 누름·뗌 에지나 반복도 만들지 않습니다. 필요하면 결과를 저장하고 직접 보관한 이전 마스크와 비교해 변화를 구하세요.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>all_keys=__readpad(); // A + Right: 0x11, decimal 17.</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>세 가지 버튼 마스크 형식과 현재 상태·새 입력을 묶은 반환값을 비교하는 프로그램입니다. A와 오른쪽을 함께 누릅니다. ALL KEYS는 17이고 DIRECTIONS와 BUTTONS LOW는 각각 1입니다. 이전 마스크가 0이면 EX CURRENT와 EX NEW PRESS가 모두 17입니다. 현재 마스크를 다음 읽기에 전달하면 HELD PRESS는 0이 됩니다. FAILED CHECKS는 0이어야 합니다. 관측값은 화면에 고정되므로 버튼을 놓아도 사라지지 않습니다.</p><p><a href="../samples/api-examples/gb/input_raw.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+    AsmOperand pr_done        = MakeUniqueLabel(&quot;padrep_done&quot;);
+    AsmOperand pr_ret0        = MakeUniqueLabel(&quot;padrep_ret0&quot;);
+    AsmOperand pr_check_left  = MakeUniqueLabel(&quot;padrep_chkL&quot;);
+    AsmOperand pr_no_trig     = MakeUniqueLabel(&quot;padrep_notrig&quot;);
+    AsmOperand pr_reset_all   = MakeUniqueLabel(&quot;padrep_reset&quot;);
+    AsmOperand pr_dir0        = MakeUniqueLabel(&quot;padrep_dir0&quot;);
+    AsmOperand pr_have_dir    = MakeUniqueLabel(&quot;padrep_havedir&quot;);
+    AsmOperand pr_first_rep   = MakeUniqueLabel(&quot;padrep_firstrep&quot;);
+    AsmOperand pr_ret_dir     = MakeUniqueLabel(&quot;padrep</code></pre></div></details></details><details class="api searchable" id="api-__readpad" data-api-contract="input-source-20260915"><summary><code>__readpad</code></summary><p>JOYP에서 방향키와 동작 버튼을 읽어 공통 8비트 마스크로 합칩니다. 각 그룹을 선택하고 안정화를 위해 두 번 읽은 뒤 그룹 선택 비트를 <code>0x30</code>으로 되돌립니다.</p><h4>사용 형식</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>u8 __readpad();</code></pre></div><p>이 호출 형식의 매개변수 이름은 컴파일러 내장 기능을 설명하기 위한 것입니다. 별도로 추가할 C 선언이 아닙니다.</p><h4>반환값</h4><p>공통 <code>BTN_*</code> 형식의 8비트 마스크입니다. 여러 버튼 비트가 동시에 설정될 수 있으며 0은 해당 버튼이 없음을 뜻합니다.</p><h4>사용 조건과 제한</h4><p>공통 마스크는 <code>BTN_RIGHT=0x01</code>, <code>BTN_LEFT=0x02</code>, <code>BTN_UP=0x04</code>, <code>BTN_DOWN=0x08</code>, <code>BTN_A=0x10</code>, <code>BTN_B=0x20</code>, <code>BTN_SELECT=0x40</code>, <code>BTN_START=0x80</code>입니다. 1인 비트가 눌림을 뜻합니다. GB와 FC의 <code>input_*</code>는 이 형식을 쓰지만 FC의 원시 패드 함수는 비트 순서가 다릅니다.</p><p>이 호출은 하드웨어 상태를 새로 읽습니다. <code>input_*</code>나 <code>nes_pad1_*</code>의 저장 상태는 갱신하지 않으며 누름·뗌 에지나 반복도 만들지 않습니다. 필요하면 결과를 저장하고 직접 보관한 이전 마스크와 비교해 변화를 구하세요.</p><h4>사용 예</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">복사</button><pre><code>all_keys=__readpad(); // A + Right: 0x11, decimal 17.</code></pre></div><p>호출 부분을 보여 주는 코드입니다. 완전한 프로그램에 넣을 때는 명시된 초기화 및 버퍼 조건을 충족해야 합니다.</p><h4>예상 결과</h4><p>세 가지 버튼 마스크 형식과 현재 상태·새 입력을 묶은 반환값을 비교하는 프로그램입니다. A와 오른쪽을 함께 누릅니다. ALL KEYS는 17이고 DIRECTIONS와 BUTTONS LOW는 각각 1입니다. 이전 마스크가 0이면 EX CURRENT와 EX NEW PRESS가 모두 17입니다. 현재 마스크를 다음 읽기에 전달하면 HELD PRESS는 0이 됩니다. FAILED CHECKS는 0이어야 합니다. 관측값은 화면에 고정되므로 버튼을 놓아도 사라지지 않습니다.</p><p><a href="../samples/api-examples/gb/input_raw.c">사용 예의 전체 프로그램</a></p><h4>빌드 명령</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpad">검증 결과</a></p><details class="api-source"><summary>구현과 소스</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10537</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">복사</button><pre><code>{
     if (args.Length != 0) Error(expr, &quot;__readpad requires 0 arguments&quot;);
 

@@ -1664,109 +1664,117 @@ if (funcName == "__readpad")
             // Signed multiply where coefficient is Q1.7 (int8 scaled by 1/128).
             // Implemented as (a*b)&gt;&gt;8 then *2 (loses 1 bit of fractional precision).
             // Useful for sin/cos rotation coefficients in [-1, 1).
-            if (funcName == "__smul16x8_q1_</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:11320</p></details><details class="api searchable" id="api-__padrep"><summary><code>__padrep</code><span class="badge">编译器内建函数</span></summary><p>执行参数指定的操作。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep(arg0, arg1, arg2, arg3);</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__padrep.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
-    if (args.Length != 4) Error(expr, "__padrep requires 4 arguments (state*, keys, trigger, mask)");
+            if (funcName == "__smul16x8_q1_</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:11320</p></details><details class="api searchable" id="api-__padrep" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep</code></summary><p>从<code>mask</code>指定的按钮中选择一个操作进行连发。存在符合条件的新按下位时，选择最低有效位并立即返回。否则，只要当前操作仍在掩码范围内且仍被按住，就保持该操作。该操作结束后，选择剩余按住位中的最低位，但不立即产生脉冲。没有符合条件的按住位时清空运行状态。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u8 __padrep(u8* state, u8 keys, u8 trigger, u8 mask);</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>参数</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>指向连续5字节可写RAM的指针，例如<code>u8 state[5]</code>。布局为<code>[0]当前按钮位</code>、<code>[1]初始等待时间</code>、<code>[2]连发间隔</code>、<code>[3]初始等待经过计数</code>、<code>[4]连发经过计数</code>。每个独立的连发处理都应使用单独的状态，并在使用前初始化。不支持空指针、少于5字节的区域，或在方向专用处理与通用处理之间共用状态。</p></dd><dt><code>keys</code></dt><dd><p>使用GB <code>BTN_*</code>布局的当前完整按住掩码。传入<code>__readpad</code>的结果、<code>__readpadex</code>的低字节或<code>input_current</code>的结果。连发函数本身不读取硬件。</p></dd><dt><code>trigger</code></dt><dd><p>本次更新中新按下的位，布局与<code>keys</code>相同，通常为<code>keys &amp; ~previous_keys</code>或<code>__readpadex</code>的高字节。只能包含同时存在于<code>keys</code>中的位。每次都传入按住掩码会使每次调用都被误认为初次按下，重新开始等待。</p></dd><dt><code>mask</code></dt><dd><p>用<code>|</code>组合允许参与连发的GB按钮位。0会禁用所有操作并清空运行状态。多个位可提供多个候选，但每次调用只返回选中的一个位，不返回组合脉冲掩码。</p></dd></dl><h4>返回值</h4><p>没有操作脉冲时返回0，否则返回1, 2, 4, 8, 16, 32, 64, 128之一。非零结果是按钮位，不是归一化布尔值，也不是连发次数。</p><h4>使用条件与限制</h4><p>通用掩码为 <code>BTN_RIGHT=0x01</code>、<code>BTN_LEFT=0x02</code>、<code>BTN_UP=0x04</code>、<code>BTN_DOWN=0x08</code>、<code>BTN_A=0x10</code>、<code>BTN_B=0x20</code>、<code>BTN_SELECT=0x40</code>、<code>BTN_START=0x80</code>。位为 1 表示按住。GB 和 FC 的 <code>input_*</code> 均使用此格式；FC 原始手柄函数的位序不同。</p><p>初始等待时间，范围0至255，单位为连发函数的调用次数。正值N表示初次按下脉冲之后恰好经过N次调用产生首次长按连发。为0时跳过初始等待相等分支，由连发间隔决定首次长按脉冲的时间。单位不是毫秒。</p><p>后续连发间隔，范围0至255次调用。正值N表示首次连发之后，每N次有效按住更新产生一次脉冲。0表示初始等待结束后每次有效更新都产生脉冲，因此在该阶段0和1均为每次更新一次。等待时间和间隔均为0时，每次按住更新都会产生脉冲。</p><p>每个预定输入周期调用一次。每次调用都会修改状态，不会等待VBlank。没有新按下位而接管已按住的按钮时，该次调用返回0并开始新的等待。这组函数每个状态只处理一个当前操作；<code>input_repeat</code>则为八个按钮分别维护独立计时器。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>result=__padrep(actions,keys,trigger,48); // A|B: select A, the lower bit.
+    if (result!=0) action_pulses++;</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序把预设按钮状态送入四个独立状态，演示连发具体发生在哪次调用。等待时间3、间隔2时，编号0至7的八次调用会在0、3、5、7产生脉冲。因此RIGHT PULSES、DOWN PULSES、ACTION PULSES和ALIAS PULSES均显示004。通用处理同时接收A和B，选择A（16）。程序还检查初始化、重置、双方向优先级、松开、接管已按住的方向、时间值0和表达式参数。CHECKS应为057，FAILED CHECKS应为000。这是使用固定输入的状态处理示例，不会等待你实际按下按钮。</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:11117</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+    if (args.Length != 4) Error(expr, &quot;__padrep requires 4 arguments (state*, keys, trigger, mask)&quot;);
 
-    AsmOperand pm_done        = MakeUniqueLabel("padrepM_done");
-    AsmOperand pm_ret0        = MakeUniqueLabel("padrepM_ret0");
-    AsmOperand pm_no_trig     = MakeUniqueLabel("padrepM_notrig");
-    AsmOperand pm_reset_all   = MakeUniqueLabel("padrepM_reset");
-    AsmOperand pm_dir0        = MakeUniqueLabel("padrepM_dir0");
-    AsmOperand pm_have_dir    = MakeUniqueLabel("padrepM_havedir");
-    AsmOperand pm_first_rep   = MakeUniqueLabel("padrepM_firstrep");
-    AsmOperand pm_ret_dir     = MakeUniqueLabel("padrepM_retdir");
-    AsmOperand pm_skip_dasinc = MakeUniqueLabel("padrepM_skipdasinc");
-    AsmOperand pm_skip_arrinc = MakeUniqueLabel("padrepM_skiparrinc");
+    AsmOperand pm_done        = MakeUniqueLabel(&quot;padrepM_done&quot;);
+    AsmOperand pm_ret0        = MakeUniqueLabel(&quot;padrepM_ret0&quot;);
+    AsmOperand pm_no_trig     = MakeUniqueLabel(&quot;padrepM_notrig&quot;);
+    AsmOperand pm_reset_all   = MakeUniqueLabel(&quot;padrepM_reset&quot;);
+    AsmOperand pm_dir0        = MakeUniqueLabel(&quot;padrepM_dir0&quot;);
+    AsmOperand pm_have_dir    = MakeUniqueLabel(&quot;padrepM_havedir&quot;);
+    AsmOperand pm_first_rep   = MakeUniqueLabel(&quot;padrepM_firstrep&quot;);
+    AsmOperand pm_ret_dir     = MakeUniqueLabel(&quot;padrepM_retdir&quot;);
+    AsmOperand pm_skip_dasinc = MakeUniqueLabel(&quot;padrepM_skipdasinc&quot;);
+    AsmOperand pm_skip_arrinc = MakeUniqueLabel(&quot;padrepM_skiparrinc&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger, E = mask
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    CompileIntoA(args[3]); EmitAsm("LD_E_A"); // mask
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    CompileIntoA(args[3]); EmitAsm(&quot;LD_E_A&quot;); // mask
+    EmitAsm(&quot;POP_HL&quot;);
 
     // trigMasked = trigger &amp; mask -&gt; D
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_E");
-    EmitAsm("LD_D_A");
-    EmitAsm("OR_A");
-    EmitAsm("JP_Z", pm_no_trig);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_E&quot;);
+    EmitAsm(&quot;LD_D_A&quot;);
+    EmitAsm(&quot;OR_A&quot;);
+    EmitAsm(&quot;JP_Z&quot;, pm_no_trig);
 
     // select = lowbit(trigMasked) = x &amp; -x
-    EmitAsm("LD_A_D");
-    EmitAsm("CPL");
-    EmitAsm("INC_A");
-    EmitAsm("AND_D");
-    EmitAsm("LD_C_A"); // save selected in C
+    EmitAsm(&quot;LD_A_D&quot;);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;INC_A&quot;);
+    EmitAsm(&quot;AND_D&quot;);
+    EmitAsm(&quot;LD_C_A&quot;); // save selected in C
 
     // dirMask=selected, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_C");
-    EmitAsm("LD_HL_A"); // [0]=selected
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); Emi</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:11117</p></details><details class="api searchable" id="api-__padrep_down"><summary><code>__padrep_down</code><span class="badge">编译器内建函数</span></summary><p>执行参数指定的操作。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_down(arg0, arg1, arg2);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_down(arg0, arg1, arg2);</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__padrep_down.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
-    if (args.Length != 3) Error(expr, "__padrep_down requires 3 arguments (state*, keys, trigger)");
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=selected
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); Emi</code></pre></div></details></details><details class="api searchable" id="api-__padrep_down" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_down</code></summary><p>仅针对下方向推进一次连发状态。下键刚按下时立即返回8并重新开始计数。持续按住下键时按状态中的时间设置产生后续脉冲，松开后清空运行状态。其他按钮不会触发此连发处理。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u8 __padrep_down(u8* state, u8 keys, u8 trigger);</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>参数</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>指向连续5字节可写RAM的指针，例如<code>u8 state[5]</code>。布局为<code>[0]当前按钮位</code>、<code>[1]初始等待时间</code>、<code>[2]连发间隔</code>、<code>[3]初始等待经过计数</code>、<code>[4]连发经过计数</code>。每个独立的连发处理都应使用单独的状态，并在使用前初始化。不支持空指针、少于5字节的区域，或在方向专用处理与通用处理之间共用状态。</p></dd><dt><code>keys</code></dt><dd><p>使用GB <code>BTN_*</code>布局的当前完整按住掩码。传入<code>__readpad</code>的结果、<code>__readpadex</code>的低字节或<code>input_current</code>的结果。连发函数本身不读取硬件。</p></dd><dt><code>trigger</code></dt><dd><p>本次更新中新按下的位，布局与<code>keys</code>相同，通常为<code>keys &amp; ~previous_keys</code>或<code>__readpadex</code>的高字节。只能包含同时存在于<code>keys</code>中的位。每次都传入按住掩码会使每次调用都被误认为初次按下，重新开始等待。</p></dd></dl><h4>返回值</h4><p>没有操作脉冲时返回0，否则返回8之一。非零结果是按钮位，不是归一化布尔值，也不是连发次数。</p><h4>使用条件与限制</h4><p>通用掩码为 <code>BTN_RIGHT=0x01</code>、<code>BTN_LEFT=0x02</code>、<code>BTN_UP=0x04</code>、<code>BTN_DOWN=0x08</code>、<code>BTN_A=0x10</code>、<code>BTN_B=0x20</code>、<code>BTN_SELECT=0x40</code>、<code>BTN_START=0x80</code>。位为 1 表示按住。GB 和 FC 的 <code>input_*</code> 均使用此格式；FC 原始手柄函数的位序不同。</p><p>初始等待时间，范围0至255，单位为连发函数的调用次数。正值N表示初次按下脉冲之后恰好经过N次调用产生首次长按连发。为0时跳过初始等待相等分支，由连发间隔决定首次长按脉冲的时间。单位不是毫秒。</p><p>后续连发间隔，范围0至255次调用。正值N表示首次连发之后，每N次有效按住更新产生一次脉冲。0表示初始等待结束后每次有效更新都产生脉冲，因此在该阶段0和1均为每次更新一次。等待时间和间隔均为0时，每次按住更新都会产生脉冲。</p><p>每个预定输入周期调用一次。每次调用都会修改状态，不会等待VBlank。没有新按下位而接管已按住的按钮时，该次调用返回0并开始新的等待。这组函数每个状态只处理一个当前操作；<code>input_repeat</code>则为八个按钮分别维护独立计时器。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>result=__padrep_down(down,keys,trigger);
+    if (result!=0) down_pulses++;</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序把预设按钮状态送入四个独立状态，演示连发具体发生在哪次调用。等待时间3、间隔2时，编号0至7的八次调用会在0、3、5、7产生脉冲。因此RIGHT PULSES、DOWN PULSES、ACTION PULSES和ALIAS PULSES均显示004。通用处理同时接收A和B，选择A（16）。程序还检查初始化、重置、双方向优先级、松开、接管已按住的方向、时间值0和表达式参数。CHECKS应为057，FAILED CHECKS应为000。这是使用固定输入的状态处理示例，不会等待你实际按下按钮。</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_down">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10937</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+    if (args.Length != 3) Error(expr, &quot;__padrep_down requires 3 arguments (state*, keys, trigger)&quot;);
 
-    AsmOperand pd_done        = MakeUniqueLabel("padrepD_done");
-    AsmOperand pd_ret0        = MakeUniqueLabel("padrepD_ret0");
-    AsmOperand pd_no_trig     = MakeUniqueLabel("padrepD_notrig");
-    AsmOperand pd_dir0        = MakeUniqueLabel("padrepD_dir0");
-    AsmOperand pd_have_dir    = MakeUniqueLabel("padrepD_havedir");
-    AsmOperand pd_first_rep   = MakeUniqueLabel("padrepD_firstrep");
-    AsmOperand pd_ret_dir     = MakeUniqueLabel("padrepD_retdir");
-    AsmOperand pd_skip_dasinc = MakeUniqueLabel("padrepD_skipdasinc");
-    AsmOperand pd_skip_arrinc = MakeUniqueLabel("padrepD_skiparrinc");
-    AsmOperand pd_reset_all   = MakeUniqueLabel("padrepD_reset");
+    AsmOperand pd_done        = MakeUniqueLabel(&quot;padrepD_done&quot;);
+    AsmOperand pd_ret0        = MakeUniqueLabel(&quot;padrepD_ret0&quot;);
+    AsmOperand pd_no_trig     = MakeUniqueLabel(&quot;padrepD_notrig&quot;);
+    AsmOperand pd_dir0        = MakeUniqueLabel(&quot;padrepD_dir0&quot;);
+    AsmOperand pd_have_dir    = MakeUniqueLabel(&quot;padrepD_havedir&quot;);
+    AsmOperand pd_first_rep   = MakeUniqueLabel(&quot;padrepD_firstrep&quot;);
+    AsmOperand pd_ret_dir     = MakeUniqueLabel(&quot;padrepD_retdir&quot;);
+    AsmOperand pd_skip_dasinc = MakeUniqueLabel(&quot;padrepD_skipdasinc&quot;);
+    AsmOperand pd_skip_arrinc = MakeUniqueLabel(&quot;padrepD_skiparrinc&quot;);
+    AsmOperand pd_reset_all   = MakeUniqueLabel(&quot;padrepD_reset&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    EmitAsm(&quot;POP_HL&quot;);
 
     // --- Trigger Down? (bit3 = 0x08) ---
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_IMM", new AsmOperand(0x08, AddressMode.Immediate));
-    EmitAsm("JP_Z", pd_no_trig);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x08, AddressMode.Immediate));
+    EmitAsm(&quot;JP_Z&quot;, pd_no_trig);
 
     // dirMask=0x08, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_IMM", new AsmOperand(0x08, AddressMode.Immediate));
-    EmitAsm("LD_HL_A"); // [0]=0x08
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // dasCnt=0
-    EmitAsm("INC_HL");
-    EmitAsm("LD_HL_A"); // arrCnt=0
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x08, AddressMode.Immediate));
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0x08
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // dasCnt=0
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // arrCnt=0
+    EmitAsm(&quot;POP_HL&quot;);
 
-    EmitAsm</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:10937</p></details><details class="api searchable" id="api-__padrep_init"><summary><code>__padrep_init</code><span class="badge">编译器内建函数</span></summary><p>准备初始状态。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_init(arg0, arg1, arg2);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_init(arg0, arg1, arg2);</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__padrep_init.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
-    if (args.Length != 3) Error(expr, "__padrep_init requires 3 arguments (state*, das, arr)");
+    EmitAsm</code></pre></div></details></details><details class="api searchable" id="api-__padrep_init" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_init</code></summary><p>初始化调用方提供的5字节连发状态：清空当前操作和两个计数器，保存指定的初始等待时间与连发间隔。不读取按钮，也不产生连发脉冲。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __padrep_init(u8* state, u8 das, u8 arr);</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>参数</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>指向连续5字节可写RAM的指针，例如<code>u8 state[5]</code>。布局为<code>[0]当前按钮位</code>、<code>[1]初始等待时间</code>、<code>[2]连发间隔</code>、<code>[3]初始等待经过计数</code>、<code>[4]连发经过计数</code>。每个独立的连发处理都应使用单独的状态，并在使用前初始化。不支持空指针、少于5字节的区域，或在方向专用处理与通用处理之间共用状态。</p></dd><dt><code>das</code></dt><dd><p>初始等待时间，范围0至255，单位为连发函数的调用次数。正值N表示初次按下脉冲之后恰好经过N次调用产生首次长按连发。为0时跳过初始等待相等分支，由连发间隔决定首次长按脉冲的时间。单位不是毫秒。</p></dd><dt><code>arr</code></dt><dd><p>后续连发间隔，范围0至255次调用。正值N表示首次连发之后，每N次有效按住更新产生一次脉冲。0表示初始等待结束后每次有效更新都产生脉冲，因此在该阶段0和1均为每次更新一次。等待时间和间隔均为0时，每次按住更新都会产生脉冲。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_init(lr,3,2);
+// Active action and counters are zero; delay and interval are retained.
+expect(lr[0],0); expect(lr[1],3); expect(lr[2],2);
+expect(lr[3],0); expect(lr[4],0);</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序把预设按钮状态送入四个独立状态，演示连发具体发生在哪次调用。等待时间3、间隔2时，编号0至7的八次调用会在0、3、5、7产生脉冲。因此RIGHT PULSES、DOWN PULSES、ACTION PULSES和ALIAS PULSES均显示004。通用处理同时接收A和B，选择A（16）。程序还检查初始化、重置、双方向优先级、松开、接管已按住的方向、时间值0和表达式参数。CHECKS应为057，FAILED CHECKS应为000。这是使用固定输入的状态处理示例，不会等待你实际按下按钮。</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_init">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10676</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+    if (args.Length != 3) Error(expr, &quot;__padrep_init requires 3 arguments (state*, das, arr)&quot;);
 
     // Evaluate args with register safety
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // das
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // arr
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // das
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // arr
+    EmitAsm(&quot;POP_HL&quot;);
 
     // dirMask = 0; dasCnt=0; arrCnt=0; store params
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [0]=0
-    EmitAsm("INC_HL");
-    EmitAsm("LD_A_B");
-    EmitAsm("LD_HL_A"); // [1]=das
-    EmitAsm("INC_HL");
-    EmitAsm("LD_A_C");
-    EmitAsm("LD_HL_A"); // [2]=arr
-    EmitAsm("INC_HL");
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [3]=dasCnt
-    EmitAsm("INC_HL");
-    EmitAsm("LD_HL_A"); // [4]=arrCnt
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_A_B&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [1]=das
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [2]=arr
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [3]=dasCnt
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [4]=arrCnt
     return;
 }
 
@@ -1774,119 +1782,126 @@ if (funcName == "__readpad")
 // Resets runtime counters for PadRepeatState while keeping das/arr params:
 // dirMask=0, dasCnt=0, arrCnt=0
 // Treated as a compiler intrinsic (no C definition required).
-if (funcName == "__padrep_reset")
+if (funcName == &quot;__padrep_reset&quot;)
 {
-    if (args.Length != 1) Error(expr, "__padrep_reset requires 1 argument (state*)");
+    if (args.Length != 1) Error(expr, &quot;__padrep_reset requires 1 argument (state*)&quot;);
 
     CompileIntoHL(args[0]);
 
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [0]=0 (dirMask)
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0 (dirMask)
 
     // [3]=0, [4]=0
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("LD_HL_A");
-    EmitAsm("INC_HL"); // -&gt; [4]
-    EmitAsm("LD_HL_A");
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;INC_HL&quot;); // -&gt; [4]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;POP_HL&quot;);
     return;
 }
 
 // __padrep_lr(state*, keys, trigger) returns Right (1), Left (2), or zero.
 // New triggers take priority, with Right selected first when both trigger bits are set.
-// Without a new</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:10676</p></details><details class="api searchable" id="api-__padrep_lr"><summary><code>__padrep_lr</code><span class="badge">编译器内建函数</span></summary><p>执行参数指定的操作。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_lr(arg0, arg1, arg2);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_lr(arg0, arg1, arg2);</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__padrep_lr.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
-    if (args.Length != 3) Error(expr, "__padrep_lr requires 3 arguments (state*, keys, trigger)");
+// Without a new</code></pre></div></details></details><details class="api searchable" id="api-__padrep_lr" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_lr</code></summary><p>将左或右其中一个操作的连发状态推进一次。右键刚按下时立即返回1，否则左键刚按下时返回2。两者同时刚按下时优先选择右。没有新按下事件且同时按住两个方向时返回0并暂停计数器；两个方向均未按住时清空运行状态。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u8 __padrep_lr(u8* state, u8 keys, u8 trigger);</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>参数</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>指向连续5字节可写RAM的指针，例如<code>u8 state[5]</code>。布局为<code>[0]当前按钮位</code>、<code>[1]初始等待时间</code>、<code>[2]连发间隔</code>、<code>[3]初始等待经过计数</code>、<code>[4]连发经过计数</code>。每个独立的连发处理都应使用单独的状态，并在使用前初始化。不支持空指针、少于5字节的区域，或在方向专用处理与通用处理之间共用状态。</p></dd><dt><code>keys</code></dt><dd><p>使用GB <code>BTN_*</code>布局的当前完整按住掩码。传入<code>__readpad</code>的结果、<code>__readpadex</code>的低字节或<code>input_current</code>的结果。连发函数本身不读取硬件。</p></dd><dt><code>trigger</code></dt><dd><p>本次更新中新按下的位，布局与<code>keys</code>相同，通常为<code>keys &amp; ~previous_keys</code>或<code>__readpadex</code>的高字节。只能包含同时存在于<code>keys</code>中的位。每次都传入按住掩码会使每次调用都被误认为初次按下，重新开始等待。</p></dd></dl><h4>返回值</h4><p>没有操作脉冲时返回0，否则返回1, 2之一。非零结果是按钮位，不是归一化布尔值，也不是连发次数。</p><h4>使用条件与限制</h4><p>通用掩码为 <code>BTN_RIGHT=0x01</code>、<code>BTN_LEFT=0x02</code>、<code>BTN_UP=0x04</code>、<code>BTN_DOWN=0x08</code>、<code>BTN_A=0x10</code>、<code>BTN_B=0x20</code>、<code>BTN_SELECT=0x40</code>、<code>BTN_START=0x80</code>。位为 1 表示按住。GB 和 FC 的 <code>input_*</code> 均使用此格式；FC 原始手柄函数的位序不同。</p><p>初始等待时间，范围0至255，单位为连发函数的调用次数。正值N表示初次按下脉冲之后恰好经过N次调用产生首次长按连发。为0时跳过初始等待相等分支，由连发间隔决定首次长按脉冲的时间。单位不是毫秒。</p><p>后续连发间隔，范围0至255次调用。正值N表示首次连发之后，每N次有效按住更新产生一次脉冲。0表示初始等待结束后每次有效更新都产生脉冲，因此在该阶段0和1均为每次更新一次。等待时间和间隔均为0时，每次按住更新都会产生脉冲。</p><p>每个预定输入周期调用一次。每次调用都会修改状态，不会等待VBlank。没有新按下位而接管已按住的按钮时，该次调用返回0并开始新的等待。这组函数每个状态只处理一个当前操作；<code>input_repeat</code>则为八个按钮分别维护独立计时器。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>result=__padrep_lr(lr,keys,trigger);
+    if (result!=0) pulses++;</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序把预设按钮状态送入四个独立状态，演示连发具体发生在哪次调用。等待时间3、间隔2时，编号0至7的八次调用会在0、3、5、7产生脉冲。因此RIGHT PULSES、DOWN PULSES、ACTION PULSES和ALIAS PULSES均显示004。通用处理同时接收A和B，选择A（16）。程序还检查初始化、重置、双方向优先级、松开、接管已按住的方向、时间值0和表达式参数。CHECKS应为057，FAILED CHECKS应为000。这是使用固定输入的状态处理示例，不会等待你实际按下按钮。</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_lr">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10732</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+    if (args.Length != 3) Error(expr, &quot;__padrep_lr requires 3 arguments (state*, keys, trigger)&quot;);
 
-    AsmOperand pr_done        = MakeUniqueLabel("padrep_done");
-    AsmOperand pr_ret0        = MakeUniqueLabel("padrep_ret0");
-    AsmOperand pr_check_left  = MakeUniqueLabel("padrep_chkL");
-    AsmOperand pr_no_trig     = MakeUniqueLabel("padrep_notrig");
-    AsmOperand pr_reset_all   = MakeUniqueLabel("padrep_reset");
-    AsmOperand pr_dir0        = MakeUniqueLabel("padrep_dir0");
-    AsmOperand pr_have_dir    = MakeUniqueLabel("padrep_havedir");
-    AsmOperand pr_first_rep   = MakeUniqueLabel("padrep_firstrep");
-    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep_retdir");
-    AsmOperand pr_skip_dasinc = MakeUniqueLabel("padrep_skipdasinc");
-    AsmOperand pr_skip_arrinc = MakeUniqueLabel("padrep_skiparrinc");
+    AsmOperand pr_done        = MakeUniqueLabel(&quot;padrep_done&quot;);
+    AsmOperand pr_ret0        = MakeUniqueLabel(&quot;padrep_ret0&quot;);
+    AsmOperand pr_check_left  = MakeUniqueLabel(&quot;padrep_chkL&quot;);
+    AsmOperand pr_no_trig     = MakeUniqueLabel(&quot;padrep_notrig&quot;);
+    AsmOperand pr_reset_all   = MakeUniqueLabel(&quot;padrep_reset&quot;);
+    AsmOperand pr_dir0        = MakeUniqueLabel(&quot;padrep_dir0&quot;);
+    AsmOperand pr_have_dir    = MakeUniqueLabel(&quot;padrep_havedir&quot;);
+    AsmOperand pr_first_rep   = MakeUniqueLabel(&quot;padrep_firstrep&quot;);
+    AsmOperand pr_ret_dir     = MakeUniqueLabel(&quot;padrep_retdir&quot;);
+    AsmOperand pr_skip_dasinc = MakeUniqueLabel(&quot;padrep_skipdasinc&quot;);
+    AsmOperand pr_skip_arrinc = MakeUniqueLabel(&quot;padrep_skiparrinc&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    EmitAsm(&quot;POP_HL&quot;);
 
     // --- Trigger Right? (bit0) ---
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_IMM", new AsmOperand(0x01, AddressMode.Immediate));
-    EmitAsm("JP_Z", pr_check_left);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_IMM&quot;, new AsmOperand(0x01, AddressMode.Immediate));
+    EmitAsm(&quot;JP_Z&quot;, pr_check_left);
 
     // dirMask=0x01, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_IMM", new AsmOperand(0x01, AddressMode.Immediate));
-    EmitAsm("LD_HL_A"); // [0]=0x01
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // dasCnt=0
-    EmitAsm("INC_HL");
-    EmitAsm("LD_HL_A")</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:10732</p></details><details class="api searchable" id="api-__padrep_mask"><summary><code>__padrep_mask</code><span class="badge">编译器内建函数</span></summary><p>执行参数指定的操作。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_mask(arg0, arg1, arg2, arg3);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_mask(arg0, arg1, arg2, arg3);</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__padrep_mask.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
-    if (args.Length != 4) Error(expr, "__padrep requires 4 arguments (state*, keys, trigger, mask)");
+    EmitAsm(&quot;LD_A_IMM&quot;, new AsmOperand(0x01, AddressMode.Immediate));
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0x01
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // dasCnt=0
+    EmitAsm(&quot;INC_HL&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;)</code></pre></div></details></details><details class="api searchable" id="api-__padrep_mask" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_mask</code></summary><p><code>__padrep_mask</code>是<code>__padrep</code>的别名，两者进入相同的编译器实现。单个操作的选择方式、时间规则、状态布局和返回值均相同。较明确的名称有助于在调用位置看出这是通过掩码选择操作的连发处理。</p><p>从<code>mask</code>指定的按钮中选择一个操作进行连发。存在符合条件的新按下位时，选择最低有效位并立即返回。否则，只要当前操作仍在掩码范围内且仍被按住，就保持该操作。该操作结束后，选择剩余按住位中的最低位，但不立即产生脉冲。没有符合条件的按住位时清空运行状态。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u8 __padrep_mask(u8* state, u8 keys, u8 trigger, u8 mask);</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>参数</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>指向连续5字节可写RAM的指针，例如<code>u8 state[5]</code>。布局为<code>[0]当前按钮位</code>、<code>[1]初始等待时间</code>、<code>[2]连发间隔</code>、<code>[3]初始等待经过计数</code>、<code>[4]连发经过计数</code>。每个独立的连发处理都应使用单独的状态，并在使用前初始化。不支持空指针、少于5字节的区域，或在方向专用处理与通用处理之间共用状态。</p></dd><dt><code>keys</code></dt><dd><p>使用GB <code>BTN_*</code>布局的当前完整按住掩码。传入<code>__readpad</code>的结果、<code>__readpadex</code>的低字节或<code>input_current</code>的结果。连发函数本身不读取硬件。</p></dd><dt><code>trigger</code></dt><dd><p>本次更新中新按下的位，布局与<code>keys</code>相同，通常为<code>keys &amp; ~previous_keys</code>或<code>__readpadex</code>的高字节。只能包含同时存在于<code>keys</code>中的位。每次都传入按住掩码会使每次调用都被误认为初次按下，重新开始等待。</p></dd><dt><code>mask</code></dt><dd><p>用<code>|</code>组合允许参与连发的GB按钮位。0会禁用所有操作并清空运行状态。多个位可提供多个候选，但每次调用只返回选中的一个位，不返回组合脉冲掩码。</p></dd></dl><h4>返回值</h4><p>没有操作脉冲时返回0，否则返回1, 2, 4, 8, 16, 32, 64, 128之一。非零结果是按钮位，不是归一化布尔值，也不是连发次数。</p><h4>使用条件与限制</h4><p>通用掩码为 <code>BTN_RIGHT=0x01</code>、<code>BTN_LEFT=0x02</code>、<code>BTN_UP=0x04</code>、<code>BTN_DOWN=0x08</code>、<code>BTN_A=0x10</code>、<code>BTN_B=0x20</code>、<code>BTN_SELECT=0x40</code>、<code>BTN_START=0x80</code>。位为 1 表示按住。GB 和 FC 的 <code>input_*</code> 均使用此格式；FC 原始手柄函数的位序不同。</p><p>初始等待时间，范围0至255，单位为连发函数的调用次数。正值N表示初次按下脉冲之后恰好经过N次调用产生首次长按连发。为0时跳过初始等待相等分支，由连发间隔决定首次长按脉冲的时间。单位不是毫秒。</p><p>后续连发间隔，范围0至255次调用。正值N表示首次连发之后，每N次有效按住更新产生一次脉冲。0表示初始等待结束后每次有效更新都产生脉冲，因此在该阶段0和1均为每次更新一次。等待时间和间隔均为0时，每次按住更新都会产生脉冲。</p><p>每个预定输入周期调用一次。每次调用都会修改状态，不会等待VBlank。没有新按下位而接管已按住的按钮时，该次调用返回0并开始新的等待。这组函数每个状态只处理一个当前操作；<code>input_repeat</code>则为八个按钮分别维护独立计时器。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>result=__padrep_mask(alias_state,keys,trigger,48);
+    if (result!=0) alias_pulses++;</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序把预设按钮状态送入四个独立状态，演示连发具体发生在哪次调用。等待时间3、间隔2时，编号0至7的八次调用会在0、3、5、7产生脉冲。因此RIGHT PULSES、DOWN PULSES、ACTION PULSES和ALIAS PULSES均显示004。通用处理同时接收A和B，选择A（16）。程序还检查初始化、重置、双方向优先级、松开、接管已按住的方向、时间值0和表达式参数。CHECKS应为057，FAILED CHECKS应为000。这是使用固定输入的状态处理示例，不会等待你实际按下按钮。</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_mask">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:11117</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+    if (args.Length != 4) Error(expr, &quot;__padrep requires 4 arguments (state*, keys, trigger, mask)&quot;);
 
-    AsmOperand pm_done        = MakeUniqueLabel("padrepM_done");
-    AsmOperand pm_ret0        = MakeUniqueLabel("padrepM_ret0");
-    AsmOperand pm_no_trig     = MakeUniqueLabel("padrepM_notrig");
-    AsmOperand pm_reset_all   = MakeUniqueLabel("padrepM_reset");
-    AsmOperand pm_dir0        = MakeUniqueLabel("padrepM_dir0");
-    AsmOperand pm_have_dir    = MakeUniqueLabel("padrepM_havedir");
-    AsmOperand pm_first_rep   = MakeUniqueLabel("padrepM_firstrep");
-    AsmOperand pm_ret_dir     = MakeUniqueLabel("padrepM_retdir");
-    AsmOperand pm_skip_dasinc = MakeUniqueLabel("padrepM_skipdasinc");
-    AsmOperand pm_skip_arrinc = MakeUniqueLabel("padrepM_skiparrinc");
+    AsmOperand pm_done        = MakeUniqueLabel(&quot;padrepM_done&quot;);
+    AsmOperand pm_ret0        = MakeUniqueLabel(&quot;padrepM_ret0&quot;);
+    AsmOperand pm_no_trig     = MakeUniqueLabel(&quot;padrepM_notrig&quot;);
+    AsmOperand pm_reset_all   = MakeUniqueLabel(&quot;padrepM_reset&quot;);
+    AsmOperand pm_dir0        = MakeUniqueLabel(&quot;padrepM_dir0&quot;);
+    AsmOperand pm_have_dir    = MakeUniqueLabel(&quot;padrepM_havedir&quot;);
+    AsmOperand pm_first_rep   = MakeUniqueLabel(&quot;padrepM_firstrep&quot;);
+    AsmOperand pm_ret_dir     = MakeUniqueLabel(&quot;padrepM_retdir&quot;);
+    AsmOperand pm_skip_dasinc = MakeUniqueLabel(&quot;padrepM_skipdasinc&quot;);
+    AsmOperand pm_skip_arrinc = MakeUniqueLabel(&quot;padrepM_skiparrinc&quot;);
 
     // Evaluate args safely:
     // HL = state*, B = keys, C = trigger, E = mask
     CompileIntoHL(args[0]);
-    EmitAsm("PUSH_HL");
-    CompileIntoA(args[1]); EmitAsm("LD_B_A"); // keys
-    CompileIntoA(args[2]); EmitAsm("LD_C_A"); // trigger
-    CompileIntoA(args[3]); EmitAsm("LD_E_A"); // mask
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    CompileIntoA(args[1]); EmitAsm(&quot;LD_B_A&quot;); // keys
+    CompileIntoA(args[2]); EmitAsm(&quot;LD_C_A&quot;); // trigger
+    CompileIntoA(args[3]); EmitAsm(&quot;LD_E_A&quot;); // mask
+    EmitAsm(&quot;POP_HL&quot;);
 
     // trigMasked = trigger &amp; mask -&gt; D
-    EmitAsm("LD_A_C");
-    EmitAsm("AND_E");
-    EmitAsm("LD_D_A");
-    EmitAsm("OR_A");
-    EmitAsm("JP_Z", pm_no_trig);
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;AND_E&quot;);
+    EmitAsm(&quot;LD_D_A&quot;);
+    EmitAsm(&quot;OR_A&quot;);
+    EmitAsm(&quot;JP_Z&quot;, pm_no_trig);
 
     // select = lowbit(trigMasked) = x &amp; -x
-    EmitAsm("LD_A_D");
-    EmitAsm("CPL");
-    EmitAsm("INC_A");
-    EmitAsm("AND_D");
-    EmitAsm("LD_C_A"); // save selected in C
+    EmitAsm(&quot;LD_A_D&quot;);
+    EmitAsm(&quot;CPL&quot;);
+    EmitAsm(&quot;INC_A&quot;);
+    EmitAsm(&quot;AND_D&quot;);
+    EmitAsm(&quot;LD_C_A&quot;); // save selected in C
 
     // dirMask=selected, dasCnt=0, arrCnt=0
-    EmitAsm("LD_A_C");
-    EmitAsm("LD_HL_A"); // [0]=selected
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); Emi</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:11117</p></details><details class="api searchable" id="api-__padrep_reset"><summary><code>__padrep_reset</code><span class="badge">编译器内建函数</span></summary><p>重置状态。模块：编译器内建函数。确切的单位、结束标记和返回条件，请查阅下方声明、原始说明及实现。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_reset(arg0);</code></pre></div><p class="note">这里的语法记录代码生成器识别的参数个数。arg0 等名称只是说明用占位符，不是类型声明；请遵循示例和实现要求。</p><h4>参数传递示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_reset(arg0);</code></pre></div><p>调用代码需准备对象初始化、缓冲区大小、ROM bank 与设备状态。本函数片段尚未单独执行验证。</p><p><a download="" href="../samples/api-fragments/gb/__padrep_reset.c">下载此片段</a></p><details><summary>代码生成器的参数检查</summary><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
-    if (args.Length != 1) Error(expr, "__padrep_reset requires 1 argument (state*)");
+    EmitAsm(&quot;LD_A_C&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=selected
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); Emi</code></pre></div></details></details><details class="api searchable" id="api-__padrep_reset" data-api-contract="padrepeat-source-20260915"><summary><code>__padrep_reset</code></summary><p>保留已配置的等待时间和间隔，取消当前操作并清空两个经过时间计数器。可在关闭菜单或切换输入目标时使用，避免把之前长按的连发进度带入下一次交互。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>void __padrep_reset(u8* state);</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>参数</h4><dl class="api-parameters"><dt><code>state</code></dt><dd><p>指向连续5字节可写RAM的指针，例如<code>u8 state[5]</code>。布局为<code>[0]当前按钮位</code>、<code>[1]初始等待时间</code>、<code>[2]连发间隔</code>、<code>[3]初始等待经过计数</code>、<code>[4]连发经过计数</code>。每个独立的连发处理都应使用单独的状态，并在使用前初始化。不支持空指针、少于5字节的区域，或在方向专用处理与通用处理之间共用状态。</p></dd></dl><h4>返回值</h4><p>无（<code>void</code>）。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>__padrep_reset(lr);
+expect(lr[0],0); expect(lr[1],3); expect(lr[2],2);
+expect(lr[3],0); expect(lr[4],0);</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序把预设按钮状态送入四个独立状态，演示连发具体发生在哪次调用。等待时间3、间隔2时，编号0至7的八次调用会在0、3、5、7产生脉冲。因此RIGHT PULSES、DOWN PULSES、ACTION PULSES和ALIAS PULSES均显示004。通用处理同时接收A和B，选择A（16）。程序还检查初始化、重置、双方向优先级、松开、接管已按住的方向、时间值0和表达式参数。CHECKS应为057，FAILED CHECKS应为000。这是使用固定输入的状态处理示例，不会等待你实际按下按钮。</p><p><a href="../samples/api-examples/gb/pad_repeat_state.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\pad_repeat_state.c -I .\kitaq-docs\samples -I .\kitaqgb\lib -o .\out\pad_repeat_state.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><p><a href="verification.html#api-gb-__padrep_reset">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10708</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
+    if (args.Length != 1) Error(expr, &quot;__padrep_reset requires 1 argument (state*)&quot;);
 
     CompileIntoHL(args[0]);
 
-    EmitAsm("XOR_A");
-    EmitAsm("LD_HL_A"); // [0]=0 (dirMask)
+    EmitAsm(&quot;XOR_A&quot;);
+    EmitAsm(&quot;LD_HL_A&quot;); // [0]=0 (dirMask)
 
     // [3]=0, [4]=0
-    EmitAsm("PUSH_HL");
-    EmitAsm("INC_HL"); EmitAsm("INC_HL"); EmitAsm("INC_HL"); // -&gt; [3]
-    EmitAsm("LD_HL_A");
-    EmitAsm("INC_HL"); // -&gt; [4]
-    EmitAsm("LD_HL_A");
-    EmitAsm("POP_HL");
+    EmitAsm(&quot;PUSH_HL&quot;);
+    EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); EmitAsm(&quot;INC_HL&quot;); // -&gt; [3]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;INC_HL&quot;); // -&gt; [4]
+    EmitAsm(&quot;LD_HL_A&quot;);
+    EmitAsm(&quot;POP_HL&quot;);
     return;
 }
 
@@ -1894,20 +1909,20 @@ if (funcName == "__padrep_reset")
 // New triggers take priority, with Right selected first when both trigger bits are set.
 // Without a new trigger, simultaneous Left/Right holds suppress movement without resetting counters.
 // A single held direction is adopted without immediate movement when no direction is active.
-// Subsequent updates use the five-byte state's initial delay and repeat interval; ARR=0 repeats each update.
-if (funcName == "__padrep_lr")
+// Subsequent updates use the five-byte state&#x27;s initial delay and repeat interval; ARR=0 repeats each update.
+if (funcName == &quot;__padrep_lr&quot;)
 {
-    if (args.Length != 3) Error(expr, "__padrep_lr requires 3 arguments (state*, keys, trigger)");
+    if (args.Length != 3) Error(expr, &quot;__padrep_lr requires 3 arguments (state*, keys, trigger)&quot;);
 
-    AsmOperand pr_done        = MakeUniqueLabel("padrep_done");
-    AsmOperand pr_ret0        = MakeUniqueLabel("padrep_ret0");
-    AsmOperand pr_check_left  = MakeUniqueLabel("padrep_chkL");
-    AsmOperand pr_no_trig     = MakeUniqueLabel("padrep_notrig");
-    AsmOperand pr_reset_all   = MakeUniqueLabel("padrep_reset");
-    AsmOperand pr_dir0        = MakeUniqueLabel("padrep_dir0");
-    AsmOperand pr_have_dir    = MakeUniqueLabel("padrep_havedir");
-    AsmOperand pr_first_rep   = MakeUniqueLabel("padrep_firstrep");
-    AsmOperand pr_ret_dir     = MakeUniqueLabel("padrep</code></pre></div></details><p class="source">声明或标识符来源：kitaqgb/kitaqgb/CodeGenerator.cs:10708</p></details><details class="api searchable" id="api-__readpad" data-api-contract="input-source-20260915"><summary><code>__readpad</code></summary><p>从 JOYP 读取方向键和操作按钮，合并为通用 8 位按钮掩码。依次选择各组并读取两次以等待信号稳定，最后将组选择位恢复为 <code>0x30</code>。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u8 __readpad();</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>返回值</h4><p>通用 <code>BTN_*</code> 格式的 8 位掩码。多个按钮可以同时置位；0 表示没有按钮。</p><h4>使用条件与限制</h4><p>通用掩码为 <code>BTN_RIGHT=0x01</code>、<code>BTN_LEFT=0x02</code>、<code>BTN_UP=0x04</code>、<code>BTN_DOWN=0x08</code>、<code>BTN_A=0x10</code>、<code>BTN_B=0x20</code>、<code>BTN_SELECT=0x40</code>、<code>BTN_START=0x80</code>。位为 1 表示按住。GB 和 FC 的 <code>input_*</code> 均使用此格式；FC 原始手柄函数的位序不同。</p><p>此调用重新读取硬件状态，不更新 <code>input_*</code> 或 <code>nes_pad1_*</code> 的缓存，也不生成按下、松开或重复事件。需要检测变化时，请保存读取结果，并与自己保存的上次掩码比较。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>all_keys=__readpad(); // A + Right: 0x11, decimal 17.</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序用于比较三种按钮掩码格式，以及将当前状态和新按下状态打包的返回值。同时按住A和右。ALL KEYS为17，DIRECTIONS和BUTTONS LOW各为1。前次掩码为0时，EX CURRENT和EX NEW PRESS均为17。将当前掩码传给下一次读取后，HELD PRESS为0。FAILED CHECKS应为0。采集到的数值会保留在屏幕上，松开按钮也不会清除。</p><p><a href="../samples/api-examples/gb/input_raw.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+    AsmOperand pr_done        = MakeUniqueLabel(&quot;padrep_done&quot;);
+    AsmOperand pr_ret0        = MakeUniqueLabel(&quot;padrep_ret0&quot;);
+    AsmOperand pr_check_left  = MakeUniqueLabel(&quot;padrep_chkL&quot;);
+    AsmOperand pr_no_trig     = MakeUniqueLabel(&quot;padrep_notrig&quot;);
+    AsmOperand pr_reset_all   = MakeUniqueLabel(&quot;padrep_reset&quot;);
+    AsmOperand pr_dir0        = MakeUniqueLabel(&quot;padrep_dir0&quot;);
+    AsmOperand pr_have_dir    = MakeUniqueLabel(&quot;padrep_havedir&quot;);
+    AsmOperand pr_first_rep   = MakeUniqueLabel(&quot;padrep_firstrep&quot;);
+    AsmOperand pr_ret_dir     = MakeUniqueLabel(&quot;padrep</code></pre></div></details></details><details class="api searchable" id="api-__readpad" data-api-contract="input-source-20260915"><summary><code>__readpad</code></summary><p>从 JOYP 读取方向键和操作按钮，合并为通用 8 位按钮掩码。依次选择各组并读取两次以等待信号稳定，最后将组选择位恢复为 <code>0x30</code>。</p><h4>语法</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>u8 __readpad();</code></pre></div><p>此调用格式中的参数名用于解释编译器内置功能，不是需要另行添加的 C 声明。</p><h4>返回值</h4><p>通用 <code>BTN_*</code> 格式的 8 位掩码。多个按钮可以同时置位；0 表示没有按钮。</p><h4>使用条件与限制</h4><p>通用掩码为 <code>BTN_RIGHT=0x01</code>、<code>BTN_LEFT=0x02</code>、<code>BTN_UP=0x04</code>、<code>BTN_DOWN=0x08</code>、<code>BTN_A=0x10</code>、<code>BTN_B=0x20</code>、<code>BTN_SELECT=0x40</code>、<code>BTN_START=0x80</code>。位为 1 表示按住。GB 和 FC 的 <code>input_*</code> 均使用此格式；FC 原始手柄函数的位序不同。</p><p>此调用重新读取硬件状态，不更新 <code>input_*</code> 或 <code>nes_pad1_*</code> 的缓存，也不生成按下、松开或重复事件。需要检测变化时，请保存读取结果，并与自己保存的上次掩码比较。</p><h4>使用示例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">复制</button><pre><code>all_keys=__readpad(); // A + Right: 0x11, decimal 17.</code></pre></div><p>这是一段调用示例。放入完整程序前，请满足所述初始化和缓冲区要求。</p><h4>预期结果</h4><p>此程序用于比较三种按钮掩码格式，以及将当前状态和新按下状态打包的返回值。同时按住A和右。ALL KEYS为17，DIRECTIONS和BUTTONS LOW各为1。前次掩码为0时，EX CURRENT和EX NEW PRESS均为17。将当前掩码传给下一次读取后，HELD PRESS为0。FAILED CHECKS应为0。采集到的数值会保留在屏幕上，松开按钮也不会清除。</p><p><a href="../samples/api-examples/gb/input_raw.c">完整示例程序</a></p><h4>构建命令</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">复制</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\input_raw.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\input_raw.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache</code></pre></div><p><a href="verification.html#api-gb-__readpad">验证结果</a></p><details class="api-source"><summary>实现与源码</summary><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:10537</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">复制</button><pre><code>{
     if (args.Length != 0) Error(expr, &quot;__readpad requires 0 arguments&quot;);
 

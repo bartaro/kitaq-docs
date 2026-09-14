@@ -15,9 +15,10 @@ class Text(HTMLParser):
     def handle_data(self,data):self.parts.append(data)
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--browser',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--browser',action='store_true')
+    parser.add_argument('--suite',choices=['input','padrepeat'],default='input');args=parser.parse_args()
     messages,ui,contracts=api_contracts.load()
-    inputs={key:value for key,value in contracts.items() if value['review']=='input-source-20260915'}
+    inputs={key:value for key,value in contracts.items() if value['review']==args.suite+'-source-20260915'}
     results=[]
     for index,language in enumerate(api_contracts.ORDER):
         folder=SITE if language=='ja' else SITE/language
@@ -38,8 +39,8 @@ def main():
                     assert contract['example']['code'].strip() in content,(language,key,'sample')
                     assert 'verification.html#api-'+platform+'-'+name in card,(language,key,'proof link')
                     results.append({'language':language,'api':key,'card':'passed'})
-    assert len(results)==35*9, len(results)
-    modules=json.loads((api_contracts.SOURCE/'input_modules.json').read_text(encoding='utf-8'))
+    assert len(results)==len(inputs)*9 and len(inputs)==(35 if args.suite=='input' else 6), len(results)
+    modules=json.loads((api_contracts.SOURCE/'input_modules.json').read_text(encoding='utf-8')) if args.suite=='input' else {}
     module_count=0
     for index,language in enumerate(api_contracts.ORDER):
         folder=SITE if language=='ja' else SITE/language
@@ -58,7 +59,8 @@ def main():
             page=browser.new_page(viewport={'width':1100,'height':850})
             for language in api_contracts.ORDER:
                 folder=SITE if language=='ja' else SITE/language
-                for platform,volume,name in [('gb','kitaqgb','__readpadex'),('fc','kitaqfc','__pad_dirs'),('fc','fc-library','input_repeat'),('fc','fc-library','nes_pad_repeat_step')]:
+                cases=[('gb','kitaqgb','__readpadex'),('fc','kitaqfc','__pad_dirs'),('fc','fc-library','input_repeat'),('fc','fc-library','nes_pad_repeat_step')] if args.suite=='input' else [('gb','kitaqgb','__padrep_lr'),('gb','kitaqgb','__padrep_mask')]
+                for platform,volume,name in cases:
                     url=(folder/(volume+'.html')).as_uri()+'#api-'+name
                     page.goto(url)
                     card=page.locator('#api-'+name)
@@ -78,7 +80,8 @@ def main():
             browser.close()
     report={'cards':results,'module_introductions':module_count,'browser':browser_results,'status':'passed'}
     report_name='document_checks.json' if args.browser else 'static_document_checks.json'
-    (SITE/'verification/api-input'/report_name).write_text(json.dumps(report,indent=2),encoding='utf-8')
+    evidence_folder='api-input' if args.suite=='input' else 'api-pad-repeat'
+    (SITE/'verification'/evidence_folder/report_name).write_text(json.dumps(report,indent=2),encoding='utf-8')
     print(str(len(results))+' localized cards; '+str(len(browser_results))+' browser image/return checks passed.')
 
 if __name__=='__main__':main()
