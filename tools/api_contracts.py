@@ -131,6 +131,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_input_examples(contracts))
     proofs.update(verified_padrepeat_examples(contracts))
     proofs.update(verified_expansion_examples(contracts))
+    proofs.update(verified_vram_examples(contracts))
     for key in proofs:
         contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
     coverage = []
@@ -171,7 +172,7 @@ def render_modules(text, platform, language, messages):
             owner, module = key.split(':')
             if owner != platform: continue
             pattern = r'(<h3\b[^>]*id="module-' + re.escape(module) + r'"[^>]*>.*?</h3>)'
-            block = '<!-- api-module:start --><div data-module-contract="input-source-20260915">'
+            block = '<!-- api-module:start --><div data-module-contract="' + html.escape(path.stem.removesuffix('_modules'), quote=True) + '-source-20260915">'
             block += ''.join('<p>'+inline(messages[item][index])+'</p>' for item in paragraphs)
             block += '</div><!-- api-module:end -->'
             text = re.sub(pattern,lambda m:m[1]+block,text,count=1,flags=re.S)
@@ -233,6 +234,30 @@ def verified_expansion_examples(contracts):
     return verified
 
 
+def verified_vram_examples(contracts):
+    """Attach only complete, unchanged GB/FC queue geometry evidence."""
+    path = SITE/'verification/api-vram/results.json'
+    if not path.exists(): return {}
+    runs = json.loads(path.read_text(encoding='utf-8'))['records']
+    if len(runs)!=3 or not all(r['passed'] for r in runs): return {}
+    verified = {}
+    for key,contract in contracts.items():
+        if contract['review']!='vram-source-20260915': continue
+        selected = [r for r in runs if r['platform']==key.split(':')[0]]
+        if {r['mode'] for r in selected} != ({'dmg','cgb'} if key.startswith('gb:') else {'nrom'}):
+            raise ValueError('Missing VRAM hardware mode: '+key)
+        for run in selected:
+            if run['source']!=contract['example']['program']:
+                raise ValueError('VRAM example source mismatch: '+key)
+            files = {run['source']:run['source_sha256'],run['image']:run['image_sha256']}
+            files.update(run['support_sha256'])
+            for file,expected in files.items():
+                if hashlib.sha256((SITE/file).read_bytes()).hexdigest()!=expected:
+                    raise ValueError('VRAM example evidence changed: '+file)
+        verified[key]={'api':key.split(':')[1],'kind':'vram','runs':selected}
+    return verified
+
+
 def verified_tile_examples(contracts):
     path = SITE / 'verification/api-tiles/results.json'
     if not path.exists(): return {}
@@ -288,7 +313,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram']:
                 block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
                     block.append('<figure><img class="screen" loading="lazy" src="'+prefix+run['image']+'" alt="'+html.escape(name+': '+run['mode'].upper(),quote=True)+'"><figcaption>'+run['mode'].upper()+'</figcaption></figure>')

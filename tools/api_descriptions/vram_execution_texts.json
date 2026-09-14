@@ -1,0 +1,79 @@
+{
+ "vq_now_gb": [
+  "Execute every queued command in insertion order, then set the used count to 0. No VBlank wait is performed here. The called safe VRAM intrinsics handle writable periods when the LCD is on, but a large queue can span several scanlines or frames. The overflow latch is preserved.",
+  "登録された全コマンドを順番に実行し、使用数を0にします。この関数自身はVBlankを待ちません。LCDが動作中なら呼び出される安全なVRAM組み込み関数が書き込み可能な期間を待ちますが、大きなキューは複数の走査線やフレームにまたがることがあります。オーバーフローの記録は残ります。",
+  "등록된 모든 명령을 순서대로 실행한 뒤 사용 수를 0으로 만듭니다. 이 함수 자체는 VBlank를 기다리지 않습니다. LCD가 켜져 있으면 호출된 안전한 VRAM 내장 함수가 쓰기 가능한 구간을 기다리지만, 큰 큐는 여러 주사선이나 프레임에 걸칠 수 있습니다. 오버플로 기록은 유지됩니다.",
+  "按加入顺序执行所有队列命令，然后将使用数置0。此函数本身不等待VBlank。LCD开启时，被调用的安全VRAM内置函数会等待可写时段，但大队列可能跨越多条扫描线或多帧。溢出标志保留。",
+  "依加入順序執行所有佇列命令，然後將使用數設為0。此函式本身不等待VBlank。LCD開啟時，被呼叫的安全VRAM內建函式會等待可寫時段，但大佇列可能跨越多條掃描線或多個影格。溢位旗標保留。",
+  "Ejecuta todos los comandos en orden y pone a cero el número usado. No espera a VBlank por sí misma. Con el LCD encendido, las intrínsecas seguras esperan los periodos escribibles, pero una cola grande puede abarcar varias líneas o fotogramas. El indicador de desbordamiento se conserva.",
+  "Executa todos os comandos em ordem e zera a quantidade usada. Não espera o VBlank por conta própria. Com o LCD ligado, as intrínsecas seguras aguardam os períodos graváveis, mas uma fila grande pode atravessar várias linhas ou quadros. O indicador de estouro é mantido.",
+  "Exécute tous les ordres dans leur ordre d’ajout, puis remet le nombre utilisé à zéro. N’attend pas elle-même le VBlank. LCD actif, les fonctions intrinsèques sûres attendent les périodes d’écriture, mais une grande file peut s’étendre sur plusieurs lignes ou images. L’indicateur de débordement reste mémorisé.",
+  "Führt alle Befehle in Einfügereihenfolge aus und setzt die belegte Anzahl auf 0. Wartet selbst nicht auf VBlank. Bei eingeschaltetem LCD warten die sicheren VRAM-Intrinsics auf beschreibbare Zeitfenster; eine große Warteschlange kann dennoch mehrere Zeilen oder Frames beanspruchen. Die Überlaufmeldung bleibt erhalten."
+ ],
+ "vq_now_fc": [
+  "Call `__vramq_exec` immediately. It executes only when the ready flag has been set by `__vramq_commit`; an uncommitted queue remains untouched. A completed execution clears the length and ready flag, but preserves overflow. This function neither commits the queue nor waits for safe PPU timing.",
+  "`__vramq_exec`を直ちに呼びます。`__vramq_commit`で準備完了フラグが立っている場合だけ実行し、未コミットのキューはそのまま残ります。実行が完了すると長さと準備完了フラグを消しますが、オーバーフローの記録は残します。この関数はコミットも、安全なPPU書き込み時期の待機も行いません。",
+  "`__vramq_exec`를 즉시 호출합니다. `__vramq_commit`으로 준비 플래그를 설정한 경우에만 실행하며 커밋하지 않은 큐는 그대로 둡니다. 실행을 마치면 길이와 준비 플래그를 지우지만 오버플로 기록은 유지합니다. 이 함수는 커밋하거나 안전한 PPU 쓰기 시점을 기다리지 않습니다.",
+  "立即调用`__vramq_exec`。只有`__vramq_commit`设置了就绪标志才会执行，未提交的队列保持不变。执行完成后清除长度与就绪标志，但保留溢出标志。此函数既不提交队列，也不等待安全的PPU写入时机。",
+  "立即呼叫`__vramq_exec`。只有`__vramq_commit`設定了就緒旗標才會執行，未提交的佇列保持不變。執行完成後清除長度與就緒旗標，但保留溢位旗標。此函式既不提交佇列，也不等待安全的PPU寫入時機。",
+  "Llama inmediatamente a `__vramq_exec`. Solo ejecuta si `__vramq_commit` ha activado la marca de disponibilidad; una cola sin confirmar queda intacta. Al terminar borra longitud y disponibilidad, pero conserva el desbordamiento. No confirma la cola ni espera un momento seguro para la PPU.",
+  "Chama `__vramq_exec` imediatamente. Só executa se `__vramq_commit` tiver ativado a marca de prontidão; uma fila não confirmada permanece intacta. Ao terminar, limpa comprimento e prontidão, mas mantém o estouro. Não confirma a fila nem espera um momento seguro para a PPU.",
+  "Appelle immédiatement `__vramq_exec`. L’exécution n’a lieu que si `__vramq_commit` a activé le drapeau prêt ; une file non validée reste intacte. À la fin, longueur et drapeau prêt sont effacés, mais pas le débordement. Cette fonction ne valide pas la file et n’attend pas un instant sûr pour la PPU.",
+  "Ruft sofort `__vramq_exec` auf. Ausgeführt wird nur bei durch `__vramq_commit` gesetztem Bereit-Flag; eine nicht freigegebene Warteschlange bleibt unverändert. Nach der Ausführung werden Länge und Bereit-Flag gelöscht, die Überlaufmeldung bleibt. Diese Funktion gibt die Warteschlange weder frei noch wartet sie auf einen sicheren PPU-Zeitpunkt."
+ ],
+ "vq_flush_gb": [
+  "Wait with `__wait_vblank`, then call `vram_flush_now`. Use this for a modest batch of queued screen changes. The single wait does not impose a transfer budget or guarantee that the entire batch finishes within one VBlank.",
+  "`__wait_vblank`で待ってから`vram_flush_now`を呼びます。少量の画面更新をまとめて実行するときに使います。1回の待機だけで転送量に上限が設けられるわけではなく、全処理が1回のVBlank内に終わる保証もありません。",
+  "`__wait_vblank`로 기다린 뒤 `vram_flush_now`를 호출합니다. 소량의 화면 갱신을 묶어 실행할 때 사용합니다. 한 번 기다린다고 전송량이 제한되거나 전체 작업이 한 VBlank 안에 끝나는 것은 아닙니다.",
+  "先用`__wait_vblank`等待，再调用`vram_flush_now`。适合批量执行少量屏幕更新。一次等待并不会限制传输量，也不保证整个批次能在一次VBlank内完成。",
+  "先用`__wait_vblank`等待，再呼叫`vram_flush_now`。適合批次執行少量畫面更新。一次等待並不會限制傳輸量，也不保證整個批次能在一次VBlank內完成。",
+  "Espera con `__wait_vblank` y llama a `vram_flush_now`. Úsala para un lote moderado de cambios de pantalla. Una sola espera no limita la transferencia ni garantiza terminar todo el lote dentro de un VBlank.",
+  "Espera com `__wait_vblank` e chama `vram_flush_now`. Use para um lote moderado de mudanças na tela. Uma única espera não limita a transferência nem garante que todo o lote termine dentro de um VBlank.",
+  "Attend avec `__wait_vblank`, puis appelle `vram_flush_now`. Convient à un lot modéré de changements d’écran. Une seule attente n’impose pas de budget de transfert et ne garantit pas la fin de tout le lot dans un VBlank.",
+  "Wartet mit `__wait_vblank` und ruft anschließend `vram_flush_now` auf. Geeignet für einen überschaubaren Satz von Bildschirmänderungen. Einmaliges Warten begrenzt die Übertragungsmenge nicht und garantiert keinen Abschluss innerhalb eines VBlank."
+ ],
+ "vq_flush_fc": [
+  "Commit the intrinsic queue with `__vramq_commit`, then wait with `__nmi_wait` for the NMI path. The default handler consumes a ready queue. Keep NMI enabled and its handler functional; this call does not split a large transfer across successive VBlanks.",
+  "`__vramq_commit`で組み込み関数のキューをコミットし、`__nmi_wait`でNMIの処理を待ちます。標準ハンドラーが準備済みキューを処理します。NMIとそのハンドラーを有効にして使ってください。この呼び出しは大きな転送を複数回のVBlankへ分割しません。",
+  "`__vramq_commit`으로 내장 큐를 커밋한 뒤 `__nmi_wait`로 NMI 처리를 기다립니다. 기본 핸들러가 준비된 큐를 처리합니다. NMI와 핸들러가 정상 동작하도록 유지하세요. 큰 전송을 여러 VBlank로 나누지는 않습니다.",
+  "用`__vramq_commit`提交内置队列，再用`__nmi_wait`等待NMI处理。默认处理程序会消耗就绪队列。应保持NMI及其处理程序有效；此调用不会把大传输拆分到多个VBlank中。",
+  "用`__vramq_commit`提交內建佇列，再用`__nmi_wait`等待NMI處理。預設處理常式會執行就緒佇列。應保持NMI及其處理常式有效；此呼叫不會把大型傳輸拆分到多個VBlank中。",
+  "Confirma la cola intrínseca con `__vramq_commit` y espera la ruta NMI con `__nmi_wait`. El manejador predeterminado consume la cola preparada. Mantén NMI habilitada y su manejador operativo; esta llamada no reparte transferencias grandes entre varios VBlank.",
+  "Confirma a fila intrínseca com `__vramq_commit` e espera o processamento NMI com `__nmi_wait`. O tratador padrão consome a fila pronta. Mantenha NMI habilitada e seu tratador funcionando; esta chamada não divide transferências grandes entre vários VBlanks.",
+  "Valide la file intrinsèque avec `__vramq_commit`, puis attend le traitement NMI avec `__nmi_wait`. Le gestionnaire par défaut traite la file prête. Gardez NMI activée et son gestionnaire fonctionnel ; cet appel ne répartit pas un gros transfert sur plusieurs VBlank.",
+  "Gibt die intrinsische Warteschlange mit `__vramq_commit` frei und wartet mit `__nmi_wait` auf den NMI-Pfad. Der Standardhandler verarbeitet die bereite Warteschlange. NMI und Handler müssen aktiv bleiben; große Übertragungen werden durch diesen Aufruf nicht auf mehrere VBlanks verteilt."
+ ],
+ "vq_success_gb": [
+  "1 when this command was queued, or 0 if no slot was available. A failure sets the overflow latch and leaves existing commands intact. An earlier overflow does not by itself make a later successful append return 0.",
+  "今回のコマンドを登録できたら1、空きスロットがなければ0です。失敗するとオーバーフローを記録し、すでに登録したコマンドは保ちます。以前にオーバーフローしていても、今回の登録に成功すれば1を返します。",
+  "이번 명령을 등록하면 1, 빈 슬롯이 없으면 0입니다. 실패하면 오버플로를 기록하고 기존 명령은 유지합니다. 이전 오버플로가 있더라도 이번 등록에 성공하면 1을 반환합니다.",
+  "本次命令入队成功返回1，没有空槽返回0。失败时设置溢出标志并保留已有命令。之前的溢出本身不会使后续成功入队返回0。",
+  "本次命令入列成功回傳1，沒有空槽回傳0。失敗時設定溢位旗標並保留既有命令。先前的溢位本身不會使後續成功加入回傳0。",
+  "1 si este comando se encoló; 0 si no había espacio. El fallo activa el indicador de desbordamiento y conserva los comandos previos. Un desbordamiento anterior no hace que una inserción posterior correcta devuelva 0.",
+  "1 se este comando entrou na fila; 0 se não havia espaço. A falha ativa o indicador de estouro e preserva os comandos anteriores. Um estouro anterior não faz uma inserção posterior bem-sucedida retornar 0.",
+  "1 si cet ordre a été ajouté, 0 si aucune place n’était libre. Un échec mémorise le débordement sans toucher aux ordres existants. Un débordement antérieur ne fait pas renvoyer 0 à un ajout ultérieur réussi.",
+  "1, wenn dieser Befehl eingereiht wurde, oder 0 bei fehlendem Platz. Ein Fehler setzt die Überlaufmeldung und erhält vorhandene Befehle. Ein früherer Überlauf lässt einen später erfolgreichen Eintrag nicht automatisch 0 zurückgeben."
+ ],
+ "vq_success_fc": [
+  "1 if the overflow latch is clear after the attempted operation; otherwise 0. This can report an earlier overflow even when the current record fits. Multi-record operations may queue only part of their work and do not roll it back. Zero-length operations can also return 0 because of an existing latch.",
+  "登録処理後にオーバーフローの記録がなければ1、記録があれば0です。今回の記録が収まっても、以前のオーバーフローにより0を返すことがあります。複数の記録を使う処理は一部だけ登録される場合があり、取り消しは行いません。長さ0の処理でも、記録済みのオーバーフローにより0を返す場合があります。",
+  "등록 시도 후 오버플로 기록이 없으면 1, 있으면 0입니다. 현재 레코드가 들어가도 이전 오버플로 때문에 0일 수 있습니다. 여러 레코드 작업은 일부만 등록될 수 있으며 되돌리지 않습니다. 길이가 0이어도 기존 기록 때문에 0을 반환할 수 있습니다.",
+  "尝试操作后溢出标志未设置则返回1，否则返回0。即使当前记录能放下，也可能因之前的溢出返回0。多记录操作可能只加入一部分且不回滚。零长度操作也可能因已有标志返回0。",
+  "嘗試操作後溢位旗標未設定則回傳1，否則回傳0。即使目前記錄能放下，也可能因先前的溢位回傳0。多記錄操作可能只加入一部分且不復原。零長度操作也可能因既有旗標回傳0。",
+  "1 si el indicador de desbordamiento está limpio tras el intento; en caso contrario, 0. Puede señalar un fallo anterior aunque el registro actual quepa. Una operación de varios registros puede quedar parcialmente encolada, sin deshacer lo añadido. Incluso una longitud cero puede devolver 0 por un indicador previo.",
+  "1 se o indicador de estouro estiver limpo após a tentativa; caso contrário, 0. Pode indicar uma falha anterior mesmo que o registro atual caiba. Uma operação com vários registros pode entrar parcialmente, sem desfazer o que foi adicionado. Até comprimento zero pode retornar 0 por um indicador anterior.",
+  "1 si l’indicateur de débordement est effacé après la tentative, sinon 0. Un débordement ancien peut être signalé même si l’enregistrement actuel tient. Une opération à plusieurs enregistrements peut être partiellement ajoutée, sans annulation. Même une longueur nulle peut renvoyer 0 à cause d’un indicateur déjà actif.",
+  "1, wenn nach dem Versuch keine Überlaufmeldung gesetzt ist, andernfalls 0. Auch bei passendem aktuellem Eintrag kann ein früherer Überlauf 0 verursachen. Mehrteilige Operationen können teilweise eingereiht bleiben; ein Rückgängigmachen erfolgt nicht. Selbst eine Länge von null kann wegen einer vorhandenen Meldung 0 liefern."
+ ],
+ "vq_serialize": [
+  "Build and consume the queue in coordinated phases. Do not append while an interrupt executes it, change its bookkeeping directly, or overwrite retained source data unintentionally. These APIs provide neither locking nor double buffering. Capacity describes the command buffer, not free bytes in hardware VRAM.",
+  "キューの登録と実行は、互いに重ならないよう管理してください。割り込みで実行している途中の追加、管理変数の直接変更、保存した転送元データの意図しない上書きは避けてください。これらのAPIはロックやダブルバッファーを提供しません。容量はコマンドバッファーの容量であり、ハードウェアVRAMの空きバイト数ではありません。",
+  "큐 등록과 실행이 겹치지 않도록 조율하세요. 인터럽트가 실행 중일 때 추가하거나 관리 변수를 직접 바꾸거나 보관된 원본 데이터를 의도치 않게 덮어쓰지 마세요. 이 API는 잠금이나 이중 버퍼링을 제공하지 않습니다. 용량은 명령 버퍼의 용량이며 하드웨어 VRAM의 빈 바이트 수가 아닙니다.",
+  "应协调队列构建与执行阶段。不要在中断执行队列时追加、直接修改管理变量或意外覆盖保留的源数据。这些API不提供锁或双缓冲。容量指命令缓冲区，不是硬件VRAM空闲字节数。",
+  "應協調佇列建立與執行階段。不要在中斷執行佇列時加入、直接修改管理變數或意外覆寫保留的來源資料。這些API不提供鎖定或雙重緩衝。容量指命令緩衝區，不是硬體VRAM可用位元組數。",
+  "Coordina las fases de construcción y ejecución de la cola. No añadas durante su ejecución en una interrupción, alteres sus contadores directamente ni sobrescribas por accidente los datos retenidos. Estas API no ofrecen bloqueo ni doble búfer. La capacidad es la del búfer de comandos, no los bytes libres de VRAM física.",
+  "Coordene as fases de montagem e execução da fila. Não adicione enquanto uma interrupção a executa, altere diretamente seus controles nem sobrescreva por acidente os dados retidos. Estas APIs não oferecem bloqueio nem buffer duplo. A capacidade é a do buffer de comandos, não os bytes livres da VRAM física.",
+  "Coordonnez la construction et la consommation de la file. N’ajoutez rien pendant son exécution par une interruption, ne modifiez pas directement ses compteurs et n’écrasez pas involontairement les sources conservées. Ces API n’offrent ni verrouillage ni double tampon. La capacité concerne le tampon d’ordres, pas les octets libres de VRAM physique.",
+  "Koordinieren Sie Aufbau und Verarbeitung der Warteschlange. Fügen Sie während ihrer Interrupt-Ausführung nichts hinzu, ändern Sie die Verwaltung nicht direkt und überschreiben Sie gespeicherte Quelldaten nicht versehentlich. Diese APIs bieten weder Sperren noch Doppelpufferung. Die Kapazität betrifft den Befehlspuffer, nicht freie Bytes im Hardware-VRAM."
+ ]
+}
