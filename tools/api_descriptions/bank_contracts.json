@@ -1,0 +1,1185 @@
+{
+  "gb:bank_switch": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_switch_gb"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "bk_fixed_note",
+      "bk_shadow_note",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "b2feb489e521f3125fddd8df8ec672d1e067dbff62b1ebc150e0f5f50fbad739",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "bank_switch(2); // Select the payload window and update library bookkeeping.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_switch",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:bank_get_current": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_get"
+    ],
+    "args": [],
+    "returns": [
+      "bk_record_return"
+    ],
+    "notes": [
+      "bk_shadow_note"
+    ],
+    "record_sha256": "0eeb01fdf5c3d4b75ae16666046438883b8b63f0c631e940e0846ba07ba0b25a",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "starting_bank=bank_get_current(); // Last value recorded by bank_switch.\nbank_expect(starting_bank==2,1);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_switch",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:__bankswitch": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_intrinsic_gb"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "bk_fixed_note",
+      "bk_shadow_note",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "929cb4a61f85179efe7c9364246c8d7c842fade33dd13438644f996a7a62c411",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "__bankswitch(1);\nbank_expect(home1[0]==0xA1,19);\nbank_expect(bank_get_current()==2,20); // Intrinsics bypass the library record.\n__bankswitch(2);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_switch",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:__bankof": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_bankof"
+    ],
+    "args": [
+      [
+        "symbol",
+        [
+          "bk_symbol_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_bank_return"
+    ],
+    "notes": [],
+    "record_sha256": "cfdb83867774bd1ac031dca3696be74638b589951805fa7696cb6bcb24fdbe52",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "bank_expect(__bankof(payload)==3,3);\nbank_expect(__bankof(callback)==3,4);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_bankof",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    },
+    "syntax": "u8 bank = __bankof(symbol);"
+  },
+  "gb:farptr_make": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_make"
+    ],
+    "args": [
+      [
+        "out",
+        [
+          "bk_out_arg"
+        ]
+      ],
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "ptr",
+        [
+          "bk_stored_pointer"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [],
+    "record_sha256": "6d0661c47ba48f59b616c90814ec77064d932383f5996778f34b1a726e176879",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "farptr_make(&pointer,3,payload+1); // Store a bank and address; do not read ROM.\nbank_expect(pointer.bank==3 && pointer.ptr==payload+1,8);\nfarptr_make(0,1,home1); // A null destination is ignored.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_make",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:far_data_read8": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_read8"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_gb"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_byte_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "ce5d42fd8a66ad23bb97330ac75467cc6e143d5c1fb8c449710d1b4c8e1a131a",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "byte_value=far_data_read8(3,payload); // One byte: 0xD3.\nbank_expect(byte_value==0xD3,5);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_far_data_read8",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:far_data_read16": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_read16"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_gb"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_word_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "5c96b8f6500ade8e06c328b580e73572504dfa9d5772318449db5fa9aa985bcc",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "word_value=far_data_read16(3,payload+1); // Little-endian 7A 5C -> 0x5C7A.\nbank_expect(word_value==0x5C7A,6);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_far_data_read16",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:farptr_read8": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_ptr8"
+    ],
+    "args": [
+      [
+        "ptr",
+        [
+          "bk_value_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_byte_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "309cd2baad519484ebffc54db7d9127dde8f06da02634dd4cf6b6d50f9547fc7",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "bank_expect(farptr_read8(pointer)==0x7A,9);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_farptr_read8",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:farptr_read16": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_ptr16"
+    ],
+    "args": [
+      [
+        "ptr",
+        [
+          "bk_value_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_word_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "6105d1bf35be4f8b5577828bf9fedb1648b4fbcde3d02916fae54dfaab23587d",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "bank_expect(farptr_read16(pointer)==0x5C7A,10);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_farptr_read16",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:__farpeek8": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_peek8"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_gb"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_byte_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "5bca311f6b2f4f09065126494664a579062c92accdaa5fd59c22a2b4f3003a46",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "bank_expect(__farpeek8(3,payload)==0xD3,13);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_farpeek8",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:__farpeek16": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_peek16"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_gb"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_word_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "f5a12d2792521d421f474c4f1cdf56670e833169110294c61f858350a5768140",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "bank_expect(__farpeek16(3,payload+1)==0x5C7A,14);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_farpeek16",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:far_data_read": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_read_copy"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_gb"
+        ]
+      ],
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "len",
+        [
+          "as_far_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "as_copy_bounds",
+      "bk_transfer_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "f3b31fbef85a2f0fbdbd431701a5f9efacc4287b738c63983144dedec2bc7278",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "far_data_read(3,payload,buffer,4); // Copy into four writable RAM bytes.\nbank_expect(buffer[0]==0xD3 && buffer[1]==0x7A && buffer[2]==0x5C && buffer[3]==0x96,7);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_far_data_read",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:farptr_read": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_ptr_copy"
+    ],
+    "args": [
+      [
+        "ptr",
+        [
+          "bk_value_arg"
+        ]
+      ],
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "len",
+        [
+          "as_far_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "as_copy_bounds",
+      "bk_transfer_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "925534220bcbece98460719fbf7d7b83764d8284c741efe1dd54e294df75f950",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "farptr_read(pointer,buffer,3);\nbank_expect(buffer[0]==0x7A && buffer[1]==0x5C && buffer[2]==0x96,11);\nbank_expect(pointer.bank==3 && pointer.ptr==payload+1,23);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_farptr_read",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:far_call": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_call_gb"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "func",
+        [
+          "bk_callback_pointer_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "bk_call_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "da46a52aba2a62fe7fd9edb270f952a77ef8eb3ee851dce68c9d4bd3680828ac",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "far_call(3,callback); // No arguments; callback reads payload[0] in bank 3.\nbank_expect(callback_count==1 && callback_byte==0xD3,15);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_far_call",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "gb:__farcall": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_named_gb"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "func",
+        [
+          "bk_callback_name_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_call_return"
+    ],
+    "notes": [
+      "bk_call_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "9e993b10dd01caeba422d4fe0561753c6d22a24afe1bfa57a6782e177a014224",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "__farcall(3,callback);\nbank_expect(callback_count==2 && callback_byte==0xD3,16);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_farcall",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    },
+    "syntax": "__farcall(bank, function_name);"
+  },
+  "gb:__farcall_ptr": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_pointer_call"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "func",
+        [
+          "bk_callback_pointer_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "bk_call_context",
+      "bk_gb_limits"
+    ],
+    "record_sha256": "524cdeb12c9ff54591cadf22a84a01285e12e3f121f75c2b684ba105d37a6802",
+    "example": {
+      "program": "samples/api-examples/gb/banked_data_calls.c",
+      "code": "requested_bank=3;requested_callback=callback;\n__farcall_ptr(requested_bank,requested_callback); // Runtime bank and address.\nbank_expect(callback_count==3 && callback_byte==0xD3,17);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\banked_data_calls.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_gb_farcall_ptr",
+        "bk_demo_program",
+        "bk_demo_calls_gb"
+      ]
+    }
+  },
+  "fc:bank_switch": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_switch_fc"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "bk_fixed_note",
+      "bk_shadow_note",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "ac577678eae02076678e550f4cf5044d0bb2e6656e771a00f1c48150e0674120",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "bank_switch(2); // Select the payload window and update library bookkeeping.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_switch",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:bank_get_current": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_get"
+    ],
+    "args": [],
+    "returns": [
+      "bk_record_return"
+    ],
+    "notes": [
+      "bk_shadow_note"
+    ],
+    "record_sha256": "9be3f7d264b558180db0a8d49768638b84be7b41e9d48af18d5c7602e9d9432f",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "starting_bank=bank_get_current(); // Last value recorded by bank_switch.\nbank_expect(starting_bank==2,1);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_switch",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:__bankswitch": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_intrinsic_fc"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "bk_fixed_note",
+      "bk_shadow_note",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "e68c19a42ef83f3a1b6e7af99b25b91ecbe817a3b956b5f0c3d370e8e7fb7800",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "__bankswitch(1);\nbank_expect(home1[0]==0xA1,19);\nbank_expect(bank_get_current()==2,20); // Intrinsics bypass the library record.\n__bankswitch(2);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_switch",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:__bankof": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_bankof"
+    ],
+    "args": [
+      [
+        "symbol",
+        [
+          "bk_symbol_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_bank_return"
+    ],
+    "notes": [],
+    "record_sha256": "19630e05a9363f6390338a68672f337c9c028cc6450a61f5492db1ced1439521",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "bank_expect(__bankof(payload)==3,3);\nbank_expect(__bankof(callback)==3,4);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_bankof",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    },
+    "syntax": "u8 bank = __bankof(symbol);"
+  },
+  "fc:farptr_make": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_make"
+    ],
+    "args": [
+      [
+        "out",
+        [
+          "bk_out_arg"
+        ]
+      ],
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "ptr",
+        [
+          "bk_stored_pointer"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [],
+    "record_sha256": "609d2ef550c657b9b366a6516fd17c9a6df4485fcc348c9ec3700b5951663f7b",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "farptr_make(&pointer,3,payload+1); // Store a bank and address; do not read ROM.\nbank_expect(pointer.bank==3 && pointer.ptr==payload+1,8);\nfarptr_make(0,1,home1); // A null destination is ignored.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_make",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:far_data_read8": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_read8"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_gb"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_byte_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "5d108e8e0116947c8028645f89c079fbb6401b59fea9aa65e234528a8e70d506",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "byte_value=far_data_read8(3,payload); // One byte: 0xD3.\nbank_expect(byte_value==0xD3,5);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_far_data_read8",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:far_data_read16": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_read16"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_gb"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_word_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "ddf3ce52d5f90b09d110cee050b4d94bb85e78d04f993180187461c9fe5131ec",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "word_value=far_data_read16(3,payload+1); // Little-endian 7A 5C -> 0x5C7A.\nbank_expect(word_value==0x5C7A,6);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_far_data_read16",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:farptr_read8": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_ptr8"
+    ],
+    "args": [
+      [
+        "ptr",
+        [
+          "bk_value_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_byte_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "b6cc2ccedcd935db0441e95d8a474dbe7113ca9fd7bd7583674187c3dfb980bb",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "bank_expect(farptr_read8(pointer)==0x7A,9);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_farptr_read8",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:farptr_read16": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_ptr16"
+    ],
+    "args": [
+      [
+        "ptr",
+        [
+          "bk_value_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_word_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "69ee02472cac63286d926beb82c4e9f8451284ff830791738f190c1bcaa9881c",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "bank_expect(farptr_read16(pointer)==0x5C7A,10);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_farptr_read16",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:__farpeek8": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_peek8"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_fc"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_byte_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "f7b462313d1e82222540612b5bc20118c3f8d351a21f1e1996362e0e103016d2",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "bank_expect(__farpeek8(3,(u16)payload)==0xD3,13);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_farpeek8",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:__farpeek16": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_peek16"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_fc"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_word_return"
+    ],
+    "notes": [
+      "bk_read_bounds",
+      "bk_transfer_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "508311cf40f63db732a9e7c4ac6f759ac3410d36dc2ba1b44f78102c81f4fbb7",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "bank_expect(__farpeek16(3,(u16)(payload+1))==0x5C7A,14);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_farpeek16",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:far_data_read": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_read_copy"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "addr",
+        [
+          "as_far_src_gb"
+        ]
+      ],
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "len",
+        [
+          "as_far_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "as_copy_bounds",
+      "bk_transfer_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "f44d4c04ddf7c90a910544534174b476c33d142c1de22c0aa2dfdeb1d021fbb1",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "far_data_read(3,payload,buffer,4); // Copy into four writable RAM bytes.\nbank_expect(buffer[0]==0xD3 && buffer[1]==0x7A && buffer[2]==0x5C && buffer[3]==0x96,7);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_far_data_read",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:farptr_read": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_ptr_copy"
+    ],
+    "args": [
+      [
+        "ptr",
+        [
+          "bk_value_arg"
+        ]
+      ],
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "len",
+        [
+          "as_far_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "as_copy_bounds",
+      "bk_transfer_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "81aba6da6aaadb67aeb8de9a53eba95eb091095b2be9cbfa8603c3b9f6c8a053",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "farptr_read(pointer,buffer,3);\nbank_expect(buffer[0]==0x7A && buffer[1]==0x5C && buffer[2]==0x96,11);\nbank_expect(pointer.bank==3 && pointer.ptr==payload+1,23);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_farptr_read",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:far_call": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_call_fc"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "func",
+        [
+          "bk_callback_name_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_call_return"
+    ],
+    "notes": [
+      "bk_call_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "0d3d572007836f0f903749c53c50719f1fd81f99dead1e972e0642f8d4cefc82",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "far_call(3,callback); // No arguments; callback reads payload[0] in bank 3.\nbank_expect(callback_count==1 && callback_byte==0xD3,15);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_far_call",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  },
+  "fc:__farcall": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_named_fc"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ],
+      [
+        "func",
+        [
+          "bk_callback_name_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "bk_call_return"
+    ],
+    "notes": [
+      "bk_call_context",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "62021b72c301dc4e8bc2bd2cb37b2faf1661f8d2f386b2343ffdb47a9bc88563",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "__farcall(3,callback);\nbank_expect(callback_count==2 && callback_byte==0xD3,16);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_fc_farcall",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    },
+    "syntax": "__farcall(bank, function_name);"
+  },
+  "fc:__prg_bank_set": {
+    "review": "bank-source-20260915",
+    "purpose": [
+      "bk_prg_alias"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "bk_bank_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "bk_fixed_note",
+      "bk_shadow_note",
+      "bk_fc_limits"
+    ],
+    "record_sha256": "2164c91d69ebfb7e7f68b40b1e6cee82c9a7a04e69c29e70615e60ac4c0996c5",
+    "example": {
+      "program": "samples/api-examples/fc/banked_data_calls.c",
+      "code": "__prg_bank_set(1);bank_expect(home1[0]==0xA1,21);\n__prg_bank_set(2); // Same mapper helper as __bankswitch.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\banked_data_calls.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "bk_demo_switch",
+        "bk_demo_program",
+        "bk_demo_calls_fc"
+      ]
+    }
+  }
+}

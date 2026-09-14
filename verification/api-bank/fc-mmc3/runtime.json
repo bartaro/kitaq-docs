@@ -1,0 +1,157 @@
+{
+  "format": "kurosaki-run-summary-v1",
+  "rom_sha256": "afb4633f158bb259221b8284d4e3b6104a805fd3ff00adfc1c734354a0940096",
+  "frames": 240,
+  "cpu_cycles": 7149048,
+  "instructions": 1952153,
+  "stopped": false,
+  "stop_reason": null,
+  "final_pc": 53660,
+  "final_state_hash": "7b8adf897f053ff28e31d1eb307e76c46054dd5da763478ac68cbc679d927f3f",
+  "mapper": {
+    "mapper": 4,
+    "name": "MMC3/MMC6 irq_clocks=0",
+    "support": "scaffold",
+    "family": "mmc",
+    "probe_only": false,
+    "prg_bank_window": [
+      2,
+      3,
+      6,
+      7
+    ],
+    "chr_bank_window": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "mirroring": "horizontal",
+    "irq_pending": false
+  },
+  "ppu": {
+    "ctrl": 128,
+    "mask": 10,
+    "status": 0,
+    "vram_addr": 0,
+    "nametable0_sha256": "c142017df825aaa8c45d393ac657ca23ea34e558a8d2c19832b0dffa89435ee1",
+    "nametable0_nonzero": 100,
+    "nametable0_unique_tiles": 26,
+    "palette_sha256": "79e12e9dc8f786be71cb4391c57d1ac56d152eabf271aef02a42636e9cd86222",
+    "oam_sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+    "visible_sprites": 64,
+    "data_writes": 1092,
+    "data_writes_outside_vblank": 0,
+    "ctrl_writes_while_rendering": 0,
+    "mask_writes_while_rendering": 2,
+    "scroll_writes_while_rendering": 0,
+    "addr_writes_while_rendering": 0,
+    "data_writes_while_rendering": 0,
+    "addr_writes": 264,
+    "scroll_writes": 482,
+    "rendered_frames": 240,
+    "rendered_scanlines": 57381,
+    "last_pixel_hash": 12681863553428544854
+  },
+  "pc_hotspots": [
+    {
+      "pc": 53666,
+      "count": 637727
+    },
+    {
+      "pc": 53663,
+      "count": 637724
+    },
+    {
+      "pc": 53660,
+      "count": 637703
+    },
+    {
+      "pc": 56856,
+      "count": 990
+    },
+    {
+      "pc": 56858,
+      "count": 990
+    },
+    {
+      "pc": 56860,
+      "count": 960
+    },
+    {
+      "pc": 56862,
+      "count": 960
+    },
+    {
+      "pc": 56865,
+      "count": 960
+    }
+  ],
+  "diagnostics": {
+    "format": "kurosaki-diagnostics-v3",
+    "rom_sha256": "afb4633f158bb259221b8284d4e3b6104a805fd3ff00adfc1c734354a0940096",
+    "emulator": "0.1.0",
+    "errors": 0,
+    "warnings": 2,
+    "infos": 3,
+    "items": [
+      {
+        "code": "KS-MAP-0004",
+        "severity": "warn",
+        "title": "MMC3 / MMC6 scaffold",
+        "message": "Mapper 4 has a mapper-specific scaffold but is not yet accuracy-complete. Family: mmc. Notes: PRG/CHR banking and A12-driven IRQ scaffold exist; timing is fixture-driven and not yet hardware-validated.",
+        "recommendation": "Use mapper trace, state hash, and golden fixtures before treating this mapper as release-grade.",
+        "frame": null,
+        "pc": null,
+        "function": null,
+        "source": null
+      },
+      {
+        "code": "KS-MAP-FEATURE-IRQ",
+        "severity": "info",
+        "title": "Mapper may generate IRQ",
+        "message": "Mapper registry marks this board family as IRQ-capable; trace IRQ lines and snapshot mapper state during tests.",
+        "recommendation": null,
+        "frame": null,
+        "pc": null,
+        "function": null,
+        "source": null
+      },
+      {
+        "code": "KS-PPU-0006",
+        "severity": "warn",
+        "title": "PPU register writes during visible rendering candidate",
+        "message": "2 rendering-sensitive PPU register writes occurred while background/sprite rendering was active on visible scanlines (ctrl=0, mask=2, scroll=0, addr=0, data=0).",
+        "recommendation": "Reduce per-frame VRAM/OAM-side work, split queued VRAM writes across frames, or perform bulk updates with rendering disabled.",
+        "frame": 240,
+        "pc": 53660,
+        "function": null,
+        "source": null
+      },
+      {
+        "code": "KS-PPU-0100",
+        "severity": "info",
+        "title": "Pixel-oriented PPU pipeline active",
+        "message": "Rendered 57381 visible scanlines, 3672384 pattern fetches, last pixel hash AFFF07B5E014DD56.",
+        "recommendation": "Use this hash for deterministic golden tests; do not treat it as pixel-perfect validation until fixture comparisons are added.",
+        "frame": 240,
+        "pc": 53660,
+        "function": null,
+        "source": null
+      },
+      {
+        "code": "KS-APU-0100",
+        "severity": "info",
+        "title": "APU sample generation active",
+        "message": "Generated 176110 audio samples at 44100 Hz; recent buffer has 44100 samples; DMC fetches=0 DMC bits=0 DMC silence_ticks=0 DMC IRQ events=0 frame IRQ events=239",
+        "recommendation": "The current mixer uses CPU-cycle-clocked 2A03 channel sequencers, a NES-like non-linear pulse/TND approximation, DMC sample playback, and mapper expansion audio; waveform-accurate fixture comparison remains a later task.",
+        "frame": 240,
+        "pc": 53660,
+        "function": null,
+        "source": null
+      }
+    ]
+  }
+}

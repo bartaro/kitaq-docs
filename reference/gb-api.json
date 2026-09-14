@@ -1377,7 +1377,7 @@
       "args": "u8 bank, const void* addr",
       "signature": "u8 __farpeek8(u8 bank, const void* addr);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 11,
+      "line": 12,
       "comment": "",
       "body": "",
       "kind": "function",
@@ -1388,6 +1388,11 @@
         "path": "kitaqgb/lib/bank.c",
         "line": 23,
         "code": "u8 far_data_read8(u8 bank, const void* addr)\n{\n    return __farpeek8(bank, addr);\n}\n\n// Read a 16-bit value from the supplied bank and address through the far-read intrinsic.\nu16 far_data_read16(u8 bank, const void* addr)"
+      },
+      "implementation_excerpt": "if (funcName == \"__farpeek8\")\n            {\n                if (args.Length != 2) Error(expr, \"__farpeek8(bank, addr) expects 2 arguments\");\n\n                CompileIntoA(args[0]); EmitPushAAsWord(); // bank\n                CompileIntoHL(args[1]); EmitAsm(\"PUSH_HL\"); // src\n                EmitAsm(\"ADD_SP_IMM\", new AsmOperand(-2, AddressMode.Relative)); // scratch\n                // At SP: scratch, saved address, saved bank; each occupies two bytes.\n\n                EmitAsm(\"LD_HL_SP_IMM\", new AsmOperand(0, AddressMode.Relative));\n                EmitAsm(\"PUSH_HL\"); // dst = &scratch\n\n                EmitAsm(\"LD_HL_SP_IMM\", new AsmOperand(4, AddressMode.Relative));\n                EmitAsm(\"LD_A_HL\");\n                EmitAsm(\"LD_E_A\");\n                EmitAsm(\"INC_HL\");\n                EmitAsm(\"LD_A_HL\");\n                EmitAsm(\"LD_D_A\");\n\n                EmitAsm(\"LD_HL_SP_IMM\", new AsmOperand(6, AddressMode.Relative));\n                EmitAsm(\"LD_A_HL\"); // bank\n\n                EmitAsm(\"POP_HL\"); // dst\n                EmitAsm(\"LD_BC_IMM\", new AsmOperand(1, AddressMode.Immediate16));\n                EmitCallFarMemcpyHelper();\n\n                EmitAsm(\"LD_HL_SP_IMM\", new AsmOperand(0, AddressMode.Relative));\n                EmitAsm(\"LD_A_HL\");\n                EmitAsm(\"ADD_SP_IMM\", new AsmOperand(6, AddressMode.Relative));\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+        "line": 8198
       }
     },
     {
@@ -1396,7 +1401,7 @@
       "args": "u8 bank, const void* addr",
       "signature": "u16 __farpeek16(u8 bank, const void* addr);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 12,
+      "line": 13,
       "comment": "",
       "body": "",
       "kind": "function",
@@ -1407,6 +1412,11 @@
         "path": "kitaqgb/lib/bank.c",
         "line": 29,
         "code": "u16 far_data_read16(u8 bank, const void* addr)\n{\n    return __farpeek16(bank, addr);\n}\n\n// Copy len bytes from banked ROM into caller-owned writable storage.\nvoid far_data_read(u8 bank, const void* addr, void* dst, u16 len)"
+      },
+      "implementation_excerpt": "if (funcName == \"__farpeek16\")\n            {\n                if (args.Length != 2) Error(expr, \"__farpeek16(bank, addr) expects 2 arguments\");\n\n                CompileIntoA(args[0]); EmitPushAAsWord(); // bank\n                CompileIntoHL(args[1]); EmitAsm(\"PUSH_HL\"); // src\n                EmitAsm(\"ADD_SP_IMM\", new AsmOperand(-2, AddressMode.Relative)); // scratch\n                // At SP: scratch, saved address, saved bank; each occupies two bytes.\n\n                EmitAsm(\"LD_HL_SP_IMM\", new AsmOperand(0, AddressMode.Relative));\n                EmitAsm(\"PUSH_HL\"); // dst = &scratch\n\n                EmitAsm(\"LD_HL_SP_IMM\", new AsmOperand(4, AddressMode.Relative));\n                EmitAsm(\"LD_A_HL\");\n                EmitAsm(\"LD_E_A\");\n                EmitAsm(\"INC_HL\");\n                EmitAsm(\"LD_A_HL\");\n                EmitAsm(\"LD_D_A\");\n\n                EmitAsm(\"LD_HL_SP_IMM\", new AsmOperand(6, AddressMode.Relative));\n                EmitAsm(\"LD_A_HL\"); // bank\n\n                EmitAsm(\"POP_HL\"); // dst\n                EmitAsm(\"LD_BC_IMM\", new AsmOperand(2, AddressMode.Immediate16));\n                EmitCallFarMemcpyHelper();\n\n                EmitAsm(\"LD_HL_SP_IMM\", new AsmOperand(0, AddressMode.Relative));\n                EmitAsm(\"LD_A_HL\");\n                EmitAsm(\"LD_E_A\");\n                EmitAsm(\"INC_HL\");\n                EmitAsm(\"LD_A_HL\");\n                EmitAsm(\"LD_D_A\");\n                EmitAsm(\"LD_H_D\");\n                EmitAsm(\"LD_L_E\");\n                EmitAsm(\"ADD_SP_IMM\", new AsmOperand(6, AddressMode.Relative));\n                LastCallReturnsHL = true;\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+        "line": 8231
       }
     },
     {
@@ -1415,7 +1425,7 @@
       "args": "u8 bank, const void* func",
       "signature": "void __farcall_ptr(u8 bank, const void* func);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 14,
+      "line": 15,
       "comment": "",
       "body": "",
       "kind": "function",
@@ -1426,6 +1436,11 @@
         "path": "kitaqgb/lib/bank.c",
         "line": 42,
         "code": "void far_call(u8 bank, const void* func)\n{\n    __farcall_ptr(bank, func);\n}\n\n// Store a bank/address pair without accessing ROM; a null output pointer is ignored.\nvoid farptr_make(BankPtr* out, u8 bank, const u8* ptr)"
+      },
+      "implementation_excerpt": "if (funcName == \"__farcall_ptr\")\n            {\n                if (args.Length != 2) Error(expr, \"__farcall_ptr(bank, func) expects 2 arguments\");\n                CType callbackType = TypeOf(args[1]);\n                if (callbackType.IsPointer) callbackType = callbackType.Subtype;\n                if (callbackType != null && callbackType.IsFunction &&\n                    (callbackType.ParamTypes ?? Array.Empty<CType>()).Length != 0)\n                    Error(expr, \"__farcall_ptr requires a callback with no parameters\");\n                CompileIntoA(args[0]);\n                EmitAsm(\"PUSH_AF\");\n                CompileIntoHL(args[1]);\n                EmitAsm(\"POP_AF\");\n                UseFarCallPointerBank0Helper = true;\n                EmitAsm(\"CALL\", new AsmOperand(\"__kq_farcall_pointer_bank0\", AddressMode.Absolute));\n                RecordCallEdge(expr, \"<indirect-far>\", -1, \"farcall_pointer\", viaThunk: true,\n                    viaFarcall: true, actualArgSizes: new int[0], expectedArgSizes: new int[0]);\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+        "line": 8271
       }
     },
     {
@@ -1434,8 +1449,8 @@
       "args": "u8 bank",
       "signature": "void bank_switch(u8 bank);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 18,
-      "comment": "Write the requested bank to the cartridge register and update this library\nshadow. The shadow reflects calls to this wrapper, not arbitrary mapper writes.",
+      "line": 19,
+      "comment": "Update both the library bank record and the compiler shadow used by far\nreads and calls. Invoke this permanent bank change from fixed-bank code.",
       "body": "",
       "kind": "function",
       "module": "bank",
@@ -1446,8 +1461,8 @@
         "signature": "void bank_switch(u8 bank);",
         "path": "kitaqgb/lib/bank.c",
         "line": 8,
-        "comment": "Write the requested bank to the cartridge register and update this library\nshadow. The shadow reflects calls to this wrapper, not arbitrary mapper writes.",
-        "body": "void bank_switch(u8 bank)\n{\n    kq_bank_current = bank;\n    *(u8*)0x2000 = bank;\n}",
+        "comment": "Update both the library bank record and the compiler shadow used by far\nreads and calls. Invoke this permanent bank change from fixed-bank code.",
+        "body": "void bank_switch(u8 bank)\n{\n    kq_bank_current = bank;\n    __bankswitch(bank);\n}",
         "kind": "function"
       },
       "availability": "implementation",
@@ -1460,7 +1475,7 @@
       "args": "",
       "signature": "u8 bank_get_current();",
       "path": "kitaqgb/lib/bank.h",
-      "line": 20,
+      "line": 21,
       "comment": "Return the last bank recorded by bank_switch; this does not read cartridge hardware.",
       "body": "",
       "kind": "function",
@@ -1486,7 +1501,7 @@
       "args": "u8 bank, const void* addr",
       "signature": "u8 far_data_read8(u8 bank, const void* addr);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 22,
+      "line": 23,
       "comment": "Read one byte through the compiler intrinsic that accepts an explicit ROM bank.",
       "body": "",
       "kind": "function",
@@ -1512,7 +1527,7 @@
       "args": "u8 bank, const void* addr",
       "signature": "u16 far_data_read16(u8 bank, const void* addr);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 24,
+      "line": 25,
       "comment": "Read a 16-bit value from the supplied bank and address through the far-read intrinsic.",
       "body": "",
       "kind": "function",
@@ -1538,7 +1553,7 @@
       "args": "u8 bank, const void* addr, void* dst, u16 len",
       "signature": "void far_data_read(u8 bank, const void* addr, void* dst, u16 len);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 26,
+      "line": 27,
       "comment": "Copy len bytes from banked ROM into caller-owned writable storage.",
       "body": "",
       "kind": "function",
@@ -1567,8 +1582,8 @@
       "args": "u8 bank, const void* func",
       "signature": "void far_call(u8 bank, const void* func);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 29,
-      "comment": "Forward to __farcall_ptr. The current GB backend evaluates its arguments but\nemits no indirect call; this wrapper must not be used to invoke a callback.",
+      "line": 30,
+      "comment": "Invoke a no-argument callback in its ROM bank, then restore the caller\nbank. The pointer must identify executable code; no arguments are forwarded.",
       "body": "",
       "kind": "function",
       "module": "bank",
@@ -1579,7 +1594,7 @@
         "signature": "void far_call(u8 bank, const void* func);",
         "path": "kitaqgb/lib/bank.c",
         "line": 40,
-        "comment": "Forward to __farcall_ptr. The current GB backend evaluates its arguments but\nemits no indirect call; this wrapper must not be used to invoke a callback.",
+        "comment": "Invoke a no-argument callback in its ROM bank, then restore the caller\nbank. The pointer must identify executable code; no arguments are forwarded.",
         "body": "void far_call(u8 bank, const void* func)\n{\n    __farcall_ptr(bank, func);\n}",
         "kind": "function"
       },
@@ -1593,7 +1608,7 @@
       "args": "BankPtr* out, u8 bank, const u8* ptr",
       "signature": "void farptr_make(BankPtr* out, u8 bank, const u8* ptr);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 31,
+      "line": 32,
       "comment": "Store a bank/address pair without accessing ROM; a null output pointer is ignored.",
       "body": "",
       "kind": "function",
@@ -1619,7 +1634,7 @@
       "args": "BankPtr ptr",
       "signature": "u8 farptr_read8(BankPtr ptr);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 33,
+      "line": 34,
       "comment": "Read one byte using both components of the bank-qualified pointer.",
       "body": "",
       "kind": "function",
@@ -1645,7 +1660,7 @@
       "args": "BankPtr ptr",
       "signature": "u16 farptr_read16(BankPtr ptr);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 35,
+      "line": 36,
       "comment": "Read a 16-bit value using both components of the bank-qualified pointer.",
       "body": "",
       "kind": "function",
@@ -1671,7 +1686,7 @@
       "args": "BankPtr ptr, void* dst, u16 len",
       "signature": "void farptr_read(BankPtr ptr, void* dst, u16 len);",
       "path": "kitaqgb/lib/bank.h",
-      "line": 37,
+      "line": 38,
       "comment": "Copy len bytes from a bank-qualified pointer; dst must have room for the full copy.",
       "body": "",
       "kind": "function",
@@ -15980,8 +15995,12 @@
       "availability": "compiler",
       "example": null,
       "arity_only": true,
-      "implementation_excerpt": "\n            {\n                if (args.Length != 1) Program.Error(\"__bankof(symbol) expects 1 argument\");\n                if (!args[0].Match(Tag.Name, out string symName)) Program.Error(\"__bankof(symbol) requires a symbol name argument\");\n                if (TryGetKnownRomBankForSymbol(symName, out int knownBank))\n                {\n                    EmitAsm(\"LD_A_IMM\", new AsmOperand(knownBank & 0xFF, AddressMode.Immediate));\n                    return;\n                }\n                EmitAsm(\"LD_A_IMM\", new AsmOperand(symName, ImmediateModifier.Bank));\n                return;\n            }\n\n            // __cgb_is_cgb() -> A (0 or 1)\n            if (funcName == \"__cgb_is_cgb\")\n            {\n                if (args.Length != 0) Program.Error(\"__cgb_is_cgb() expects 0 arguments\");\n                if (Program.TryGetKnownCgbRuntimeValue(out int knownCgbValue))\n                {\n                    EmitAsm(\"LD_A_IMM\", new AsmOperand(knownCgbValue, AddressMode.Immediate));\n                    return;\n                }\n                EmitRuntimeCgbCheckCall();\n                return;\n            }\n\n            // Expose the normalized WRAM bank only for a color-only target.\n            if (funcName == \"__svbk_get\")\n            {\n                if (args.Length != 0) Error(expr, \"__svbk_get() expects 0 arguments\");\n                if (!Program.IsCgbOnlyTargetRequested())\n                    Error(expr, ErrorCode.BankedWramRequiresCgbOnly, \"__svbk_get() requires #pragma rom_cgb cgb_only or --cgb=cgb_only\");\n                EmitReadNormalizedSvbkIntoA();\n                retur",
-      "new_example": "__bankof(arg0);"
+      "implementation_excerpt": "if (funcName == \"__bankof\")\n            {\n                if (args.Length != 1) Program.Error(\"__bankof(symbol) expects 1 argument\");\n                if (!args[0].Match(Tag.Name, out string symName)) Program.Error(\"__bankof(symbol) requires a symbol name argument\");\n                if (TryGetKnownRomBankForSymbol(symName, out int knownBank))\n                {\n                    EmitAsm(\"LD_A_IMM\", new AsmOperand(knownBank & 0xFF, AddressMode.Immediate));\n                    return;\n                }\n                EmitAsm(\"LD_A_IMM\", new AsmOperand(symName, ImmediateModifier.Bank));\n                return;\n            }",
+      "new_example": "__bankof(arg0);",
+      "implementation_source": {
+        "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+        "line": 7311
+      }
     },
     {
       "name": "__vram_memset_unsafe",
@@ -16329,8 +16348,12 @@
       "availability": "compiler",
       "example": null,
       "arity_only": true,
-      "implementation_excerpt": "\n            {\n                if (args.Length != 2) Program.Error(\"__farcall(bank, func) expects 2 arguments\");\n                if (!args[1].Match(Tag.Name, out string targetName)) Program.Error(\"__farcall(bank, func) requires 2nd argument to be a function name\");\n\n                Expr bankExpr = FoldConstants(args[0]);\n                int targetBank = -1;\n                CFunctionInfo targetInfo;\n                if (Functions.TryGetValue(targetName, out targetInfo))\n                {\n                    targetBank = targetInfo.RomBank;\n                    PrepareStructReturnDestination(expr, targetInfo.ReturnType, targetInfo, targetName);\n                    if (targetInfo.ReturnType != null)\n                        LastCallReturnsHL = ReturnsInHL(expr, targetInfo.ReturnType);\n                }\n\n                // A known bank permits direct dispatch when safe, otherwise request a fixed-bank thunk.\n                if (TryResolveBankExprToConstU8(args[0], out int bankLiteral))\n                {\n                    int optimizedBank = bankLiteral & 0xFF;\n                    bool farcallDirectOK = IsDirectCallBankSafe(optimizedBank, CurrentFunctionBank);\n                    if (!farcallDirectOK)\n                    {\n                        string farcallThunkName = EnsureBank0Thunk(\n                            targetName,\n                            optimizedBank,\n                            isStackCall: targetInfo != null && targetInfo.IsStackCall,\n                            stackArgBytes: 0);\n                        EmitAsm(\"CALL\", new AsmOperand(farcallThunkName, Addres",
-      "new_example": "__farcall(arg0, arg1);"
+      "implementation_excerpt": "if (funcName == \"__farcall\")\n            {\n                if (args.Length != 2) Program.Error(\"__farcall(bank, func) expects 2 arguments\");\n                if (!args[1].Match(Tag.Name, out string targetName)) Program.Error(\"__farcall(bank, func) requires 2nd argument to be a function name\");\n\n                // A named far call supplies no arguments. Reject data symbols\n                // and callbacks that would otherwise read stale argument storage.\n                CFunctionInfo targetInfo;\n                if (!Functions.TryGetValue(targetName, out targetInfo))\n                {\n                    Error(expr, \"__farcall requires a declared function name\");\n                    return;\n                }\n                if ((targetInfo.Parameters ?? Array.Empty<FieldInfo>()).Length != 0)\n                {\n                    Error(expr, \"__farcall requires a callback with no parameters\");\n                    return;\n                }\n                Expr bankExpr = FoldConstants(args[0]);\n                int targetBank = -1;\n                if (targetInfo != null)\n                {\n                    targetBank = targetInfo.RomBank;\n                    PrepareStructReturnDestination(expr, targetInfo.ReturnType, targetInfo, targetName);\n                    if (targetInfo.ReturnType != null)\n                        LastCallReturnsHL = ReturnsInHL(expr, targetInfo.ReturnType);\n                }\n\n                // A known bank permits direct dispatch when safe, otherwise request a fixed-bank thunk.\n                if (TryResolveBankExprToConstU8(args[0], out int bankLiteral))\n                {\n                    int optimizedBank = bankLiteral & 0xFF;\n                    bool farcallDirectOK = IsDirectCallBankSafe(optimizedBank, CurrentFunctionBank);\n                    if (!farcallDirectOK)\n                    {\n                        string farcallThunkName = EnsureBank0Thunk(\n                            targetName,\n                            optimizedBank,\n                            isStackCall: targetInfo != null && targetInfo.IsStackCall,\n                            stackArgBytes: 0);\n                        EmitAsm(\"CALL\", new AsmOperand(farcallThunkName, AddressMode.Absolute));\n                        RecordCallEdge(expr, targetName, optimizedBank, \"farcall_bank_thunk\", viaThunk: true, viaFarcall: true, actualArgSizes: new int[0], expectedArgSizes: new int[0]);\n                    }\n                    else\n                    {\n                        if (Program.CheckBankCalls && !InUnsafe && optimizedBank != 0)\n                        {\n                            AsmOperand ok = MakeUniqueLabel(\"kq_bank_ok\");\n                            EmitLoadA(RomBankVar);\n                            EmitAsm(\"CP_IMM\", new AsmOperand(optimizedBank & 0xFF, AddressMode.Immediate));\n                            EmitAsm(\"JP_Z\", ok);\n                            EmitAsm(\"JP\", EnsureCheckTrap());\n                            EmitLabel(ok);\n                        }\n\n                        EmitAsm(\"CALL\", new AsmOperand(targetName, AddressMode.Absolute));\n                        RecordCallEdge(expr, targetName, optimizedBank, \"farcall_direct\", viaThunk: false, viaFarcall: true, actualArgSizes: new int[0], expectedArgSizes: new int[0]);\n                    }\n                    return;\n                }\n\n                // A = requested bank argument (runtime value)\n                CompileIntoA(bankExpr);\n\n                // Always dispatch via bank0 helper thunk.\n                string thunkName = EnsureBank0RuntimeFarcallThunk(targetName);\n                EmitAsm(\"CALL\", new AsmOperand(thunkName, AddressMode.Absolute));\n                RecordCallEdge(expr, targetName, targetBank, \"farcall_intrinsic\", viaThunk: true, viaFarcall: true, actualArgSizes: new int[0], expectedArgSizes: new int[0]);\n                return;\n            }",
+      "new_example": "__farcall(arg0, arg1);",
+      "implementation_source": {
+        "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+        "line": 7239
+      }
     },
     {
       "name": "__cgb_safe_set_obpd",
@@ -16518,11 +16541,11 @@
     },
     {
       "name": "__bankswitch",
-      "ret": "",
-      "args": "arg0",
-      "signature": "__bankswitch(arg0);",
-      "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
-      "line": 7182,
+      "ret": "void",
+      "args": "u8 bank",
+      "signature": "void __bankswitch(u8 bank);",
+      "path": "kitaqgb/lib/bank.h",
+      "line": 11,
       "comment": "",
       "body": "",
       "kind": "intrinsic",
@@ -16534,8 +16557,11 @@
         "line": 166,
         "code": "    if (Audio_EffectPointer3 != 0) {\n        __saved_bank = __rom_bank;\n        if (__saved_bank != Audio_EffectBank3) __bankswitch(Audio_EffectBank3);\n\n        n = *Audio_EffectPointer3;\n        if (n == 0) {\n            Audio_EffectPointer3 = 0;"
       },
-      "arity_only": true,
-      "implementation_excerpt": "\n            {\n                if (args.Length != 1) Program.Error(\"__bankswitch(bank) expects 1 argument\");\n                CompileIntoA(args[0]);\n                if (CurrentFunctionBank == 0)\n                {\n                    EmitAsm(\"LD_MEM_A\", new AsmOperand(0x2000, AddressMode.Absolute));\n                    EmitStoreA(RomBankVar);\n                }\n                else\n                {\n                    UseBankSwitchBank0Helper = true;\n                    EmitAsm(\"CALL\", new AsmOperand(\"__kq_bankswitch_bank0\", AddressMode.Absolute));\n                }\n                return;\n            }\n\n            \n            // __farcall(bank_u8, func_name)\n            // Safe far call: always executes bank switch from bank0 thunk.\n            if (funcName == \"__farcall\")\n            {\n                if (args.Length != 2) Program.Error(\"__farcall(bank, func) expects 2 arguments\");\n                if (!args[1].Match(Tag.Name, out string targetName)) Program.Error(\"__farcall(bank, func) requires 2nd argument to be a function name\");\n\n                Expr bankExpr = FoldConstants(args[0]);\n                int targetBank = -1;\n                CFunctionInfo targetInfo;\n                if (Functions.TryGetValue(targetName, out targetInfo))\n                {\n                    targetBank = targetInfo.RomBank;\n                    PrepareStructReturnDestination(expr, targetInfo.ReturnType, targetInfo, targetName);\n                    if (targetInfo.ReturnType != null)\n                        LastCallReturnsHL = ReturnsInHL(expr, targetInfo.ReturnType);\n                }\n\n       "
+      "implementation_excerpt": "if (funcName == \"__bankswitch\")\n            {\n                if (args.Length != 1) Program.Error(\"__bankswitch(bank) expects 1 argument\");\n                CompileIntoA(args[0]);\n                if (CurrentFunctionBank == 0)\n                {\n                    EmitAsm(\"LD_MEM_A\", new AsmOperand(0x2000, AddressMode.Absolute));\n                    EmitStoreA(RomBankVar);\n                }\n                else\n                {\n                    UseBankSwitchBank0Helper = true;\n                    EmitAsm(\"CALL\", new AsmOperand(\"__kq_bankswitch_bank0\", AddressMode.Absolute));\n                }\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+        "line": 7219
+      }
     },
     {
       "name": "__critical_enter",

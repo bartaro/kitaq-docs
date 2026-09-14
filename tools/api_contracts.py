@@ -81,11 +81,15 @@ def render(record, contract, language, messages, ui):
     out.append('<details class="api-source"><summary>' + label('implementation') + '</summary>')
     out.append('<p class="source">' + html.escape(record['path']) + ':' + str(record['line']) + '</p>')
     if record.get('comment'):
-        out += ['<div class="original"><b>' + label('original') + '</b><pre>' + html.escape(record['comment']) + '</pre></div>']
+        comment = '\n'.join(line.rstrip() for line in record['comment'].splitlines())
+        out += ['<div class="original"><b>' + label('original') + '</b><pre>' + html.escape(comment) + '</pre></div>']
     if record.get('definition'):
         source = record['definition']
         out += ['<p class="source">' + html.escape(source['path']) + ':' + str(source['line']) + '</p>', code(source['body'])]
     elif record.get('implementation_excerpt'):
+        if record.get('implementation_source'):
+            origin = record['implementation_source']
+            out.append('<p class="source">'+html.escape(origin['path'])+':'+str(origin['line'])+'</p>')
         out.append(code(record['implementation_excerpt'], 'csharp'))
     out.append('</details></details>')
     return ''.join(out)
@@ -137,6 +141,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
+    proofs.update(verified_bank_examples(contracts))
     for key in proofs:
         contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
     coverage = []
@@ -262,6 +267,32 @@ def verified_vram_examples(contracts, family='vram', modes=None):
                     raise ValueError('VRAM example evidence changed: '+file)
         verified[key]={'api':key.split(':')[1],'kind':family,'runs':selected}
     return verified
+
+
+def verified_bank_examples(contracts):
+    """Require the complete byte/word/callback/restoration matrix and unchanged inputs."""
+    path = SITE/'verification/api-bank/results.json'
+    if not path.exists(): return {}
+    runs = json.loads(path.read_text(encoding='utf-8'))['records']
+    if len(runs)!=3 or {(r['platform'],r['mode']) for r in runs}!={('gb','dmg'),('gb','cgb'),('fc','mmc3')}: return {}
+    if not all(r['passed'] and r['frames']==240 and r['label_pixel_mismatches']==0 and r['color_pixel_mismatches']==0 for r in runs):return {}
+    result={}
+    for key,contract in contracts.items():
+        if contract['review']!='bank-source-20260915':continue
+        selected=[r for r in runs if r['platform']==key.split(':')[0]]
+        for run in selected:
+            if run['source']!=contract['example']['program']:raise ValueError('Bank example mismatch: '+key)
+            runtime=str(Path(run['image']).parent/'runtime.json').replace('\\','/')
+            files={run['source']:run['source_sha256'],run['image']:run['image_sha256'],runtime:run['runtime_sha256'],**run['support_sha256']}
+            for name,expected in files.items():
+                if hashlib.sha256((SITE/name).read_bytes()).hexdigest()!=expected:raise ValueError('Bank evidence changed: '+name)
+            repos=SITE.parents[1]/'publish/github_20260912'
+            if not repos.exists():repos=SITE.parent
+            for name,expected in run['library_sha256'].items():
+                source=repos/('kitaq'+run['platform'])/'lib'/name
+                if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('Bank library changed: '+str(source))
+        result[key]={'api':key.split(':')[1],'kind':'bank','runs':selected}
+    return result
 
 
 def verified_asset_examples(contracts):
@@ -402,7 +433,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank']:
                 block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
                     caption = ('--cgb='+run['target']+' / ' if result.get('kind') in ['cgb-palette','cgb-dma-wram'] else '')+run['mode'].upper()

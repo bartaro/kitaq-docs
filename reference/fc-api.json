@@ -3305,7 +3305,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_bankof(u16 symbol_or_function) {\n    return __bankof(symbol_or_function);\n}"
+      "new_example": "u8 example_bankof(u16 symbol_or_function) {\n    return __bankof(symbol_or_function);\n}",
+      "implementation_excerpt": "if (expr.MatchAny(Tag.Call, out funcExpr, out args) &&\n                funcExpr != null &&\n                funcExpr.Match(Tag.Name, out name) &&\n                string.Equals(name, \"__bankof\", StringComparison.Ordinal) &&\n                args != null &&\n                args.Length == 1 &&\n                args[0] != null &&\n                args[0].Match(Tag.Name, out string bankedSymbol))\n            {\n                // Resolve __bankof from placement metadata and keep the byte-sized bank value.\n                value = ResolveSymbolBank(bankedSymbol) & 0xFF;\n                return true;\n            }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 6446
+      }
     },
     {
       "name": "__bankswitch",
@@ -3324,6 +3329,11 @@
         "path": "kitaqfc/lib/bank.c",
         "line": 10,
         "code": "{\n    kq_bank_current = bank;\n    __bankswitch(bank);\n}\n\n// Read this wrapper's bank shadow; arbitrary mapper writes do not update it.\nu8 bank_get_current(void)"
+      },
+      "implementation_excerpt": "case \"__prg_bank_set\":\n                case \"__bankswitch\":\n                    if (!Need(1)) return true;\n                    if (Program.NesMapperProfile.IsSurom512 && TryEvaluateConstant(args[0], out int constantBank) && (constantBank < 1 || constantBank > 30))\n                    {\n                        Program.Error(\"error KQFC2603 KQFC-SUROM-BANK-RANGE: {0} constant bank {1} is outside 1..30; common bank 0 is not a switch target.\", funcName, constantBank);\n                        return true;\n                    }\n                    _mapperWritingFunctions.Add(_currentFunctionName);\n                    Load1(args[0]); EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\")); return true;",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4451
       }
     },
     {
@@ -3340,7 +3350,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_prg_bank_set(u8 bank) {\n    __prg_bank_set(bank);\n}"
+      "new_example": "void example_prg_bank_set(u8 bank) {\n    __prg_bank_set(bank);\n}",
+      "implementation_excerpt": "case \"__prg_bank_set\":\n                case \"__bankswitch\":\n                    if (!Need(1)) return true;\n                    if (Program.NesMapperProfile.IsSurom512 && TryEvaluateConstant(args[0], out int constantBank) && (constantBank < 1 || constantBank > 30))\n                    {\n                        Program.Error(\"error KQFC2603 KQFC-SUROM-BANK-RANGE: {0} constant bank {1} is outside 1..30; common bank 0 is not a switch target.\", funcName, constantBank);\n                        return true;\n                    }\n                    _mapperWritingFunctions.Add(_currentFunctionName);\n                    Load1(args[0]); EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\")); return true;",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4451
+      }
     },
     {
       "name": "__farcall",
@@ -3349,14 +3364,19 @@
       "signature": "u8 __farcall(u8 bank, u16 func);",
       "path": "kitaqfc/lib/intrinsics.h",
       "line": 83,
-      "comment": "Invoke the compiler banked-call path; target placement and calling convention must match the selected mapper.",
+      "comment": "Call a declared zero-argument function; placement selects its bank and its declared type determines the result.",
       "body": "",
       "kind": "function",
       "module": "intrinsics",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_farcall(u8 bank, u16 func) {\n    return __farcall(bank, func);\n}"
+      "new_example": "u8 example_farcall(u8 bank, u16 func) {\n    return __farcall(bank, func);\n}",
+      "implementation_excerpt": "if (string.Equals(funcName, \"__farcall\", StringComparison.Ordinal))\n            {\n                Expr[] farArgs = args ?? Array.Empty<Expr>();\n                if (farArgs.Length != 2)\n                {\n                    Program.Error(\"error KQ0000: __farcall(bank, func) expects exactly 2 arguments.\");\n                    return;\n                }\n\n                string targetName;\n                if (!farArgs[1].Match(Tag.Name, out targetName))\n                {\n                    Program.Error(\"error KQ0000: __farcall(bank, func) requires the 2nd argument to be a function name.\");\n                    return;\n                }\n                // This intrinsic supplies no callback arguments. A variable name\n                // is not a static function target, even when its value is a pointer.\n                if (!_functionParameters.TryGetValue(targetName, out FieldInfo[] farParameters))\n                {\n                    Program.Error(\"error KQFC2610: __farcall requires a declared function name; use an ordinary typed call for a function pointer.\");\n                    return;\n                }\n                if (farParameters.Length != 0)\n                {\n                    Program.Error(\"error KQFC2610: __farcall requires a callback with no parameters.\");\n                    return;\n                }\n                if (Program.NesMapperProfile.IsSurom512 &&\n                    TryEvaluateConstant(farArgs[0], out int constantFarBank) &&\n                    (constantFarBank < 1 || constantFarBank > 30))\n                {\n                    Program.Error(\"error KQFC2603 KQFC-SUROM-BANK-RANGE: __farcall constant bank {0} is outside 1..30; common bank 0 is not a switch target.\", constantFarBank);\n                    return;\n                }\n\n                // Evaluate the requested far-call bank byte; the following dispatch uses the target function bank metadata.\n                EmitLoadValue(farArgs[0], ctx, 1);\n\n                int callerBank = ctx == null ? 0 : ctx.Bank;\n                int calleeBank = GetFunctionBank(targetName);\n                if (ShouldUseFdsOverlayThunk(callerBank, calleeBank))\n                {\n                    string fdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                    EmitAsm(\"JSR\", Abs(fdsThunkName));\n                    RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                    return;\n                }\n                bool bankedPrg = Program.NesMapperProfile.SupportsPrgBanking || Program.NesMapperProfile.UsesDuplicatedCommonBank;\n                bool directSafe = !bankedPrg || calleeBank == 0 || calleeBank == callerBank;\n                if (directSafe)\n                {\n                    EmitAsm(\"JSR\", Abs(targetName));\n                    RecordCallEdge(targetName, calleeBank, \"direct\", viaThunk: false, viaFarcall: true);\n                    return;\n                }\n\n                string thunkName = EnsureBankThunk(targetName, calleeBank);\n                EmitAsm(\"JSR\", Abs(thunkName));\n                RecordCallEdge(targetName, calleeBank, \"bank_thunk\", viaThunk: true, viaFarcall: true);\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 3843
+      }
     },
     {
       "name": "__far_memcpy",
@@ -3394,6 +3414,11 @@
         "path": "kitaqfc/lib/bank.c",
         "line": 22,
         "code": "u8 far_data_read8(u8 bank, const void* addr)\n{\n    return __farpeek8(bank, (u16)addr);\n}\n\n// Read a 16-bit value through the bank-aware compiler intrinsic.\nu16 far_data_read16(u8 bank, const void* addr)"
+      },
+      "implementation_excerpt": "EmitHelperStart(\"__farpeek8\");\n            // args: bank, addr16. Return A.\n            EmitAsm(\"LDA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"PHA\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\"));\n            EmitAsm(\"LDY\", Imm(0));\n            EmitAsm(\"LDA\", IndY(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"PLA\");\n            EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\"));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Retain both fetched bytes across bank restoration and return the word in A/X.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 8203
       }
     },
     {
@@ -3413,6 +3438,11 @@
         "path": "kitaqfc/lib/bank.c",
         "line": 28,
         "code": "u16 far_data_read16(u8 bank, const void* addr)\n{\n    return __farpeek16(bank, (u16)addr);\n}\n\n// Copy len bytes from banked ROM to caller-owned writable storage.\nvoid far_data_read(u8 bank, const void* addr, void* dst, u16 len)"
+      },
+      "implementation_excerpt": "EmitHelperStart(\"__farpeek16\");\n            // args: bank, addr16. Return A=lo, X=hi.\n            EmitAsm(\"LDA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"PHA\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\"));\n            EmitAsm(\"LDY\", Imm(0));\n            EmitAsm(\"LDA\", IndY(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"INY\");\n            EmitAsm(\"LDA\", IndY(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"PLA\");\n            EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\"));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDX\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"RTS\");\n\n            // Consume the word count while advancing source/destination pointers; zero count still restores the saved bank.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 8218
       }
     },
     {
