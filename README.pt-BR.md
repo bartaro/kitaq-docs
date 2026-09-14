@@ -2,6 +2,14 @@
 
 [English](README.md#english) | [日本語](README.md#japanese) | **Português (Brasil)**
 
+<!-- ai-prompts:start -->
+## Prompts para desenvolver jogos com IA
+
+Preencha os requisitos e envie o prompt completo ao assistente de IA. Ele abrange implementação, testes no emulador, análise com SARAKURA e verificação das correções.
+
+[KITAQGB](https://bartaro.github.io/kitaq-docs/pt/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/pt/loop-engineering.html#fc)
+<!-- ai-prompts:end -->
+
 ## Abrir o manual de cada ferramenta
 
 Os links abaixo levam diretamente ao volume em português brasileiro.
@@ -45,7 +53,7 @@ Se os fontes estiverem em outro local, informe `-Root "caminho absoluto da árvo
 ## Publicar no GitHub
 
 1. Coloque o conteúdo desta pasta na raiz do repositório ou em uma pasta `docs`.
-2. Envie juntos `index.html`, os sete volumes, `verification.html`, as pastas de idiomas, `assets`, `samples`, `reference`, `verification`, os READMEs e os avisos de licença. Inclua `.nojekyll`.
+2. Envie juntos `index.html`, os sete volumes, `verification.html`, `loop-engineering.html`, `prompts`, as pastas de idiomas, `assets`, `samples`, `reference`, `verification`, os READMEs e os avisos de licença. Inclua `.nojekyll`.
 3. Em Settings → Pages → Build and deployment, escolha Deploy from a branch no campo Source.
 4. Selecione a branch enviada e `/ (root)` ou `/docs`, conforme a organização, e salve.
 5. Quando a publicação terminar, abra o endereço exibido em Pages e confira os links do sumário e dos volumes.

@@ -228,6 +228,8 @@ def main():
         elif key!='index':body+=cli_section(key,inventory)
         page(key,title,sub,body)
     verification()
-    print('Generated 9 English HTML pages with shared API and sample records')
+    from generate_prompts import publish
+    publish('en')
+    print('Generated 10 English HTML pages including development prompts')
 
 if __name__=='__main__':main()

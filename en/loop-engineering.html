@@ -1,0 +1,428 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>AI game development prompts — KITAQ SERIES</title><link rel="stylesheet" href="../assets/manual.css"></head><body><a class="skip" href="#main">Skip to content</a><header class="mast"><a href="index.html">KITAQ <span>DEVELOPMENT SYSTEM</span></a><div>USER'S MANUAL <b>2026.09</b></div></header><nav class="languages" aria-label="Languages"><a href="../en/loop-engineering.html" lang="en" hreflang="en" aria-current="page">English</a> <a href="../loop-engineering.html" lang="ja" hreflang="ja">日本語</a> <a href="../ko/loop-engineering.html" lang="ko" hreflang="ko">한국어</a> <a href="../zh-CN/loop-engineering.html" lang="zh-CN" hreflang="zh-CN">简体中文</a> <a href="../zh-TW/loop-engineering.html" lang="zh-TW" hreflang="zh-TW">繁體中文</a> <a href="../es/loop-engineering.html" lang="es" hreflang="es">Español</a> <a href="../pt/loop-engineering.html" lang="pt-BR" hreflang="pt-BR">Português (Brasil)</a> <a href="../fr/loop-engineering.html" lang="fr" hreflang="fr">Français</a> <a href="../de/loop-engineering.html" lang="de" hreflang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="Select a volume"><a href="index.html">Contents</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> KITAQGB LIBRARY</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> KITAQFC LIBRARY</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">Search this volume</label><input type="search" id="search" placeholder="e.g. input / __memcpy"><p id="search-status" role="status"></p><nav class="toc" aria-label="Volume contents"><a href="#gb">KITAQGB</a><a href="#fc">KITAQFC</a></nav><button class="print" type="button">Print this volume</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES</p><h1>AI game development prompts</h1><p class="subtitle">Fill in the requirements, then give the complete prompt to your AI assistant. It covers implementation, emulator testing, SARAKURA analysis and retesting.</p></div>
+<section class="authored"><h2 id="gb">KITAQGB</h2><p><button type="button" class="copy" data-copy-source="prompt-gb">Copy complete prompt</button> · <a download href="../prompts/en/kitaqgb-prompt.md">Download Markdown</a></p>
+<pre id="prompt-gb" hidden><code># Game development with KITAQGB, KOKURA and SARAKURA
+
+Fill in the requirements and give this entire document to the AI assistant. Commands assume sibling repositories named `kitaqgb`, `kitaqfc`, `kokura`, `kurosaki`, `sarakura` and `kitaq-docs`, with your `game-gb` or `game-fc` project beside them. Run commands from their parent directory; adapt paths to the actual environment.
+
+## Requirements
+
+- Game title: &lt;fill in&gt;
+- Genre and core gameplay: &lt;fill in&gt;
+- Controls, success and failure conditions: &lt;fill in&gt;
+- Required screens, stages, enemies and items: &lt;fill in&gt;
+- Visual style, music and sound effects: &lt;fill in; identify any supplied assets&gt;
+- Saving, communication, peripherals and other requirements: &lt;fill in, or none&gt;
+- Project directory: &lt;fill in&gt;
+- Redistribution requirements: &lt;for example, original code and assets suitable for MIT publication&gt;
+
+- Target: &lt;original Game Boy / dual GB–CGB support / CGB only&gt;
+- Performance: &lt;for example, 60 gameplay updates per second in normal play; define acceptable behavior in demanding scenes&gt;
+
+## Task
+
+Implement the game with KITAQGB and its libraries. Use KOKURA for execution and debugging, and SARAKURA to organize diagnostics and compare results before and after a fix.
+
+Repeat this cycle until the acceptance criteria are met: make the specification concrete → implement a small change → build → apply inputs and observe → investigate the cause → fix → retest under the same conditions. A plan, a code listing or a successful compilation is not completion.
+
+### Establish the environment and acceptance criteria
+
+1. Read workspace instructions, tool READMEs, HTML manuals, and the headers and implementations of the libraries you will use. Record executable paths and versions or SHA-256 hashes. Verify commands against actual `--help` output and APIs against source.
+2. Define measurable acceptance criteria for inputs, images, audio, progression and update frequency. Examples: pressing and releasing START begins the game; a collision removes one life; pausing silences the intended audio and resuming restores playback.
+3. Ask only about material ambiguities. Make ordinary reversible implementation decisions autonomously. Do not weaken requirements or acceptance criteria.
+4. First run a small supplied sample through the compiler, emulator and SARAKURA. This checks the tool connection, not completion of the requested game.
+
+### Implement a small playable slice
+
+- Use the KITAQGB C dialect and `void main()`. Do not assume desktop C or GBDK APIs are available. Include required `.c` implementation units, not just declarations; check initialization order, units, signedness, ranges, buffer lifetime and ROM banking.
+- Plan VRAM/OAM updates, VBlank, interrupts, stack, ROM/WRAM banks and tile/sprite limits. Transfer-queue capacity and free space are different from physical VRAM capacity and free space.
+- A DMG game must not depend on CGB-only features. Test both hardware modes for a dual-mode game.
+- Use the supplied original `ascii.c` font for letters, digits and symbols, and verify character-to-tile mapping.
+
+- First connect boot, title, a controllable player, success or failure, and restart. Then expand the game.
+- Keep editable graphics, music and sound-effect sources and their generation steps. Verify that the build actually consumes their exports.
+- Write source comments in English and progress reports in English. Keep SARAKURA’s standard reports in English.
+
+### Connect each build to its execution
+
+Use a separate output directory for each iteration, such as `out/iter-001`. Record commands, exit codes, and hashes of source, assets, tools, ROM and metadata. Never run an older ROM after a failed build. Maps, source maps and debug information must come from the same build as the ROM.
+
+The following is a basic DMG check. Supply `main.c` and every required library implementation unit, and adapt the options and input sequence to the game.
+
+```powershell
+$iteration = &#x27;.\game-gb\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqgb\kitaqgb.exe&#x27; &#x27;.\game-gb\src\main.c&#x27; `
+  -I &#x27;.\kitaqgb\lib&#x27; -o &quot;$iteration\game.gb&quot; `
+  --profile=dev --rst-disable --stack-bank=fixed --no-disasm `
+  &quot;--emit-ai-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+# This sequence presses START once, with released intervals on both sides.
+&amp; &#x27;.\kokura\kokura-cli.exe&#x27; &quot;$iteration\game.gb&quot; `
+  --hardware dmg --run-frames 300 `
+  --input-seq &#x27;NONE:60;START:1;NONE:239&#x27; `
+  --png &quot;$iteration\frame.png&quot; --record-wav &quot;$iteration\audio.wav&quot; `
+  --dump-report &quot;$iteration\run.json&quot; `
+  --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; gb analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }
+```
+
+
+`--hardware dmg` selects the original GB. Match the ROM header and emulator hardware setting when testing CGB or dual support. The input sequence presses START once between released intervals. A 300-frame run does not test the whole game.
+
+### Check images, audio, state and performance
+
+- Save input scenarios with distinct presses, holds and releases. Exercise every specified path: boot, start, movement, actions, collisions, scrolling, stage changes, game over, restart, pause and saving or communication where applicable.
+- Preserve PNGs at relevant frames, input data, execution reports, diagnostic JSONL, WAVs and any necessary state or memory observations. Check the reached frame count and stop reason. Actually open the images; one screenshot cannot establish motion or input response. Compare counters, positions and state changes with expected values. Check screen edges, tile/attribute boundaries and crowded sprite scenes.
+- Check music, effects, simultaneous playback, dropouts, pause and resume. A generated WAV alone does not establish correct sound. If listening is unavailable, distinguish the waveform/numerical checks performed from unverified audible qualities.
+- Measure heavy scenes, target CPU/update workload and transfers; on FC, include NMI work. Host emulator throughput is not game update frequency or proof of hardware speed. Continuing with `--allow-unimplemented`, where available, does not demonstrate support for the missing feature.
+
+### Analyze, repair and retest
+
+- Feed SARAKURA the build metadata for the tested ROM and diagnostic JSONL from the tested execution. A CPU trace or ordinary run report is not a substitute. `--frames` specifies analysis conditions; SARAKURA does not execute the ROM or automatically edit the source.
+- Read `report.html`, `ai_diagnostics.json`, `repair_prompt.md` and `retest_plan.json`. Compare diagnoses with reproduction steps, images, audio and source. Distinguish inferred source locations or causes from verified facts, and normal waiting loops from hangs. Assess warnings individually and record unsupported events or analysis limits. Do not hide warnings with filters or shorten tests to obtain a passing result.
+- Reduce failures to minimal reproductions, fix their causes and rebuild. If the compiler or emulator is responsible, isolate its defect from game code and add regression verification for the tool fix.
+- Retest with matching input, random seed, hardware/video mode, mapper, observed frames and diagnostic settings. Use new metadata for each new ROM; do not blindly reuse save states after code or RAM layout changes.
+
+```powershell
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-gb\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-gb\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-gb\out\delta.json&#x27; --markdown &#x27;.\game-gb\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce
+```
+
+
+Use diagnostic differences alongside gameplay, graphics and audio acceptance checks. If the same failure repeats, revisit the evidence and hypothesis instead of continuing arbitrary changes.
+
+### Completion and deliverables
+
+Rerun all required scenarios against the final ROM built from the delivered source and settings. Invincibility, automatic test input or another mapper alone does not verify normal play in the final build. Provide a requirement-to-test table, reasons for remaining warnings and explicit unverified or unsupported items. State “not tested on physical hardware” when applicable.
+
+Deliver source, tool/library identities, editable assets, reproducible build and test scripts, the ROM, final verification evidence, and a README covering setup, controls and known limits. Include replay data and a test harness where needed. Publish or send files externally only within explicitly authorized scope. Delete unnecessary intermediate builds and temporary traces after verification, preserving source, assets, final deliverables and needed regression evidence.
+
+If environment or permission constraints prevent a required check, report the exact reproduction steps and required action. Do not mark the work complete.
+</code></pre>
+<p>Fill in the requirements and give this entire document to the AI assistant. Commands assume sibling repositories named <code>kitaqgb</code>, <code>kitaqfc</code>, <code>kokura</code>, <code>kurosaki</code>, <code>sarakura</code> and <code>kitaq-docs</code>, with your <code>game-gb</code> or <code>game-fc</code> project beside them. Run commands from their parent directory; adapt paths to the actual environment.</p>
+<h3 id="gb-section-1">Requirements</h3>
+<ul>
+<li>Game title: &lt;fill in&gt;</li>
+<li>Genre and core gameplay: &lt;fill in&gt;</li>
+<li>Controls, success and failure conditions: &lt;fill in&gt;</li>
+<li>Required screens, stages, enemies and items: &lt;fill in&gt;</li>
+<li>Visual style, music and sound effects: &lt;fill in; identify any supplied assets&gt;</li>
+<li>Saving, communication, peripherals and other requirements: &lt;fill in, or none&gt;</li>
+<li>Project directory: &lt;fill in&gt;</li>
+<li>Redistribution requirements: &lt;for example, original code and assets suitable for MIT publication&gt;</li>
+</ul>
+<ul>
+<li>Target: &lt;original Game Boy / dual GB–CGB support / CGB only&gt;</li>
+<li>Performance: &lt;for example, 60 gameplay updates per second in normal play; define acceptable behavior in demanding scenes&gt;</li>
+</ul>
+<h3 id="gb-section-2">Task</h3>
+<p>Implement the game with KITAQGB and its libraries. Use KOKURA for execution and debugging, and SARAKURA to organize diagnostics and compare results before and after a fix.</p>
+<p>Repeat this cycle until the acceptance criteria are met: make the specification concrete → implement a small change → build → apply inputs and observe → investigate the cause → fix → retest under the same conditions. A plan, a code listing or a successful compilation is not completion.</p>
+<h4 id="gb-section-3">Establish the environment and acceptance criteria</h4>
+<ol>
+<li>Read workspace instructions, tool READMEs, HTML manuals, and the headers and implementations of the libraries you will use. Record executable paths and versions or SHA-256 hashes. Verify commands against actual <code>--help</code> output and APIs against source.</li>
+<li>Define measurable acceptance criteria for inputs, images, audio, progression and update frequency. Examples: pressing and releasing START begins the game; a collision removes one life; pausing silences the intended audio and resuming restores playback.</li>
+<li>Ask only about material ambiguities. Make ordinary reversible implementation decisions autonomously. Do not weaken requirements or acceptance criteria.</li>
+<li>First run a small supplied sample through the compiler, emulator and SARAKURA. This checks the tool connection, not completion of the requested game.</li>
+</ol>
+<h4 id="gb-section-4">Implement a small playable slice</h4>
+<ul>
+<li>Use the KITAQGB C dialect and <code>void main()</code>. Do not assume desktop C or GBDK APIs are available. Include required <code>.c</code> implementation units, not just declarations; check initialization order, units, signedness, ranges, buffer lifetime and ROM banking.</li>
+<li>Plan VRAM/OAM updates, VBlank, interrupts, stack, ROM/WRAM banks and tile/sprite limits. Transfer-queue capacity and free space are different from physical VRAM capacity and free space.</li>
+<li>A DMG game must not depend on CGB-only features. Test both hardware modes for a dual-mode game.</li>
+<li>Use the supplied original <code>ascii.c</code> font for letters, digits and symbols, and verify character-to-tile mapping.</li>
+</ul>
+<ul>
+<li>First connect boot, title, a controllable player, success or failure, and restart. Then expand the game.</li>
+<li>Keep editable graphics, music and sound-effect sources and their generation steps. Verify that the build actually consumes their exports.</li>
+<li>Write source comments in English and progress reports in English. Keep SARAKURA’s standard reports in English.</li>
+</ul>
+<h4 id="gb-section-5">Connect each build to its execution</h4>
+<p>Use a separate output directory for each iteration, such as <code>out/iter-001</code>. Record commands, exit codes, and hashes of source, assets, tools, ROM and metadata. Never run an older ROM after a failed build. Maps, source maps and debug information must come from the same build as the ROM.</p>
+<p>The following is a basic DMG check. Supply <code>main.c</code> and every required library implementation unit, and adapt the options and input sequence to the game.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>$iteration = &#x27;.\game-gb\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqgb\kitaqgb.exe&#x27; &#x27;.\game-gb\src\main.c&#x27; `
+  -I &#x27;.\kitaqgb\lib&#x27; -o &quot;$iteration\game.gb&quot; `
+  --profile=dev --rst-disable --stack-bank=fixed --no-disasm `
+  &quot;--emit-ai-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+# This sequence presses START once, with released intervals on both sides.
+&amp; &#x27;.\kokura\kokura-cli.exe&#x27; &quot;$iteration\game.gb&quot; `
+  --hardware dmg --run-frames 300 `
+  --input-seq &#x27;NONE:60;START:1;NONE:239&#x27; `
+  --png &quot;$iteration\frame.png&quot; --record-wav &quot;$iteration\audio.wav&quot; `
+  --dump-report &quot;$iteration\run.json&quot; `
+  --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; gb analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }</code></pre></div>
+<p><code>--hardware dmg</code> selects the original GB. Match the ROM header and emulator hardware setting when testing CGB or dual support. The input sequence presses START once between released intervals. A 300-frame run does not test the whole game.</p>
+<h4 id="gb-section-6">Check images, audio, state and performance</h4>
+<ul>
+<li>Save input scenarios with distinct presses, holds and releases. Exercise every specified path: boot, start, movement, actions, collisions, scrolling, stage changes, game over, restart, pause and saving or communication where applicable.</li>
+<li>Preserve PNGs at relevant frames, input data, execution reports, diagnostic JSONL, WAVs and any necessary state or memory observations. Check the reached frame count and stop reason. Actually open the images; one screenshot cannot establish motion or input response. Compare counters, positions and state changes with expected values. Check screen edges, tile/attribute boundaries and crowded sprite scenes.</li>
+<li>Check music, effects, simultaneous playback, dropouts, pause and resume. A generated WAV alone does not establish correct sound. If listening is unavailable, distinguish the waveform/numerical checks performed from unverified audible qualities.</li>
+<li>Measure heavy scenes, target CPU/update workload and transfers; on FC, include NMI work. Host emulator throughput is not game update frequency or proof of hardware speed. Continuing with <code>--allow-unimplemented</code>, where available, does not demonstrate support for the missing feature.</li>
+</ul>
+<h4 id="gb-section-7">Analyze, repair and retest</h4>
+<ul>
+<li>Feed SARAKURA the build metadata for the tested ROM and diagnostic JSONL from the tested execution. A CPU trace or ordinary run report is not a substitute. <code>--frames</code> specifies analysis conditions; SARAKURA does not execute the ROM or automatically edit the source.</li>
+<li>Read <code>report.html</code>, <code>ai_diagnostics.json</code>, <code>repair_prompt.md</code> and <code>retest_plan.json</code>. Compare diagnoses with reproduction steps, images, audio and source. Distinguish inferred source locations or causes from verified facts, and normal waiting loops from hangs. Assess warnings individually and record unsupported events or analysis limits. Do not hide warnings with filters or shorten tests to obtain a passing result.</li>
+<li>Reduce failures to minimal reproductions, fix their causes and rebuild. If the compiler or emulator is responsible, isolate its defect from game code and add regression verification for the tool fix.</li>
+<li>Retest with matching input, random seed, hardware/video mode, mapper, observed frames and diagnostic settings. Use new metadata for each new ROM; do not blindly reuse save states after code or RAM layout changes.</li>
+</ul>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-gb\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-gb\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-gb\out\delta.json&#x27; --markdown &#x27;.\game-gb\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce</code></pre></div>
+<p>Use diagnostic differences alongside gameplay, graphics and audio acceptance checks. If the same failure repeats, revisit the evidence and hypothesis instead of continuing arbitrary changes.</p>
+<h4 id="gb-section-8">Completion and deliverables</h4>
+<p>Rerun all required scenarios against the final ROM built from the delivered source and settings. Invincibility, automatic test input or another mapper alone does not verify normal play in the final build. Provide a requirement-to-test table, reasons for remaining warnings and explicit unverified or unsupported items. State “not tested on physical hardware” when applicable.</p>
+<p>Deliver source, tool/library identities, editable assets, reproducible build and test scripts, the ROM, final verification evidence, and a README covering setup, controls and known limits. Include replay data and a test harness where needed. Publish or send files externally only within explicitly authorized scope. Delete unnecessary intermediate builds and temporary traces after verification, preserving source, assets, final deliverables and needed regression evidence.</p>
+<p>If environment or permission constraints prevent a required check, report the exact reproduction steps and required action. Do not mark the work complete.</p>
+</section>
+<section class="authored"><h2 id="fc">KITAQFC</h2><p><button type="button" class="copy" data-copy-source="prompt-fc">Copy complete prompt</button> · <a download href="../prompts/en/kitaqfc-prompt.md">Download Markdown</a></p>
+<pre id="prompt-fc" hidden><code># Game development with KITAQFC, KUROSAKI and SARAKURA
+
+Fill in the requirements and give this entire document to the AI assistant. Commands assume sibling repositories named `kitaqgb`, `kitaqfc`, `kokura`, `kurosaki`, `sarakura` and `kitaq-docs`, with your `game-gb` or `game-fc` project beside them. Run commands from their parent directory; adapt paths to the actual environment.
+
+## Requirements
+
+- Game title: &lt;fill in&gt;
+- Genre and core gameplay: &lt;fill in&gt;
+- Controls, success and failure conditions: &lt;fill in&gt;
+- Required screens, stages, enemies and items: &lt;fill in&gt;
+- Visual style, music and sound effects: &lt;fill in; identify any supplied assets&gt;
+- Saving, communication, peripherals and other requirements: &lt;fill in, or none&gt;
+- Project directory: &lt;fill in&gt;
+- Redistribution requirements: &lt;for example, original code and assets suitable for MIT publication&gt;
+
+- Target: &lt;NES/Famicom cartridge or FDS&gt;
+- Mapper, ROM size and mirroring: &lt;specify, or select from the requirements&gt;
+- Video standard and performance: &lt;for example, NTSC and 60 gameplay updates per second&gt;
+
+## Task
+
+Implement the game with KITAQFC and its libraries. Use KUROSAKI for execution and debugging, and SARAKURA to organize diagnostics and compare results before and after a fix.
+
+Repeat this cycle until the acceptance criteria are met: make the specification concrete → implement a small change → build → apply inputs and observe → investigate the cause → fix → retest under the same conditions. A plan, a code listing or a successful compilation is not completion.
+
+### Establish the environment and acceptance criteria
+
+1. Read workspace instructions, tool READMEs, HTML manuals, and the headers and implementations of the libraries you will use. Record executable paths and versions or SHA-256 hashes. Verify commands against actual `--help` output and APIs against source.
+2. Define measurable acceptance criteria for inputs, images, audio, progression and update frequency. Examples: pressing and releasing START begins the game; a collision removes one life; pausing silences the intended audio and resuming restores playback.
+3. Ask only about material ambiguities. Make ordinary reversible implementation decisions autonomously. Do not weaken requirements or acceptance criteria.
+4. First run a small supplied sample through the compiler, emulator and SARAKURA. This checks the tool connection, not completion of the requested game.
+
+### Implement a small playable slice
+
+- Start with NROM for a small game; choose MMC3 or another mapper when banking or size requires it. Verify required board features using `inspect-rom`, `mapper-info`, `audit-board` and the implementation, rather than relying on the mapper name alone.
+- Plan PRG/CHR size, CHR-ROM or CHR-RAM, mirroring, fixed banks, interrupt vectors and save RAM. Check headers against actual placement after optimizations or banking changes. `--nes-local-ram` uses internal CPU RAM in `$0000–$07FF`; avoid overlaps with zero page, stack, OAM buffers and runtime/library storage.
+- Use the KITAQFC C dialect, FC libraries and `void main(void)`. Do not assume GB APIs are compatible. Check implementation providers and include the required `.c` files; some header entries are declarations only.
+- Account for PPU registers, NMI, OAM DMA, per-scanline sprite limits, scrolling, mirroring, attribute tables and APU/DMC behavior. Transfer-queue free space is not PPU VRAM capacity; budget the work done per NMI.
+- Convert the supplied original `ascii.c` font to FC CHR for letters, digits and symbols. Verify CHR, palettes, nametables and attributes. For FDS, separately verify disk access, saving and BIOS requirements; do not assume cartridge boot conditions.
+
+- First connect boot, title, a controllable player, success or failure, and restart. Then expand the game.
+- Keep editable graphics, music and sound-effect sources and their generation steps. Verify that the build actually consumes their exports.
+- Write source comments in English and progress reports in English. Keep SARAKURA’s standard reports in English.
+
+### Connect each build to its execution
+
+Use a separate output directory for each iteration, such as `out/iter-001`. Record commands, exit codes, and hashes of source, assets, tools, ROM and metadata. Never run an older ROM after a failed build. Maps, source maps and debug information must come from the same build as the ROM.
+
+The following is an NROM check with no input. Supply `main.c`, required library implementation units and the CHR file; select the appropriate mapper. Do not pass compiler build metadata to KUROSAKI’s `--kitaqfc-debug` without first checking its required format.
+
+```powershell
+$iteration = &#x27;.\game-fc\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqfc\kitaqfc.exe&#x27; &#x27;.\game-fc\src\main.c&#x27; `
+  -I &#x27;.\kitaqfc\lib&#x27; -o &quot;$iteration\game.nes&quot; `
+  --mapper=nrom &#x27;--nes-chr=.\game-fc\assets\game.chr&#x27; --no-disasm `
+  &quot;--kurosaki-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; run &quot;$iteration\game.nes&quot; `
+  --frames 300 --pad1 0 --png &quot;$iteration\frame.png&quot; `
+  --json &quot;$iteration\run.json&quot; --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; fc analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }
+```
+
+
+A 300-frame run with no input is only an initial check. Add ordered gameplay scenarios before claiming that the game works.
+
+### Reproduce ordered input
+
+- `--pad1` and `--pad2` use raw NES bitmasks: A=1, B=2, SELECT=4, START=8, UP=16, DOWN=32, LEFT=64, RIGHT=128. Do not confuse these with library `BTN_*` values.
+- `run --pad1` applies fixed input. For sequences of actions, create a replay that distinguishes presses, holds and releases. Inspect the `Replay` and `ReplayFrame` definitions. The public CLI’s `replay-record` records neutral input, not a person’s interactive play.
+- Check ROM SHA-256, replay identity and frame range yourself. `replay-run --verify` compares an expected final hash only when one is provided; it does not comprehensively validate gameplay or ROM identity. Never overwrite expected results with observed results merely to make a test pass.
+
+```powershell
+&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; replay-run `
+  &#x27;.\game-fc\out\iter-001\game.nes&#x27; &#x27;.\game-fc\tests\start-and-play.replay.json&#x27; `
+  --frames 900 --json &#x27;.\game-fc\out\iter-001\play.json&#x27; `
+  --png &#x27;.\game-fc\out\iter-001\play.png&#x27; `
+  --wav &#x27;.\game-fc\out\iter-001\play.wav&#x27;
+```
+
+
+Prepare the replay for the ROM being tested. The public CLI’s `replay-run` has no `--emit-diagnostics` option. Do not invent that option or pass CPU trace data as diagnostic events. To analyze ordered-input scenarios with SARAKURA, create a project-local test harness using public `kurosaki-core` APIs: `RunOptions.replay_frames` and `diagnostic_events_from_trace_and_report`. Run the same ROM, replay and frame conditions; generate diagnostic JSONL from that execution’s trace and diagnostic report. Check trace configuration and retained ranges, and compare the harness’s images and observations with CLI replay results. Do not present no-input diagnostics as evidence for a gameplay scenario. If the required environment is unavailable, report this verification as incomplete.
+
+### Check images, audio, state and performance
+
+- Save input scenarios with distinct presses, holds and releases. Exercise every specified path: boot, start, movement, actions, collisions, scrolling, stage changes, game over, restart, pause and saving or communication where applicable.
+- Preserve PNGs at relevant frames, input data, execution reports, diagnostic JSONL, WAVs and any necessary state or memory observations. Check the reached frame count and stop reason. Actually open the images; one screenshot cannot establish motion or input response. Compare counters, positions and state changes with expected values. Check screen edges, tile/attribute boundaries and crowded sprite scenes.
+- Check music, effects, simultaneous playback, dropouts, pause and resume. A generated WAV alone does not establish correct sound. If listening is unavailable, distinguish the waveform/numerical checks performed from unverified audible qualities.
+- Measure heavy scenes, target CPU/update workload and transfers; on FC, include NMI work. Host emulator throughput is not game update frequency or proof of hardware speed. Continuing with `--allow-unimplemented`, where available, does not demonstrate support for the missing feature.
+
+### Analyze, repair and retest
+
+- Feed SARAKURA the build metadata for the tested ROM and diagnostic JSONL from the tested execution. A CPU trace or ordinary run report is not a substitute. `--frames` specifies analysis conditions; SARAKURA does not execute the ROM or automatically edit the source.
+- Read `report.html`, `ai_diagnostics.json`, `repair_prompt.md` and `retest_plan.json`. Compare diagnoses with reproduction steps, images, audio and source. Distinguish inferred source locations or causes from verified facts, and normal waiting loops from hangs. Assess warnings individually and record unsupported events or analysis limits. Do not hide warnings with filters or shorten tests to obtain a passing result.
+- Reduce failures to minimal reproductions, fix their causes and rebuild. If the compiler or emulator is responsible, isolate its defect from game code and add regression verification for the tool fix.
+- Retest with matching input, random seed, hardware/video mode, mapper, observed frames and diagnostic settings. Use new metadata for each new ROM; do not blindly reuse save states after code or RAM layout changes.
+
+```powershell
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-fc\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-fc\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-fc\out\delta.json&#x27; --markdown &#x27;.\game-fc\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce
+```
+
+
+Use diagnostic differences alongside gameplay, graphics and audio acceptance checks. If the same failure repeats, revisit the evidence and hypothesis instead of continuing arbitrary changes.
+
+### Completion and deliverables
+
+Rerun all required scenarios against the final ROM built from the delivered source and settings. Invincibility, automatic test input or another mapper alone does not verify normal play in the final build. Provide a requirement-to-test table, reasons for remaining warnings and explicit unverified or unsupported items. State “not tested on physical hardware” when applicable.
+
+Deliver source, tool/library identities, editable assets, reproducible build and test scripts, the ROM, final verification evidence, and a README covering setup, controls and known limits. Include replay data and a test harness where needed. Publish or send files externally only within explicitly authorized scope. Delete unnecessary intermediate builds and temporary traces after verification, preserving source, assets, final deliverables and needed regression evidence.
+
+If environment or permission constraints prevent a required check, report the exact reproduction steps and required action. Do not mark the work complete.
+</code></pre>
+<p>Fill in the requirements and give this entire document to the AI assistant. Commands assume sibling repositories named <code>kitaqgb</code>, <code>kitaqfc</code>, <code>kokura</code>, <code>kurosaki</code>, <code>sarakura</code> and <code>kitaq-docs</code>, with your <code>game-gb</code> or <code>game-fc</code> project beside them. Run commands from their parent directory; adapt paths to the actual environment.</p>
+<h3 id="fc-section-1">Requirements</h3>
+<ul>
+<li>Game title: &lt;fill in&gt;</li>
+<li>Genre and core gameplay: &lt;fill in&gt;</li>
+<li>Controls, success and failure conditions: &lt;fill in&gt;</li>
+<li>Required screens, stages, enemies and items: &lt;fill in&gt;</li>
+<li>Visual style, music and sound effects: &lt;fill in; identify any supplied assets&gt;</li>
+<li>Saving, communication, peripherals and other requirements: &lt;fill in, or none&gt;</li>
+<li>Project directory: &lt;fill in&gt;</li>
+<li>Redistribution requirements: &lt;for example, original code and assets suitable for MIT publication&gt;</li>
+</ul>
+<ul>
+<li>Target: &lt;NES/Famicom cartridge or FDS&gt;</li>
+<li>Mapper, ROM size and mirroring: &lt;specify, or select from the requirements&gt;</li>
+<li>Video standard and performance: &lt;for example, NTSC and 60 gameplay updates per second&gt;</li>
+</ul>
+<h3 id="fc-section-2">Task</h3>
+<p>Implement the game with KITAQFC and its libraries. Use KUROSAKI for execution and debugging, and SARAKURA to organize diagnostics and compare results before and after a fix.</p>
+<p>Repeat this cycle until the acceptance criteria are met: make the specification concrete → implement a small change → build → apply inputs and observe → investigate the cause → fix → retest under the same conditions. A plan, a code listing or a successful compilation is not completion.</p>
+<h4 id="fc-section-3">Establish the environment and acceptance criteria</h4>
+<ol>
+<li>Read workspace instructions, tool READMEs, HTML manuals, and the headers and implementations of the libraries you will use. Record executable paths and versions or SHA-256 hashes. Verify commands against actual <code>--help</code> output and APIs against source.</li>
+<li>Define measurable acceptance criteria for inputs, images, audio, progression and update frequency. Examples: pressing and releasing START begins the game; a collision removes one life; pausing silences the intended audio and resuming restores playback.</li>
+<li>Ask only about material ambiguities. Make ordinary reversible implementation decisions autonomously. Do not weaken requirements or acceptance criteria.</li>
+<li>First run a small supplied sample through the compiler, emulator and SARAKURA. This checks the tool connection, not completion of the requested game.</li>
+</ol>
+<h4 id="fc-section-4">Implement a small playable slice</h4>
+<ul>
+<li>Start with NROM for a small game; choose MMC3 or another mapper when banking or size requires it. Verify required board features using <code>inspect-rom</code>, <code>mapper-info</code>, <code>audit-board</code> and the implementation, rather than relying on the mapper name alone.</li>
+<li>Plan PRG/CHR size, CHR-ROM or CHR-RAM, mirroring, fixed banks, interrupt vectors and save RAM. Check headers against actual placement after optimizations or banking changes. <code>--nes-local-ram</code> uses internal CPU RAM in <code>$0000–$07FF</code>; avoid overlaps with zero page, stack, OAM buffers and runtime/library storage.</li>
+<li>Use the KITAQFC C dialect, FC libraries and <code>void main(void)</code>. Do not assume GB APIs are compatible. Check implementation providers and include the required <code>.c</code> files; some header entries are declarations only.</li>
+<li>Account for PPU registers, NMI, OAM DMA, per-scanline sprite limits, scrolling, mirroring, attribute tables and APU/DMC behavior. Transfer-queue free space is not PPU VRAM capacity; budget the work done per NMI.</li>
+<li>Convert the supplied original <code>ascii.c</code> font to FC CHR for letters, digits and symbols. Verify CHR, palettes, nametables and attributes. For FDS, separately verify disk access, saving and BIOS requirements; do not assume cartridge boot conditions.</li>
+</ul>
+<ul>
+<li>First connect boot, title, a controllable player, success or failure, and restart. Then expand the game.</li>
+<li>Keep editable graphics, music and sound-effect sources and their generation steps. Verify that the build actually consumes their exports.</li>
+<li>Write source comments in English and progress reports in English. Keep SARAKURA’s standard reports in English.</li>
+</ul>
+<h4 id="fc-section-5">Connect each build to its execution</h4>
+<p>Use a separate output directory for each iteration, such as <code>out/iter-001</code>. Record commands, exit codes, and hashes of source, assets, tools, ROM and metadata. Never run an older ROM after a failed build. Maps, source maps and debug information must come from the same build as the ROM.</p>
+<p>The following is an NROM check with no input. Supply <code>main.c</code>, required library implementation units and the CHR file; select the appropriate mapper. Do not pass compiler build metadata to KUROSAKI’s <code>--kitaqfc-debug</code> without first checking its required format.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>$iteration = &#x27;.\game-fc\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqfc\kitaqfc.exe&#x27; &#x27;.\game-fc\src\main.c&#x27; `
+  -I &#x27;.\kitaqfc\lib&#x27; -o &quot;$iteration\game.nes&quot; `
+  --mapper=nrom &#x27;--nes-chr=.\game-fc\assets\game.chr&#x27; --no-disasm `
+  &quot;--kurosaki-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; run &quot;$iteration\game.nes&quot; `
+  --frames 300 --pad1 0 --png &quot;$iteration\frame.png&quot; `
+  --json &quot;$iteration\run.json&quot; --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; fc analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }</code></pre></div>
+<p>A 300-frame run with no input is only an initial check. Add ordered gameplay scenarios before claiming that the game works.</p>
+<h4 id="fc-section-6">Reproduce ordered input</h4>
+<ul>
+<li><code>--pad1</code> and <code>--pad2</code> use raw NES bitmasks: A=1, B=2, SELECT=4, START=8, UP=16, DOWN=32, LEFT=64, RIGHT=128. Do not confuse these with library <code>BTN_*</code> values.</li>
+<li><code>run --pad1</code> applies fixed input. For sequences of actions, create a replay that distinguishes presses, holds and releases. Inspect the <code>Replay</code> and <code>ReplayFrame</code> definitions. The public CLI’s <code>replay-record</code> records neutral input, not a person’s interactive play.</li>
+<li>Check ROM SHA-256, replay identity and frame range yourself. <code>replay-run --verify</code> compares an expected final hash only when one is provided; it does not comprehensively validate gameplay or ROM identity. Never overwrite expected results with observed results merely to make a test pass.</li>
+</ul>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; replay-run `
+  &#x27;.\game-fc\out\iter-001\game.nes&#x27; &#x27;.\game-fc\tests\start-and-play.replay.json&#x27; `
+  --frames 900 --json &#x27;.\game-fc\out\iter-001\play.json&#x27; `
+  --png &#x27;.\game-fc\out\iter-001\play.png&#x27; `
+  --wav &#x27;.\game-fc\out\iter-001\play.wav&#x27;</code></pre></div>
+<p>Prepare the replay for the ROM being tested. The public CLI’s <code>replay-run</code> has no <code>--emit-diagnostics</code> option. Do not invent that option or pass CPU trace data as diagnostic events. To analyze ordered-input scenarios with SARAKURA, create a project-local test harness using public <code>kurosaki-core</code> APIs: <code>RunOptions.replay_frames</code> and <code>diagnostic_events_from_trace_and_report</code>. Run the same ROM, replay and frame conditions; generate diagnostic JSONL from that execution’s trace and diagnostic report. Check trace configuration and retained ranges, and compare the harness’s images and observations with CLI replay results. Do not present no-input diagnostics as evidence for a gameplay scenario. If the required environment is unavailable, report this verification as incomplete.</p>
+<h4 id="fc-section-7">Check images, audio, state and performance</h4>
+<ul>
+<li>Save input scenarios with distinct presses, holds and releases. Exercise every specified path: boot, start, movement, actions, collisions, scrolling, stage changes, game over, restart, pause and saving or communication where applicable.</li>
+<li>Preserve PNGs at relevant frames, input data, execution reports, diagnostic JSONL, WAVs and any necessary state or memory observations. Check the reached frame count and stop reason. Actually open the images; one screenshot cannot establish motion or input response. Compare counters, positions and state changes with expected values. Check screen edges, tile/attribute boundaries and crowded sprite scenes.</li>
+<li>Check music, effects, simultaneous playback, dropouts, pause and resume. A generated WAV alone does not establish correct sound. If listening is unavailable, distinguish the waveform/numerical checks performed from unverified audible qualities.</li>
+<li>Measure heavy scenes, target CPU/update workload and transfers; on FC, include NMI work. Host emulator throughput is not game update frequency or proof of hardware speed. Continuing with <code>--allow-unimplemented</code>, where available, does not demonstrate support for the missing feature.</li>
+</ul>
+<h4 id="fc-section-8">Analyze, repair and retest</h4>
+<ul>
+<li>Feed SARAKURA the build metadata for the tested ROM and diagnostic JSONL from the tested execution. A CPU trace or ordinary run report is not a substitute. <code>--frames</code> specifies analysis conditions; SARAKURA does not execute the ROM or automatically edit the source.</li>
+<li>Read <code>report.html</code>, <code>ai_diagnostics.json</code>, <code>repair_prompt.md</code> and <code>retest_plan.json</code>. Compare diagnoses with reproduction steps, images, audio and source. Distinguish inferred source locations or causes from verified facts, and normal waiting loops from hangs. Assess warnings individually and record unsupported events or analysis limits. Do not hide warnings with filters or shorten tests to obtain a passing result.</li>
+<li>Reduce failures to minimal reproductions, fix their causes and rebuild. If the compiler or emulator is responsible, isolate its defect from game code and add regression verification for the tool fix.</li>
+<li>Retest with matching input, random seed, hardware/video mode, mapper, observed frames and diagnostic settings. Use new metadata for each new ROM; do not blindly reuse save states after code or RAM layout changes.</li>
+</ul>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-fc\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-fc\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-fc\out\delta.json&#x27; --markdown &#x27;.\game-fc\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce</code></pre></div>
+<p>Use diagnostic differences alongside gameplay, graphics and audio acceptance checks. If the same failure repeats, revisit the evidence and hypothesis instead of continuing arbitrary changes.</p>
+<h4 id="fc-section-9">Completion and deliverables</h4>
+<p>Rerun all required scenarios against the final ROM built from the delivered source and settings. Invincibility, automatic test input or another mapper alone does not verify normal play in the final build. Provide a requirement-to-test table, reasons for remaining warnings and explicit unverified or unsupported items. State “not tested on physical hardware” when applicable.</p>
+<p>Deliver source, tool/library identities, editable assets, reproducible build and test scripts, the ROM, final verification evidence, and a README covering setup, controls and known limits. Include replay data and a test harness where needed. Publish or send files externally only within explicitly authorized scope. Delete unnecessary intermediate builds and temporary traces after verification, preserving source, assets, final deliverables and needed regression evidence.</p>
+<p>If environment or permission constraints prevent a required check, report the exact reproduction steps and required action. Do not mark the work complete.</p>
+</section></main></div><script src="../assets/manual.js"></script></body></html>

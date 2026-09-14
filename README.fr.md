@@ -2,6 +2,14 @@
 
 [English](README.md#english) | [日本語](README.md#japanese) | **Français**
 
+<!-- ai-prompts:start -->
+## Prompts de développement de jeux avec l’IA
+
+Renseignez les besoins, puis transmettez le prompt complet à votre assistant IA. Il couvre l’implémentation, les tests dans l’émulateur, l’analyse avec SARAKURA et la vérification des corrections.
+
+[KITAQGB](https://bartaro.github.io/kitaq-docs/fr/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/fr/loop-engineering.html#fc)
+<!-- ai-prompts:end -->
+
 ## Manuels HTML
 
 Les sept volumes sont disponibles en neuf langues et décrivent les sources du 14 septembre 2026. Toutes les éditions comprennent les mêmes 1 053 entrées d’API et 47 programmes d’exemple complets. Ouvrez `fr/index.html` pour le français, `en/index.html` pour l’anglais ou `index.html` pour le japonais. Chaque volume permet de changer de langue. Les comptes rendus de vérification précisent les sources, les exécutables et les conditions des tests.
@@ -41,7 +49,7 @@ Pour un autre emplacement des sources, indiquez `-Root "chemin absolu des source
 ## Publier sur GitHub
 
 1. Placez le contenu de ce dossier à la racine du dépôt ou dans un dossier `docs`.
-2. Téléversez ensemble `index.html`, les sept volumes, `verification.html`, les dossiers de langues, `assets`, `samples`, `reference`, `verification`, le README et les mentions de licence. Incluez `.nojekyll`.
+2. Téléversez ensemble `index.html`, les sept volumes, `verification.html`, `loop-engineering.html`, `prompts`, les dossiers de langues, `assets`, `samples`, `reference`, `verification`, le README et les mentions de licence. Incluez `.nojekyll`.
 3. Dans GitHub, ouvrez Settings → Pages → Build and deployment et choisissez Deploy from a branch comme source.
 4. Sélectionnez la branche publiée et `/ (root)` ou `/docs`, puis enregistrez.
 5. Une fois la publication terminée, ouvrez l'adresse indiquée dans Pages et vérifiez les liens du sommaire et des volumes.

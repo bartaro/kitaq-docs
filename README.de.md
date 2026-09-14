@@ -2,6 +2,14 @@
 
 [English](README.md#english) | [日本語](README.md#japanese) | **Deutsch**
 
+<!-- ai-prompts:start -->
+## Prompts zur Spieleentwicklung mit KI
+
+Tragen Sie die Anforderungen ein und geben Sie den vollständigen Prompt an Ihre KI weiter. Er umfasst die Implementierung, Emulator-Tests, die Analyse mit SARAKURA und die erneute Prüfung nach Korrekturen.
+
+[KITAQGB](https://bartaro.github.io/kitaq-docs/de/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/de/loop-engineering.html#fc)
+<!-- ai-prompts:end -->
+
 ## Direkt zum deutschen Handbuch
 
 - [KITAQGB](https://bartaro.github.io/kitaq-docs/de/kitaqgb.html)
@@ -53,7 +61,7 @@ Die Fragmente in `samples/api-fragments` benötigen Initialisierung und gültige
 ## Auf GitHub veröffentlichen
 
 1. Legen Sie den Inhalt dieses Ordners im Repository-Stammverzeichnis oder in einem Ordner `docs` ab.
-2. Laden Sie `index.html`, alle sieben Bände, `verification.html`, die Sprachordner, `assets`, `samples`, `reference`, `verification`, die README-Dateien und Lizenzhinweise gemeinsam hoch. Nehmen Sie `.nojekyll` mit auf.
+2. Laden Sie `index.html`, alle sieben Bände, `verification.html`, `loop-engineering.html`, `prompts`, die Sprachordner, `assets`, `samples`, `reference`, `verification`, die README-Dateien und Lizenzhinweise gemeinsam hoch. Nehmen Sie `.nojekyll` mit auf.
 3. Wählen Sie unter GitHub **Settings → Pages → Build and deployment** als Quelle **Deploy from a branch**.
 4. Wählen Sie den hochgeladenen Branch sowie `/ (root)` oder `/docs` und speichern Sie.
 5. Öffnen Sie nach Abschluss der Veröffentlichung die unter Pages angezeigte Adresse und prüfen Sie Inhalts- und Bandverweise.

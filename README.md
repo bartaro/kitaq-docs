@@ -14,6 +14,21 @@
 | Deutsch | [KITAQGB](https://bartaro.github.io/kitaq-docs/de/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/de/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/de/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/de/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/de/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/de/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/de/sarakura.html) |
 <!-- manual-language-links:end -->
 
+<!-- ai-prompts:start -->
+### AI game development prompts
+
+Fill in the requirements, then give the complete prompt to your AI assistant. It covers implementation, emulator testing, SARAKURA analysis and retesting.
+
+[KITAQGB](https://bartaro.github.io/kitaq-docs/en/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/en/loop-engineering.html#fc)
+
+### 生成AIによるゲーム開発プロンプト
+
+依頼内容を記入して、プロンプト全文を生成AIに渡してください。実装、エミュレータ検証、SARAKURA解析、修正後の再検証まで含みます。
+
+[KITAQGB](https://bartaro.github.io/kitaq-docs/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/loop-engineering.html#fc)
+<!-- ai-prompts:end -->
+
+
 
 [English](#english) | [日本語](#japanese) | [한국어](README.ko.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [Español](README.es.md) | [Português (Brasil)](README.pt-BR.md) | [Français](README.fr.md) | [Deutsch](README.de.md)
 
@@ -62,7 +77,7 @@ For another source location, set `-Root "absolute path to the source tree"`. Sel
 ### Publish on GitHub
 
 1. Place this folder's contents at the repository root or inside a `docs` folder.
-2. Upload `index.html`, all seven volumes, `verification.html`, the language directories, `assets`, `samples`, `reference`, `verification`, the README and license notices together. Include `.nojekyll`.
+2. Upload `index.html`, all seven volumes, `verification.html`, `loop-engineering.html`, `prompts`, the language directories, `assets`, `samples`, `reference`, `verification`, the README and license notices together. Include `.nojekyll`.
 3. In GitHub Settings → Pages → Build and deployment, set Source to Deploy from a branch.
 4. Select the uploaded branch and `/ (root)` or `/docs`, then save.
 5. After publication completes, open the URL shown in Pages and check the contents and volume links.
@@ -149,7 +164,7 @@ EXEを別配置にしている場合は `-GbCompiler` / `-FcCompiler` で選べ�
 ### GitHubへ置く
 
 1. このフォルダーの内容を、公開するリポジトリのルート、または `docs` フォルダーへ置きます。
-2. `index.html`、7冊、`verification.html`、各言語のフォルダー、`assets`、`samples`、`reference`、`verification`、READMEと権利表記を一緒にアップロードします。`.nojekyll` も含めます。
+2. `index.html`、7冊、`verification.html`、`loop-engineering.html`、`prompts`、各言語のフォルダー、`assets`、`samples`、`reference`、`verification`、READMEと権利表記を一緒にアップロードします。`.nojekyll` も含めます。
 3. GitHubの Settings → Pages → Build and deployment で、Sourceを Deploy from a branch にします。
 4. アップロード先のブランチと `/ (root)` または `/docs` を選び、Saveします。
 5. 公開処理が完了したら、Pages欄に表示されたURLから目次と各巻のリンクを確かめます。

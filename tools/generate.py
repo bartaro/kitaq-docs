@@ -270,5 +270,7 @@ def main():
  for filename,title in [('visual_checks.json','サンプル画面の数値・字体照合'),('workflow.json','診断ワークフロー'),('compiler_tests.json','コンパイラ修正の回帰試験'),('browser_checks.json','ブラウザーでの表示確認'),('site_checks.json','HTML構造とリンク')]:
   if (SITE/'verification'/filename).exists():body+='<h2 id="'+filename.replace('.','-')+'">'+title+'</h2>'+code(read(SITE/'verification'/filename),'json')
  page('verification','VERIFICATION','ビルド・実行・表示の確認記録',body)
- print('Generated 9 HTML pages')
+ from generate_prompts import publish
+ publish('ja')
+ print('Generated 10 Japanese HTML pages including development prompts')
 if __name__=='__main__':main()

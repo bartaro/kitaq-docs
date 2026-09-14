@@ -33,15 +33,26 @@
     if(!(e.target instanceof Element))return;
     const button=e.target.closest('.copy');
     if(button){
-      const text=button.parentElement.querySelector('code').textContent;
+      const source=button.dataset.copySource
+        ? document.getElementById(button.dataset.copySource)
+        : button.parentElement.querySelector('code');
+      if(!source)return;
+      const text=source.textContent;
+      const originalLabel=button.dataset.copyLabel || button.textContent;
+      button.dataset.copyLabel=originalLabel;
       try { await navigator.clipboard.writeText(text); button.textContent=ui[2]; }
       catch { const a=document.createElement('textarea');a.value=text;document.body.append(a);a.select();const ok=document.execCommand('copy');a.remove();button.textContent=ok?ui[2]:ui[3]; }
-      setTimeout(()=>button.textContent=ui[4],1800);
+      setTimeout(()=>button.textContent=originalLabel,1800);
     }
     if(e.target.closest('.print'))window.print();
   });
   function reveal(){
     if(!location.hash)return;
+    if(document.querySelector('[data-copy-source]') && ['#gb','#fc'].includes(location.hash)){
+      document.querySelectorAll('nav.languages a').forEach(a=>{
+        a.href=a.href.split('#')[0]+location.hash;
+      });
+    }
     const el=document.getElementById(decodeURIComponent(location.hash.slice(1)));
     if(el){let p=el;while(p){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}el.scrollIntoView();}
   }

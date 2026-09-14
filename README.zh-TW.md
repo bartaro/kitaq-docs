@@ -2,6 +2,14 @@
 
 [English](README.md#english) | [日本語](README.md#japanese) | **繁體中文**
 
+<!-- ai-prompts:start -->
+## 生成式 AI 遊戲開發提示詞
+
+填寫需求後，將完整提示詞交給 AI。內容涵蓋實作、模擬器測試、SARAKURA 分析，以及修正後的重新驗證。
+
+[KITAQGB](https://bartaro.github.io/kitaq-docs/zh-TW/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/zh-TW/loop-engineering.html#fc)
+<!-- ai-prompts:end -->
+
 ## 直接開啟各工具手冊
 
 以下連結會直接開啟對應工具的繁體中文分冊。
@@ -45,7 +53,7 @@
 ## 發佈至 GitHub
 
 1. 將本目錄內容放在儲存庫根目錄或 `docs` 目錄。
-2. 一併上傳 `index.html`、七冊正文、`verification.html`、語言目錄、`assets`、`samples`、`reference`、`verification`、README 與授權聲明，並保留 `.nojekyll`。
+2. 一併上傳 `index.html`、七冊正文、`verification.html`、`loop-engineering.html`、`prompts`、語言目錄、`assets`、`samples`、`reference`、`verification`、README 與授權聲明，並保留 `.nojekyll`。
 3. 在 GitHub 的 Settings → Pages → Build and deployment，將 Source 設為 Deploy from a branch。
 4. 選取已上傳的分支，以及符合目錄配置的 `/ (root)` 或 `/docs`，然後儲存。
 5. 發佈完成後，開啟 Pages 顯示的網址，檢查總目錄與各分冊連結。

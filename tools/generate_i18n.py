@@ -59,7 +59,10 @@ def translate_text(text, messages):
 
 
 def make_page(lang,key,messages,inspect=False):
-    soup=BeautifulSoup((S/'en'/(key+'.html')).read_text(encoding='utf-8'),'html.parser')
+    source=(S/'en'/(key+'.html')).read_text(encoding='utf-8')
+    # Prompt navigation is authored separately for each language, after translation.
+    source=re.sub(r'<!-- loop-prompts:start -->.*?<!-- loop-prompts:end -->','',source,flags=re.S)
+    soup=BeautifulSoup(source,'html.parser')
     # Replace the source edition's navigation instead of duplicating it.
     for navigation in soup.select('nav.languages'):navigation.decompose()
     main=soup.find('main')
@@ -136,6 +139,8 @@ def main():
         print(f'{lang}: {len(missing)} missing translations');raise SystemExit(1)
     if not args.inspect:
         for key in BOOKS:make_page(lang,key,messages)
+        from generate_prompts import publish
+        publish(lang)
     stale=S/'tools/i18n'/lang/'missing.json'
     if stale.exists():stale.unlink()
     print(f'{lang}: 9 pages '+('ready to generate' if args.inspect else 'generated')+'; all reference prose translated')

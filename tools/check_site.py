@@ -19,7 +19,7 @@ def main():
  pages={p:Page(p.read_text(encoding='utf-8')) for p in S.rglob('*.html')}
  errors=[];n=0
  # Require every volume in every published language, including the root Japanese edition.
- names=('index','kitaqgb','gb-library','kokura','kitaqfc','fc-library','kurosaki','sarakura','verification')
+ names=('index','kitaqgb','gb-library','kokura','kitaqfc','fc-library','kurosaki','sarakura','verification','loop-engineering')
  editions={language: S if language=='ja' else S/language for language in LANGUAGES}
  for language,folder in editions.items():
   for name in names:

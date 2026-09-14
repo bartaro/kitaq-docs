@@ -2,6 +2,14 @@
 
 [English](README.md#english) | [日本語](README.md#japanese) | **한국어**
 
+<!-- ai-prompts:start -->
+## 생성형 AI 게임 개발 프롬프트
+
+요구 사항을 작성한 뒤 프롬프트 전체를 AI에 전달하세요. 구현, 에뮬레이터 테스트, SARAKURA 분석, 수정 후 재검증까지 다룹니다.
+
+[KITAQGB](https://bartaro.github.io/kitaq-docs/ko/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/ko/loop-engineering.html#fc)
+<!-- ai-prompts:end -->
+
 ## 도구별 설명서 바로 열기
 
 아래 링크를 누르면 해당 도구의 한국어 설명서가 바로 열립니다.
@@ -45,7 +53,7 @@
 ## GitHub에 공개하기
 
 1. 이 폴더의 내용을 저장소 최상위 또는 `docs` 폴더에 넣습니다.
-2. `index.html`, 7권의 본편, `verification.html`, 언어별 폴더, `assets`, `samples`, `reference`, `verification`, README, 라이선스 고지를 함께 업로드합니다. `.nojekyll`도 포함하세요.
+2. `index.html`, 7권의 본편, `verification.html`, `loop-engineering.html`, `prompts`, 언어별 폴더, `assets`, `samples`, `reference`, `verification`, README, 라이선스 고지를 함께 업로드합니다. `.nojekyll`도 포함하세요.
 3. GitHub의 Settings → Pages → Build and deployment에서 Source를 Deploy from a branch로 설정합니다.
 4. 업로드한 브랜치와 배치에 맞는 `/ (root)` 또는 `/docs`를 선택하고 저장합니다.
 5. 배포가 완료되면 Pages에 표시된 주소를 열고 목차와 각 권의 링크를 확인합니다.

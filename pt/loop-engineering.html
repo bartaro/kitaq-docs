@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="light" name="color-scheme"/><title>Prompts para desenvolver jogos com IA — KITAQ SERIES</title><link href="../assets/manual.css" rel="stylesheet"/></head><body><a class="skip" href="#main">Ir para o conteúdo</a><header class="mast"><a href="index.html">KITAQ <span>SISTEMA DE DESENVOLVIMENTO</span></a><div>MANUAL DO USUÁRIO <b>2026.09</b></div></header><nav class="languages" aria-label="Idiomas"><a href="../en/loop-engineering.html" lang="en" hreflang="en">English</a> <a href="../loop-engineering.html" lang="ja" hreflang="ja">日本語</a> <a href="../ko/loop-engineering.html" lang="ko" hreflang="ko">한국어</a> <a href="../zh-CN/loop-engineering.html" lang="zh-CN" hreflang="zh-CN">简体中文</a> <a href="../zh-TW/loop-engineering.html" lang="zh-TW" hreflang="zh-TW">繁體中文</a> <a href="../es/loop-engineering.html" lang="es" hreflang="es">Español</a> <a href="../pt/loop-engineering.html" lang="pt-BR" hreflang="pt-BR" aria-current="page">Português (Brasil)</a> <a href="../fr/loop-engineering.html" lang="fr" hreflang="fr">Français</a> <a href="../de/loop-engineering.html" lang="de" hreflang="de">Deutsch</a></nav><div class="layout"><aside><nav aria-label="Selecionar um volume"><a href="index.html">Índice</a><a href="kitaqgb.html"><b>01</b> KITAQGB</a><a href="gb-library.html"><b>02</b> BIBLIOTECA KITAQGB</a><a href="kokura.html"><b>03</b> KOKURA</a><a href="kitaqfc.html"><b>04</b> KITAQFC</a><a href="fc-library.html"><b>05</b> BIBLIOTECA KITAQFC</a><a href="kurosaki.html"><b>06</b> KUROSAKI</a><a href="sarakura.html"><b>07</b> SARAKURA</a></nav><label class="searchlabel" for="search">Buscar neste volume</label><input id="search" placeholder="ex.: entrada / __memcpy" type="search"/><p id="search-status" role="status"></p><nav aria-label="Conteúdo do volume" class="toc"><a href="#gb">KITAQGB</a><a href="#fc">KITAQFC</a></nav><button class="print" type="button">Imprimir este volume</button></aside><main id="main"><div class="cover"><p class="eyebrow">KITAQ SERIES</p><h1>Prompts para desenvolver jogos com IA</h1><p class="subtitle">Preencha os requisitos e envie o prompt completo ao assistente de IA. Ele abrange implementação, testes no emulador, análise com SARAKURA e verificação das correções.</p></div>
+<section class="authored"><h2 id="gb">KITAQGB</h2><p><button type="button" class="copy" data-copy-source="prompt-gb">Copiar prompt completo</button> · <a download href="../prompts/pt/kitaqgb-prompt.md">Baixar Markdown</a></p>
+<pre id="prompt-gb" hidden><code># Desenvolvimento de jogos com KITAQGB, KOKURA e SARAKURA
+
+Preencha os requisitos e envie este documento inteiro ao assistente de IA. Os comandos pressupõem que os repositórios `kitaqgb`, `kitaqfc`, `kokura`, `kurosaki`, `sarakura` e `kitaq-docs`, além do projeto `game-gb` ou `game-fc`, estejam na mesma pasta pai. Execute os comandos nessa pasta e ajuste os caminhos ao ambiente real.
+
+## Requisitos
+
+- Nome do jogo: &lt;preencher&gt;
+- Gênero e mecânica principal: &lt;preencher&gt;
+- Controles e condições de sucesso e fracasso: &lt;preencher&gt;
+- Telas, fases, inimigos e itens obrigatórios: &lt;preencher&gt;
+- Estilo visual, música e efeitos sonoros: &lt;preencher e indicar os materiais fornecidos&gt;
+- Salvamento, comunicação, periféricos e outros requisitos: &lt;preencher ou nenhum&gt;
+- Pasta do projeto: &lt;preencher&gt;
+- Condições de redistribuição: &lt;por exemplo, código e materiais originais que possam ser publicados sob a licença MIT&gt;
+
+- Plataforma: &lt;Game Boy original / suporte a GB e CGB / somente CGB&gt;
+- Meta de desempenho: &lt;por exemplo, 60 atualizações da lógica por segundo em situações normais; definir o comportamento aceitável nas cenas mais pesadas&gt;
+
+## Trabalho solicitado
+
+Implemente o jogo com KITAQGB e suas bibliotecas. Use KOKURA para execução e depuração, e SARAKURA para organizar os diagnósticos e comparar os resultados antes e depois de uma correção.
+
+Repita este ciclo até atender aos critérios de aceitação: detalhar a especificação → implementar uma pequena mudança → compilar → aplicar entradas e observar → investigar a causa → corrigir → testar novamente nas mesmas condições. Um plano, a apresentação do código ou uma compilação bem-sucedida não significam que o trabalho está concluído.
+
+### Verificar o ambiente e os critérios de aceitação
+
+1. Leia as instruções da pasta de trabalho, os README, os manuais HTML e os cabeçalhos e implementações das bibliotecas usadas. Registre os caminhos dos executáveis e suas versões ou hashes SHA-256. Confira os comandos na saída real de `--help` e as APIs no código-fonte.
+2. Defina critérios verificáveis para entradas, imagem, som, progressão e frequência de atualização. Por exemplo: pressionar e soltar START inicia a partida; uma colisão tira uma vida; a pausa silencia o áudio especificado e, ao continuar, a reprodução é retomada.
+3. Pergunte apenas sobre ambiguidades relevantes. Tome decisões comuns e reversíveis de implementação de forma autônoma. Não reduza os requisitos nem flexibilize os critérios de aceitação.
+4. Primeiro execute um pequeno exemplo fornecido pelo compilador, pelo emulador e pelo SARAKURA. Isso verifica a integração entre as ferramentas, não a conclusão do jogo solicitado.
+
+### Implementar uma primeira versão jogável
+
+- Use o dialeto C do KITAQGB e `void main()`. Não presuma que APIs de C para desktop ou do GBDK estejam disponíveis. Inclua as implementações `.c` necessárias, não apenas as declarações; verifique inicialização, unidades, sinal, faixas, tempo de vida dos buffers e bancos de ROM.
+- Planeje atualizações de VRAM/OAM, VBlank, interrupções, pilha, bancos de ROM/WRAM e limites de tiles e sprites. A capacidade total e livre da fila de transferências é diferente da capacidade e do espaço livre da VRAM física.
+- Um jogo para DMG não pode depender de funções exclusivas do CGB. Se houver suporte aos dois modos, teste cada um separadamente.
+- Use a fonte original fornecida em `ascii.c` para letras, números e símbolos, e confira a correspondência entre caracteres e tiles.
+
+- Primeiro conecte inicialização, título, personagem controlável, sucesso ou fracasso e reinício. Amplie o conteúdo depois.
+- Preserve os originais editáveis de gráficos, música e efeitos, além das etapas de geração. Confirme que a compilação realmente utiliza os dados exportados.
+- Escreva comentários no código em inglês e relatórios de andamento em português do Brasil. Mantenha os relatórios padrão do SARAKURA em inglês.
+
+### Relacionar cada compilação à sua execução
+
+Separe as saídas por iteração, como em `out/iter-001`. Registre comandos, códigos de saída e hashes de código, materiais, ferramentas, ROM e metadados. Nunca execute uma ROM antiga depois de uma compilação com falha. Mapas, mapas de código-fonte e informações de depuração devem ser da mesma compilação da ROM.
+
+O exemplo a seguir faz uma verificação básica em DMG. Prepare `main.c` e as implementações de biblioteca necessárias; adapte as opções e a sequência de entrada ao jogo.
+
+```powershell
+$iteration = &#x27;.\game-gb\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqgb\kitaqgb.exe&#x27; &#x27;.\game-gb\src\main.c&#x27; `
+  -I &#x27;.\kitaqgb\lib&#x27; -o &quot;$iteration\game.gb&quot; `
+  --profile=dev --rst-disable --stack-bank=fixed --no-disasm `
+  &quot;--emit-ai-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+# This sequence presses START once, with released intervals on both sides.
+&amp; &#x27;.\kokura\kokura-cli.exe&#x27; &quot;$iteration\game.gb&quot; `
+  --hardware dmg --run-frames 300 `
+  --input-seq &#x27;NONE:60;START:1;NONE:239&#x27; `
+  --png &quot;$iteration\frame.png&quot; --record-wav &quot;$iteration\audio.wav&quot; `
+  --dump-report &quot;$iteration\run.json&quot; `
+  --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; gb analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }
+```
+
+
+`--hardware dmg` seleciona o Game Boy original. Ao testar CGB ou suporte aos dois modos, mantenha o cabeçalho da ROM e a configuração de hardware do emulador coerentes. A sequência pressiona START uma vez entre intervalos com os botões soltos. Executar 300 quadros não equivale a testar o jogo inteiro.
+
+### Verificar imagem, som, estado e desempenho
+
+- Salve cenários que diferenciem pressionar, segurar e soltar. Percorra todos os caminhos especificados: inicialização, início, movimento, ações, colisões, rolagem, mudanças de fase, fim de jogo, reinício, pausa e, quando aplicável, salvamento ou comunicação.
+- Preserve PNGs de quadros relevantes, entradas, relatórios de execução, JSONL de diagnóstico, WAVs e as observações necessárias de estado ou memória. Verifique os quadros alcançados e o motivo da parada. Abra as imagens de fato: uma captura isolada não comprova movimento ou resposta aos controles. Compare contadores, posições e mudanças de estado com o esperado; confira bordas da tela, limites de tiles e atributos e cenas com muitos sprites.
+- Verifique música, efeitos, reprodução simultânea, cortes, pausa e retomada. Gerar um WAV não comprova que o áudio está correto. Se não puder ouvi-lo, diferencie os testes numéricos ou de forma de onda das qualidades audíveis ainda não verificadas.
+- Meça cenas pesadas, trabalho da CPU de destino, atualizações e transferências; em FC, inclua o trabalho de NMI. A velocidade do emulador no computador não é a frequência do jogo nem prova de desempenho no hardware real. Continuar com `--allow-unimplemented` não comprova suporte ao recurso ausente.
+
+### Analisar, corrigir e testar novamente
+
+- Forneça ao SARAKURA os metadados da ROM testada e o JSONL de diagnóstico daquela execução. Um rastreamento de CPU ou relatório comum não serve como substituto. `--frames` define condições de análise; SARAKURA não executa a ROM nem modifica o código automaticamente.
+- Leia `report.html`, `ai_diagnostics.json`, `repair_prompt.md` e `retest_plan.json`. Compare os diagnósticos com reprodução, imagens, áudio e código. Separe localizações ou causas inferidas de fatos verificados e laços de espera normais de travamentos. Avalie cada aviso e registre eventos não suportados ou limites da análise. Não oculte avisos com filtros nem encurte testes para obter aprovação.
+- Reduza falhas a casos mínimos, corrija a causa e recompile. Se a origem estiver no compilador ou emulador, isole o defeito do código do jogo e acrescente verificação de regressão à correção da ferramenta.
+- Repita os testes com as mesmas entradas, semente aleatória, máquina e padrão de vídeo, mapper, quadros observados e configurações de diagnóstico. Cada ROM precisa dos metadados correspondentes; não reutilize estados salvos indiscriminadamente após mudar código ou organização da RAM.
+
+```powershell
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-gb\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-gb\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-gb\out\delta.json&#x27; --markdown &#x27;.\game-gb\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce
+```
+
+
+Use as diferenças de diagnóstico junto com a avaliação de controles, gráficos e áudio. Se a mesma falha se repetir, reavalie as evidências e a hipótese em vez de continuar fazendo mudanças arbitrárias.
+
+### Critérios de conclusão e entregáveis
+
+Repita todos os cenários obrigatórios com a ROM final compilada a partir do código e das configurações entregues. Invencibilidade, entradas automáticas de teste ou outro mapper, isoladamente, não verificam uma partida normal na versão final. Entregue uma tabela relacionando requisitos e testes, explique os avisos restantes e identifique o que não foi verificado ou não é suportado. Se não houve teste em hardware físico, informe isso explicitamente.
+
+Entregue código-fonte, identificação de ferramentas e bibliotecas, materiais editáveis, scripts reproduzíveis de compilação e testes, ROM, evidências finais e um README com instalação, controles e limitações conhecidas. Inclua replays e o programa de testes quando necessários. Publique ou envie arquivos externamente apenas no escopo autorizado de forma explícita. Remova compilações intermediárias e rastreamentos temporários desnecessários após a verificação, preservando fontes, materiais, entregáveis e evidências de regressão necessárias.
+
+Se o ambiente ou as permissões impedirem uma verificação obrigatória, informe os passos exatos para reprodução e a ação necessária. Não marque o trabalho como concluído.
+</code></pre>
+<p>Preencha os requisitos e envie este documento inteiro ao assistente de IA. Os comandos pressupõem que os repositórios <code>kitaqgb</code>, <code>kitaqfc</code>, <code>kokura</code>, <code>kurosaki</code>, <code>sarakura</code> e <code>kitaq-docs</code>, além do projeto <code>game-gb</code> ou <code>game-fc</code>, estejam na mesma pasta pai. Execute os comandos nessa pasta e ajuste os caminhos ao ambiente real.</p>
+<h3 id="gb-section-1">Requisitos</h3>
+<ul>
+<li>Nome do jogo: &lt;preencher&gt;</li>
+<li>Gênero e mecânica principal: &lt;preencher&gt;</li>
+<li>Controles e condições de sucesso e fracasso: &lt;preencher&gt;</li>
+<li>Telas, fases, inimigos e itens obrigatórios: &lt;preencher&gt;</li>
+<li>Estilo visual, música e efeitos sonoros: &lt;preencher e indicar os materiais fornecidos&gt;</li>
+<li>Salvamento, comunicação, periféricos e outros requisitos: &lt;preencher ou nenhum&gt;</li>
+<li>Pasta do projeto: &lt;preencher&gt;</li>
+<li>Condições de redistribuição: &lt;por exemplo, código e materiais originais que possam ser publicados sob a licença MIT&gt;</li>
+</ul>
+<ul>
+<li>Plataforma: &lt;Game Boy original / suporte a GB e CGB / somente CGB&gt;</li>
+<li>Meta de desempenho: &lt;por exemplo, 60 atualizações da lógica por segundo em situações normais; definir o comportamento aceitável nas cenas mais pesadas&gt;</li>
+</ul>
+<h3 id="gb-section-2">Trabalho solicitado</h3>
+<p>Implemente o jogo com KITAQGB e suas bibliotecas. Use KOKURA para execução e depuração, e SARAKURA para organizar os diagnósticos e comparar os resultados antes e depois de uma correção.</p>
+<p>Repita este ciclo até atender aos critérios de aceitação: detalhar a especificação → implementar uma pequena mudança → compilar → aplicar entradas e observar → investigar a causa → corrigir → testar novamente nas mesmas condições. Um plano, a apresentação do código ou uma compilação bem-sucedida não significam que o trabalho está concluído.</p>
+<h4 id="gb-section-3">Verificar o ambiente e os critérios de aceitação</h4>
+<ol>
+<li>Leia as instruções da pasta de trabalho, os README, os manuais HTML e os cabeçalhos e implementações das bibliotecas usadas. Registre os caminhos dos executáveis e suas versões ou hashes SHA-256. Confira os comandos na saída real de <code>--help</code> e as APIs no código-fonte.</li>
+<li>Defina critérios verificáveis para entradas, imagem, som, progressão e frequência de atualização. Por exemplo: pressionar e soltar START inicia a partida; uma colisão tira uma vida; a pausa silencia o áudio especificado e, ao continuar, a reprodução é retomada.</li>
+<li>Pergunte apenas sobre ambiguidades relevantes. Tome decisões comuns e reversíveis de implementação de forma autônoma. Não reduza os requisitos nem flexibilize os critérios de aceitação.</li>
+<li>Primeiro execute um pequeno exemplo fornecido pelo compilador, pelo emulador e pelo SARAKURA. Isso verifica a integração entre as ferramentas, não a conclusão do jogo solicitado.</li>
+</ol>
+<h4 id="gb-section-4">Implementar uma primeira versão jogável</h4>
+<ul>
+<li>Use o dialeto C do KITAQGB e <code>void main()</code>. Não presuma que APIs de C para desktop ou do GBDK estejam disponíveis. Inclua as implementações <code>.c</code> necessárias, não apenas as declarações; verifique inicialização, unidades, sinal, faixas, tempo de vida dos buffers e bancos de ROM.</li>
+<li>Planeje atualizações de VRAM/OAM, VBlank, interrupções, pilha, bancos de ROM/WRAM e limites de tiles e sprites. A capacidade total e livre da fila de transferências é diferente da capacidade e do espaço livre da VRAM física.</li>
+<li>Um jogo para DMG não pode depender de funções exclusivas do CGB. Se houver suporte aos dois modos, teste cada um separadamente.</li>
+<li>Use a fonte original fornecida em <code>ascii.c</code> para letras, números e símbolos, e confira a correspondência entre caracteres e tiles.</li>
+</ul>
+<ul>
+<li>Primeiro conecte inicialização, título, personagem controlável, sucesso ou fracasso e reinício. Amplie o conteúdo depois.</li>
+<li>Preserve os originais editáveis de gráficos, música e efeitos, além das etapas de geração. Confirme que a compilação realmente utiliza os dados exportados.</li>
+<li>Escreva comentários no código em inglês e relatórios de andamento em português do Brasil. Mantenha os relatórios padrão do SARAKURA em inglês.</li>
+</ul>
+<h4 id="gb-section-5">Relacionar cada compilação à sua execução</h4>
+<p>Separe as saídas por iteração, como em <code>out/iter-001</code>. Registre comandos, códigos de saída e hashes de código, materiais, ferramentas, ROM e metadados. Nunca execute uma ROM antiga depois de uma compilação com falha. Mapas, mapas de código-fonte e informações de depuração devem ser da mesma compilação da ROM.</p>
+<p>O exemplo a seguir faz uma verificação básica em DMG. Prepare <code>main.c</code> e as implementações de biblioteca necessárias; adapte as opções e a sequência de entrada ao jogo.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>$iteration = &#x27;.\game-gb\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqgb\kitaqgb.exe&#x27; &#x27;.\game-gb\src\main.c&#x27; `
+  -I &#x27;.\kitaqgb\lib&#x27; -o &quot;$iteration\game.gb&quot; `
+  --profile=dev --rst-disable --stack-bank=fixed --no-disasm `
+  &quot;--emit-ai-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+# This sequence presses START once, with released intervals on both sides.
+&amp; &#x27;.\kokura\kokura-cli.exe&#x27; &quot;$iteration\game.gb&quot; `
+  --hardware dmg --run-frames 300 `
+  --input-seq &#x27;NONE:60;START:1;NONE:239&#x27; `
+  --png &quot;$iteration\frame.png&quot; --record-wav &quot;$iteration\audio.wav&quot; `
+  --dump-report &quot;$iteration\run.json&quot; `
+  --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; gb analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }</code></pre></div>
+<p><code>--hardware dmg</code> seleciona o Game Boy original. Ao testar CGB ou suporte aos dois modos, mantenha o cabeçalho da ROM e a configuração de hardware do emulador coerentes. A sequência pressiona START uma vez entre intervalos com os botões soltos. Executar 300 quadros não equivale a testar o jogo inteiro.</p>
+<h4 id="gb-section-6">Verificar imagem, som, estado e desempenho</h4>
+<ul>
+<li>Salve cenários que diferenciem pressionar, segurar e soltar. Percorra todos os caminhos especificados: inicialização, início, movimento, ações, colisões, rolagem, mudanças de fase, fim de jogo, reinício, pausa e, quando aplicável, salvamento ou comunicação.</li>
+<li>Preserve PNGs de quadros relevantes, entradas, relatórios de execução, JSONL de diagnóstico, WAVs e as observações necessárias de estado ou memória. Verifique os quadros alcançados e o motivo da parada. Abra as imagens de fato: uma captura isolada não comprova movimento ou resposta aos controles. Compare contadores, posições e mudanças de estado com o esperado; confira bordas da tela, limites de tiles e atributos e cenas com muitos sprites.</li>
+<li>Verifique música, efeitos, reprodução simultânea, cortes, pausa e retomada. Gerar um WAV não comprova que o áudio está correto. Se não puder ouvi-lo, diferencie os testes numéricos ou de forma de onda das qualidades audíveis ainda não verificadas.</li>
+<li>Meça cenas pesadas, trabalho da CPU de destino, atualizações e transferências; em FC, inclua o trabalho de NMI. A velocidade do emulador no computador não é a frequência do jogo nem prova de desempenho no hardware real. Continuar com <code>--allow-unimplemented</code> não comprova suporte ao recurso ausente.</li>
+</ul>
+<h4 id="gb-section-7">Analisar, corrigir e testar novamente</h4>
+<ul>
+<li>Forneça ao SARAKURA os metadados da ROM testada e o JSONL de diagnóstico daquela execução. Um rastreamento de CPU ou relatório comum não serve como substituto. <code>--frames</code> define condições de análise; SARAKURA não executa a ROM nem modifica o código automaticamente.</li>
+<li>Leia <code>report.html</code>, <code>ai_diagnostics.json</code>, <code>repair_prompt.md</code> e <code>retest_plan.json</code>. Compare os diagnósticos com reprodução, imagens, áudio e código. Separe localizações ou causas inferidas de fatos verificados e laços de espera normais de travamentos. Avalie cada aviso e registre eventos não suportados ou limites da análise. Não oculte avisos com filtros nem encurte testes para obter aprovação.</li>
+<li>Reduza falhas a casos mínimos, corrija a causa e recompile. Se a origem estiver no compilador ou emulador, isole o defeito do código do jogo e acrescente verificação de regressão à correção da ferramenta.</li>
+<li>Repita os testes com as mesmas entradas, semente aleatória, máquina e padrão de vídeo, mapper, quadros observados e configurações de diagnóstico. Cada ROM precisa dos metadados correspondentes; não reutilize estados salvos indiscriminadamente após mudar código ou organização da RAM.</li>
+</ul>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-gb\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-gb\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-gb\out\delta.json&#x27; --markdown &#x27;.\game-gb\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce</code></pre></div>
+<p>Use as diferenças de diagnóstico junto com a avaliação de controles, gráficos e áudio. Se a mesma falha se repetir, reavalie as evidências e a hipótese em vez de continuar fazendo mudanças arbitrárias.</p>
+<h4 id="gb-section-8">Critérios de conclusão e entregáveis</h4>
+<p>Repita todos os cenários obrigatórios com a ROM final compilada a partir do código e das configurações entregues. Invencibilidade, entradas automáticas de teste ou outro mapper, isoladamente, não verificam uma partida normal na versão final. Entregue uma tabela relacionando requisitos e testes, explique os avisos restantes e identifique o que não foi verificado ou não é suportado. Se não houve teste em hardware físico, informe isso explicitamente.</p>
+<p>Entregue código-fonte, identificação de ferramentas e bibliotecas, materiais editáveis, scripts reproduzíveis de compilação e testes, ROM, evidências finais e um README com instalação, controles e limitações conhecidas. Inclua replays e o programa de testes quando necessários. Publique ou envie arquivos externamente apenas no escopo autorizado de forma explícita. Remova compilações intermediárias e rastreamentos temporários desnecessários após a verificação, preservando fontes, materiais, entregáveis e evidências de regressão necessárias.</p>
+<p>Se o ambiente ou as permissões impedirem uma verificação obrigatória, informe os passos exatos para reprodução e a ação necessária. Não marque o trabalho como concluído.</p>
+</section>
+<section class="authored"><h2 id="fc">KITAQFC</h2><p><button type="button" class="copy" data-copy-source="prompt-fc">Copiar prompt completo</button> · <a download href="../prompts/pt/kitaqfc-prompt.md">Baixar Markdown</a></p>
+<pre id="prompt-fc" hidden><code># Desenvolvimento de jogos com KITAQFC, KUROSAKI e SARAKURA
+
+Preencha os requisitos e envie este documento inteiro ao assistente de IA. Os comandos pressupõem que os repositórios `kitaqgb`, `kitaqfc`, `kokura`, `kurosaki`, `sarakura` e `kitaq-docs`, além do projeto `game-gb` ou `game-fc`, estejam na mesma pasta pai. Execute os comandos nessa pasta e ajuste os caminhos ao ambiente real.
+
+## Requisitos
+
+- Nome do jogo: &lt;preencher&gt;
+- Gênero e mecânica principal: &lt;preencher&gt;
+- Controles e condições de sucesso e fracasso: &lt;preencher&gt;
+- Telas, fases, inimigos e itens obrigatórios: &lt;preencher&gt;
+- Estilo visual, música e efeitos sonoros: &lt;preencher e indicar os materiais fornecidos&gt;
+- Salvamento, comunicação, periféricos e outros requisitos: &lt;preencher ou nenhum&gt;
+- Pasta do projeto: &lt;preencher&gt;
+- Condições de redistribuição: &lt;por exemplo, código e materiais originais que possam ser publicados sob a licença MIT&gt;
+
+- Plataforma: &lt;cartucho NES/Famicom ou FDS&gt;
+- Mapper, tamanho da ROM e espelhamento: &lt;especificar ou escolher conforme os requisitos&gt;
+- Padrão de vídeo e desempenho: &lt;por exemplo, NTSC e 60 atualizações da lógica por segundo&gt;
+
+## Trabalho solicitado
+
+Implemente o jogo com KITAQFC e suas bibliotecas. Use KUROSAKI para execução e depuração, e SARAKURA para organizar os diagnósticos e comparar os resultados antes e depois de uma correção.
+
+Repita este ciclo até atender aos critérios de aceitação: detalhar a especificação → implementar uma pequena mudança → compilar → aplicar entradas e observar → investigar a causa → corrigir → testar novamente nas mesmas condições. Um plano, a apresentação do código ou uma compilação bem-sucedida não significam que o trabalho está concluído.
+
+### Verificar o ambiente e os critérios de aceitação
+
+1. Leia as instruções da pasta de trabalho, os README, os manuais HTML e os cabeçalhos e implementações das bibliotecas usadas. Registre os caminhos dos executáveis e suas versões ou hashes SHA-256. Confira os comandos na saída real de `--help` e as APIs no código-fonte.
+2. Defina critérios verificáveis para entradas, imagem, som, progressão e frequência de atualização. Por exemplo: pressionar e soltar START inicia a partida; uma colisão tira uma vida; a pausa silencia o áudio especificado e, ao continuar, a reprodução é retomada.
+3. Pergunte apenas sobre ambiguidades relevantes. Tome decisões comuns e reversíveis de implementação de forma autônoma. Não reduza os requisitos nem flexibilize os critérios de aceitação.
+4. Primeiro execute um pequeno exemplo fornecido pelo compilador, pelo emulador e pelo SARAKURA. Isso verifica a integração entre as ferramentas, não a conclusão do jogo solicitado.
+
+### Implementar uma primeira versão jogável
+
+- Considere NROM para um jogo pequeno; escolha MMC3 ou outro mapper quando o tamanho ou a troca de bancos exigir. Verifique as funções necessárias da placa com `inspect-rom`, `mapper-info`, `audit-board` e a implementação, sem concluir que há suporte apenas pelo nome do mapper.
+- Planeje tamanhos de PRG/CHR, CHR-ROM ou CHR-RAM, espelhamento, bancos fixos, vetores de interrupção e RAM de salvamento. Depois de otimizações ou mudanças de banco, compare o cabeçalho com a organização real. `--nes-local-ram` usa a RAM interna da CPU em `$0000–$07FF`; evite sobreposição com página zero, pilha, buffers OAM e áreas do runtime e das bibliotecas.
+- Use o dialeto C do KITAQFC, as bibliotecas FC e `void main(void)`. Não presuma compatibilidade com APIs de GB. Alguns cabeçalhos têm apenas declarações: localize as implementações e inclua os `.c` necessários.
+- Considere registradores PPU, NMI, OAM DMA, limite de sprites por linha, rolagem, espelhamento, tabelas de atributos e comportamento de APU/DMC. O espaço livre da fila não é a capacidade de VRAM da PPU; dimensione o trabalho por NMI.
+- Converta a fonte original `ascii.c` para CHR de FC e confira CHR, paletas, tabelas de nomes e atributos. Para FDS, verifique separadamente acesso ao disco, salvamento e requisitos de BIOS; não presuma as mesmas condições de inicialização de um cartucho.
+
+- Primeiro conecte inicialização, título, personagem controlável, sucesso ou fracasso e reinício. Amplie o conteúdo depois.
+- Preserve os originais editáveis de gráficos, música e efeitos, além das etapas de geração. Confirme que a compilação realmente utiliza os dados exportados.
+- Escreva comentários no código em inglês e relatórios de andamento em português do Brasil. Mantenha os relatórios padrão do SARAKURA em inglês.
+
+### Relacionar cada compilação à sua execução
+
+Separe as saídas por iteração, como em `out/iter-001`. Registre comandos, códigos de saída e hashes de código, materiais, ferramentas, ROM e metadados. Nunca execute uma ROM antiga depois de uma compilação com falha. Mapas, mapas de código-fonte e informações de depuração devem ser da mesma compilação da ROM.
+
+O exemplo a seguir verifica NROM sem entrada. Prepare `main.c`, as implementações necessárias e o arquivo CHR; escolha o mapper adequado. Não passe metadados de compilação para `--kitaqfc-debug` do KUROSAKI sem conferir primeiro o formato exigido.
+
+```powershell
+$iteration = &#x27;.\game-fc\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqfc\kitaqfc.exe&#x27; &#x27;.\game-fc\src\main.c&#x27; `
+  -I &#x27;.\kitaqfc\lib&#x27; -o &quot;$iteration\game.nes&quot; `
+  --mapper=nrom &#x27;--nes-chr=.\game-fc\assets\game.chr&#x27; --no-disasm `
+  &quot;--kurosaki-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; run &quot;$iteration\game.nes&quot; `
+  --frames 300 --pad1 0 --png &quot;$iteration\frame.png&quot; `
+  --json &quot;$iteration\run.json&quot; --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; fc analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }
+```
+
+
+Uma execução de 300 quadros sem entrada é apenas uma verificação inicial. Acrescente cenários de jogo com sequências de ações antes de afirmar que o jogo funciona.
+
+### Reproduzir sequências de entrada
+
+- `--pad1` e `--pad2` usam máscaras de bits NES brutas: A=1, B=2, SELECT=4, START=8, UP=16, DOWN=32, LEFT=64, RIGHT=128. Não confunda esses valores com os `BTN_*` da biblioteca.
+- `run --pad1` aplica entrada fixa. Para ações em sequência, crie um replay que diferencie pressionar, manter pressionado e soltar. Consulte `Replay` e `ReplayFrame`. Na CLI pública, `replay-record` grava entrada neutra, não uma partida jogada por uma pessoa.
+- Confira por conta própria o SHA-256 da ROM, o alvo do replay e o intervalo de quadros. `replay-run --verify` só compara o hash final esperado quando ele existe; não valida integralmente o jogo nem a identidade da ROM. Não sobrescreva os resultados esperados com os observados apenas para fazer o teste passar.
+
+```powershell
+&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; replay-run `
+  &#x27;.\game-fc\out\iter-001\game.nes&#x27; &#x27;.\game-fc\tests\start-and-play.replay.json&#x27; `
+  --frames 900 --json &#x27;.\game-fc\out\iter-001\play.json&#x27; `
+  --png &#x27;.\game-fc\out\iter-001\play.png&#x27; `
+  --wav &#x27;.\game-fc\out\iter-001\play.wav&#x27;
+```
+
+
+Prepare o replay para a ROM em teste. A CLI pública não oferece `--emit-diagnostics` em `replay-run`. Não invente essa opção nem use rastreamentos de CPU como eventos de diagnóstico. Para analisar sequências de entrada com SARAKURA, crie um programa de testes dentro do projeto usando as APIs públicas de `kurosaki-core`: `RunOptions.replay_frames` e `diagnostic_events_from_trace_and_report`. Execute a mesma ROM, replay e condições de quadros; gere JSONL a partir do rastreamento e do relatório diagnóstico dessa execução. Confira a configuração e o intervalo preservado do rastreamento, e compare imagens e observações do programa de testes com o replay da CLI. Não apresente diagnósticos sem entrada como evidência de um cenário jogável. Se faltar o ambiente necessário, informe que essa verificação está incompleta.
+
+### Verificar imagem, som, estado e desempenho
+
+- Salve cenários que diferenciem pressionar, segurar e soltar. Percorra todos os caminhos especificados: inicialização, início, movimento, ações, colisões, rolagem, mudanças de fase, fim de jogo, reinício, pausa e, quando aplicável, salvamento ou comunicação.
+- Preserve PNGs de quadros relevantes, entradas, relatórios de execução, JSONL de diagnóstico, WAVs e as observações necessárias de estado ou memória. Verifique os quadros alcançados e o motivo da parada. Abra as imagens de fato: uma captura isolada não comprova movimento ou resposta aos controles. Compare contadores, posições e mudanças de estado com o esperado; confira bordas da tela, limites de tiles e atributos e cenas com muitos sprites.
+- Verifique música, efeitos, reprodução simultânea, cortes, pausa e retomada. Gerar um WAV não comprova que o áudio está correto. Se não puder ouvi-lo, diferencie os testes numéricos ou de forma de onda das qualidades audíveis ainda não verificadas.
+- Meça cenas pesadas, trabalho da CPU de destino, atualizações e transferências; em FC, inclua o trabalho de NMI. A velocidade do emulador no computador não é a frequência do jogo nem prova de desempenho no hardware real. Continuar com `--allow-unimplemented` não comprova suporte ao recurso ausente.
+
+### Analisar, corrigir e testar novamente
+
+- Forneça ao SARAKURA os metadados da ROM testada e o JSONL de diagnóstico daquela execução. Um rastreamento de CPU ou relatório comum não serve como substituto. `--frames` define condições de análise; SARAKURA não executa a ROM nem modifica o código automaticamente.
+- Leia `report.html`, `ai_diagnostics.json`, `repair_prompt.md` e `retest_plan.json`. Compare os diagnósticos com reprodução, imagens, áudio e código. Separe localizações ou causas inferidas de fatos verificados e laços de espera normais de travamentos. Avalie cada aviso e registre eventos não suportados ou limites da análise. Não oculte avisos com filtros nem encurte testes para obter aprovação.
+- Reduza falhas a casos mínimos, corrija a causa e recompile. Se a origem estiver no compilador ou emulador, isole o defeito do código do jogo e acrescente verificação de regressão à correção da ferramenta.
+- Repita os testes com as mesmas entradas, semente aleatória, máquina e padrão de vídeo, mapper, quadros observados e configurações de diagnóstico. Cada ROM precisa dos metadados correspondentes; não reutilize estados salvos indiscriminadamente após mudar código ou organização da RAM.
+
+```powershell
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-fc\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-fc\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-fc\out\delta.json&#x27; --markdown &#x27;.\game-fc\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce
+```
+
+
+Use as diferenças de diagnóstico junto com a avaliação de controles, gráficos e áudio. Se a mesma falha se repetir, reavalie as evidências e a hipótese em vez de continuar fazendo mudanças arbitrárias.
+
+### Critérios de conclusão e entregáveis
+
+Repita todos os cenários obrigatórios com a ROM final compilada a partir do código e das configurações entregues. Invencibilidade, entradas automáticas de teste ou outro mapper, isoladamente, não verificam uma partida normal na versão final. Entregue uma tabela relacionando requisitos e testes, explique os avisos restantes e identifique o que não foi verificado ou não é suportado. Se não houve teste em hardware físico, informe isso explicitamente.
+
+Entregue código-fonte, identificação de ferramentas e bibliotecas, materiais editáveis, scripts reproduzíveis de compilação e testes, ROM, evidências finais e um README com instalação, controles e limitações conhecidas. Inclua replays e o programa de testes quando necessários. Publique ou envie arquivos externamente apenas no escopo autorizado de forma explícita. Remova compilações intermediárias e rastreamentos temporários desnecessários após a verificação, preservando fontes, materiais, entregáveis e evidências de regressão necessárias.
+
+Se o ambiente ou as permissões impedirem uma verificação obrigatória, informe os passos exatos para reprodução e a ação necessária. Não marque o trabalho como concluído.
+</code></pre>
+<p>Preencha os requisitos e envie este documento inteiro ao assistente de IA. Os comandos pressupõem que os repositórios <code>kitaqgb</code>, <code>kitaqfc</code>, <code>kokura</code>, <code>kurosaki</code>, <code>sarakura</code> e <code>kitaq-docs</code>, além do projeto <code>game-gb</code> ou <code>game-fc</code>, estejam na mesma pasta pai. Execute os comandos nessa pasta e ajuste os caminhos ao ambiente real.</p>
+<h3 id="fc-section-1">Requisitos</h3>
+<ul>
+<li>Nome do jogo: &lt;preencher&gt;</li>
+<li>Gênero e mecânica principal: &lt;preencher&gt;</li>
+<li>Controles e condições de sucesso e fracasso: &lt;preencher&gt;</li>
+<li>Telas, fases, inimigos e itens obrigatórios: &lt;preencher&gt;</li>
+<li>Estilo visual, música e efeitos sonoros: &lt;preencher e indicar os materiais fornecidos&gt;</li>
+<li>Salvamento, comunicação, periféricos e outros requisitos: &lt;preencher ou nenhum&gt;</li>
+<li>Pasta do projeto: &lt;preencher&gt;</li>
+<li>Condições de redistribuição: &lt;por exemplo, código e materiais originais que possam ser publicados sob a licença MIT&gt;</li>
+</ul>
+<ul>
+<li>Plataforma: &lt;cartucho NES/Famicom ou FDS&gt;</li>
+<li>Mapper, tamanho da ROM e espelhamento: &lt;especificar ou escolher conforme os requisitos&gt;</li>
+<li>Padrão de vídeo e desempenho: &lt;por exemplo, NTSC e 60 atualizações da lógica por segundo&gt;</li>
+</ul>
+<h3 id="fc-section-2">Trabalho solicitado</h3>
+<p>Implemente o jogo com KITAQFC e suas bibliotecas. Use KUROSAKI para execução e depuração, e SARAKURA para organizar os diagnósticos e comparar os resultados antes e depois de uma correção.</p>
+<p>Repita este ciclo até atender aos critérios de aceitação: detalhar a especificação → implementar uma pequena mudança → compilar → aplicar entradas e observar → investigar a causa → corrigir → testar novamente nas mesmas condições. Um plano, a apresentação do código ou uma compilação bem-sucedida não significam que o trabalho está concluído.</p>
+<h4 id="fc-section-3">Verificar o ambiente e os critérios de aceitação</h4>
+<ol>
+<li>Leia as instruções da pasta de trabalho, os README, os manuais HTML e os cabeçalhos e implementações das bibliotecas usadas. Registre os caminhos dos executáveis e suas versões ou hashes SHA-256. Confira os comandos na saída real de <code>--help</code> e as APIs no código-fonte.</li>
+<li>Defina critérios verificáveis para entradas, imagem, som, progressão e frequência de atualização. Por exemplo: pressionar e soltar START inicia a partida; uma colisão tira uma vida; a pausa silencia o áudio especificado e, ao continuar, a reprodução é retomada.</li>
+<li>Pergunte apenas sobre ambiguidades relevantes. Tome decisões comuns e reversíveis de implementação de forma autônoma. Não reduza os requisitos nem flexibilize os critérios de aceitação.</li>
+<li>Primeiro execute um pequeno exemplo fornecido pelo compilador, pelo emulador e pelo SARAKURA. Isso verifica a integração entre as ferramentas, não a conclusão do jogo solicitado.</li>
+</ol>
+<h4 id="fc-section-4">Implementar uma primeira versão jogável</h4>
+<ul>
+<li>Considere NROM para um jogo pequeno; escolha MMC3 ou outro mapper quando o tamanho ou a troca de bancos exigir. Verifique as funções necessárias da placa com <code>inspect-rom</code>, <code>mapper-info</code>, <code>audit-board</code> e a implementação, sem concluir que há suporte apenas pelo nome do mapper.</li>
+<li>Planeje tamanhos de PRG/CHR, CHR-ROM ou CHR-RAM, espelhamento, bancos fixos, vetores de interrupção e RAM de salvamento. Depois de otimizações ou mudanças de banco, compare o cabeçalho com a organização real. <code>--nes-local-ram</code> usa a RAM interna da CPU em <code>$0000–$07FF</code>; evite sobreposição com página zero, pilha, buffers OAM e áreas do runtime e das bibliotecas.</li>
+<li>Use o dialeto C do KITAQFC, as bibliotecas FC e <code>void main(void)</code>. Não presuma compatibilidade com APIs de GB. Alguns cabeçalhos têm apenas declarações: localize as implementações e inclua os <code>.c</code> necessários.</li>
+<li>Considere registradores PPU, NMI, OAM DMA, limite de sprites por linha, rolagem, espelhamento, tabelas de atributos e comportamento de APU/DMC. O espaço livre da fila não é a capacidade de VRAM da PPU; dimensione o trabalho por NMI.</li>
+<li>Converta a fonte original <code>ascii.c</code> para CHR de FC e confira CHR, paletas, tabelas de nomes e atributos. Para FDS, verifique separadamente acesso ao disco, salvamento e requisitos de BIOS; não presuma as mesmas condições de inicialização de um cartucho.</li>
+</ul>
+<ul>
+<li>Primeiro conecte inicialização, título, personagem controlável, sucesso ou fracasso e reinício. Amplie o conteúdo depois.</li>
+<li>Preserve os originais editáveis de gráficos, música e efeitos, além das etapas de geração. Confirme que a compilação realmente utiliza os dados exportados.</li>
+<li>Escreva comentários no código em inglês e relatórios de andamento em português do Brasil. Mantenha os relatórios padrão do SARAKURA em inglês.</li>
+</ul>
+<h4 id="fc-section-5">Relacionar cada compilação à sua execução</h4>
+<p>Separe as saídas por iteração, como em <code>out/iter-001</code>. Registre comandos, códigos de saída e hashes de código, materiais, ferramentas, ROM e metadados. Nunca execute uma ROM antiga depois de uma compilação com falha. Mapas, mapas de código-fonte e informações de depuração devem ser da mesma compilação da ROM.</p>
+<p>O exemplo a seguir verifica NROM sem entrada. Prepare <code>main.c</code>, as implementações necessárias e o arquivo CHR; escolha o mapper adequado. Não passe metadados de compilação para <code>--kitaqfc-debug</code> do KUROSAKI sem conferir primeiro o formato exigido.</p>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>$iteration = &#x27;.\game-fc\out\iter-001&#x27;
+New-Item -ItemType Directory -Force $iteration | Out-Null
+
+# Include all additional implementation units required by the game.
+&amp; &#x27;.\kitaqfc\kitaqfc.exe&#x27; &#x27;.\game-fc\src\main.c&#x27; `
+  -I &#x27;.\kitaqfc\lib&#x27; -o &quot;$iteration\game.nes&quot; `
+  --mapper=nrom &#x27;--nes-chr=.\game-fc\assets\game.chr&#x27; --no-disasm `
+  &quot;--kurosaki-metadata=$iteration\build.json&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Build failed; inspect the build log.&#x27; }
+
+&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; run &quot;$iteration\game.nes&quot; `
+  --frames 300 --pad1 0 --png &quot;$iteration\frame.png&quot; `
+  --json &quot;$iteration\run.json&quot; --emit-diagnostics &quot;$iteration\events.jsonl&quot;
+if ($LASTEXITCODE -ne 0) { throw &#x27;Emulator run failed; inspect the run log.&#x27; }
+
+&amp; &#x27;.\sarakura\sarakura.exe&#x27; fc analyze `
+  --metadata &quot;$iteration\build.json&quot; --events &quot;$iteration\events.jsonl&quot; `
+  --frames 300 --out &quot;$iteration\analysis&quot; --fail-on error
+if ($LASTEXITCODE -ne 0) { throw &#x27;Inspect the analysis report and fix the cause.&#x27; }</code></pre></div>
+<p>Uma execução de 300 quadros sem entrada é apenas uma verificação inicial. Acrescente cenários de jogo com sequências de ações antes de afirmar que o jogo funciona.</p>
+<h4 id="fc-section-6">Reproduzir sequências de entrada</h4>
+<ul>
+<li><code>--pad1</code> e <code>--pad2</code> usam máscaras de bits NES brutas: A=1, B=2, SELECT=4, START=8, UP=16, DOWN=32, LEFT=64, RIGHT=128. Não confunda esses valores com os <code>BTN_*</code> da biblioteca.</li>
+<li><code>run --pad1</code> aplica entrada fixa. Para ações em sequência, crie um replay que diferencie pressionar, manter pressionado e soltar. Consulte <code>Replay</code> e <code>ReplayFrame</code>. Na CLI pública, <code>replay-record</code> grava entrada neutra, não uma partida jogada por uma pessoa.</li>
+<li>Confira por conta própria o SHA-256 da ROM, o alvo do replay e o intervalo de quadros. <code>replay-run --verify</code> só compara o hash final esperado quando ele existe; não valida integralmente o jogo nem a identidade da ROM. Não sobrescreva os resultados esperados com os observados apenas para fazer o teste passar.</li>
+</ul>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>&amp; &#x27;.\kurosaki\kurosaki.exe&#x27; replay-run `
+  &#x27;.\game-fc\out\iter-001\game.nes&#x27; &#x27;.\game-fc\tests\start-and-play.replay.json&#x27; `
+  --frames 900 --json &#x27;.\game-fc\out\iter-001\play.json&#x27; `
+  --png &#x27;.\game-fc\out\iter-001\play.png&#x27; `
+  --wav &#x27;.\game-fc\out\iter-001\play.wav&#x27;</code></pre></div>
+<p>Prepare o replay para a ROM em teste. A CLI pública não oferece <code>--emit-diagnostics</code> em <code>replay-run</code>. Não invente essa opção nem use rastreamentos de CPU como eventos de diagnóstico. Para analisar sequências de entrada com SARAKURA, crie um programa de testes dentro do projeto usando as APIs públicas de <code>kurosaki-core</code>: <code>RunOptions.replay_frames</code> e <code>diagnostic_events_from_trace_and_report</code>. Execute a mesma ROM, replay e condições de quadros; gere JSONL a partir do rastreamento e do relatório diagnóstico dessa execução. Confira a configuração e o intervalo preservado do rastreamento, e compare imagens e observações do programa de testes com o replay da CLI. Não apresente diagnósticos sem entrada como evidência de um cenário jogável. Se faltar o ambiente necessário, informe que essa verificação está incompleta.</p>
+<h4 id="fc-section-7">Verificar imagem, som, estado e desempenho</h4>
+<ul>
+<li>Salve cenários que diferenciem pressionar, segurar e soltar. Percorra todos os caminhos especificados: inicialização, início, movimento, ações, colisões, rolagem, mudanças de fase, fim de jogo, reinício, pausa e, quando aplicável, salvamento ou comunicação.</li>
+<li>Preserve PNGs de quadros relevantes, entradas, relatórios de execução, JSONL de diagnóstico, WAVs e as observações necessárias de estado ou memória. Verifique os quadros alcançados e o motivo da parada. Abra as imagens de fato: uma captura isolada não comprova movimento ou resposta aos controles. Compare contadores, posições e mudanças de estado com o esperado; confira bordas da tela, limites de tiles e atributos e cenas com muitos sprites.</li>
+<li>Verifique música, efeitos, reprodução simultânea, cortes, pausa e retomada. Gerar um WAV não comprova que o áudio está correto. Se não puder ouvi-lo, diferencie os testes numéricos ou de forma de onda das qualidades audíveis ainda não verificadas.</li>
+<li>Meça cenas pesadas, trabalho da CPU de destino, atualizações e transferências; em FC, inclua o trabalho de NMI. A velocidade do emulador no computador não é a frequência do jogo nem prova de desempenho no hardware real. Continuar com <code>--allow-unimplemented</code> não comprova suporte ao recurso ausente.</li>
+</ul>
+<h4 id="fc-section-8">Analisar, corrigir e testar novamente</h4>
+<ul>
+<li>Forneça ao SARAKURA os metadados da ROM testada e o JSONL de diagnóstico daquela execução. Um rastreamento de CPU ou relatório comum não serve como substituto. <code>--frames</code> define condições de análise; SARAKURA não executa a ROM nem modifica o código automaticamente.</li>
+<li>Leia <code>report.html</code>, <code>ai_diagnostics.json</code>, <code>repair_prompt.md</code> e <code>retest_plan.json</code>. Compare os diagnósticos com reprodução, imagens, áudio e código. Separe localizações ou causas inferidas de fatos verificados e laços de espera normais de travamentos. Avalie cada aviso e registre eventos não suportados ou limites da análise. Não oculte avisos com filtros nem encurte testes para obter aprovação.</li>
+<li>Reduza falhas a casos mínimos, corrija a causa e recompile. Se a origem estiver no compilador ou emulador, isole o defeito do código do jogo e acrescente verificação de regressão à correção da ferramenta.</li>
+<li>Repita os testes com as mesmas entradas, semente aleatória, máquina e padrão de vídeo, mapper, quadros observados e configurações de diagnóstico. Cada ROM precisa dos metadados correspondentes; não reutilize estados salvos indiscriminadamente após mudar código ou organização da RAM.</li>
+</ul>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>&amp; &#x27;.\sarakura\sarakura.exe&#x27; baseline-delta `
+  --baseline &#x27;.\game-fc\out\iter-001\analysis&#x27; `
+  --current &#x27;.\game-fc\out\iter-002\analysis&#x27; `
+  --out &#x27;.\game-fc\out\delta.json&#x27; --markdown &#x27;.\game-fc\out\delta.md&#x27; `
+  --fail-on-new error --fail-on-regression error --enforce</code></pre></div>
+<p>Use as diferenças de diagnóstico junto com a avaliação de controles, gráficos e áudio. Se a mesma falha se repetir, reavalie as evidências e a hipótese em vez de continuar fazendo mudanças arbitrárias.</p>
+<h4 id="fc-section-9">Critérios de conclusão e entregáveis</h4>
+<p>Repita todos os cenários obrigatórios com a ROM final compilada a partir do código e das configurações entregues. Invencibilidade, entradas automáticas de teste ou outro mapper, isoladamente, não verificam uma partida normal na versão final. Entregue uma tabela relacionando requisitos e testes, explique os avisos restantes e identifique o que não foi verificado ou não é suportado. Se não houve teste em hardware físico, informe isso explicitamente.</p>
+<p>Entregue código-fonte, identificação de ferramentas e bibliotecas, materiais editáveis, scripts reproduzíveis de compilação e testes, ROM, evidências finais e um README com instalação, controles e limitações conhecidas. Inclua replays e o programa de testes quando necessários. Publique ou envie arquivos externamente apenas no escopo autorizado de forma explícita. Remova compilações intermediárias e rastreamentos temporários desnecessários após a verificação, preservando fontes, materiais, entregáveis e evidências de regressão necessárias.</p>
+<p>Se o ambiente ou as permissões impedirem uma verificação obrigatória, informe os passos exatos para reprodução e a ação necessária. Não marque o trabalho como concluído.</p>
+</section></main></div><script src="../assets/manual.js"></script></body></html>

@@ -64,3 +64,28 @@ commercial ROMs, BIOS images and private analysis data are excluded.
 Original font glyphs and synthetic tutorial assets are included with their
 applicable license notices. See `LICENSE`, `LICENSE.ja` and
 `THIRD_PARTY_NOTICES.md` for licensing scope.
+
+
+## AI development prompts — September 14, 2026
+
+The prompt supplement provides KITAQGB/KOKURA/SARAKURA and
+KITAQFC/KUROSAKI/SARAKURA workflows in all nine published languages.
+Each edition includes the full prompt, a complete-text copy button and two
+Markdown downloads. Links from the manuals and READMEs open the corresponding
+language and target platform.
+
+[Prompt verification](verification/prompt_checks.json) records real clipboard
+comparisons for all 18 prompts, shared command preservation, desktop/mobile
+layout checks, and FC section navigation across language changes in an isolated
+headless Microsoft Edge session. These are documentation checks, not gameplay
+or physical-hardware tests. The FC prompt explicitly accounts for the public
+CLI's lack of diagnostic-event output from `replay-run`.
+
+Run `python -B tools/check_prompts.py` with Playwright available to repeat the
+browser checks. `tools/generate_prompts.py` rebuilds the supplement and links.
+The complete site has 90 edition pages, plus two existing diagnostic HTML reports.
+
+日本語：GB用・FC用の開発プロンプトを公開中の9言語に収録しました。
+18本すべてで全文コピーとMarkdownの一致、コマンドの保持、PC・スマートフォン幅の
+表示、言語切替後もFC用の位置を保つ動作を確認しています。これは説明書の検証であり、
+ゲームや実機の動作検証を意味しません。確認結果は上記の記録を参照してください。
