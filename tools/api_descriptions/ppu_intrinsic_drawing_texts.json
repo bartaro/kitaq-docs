@@ -1,0 +1,90 @@
+{
+  "pi_scroll": [
+    "Save both pixel offsets in the runtime X/Y shadows, read PPUSTATUS to reset the shared latch, then write X and Y to PPUSCROLL in that order. This updates scrolling immediately; it does not queue a camera move, wait for NMI or choose a base nametable.",
+    "ピクセル単位のX・Yをランタイムの保存領域へ記録し、PPUSTATUSを読んで共有ラッチをリセットしてから、PPUSCROLLへX、Yの順に書きます。スクロールを直接更新する処理で、カメラ移動の予約、NMI待機、基準ネームテーブルの選択は行いません。",
+    "픽셀 단위 X/Y를 런타임 저장 영역에 기록하고 PPUSTATUS를 읽어 공유 래치를 초기화한 뒤 PPUSCROLL에 X, Y 순으로 씁니다. 스크롤을 직접 갱신하며 카메라 이동 예약, NMI 대기, 기준 네임테이블 선택은 하지 않습니다.",
+    "将两个像素偏移保存到运行时 X/Y 保存区，读取 PPUSTATUS 复位共享锁存器，再按 X、Y 顺序写入 PPUSCROLL。它直接更新滚动，不会排队执行相机移动、等待 NMI 或选择基础名称表。",
+    "將兩個像素偏移儲存到執行階段 X/Y 儲存區，讀取 PPUSTATUS 重設共用鎖存器，再依 X、Y 順序寫入 PPUSCROLL。它直接更新捲動，不會排程攝影機移動、等待 NMI 或選擇基準名稱表。",
+    "Guarda ambos desplazamientos en píxeles en las copias X/Y del runtime, lee PPUSTATUS para reiniciar el latch y escribe X e Y en PPUSCROLL, en ese orden. Actualiza el desplazamiento directamente; no encola movimientos de cámara, espera a NMI ni elige una tabla de nombres base.",
+    "Salva os dois deslocamentos em pixels nas cópias X/Y do runtime, lê PPUSTATUS para reiniciar o latch e grava X e Y em PPUSCROLL, nessa ordem. Atualiza a rolagem diretamente; não enfileira movimentos de câmera, espera NMI ou escolhe uma tabela de nomes base.",
+    "Mémorise les deux décalages en pixels dans les copies X/Y du runtime, lit PPUSTATUS pour réinitialiser le verrou, puis écrit X et Y dans PPUSCROLL, dans cet ordre. Met à jour le défilement directement, sans mettre un mouvement de caméra en file, attendre NMI ni choisir une table de noms de base.",
+    "Speichert beide Pixelversätze in den X/Y-Kopien der Laufzeitbibliothek, liest PPUSTATUS zum Zurücksetzen des Latches und schreibt dann X und Y in dieser Reihenfolge nach PPUSCROLL. Aktualisiert den Bildlauf direkt, ohne eine Kamerabewegung vorzumerken, auf NMI zu warten oder eine Basis-Nametable auszuwählen."
+  ],
+  "pi_scroll_x": [
+    "Replace saved X, reset the shared latch with a status read, then write the new X and saved Y to PPUSCROLL. Y comes from the software shadow, not from the PPU; direct register writes do not update that shadow.",
+    "保存済みのXを置き換え、ステータス読み取りで共有ラッチをリセットし、新しいXと保存済みのYをPPUSCROLLへ書きます。YはPPUから読み戻すのではなくソフトウェアの保存値です。レジスターへの直接書き込みでは、この保存値は更新されません。",
+    "저장된 X를 바꾸고 상태 읽기로 공유 래치를 초기화한 뒤 새 X와 저장된 Y를 PPUSCROLL에 씁니다. Y는 PPU에서 읽는 값이 아니라 소프트웨어 저장값입니다. 레지스터 직접 쓰기는 이 저장값을 갱신하지 않습니다.",
+    "替换保存的 X，通过状态读取复位共享锁存器，再将新 X 和保存的 Y 写入 PPUSCROLL。Y 来自软件保存区，不是从 PPU 读回的值；直接写寄存器不会更新此保存值。",
+    "替換儲存的 X，透過狀態讀取重設共用鎖存器，再將新 X 和儲存的 Y 寫入 PPUSCROLL。Y 來自軟體儲存區，不是從 PPU 讀回的值；直接寫暫存器不會更新此儲存值。",
+    "Sustituye X guardado, reinicia el latch leyendo el estado y escribe el nuevo X y el Y guardado en PPUSCROLL. Y procede de la copia de software, no de la PPU; las escrituras directas al registro no actualizan esa copia.",
+    "Substitui X salvo, reinicia o latch lendo o status e grava o novo X e o Y salvo em PPUSCROLL. Y vem da cópia de software, não da PPU; escritas diretas no registrador não atualizam essa cópia.",
+    "Remplace X mémorisé, réinitialise le verrou par une lecture d’état, puis écrit le nouveau X et Y mémorisé dans PPUSCROLL. Y provient de la copie logicielle, pas d’une lecture de la PPU ; les écritures directes du registre ne mettent pas cette copie à jour.",
+    "Ersetzt das gespeicherte X, setzt den Latch durch einen Statuslesezugriff zurück und schreibt das neue X sowie das gespeicherte Y nach PPUSCROLL. Y stammt aus der Softwarekopie, nicht aus der PPU; direkte Registerzugriffe aktualisieren diese Kopie nicht."
+  ],
+  "pi_scroll_y": [
+    "Replace saved Y, reset the shared latch with a status read, then write saved X and the new Y to PPUSCROLL. Both scroll bytes are written even though only Y changes. X is taken from the runtime shadow.",
+    "保存済みのYを置き換え、ステータス読み取りで共有ラッチをリセットし、保存済みのXと新しいYをPPUSCROLLへ書きます。変更する値がYだけでも、スクロールの2バイトを両方書きます。Xにはランタイムの保存値を使います。",
+    "저장된 Y를 바꾸고 상태 읽기로 공유 래치를 초기화한 뒤 저장된 X와 새 Y를 PPUSCROLL에 씁니다. Y만 바꿔도 스크롤 두 바이트를 모두 씁니다. X는 런타임 저장값을 사용합니다.",
+    "替换保存的 Y，通过状态读取复位共享锁存器，再将保存的 X 和新 Y 写入 PPUSCROLL。即使只改变 Y，也会写入两个滚动字节。X 使用运行时保存值。",
+    "替換儲存的 Y，透過狀態讀取重設共用鎖存器，再將儲存的 X 和新 Y 寫入 PPUSCROLL。即使只改變 Y，也會寫入兩個捲動位元組。X 使用執行階段儲存值。",
+    "Sustituye Y guardado, reinicia el latch leyendo el estado y escribe el X guardado y el nuevo Y en PPUSCROLL. Escribe ambos bytes aunque solo cambie Y. X procede de la copia del runtime.",
+    "Substitui Y salvo, reinicia o latch lendo o status e grava o X salvo e o novo Y em PPUSCROLL. Grava os dois bytes mesmo alterando apenas Y. X vem da cópia do runtime.",
+    "Remplace Y mémorisé, réinitialise le verrou par une lecture d’état, puis écrit X mémorisé et le nouveau Y dans PPUSCROLL. Les deux octets sont écrits même si seul Y change. X provient de la copie du runtime.",
+    "Ersetzt das gespeicherte Y, setzt den Latch durch einen Statuslesezugriff zurück und schreibt das gespeicherte X sowie das neue Y nach PPUSCROLL. Auch bei alleiniger Änderung von Y werden beide Scrollbytes geschrieben. X stammt aus der Laufzeitkopie."
+  ],
+  "pi_write": [
+    "Reset the PPU latch, set `ppu_addr` and synchronously copy `len` consecutive source bytes to PPUDATA. The count is eight-bit; the compiler uses indexed source reads. No pointer is retained for later execution, and changing the source after return does not change VRAM.",
+    "PPUラッチをリセットして`ppu_addr`を設定し、転送元の連続した`len`バイトをPPUDATAへ同期転送します。個数は8ビットで、コンパイラは添字付きの読み取りを行います。後で実行するためのポインター保持はなく、戻った後に転送元を変更してもVRAMは変わりません。",
+    "PPU 래치를 초기화하고 `ppu_addr`를 설정한 뒤 원본의 연속된 `len`바이트를 PPUDATA에 동기 전송합니다. 개수는 8비트이며 컴파일러는 인덱스 읽기를 사용합니다. 나중에 실행할 포인터를 보관하지 않고 반환 후 원본을 바꿔도 VRAM은 바뀌지 않습니다.",
+    "复位 PPU 锁存器，设置 `ppu_addr`，并同步将源数据中连续的 `len` 字节复制到 PPUDATA。计数为八位，编译器使用索引读取源数据。不为稍后执行保留指针，返回后修改源数据不会改变 VRAM。",
+    "重設 PPU 鎖存器，設定 `ppu_addr`，並同步將來源中連續的 `len` 位元組複製到 PPUDATA。計數為八位元，編譯器使用索引讀取來源。不為稍後執行保留指標，返回後修改來源不會改變 VRAM。",
+    "Reinicia el latch PPU, establece `ppu_addr` y copia sincrónicamente `len` bytes consecutivos del origen a PPUDATA. El recuento es de ocho bits y el compilador usa lecturas indexadas. No conserva un puntero para ejecutarlo después; cambiar el origen tras el retorno no modifica la VRAM.",
+    "Reinicia o latch PPU, define `ppu_addr` e copia de forma síncrona `len` bytes consecutivos da origem para PPUDATA. A contagem é de oito bits e o compilador usa leituras indexadas. Não guarda um ponteiro para executar depois; alterar a origem após o retorno não modifica a VRAM.",
+    "Réinitialise le verrou PPU, définit `ppu_addr` et copie de façon synchrone `len` octets consécutifs de la source vers PPUDATA. Le nombre est sur huit bits et le compilateur utilise des lectures indexées. Aucun pointeur n’est conservé pour plus tard ; modifier la source après le retour ne change pas la VRAM.",
+    "Setzt den PPU-Latch zurück, setzt `ppu_addr` und kopiert synchron `len` aufeinanderfolgende Quellbytes nach PPUDATA. Die Anzahl ist acht Bit breit; der Compiler verwendet indizierte Quellzugriffe. Kein Zeiger wird für eine spätere Ausführung gespeichert. Änderungen der Quelle nach der Rückkehr verändern VRAM nicht."
+  ],
+  "pi_put": [
+    "Write one tile byte directly to nametable 0 at PPU address `0x2000 + y*32 + x`. The helper resets the latch before setting the address. It does not write tile graphics or palette attributes and does not clip coordinates.",
+    "PPUアドレス`0x2000 + y*32 + x`へ、ネームテーブル0のタイル番号を1バイト直接書きます。アドレス設定前にラッチをリセットします。タイルの絵柄やパレット属性は書かず、座標の切り詰めも行いません。",
+    "PPU 주소 `0x2000 + y*32 + x`에 네임테이블 0의 타일 바이트 하나를 직접 씁니다. 주소 설정 전에 래치를 초기화합니다. 타일 그래픽이나 팔레트 속성은 쓰지 않으며 좌표를 잘라내지 않습니다.",
+    "向 PPU 地址 `0x2000 + y*32 + x` 直接写入名称表 0 的一个图块字节。设置地址前会复位锁存器。不会写入图块图形或调色板属性，也不裁剪坐标。",
+    "向 PPU 位址 `0x2000 + y*32 + x` 直接寫入名稱表 0 的一個圖塊位元組。設定位址前會重設鎖存器。不會寫入圖塊圖像或調色盤屬性，也不裁切座標。",
+    "Escribe directamente un byte de tile en la tabla de nombres 0, en `0x2000 + y*32 + x`. Reinicia el latch antes de fijar la dirección. No escribe gráficos ni atributos de paleta y no recorta las coordenadas.",
+    "Grava diretamente um byte de tile na tabela de nomes 0, em `0x2000 + y*32 + x`. Reinicia o latch antes de definir o endereço. Não grava gráficos ou atributos de paleta e não limita as coordenadas.",
+    "Écrit directement un octet de tuile dans la table de noms 0, à `0x2000 + y*32 + x`. Réinitialise le verrou avant de définir l’adresse. N’écrit ni graphisme de tuile ni attribut de palette et ne limite pas les coordonnées.",
+    "Schreibt ein Kachelbyte direkt in Nametable 0 an `0x2000 + y*32 + x`. Setzt den Latch vor der Adresse zurück. Schreibt weder Kachelgrafiken noch Palettenattribute und begrenzt die Koordinaten nicht."
+  ],
+  "pi_put_nt": [
+    "Select logical nametable `nt & 3` and write one tile at `0x2000 + (nt & 3)*0x400 + y*32 + x`. The latch is reset before the address pair. Cartridge mirroring can make different logical table numbers address the same physical memory.",
+    "論理ネームテーブル`nt & 3`を選び、`0x2000 + (nt & 3)*0x400 + y*32 + x`へタイル番号を1個書きます。アドレスの2バイトを書く前にラッチをリセットします。カートリッジのミラーリングにより、異なる論理テーブル番号が同じ物理メモリーを指す場合があります。",
+    "논리 네임테이블 `nt & 3`을 선택하고 `0x2000 + (nt & 3)*0x400 + y*32 + x`에 타일 하나를 씁니다. 주소 쌍을 쓰기 전에 래치를 초기화합니다. 카트리지 미러링에 따라 다른 논리 테이블 번호가 같은 물리 메모리를 가리킬 수 있습니다.",
+    "选择逻辑名称表 `nt & 3`，向 `0x2000 + (nt & 3)*0x400 + y*32 + x` 写入一个图块。写入地址对之前复位锁存器。卡带镜像可能让不同的逻辑表编号指向同一物理内存。",
+    "選擇邏輯名稱表 `nt & 3`，向 `0x2000 + (nt & 3)*0x400 + y*32 + x` 寫入一個圖塊。寫入位址對之前重設鎖存器。卡匣鏡像可能讓不同的邏輯表編號指向同一實體記憶體。",
+    "Selecciona la tabla lógica `nt & 3` y escribe un tile en `0x2000 + (nt & 3)*0x400 + y*32 + x`. Reinicia el latch antes de escribir la dirección. El mirroring del cartucho puede hacer que distintos números lógicos compartan memoria física.",
+    "Seleciona a tabela lógica `nt & 3` e grava um tile em `0x2000 + (nt & 3)*0x400 + y*32 + x`. Reinicia o latch antes de gravar o endereço. O espelhamento do cartucho pode fazer números lógicos diferentes compartilharem memória física.",
+    "Sélectionne la table logique `nt & 3` et écrit une tuile à `0x2000 + (nt & 3)*0x400 + y*32 + x`. Réinitialise le verrou avant la paire d’adresse. Le mirroring de la cartouche peut faire correspondre plusieurs numéros logiques à la même mémoire physique.",
+    "Wählt die logische Nametable `nt & 3` und schreibt eine Kachel an `0x2000 + (nt & 3)*0x400 + y*32 + x`. Setzt den Latch vor dem Adresspaar zurück. Durch Cartridge-Spiegelung können verschiedene logische Tabellennummern denselben physischen Speicher adressieren."
+  ],
+  "pi_rect": [
+    "Fill a `w`-by-`h` rectangle of tile bytes in nametable 0, starting at `(x,y)`. Reset the latch and address for each row, write `w` copies of `tile`, then advance the next row start by 32 bytes. Palette attributes are not changed.",
+    "ネームテーブル0の`(x,y)`を起点に、幅`w`・高さ`h`のタイル番号を埋めます。各行でラッチとアドレスを設定し、`tile`を`w`個書いて、次の行の先頭を32バイト先へ進めます。パレット属性は変更しません。",
+    "네임테이블 0의 `(x,y)`에서 시작하는 너비 `w`, 높이 `h`의 타일 영역을 채웁니다. 행마다 래치와 주소를 설정하고 `tile`을 `w`개 쓴 뒤 다음 행 시작을 32바이트 앞으로 옮깁니다. 팔레트 속성은 바꾸지 않습니다.",
+    "从名称表 0 的 `(x,y)` 开始，填充宽 `w`、高 `h` 的图块区域。每行复位锁存器并设置地址，写入 `w` 个 `tile`，再将下一行起点前移 32 字节。不改变调色板属性。",
+    "從名稱表 0 的 `(x,y)` 開始，填滿寬 `w`、高 `h` 的圖塊區域。每行重設鎖存器並設定位址，寫入 `w` 個 `tile`，再將下一行起點前移 32 位元組。不改變調色盤屬性。",
+    "Rellena un rectángulo de `w` por `h` tiles en la tabla de nombres 0 desde `(x,y)`. Reinicia el latch y la dirección en cada fila, escribe `w` copias de `tile` y avanza 32 bytes hasta el inicio de la fila siguiente. No cambia los atributos de paleta.",
+    "Preenche um retângulo de `w` por `h` tiles na tabela de nomes 0 a partir de `(x,y)`. Reinicia o latch e o endereço a cada linha, grava `w` cópias de `tile` e avança 32 bytes até o início da próxima linha. Não altera os atributos de paleta.",
+    "Remplit un rectangle de `w` par `h` tuiles dans la table de noms 0 à partir de `(x,y)`. Réinitialise le verrou et l’adresse à chaque ligne, écrit `w` copies de `tile`, puis avance le début de ligne suivant de 32 octets. Ne modifie pas les attributs de palette.",
+    "Füllt ab `(x,y)` ein Rechteck aus `w` mal `h` Kachelbytes in Nametable 0. Setzt Latch und Adresse für jede Zeile zurück, schreibt `w` Kopien von `tile` und erhöht den Beginn der nächsten Zeile um 32 Bytes. Palettenattribute bleiben unverändert."
+  ],
+  "pi_rect_nt": [
+    "Fill `w` tiles per row for `h` rows in logical nametable `nt & 3`. The first address is `0x2000 + (nt & 3)*0x400 + y*32 + x`; each row start advances by 32. This writes tile bytes only, with no attribute update, clipping or mirroring configuration.",
+    "論理ネームテーブル`nt & 3`で、1行`w`タイルを`h`行埋めます。開始アドレスは`0x2000 + (nt & 3)*0x400 + y*32 + x`で、行の先頭を32ずつ進めます。書くのはタイル番号だけです。属性更新、切り詰め、ミラーリング設定は行いません。",
+    "논리 네임테이블 `nt & 3`에서 행당 `w`타일을 `h`행 채웁니다. 시작 주소는 `0x2000 + (nt & 3)*0x400 + y*32 + x`이며 행 시작은 32씩 증가합니다. 타일 바이트만 쓰며 속성 갱신, 경계 잘라내기, 미러링 설정은 하지 않습니다.",
+    "在逻辑名称表 `nt & 3` 中，每行填充 `w` 个图块，共 `h` 行。起始地址为 `0x2000 + (nt & 3)*0x400 + y*32 + x`，每行起点增加 32。只写图块字节，不更新属性、不裁剪，也不配置镜像。",
+    "在邏輯名稱表 `nt & 3` 中，每行填滿 `w` 個圖塊，共 `h` 行。起始位址為 `0x2000 + (nt & 3)*0x400 + y*32 + x`，每行起點增加 32。只寫圖塊位元組，不更新屬性、不裁切，也不設定鏡像。",
+    "Rellena `w` tiles por fila durante `h` filas en la tabla lógica `nt & 3`. La dirección inicial es `0x2000 + (nt & 3)*0x400 + y*32 + x`; cada fila comienza 32 bytes después. Solo escribe tiles, sin actualizar atributos, recortar ni configurar el mirroring.",
+    "Preenche `w` tiles por linha durante `h` linhas na tabela lógica `nt & 3`. O endereço inicial é `0x2000 + (nt & 3)*0x400 + y*32 + x`; cada linha começa 32 bytes adiante. Grava apenas tiles, sem atualizar atributos, limitar a área ou configurar espelhamento.",
+    "Remplit `w` tuiles par ligne sur `h` lignes dans la table logique `nt & 3`. La première adresse est `0x2000 + (nt & 3)*0x400 + y*32 + x` ; chaque début de ligne avance de 32 octets. Écrit uniquement les tuiles, sans attributs, découpage aux limites ni configuration du mirroring.",
+    "Füllt in der logischen Nametable `nt & 3` jeweils `w` Kacheln über `h` Zeilen. Die Anfangsadresse lautet `0x2000 + (nt & 3)*0x400 + y*32 + x`; jeder Zeilenbeginn rückt um 32 Bytes weiter. Schreibt nur Kachelbytes, ohne Attribute zu ändern, Grenzen abzuschneiden oder Spiegelung einzustellen."
+  ]
+}

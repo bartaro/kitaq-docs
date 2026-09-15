@@ -24,7 +24,7 @@ Tragen Sie die Anforderungen ein und geben Sie den vollständigen Prompt an Ihre
 
 ## HTML-Handbücher
 
-Die sieben Bände sind in neun Sprachen verfügbar und beschreiben den Quellenstand vom 14. September 2026. Alle Ausgaben enthalten dieselben 1.053 API-Einträge und 47 vollständigen Beispielprogramme. Öffnen Sie `de/index.html` für Deutsch, `en/index.html` für Englisch oder `index.html` für Japanisch. In jedem Band können Sie die Sprache wechseln. Die Prüfprotokolle nennen die getesteten Quellen, ausführbaren Dateien und Testbedingungen.
+Die sieben Bände sind in neun Sprachen verfügbar und beschreiben den Quellenstand vom 14. September 2026. Alle Ausgaben enthalten dieselben 1.055 API-Einträge und 47 vollständigen Beispielprogramme. Öffnen Sie `de/index.html` für Deutsch, `en/index.html` für Englisch oder `index.html` für Japanisch. In jedem Band können Sie die Sprache wechseln. Die Prüfprotokolle nennen die getesteten Quellen, ausführbaren Dateien und Testbedingungen.
 
 Originale Quellcodeauszüge und aufgezeichnete Werkzeugausgaben bleiben unverändert. Die HTML-Dateien lassen sich offline lesen, innerhalb eines Bandes durchsuchen und ausdrucken; Code kann direkt kopiert werden. Beachten Sie die [GitHub-Einrichtung](GITHUB_SETUP.md) und die [Veröffentlichungsprüfungen](PUBLICATION_CHECKS.md).
 
@@ -37,7 +37,7 @@ Originale Quellcodeauszüge und aufgezeichnete Werkzeugausgaben bleiben unverän
 | fc-library.html | KITAQFC-Bibliotheken |
 | kurosaki.html | Ausführen, Speichern und Analysieren mit KUROSAKI |
 | sarakura.html | Diagnosen und erneute Tests mit SARAKURA |
-| verification.html | Aufgezeichnete Builds, Ausführungstests und Pixelvergleiche |
+| verification.html | Bildschirmaufnahmen der Beispiele |
 
 Die Inhaltsseite und der Anfang des ersten Bandes erklären die doppelte Bedeutung des Namens und würdigen NORCAL. Buchstaben, Ziffern und Sonderzeichen stammen aus der mitgelieferten `samples/assets/ascii.c`. Die GB-Ressourcen sind in ASCII-Reihenfolge angeordnet; für FC werden sie in NES-Bitplanes umgewandelt. Die Zeichenformen bleiben erhalten.
 
@@ -86,7 +86,7 @@ python -B kitaq-docs/tools/check_site.py
 python -B kitaq-docs/tools/check_bilingual.py
 ```
 
-Quellensammlung und Builds benötigen die ursprünglichen Quellverzeichnisse und Werkzeuge. Schriftumwandlung und Pixelvergleiche verwenden Pillow. Zum Lesen der HTML-Dateien benötigen Sie weder Python noch einen Server. Verwenden Sie nach Änderungen an Quellen oder Programmen alte Prüfergebnisse nicht als Nachweis für die neue Version. Siehe [Compilerkorrekturen](verification/compiler_fixes.md) und [Drittanbieterhinweise](THIRD_PARTY_NOTICES.md).
+Die aufgenommenen Bilder stehen bei den Erläuterungen der Beispiele. Build- und Ausführungsprotokolle sowie lokale Prüfaufzeichnungen gehören nicht zu den veröffentlichten Dateien. Exportieren Sie das Handbuch vor dem Hochladen mit `tools/export_public.py` in ein separates Git-Arbeitsverzeichnis. Beachten Sie die [Drittanbieterhinweise](THIRD_PARTY_NOTICES.md).
 
 ## Umfang der veröffentlichten Quellen
 

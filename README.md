@@ -40,7 +40,7 @@ Fill in the requirements, then give the complete prompt to your AI assistant. It
 
 ### HTML manuals
 
-Seven complete volumes are available in nine languages, based on the source snapshot of September 14, 2026. Every edition contains the same 1,053 API entries and 47 complete sample programs. Open `en/index.html` for English or `index.html` for Japanese; each volume provides language navigation. Verification records identify the tested sources, executables and conditions.
+Seven complete volumes are available in nine languages, based on the source snapshot of September 14, 2026. Every edition contains the same 1,055 API entries and 47 complete sample programs. Open `en/index.html` for English or `index.html` for Japanese; each volume provides language navigation. The sample explanations identify the tested behavior and conditions.
 
 Original source excerpts and captured tool output are preserved verbatim. See [GitHub setup](GITHUB_SETUP.md) and [publication checks](PUBLICATION_CHECKS.md). The HTML files support offline reading, searching within a volume, copying code and printing.
 
@@ -53,7 +53,7 @@ Original source excerpts and captured tool output are preserved verbatim. See [G
 | fc-library.html | KITAQFC libraries |
 | kurosaki.html | KUROSAKI execution, saving and analysis |
 | sarakura.html | SARAKURA diagnostics and retesting |
-| verification.html | Recorded builds, execution and pixel comparisons |
+| verification.html | Sample screens |
 
 The contents page and the beginning of volume 1 explain the two meanings of the name and acknowledge NORCAL. Letters, digits and symbols use the supplied `samples/assets/ascii.c`. GB assets are reordered into ASCII order; FC assets are converted to NES bitplanes. The glyph shapes are unchanged.
 
@@ -102,7 +102,7 @@ python -B kitaq-docs/tools/check_site.py
 python -B kitaq-docs/tools/check_bilingual.py
 ```
 
-Source collection and builds require the original source trees and their tools. Font conversion and pixel comparisons use Pillow. Reading the HTML requires neither Python nor a server. Record the source and executable hashes with each verification run. See [compiler verification](verification/compiler_fixes.md) and [third-party notices](THIRD_PARTY_NOTICES.md).
+Captured screens are included with the sample explanations. Build logs, execution logs and raw local verification records are excluded from the public files. Before uploading, use `tools/export_public.py` to export the manual into a separate Git checkout. See [third-party notices](THIRD_PARTY_NOTICES.md).
 
 ### Scope of this source publication
 
@@ -118,9 +118,9 @@ KOKURA-GUI, KUROSAKI-GUI and PLITA are excluded from this upload. The published 
 
 ### 9言語のHTMLマニュアル
 
-2026年9月14日のソースに基づく7冊のマニュアルを9言語で収録しています。各言語版に共通の1,053個のAPI項目と47本の完全なサンプルプログラムがあります。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。検証記録には使用したソース、実行ファイル、試験条件を記載しています。
+2026年9月14日のソースに基づく7冊のマニュアルを9言語で収録しています。各言語版に共通の1,055個のAPI項目と47本の完全なサンプルプログラムがあります。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。検証記録には使用したソース、実行ファイル、試験条件を記載しています。
 
-全言語に同じ1,053件のAPIと47本の完成サンプルを収録しています。元のソース抜粋とツール出力は原文のまま保持しています。[取得・配置手順](GITHUB_SETUP.md)と[公開時の確認記録](PUBLICATION_CHECKS.md)も参照してください。
+全言語に同じ1,055件のAPIと47本の完成サンプルを収録しています。元のソース抜粋とツール出力は原文のまま保持しています。[取得・配置手順](GITHUB_SETUP.md)と[公開時の確認記録](PUBLICATION_CHECKS.md)も参照してください。
 `index.html` を開いてください。オフラインで閲覧・巻内検索・コードのコピー・印刷ができます。
 
 | ファイル | 内容 |
@@ -132,7 +132,7 @@ KOKURA-GUI, KUROSAKI-GUI and PLITA are excluded from this upload. The published 
 | fc-library.html | KITAQFCライブラリ |
 | kurosaki.html | KUROSAKIの実行・保存・解析 |
 | sarakura.html | SARAKURAの診断と再テスト |
-| verification.html | 実際のビルド・実行・画面照合の記録 |
+| verification.html | サンプルの実行画面 |
 
 名称の二つの意味とNORCALへの謝辞は総合目次と第1巻の冒頭にあります。
 英数字・記号は指定された `samples/assets/ascii.c` を使用しています。
@@ -191,9 +191,7 @@ python -B kitaq-docs/tools/check_site.py
 python -B kitaq-docs/tools/check_bilingual.py
 ```
 
-ソース採取・ビルドには元のソースツリーと各ツールが必要です。字体変換・画面照合にはPillowを使用します。
-単なるHTML閲覧にはPythonもサーバーも不要です。ソースやEXEを更新したら、古い検証結果をそのまま流用しないでください。
-変更内容は [compiler_fixes.md](verification/compiler_fixes.md)、権利表記は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。
+確認した画像はサンプルの説明とともに掲載しています。ビルドログ・実行ログ・ローカルの検証記録は公開ファイルに含めません。アップロードする前に、`tools/export_public.py`で別のGit作業フォルダへマニュアルを書き出してください。権利表記は[第三者の権利に関する通知](THIRD_PARTY_NOTICES.md)を参照してください。
 
 ### 今回のソース公開範囲
 

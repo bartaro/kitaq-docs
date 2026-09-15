@@ -27,7 +27,7 @@ Os links abaixo levam diretamente ao volume em português brasileiro.
 
 ## Manuais em HTML
 
-Os sete volumes estão disponíveis em nove idiomas e descrevem o código-fonte de 14 de setembro de 2026. Todas as edições incluem as mesmas 1.053 entradas de API e 47 programas de exemplo completos. Abra `pt/index.html` em português, `en/index.html` em inglês ou `index.html` em japonês. Cada volume permite mudar de idioma. Os registros de verificação identificam os fontes, os executáveis e as condições dos testes.
+Os sete volumes estão disponíveis em nove idiomas e descrevem o código-fonte de 14 de setembro de 2026. Todas as edições incluem as mesmas 1.055 entradas de API e 47 programas de exemplo completos. Abra `pt/index.html` em português, `en/index.html` em inglês ou `index.html` em japonês. Cada volume permite mudar de idioma. Os registros de verificação identificam os fontes, os executáveis e as condições dos testes.
 
 Trechos dos fontes originais e saídas capturadas das ferramentas são mantidos sem alterações. Consulte as [instruções de obtenção e organização dos repositórios](GITHUB_SETUP.md) e as [verificações de publicação](PUBLICATION_CHECKS.md). Os arquivos HTML podem ser lidos offline e oferecem busca dentro do volume, cópia de código e impressão.
 
@@ -78,7 +78,7 @@ python -B kitaq-docs/tools/check_site.py
 python -B kitaq-docs/tools/check_bilingual.py
 ```
 
-A coleta dos fontes e a compilação exigem as árvores de código originais e suas ferramentas. A conversão da fonte e as comparações de pixels usam Pillow. Para ler o HTML, não é necessário Python nem servidor. Depois de alterar fontes ou executáveis, não use resultados antigos como prova da nova versão. Consulte as [correções dos compiladores](verification/compiler_fixes.md) e os [avisos de terceiros](THIRD_PARTY_NOTICES.md).
+As capturas aparecem junto às explicações dos exemplos. Os arquivos públicos não incluem logs de compilação, de execução nem registros de verificação local. Antes do envio, use `tools/export_public.py` para exportar o manual para uma pasta de trabalho separada do Git. Consulte os [avisos de terceiros](THIRD_PARTY_NOTICES.md).
 
 ## Escopo dos fontes publicados
 

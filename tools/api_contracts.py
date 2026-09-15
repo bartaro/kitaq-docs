@@ -48,6 +48,12 @@ def render(record, contract, language, messages, ui):
     def paragraphs(keys): return ''.join('<p>' + prose(key) + '</p>' for key in keys)
     def code(text, kind='c'):
         return '<div class="codebox"><span class="lang">' + kind + '</span><button class="copy" type="button">' + label('copy') + '</button><pre><code>' + html.escape(text.strip()) + '</code></pre></div>'
+    def images(example):
+        result = []
+        for shot in example.get('verified_images', []):
+            caption = shot['caption']
+            result.append('<figure class="example-result"><img class="screen" loading="lazy" src="' + prefix + html.escape(shot['image'], quote=True) + '" alt="' + html.escape(name + ': ' + caption, quote=True) + '"><figcaption>' + html.escape(caption) + '</figcaption></figure>')
+        return ''.join(result)
     prefix = '' if language == 'ja' else '../'
     name = record['name']
     out = ['<details class="api searchable" id="api-' + name + '" data-api-contract="' + contract['review'] + '"><summary><code>' + html.escape(name) + '</code></summary>']
@@ -62,6 +68,8 @@ def render(record, contract, language, messages, ui):
     out += ['<h4>' + label('returns') + '</h4>', paragraphs(contract['returns'])]
     if contract.get('notes'):
         out += ['<h4>' + label('notes') + '</h4>', paragraphs(contract['notes'])]
+    for reference in contract.get('references', []):
+        out.append('<p><a href="' + html.escape(reference['url'], quote=True) + '">' + html.escape(reference['title']) + '</a></p>')
     example = contract['example']
     out += ['<h4>' + label('example') + '</h4>', code(example['code'])]
     if not example.get('standalone'):
@@ -72,6 +80,7 @@ def render(record, contract, language, messages, ui):
         diagram = example['image']
         caption = messages['tile_image_layout'][index].format(x=diagram['x'],y=diagram['y'],px=diagram['x']*8,py=diagram['y']*8)
         out += ['<p>' + inline(caption) + '</p>', code('\n'.join(diagram['rows']), 'text')]
+    out.append(images(example))
     if example.get('program'):
         out.append('<p><a href="' + prefix + example['program'] + '">' + label('download') + '</a></p>')
     if example.get('build'):
@@ -79,10 +88,9 @@ def render(record, contract, language, messages, ui):
     for additional in example.get('additional', []):
         out += ['<h4>' + label('example') + '</h4>', code(additional['code']), paragraphs(['fragment'])]
         out += ['<h4>' + label('expected') + '</h4>', paragraphs(additional['expected'])]
+        out.append(images(additional))
         out.append('<p><a href="' + prefix + additional['program'] + '">' + label('download') + '</a></p>')
         out += ['<h4>' + label('build') + '</h4>', code(additional['build'], 'powershell')]
-    if example.get('verification'):
-        out.append('<p><a href="verification.html#' + example['verification'] + '">' + label('verification') + '</a></p>')
     out.append('<details class="api-source"><summary>' + label('implementation') + '</summary>')
     out.append('<p class="source">' + html.escape(record['path']) + ':' + str(record['line']) + '</p>')
     if record.get('comment'):
@@ -150,6 +158,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_runtime_queue_examples(contracts))
     proofs.update(verified_runtime_ppu_examples(contracts))
     proofs.update(verified_ppu_declaration_examples(contracts))
+    proofs.update(verified_ppu_intrinsic_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -158,8 +167,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_oam_examples(contracts))
     proofs.update(verified_fc_oam_examples(contracts))
     proofs.update(verified_oam_library_examples(contracts))
-    for key in proofs:
-        contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
+    attach_verified_images(contracts, proofs)
     coverage = []
     for platform, volumes in [('gb', ('kitaqgb', 'gb-library')), ('fc', ('kitaqfc', 'fc-library'))]:
         records = json.loads((SITE / 'reference' / (platform + '-api.json')).read_text(encoding='utf-8'))['records']
@@ -186,6 +194,8 @@ def publish(language, require_complete=False):
             text = render_modules(text, platform, language, messages)
             path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
     publish_verification(language, contracts, proofs, messages, ui)
+    from public_presentation import normalize
+    normalize(language)
     return {'reviewed': len(contracts), 'remaining': len(coverage), 'missing': coverage}
 
 
@@ -267,7 +277,7 @@ def verified_vram_examples(contracts, family='vram', modes=None):
     if not path.exists(): return {}
     runs = json.loads(path.read_text(encoding='utf-8'))['records']
     if len(runs)!=sum(len(values) for values in modes.values()) or not all(r['passed'] for r in runs): return {}
-    if family in ['vram-macros','runtime-queue','runtime-ppu','ppu-declarations']:
+    if family in ['vram-macros','runtime-queue','runtime-ppu','ppu-declarations','ppu-intrinsics']:
         repos=SITE.parents[1]/'publish/github_20260912'
         if not repos.exists():repos=SITE.parent
         for run in runs:
@@ -377,6 +387,35 @@ def verified_ppu_declaration_examples(contracts):
         if contract['example']['program']!=run['source']:raise ValueError('Alternative program mismatch')
         name=key.split(':')[1]
         result[key]=dict(api=name,kind='ppu-declarations',runs=runs,state_path='verification/api-ppu-declarations/state_checks.json',state_count=8,declaration_path='verification/api-ppu-declarations/declarations/'+name+'/build.txt')
+    return result
+
+
+def verified_ppu_intrinsic_examples(contracts):
+    """Require compiler-bound register tests and both BG/sprite color evidence."""
+    folder=SITE/'verification/api-ppu-intrinsics'
+    if not (folder/'results.json').exists() or not (folder/'state_checks.json').exists():return {}
+    runs=json.loads((folder/'results.json').read_text(encoding='utf-8'))['records']
+    state=json.loads((folder/'state_checks.json').read_text(encoding='utf-8'))
+    if len(runs)!=1 or not runs[0]['passed'] or len(state['cases'])!=31:return {}
+    if not all(r['passed'] and r['ppu']==r['expected_ppu'] and r['result']==r['expected_result'] and r['vram']==r['expected_vram'] for r in state['cases']):return {}
+    repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    review=json.loads((SOURCE/'ppu_intrinsic_review_sources.json').read_text(encoding='utf-8'))
+    for name,expected in review['source_sha256'].items():
+        source=repos/name
+        if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('PPU compiler source changed: '+name)
+    script=repos/'kitaqfc/scripts/test-ppu-intrinsics.py'
+    if script.exists() and hashlib.sha256(script.read_bytes()).hexdigest()!=state['script_sha256']:raise ValueError('PPU intrinsic test script changed')
+    run=runs[0]
+    if run['frames']!=240 or run['geometry_pixels_checked']!=16384 or any(run[k]!=0 for k in ['label_pixel_mismatches','geometry_pixel_mismatches','geometry_color_mismatches','ppu_writes_while_rendering']):return {}
+    if run['compiler_sha256']!=state['compiler_sha256'] or run['emulator_sha256']!=state['emulator_sha256'] or run['library_sha256']['intrinsics.h']!=state['header_sha256']:return {}
+    for name,expected in {run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}.items():
+        if hashlib.sha256((SITE/name).read_bytes()).hexdigest()!=expected:raise ValueError('PPU intrinsic sample changed: '+name)
+    result={}
+    for key,contract in contracts.items():
+        if contract['review']!='ppu-intrinsics-source-20260915':continue
+        if contract['example']['program']!=run['source']:raise ValueError('PPU intrinsic program mismatch')
+        result[key]=dict(api=key.split(':')[1],kind='ppu-intrinsics',runs=runs,state_path='verification/api-ppu-intrinsics/state_checks.json',state_count=31)
     return result
 
 
@@ -641,58 +680,38 @@ def verified_entity_examples(contracts):
     return result
 
 
+def attach_verified_images(contracts, proofs):
+    """Bind captured screens to the exact complete program that produced them."""
+    for key, result in proofs.items():
+        example = contracts[key]['example']
+        examples = [example] + example.get('additional', [])
+        for item in examples:
+            item['verified_images'] = []
+        if not result.get('kind'):
+            for hardware in ['dmg', 'cgb']:
+                image = 'verification/api-tiles/' + result['api'] + '-' + hardware + '.png'
+                if not (SITE / image).is_file():
+                    raise ValueError('Missing captured screen: ' + image)
+                example['verified_images'].append({'image': image, 'caption': hardware.upper()})
+            continue
+        for run in result['runs']:
+            program = run.get('source', run.get('program'))
+            matching = [item for item in examples if item['program'] == program]
+            if len(matching) != 1:
+                raise ValueError('Screen does not identify exactly one sample: ' + key)
+            caption = ('--cgb=' + run['target'] + ' / ' if result.get('kind') in ['cgb-palette', 'cgb-dma-wram'] else '') + run['mode'].upper()
+            matching[0]['verified_images'].append({'image': run['image'], 'caption': caption})
+        if not all(item['verified_images'] for item in examples):
+            raise ValueError('Missing sample screen: ' + key)
+
+
 def publish_verification(language, contracts, proofs, messages, ui):
-    path = (SITE if language=='ja' else SITE/language)/'verification.html'
+    """API screens are rendered with their explanations, without raw run records."""
+    path = (SITE if language == 'ja' else SITE / language) / 'verification.html'
     original = path.read_bytes()
-    text = original.decode('utf-8').replace('\r\n','\n')
-    text = re.sub(r'<!-- api-verification:start -->.*?<!-- api-verification:end -->','',text,flags=re.S)
-    if proofs:
-        index = ORDER.index(language)
-        prefix = '' if language=='ja' else '../'
-        title = messages['api_verification_title'][index]
-        block = ['<!-- api-verification:start --><h2 id="api-verification">' + html.escape(title) + '</h2>']
-        block += ['<p>' + inline(messages['tile_verification_method'][index]) + '</p>']
-        for key, result in proofs.items():
-            name = result['api']
-            example = contracts[key]['example']
-            block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
-            block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue','runtime-ppu','ppu-declarations']:
-                if not example.get('additional'):
-                    block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
-                for run in result['runs']:
-                    if example.get('additional'):
-                        matching=next(e for e in [example]+example['additional'] if e['program']==run['source'])
-                        block += ['<p>' + inline(messages[item][index]) + '</p>' for item in matching['expected']]
-                        block.append('<p><a href="'+prefix+matching['program']+'">'+html.escape(ui['download'][index])+'</a></p>')
-                    caption = ('--cgb='+run['target']+' / ' if result.get('kind') in ['cgb-palette','cgb-dma-wram'] else '')+run['mode'].upper()
-                    block.append('<figure><img class="screen" loading="lazy" src="'+prefix+run['image']+'" alt="'+html.escape(name+': '+caption,quote=True)+'"><figcaption>'+html.escape(caption)+'</figcaption></figure>')
-                    log = str(Path(run['image']).parent/'build.txt').replace('\\','/')
-                    block.append('<p><a href="'+prefix+log+'">'+html.escape(ui['build_log'][index])+'</a></p>')
-                records_path = 'verification/api-'+result['kind']+'/results.json'
-                if result.get('diagnostics_path'):
-                    block.append('<p><a href="'+prefix+result['diagnostics_path']+'">KQ2102 / KQ2103</a></p>')
-                if result.get('declaration_path'):
-                    block.append('<p><a href="'+prefix+result['declaration_path']+'">'+html.escape(messages['pd_rejected_build'][index])+'</a></p>')
-                if result.get('state_path'):
-                    block.append('<p><a href="'+prefix+result['state_path']+'">'+html.escape(messages['verification_records'][index])+' ('+str(result['state_count'])+')</a></p>')
-                block.append('<p><a href="'+prefix+example['program']+'">'+html.escape(ui['download'][index])+'</a> · <a href="'+prefix+records_path+'">'+html.escape(messages['verification_records'][index])+'</a></p></section>')
-                continue
-            diagram = example['image']
-            caption = messages['tile_image_layout'][index].format(x=diagram['x'],y=diagram['y'],px=diagram['x']*8,py=diagram['y']*8)
-            block.append('<p>' + inline(caption) + '</p><pre>' + html.escape('\n'.join(diagram['rows'])) + '</pre>')
-            block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected'] if item != 'tile_test_expected']
-            for hardware in ['dmg','cgb']:
-                url = prefix + 'verification/api-tiles/' + name + '-' + hardware + '.png'
-                block.append('<figure><img class="screen" loading="lazy" src="' + url + '" alt="' + html.escape(name+' — '+hardware.upper()+': '+caption,quote=True) + '"><figcaption>' + hardware.upper() + '</figcaption></figure>')
-            block.append('<p><a href="' + prefix + example['program'] + '">' + html.escape(ui['download'][index]) + '</a> · <a href="' + prefix + 'verification/api-tiles/' + name + '-build.txt">' + html.escape(ui['build_log'][index]) + '</a></p>')
-            block.append('<details><summary>' + html.escape(messages['verification_records'][index]) + '</summary><pre>' + html.escape(json.dumps(result,indent=2)) + '</pre></details></section>')
-        block.append('<!-- api-verification:end -->')
-        footer = text.index('<footer',text.index('<main'))
-        text = text[:footer] + ''.join(block) + text[footer:]
-        entry = '<!-- api-verification:start --><a href="#api-verification">' + html.escape(title) + '</a><!-- api-verification:end -->'
-        text = re.sub(r'(<nav\b[^>]*class="toc"[^>]*>.*?)(</nav>)',lambda m:m[1]+entry+m[2],text,count=1,flags=re.S)
-    path.write_text(text,encoding='utf-8',newline='\r\n' if b'\r\n' in original else '\n')
+    text = original.decode('utf-8').replace('\r\n', '\n')
+    text = re.sub(r'<!-- api-verification:start -->.*?<!-- api-verification:end -->', '', text, flags=re.S)
+    path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
 
 
 if __name__ == '__main__':

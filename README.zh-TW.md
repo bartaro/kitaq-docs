@@ -27,7 +27,7 @@
 
 ## HTML 手冊
 
-本套手冊以2026年9月14日的原始碼為依據，共七冊，提供九種語言版本。各語言版均包含相同的1,053個API項目與47個完整範例程式。繁體中文版請開啟 `zh-TW/index.html`，英文版開啟 `en/index.html`，日文版開啟 `index.html`。各分冊均可切換語言。驗證紀錄列明了測試所用的原始碼、執行檔與條件。
+本套手冊以2026年9月14日的原始碼為依據，共七冊，提供九種語言版本。各語言版均包含相同的1,055個API項目與47個完整範例程式。繁體中文版請開啟 `zh-TW/index.html`，英文版開啟 `en/index.html`，日文版開啟 `index.html`。各分冊均可切換語言。驗證紀錄列明了測試所用的原始碼、執行檔與條件。
 
 原始碼摘錄與實際擷取的工具輸出保持原文。另請參閱[儲存庫取得方式與目錄配置](GITHUB_SETUP.md)及[發行檢查紀錄](PUBLICATION_CHECKS.md)。HTML 支援離線閱讀、冊內搜尋、複製程式碼與列印。
 
@@ -78,7 +78,7 @@ python -B kitaq-docs/tools/check_site.py
 python -B kitaq-docs/tools/check_bilingual.py
 ```
 
-收集原始碼與建置範例需要原始專案樹及對應工具。字型轉換與像素比較使用 Pillow。閱讀 HTML 不需要 Python 或伺服器。每次驗證都應記錄所用原始碼與執行檔的雜湊值。另請參閱[編譯器修正紀錄](verification/compiler_fixes.md)與[第三方聲明](THIRD_PARTY_NOTICES.md)。
+已確認的畫面與範例說明一同呈現。公開檔案不包含建置紀錄、執行紀錄或本機驗證資料。上傳前，請使用 `tools/export_public.py` 將手冊匯出至獨立的 Git 工作目錄。另請參閱[第三方聲明](THIRD_PARTY_NOTICES.md)。
 
 ## 本次原始碼公開範圍
 

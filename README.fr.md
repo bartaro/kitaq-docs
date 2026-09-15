@@ -76,7 +76,7 @@ python -B kitaq-docs/tools/check_bilingual.py
 
 Pour régénérer le français à partir de ses textes après la génération anglaise, utilisez `python kitaq-docs/tools/generate_i18n.py --language fr`. Les traductions sont rédigées dans les fichiers ; aucun service de traduction n'est appelé. Cette génération utilise Beautiful Soup.
 
-La collecte et la compilation nécessitent les arborescences source et leurs outils. La conversion des polices et les comparaisons de pixels utilisent Pillow. Lire le HTML ne nécessite ni Python ni serveur. Consignez les empreintes des sources et des exécutables pour chaque vérification. Consultez les [corrections des compilateurs](verification/compiler_fixes.md) et les [mentions de tiers](THIRD_PARTY_NOTICES.md).
+Les captures accompagnent les explications des exemples. Les fichiers publics ne contiennent ni journaux de compilation ou d’exécution, ni relevés de vérification locaux. Avant la mise en ligne, utilisez `tools/export_public.py` pour exporter le manuel vers une copie de travail Git distincte. Consultez les [mentions de tiers](THIRD_PARTY_NOTICES.md).
 
 ## Périmètre de cette publication
 

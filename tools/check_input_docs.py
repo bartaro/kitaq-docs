@@ -16,9 +16,9 @@ class Text(HTMLParser):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--browser',action='store_true')
-    parser.add_argument('--suite',choices=['input','padrepeat','expansion','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue','runtime-ppu','ppu-declarations'],default='input');args=parser.parse_args()
+    parser.add_argument('--suite',choices=['all','input','padrepeat','expansion','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue','runtime-ppu','ppu-declarations','ppu-intrinsics'],default='input');args=parser.parse_args()
     messages,ui,contracts=api_contracts.load()
-    inputs={key:value for key,value in contracts.items() if value['review']==args.suite+'-source-20260915'}
+    inputs={key:value for key,value in contracts.items() if args.suite=='all' or value['review']==args.suite+'-source-20260915'}
     results=[]
     for index,language in enumerate(api_contracts.ORDER):
         folder=SITE if language=='ja' else SITE/language
@@ -36,14 +36,17 @@ def main():
                     for parameter,keys in contract['args']:
                         assert parameter in content,(language,key,parameter)
                         for message in keys:assert messages[message][index].replace('`','') in content,(language,key,message)
+                    for reference in contract.get('references',[]):assert 'href="'+reference['url']+'"' in card,(language,key,'reference')
                     assert contract['example']['code'].strip() in content,(language,key,'sample')
                     for additional in contract['example'].get('additional',[]):
                         assert additional['code'].strip() in content,(language,key,'additional sample')
                         assert additional['program'] in card,(language,key,'additional source')
                         for message in additional['expected']:assert messages[message][index].replace('`','') in content,(language,key,message)
-                    assert 'verification.html#api-'+platform+'-'+name in card,(language,key,'proof link')
+                    assert 'class="example-result"' in card,(language,key,'inline screen')
+                    assert 'verification.html#api-' not in card,(language,key,'external proof link')
+                    assert not re.search(r'href="[^"]*verification/[^"#]*\.(?:txt|json|log)',card),(language,key,'raw log link')
                     results.append({'language':language,'api':key,'card':'passed'})
-    assert len(results)==len(inputs)*9 and len(inputs)=={'input':35,'padrepeat':6,'expansion':6,'vram':30,'vram-memory':9,'vramq':10,'cgb-palette':28,'cgb-dma-wram':8,'asset':17,'bank':32,'sprite':28,'oam':1,'fc-oam':9,'oam-library':8,'vram-macros':5,'runtime-queue':4,'runtime-ppu':7,'ppu-declarations':4}[args.suite], len(results)
+    assert len(results)==len(inputs)*9 and len(inputs)=={'all':len(contracts),'input':35,'padrepeat':6,'expansion':6,'vram':30,'vram-memory':9,'vramq':10,'cgb-palette':28,'cgb-dma-wram':8,'asset':17,'bank':32,'sprite':28,'oam':1,'fc-oam':9,'oam-library':8,'vram-macros':5,'runtime-queue':4,'runtime-ppu':7,'ppu-declarations':4,'ppu-intrinsics':21}[args.suite], len(results)
     modules=json.loads((api_contracts.SOURCE/(args.suite+'_modules.json')).read_text(encoding='utf-8')) if args.suite in ['input','vram','cgb-palette','asset','bank','sprite','oam-library','runtime-queue','runtime-ppu'] else {}
     module_count=0
     for index,language in enumerate(api_contracts.ORDER):
@@ -74,34 +77,33 @@ def main():
                 if args.suite=='bank':cases=[('gb','gb-library','far_call'),('gb','kitaqgb','__farcall_ptr'),('fc','fc-library','farptr_read16'),('fc','kitaqfc','__prg_bank_set')]
                 if args.suite=='sprite':cases=[('gb','gb-library','sprite_set_flags'),('gb','gb-library','metasprite_draw'),('fc','fc-library','sprite_set_pos'),('fc','fc-library','sprite_max_scanline_count')]
                 if args.suite=='oam':cases=[('gb','kitaqgb','__oam_dma')]
+                if args.suite=='ppu-intrinsics':cases=[('fc','kitaqfc',name) for name in ['__ppu_off','__scroll_x_set','__attr_set_nt','__palette_sp_load']]
                 if args.suite=='ppu-declarations':cases=[('fc','fc-library',name) for name in ['nes_ppu_screen_on','nes_ppu_load_palette','nes_ppu_clear_nt']]
                 if args.suite=='runtime-ppu':cases=[('fc','fc-library',name) for name in ['nes_ppu_seek','nes_ppu_write_bytes','nes_wait_nmi']]
                 if args.suite=='runtime-queue':cases=[('fc','fc-library',name) for name in ['nes_vram_queue_clear','nes_vram_queue_try_write','nes_vram_queue_nmi_flush']]
                 if args.suite=='vram-macros':cases=[('fc','fc-library',name) for name in ['nes_vram_copy','nes_vram_commit','nes_vram_clear_queue']]
                 if args.suite=='oam-library':cases=[('fc','fc-library',name) for name in ['nes_oam_dma','nes_metasprite_draw','OAM_FairDraw']]
                 if args.suite=='fc-oam':cases=[('fc','kitaqfc',name) for name in ['__sprite_set','__metasprite_draw','__oam_dma_page']]
+                if args.suite=='all':cases=[('gb','kitaqgb','__settile'),('gb','gb-library','entity_update_all'),('gb','kitaqgb','__cgb_safe_set_bgpd'),('fc','fc-library','nes_ppu_seek'),('fc','kitaqfc','__palette_sp_load'),('fc','fc-library','nes_ppu_clear_nt')]
                 for platform,volume,name in cases:
                     url=(folder/(volume+'.html')).as_uri()+'#api-'+name
                     page.goto(url)
                     card=page.locator('#api-'+name)
                     assert card.get_attribute('open') is not None
-                    card.locator('a[href*="verification.html"]').click()
-                    section=page.locator('#api-'+platform+'-'+name)
-                    section.scroll_into_view_if_needed()
-                    for img in section.locator('img').all():
+                    shots=card.locator('figure.example-result img')
+                    assert shots.count()>0
+                    for img in shots.all():
                         img.scroll_into_view_if_needed()
                         img.evaluate('(img) => img.decode()')
                         assert img.evaluate('(img) => img.naturalWidth > 0')
-                    section.locator('.verification-return a').click()
-                    page.wait_for_load_state('load')
                     assert page.url==url,(page.url,url)
                     page.locator('#api-'+name+'[open]').wait_for(state='visible')
-                    browser_results.append({'language':language,'api':platform+':'+name,'images_and_return':'passed'})
+                    browser_results.append({'language':language,'api':platform+':'+name,'inline_images':'passed'})
             browser.close()
     report={'cards':results,'module_introductions':module_count,'browser':browser_results,'status':'passed'}
     report_name='document_checks.json' if args.browser else 'static_document_checks.json'
-    evidence_folder={'input':'api-input','padrepeat':'api-pad-repeat','expansion':'api-expansion-input','vram':'api-vram','vram-memory':'api-vram-memory','vramq':'api-vramq','cgb-palette':'api-cgb-palette','cgb-dma-wram':'api-cgb-dma-wram','asset':'api-asset','bank':'api-bank','sprite':'api-sprite','oam':'api-oam','fc-oam':'api-fc-oam','oam-library':'api-oam-library','vram-macros':'api-vram-macros','runtime-queue':'api-runtime-queue','runtime-ppu':'api-runtime-ppu','ppu-declarations':'api-ppu-declarations'}[args.suite]
+    evidence_folder={'all':'.','input':'api-input','padrepeat':'api-pad-repeat','expansion':'api-expansion-input','vram':'api-vram','vram-memory':'api-vram-memory','vramq':'api-vramq','cgb-palette':'api-cgb-palette','cgb-dma-wram':'api-cgb-dma-wram','asset':'api-asset','bank':'api-bank','sprite':'api-sprite','oam':'api-oam','fc-oam':'api-fc-oam','oam-library':'api-oam-library','vram-macros':'api-vram-macros','runtime-queue':'api-runtime-queue','runtime-ppu':'api-runtime-ppu','ppu-declarations':'api-ppu-declarations','ppu-intrinsics':'api-ppu-intrinsics'}[args.suite]
     (SITE/'verification'/evidence_folder/report_name).write_text(json.dumps(report,indent=2),encoding='utf-8')
-    print(str(len(results))+' localized cards; '+str(len(browser_results))+' browser image/return checks passed.')
+    print(str(len(results))+' localized cards; '+str(len(browser_results))+' browser inline-image checks passed.')
 
 if __name__=='__main__':main()

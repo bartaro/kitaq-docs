@@ -2,7 +2,7 @@
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlsplit,unquote
-import json,hashlib
+import argparse,json,hashlib
 from languages import LANGUAGES, HTML_LANG
 S=Path(__file__).resolve().parents[1]
 class Page(HTMLParser):
@@ -16,6 +16,11 @@ class Page(HTMLParser):
   for k in ('href','src'):
    if a.get(k):self.links.append(a[k])
 def main():
+ global S
+ parser=argparse.ArgumentParser(description=__doc__)
+ parser.add_argument('--site',type=Path,default=S)
+ parser.add_argument('--report',type=Path)
+ args=parser.parse_args();S=args.site.resolve()
  pages={p:Page(p.read_text(encoding='utf-8')) for p in S.rglob('*.html')}
  errors=[];n=0
  # Require every volume in every published language, including the root Japanese edition.
@@ -38,11 +43,12 @@ def main():
    if not target.exists():errors.append({'page':p.relative_to(S).as_posix(),'missing':url})
    elif u.fragment and target in pages and unquote(u.fragment) not in pages[target].ids:errors.append({'page':p.relative_to(S).as_posix(),'missing_anchor':url})
  manifest=json.loads((S/'samples/manifest.json').read_text(encoding='utf-8'))
- results=json.loads((S/'verification/samples.json').read_text(encoding='utf-8'))
+ result_path=S/'verification/samples.json'
+ results=json.loads(result_path.read_text(encoding='utf-8')) if result_path.exists() else []
  result_by_id={r['id']:r for r in results}
  for sample in manifest:
   if not (S/'samples'/sample['file']).exists():errors.append('missing source '+sample['id'])
-  if sample['id'] not in result_by_id:errors.append('missing build result '+sample['id'])
+  if results and sample['id'] not in result_by_id:errors.append('missing build result '+sample['id'])
  records={p:json.loads((S/'reference'/(p+'-api.json')).read_text(encoding='utf-8'))['records'] for p in ['gb','fc']}
  total=sum(len(r) for r in records.values())
  for p,items in records.items():
@@ -50,6 +56,10 @@ def main():
    page=S/((('kitaq'+p) if r['name'].startswith('__') else (p+'-library'))+'.html')
    if 'api-'+r['name'] not in pages[page].ids:errors.append('missing API '+p+':'+r['name'])
  report={'pages_per_language':{HTML_LANG.get(language,language):sum(p.parent==folder for p in pages) for language,folder in editions.items()},'other_html_pages':sum(p.parent not in editions.values() for p in pages),'local_links_checked':n,'api_entries':total,'sample_programs':len(manifest),'historical_successful_builds':sum(r.get('build_exit')==0 for r in results),'historical_emulator_runs':sum(r.get('runtime')=='executed' for r in results),'errors':errors,'status':'passed' if not errors else 'failed'}
- (S/'verification/site_checks.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8');print(json.dumps(report,ensure_ascii=True))
+ if not result_path.exists():
+  report.pop('historical_successful_builds');report.pop('historical_emulator_runs')
+ report_path=args.report or S/'verification/site_checks.json'
+ report_path.parent.mkdir(parents=True,exist_ok=True)
+ report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8');print(json.dumps(report,ensure_ascii=True))
  if errors:raise SystemExit(1)
 if __name__=='__main__':main()
