@@ -166,6 +166,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_flags_examples(contracts))
     proofs.update(verified_rle_examples(contracts))
     proofs.update(verified_text_layout_examples(contracts))
+    proofs.update(verified_dialogue_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -693,6 +694,56 @@ def verified_memory_intrinsic_examples(contracts):
 
 def verified_bit_intrinsic_examples(contracts):
     return verified_buffer_intrinsic_examples(contracts, 'bit', 136)
+
+
+def verified_dialogue_examples(contracts):
+    """Require control-stream, timing and real button-replay evidence for dialogue."""
+    selected={k:c for k,c in contracts.items() if c['review']=='dialogue-source-20260915'}
+    if not selected:return {}
+    folder=SITE/'verification/api-dialogue';repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    report=json.loads((folder/'results.json').read_text(encoding='utf-8'))
+    review=json.loads((SOURCE/'dialogue_review_sources.json').read_text(encoding='utf-8'))
+    for name,expected in review['source_sha256'].items():
+        if sha(repos/name)!=expected:raise ValueError('Dialogue implementation changed: '+name)
+    for path,key in [(repos/'kitaqgb/kitaqgb.exe','compiler_sha256'),(repos/'kokura/kokura-cli.exe','emulator_sha256'),(SITE/'tools/check_dialogue.py','script_sha256'),(SITE/'tools/check_text_layout.py','model_sha256')]:
+        if sha(path)!=report[key]:raise ValueError('Dialogue verification tool changed')
+    for name,expected in report['source_sha256'].items():
+        if sha(repos/name)!=expected:raise ValueError('Dialogue source changed')
+    for name,expected in report['support_sha256'].items():
+        if sha(SITE/name)!=expected:raise ValueError('Dialogue support changed')
+    names=['controls','lifecycle','timing','lcd_off_wait','page_explicit_held']
+    names += ['page_'+kind+'_'+button+suffix for kind,button in [('explicit','A'),('explicit','B'),('explicit','START'),('auto','A'),('far','A')] for suffix in ['','_before','_after']]
+    names += ['choice_'+name for name in ['accept','cancel','up_wrap','down_wrap','hold_down','held_a','both_accept_cancel','down_accept','opposite','hold_only','empty']]
+    cases=report['cases'];runs=report['records']
+    if len(cases)!=62 or {(r['name'],r['mode']) for r in cases}!={(n,m) for n in names for m in ['dmg','cgb']}:raise ValueError('Dialogue matrix incomplete')
+    if len(runs)!=4 or {(r['name'],r['mode']) for r in runs}!={(n,m) for n in ['dialogue_flow','dialogue_choice'] for m in ['dmg','cgb']}:raise ValueError('Dialogue screens missing')
+    for row in cases+runs:
+        frames=29 if row['name'].endswith('_before') else 33 if row['name'].endswith('_after') else 5 if row['name']=='lcd_off_wait' else 180
+        if not(row['passed'] and row['frames']==frames and len(row['actual'])==1024 and row['actual']==row['expected']):raise ValueError('Dialogue map/state verification failed')
+        if row['expected_result'] is not None and row['observed']!=row['expected_result']:raise ValueError('Dialogue result mismatch')
+        if sha(SITE/row['source'])!=row['source_sha256'] or sha(SITE/row['rom'])!=row['rom_sha256']:raise ValueError('Dialogue fixture changed')
+        if row['name']=='timing':
+            first=lambda predicate:next(f['frame'] for f in row['timeline'] if predicate(f))
+            a=first(lambda f:f['row2'][2]==65);b=first(lambda f:f['row2'][3]==66)
+            end=first(lambda f:f['result'][0]>=2);wait=first(lambda f:f['result'][0]>=3);closed=first(lambda f:f['result'][0]>=4)
+            if [b-a,end-b,wait-end,closed-wait]!=[3,3,5,4]:raise ValueError('Dialogue delays failed')
+        if row['name']=='choice_hold_only':
+            held=[f for f in row['timeline'] if 5<=f['frame']<=180]
+            if not held or not all(f['row3'][2]==7 and f['result'][7]==0 for f in held):raise ValueError('Held direction repeated')
+        if row['name']=='page_explicit_held':
+            done=next(f['frame'] for f in row['timeline'] if f['result'][7]==165)
+            if done>=30:raise ValueError('Held page advance failed')
+    for row in runs:
+        if row['pixel_mismatches'] or row['color_mismatches'] or row['ink_pixels']<=0:raise ValueError('Dialogue image mismatch')
+        if sha(SITE/row['image'])!=row['image_sha256']:raise ValueError('Dialogue screen changed')
+    result={}
+    for key,contract in selected.items():
+        matching=[r for r in runs if r['source']==contract['example']['program']]
+        if len(matching)!=2:raise ValueError('Dialogue example mismatch: '+key)
+        result[key]={'api':key.split(':')[1],'kind':'dialogue','runs':matching}
+    return result
 
 
 def verified_text_layout_examples(contracts):

@@ -1,0 +1,142 @@
+{
+  "dlg_open": {
+    "en": "Open a software text area on the background map. Store its position and size, reset the character cursor to the first interior cell, draw the frame and clear the interior. Opening another area changes the active cursor and area; it does not erase a previously drawn area elsewhere on the map.",
+    "ja": "背景マップ上に文字領域を開きます。位置と大きさを記録し、文字カーソルを内側の先頭へ戻して枠を描き、内側を消去します。別の位置で開くと操作対象の領域とカーソルが変わりますが、以前に別の位置へ描いた領域は消去しません。"
+  },
+  "dlg_close": {
+    "en": "Erase the active text area, including its frame, with TEXT_TILE_FILL and mark it closed. Calling again while closed does nothing. It does not restore the background tiles that were present before opening the area.",
+    "ja": "操作対象の文字領域を枠ごとTEXT_TILE_FILLで埋め、閉じた状態にします。閉じているときに再度呼んでも何もしません。領域を開く前にあった背景タイルを復元する処理ではありません。"
+  },
+  "dlg_speed": {
+    "en": "Set the number of VBlank waits performed after each ordinary character written by text_print or text_print_far. Zero removes these per-character waits. Opening or closing an area does not reset this setting. Explicit WAIT commands still wait even when the character speed is zero.",
+    "ja": "text_printまたはtext_print_farが通常の文字を書いた後に、VBlankを何回待つかを設定します。0なら文字ごとの待ち時間はありません。領域を開閉しても設定は変わりません。文字速度が0でも、明示的なWAIT命令の待ち時間は実行します。"
+  },
+  "dlg_print": {
+    "en": "Read a control stream through an ordinary pointer and write its character tiles at the active window cursor. The function interprets newlines, timed waits and page waits, wrapping at the interior width. It returns only after reaching END, so page waits can block until a button is pressed.",
+    "ja": "通常のポインターから制御コード付きの列を読み、操作対象の文字領域のカーソル位置へ文字タイルを書きます。改行、指定回数の待ち、ページ送り待ちを解釈し、内側の幅で折り返します。ENDまで処理してから戻るため、ページ送りではボタンが押されるまで呼び出し元へ戻りません。"
+  },
+  "dlg_far": {
+    "en": "Interpret the same dialogue control stream while fetching each byte from a specified ROM bank with __farpeek8. Use this for dialogue stored outside the currently mapped source bank. Character placement, speed, wrapping and page controls are the same as text_print.",
+    "ja": "__farpeek8で指定ROMバンクから1バイトずつ読み、同じ会話用の制御コード付き列を処理します。現在読み込まれている入力用バンク以外に置いた会話データに使います。文字位置、速度、折り返し、ページ制御はtext_printと同じです。"
+  },
+  "dlg_choice": {
+    "en": "Draw a vertical list inside the active text area and wait for a selection. UP and DOWN move a cursor with wraparound; A accepts and B cancels. The loop redraws choices and polls once after a VBlank wait. It returns a zero-based index or 255 for cancellation or an empty list.",
+    "ja": "操作対象の文字領域に縦並びの選択肢を描き、選択を待ちます。上下でカーソルを循環移動し、Aで決定、Bで取消します。ループは選択肢を描き直し、VBlankを待ってから入力を1回調べます。戻り値は0から始まる選択番号で、取消または空の一覧では255です。"
+  },
+  "dlg_x": {
+    "en": "Leftmost column of the area in 8×8 BG-map cells. Keep the full width inside columns 0–31.",
+    "ja": "8×8ピクセルの背景マップのマス単位で指定する、領域の左端の列です。幅全体が0〜31列に収まるようにします。"
+  },
+  "dlg_y": {
+    "en": "Top row of the area in 8×8 BG-map cells. Keep the full height inside rows 0–31.",
+    "ja": "8×8ピクセルの背景マップのマス単位で指定する、領域の上端の行です。高さ全体が0〜31行に収まるようにします。"
+  },
+  "dlg_w": {
+    "en": "Total width in cells, including left and right borders. At least three cells are needed for one interior character column.",
+    "ja": "左右の枠を含む全体の幅をマス単位で指定します。内側に文字を1列表示するには3マス以上必要です。"
+  },
+  "dlg_h": {
+    "en": "Total height in cells, including top and bottom borders. At least three cells are needed for one interior character row.",
+    "ja": "上下の枠を含む全体の高さをマス単位で指定します。内側に文字を1行表示するには3マス以上必要です。"
+  },
+  "dlg_speed_arg": {
+    "en": "VBlank waits after each displayed character, from 0 to 255. This is a wait count, not milliseconds. The setting does not affect text_print_xy, numeric helpers or the choice list.",
+    "ja": "表示した1文字の後に待つVBlankの回数で、0〜255です。ミリ秒ではありません。text_print_xy、数値表示関数、選択肢一覧の表示には作用しません。"
+  },
+  "dlg_str": {
+    "en": "Readable pointer to a stream terminated by TEXT_CTRL_END (0). Keep the whole stream mapped, including any operand after WAIT, throughout blocking waits. No buffer length or validity check is provided.",
+    "ja": "TEXT_CTRL_END（0）で終わる列への読み取り可能なポインターです。処理が待機している間も、WAIT直後の引数を含めて列全体を読み取れるメモリ配置に保ちます。バッファ長の指定や形式の検査はありません。"
+  },
+  "dlg_bank": {
+    "en": "Unsigned 8-bit source ROM bank number. The example stores the stream in bank 2 and checks that the caller can still read a marker in bank 1 after printing.",
+    "ja": "符号なし8ビットの入力ROMバンク番号です。サンプルは列をバンク2に置き、表示後も呼び出し元のバンク1の目印を読めることを確認します。"
+  },
+  "dlg_far_str": {
+    "en": "CPU address of the stream within the specified bank. The address advances but the bank number stays fixed; crossing the switchable ROM window does not automatically continue in the next bank.",
+    "ja": "指定バンク内の列を指すCPUアドレスです。アドレスは進みますがバンク番号は変わらず、切り替え式ROM領域の端を越えても次のバンクへ自動的には続きません。"
+  },
+  "dlg_choices": {
+    "en": "Pointer to an array of count readable string pointers. Each string ends in zero and contains raw tile IDs; choice labels do not interpret dialogue control codes. Keep the pointer table and strings mapped until selection finishes.",
+    "ja": "count個の読み取り可能な文字列ポインターが入った配列へのポインターです。各文字列は0で終わるタイル番号列で、選択肢のラベルは会話用の制御コードを解釈しません。選択が終わるまで、ポインター配列と各文字列を読み取れる配置に保ちます。"
+  },
+  "dlg_count": {
+    "en": "Number of choices. Zero returns 255 immediately without reading the pointer table. For a nonempty list, provide at least count interior rows and enough width for one cursor cell plus the longest label. There is no clipping or scrolling.",
+    "ja": "選択肢の数です。0ならポインター配列を読まず、直ちに255を返します。1以上なら内側にcount行以上を用意し、カーソル1マスと最長ラベルが収まる幅を確保します。切り取りやスクロールは行いません。"
+  },
+  "dlg_void": {
+    "en": "No return value. Any drawing or blocking waits occur before the function returns.",
+    "ja": "戻り値はありません。描画や待機の処理は、関数が戻る前に行われます。"
+  },
+  "dlg_choice_return": {
+    "en": "Index from 0 to count−1 when A accepts. The value 255 means B cancelled or count was zero; distinguish these situations in the calling code if needed. The function does not close the text area or clear the list.",
+    "ja": "Aで決定した場合は0〜count−1の番号です。255はBによる取消、またはcountが0だったことを表すため、必要なら呼び出し側で区別します。関数は文字領域を閉じず、一覧も消去しません。"
+  },
+  "dlg_setup": {
+    "en": "Use a valid BG-map rectangle and load font/frame tiles first. The software text area uses the BG map selected by LCDC bit 3; it does not enable the hardware Window layer. Use VBK 0 on CGB for tile numbers and set color attributes separately. The examples provide the ASCII-mapped font and frame, cursor and page-indicator tiles.",
+    "ja": "有効な背景マップの範囲を指定し、先にフォントと枠のタイルを読み込みます。文字領域はLCDCのビット3が選ぶ背景マップを使い、ハードウェアのWindowレイヤーを有効にはしません。CGBでタイル番号を書くときはVBKを0にし、色属性は別に設定します。サンプルにはASCIIに合わせたフォントと、枠・カーソル・ページ待ちのタイルを用意しています。"
+  },
+  "dlg_controls": {
+    "en": "Control bytes: 0x00 ends the stream; 0x0A moves to a new interior row; 0x01 consumes the next byte as a VBlank-wait count, including zero; 0x02 waits for page advance, clears the interior and resets the cursor. Other bytes are tile IDs. A WAIT operand of zero is not an END marker.",
+    "ja": "制御バイトは、0x00が終了、0x0Aが内側の次行への改行、0x01が直後の1バイトで指定するVBlank待ち、0x02がページ送り待ち・内側の消去・カーソルの初期化です。それ以外はタイル番号です。WAITの引数には0も指定でき、この0は列の終端にはなりません。"
+  },
+  "dlg_paging": {
+    "en": "Moving below the last interior row, either through a newline or automatic wrapping, shows the page-wait marker, waits for A, B or START, clears the interior and resumes at its first cell. This replaces the page rather than scrolling its rows. An explicit 0x02 waits without adding the marker. The page poll starts with no remembered buttons, so a button already held when the wait begins can advance it.",
+    "ja": "改行または自動折り返しで最後の内側の行を越えると、ページ待ちの印を描き、A・B・STARTのいずれかを待って内側を消し、先頭のマスから再開します。行をスクロールするのではなく、ページを入れ替えます。明示的な0x02は印を追加せず待機します。ページ待ちに入る時点のボタン状態を記憶していないため、すでに押されているボタンでも進みます。"
+  },
+  "dlg_closed": {
+    "en": "Ordinary characters are ignored while the area is closed or has no usable interior. Control bytes are still interpreted: WAIT can still block, and page controls can wait or clear the stored area. Therefore text_print on a closed area is not a general no-op.",
+    "ja": "領域が閉じている場合や内側に使えるマスがない場合、通常の文字は表示しません。ただし制御バイトは解釈するため、WAITによる待機やページ制御による待機・記録済み領域の消去は起こり得ます。閉じている領域へのtext_printが常に何もしないわけではありません。"
+  },
+  "dlg_blocking": {
+    "en": "These are blocking helpers: they do not call your game update, music service or rendering loop while waiting. With the LCD off, __wait_vblank returns immediately, so character speed and WAIT do not create frame delays. Keep the LCD enabled for timed dialogue and frame-paced input polling. Use a game-side state machine when other work must advance during a conversation.",
+    "ja": "これらは処理を待つ関数で、待機中にゲーム更新、音楽の更新、描画ループを代わりに呼ぶことはありません。LCD停止中の__wait_vblankは直ちに戻るため、文字速度やWAITによるフレーム単位の待ち時間は発生しません。時間をかけた会話表示やフレームごとの入力確認ではLCDを有効にしてください。会話中も他の仕事を進める必要がある場合は、呼び出し側で待機を分割して扱う設計が必要です。"
+  },
+  "dlg_timing": {
+    "en": "The underlying safe tile writes wait for writable LCD modes when the LCD is on and use DI/EI around writes. They can enable interrupts rather than preserving an initially disabled interrupt state. Do not call these blocking helpers from an interrupt handler or depend on them to preserve that state.",
+    "ja": "下位の安全なタイル書き込みは、LCD表示中には書き込み可能なモードを待ち、DI/EIで書き込みを保護します。開始時の割り込み禁止状態を保持せず、有効にする場合があります。これらの待機を含む関数を割り込みハンドラーから呼んだり、割り込み禁止状態の保持を期待したりしないでください。"
+  },
+  "dlg_choice_input": {
+    "en": "The input loop reacts to new presses, with UP processed before DOWN and A before B. Holding a direction does not repeat the movement; release and press again. Since the previous button mask starts at zero, a held button can act immediately on entry. A simultaneous move and A returns the moved-to index, although the last drawn cursor may still show the preceding position.",
+    "ja": "入力は押した瞬間に反応し、UP、DOWN、A、Bの順で処理します。方向を押し続けても移動は繰り返さないため、いったん離して押し直します。直前のボタン状態を0で始めるため、入る前から押しているボタンも直ちに作用します。移動とAを同時に押すと移動後の番号を返しますが、最後に描いたカーソルは移動前の位置のままの場合があります。"
+  },
+  "dlg_choice_area": {
+    "en": "Open and size the area before calling. The choice routine uses its stored position without checking whether the area is open. Labels start two columns inside the left edge and one row below the top; the cursor occupies the cell immediately to their left. Printing the choices does not use the dialogue character-speed setting.",
+    "ja": "呼び出す前に領域を開き、十分な大きさを用意します。選択肢の処理は開いているかを検査せず、記録済みの位置を使います。ラベルは左端から2列、上端から1行内側に始まり、そのすぐ左のマスがカーソルです。選択肢の描画には会話の文字速度設定を使いません。"
+  },
+  "dlg_build": {
+    "en": "Each complete example includes text.c once. Build the example with the library and manual-sample include directories; do not also add lib/text.c as another source input. The far-stream example uses MBC5 with a 64 KiB ROM so its bank-2 data is present.",
+    "ja": "完全な各サンプルはtext.cを1回取り込みます。ライブラリと説明書のサンプル用インクルード先を指定してビルドし、さらに別の入力ソースとしてlib/text.cを追加しないでください。バンク付き文字列のサンプルはバンク2のデータを配置するため、64KiBのMBC5 ROMを使います。"
+  },
+  "dlg_demo_open": {
+    "en": "DIALOGUE FLOW opens an 18×5-cell frame at (1,2), with a 16×3-cell interior. NEAR, READY and BANK 2 occupy its three rows. The visible frame lines extend from pixel x=11 to 147 and y=19 to 51. The frame and its text are blue on CGB and black on DMG. Opening the later erase-test area leaves this frame visible.",
+    "ja": "DIALOGUE FLOWは(1,2)に18×5マスの枠を開き、内側の16×3マスにNEAR、READY、BANK 2を1行ずつ表示します。見える枠線はピクセル座標のx=11〜147、y=19〜51にあり、CGBでは文字とともに青、DMGでは黒です。その後で消去テスト用の領域を開いても、この枠は残ります。"
+  },
+  "dlg_demo_close": {
+    "en": "The example opens an 18×3-cell area at (1,9), writes ERASE ME, then closes it and attempts to write HIDDEN. Below CLOSED AREA, cells x=1–18 and y=9–11 must be blank: neither text nor frame should remain. The blue dialogue above remains visible.",
+    "ja": "サンプルは(1,9)に18×3マスの領域を開き、ERASE MEを書いてから閉じ、HIDDENの表示を試します。CLOSED AREAの下のx=1〜18、y=9〜11のマスは空白になり、文字も枠も残りません。上の青い会話領域は見えたままです。"
+  },
+  "dlg_demo_speed": {
+    "en": "The flow example uses speed 2 for the near and banked dialogue and includes a WAIT operand of 12. The finished image shows the text after those waits; a separate frame trace checks speed 3, an explicit five-wait command and a four-wait command while closed. A final screenshot alone is not used to verify timing.",
+    "ja": "会話サンプルは通常・バンク付きの両方の文字列に速度2を使い、12回待つWAITも含めます。画像は待機後の表示です。速度3、明示的な5回の待ち、閉じた状態での4回の待ちは別のフレーム観測で調べ、完成画像だけで待ち時間を確認したことにはしません。"
+  },
+  "dlg_demo_print": {
+    "en": "The near stream writes NEAR, a newline, READY and a twelve-wait command before END. NEAR starts at tile (2,3) and READY at (2,4). The later banked stream continues from the same cursor, so its initial newline places BANK 2 on the third interior row.",
+    "ja": "通常の列はNEAR、改行、READY、12回の待ち、ENDの順です。NEARはタイル座標(2,3)、READYは(2,4)に始まります。その後のバンク付き文字列は同じカーソルから続くため、先頭の改行でBANK 2を内側の3行目へ置きます。"
+  },
+  "dlg_demo_far": {
+    "en": "The sample reads the newline and BANK 2 from ROM bank 2. BANK RESTORED displays 161 by reading the marker in the caller's bank 1 afterward. The visible BANK 2 line starts at tile (2,5); the restoration number appears at (16,14).",
+    "ja": "サンプルはROMバンク2から改行とBANK 2を読みます。その後、呼び出し元のバンク1にある目印を読み、BANK RESTOREDに161を表示します。BANK 2の行はタイル座標(2,5)、バンク復元の数値は(16,14)にあります。"
+  },
+  "dlg_demo_choice": {
+    "en": "Press DOWN once and then A. In the captured run, the right-pointing cursor is beside SHIELD at tile (2,4), and SELECTED shows 1. The three labels start at (3,3), (3,4) and (3,5). The frame, cursor and labels are green on CGB and black on DMG; the result and instructions remain black.",
+    "ja": "DOWNを1回押してからAを押します。確認した実行では、右向きのカーソルがSHIELDの左のタイル座標(2,4)にあり、SELECTEDは1です。3つのラベルは(3,3)、(3,4)、(3,5)に始まります。枠・カーソル・ラベルはCGBでは緑、DMGでは黒で、結果と操作説明は黒です。"
+  },
+  "dlg_proof": {
+    "en": "The emulator checks compare complete BG-map contents and the four sample images. Additional runs cover open/close state, ordinary and banked control streams, timed waits, explicit and automatic page waits, A/B/START advance, held buttons, wraparound choices, empty lists and simultaneous-input priority. Checkpoints before and after scripted input verify that page waits actually block. Physical hardware and interrupt concurrency are not tested.",
+    "ja": "エミュレータでは背景マップの内容全体と4枚のサンプル画像を照合します。別の実行で、開閉状態、通常・バンク付き制御列、時間待ち、明示・自動のページ待ち、A・B・STARTによる送り、押し続け、選択肢の循環、空の一覧、同時入力の優先順位を確認します。入力前後の観測点で、ページ待ちが実際に処理を止めることも調べます。実機と割り込みからの並行利用は検証していません。"
+  },
+  "dlg_module": {
+    "en": "Windowed dialogue shares one active rectangle, cursor and character-speed setting. text_open initializes the area, text_close erases it, and text_set_speed sets per-character VBlank waits. text_print and text_print_far interpret control streams; text_choice runs a blocking vertical selector. Load the tiles, fit the area and plan how the game handles these blocking calls.",
+    "ja": "ウィンドウ内の会話表示は、操作対象の長方形・カーソル・文字速度を1組共有します。text_openで領域を設定し、text_closeで消去し、text_set_speedで文字ごとのVBlank待ちを指定します。text_printとtext_print_farは制御列を解釈し、text_choiceは選択が終わるまで待つ縦並びの一覧です。タイルと領域を用意し、処理が戻るまで待つ呼び出しをゲーム内でどう扱うかを設計します。"
+  }
+}
