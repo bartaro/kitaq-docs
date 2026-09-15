@@ -40,7 +40,7 @@ def public_file(relative):
     # The three teaching ROMs/screens have distinct gb-dmg, gb-cgb and fc-nrom folders.
     if len(path.parts)>2 and path.parts[0]=='verification' and path.parts[1] in ('api-memory-intrinsics','api-bit-intrinsics','api-rng') and path.parts[2] in ('gb','fc'):
         return False
-    if path.parts[:3] in [('verification','api-flags','state'),('verification','api-rle','state')]:
+    if path.parts[:3] in [('verification','api-flags','state'),('verification','api-rle','state'),('verification','api-text-layout','state')]:
         return False
     return path.parts[0] != 'verification' or path.suffix in PUBLIC_EVIDENCE_SUFFIXES
 

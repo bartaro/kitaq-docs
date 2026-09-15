@@ -165,6 +165,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_rng_examples(contracts))
     proofs.update(verified_flags_examples(contracts))
     proofs.update(verified_rle_examples(contracts))
+    proofs.update(verified_text_layout_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -692,6 +693,48 @@ def verified_memory_intrinsic_examples(contracts):
 
 def verified_bit_intrinsic_examples(contracts):
     return verified_buffer_intrinsic_examples(contracts, 'bit', 136)
+
+
+def verified_text_layout_examples(contracts):
+    """Bind absolute text contracts to full-map, numeric-field and pixel checks."""
+    selected={k:c for k,c in contracts.items() if c['review']=='text-layout-source-20260915'}
+    if not selected:return {}
+    folder=SITE/'verification/api-text-layout';repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    report=json.loads((folder/'results.json').read_text(encoding='utf-8'))
+    review=json.loads((SOURCE/'text-layout_review_sources.json').read_text(encoding='utf-8'))
+    for name,expected in review['source_sha256'].items():
+        if sha(repos/name)!=expected:raise ValueError('Text implementation changed: '+name)
+    for path,key in [(repos/'kitaqgb/kitaqgb.exe','compiler_sha256'),(repos/'kokura/kokura-cli.exe','emulator_sha256'),(SITE/'tools/check_text_layout.py','script_sha256')]:
+        if sha(path)!=report[key]:raise ValueError('Text verification tool changed')
+    for name,expected in report['source_sha256'].items():
+        if sha(repos/name)!=expected:raise ValueError('Text verification source changed')
+    for name,expected in report['support_sha256'].items():
+        if sha(SITE/name)!=expected:raise ValueError('Text support changed')
+    cases=report['cases'];runs=report['records']
+    expected_cases={(name,mode) for name in ['text_print_u8','text_print_u16','text_print_s16','layout'] for mode in ['dmg','cgb']}
+    if len(cases)!=8 or {(r['name'],r['mode']) for r in cases}!=expected_cases:raise ValueError('Text state matrix incomplete')
+    if len(runs)!=2 or {r['mode'] for r in runs}!={'dmg','cgb'}:raise ValueError('Text sample variants missing')
+    for row in cases+runs:
+        if not(row['passed'] and row['build_exit']==row['runtime_exit']==0 and row['done'] and row['frames']==600 and row['actual']==row['expected']):raise ValueError('Text verification failed')
+        source=SITE/row['source']
+        rom=(SITE/row['image']).with_name('example.gb') if 'image' in row else source.with_name('example.gb')
+        if sha(source)!=row['source_sha256'] or sha(rom)!=row['rom_sha256']:raise ValueError('Text fixture changed')
+        if 'values' in row:
+            values=row['values']
+            expected=[tile for value in values for tile in list(str(value).encode('ascii'))+[46]*(8-len(str(value)))]
+            if row['expected']!=expected:raise ValueError('Numeric oracle differs from decimal formatting')
+            if row['name']=='text_print_u8' and values!=list(range(256)):raise ValueError('Incomplete byte coverage')
+            if row['name']=='text_print_u16' and (len(values)!=39 or values[-1]!=65535):raise ValueError('Incomplete word coverage')
+            if row['name']=='text_print_s16' and (len(values)!=53 or (values[0],values[-1])!=(-32768,32767)):raise ValueError('Incomplete signed coverage')
+        elif len(row['actual'])!=1024:raise ValueError('Incomplete text map capture')
+    for row in runs:
+        if row['pixel_mismatches'] or row['color_mismatches'] or row['ink_pixels']<=0:raise ValueError('Text image mismatch')
+        if sha(SITE/row['image'])!=row['image_sha256']:raise ValueError('Text screen changed')
+    for key,contract in selected.items():
+        if any(r['source']!=contract['example']['program'] for r in runs):raise ValueError('Text program mismatch: '+key)
+    return {k:{'api':k.split(':')[1],'kind':'text-layout','runs':runs} for k in selected}
 
 
 def verified_rle_examples(contracts):
