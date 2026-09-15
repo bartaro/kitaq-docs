@@ -3031,7 +3031,13 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_rng_seed(u16 seed) {\n    __rng_seed(seed);\n}"
+      "new_example": "void example_rng_seed(u16 seed) {\n    __rng_seed(seed);\n}",
+      "arity_only": false,
+      "implementation_excerpt": "case \"__rng_seed\":\n                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2}, \"__rng_seed\");\n\nEmitHelperStart(\"__rng_seed\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"STA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 8229
+      }
     },
     {
       "name": "__rng8",
@@ -3047,7 +3053,13 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__rng8();"
+      "new_example": "__rng8();",
+      "arity_only": false,
+      "implementation_excerpt": "case \"__rng8\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"JSR\", Abs(\"__rng8\"));\n                    return true;\n                // Far-memory helpers pack the address, bank and length arguments according to their explicit byte/word signatures.\n\nEmitHelperStart(\"__rng8\");\n            // 16-bit Galois LFSR: if low bit set, shift right then xor $B400.\n            EmitAsm(\"LDA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"ORA\", Mem(_runtimeRngHiAddress));\n            // Replace the all-zero LFSR state with a deterministic nonzero seed before advancing.\n            string seeded = NewGeneratedLabel(\"rng_seeded\");\n            EmitAsm(\"BNE\", Rel(seeded));\n            EmitAsm(\"LDA\", Imm(0x5A));\n            EmitAsm(\"STA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"LDA\", Imm(0xA5));\n            EmitAsm(\"STA\", Mem(_runtimeRngHiAddress));\n            _assembly.Add(Expr.Make(Tag.Label, seeded));\n            EmitAsm(\"LDA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"AND\", Imm(1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LSR\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"ROR\", Mem(_runtimeRngLoAddress));\n            string rngNoXor = NewGeneratedLabel(\"rng_no_xor\");\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"BEQ\", Rel(rngNoXor));\n            EmitAsm(\"LDA\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"EOR\", Imm(0xB4));\n            EmitAsm(\"STA\", Mem(_runtimeRngHiAddress));\n            _assembly.Add(Expr.Make(Tag.Label, rngNoXor));\n            EmitAsm(\"LDA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"EOR\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 8236
+      }
     },
     {
       "name": "__bit_test",

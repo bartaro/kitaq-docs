@@ -1,0 +1,104 @@
+{
+  "rng_seed_gb": {
+    "en": "Replace the shared GB generator's 16-bit state. Use a fixed seed when you want to replay the same sequence during debugging. Seeding itself does not draw a random value.",
+    "ja": "GBの乱数生成器が共有する16ビットの状態を設定します。デバッグで同じ乱数列を再現したいときは、固定したシードを指定します。この関数自体は乱数を取り出しません。"
+  },
+  "rng_seed_fc": {
+    "en": "Replace both state bytes of the FC generator. Reusing a seed lets a test or replay start from the same point in its pseudorandom sequence; the call does not advance the generator.",
+    "ja": "FCの乱数生成器の状態を構成する2バイトを設定します。同じシードを使うと、テストやリプレイを同じ疑似乱数列の開始点から実行できます。この呼び出しでは生成器を進めません。"
+  },
+  "rng_byte_gb": {
+    "en": "Advance the shared GB pseudorandom generator once and return its new high byte. Use this intrinsic when you need one byte without linking the rng.c library wrappers.",
+    "ja": "共有するGBの疑似乱数生成器を1回進め、更新後の上位バイトを返します。rng.cのラッパー関数をリンクせずに1バイトの乱数を取得するときに使う組み込み関数です。"
+  },
+  "rng_byte_fc": {
+    "en": "Advance the shared 16-bit FC Galois LFSR once and return the XOR of the updated low and high bytes. An LFSR is a shift register whose feedback is calculated with XOR; a fixed seed therefore produces a reproducible byte sequence.",
+    "ja": "共有するFCの16ビットGalois LFSRを1回進め、更新後の下位バイトと上位バイトの排他的論理和を返します。LFSRはシフトと排他的論理和で状態を更新する方式で、固定したシードからは同じバイト列が得られます。"
+  },
+  "rng_wrap_seed": {
+    "en": "Set the seed through the GB library interface. This is a wrapper around __rng_seed, so it resets the same shared state used by rng8, rng16 and the selection helpers; it does not create a separate generator.",
+    "ja": "GBライブラリのインターフェースからシードを設定します。__rng_seedを呼ぶラッパーであり、rng8・rng16・各選択関数が使う共有状態を初期化します。別の乱数生成器を作る関数ではありません。"
+  },
+  "rng_wrap_byte": {
+    "en": "Get one pseudorandom byte through the GB library. rng8 calls __rng8 exactly once, making it the basic draw operation used by the other rng.c helpers.",
+    "ja": "GBライブラリを通じて1バイトの疑似乱数を取得します。rng8は__rng8をちょうど1回呼ぶ関数で、rng.cのほかの補助関数もこの基本操作を利用します。"
+  },
+  "rng_alias_byte": {
+    "en": "Draw the next byte using the same operation as rng8. The name emphasizes advancing the sequence; calling both names in turn consumes two successive draws from one shared generator.",
+    "ja": "rng8と同じ処理で次の1バイトを取得します。名前のnextは乱数列を進めることを表します。rng8とrng_next8を続けて呼ぶと、一つの共有生成器から順に2回取り出すことになります。"
+  },
+  "rng_word": {
+    "en": "Build an unsigned 16-bit value from two successive rng8 draws. The first byte becomes bits 15–8 and the second becomes bits 7–0. Use this when one byte cannot represent the value range you need.",
+    "ja": "rng8で連続して取得した2バイトから、符号なし16ビット値を作ります。1回目のバイトがビット15〜8、2回目がビット7〜0になります。1バイトでは必要な値の範囲を表せない場合に使います。"
+  },
+  "rng_alias_word": {
+    "en": "Return the same two-draw word as rng16. This is an alias through the library, with the first draw in the high byte and the second in the low byte; it does not skip an extra value before drawing.",
+    "ja": "rng16と同じ、2回の取得で組み立てたワードを返します。ライブラリ内でrng16を呼ぶ別名の関数で、1回目が上位、2回目が下位バイトになります。取得前に余分な値を読み飛ばすことはありません。"
+  },
+  "rng_bound": {
+    "en": "Choose a zero-based value below max by taking rng8() % max. For example, a bound of 10 gives a usable index from 0 through 9. A zero bound returns zero immediately without drawing.",
+    "ja": "rng8() % maxを計算し、0以上max未満の値を選びます。たとえば上限10なら、0〜9の添字として使えます。上限が0の場合は乱数を取り出さず、その場で0を返します。"
+  },
+  "rng_alias_bound": {
+    "en": "Call rand_range with the same exclusive upper bound. This spelling groups bounded selection with the other rng_ functions; it uses the same byte draw and modulo operation, including the no-draw result for a zero bound.",
+    "ja": "指定した上限をそのままrand_rangeに渡します。rng_で始まる関数名に揃えて範囲付きの選択を行いたい場合に使えます。1バイトの取得と剰余計算を使い、上限0で乱数を消費しない動作も同じです。"
+  },
+  "rng_chance": {
+    "en": "Make a yes/no choice using rng_range(100) < percent. This is useful for approximate gameplay chances, such as deciding whether an enemy drops an item. Zero always returns false; values of 100 or more always return true, and neither endpoint consumes a draw.",
+    "ja": "rng_range(100) < percentで、成立・不成立を判定します。敵がアイテムを落とすかどうかなど、おおよその確率で決めるゲーム処理に使えます。0なら必ず偽、100以上なら必ず真を返し、いずれの場合も乱数を消費しません。"
+  },
+  "rng_weighted": {
+    "en": "Select an item index from a list of relative byte weights. The function sums the weights, reduces one rng16 draw modulo that total, then finds the first cumulative interval containing the result. With weights [1, 3, 6], indices 0, 1 and 2 own intervals 0, 1–3 and 4–9.",
+    "ja": "各項目に設定した1バイトの相対的な重みから、項目の添字を選びます。重みの合計でrng16の値の剰余を求め、その値を含む最初の累積区間を探します。重みが[1, 3, 6]なら、添字0・1・2の担当区間はそれぞれ0、1〜3、4〜9です。"
+  },
+  "rng_seed_arg": {
+    "en": "Unsigned 16-bit seed, 0–65535. Both bytes are stored as supplied. Choose and record the seed before the sequence of gameplay draws you want to reproduce.",
+    "ja": "0〜65535の符号なし16ビットのシードです。指定した2バイトをそのまま保存します。再現したいゲーム処理の乱数取得を始める前に設定し、使用した値を記録してください。"
+  },
+  "rng_max_arg": {
+    "en": "Exclusive upper bound, as u8 (0–255). For max > 0 the result is smaller than max. This parameter cannot express 256; use rng8 when you want the full byte result without modulo reduction.",
+    "ja": "結果に含めない上限値です。型はu8で、指定範囲は0〜255です。max > 0なら戻り値は必ずmaxより小さくなります。256は指定できません。剰余を取らずに1バイトの結果をそのまま使う場合はrng8を使ってください。"
+  },
+  "rng_percent_arg": {
+    "en": "Requested chance as u8. Values 1–99 use one modulo-reduced byte; 0 returns false, and 100–255 return true. The intermediate values are approximate thresholds, not a guarantee of exact percentages.",
+    "ja": "u8で指定する成立確率の目安です。1〜99では1バイトの乱数を剰余で縮めて比較します。0なら偽、100〜255なら真です。中間の値は判定のしきい値であり、厳密にその百分率になることを保証しません。"
+  },
+  "rng_weights_arg": {
+    "en": "Pointer to count readable u8 weights. The array is not modified. Zero-weight items are skipped when the total is positive. With count == 0 the pointer is not read and may be null; otherwise provide a valid array.",
+    "ja": "count個の読み取り可能なu8の重みを指すポインターです。配列は変更しません。合計が正なら重み0の項目は選ばれません。count == 0ではポインターを読み取らないためnullを指定できます。それ以外では有効な配列を渡してください。"
+  },
+  "rng_count_arg": {
+    "en": "Number of weights, 0–255. At most 255 weights of 255 sum to 65025, which fits the function's u16 accumulator. The function scans the list to total the weights, then scans until it finds the selected interval.",
+    "ja": "重みの個数で、0〜255を指定します。最大でも255の重みが255個なので合計は65025となり、関数内のu16の累積値に収まります。まず配列を走査して合計し、次に選択区間が見つかるまで走査します。"
+  },
+  "rng_ret_byte": {"en": "One u8 result (0–255), after advancing the shared generator once. This describes the value's type and bounds, not equal likelihood for every byte.", "ja": "共有生成器を1回進めて得たu8の値（0〜255）です。これは型と値の範囲を示しており、各バイト値が同じ確率で出るという意味ではありません。"},
+  "rng_ret_word": {"en": "One u16 result (0–65535), formed as (first_byte << 8) | second_byte. Exactly two byte draws are consumed; this does not establish a uniform distribution of all 65536 values.", "ja": "(1回目のバイト << 8) | 2回目のバイトで作ったu16の値（0〜65535）です。ちょうど2回のバイト取得を消費します。65536通りの値が一様に現れることを示すものではありません。"},
+  "rng_ret_bound": {"en": "For max > 0, a u8 in 0 through max−1 after one draw. For max == 0, zero without a draw. Even max == 1 consumes one draw although its result is always zero.", "ja": "max > 0なら1回取得し、0〜max−1のu8を返します。max == 0では取得せずに0を返します。max == 1では結果は常に0ですが、乱数は1回消費します。"},
+  "rng_ret_chance": {"en": "Normalized Boolean: 0 for false or 1 for true. A call with a threshold from 1 through 99 consumes one byte draw.", "ja": "偽なら0、真なら1に正規化した真偽値です。しきい値1〜99の呼び出しでは、1バイトの乱数を消費します。"},
+  "rng_ret_weighted": {"en": "For a positive total, an index from 0 through count−1 after two byte draws. If count is zero or every weight is zero, returns zero without drawing. That fallback is indistinguishable from a valid selection of index 0, so check empty or all-zero lists yourself when that distinction matters.", "ja": "合計が正なら、2回のバイト取得後に0〜count−1の添字を返します。個数0または全重み0なら、取得せずに0を返します。この代替値と、有効な選択結果である添字0は区別できません。区別が必要な処理では、空の配列や合計0を呼び出し側で確認してください。"},
+  "rng_zero_gb": {"en": "A zero state is accepted. On the next byte draw, the GB generator substitutes 0x5AA5 before advancing; __rng_seed(0) followed by __rng8() therefore returns 122. Repeatedly reseeding restarts the sequence instead of adding randomness.", "ja": "状態0も受け付けます。次のバイト取得でGB生成器が0x5AA5に置き換えてから更新するため、__rng_seed(0)の直後の__rng8()は122を返します。毎回シードを設定し直すと、乱数性が増すのではなく列の先頭に戻ります。"},
+  "rng_zero_fc": {"en": "If both state bytes are zero, the next draw substitutes 0xA55A before shifting. Thus __rng_seed(0) followed by __rng8() returns 255. The seed call stores zero; the substitution happens in the draw call.", "ja": "状態の2バイトがともに0なら、次の取得時に0xA55Aへ置き換えてからシフトします。このため__rng_seed(0)の直後の__rng8()は255を返します。シード設定は0を保存し、置き換えは取得側で行います。"},
+  "rng_algorithm_gb": {"en": "The GB step adds 0x5D17 to the 16-bit state with wraparound, XORs the updated low byte with the high byte, then adds that low byte to a one-bit left rotation of the high byte. It stores both updated bytes and returns the high byte.", "ja": "GBの更新では、16ビット状態に0x5D17を加えて桁あふれを捨て、更新後の下位バイトと上位バイトの排他的論理和を新たな下位バイトにします。上位バイトを1ビット左回転した値にその下位バイトを加え、更新した2バイトを保存して上位バイトを返します。"},
+  "rng_algorithm_fc": {"en": "The FC step shifts the 16-bit state right by one. If the original least significant bit was 1, it XORs the shifted state with 0xB400. The returned byte is low_byte XOR high_byte, not the raw low byte.", "ja": "FCの更新では16ビット状態を1ビット右にシフトします。更新前の最下位ビットが1なら、シフト後の状態と0xB400の排他的論理和を取ります。戻り値は下位バイトそのものではなく、下位バイトと上位バイトの排他的論理和です。"},
+  "rng_shared": {"en": "These calls share persistent state. Reproduction requires the same target, seed and sequence of calls, including calls made by other helpers. Keep seed and draw operations in one execution context; these checks do not establish safe concurrent use from an interrupt handler.", "ja": "各呼び出しは持続する状態を共有します。再現には、同じ対象機種・シード・呼び出し順が必要で、ほかの補助関数による取得もその順番に含まれます。シード設定と取得は一つの実行箇所にまとめてください。今回の確認は、割り込み処理と並行して安全に使えることを保証するものではありません。"},
+  "rng_targets": {"en": "GB and FC use different algorithms and do not promise the same sequence for the same seed. These are deterministic gameplay generators, not a source of cryptographic randomness; the tests check implementation behavior, not statistical quality or period.", "ja": "GBとFCは異なるアルゴリズムを使い、同じシードでも同じ列になることを保証しません。ゲーム処理向けの決定的な生成器であり、暗号用の乱数源ではありません。検証対象は実装の動作で、統計的な品質や周期ではありません。"},
+  "rng_modulo": {"en": "Modulo reduction can favor some outcomes when the input range is not divisible by the bound. The underlying generator also need not be uniform. Treat bounded results and chance thresholds as gameplay approximations rather than exact probabilities.", "ja": "入力の範囲が上限で割り切れないと、剰余による縮小で出やすい結果が生じます。元の生成器が一様とは限りません。範囲付きの結果や確率のしきい値は、厳密な確率ではなくゲーム処理上の目安として使ってください。"},
+  "rng_weight_bias": {"en": "The weights define relative interval sizes, not guaranteed observed percentages. Both the rng16 output distribution and reduction modulo the total affect the actual frequencies. A positive total always consumes two byte draws, even if only one item has a nonzero weight.", "ja": "重みが決めるのは相対的な区間の大きさであり、実測での百分率を保証しません。rng16の出力分布と、合計による剰余の両方が出現頻度に影響します。合計が正なら、重みが正の項目が一つだけでも必ず2回のバイト取得を消費します。"},
+  "rng_link": {"en": "Include rpg.h and compile lib/rng.c alongside your game when using the library functions. The __rng_seed and __rng8 intrinsics themselves are emitted by the compiler; a program using only those two needs no rng.c object.", "ja": "ライブラリ関数を使う場合はrpg.hをインクルードし、ゲームのソースと一緒にlib/rng.cをコンパイルします。__rng_seedと__rng8自体はコンパイラが生成するため、この2つだけを使うプログラムにはrng.cは不要です。"},
+  "rng_demo_seed_gb": {"en": "This sample demonstrates resetting a test sequence. FIRST and RESEEDED both show 00002 after seed 0x1234; SECOND shows 00034. The library seed resets the same state, so RNG8 also shows 00002.", "ja": "テスト用の乱数列を初めから再現するサンプルです。シード0x1234でFIRSTとRESEEDEDはともに00002、SECONDは00034になります。ライブラリのシード設定も同じ状態を初期化するため、RNG8も00002です。"},
+  "rng_demo_byte_gb": {"en": "This sample demonstrates that each draw advances the sequence. After seed 0x1234, the first two __rng8 calls display FIRST 00002 and SECOND 00034. Repeating the seed restarts at 00002.", "ja": "取得のたびに列が進むことを確かめるサンプルです。シード0x1234の後の2回の__rng8で、FIRSTは00002、SECONDは00034になります。同じシードを設定し直すと00002から再開します。"},
+  "rng_demo_seed_fc": {"en": "This sample shows repeatable FC startup and the zero-seed rule. FIRST and RESEEDED both display 00019 for seed 0x1234. ZERO SEED displays 00255 after seeding with zero.", "ja": "FCの列の再現と、シード0の扱いを確かめるサンプルです。シード0x1234ではFIRSTとRESEEDEDがともに00019になります。0を設定した後のZERO SEEDは00255です。"},
+  "rng_demo_byte_fc": {"en": "This sample reads three consecutive FC bytes. Seed 0x1234 produces FIRST 00019, SECOND 00137 and THIRD 00240. Those values show the call order; they are not a frequency or randomness score.", "ja": "FCから連続する3バイトを取得するサンプルです。シード0x1234でFIRSTは00019、SECONDは00137、THIRDは00240になります。表示は呼び出し順の結果であり、頻度や乱数品質の点数ではありません。"},
+  "rng_demo_wrap": {"en": "This sample compares the library byte draw with the intrinsic. After rng_seed(0x1234), RNG8 displays 00002, matching FIRST. Seeding does not consume the first draw.", "ja": "ライブラリのバイト取得と組み込み関数を比べるサンプルです。rng_seed(0x1234)の後のRNG8は00002となり、FIRSTと一致します。シード設定では最初の乱数を消費しません。"},
+  "rng_demo_next8": {"en": "This sample checks the byte alias after the same seed. NEXT8 and RNG8 both display 00002 because the program reseeds before each comparison; without those resets they would consume successive values.", "ja": "同じシードでバイト取得の別名関数を確認するサンプルです。比較の前にそれぞれシードを設定するため、NEXT8とRNG8はともに00002です。設定し直さなければ、同じ列から順番に値を消費します。"},
+  "rng_demo_word": {"en": "This sample demonstrates word assembly. After reseeding with 0x1234, bytes 2 and 34 form 0x0222, so RNG16 displays 00546. FIRST and SECOND show the corresponding byte values separately.", "ja": "2バイトからワードを作る順序を確かめるサンプルです。0x1234で初期化すると、バイト2と34から0x0222を作るため、RNG16は00546になります。FIRSTとSECONDでは対応するバイト値を個別に確認できます。"},
+  "rng_demo_next16": {"en": "This sample compares the word alias with rng16 after equal seeds. NEXT16 and RNG16 both display 00546, representing two byte draws in high/low order.", "ja": "同じシードでワード取得の別名関数とrng16を比べるサンプルです。NEXT16とRNG16はともに00546で、上位・下位の順に取得した2バイトを表します。"},
+  "rng_demo_bound": {"en": "This sample chooses an index below 10. RANGE 10 displays 00002 because the first byte from seed 0x1234 is 2. ZERO BOUND is 00000 and the following NEXT BYTE is still 00002, confirming that the zero-bound call did not draw.", "ja": "10未満の添字を選ぶサンプルです。シード0x1234の最初のバイトは2なので、RANGE 10は00002です。ZERO BOUNDは00000、その後のNEXT BYTEは00002のままで、上限0の呼び出しが乱数を消費しないことも確かめられます。"},
+  "rng_demo_alias_bound": {"en": "This sample compares two spellings of bounded selection. Reseeding before each call makes ALIAS 10 and RANGE 10 both display 00002. The upper bound 10 itself is excluded.", "ja": "範囲付き選択の二つの関数名を比べるサンプルです。各呼び出しの前にシードを設定し直すため、ALIAS 10とRANGE 10はともに00002になります。上限値10は結果に含みません。"},
+  "rng_demo_chance": {"en": "This sample performs one approximate 50-percent decision. The seeded byte is 2, and 2 % 100 < 50 is true, so CHANCE 50 displays 00001. One successful draw does not demonstrate a 50-percent long-run success rate.", "ja": "50%を目安とする判定を1回行うサンプルです。シードから得たバイトは2で、2 % 100 < 50が成立するためCHANCE 50は00001になります。1回成立したことは、長期的な成功率が50%であるという検証ではありません。"},
+  "rng_demo_weighted": {"en": "This sample assigns weights 1, 3 and 6 to three items. The seeded word 546 gives remainder 6, which lies in index 2's interval 4–9; WEIGHT INDEX displays 00002. EMPTY LIST displays 00000 as an empty-list fallback, not a successful choice of item 0.", "ja": "3項目に重み1・3・6を設定するサンプルです。シードから得たワード546の剰余6は、添字2の区間4〜9に入るので、WEIGHT INDEXは00002になります。EMPTY LISTの00000は空の配列に対する代替値であり、項目0の選択に成功したという意味ではありません。"},
+  "rng_screen_gb": {"en": "The complete program prints decimal results on a white background: black text on DMG, blue text on CGB. FAILED must read 00000. The pictures show the actual emulator output of this sample.", "ja": "完全なプログラムでは、白地に10進数の結果を表示します。DMGでは黒文字、CGBでは青文字です。FAILEDは00000になる必要があります。画像はこのサンプルのエミュレータ実行結果です。"},
+  "rng_screen_fc": {"en": "The complete NROM program prints blue decimal results on black. FAILED must read 00000. Text is uploaded with rendering disabled before the result screen is enabled.", "ja": "完全なNROMプログラムでは、黒地に青文字で10進数の結果を表示します。FAILEDは00000になる必要があります。描画を無効にした状態で文字を転送してから、結果画面を有効にします。"},
+  "rng_proof": {"en": "Verification compared 32 outputs and eight subsequent byte draws per case with an independent host model: 93 GB cases and 18 FC cases, including constant/runtime seeds and GB range/chance/weight boundaries. The teaching screens were checked after 240 emulator frames. Physical hardware and statistical quality were not tested.", "ja": "各条件で32個の出力と、その後の8回のバイト取得を独立したホスト側モデルと照合しました。GBは93条件、FCは18条件で、定数・実行時のシード指定や、GBの範囲・確率・重みの境界条件を含みます。サンプル画面はエミュレータで240フレーム後に確認しました。実機や統計的な品質は未検証です。"},
+  "rng_module": {"en": "The RNG functions declared in rpg.h are implemented in lib/rng.c. They share the compiler's GB generator: rng_seed resets it, rng8/rng_next8 consume one byte, rng16/rng_next16 consume two, and rand_range/rng_range, rng_chance and weighted_choice adapt draws for gameplay choices. Compile rng.c with your program when calling these library functions. For reproducible tests, keep the seed and call order fixed; modulo-based choices do not promise exact probabilities.", "ja": "rpg.hで宣言された乱数ライブラリ関数の実装はlib/rng.cにあります。コンパイラのGB生成器を共有し、rng_seedが初期化、rng8/rng_next8が1バイト、rng16/rng_next16が2バイトを消費します。rand_range/rng_range・rng_chance・weighted_choiceは、取得した値をゲーム内の選択に使いやすく変換します。ライブラリ関数を呼ぶ場合はrng.cをプログラムと一緒にコンパイルしてください。テストの再現にはシードと呼び出し順を固定します。剰余を使う選択は厳密な確率を保証しません。"}
+}

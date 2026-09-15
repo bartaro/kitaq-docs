@@ -1,7 +1,8 @@
 """Language order and same-volume links for this nine-language publication."""
 import html
 import re
-from publication_languages import VISIBLE_LANGUAGES
+from publication_languages import ORDER, VISIBLE_LANGUAGES
+from urllib.parse import urlsplit, unquote
 
 LANGUAGES = {
     'en': 'English', 'ja': '日本語', 'ko': '한국어', 'zh-CN': '简体中文',
@@ -35,3 +36,15 @@ def refresh_language_navigation(path, current):
     updated=re.sub(pattern,replace,text,flags=re.S)
     if updated!=text:path.write_bytes(updated.encode('utf-8'))
     return updated!=text
+
+
+def check_readme_language_links(path):
+    """Reject stale README navigation before it can restore hidden editions."""
+    hidden=set(ORDER)-set(VISIBLE_LANGUAGES)
+    hidden_readmes={'README.'+HTML_LANG.get(code,code)+'.md' for code in hidden}
+    text=path.read_text(encoding='utf-8')
+    urls=re.findall(r'\]\(([^\s)]+)',text)+re.findall(r'href="([^"]+)"',text)
+    for url in urls:
+        parsed=urlsplit(html.unescape(url));parts=unquote(parsed.path).split('/')
+        if (not parsed.netloc and set(parts)&hidden_readmes) or (parsed.netloc=='bartaro.github.io' and parts[:2]==['','kitaq-docs'] and set(parts[2:])&hidden):
+            raise ValueError('README links to a hidden language edition: '+str(path)+' -> '+url)

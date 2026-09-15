@@ -38,7 +38,7 @@ def public_file(relative):
         return False
     # Per-case memory snapshots and fixtures are private authoring evidence.
     # The three teaching ROMs/screens have distinct gb-dmg, gb-cgb and fc-nrom folders.
-    if len(path.parts)>2 and path.parts[0]=='verification' and path.parts[1] in ('api-memory-intrinsics','api-bit-intrinsics') and path.parts[2] in ('gb','fc'):
+    if len(path.parts)>2 and path.parts[0]=='verification' and path.parts[1] in ('api-memory-intrinsics','api-bit-intrinsics','api-rng') and path.parts[2] in ('gb','fc'):
         return False
     return path.parts[0] != 'verification' or path.suffix in PUBLIC_EVIDENCE_SUFFIXES
 

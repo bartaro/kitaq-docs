@@ -162,6 +162,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_interrupt_intrinsic_examples(contracts))
     proofs.update(verified_memory_intrinsic_examples(contracts))
     proofs.update(verified_bit_intrinsic_examples(contracts))
+    proofs.update(verified_rng_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -689,6 +690,53 @@ def verified_memory_intrinsic_examples(contracts):
 
 def verified_bit_intrinsic_examples(contracts):
     return verified_buffer_intrinsic_examples(contracts, 'bit', 136)
+
+
+def verified_rng_examples(contracts):
+    """Bind RNG documentation to exact sequences, draw counts and teaching screens."""
+    folder=SITE/'verification/api-rng'
+    selected_contracts={k:c for k,c in contracts.items() if c['review']=='rng-source-20260915'}
+    if not selected_contracts:return {}
+    repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    review=json.loads((SOURCE/'rng_review_sources.json').read_text(encoding='utf-8'))
+    sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    for name,expected in review['source_sha256'].items():
+        if sha(repos/name)!=expected:raise ValueError('RNG implementation changed: '+name)
+    runs=json.loads((folder/'results.json').read_text(encoding='utf-8'))['records']
+    expected_variants={('rng_values','dmg'),('rng_values','cgb'),('rng_choices','dmg'),('rng_choices','cgb'),('rng_core','nrom')}
+    if len(runs)!=5 or {(r['sample'],r['mode']) for r in runs}!=expected_variants:raise ValueError('RNG screens missing')
+    states={}
+    for platform,count in [('gb',93),('fc',18)]:
+        state=json.loads((folder/platform/'state_checks.json').read_text(encoding='utf-8'));states[platform]=state
+        if len(state['cases'])!=count or not all(r['passed'] and len(r['actual'])==80 and r['actual']==r['expected'] for r in state['cases']):raise ValueError('RNG state comparison failed')
+        if sha(SITE/'tools/check_rng_state.py')!=state['script_sha256']:raise ValueError('RNG state checker changed')
+        for row in state['cases']:
+            case=folder/platform/row['name']
+            for name,expected in [('case.c',row['source_sha256']),('case.'+('gb' if platform=='gb' else 'nes'),row['rom_sha256'])]:
+                if sha(case/name)!=expected:raise ValueError('RNG state fixture changed: '+str(case/name))
+        for name,expected in state['library_sha256'].items():
+            if sha(repos/name)!=expected:raise ValueError('RNG state library changed: '+name)
+        for path,key in [(repos/('kitaq'+platform)/('kitaq'+platform+'.exe'),'compiler_sha256'),(repos/('kokura/kokura-cli.exe' if platform=='gb' else 'kurosaki/kurosaki.exe'),'emulator_sha256')]:
+            if sha(path)!=state[key]:raise ValueError('RNG verification executable changed')
+    for run in runs:
+        if not (run['passed'] and run['build_exit']==0 and run['runtime_exit']==0 and run['frames']==240 and run['label_pixel_mismatches']==0 and run['color_mismatches']==0 and run['colored_pixels']>0 and run['ppu_writes_while_rendering']==0):raise ValueError('RNG screen check failed')
+        platform=run['platform'];state=states[platform]
+        if any(run[k]!=state[k] for k in ['compiler_sha256','emulator_sha256']):raise ValueError('RNG sample executable mismatch')
+        header='kitaq'+platform+'/lib/'+('rpg.h' if platform=='gb' else 'intrinsics.h')
+        if run['header_sha256']!=review['source_sha256'][header]:raise ValueError('RNG sample header mismatch')
+        if platform=='gb' and run['library_sha256']!=review['source_sha256']['kitaqgb/lib/rng.c']:raise ValueError('RNG sample library mismatch')
+        files={run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}
+        rom=(SITE/run['image']).with_name('example.'+('gb' if platform=='gb' else 'nes'))
+        if sha(rom)!=run['rom_sha256']:raise ValueError('RNG teaching ROM changed')
+        for name,expected in files.items():
+            if sha(SITE/name)!=expected:raise ValueError('RNG sample changed: '+name)
+    result={}
+    for key,contract in selected_contracts.items():
+        selected=[r for r in runs if r['source']==contract['example']['program'] and r['platform']==key.split(':')[0]]
+        if len(selected)!=(2 if key.startswith('gb:') else 1):raise ValueError('RNG sample variants missing: '+key)
+        result[key]={'api':key.split(':')[1],'kind':'rng','runs':selected}
+    return result
 
 
 def verified_buffer_intrinsic_examples(contracts, family, state_count):

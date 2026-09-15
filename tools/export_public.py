@@ -13,7 +13,7 @@ import stat
 import subprocess
 from public_presentation import SITE, normalize, public_file
 from publication_languages import ACTIVE_LANGUAGES, PAUSED_LANGUAGES
-from languages import refresh_language_navigation
+from languages import refresh_language_navigation, check_readme_language_links
 
 
 def digest(path):
@@ -69,6 +69,8 @@ def main():
         name = source.relative_to(SITE).as_posix()
         if source.relative_to(SITE).parts[0] in PAUSED_LANGUAGES:
             continue
+        if source.name.startswith('README') and source.suffix=='.md':
+            check_readme_language_links(source)
         target = destination / name
         check_path(source, SITE)
         check_path(target, destination)

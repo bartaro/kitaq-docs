@@ -35,7 +35,7 @@ Fill in the requirements, then give the complete prompt to your AI assistant. It
 
 Seven volumes are presented in Japanese and English, based on the source snapshot of September 14, 2026. The reference inventory contains 1,055 API entries and 47 complete sample programs. Open `en/index.html` for English or `index.html` for Japanese; each volume provides language navigation. The sample explanations identify the tested behavior and conditions.
 
-Original source excerpts and captured tool output are preserved verbatim. See [GitHub setup](GITHUB_SETUP.md) and [publication checks](PUBLICATION_CHECKS.md). The HTML files support offline reading, searching within a volume, copying code and printing.
+Original source excerpts are preserved verbatim; captured emulator screens appear beside the sample explanations. See [GitHub setup](GITHUB_SETUP.md) and [publication checks](PUBLICATION_CHECKS.md). The HTML files support offline reading, searching within a volume, copying code and printing.
 
 | File | Contents |
 |---|---|
@@ -111,9 +111,9 @@ KOKURA-GUI, KUROSAKI-GUI and PLITA are excluded from this upload. The published 
 
 ### 日本語・英語のHTMLマニュアル
 
-2026年9月14日のソースに基づく7冊のマニュアルを日本語・英語で収録しています。各言語版に共通の1,055個のAPI項目と47本の完全なサンプルプログラムがあります。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。検証記録には使用したソース、実行ファイル、試験条件を記載しています。
+2026年9月14日のソースに基づく7冊のマニュアルを日本語・英語で収録しています。各言語版に共通の1,055個のAPI項目と47本の完全なサンプルプログラムがあります。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。サンプルの説明には期待結果と確認した実行画像を掲載しています。
 
-全言語に同じ1,055件のAPIと47本の完成サンプルを収録しています。元のソース抜粋とツール出力は原文のまま保持しています。[取得・配置手順](GITHUB_SETUP.md)と[公開時の確認記録](PUBLICATION_CHECKS.md)も参照してください。
+全言語に同じ1,055件のAPIと47本の完成サンプルを収録しています。元のソース抜粋は原文のまま保持し、確認した実行画像をサンプルの説明に添えています。[取得・配置手順](GITHUB_SETUP.md)と[公開時の確認記録](PUBLICATION_CHECKS.md)も参照してください。
 `index.html` を開いてください。オフラインで閲覧・巻内検索・コードのコピー・印刷ができます。
 
 | ファイル | 内容 |

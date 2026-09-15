@@ -7825,6 +7825,12 @@
         "path": "kitaqgb/lib/rng.c",
         "line": 6,
         "code": "u8 rng8()\n{\n    return __rng8();\n}\n\n// Replace the generator seed so subsequent calls can reproduce a sequence.\nvoid rng_seed(u16 seed)"
+      },
+      "arity_only": false,
+      "implementation_excerpt": "if (funcName == \"__rng8\")\n            {\n                if (args.Length != 0) Error(expr, \"__rng8() expects 0 arguments\");\n\n                EmitLoadA(RngStateLoVar);\n                EmitAsm(\"LD_B_A\");\n                EmitLoadA(RngStateHiVar);\n                EmitAsm(\"LD_C_A\");\n\n                // Zero state fallback for deterministic startup.\n                AsmOperand rngSeeded = MakeUniqueLabel(\"rng_seeded\");\n                EmitAsm(\"LD_A_B\");\n                EmitAsm(\"OR_C\");\n                EmitAsm(\"JR_NZ\", rngSeeded);\n                EmitAsm(\"LD_A_IMM\", new AsmOperand(0xA5, AddressMode.Immediate));\n                EmitAsm(\"LD_B_A\");\n                EmitAsm(\"LD_A_IMM\", new AsmOperand(0x5A, AddressMode.Immediate));\n                EmitAsm(\"LD_C_A\");\n                EmitLabel(rngSeeded);\n\n                // 16-bit mixed add/xor/rotate step.\n                EmitAsm(\"LD_A_B\");\n                EmitAsm(\"ADD_A_IMM\", new AsmOperand(0x17, AddressMode.Immediate));\n                EmitAsm(\"LD_B_A\");\n                EmitAsm(\"LD_A_C\");\n                EmitAsm(\"ADC_IMM\", new AsmOperand(0x5D, AddressMode.Immediate));\n                EmitAsm(\"LD_C_A\");\n                EmitAsm(\"LD_A_B\");\n                EmitAsm(\"XOR_C\");\n                EmitAsm(\"LD_B_A\");\n                EmitAsm(\"LD_A_C\");\n                EmitAsm(\"RLCA\");\n                EmitAsm(\"ADD_B\");\n                EmitAsm(\"LD_C_A\");\n\n                EmitAsm(\"LD_A_B\");\n                EmitStoreA(RngStateLoVar);\n                EmitAsm(\"LD_A_C\");\n                EmitStoreA(RngStateHiVar);\n                EmitAsm(\"LD_A_C\");\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+        "line": 8847
       }
     },
     {
@@ -7844,6 +7850,12 @@
         "path": "kitaqgb/lib/rng.c",
         "line": 12,
         "code": "void rng_seed(u16 seed)\n{\n    __rng_seed(seed);\n}\n\n// Alias the byte generator; this consumes one generator step.\nu8 rng_next8()"
+      },
+      "arity_only": false,
+      "implementation_excerpt": "if (funcName == \"__rng_seed\")\n            {\n                if (args.Length != 1) Error(expr, \"__rng_seed(seed) expects 1 argument\");\n\n                CompileIntoHL(args[0]);\n                EmitAsm(\"LD_A_L\");\n                EmitStoreA(RngStateLoVar);\n                EmitAsm(\"LD_A_H\");\n                EmitStoreA(RngStateHiVar);\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+        "line": 8834
       }
     },
     {
@@ -8325,7 +8337,8 @@
         "path": "kitaqgb/lib/rng.c",
         "line": 18,
         "code": "u8 rng_next8()\n{\n    return rng8();\n}\n\n// Consume two generator bytes in high-byte/low-byte order to form a 16-bit value.\nu16 rng16()"
-      }
+      },
+      "arity_only": false
     },
     {
       "name": "rng16",
@@ -8354,7 +8367,8 @@
         "path": "kitaqgb/lib/rng.c",
         "line": 32,
         "code": "u16 rng_next16()\n{\n    return rng16();\n}\n\n// Reduce a random byte modulo max; zero returns zero without consuming randomness.\n// Modulo reduction is biased unless max divides the generator range."
-      }
+      },
+      "arity_only": false
     },
     {
       "name": "rand_range",
@@ -8383,7 +8397,8 @@
         "path": "kitaqgb/lib/rng.c",
         "line": 46,
         "code": "u8 rng_range(u8 max)\n{\n    return rand_range(max);\n}\n\n// Return false for zero and true for values at least 100. Intermediate values\n// use the modulo-based range generator, so percentages are approximate."
-      }
+      },
+      "arity_only": false
     },
     {
       "name": "weighted_choice",
@@ -8409,7 +8424,8 @@
       },
       "availability": "implementation",
       "example": null,
-      "new_example": "u8 example_weighted_choice(const u8* weights, u8 count) {\n    return weighted_choice(weights, count);\n}"
+      "new_example": "u8 example_weighted_choice(const u8* weights, u8 count) {\n    return weighted_choice(weights, count);\n}",
+      "arity_only": false
     },
     {
       "name": "rng_seed",
@@ -8438,7 +8454,8 @@
         "path": "kitaq-docs/samples/gb_rng.c",
         "line": 11,
         "code": "    m_init();\n    m_text(2,3,\"RNG\");\n    rng_seed(1234); m_number(rng_range(10));\n    while (1) { m_wait();  }\n}"
-      }
+      },
+      "arity_only": false
     },
     {
       "name": "rng_next8",
@@ -8464,7 +8481,8 @@
       },
       "availability": "implementation",
       "example": null,
-      "new_example": "rng_next8();"
+      "new_example": "rng_next8();",
+      "arity_only": false
     },
     {
       "name": "rng_next16",
@@ -8490,7 +8508,8 @@
       },
       "availability": "implementation",
       "example": null,
-      "new_example": "rng_next16();"
+      "new_example": "rng_next16();",
+      "arity_only": false
     },
     {
       "name": "rng_range",
@@ -8519,7 +8538,8 @@
         "path": "kitaq-docs/samples/gb_rng.c",
         "line": 11,
         "code": "    m_init();\n    m_text(2,3,\"RNG\");\n    rng_seed(1234); m_number(rng_range(10));\n    while (1) { m_wait();  }\n}"
-      }
+      },
+      "arity_only": false
     },
     {
       "name": "rng_chance",
@@ -8545,7 +8565,8 @@
       },
       "availability": "implementation",
       "example": null,
-      "new_example": "u8 example_rng_chance(u8 percent) {\n    return rng_chance(percent);\n}"
+      "new_example": "u8 example_rng_chance(u8 percent) {\n    return rng_chance(percent);\n}",
+      "arity_only": false
     },
     {
       "name": "text_open",
