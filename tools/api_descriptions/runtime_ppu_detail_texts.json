@@ -1,0 +1,68 @@
+{
+  "rp_length": [
+    "Byte count, `0..65535` (unsigned 16-bit). Zero still seeks the PPU address and resets the latch, but performs no PPUDATA writes. No destination-size check or transfer splitting is provided; large counts can wrap through the PPU address space.",
+    "バイト数。符号なし16ビットの`0..65535`です。0でもPPUアドレスの設定とラッチのリセットは行いますが、PPUDATAへは書きません。転送先の容量確認や分割処理はなく、大きな値ではPPUアドレス空間を周回し得ます。",
+    "바이트 수이며 부호 없는 16비트 값 `0..65535`입니다. 0이어도 PPU 주소 설정과 래치 초기화는 수행하지만 PPUDATA에는 쓰지 않습니다. 대상 크기 검사나 전송 분할이 없으므로 큰 값은 PPU 주소 공간을 순환할 수 있습니다.",
+    "字节数，范围为 `0..65535`，使用无符号 16 位值。即使为 0，也会设置 PPU 地址并复位锁存器，但不写入 PPUDATA。没有目标容量检查或分段传输；较大的计数可能绕回 PPU 地址空间。",
+    "位元組數，範圍為 `0..65535`，使用無號 16 位元值。即使為 0，也會設定 PPU 位址並重設鎖存器，但不寫入 PPUDATA。沒有目的地容量檢查或分段傳輸；較大的計數可能繞回 PPU 位址空間。",
+    "Número de bytes, `0..65535` (entero sin signo de 16 bits). Cero también establece la dirección PPU y reinicia el latch, pero no escribe en PPUDATA. No comprueba la capacidad del destino ni divide la transferencia; los valores grandes pueden recorrer y desbordar el espacio de direcciones PPU.",
+    "Quantidade de bytes, `0..65535` (inteiro sem sinal de 16 bits). Zero ainda define o endereço PPU e reinicia o latch, mas não grava em PPUDATA. Não há verificação da capacidade do destino nem divisão da transferência; valores grandes podem percorrer e dar a volta no espaço de endereços PPU.",
+    "Nombre d’octets, de `0..65535` (entier non signé sur 16 bits). Zéro définit tout de même l’adresse PPU et réinitialise le verrou, sans écrire dans PPUDATA. Aucune vérification de capacité ni division du transfert n’est effectuée ; un grand nombre peut boucler dans l’espace d’adressage PPU.",
+    "Byteanzahl von `0..65535` als vorzeichenloser 16-Bit-Wert. Auch null setzt die PPU-Adresse und den Latch zurück, schreibt aber nicht nach PPUDATA. Zielgröße und Aufteilung der Übertragung werden nicht geprüft; große Werte können den PPU-Adressraum umlaufen."
+  ],
+  "rp_source": [
+    "CPU pointer to at least the requested number of readable bytes. Keep the source mapped and stable until this synchronous transfer returns. There is no bank switching, retained queue pointer or source-length check; a zero count does not dereference the pointer.",
+    "指定したバイト数を読み出せるCPU側のポインターです。同期転送が戻るまで、元データが見えるバンクと内容を保ってください。バンク切り替え・キューへのポインター保持・転送元の長さ確認は行いません。長さ0ならポインターを参照しません。",
+    "요청한 수만큼의 바이트를 읽을 수 있는 CPU 포인터입니다. 동기 전송이 반환될 때까지 원본의 매핑과 내용을 유지하세요. 뱅크 전환, 큐에 포인터 보관, 원본 길이 검사는 하지 않습니다. 길이가 0이면 포인터를 역참조하지 않습니다.",
+    "CPU 指针，必须能读取至少指定数量的字节。同步传输返回前，请保持源数据映射和内容稳定。函数不会切换存储体、在队列中保留指针或检查源长度；计数为 0 时不会解引用指针。",
+    "CPU 指標，必須能讀取至少指定數量的位元組。同步傳輸返回前，請保持來源映射與內容穩定。函式不會切換記憶體庫、在佇列中保留指標或檢查來源長度；計數為 0 時不會解參考指標。",
+    "Puntero CPU a un origen con al menos el número solicitado de bytes legibles. Mantenga el origen mapeado y estable hasta que termine esta transferencia síncrona. No cambia bancos, guarda el puntero en una cola ni comprueba la longitud del origen; con un recuento cero no desreferencia el puntero.",
+    "Ponteiro de CPU para pelo menos a quantidade solicitada de bytes legíveis. Mantenha a origem mapeada e estável até o retorno dessa transferência síncrona. Não há troca de bancos, armazenamento do ponteiro em fila ou verificação do tamanho da origem; a contagem zero não desreferencia o ponteiro.",
+    "Pointeur CPU vers au moins le nombre demandé d’octets lisibles. Maintenez la source accessible et stable jusqu’au retour de ce transfert synchrone. Aucun changement de banque, stockage du pointeur dans une file ou contrôle de longueur n’est effectué ; un nombre nul ne déréférence pas le pointeur.",
+    "CPU-Zeiger auf mindestens die angeforderte Anzahl lesbarer Bytes. Halten Sie die Quelle bis zur Rückkehr dieser synchronen Übertragung eingeblendet und unverändert. Es gibt keine Bankumschaltung, Speicherung des Zeigers in einer Warteschlange oder Prüfung der Quelllänge. Bei Anzahl null wird der Zeiger nicht dereferenziert."
+  ],
+  "rp_timing": [
+    "Direct PPU access requires rendering to be off or the entire operation to fit a safe VBlank interval. These functions do not wait, queue, mask NMI or restore scroll. Prevent an interrupt from changing the shared latch/address during the call. PPUCTRL bit 2 selects a destination step of 1 or 32 per data byte. The PPU handles mirroring and address wrapping; CHR-ROM cannot be written. Set the intended scroll state after access and before rendering.",
+    "PPU直接アクセスは、描画停止中か、処理全体が安全なVBlank時間内に収まる条件で行います。これらの関数は待機・キュー登録・NMI抑止・スクロール復元を行いません。呼び出し中に割り込みで共有ラッチやアドレスを変更しないでください。PPUCTRLのビット2により、書き込み先は1バイトごとに1または32進みます。ミラーリングとアドレスの周回はPPUの動作に従い、CHR-ROMへは書き込めません。アクセス後、描画を始める前に意図したスクロール状態を設定してください。",
+    "직접 PPU 접근은 렌더링을 끄거나 전체 작업이 안전한 VBlank 구간 안에 끝나는 조건에서 수행하세요. 이 함수들은 대기, 큐 등록, NMI 차단, 스크롤 복원을 하지 않습니다. 호출 중 인터럽트가 공유 래치나 주소를 바꾸지 않도록 하세요. PPUCTRL 비트 2에 따라 대상 주소는 바이트마다 1 또는 32씩 증가합니다. 미러링과 주소 순환은 PPU 동작을 따르며 CHR-ROM에는 쓸 수 없습니다. 접근 후 렌더링 전에 원하는 스크롤 상태를 설정하세요.",
+    "直接访问 PPU 时，必须关闭渲染，或确保整个操作处于安全的 VBlank 时间内。这些函数不等待、不排队、不屏蔽 NMI，也不恢复滚动。调用期间应防止中断改变共享锁存器或地址。PPUCTRL 第 2 位决定每个数据字节使目标地址增加 1 还是 32。镜像和地址回绕由 PPU 处理；CHR-ROM 不可写。访问结束后、开始渲染前，请设置所需的滚动状态。",
+    "直接存取 PPU 時，必須關閉繪製，或確保整個操作位於安全的 VBlank 時間內。這些函式不等待、不排入佇列、不阻擋 NMI，也不還原捲動。呼叫期間應防止中斷改變共用鎖存器或位址。PPUCTRL 第 2 位元決定每個資料位元組使目的位址增加 1 還是 32。鏡像和位址繞回由 PPU 處理；CHR-ROM 不可寫入。存取結束後、開始繪製前，請設定所需的捲動狀態。",
+    "El acceso directo a PPU requiere desactivar el renderizado o completar toda la operación dentro de un VBlank seguro. Estas funciones no esperan, encolan, bloquean NMI ni restauran el desplazamiento. Evite que una interrupción cambie el latch o la dirección compartidos durante la llamada. El bit 2 de PPUCTRL selecciona un incremento de destino de 1 o 32 por byte. La PPU gestiona los espejos y el retorno de direcciones; no se puede escribir en CHR-ROM. Restablezca el desplazamiento deseado antes de renderizar.",
+    "O acesso direto à PPU exige desativar a renderização ou concluir toda a operação em um intervalo seguro de VBlank. Essas funções não esperam, enfileiram, bloqueiam NMI ou restauram a rolagem. Impeça que interrupções alterem o latch ou o endereço compartilhados durante a chamada. O bit 2 de PPUCTRL seleciona um avanço de 1 ou 32 por byte. A PPU trata espelhamento e retorno de endereços; CHR-ROM não aceita escrita. Configure a rolagem desejada após o acesso e antes de renderizar.",
+    "L’accès direct à la PPU exige de désactiver le rendu ou de terminer toute l’opération dans un intervalle VBlank sûr. Ces fonctions n’attendent pas, ne mettent rien en file, ne bloquent pas NMI et ne rétablissent pas le défilement. Empêchez une interruption de modifier le verrou ou l’adresse partagés pendant l’appel. Le bit 2 de PPUCTRL choisit un pas de destination de 1 ou 32 par octet. La PPU gère les miroirs et le bouclage des adresses ; la CHR-ROM n’est pas inscriptible. Rétablissez le défilement voulu avant le rendu.",
+    "Direkter PPU-Zugriff erfordert ausgeschaltete Bildausgabe oder einen sicheren VBlank-Zeitraum, in den die gesamte Operation passt. Diese Funktionen warten nicht, legen keine Aufträge an, sperren NMI nicht und stellen den Bildlauf nicht wieder her. Verhindern Sie, dass Interrupts während des Aufrufs den gemeinsamen Latch oder die Adresse verändern. PPUCTRL-Bit 2 wählt eine Zieladressschrittweite von 1 oder 32 pro Byte. Spiegelung und Adressumlauf übernimmt die PPU; CHR-ROM ist nicht beschreibbar. Stellen Sie nach dem Zugriff vor der Bildausgabe den gewünschten Bildlauf ein."
+  ],
+  "rp_pair_setup": [
+    "Include or compile `ppu.c` once, without `runtime.c`. Call `__ppu_read_status()` before its address-pair helpers to reset the shared latch. `ppu.h` does not declare these functions: its four screen/palette/nametable declarations have no implementations in this distribution. Including `ppu.c` supplies the functions shown here; including `ppu.h` alone does not.",
+    "`runtime.c`を併用せず、`ppu.c`を一度だけインクルードまたはコンパイルしてください。上位・下位バイトでアドレスを渡すこれらの関数の前には、`__ppu_read_status()`で共有ラッチをリセットします。`ppu.h`はこれらの関数を宣言しておらず、画面・パレット・ネームテーブル用の4宣言にも配布物内の実装がありません。ここで示す関数は`ppu.c`を組み込んで使います。`ppu.h`だけでは使えません。",
+    "`runtime.c`와 함께 사용하지 말고 `ppu.c`를 한 번만 포함하거나 컴파일하세요. 상위·하위 주소 바이트를 받는 함수 앞에서 `__ppu_read_status()`를 호출해 공유 래치를 초기화하세요. `ppu.h`에는 이 함수들의 선언이 없으며, 그 안의 화면·팔레트·네임테이블용 선언 네 개는 배포본에 구현이 없습니다. 여기 나온 함수는 `ppu.c`를 포함해 사용하며 `ppu.h`만으로는 사용할 수 없습니다.",
+    "仅引入或编译一次 `ppu.c`，不要同时使用 `runtime.c`。调用其高、低地址字节函数前，请用 `__ppu_read_status()` 复位共享锁存器。`ppu.h` 没有声明这些函数；其中四个屏幕、调色板及名称表函数的声明在此发行包中没有实现。这里展示的函数由 `ppu.c` 提供，仅包含 `ppu.h` 无法使用。",
+    "僅引入或編譯一次 `ppu.c`，不要同時使用 `runtime.c`。呼叫其高、低位址位元組函式前，請用 `__ppu_read_status()` 重設共用鎖存器。`ppu.h` 沒有宣告這些函式；其中四個畫面、調色盤及名稱表函式的宣告在此散布套件中沒有實作。這裡展示的函式由 `ppu.c` 提供，僅包含 `ppu.h` 無法使用。",
+    "Incluya o compile `ppu.c` una sola vez, sin `runtime.c`. Antes de sus funciones de dirección alta/baja, llame a `__ppu_read_status()` para reiniciar el latch compartido. `ppu.h` no declara estas funciones: sus cuatro declaraciones de pantalla, paleta y tabla de nombres no tienen implementación en esta distribución. Las funciones mostradas se obtienen al incluir `ppu.c`, no solo `ppu.h`.",
+    "Inclua ou compile `ppu.c` uma única vez, sem `runtime.c`. Antes das funções que recebem os bytes alto e baixo do endereço, chame `__ppu_read_status()` para reiniciar o latch compartilhado. `ppu.h` não declara essas funções: suas quatro declarações de tela, paleta e tabela de nomes não têm implementação nesta distribuição. As funções mostradas vêm de `ppu.c`, não apenas de `ppu.h`.",
+    "Incluez ou compilez `ppu.c` une seule fois, sans `runtime.c`. Avant ses fonctions à deux octets d’adresse, appelez `__ppu_read_status()` pour réinitialiser le verrou partagé. `ppu.h` ne déclare pas ces fonctions : ses quatre déclarations relatives à l’écran, à la palette et à la table de noms n’ont pas d’implémentation dans cette distribution. Les fonctions présentées ici proviennent de `ppu.c` ; inclure uniquement `ppu.h` ne suffit pas.",
+    "Binden oder kompilieren Sie `ppu.c` genau einmal und ohne `runtime.c`. Rufen Sie vor dessen Funktionen mit zwei Adressbytes `__ppu_read_status()` auf, um den gemeinsamen Latch zurückzusetzen. `ppu.h` deklariert diese Funktionen nicht; seine vier Deklarationen für Bildausgabe, Palette und Nametable besitzen in dieser Distribution keine Implementierung. Die hier gezeigten Funktionen stammen aus `ppu.c`; `ppu.h` allein reicht nicht aus."
+  ],
+  "rp_pair_length": [
+    "Byte count `0..255` (unsigned eight-bit). Zero sets the address without writing data. The helper does not reset the shared latch, even for zero; prepare it before calling.",
+    "符号なし8ビットのバイト数`0..255`です。0ならアドレスだけを設定し、データを書きません。0の場合も含め、関数は共有ラッチをリセットしないため、呼び出す前に準備してください。",
+    "부호 없는 8비트 바이트 수 `0..255`입니다. 0이면 주소만 설정하고 데이터는 쓰지 않습니다. 0인 경우에도 공유 래치를 초기화하지 않으므로 호출 전에 준비하세요.",
+    "无符号八位字节数，范围为 `0..255`。0 只设置地址，不写入数据。即使为 0，函数也不会复位共享锁存器，请在调用前准备好锁存器。",
+    "無號八位元的位元組數，範圍為 `0..255`。0 只設定位址，不寫入資料。即使為 0，函式也不會重設共用鎖存器，請在呼叫前準備好鎖存器。",
+    "Número de bytes `0..255` (ocho bits sin signo). Cero establece la dirección sin escribir datos. La función no reinicia el latch compartido, ni siquiera con cero; prepárelo antes de llamar.",
+    "Quantidade de bytes `0..255` (oito bits sem sinal). Zero define o endereço sem gravar dados. A função não reinicia o latch compartilhado, nem mesmo com zero; prepare-o antes da chamada.",
+    "Nombre d’octets de `0..255` (huit bits non signés). Zéro définit l’adresse sans écrire de données. Le verrou partagé n’est pas réinitialisé, même pour zéro ; préparez-le avant l’appel.",
+    "Byteanzahl `0..255` als vorzeichenloser 8-Bit-Wert. Null setzt die Adresse, ohne Daten zu schreiben. Der gemeinsame Latch wird auch bei null nicht zurückgesetzt; bereiten Sie ihn vor dem Aufruf vor."
+  ],
+  "rp_pair_address": [
+    "`hi` and `lo` are the upper and lower bytes of a PPU address: for example, `0x23, 0x42` means `0x2342`. They are address bytes, not tile coordinates. Normal PPU address masking and mirroring apply.",
+    "`hi`と`lo`はPPUアドレスの上位・下位バイトです。たとえば`0x23, 0x42`で`0x2342`を表します。タイル座標ではなくアドレスのバイトです。PPUの通常のアドレスマスクとミラーリングが適用されます。",
+    "`hi`와 `lo`는 PPU 주소의 상위·하위 바이트입니다. 예를 들어 `0x23, 0x42`는 `0x2342`를 뜻합니다. 타일 좌표가 아닌 주소 바이트이며, 일반적인 PPU 주소 마스킹과 미러링이 적용됩니다.",
+    "`hi` 和 `lo` 是 PPU 地址的高、低字节，例如 `0x23, 0x42` 表示 `0x2342`。它们是地址字节，不是图块坐标。适用正常的 PPU 地址掩码与镜像规则。",
+    "`hi` 和 `lo` 是 PPU 位址的高、低位元組，例如 `0x23, 0x42` 表示 `0x2342`。它們是位址位元組，不是圖塊座標。適用正常的 PPU 位址遮罩與鏡像規則。",
+    "`hi` y `lo` son los bytes alto y bajo de una dirección PPU: por ejemplo, `0x23, 0x42` representa `0x2342`. Son bytes de dirección, no coordenadas de tiles. Se aplican las máscaras y los espejos habituales de la PPU.",
+    "`hi` e `lo` são os bytes alto e baixo de um endereço PPU: por exemplo, `0x23, 0x42` representa `0x2342`. São bytes de endereço, não coordenadas de tiles. Aplicam-se as máscaras e o espelhamento normais da PPU.",
+    "`hi` et `lo` sont les octets de poids fort et faible d’une adresse PPU : par exemple, `0x23, 0x42` désigne `0x2342`. Ce ne sont pas des coordonnées de tuiles. Les règles habituelles de masquage et de miroir des adresses PPU s’appliquent.",
+    "`hi` und `lo` sind das obere und untere Byte einer PPU-Adresse: `0x23, 0x42` steht beispielsweise für `0x2342`. Es sind Adressbytes und keine Kachelkoordinaten. Die üblichen Adressmasken und Spiegelungen der PPU gelten weiterhin."
+  ]
+}

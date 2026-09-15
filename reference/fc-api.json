@@ -6120,7 +6120,7 @@
       "args": "void",
       "signature": "void nes_wait_nmi(void);",
       "path": "kitaqfc/lib/runtime.h",
-      "line": 24,
+      "line": 23,
       "comment": "Wait until the NMI handler advances its counter. NMI must already be enabled\nand able to execute; this polling loop has no timeout.",
       "body": "",
       "kind": "function",
@@ -6131,7 +6131,7 @@
         "args": "void",
         "signature": "void nes_wait_nmi(void);",
         "path": "kitaqfc/lib/runtime.c",
-        "line": 178,
+        "line": 185,
         "comment": "Wait until the NMI handler advances its counter. NMI must already be enabled\nand able to execute; this polling loop has no timeout.",
         "body": "void nes_wait_nmi(void)\n{\n    unsigned char start;\n    start = nes_nmi_counter;\n    while (nes_nmi_counter == start)\n    {\n    }\n}",
         "kind": "function"
@@ -6146,7 +6146,7 @@
       "args": "void",
       "signature": "void nes_vblank_wait(void);",
       "path": "kitaqfc/lib/runtime.h",
-      "line": 27,
+      "line": 26,
       "comment": "Wait for the current VBlank to end, then for the next one to begin. Each\nPPUSTATUS read has hardware side effects, including clearing the VBlank flag.",
       "body": "",
       "kind": "function",
@@ -6157,7 +6157,7 @@
         "args": "void",
         "signature": "void nes_vblank_wait(void);",
         "path": "kitaqfc/lib/runtime.c",
-        "line": 189,
+        "line": 196,
         "comment": "Wait for the current VBlank to end, then for the next one to begin. Each\nPPUSTATUS read has hardware side effects, including clearing the VBlank flag.",
         "body": "void nes_vblank_wait(void)\n{\n    while ((PPUSTATUS & 0x80) != 0)\n    {\n    }\n    while ((PPUSTATUS & 0x80) == 0)\n    {\n    }\n}",
         "kind": "function"
@@ -6172,7 +6172,7 @@
       "args": "unsigned short ppu_addr",
       "signature": "void nes_ppu_seek(unsigned short ppu_addr);",
       "path": "kitaqfc/lib/runtime.h",
-      "line": 29,
+      "line": 28,
       "comment": "Reset the PPU address latch with a status read, then write the high/low address bytes.",
       "body": "",
       "kind": "function",
@@ -6180,12 +6180,12 @@
       "definition": {
         "name": "nes_ppu_seek",
         "ret": "void",
-        "args": "unsigned char hi, unsigned char lo",
-        "signature": "void nes_ppu_seek(unsigned char hi, unsigned char lo);",
-        "path": "kitaqfc/lib/ppu.c",
-        "line": 7,
-        "comment": "Write a high/low PPU address pair without resetting the shared latch first.\nThe caller must prepare latch state and safe PPU timing. This legacy signature\ndiffers from runtime.c's nes_ppu_seek; do not link both implementations.",
-        "body": "void nes_ppu_seek(unsigned char hi, unsigned char lo)\n{\n    PPUADDR = hi;\n    PPUADDR = lo;\n}",
+        "args": "unsigned short ppu_addr",
+        "signature": "void nes_ppu_seek(unsigned short ppu_addr);",
+        "path": "kitaqfc/lib/runtime.c",
+        "line": 207,
+        "comment": "Reset the PPU address latch with a status read, then write the high/low address bytes.",
+        "body": "void nes_ppu_seek(unsigned short ppu_addr)\n{\n    unsigned char latch;\n    latch = PPUSTATUS;\n    PPUADDR = (unsigned char)(ppu_addr >> 8);\n    PPUADDR = (unsigned char)ppu_addr;\n    latch = latch;\n}",
         "kind": "function"
       },
       "availability": "implementation",
@@ -6193,6 +6193,18 @@
         "path": "kitaqfc/lib/ppu.c",
         "line": 19,
         "code": "{\n    unsigned char i;\n    nes_ppu_seek(hi, lo);\n    for (i = 0; i != count; ++i)\n        PPUDATA = src[i];\n}\n"
+      },
+      "implementation_excerpt": "void nes_ppu_seek(unsigned char hi, unsigned char lo)\n{\n    PPUADDR = hi;\n    PPUADDR = lo;\n}",
+      "alternative_definition": {
+        "name": "nes_ppu_seek",
+        "ret": "void",
+        "args": "unsigned char hi, unsigned char lo",
+        "signature": "void nes_ppu_seek(unsigned char hi, unsigned char lo);",
+        "path": "kitaqfc/lib/ppu.c",
+        "line": 7,
+        "comment": "Write a high/low PPU address pair without resetting the shared latch first.\nThe caller must prepare latch state and safe PPU timing. This signature\ndiffers from runtime.c's nes_ppu_seek; do not link both implementations.",
+        "body": "void nes_ppu_seek(unsigned char hi, unsigned char lo)\n{\n    PPUADDR = hi;\n    PPUADDR = lo;\n}",
+        "kind": "function"
       }
     },
     {
@@ -6201,7 +6213,7 @@
       "args": "unsigned short ppu_addr, unsigned char* src, unsigned short len",
       "signature": "void nes_ppu_stream_write(unsigned short ppu_addr, unsigned char* src, unsigned short len);",
       "path": "kitaqfc/lib/runtime.h",
-      "line": 32,
+      "line": 31,
       "comment": "Write len source bytes directly through PPUDATA. Call only during an appropriate\nPPU access period; the address increment mode comes from the current PPUCTRL.",
       "body": "",
       "kind": "function",
@@ -6212,7 +6224,7 @@
         "args": "unsigned short ppu_addr, unsigned char* src, unsigned short len",
         "signature": "void nes_ppu_stream_write(unsigned short ppu_addr, unsigned char* src, unsigned short len);",
         "path": "kitaqfc/lib/runtime.c",
-        "line": 212,
+        "line": 219,
         "comment": "Write len source bytes directly through PPUDATA. Call only during an appropriate\nPPU access period; the address increment mode comes from the current PPUCTRL.\nEven a zero-length operation seeks the PPU address and changes the shared latch state.",
         "body": "void nes_ppu_stream_write(unsigned short ppu_addr, unsigned char* src, unsigned short len)\n{\n    nes_ppu_seek(ppu_addr);\n    while (len != 0)\n    {\n        PPUDATA = *src;\n        src = src + 1;\n        len = len - 1;\n    }\n}",
         "kind": "function"
@@ -6230,7 +6242,7 @@
       "args": "unsigned short ppu_addr, unsigned char value, unsigned short len",
       "signature": "void nes_ppu_stream_fill(unsigned short ppu_addr, unsigned char value, unsigned short len);",
       "path": "kitaqfc/lib/runtime.h",
-      "line": 35,
+      "line": 34,
       "comment": "Write value repeatedly through PPUDATA, using the current PPU address increment\nmode. This routine does not wait for VBlank or disable rendering.",
       "body": "",
       "kind": "function",
@@ -6241,7 +6253,7 @@
         "args": "unsigned short ppu_addr, unsigned char value, unsigned short len",
         "signature": "void nes_ppu_stream_fill(unsigned short ppu_addr, unsigned char value, unsigned short len);",
         "path": "kitaqfc/lib/runtime.c",
-        "line": 225,
+        "line": 232,
         "comment": "Write value repeatedly through PPUDATA, using the current PPU address increment\nmode. This routine does not wait for VBlank or disable rendering.",
         "body": "void nes_ppu_stream_fill(unsigned short ppu_addr, unsigned char value, unsigned short len)\n{\n    nes_ppu_seek(ppu_addr);\n    while (len != 0)\n    {\n        PPUDATA = value;\n        len = len - 1;\n    }\n}",
         "kind": "function"
@@ -8265,6 +8277,56 @@
       "availability": "implementation",
       "example": null,
       "new_example": "nes_vrc7_silence_all();"
+    },
+    {
+      "name": "nes_ppu_write_bytes",
+      "ret": "void",
+      "args": "unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count",
+      "signature": "void nes_ppu_write_bytes(unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count);",
+      "path": "kitaqfc/lib/ppu.c",
+      "line": 16,
+      "comment": "Set the address and write count bytes directly through PPUDATA. The current\nPPUCTRL increment mode determines how the destination advances.\ncount is 0..255; zero still changes PPU address/latch state. No bank switch or payload copy is performed.",
+      "body": "void nes_ppu_write_bytes(unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count)\n{\n    unsigned char i;\n    nes_ppu_seek(hi, lo);\n    for (i = 0; i != count; ++i)\n        PPUDATA = src[i];\n}",
+      "kind": "function",
+      "module": "ppu",
+      "availability": "implementation",
+      "definition": {
+        "name": "nes_ppu_write_bytes",
+        "ret": "void",
+        "args": "unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count",
+        "signature": "void nes_ppu_write_bytes(unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count);",
+        "path": "kitaqfc/lib/ppu.c",
+        "line": 16,
+        "comment": "Set the address and write count bytes directly through PPUDATA. The current\nPPUCTRL increment mode determines how the destination advances.\ncount is 0..255; zero still changes PPU address/latch state. No bank switch or payload copy is performed.",
+        "body": "void nes_ppu_write_bytes(unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count)\n{\n    unsigned char i;\n    nes_ppu_seek(hi, lo);\n    for (i = 0; i != count; ++i)\n        PPUDATA = src[i];\n}",
+        "kind": "function"
+      },
+      "example": null
+    },
+    {
+      "name": "nes_ppu_fill",
+      "ret": "void",
+      "args": "unsigned char hi, unsigned char lo, unsigned char value, unsigned char count",
+      "signature": "void nes_ppu_fill(unsigned char hi, unsigned char lo, unsigned char value, unsigned char count);",
+      "path": "kitaqfc/lib/ppu.c",
+      "line": 25,
+      "comment": "Set the address and issue count identical PPUDATA writes without waiting for VBlank.",
+      "body": "void nes_ppu_fill(unsigned char hi, unsigned char lo, unsigned char value, unsigned char count)\n{\n    unsigned char i;\n    nes_ppu_seek(hi, lo);\n    for (i = 0; i != count; ++i)\n        PPUDATA = value;\n}",
+      "kind": "function",
+      "module": "ppu",
+      "availability": "implementation",
+      "definition": {
+        "name": "nes_ppu_fill",
+        "ret": "void",
+        "args": "unsigned char hi, unsigned char lo, unsigned char value, unsigned char count",
+        "signature": "void nes_ppu_fill(unsigned char hi, unsigned char lo, unsigned char value, unsigned char count);",
+        "path": "kitaqfc/lib/ppu.c",
+        "line": 25,
+        "comment": "Set the address and issue count identical PPUDATA writes without waiting for VBlank.",
+        "body": "void nes_ppu_fill(unsigned char hi, unsigned char lo, unsigned char value, unsigned char count)\n{\n    unsigned char i;\n    nes_ppu_seek(hi, lo);\n    for (i = 0; i != count; ++i)\n        PPUDATA = value;\n}",
+        "kind": "function"
+      },
+      "example": null
     }
   ]
 }

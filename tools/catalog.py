@@ -83,6 +83,12 @@ def collect(platform):
    name,args,body=m.groups()
    if name in records:continue
    records[name]=dict(name=name,ret='macro',args=args,signature=m[0],path=f.relative_to(ROOT).as_posix(),line=text.count('\n',0,m.start())+1,comment='',body='',kind='macro',module=f.stem,definition=None,availability='macro')
+ if platform=='fc':
+  # Public address-pair helpers are defined directly in ppu.c, without a header.
+  for r in definitions(lib/'ppu.c'):
+   if r['name'] in ['nes_ppu_write_bytes','nes_ppu_fill']:
+    r.update(module='ppu',availability='implementation',definition=dict(r))
+    records[r['name']]=r
  if platform=='gb':
   # Expose both compile-time contracts, including the 96-line-only APIs. The
   # primary signature is 120-line where available; original notes identify each

@@ -96,6 +96,9 @@ def render(record, contract, language, messages, ui):
             origin = record['implementation_source']
             out.append('<p class="source">'+html.escape(origin['path'])+':'+str(origin['line'])+'</p>')
         out.append(code(record['implementation_excerpt'], 'c' if record.get('kind') == 'macro' else 'csharp'))
+    if record.get('alternative_definition'):
+        source = record['alternative_definition']
+        out += ['<p class="source">' + html.escape(source['path']) + ':' + str(source['line']) + '</p>', code(source['body'])]
     out.append('</details></details>')
     return ''.join(out)
 
@@ -145,6 +148,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_vram_examples(contracts, 'vramq', {'fc': {'nrom'}}))
     proofs.update(verified_vram_examples(contracts, 'vram-macros', {'fc': {'nrom'}}))
     proofs.update(verified_runtime_queue_examples(contracts))
+    proofs.update(verified_runtime_ppu_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -262,7 +266,7 @@ def verified_vram_examples(contracts, family='vram', modes=None):
     if not path.exists(): return {}
     runs = json.loads(path.read_text(encoding='utf-8'))['records']
     if len(runs)!=sum(len(values) for values in modes.values()) or not all(r['passed'] for r in runs): return {}
-    if family in ['vram-macros','runtime-queue']:
+    if family in ['vram-macros','runtime-queue','runtime-ppu']:
         repos=SITE.parents[1]/'publish/github_20260912'
         if not repos.exists():repos=SITE.parent
         for run in runs:
@@ -306,6 +310,38 @@ def verified_runtime_queue_examples(contracts):
         if not all(r['compiler_sha256']==state['compiler_sha256'] and r['ppu_writes_while_rendering']==0 and r['geometry_pixels_checked']==18432 for r in result['runs']):return {}
         result.update(state_path=path.relative_to(SITE).as_posix(),state_count=13)
     return results
+
+
+def verified_runtime_ppu_examples(contracts):
+    """Require real state/pixel evidence for each separately linked PPU API form."""
+    folder=SITE/'verification/api-runtime-ppu'
+    if not (folder/'results.json').exists() or not (folder/'state_checks.json').exists():return {}
+    runs=json.loads((folder/'results.json').read_text(encoding='utf-8'))['records']
+    state=json.loads((folder/'state_checks.json').read_text(encoding='utf-8'))
+    if len(runs)!=2 or {r['mode'] for r in runs}!={'runtime','pair'}:return {}
+    if len(state['cases'])!=14 or not all(r['passed'] and r['result']==r['expected_result'] and r['vram']==r['expected_vram'] and r['data_writes']==r['expected_writes'] for r in state['cases']):return {}
+    repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    for name,expected in state['library_sha256'].items():
+        source=repos/'kitaqfc/lib'/name
+        if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('PPU state-test source changed: '+name)
+    script=repos/'kitaqfc/scripts/test-runtime-ppu.py'
+    if script.exists() and hashlib.sha256(script.read_bytes()).hexdigest()!=state['script_sha256']:raise ValueError('PPU state-test script changed')
+    for run in runs:
+        if not run['passed'] or run['frames']!=240 or run['geometry_pixels_checked']!=34816:return {}
+        if any(run[k]!=0 for k in ['label_pixel_mismatches','geometry_pixel_mismatches','geometry_color_mismatches','ppu_writes_while_rendering']):return {}
+        if run['compiler_sha256']!=state['compiler_sha256'] or run['emulator_sha256']!=state['emulator_sha256'] or run['library_sha256']!=state['library_sha256']:return {}
+        files={run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}
+        for file,expected in files.items():
+            if hashlib.sha256((SITE/file).read_bytes()).hexdigest()!=expected:raise ValueError('PPU example evidence changed: '+file)
+    result={}
+    for key,contract in contracts.items():
+        if contract['review']!='runtime-ppu-source-20260915':continue
+        programs={e['program'] for e in [contract['example']]+contract['example'].get('additional',[])}
+        selected=[r for r in runs if r['source'] in programs]
+        if len(selected)!=len(programs):raise ValueError('Missing PPU API form: '+key)
+        result[key]=dict(api=key.split(':')[1],kind='runtime-ppu',runs=selected,state_path='verification/api-runtime-ppu/state_checks.json',state_count=14)
+    return result
 
 
 def verified_oam_library_examples(contracts):
@@ -585,7 +621,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue','runtime-ppu']:
                 if not example.get('additional'):
                     block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
