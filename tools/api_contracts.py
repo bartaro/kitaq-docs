@@ -168,6 +168,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_text_layout_examples(contracts))
     proofs.update(verified_dialogue_examples(contracts))
     proofs.update(verified_batch100_examples(contracts))
+    proofs.update(verified_batch200_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -762,6 +763,46 @@ def verified_batch100_examples(contracts):
         matched=[r for r in runs if r['source']==contract['example']['program']]
         if len(matched)!=(2 if key.startswith('gb:') else 1):raise ValueError('Batch API sample missing: '+key)
         result[key]={'api':key.split(':')[1],'kind':'batch100','runs':matched}
+    return result
+
+
+def verified_batch200_examples(contracts):
+    """Reject incomplete source, runtime, boundary and image proof for the second batch."""
+    selected={k:c for k,c in contracts.items() if c['review']=='batch200-source-20260915'}
+    if not selected:return {}
+    if len(selected)!=100:raise ValueError('Second batch must contain exactly 100 contracts')
+    repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    folder=SITE/'verification/api-batch200';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    review=json.loads((SOURCE/'batch200_review_sources.json').read_text(encoding='utf-8'))
+    for path,digest in review['source_sha256'].items():
+        if sha(repos/path)!=digest:raise ValueError('Second-batch reviewed source changed: '+path)
+    evidence=json.loads((folder/'results.json').read_text(encoding='utf-8'));runs=evidence['records']
+    if evidence['checker_sha256']!=sha(SITE/'tools/check_batch200.py'):raise ValueError('Second-batch image checker changed')
+    if len(runs)!=20 or not all(r['passed'] and r['actual']==r['expected'] and r['pixel_mismatches']==0 for r in runs):raise ValueError('Second-batch image/RAM proof incomplete')
+    edges=json.loads((folder/'edge_checks.json').read_text(encoding='utf-8'))
+    if edges['script_sha256']!=sha(SITE/'tools/check_batch200_edges.py'):raise ValueError('Second-batch edge checker changed')
+    if len(edges['records'])!=65 or not all(r['passed'] and r['actual']==r['expected'] for r in edges['records']):raise ValueError('Second-batch boundary proof incomplete')
+    for row in runs+edges['records']:
+        for name in ['source','rom']+(['image'] if 'image' in row else []):
+            if sha(SITE/row[name])!=row[name+'_sha256']:raise ValueError('Second-batch evidence changed: '+row[name])
+        for path,digest in row.get('input_sha256',{}).items():
+            actual=repos/path if path.startswith(('kitaqgb/','kitaqfc/')) else SITE/path
+            if sha(actual)!=digest:raise ValueError('Second-batch build input changed: '+path)
+        p=row['platform']
+        if row['compiler_sha256']!=sha(repos/('kitaq'+p)/('kitaq'+p+'.exe')):raise ValueError('Second-batch compiler changed')
+        if row['emulator_sha256']!=sha(repos/('kokura/kokura-cli.exe' if p=='gb' else 'kurosaki/kurosaki.exe')):raise ValueError('Second-batch emulator changed')
+        if 'ppu' in row and row['ppu']!=row['expected_ppu']:raise ValueError('Second-batch PPU proof mismatch')
+        if 'vram' in row and row['vram']!=row['expected_vram']:raise ValueError('Second-batch VRAM proof mismatch')
+    result={}
+    for key,c in selected.items():
+        examples=[c['example']]+c['example'].get('additional',[]);matched=[]
+        for e in examples:
+            found=[r for r in runs if r['source']==e['program']]
+            count=1 if key=='gb:Scroll_SplitPushBgColor0' or key.startswith('fc:') else 2
+            if len(found)!=count:raise ValueError('Second-batch sample missing: '+key)
+            matched+=found
+        result[key]={'api':key.split(':')[1],'kind':'batch200','runs':matched}
     return result
 
 
