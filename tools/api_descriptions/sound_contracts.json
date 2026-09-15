@@ -1,0 +1,2565 @@
+{
+  "gb:Audio_Init": {
+    "review": "sound-source-20260916",
+    "record_sha256": "b712d6acffba79e42dcabfd8aa7c04a8864804bc99357af285109208636b6ce4",
+    "purpose": [
+      "sound_Audio_Init"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_gb_setup"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_Update": {
+    "review": "sound-source-20260916",
+    "record_sha256": "34bcd5337c5dec9c6798f5a69673daba552cbce44bbb26854aefe7950b4bbf06",
+    "purpose": [
+      "sound_Audio_Update"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_gb_setup",
+      "sound_update_pause"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_music.c",
+      "code": "// Original two-note phrase: pause preserves the cursor; the enable gate does not.\n#include \"gb_sound_example.h\"\n__prg_rom u8 song[]={\n    AUDIO_CMD_SET_INST,AUDIO_STREAM_CHANNEL_CH1,2,0xC0,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,33,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,40,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_LOOP\n};\nvoid main() {\n    u8 delay;\n    sound_begin(\"MUSIC PAUSE GATE\");\n    Audio_SetMasterVolume(3,3);\n    Audio_PlayMusic(0,song);\n    sound_wait(30);\n    delay=Audio_Delay;\n    Audio_SetPaused(1);\n    sound_wait(30);\n    sound_result[0]=(u8)(Audio_Delay==delay);\n    sound_result[1]=Audio_Paused;\n    Audio_SetPaused(0);\n    sound_wait(30);\n    sound_result[2]=Audio_Paused;\n    // Disabling suppresses note writes; the next 30 updates still consume data.\n    Audio_SetMusicEnabled(0);\n    sound_wait(30);\n    sound_result[3]=Audio_Delay;\n    sound_result[4]=Audio_MusicEnabled;\n    // Explicitly stop the sounding channel while leaving the stream running.\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(30);\n    Audio_SetMusicEnabled(1);\n    sound_wait(30);\n    Audio_StopMusic();\n    sound_result[5]=Audio_PlayingMusic;\n    sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-music"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_music.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-music.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_PlayMusic": {
+    "review": "sound-source-20260916",
+    "record_sha256": "100d2dae6ebc34f242e7ed7db4e77b6300e0c189f9d29f115bd0b3469924c6aa",
+    "purpose": [
+      "sound_Audio_PlayMusic"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "sound_arg_bank"
+        ]
+      ],
+      [
+        "song",
+        [
+          "sound_arg_song"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_gb_setup",
+      "sound_music_start"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_music.c",
+      "code": "// Original two-note phrase: pause preserves the cursor; the enable gate does not.\n#include \"gb_sound_example.h\"\n__prg_rom u8 song[]={\n    AUDIO_CMD_SET_INST,AUDIO_STREAM_CHANNEL_CH1,2,0xC0,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,33,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,40,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_LOOP\n};\nvoid main() {\n    u8 delay;\n    sound_begin(\"MUSIC PAUSE GATE\");\n    Audio_SetMasterVolume(3,3);\n    Audio_PlayMusic(0,song);\n    sound_wait(30);\n    delay=Audio_Delay;\n    Audio_SetPaused(1);\n    sound_wait(30);\n    sound_result[0]=(u8)(Audio_Delay==delay);\n    sound_result[1]=Audio_Paused;\n    Audio_SetPaused(0);\n    sound_wait(30);\n    sound_result[2]=Audio_Paused;\n    // Disabling suppresses note writes; the next 30 updates still consume data.\n    Audio_SetMusicEnabled(0);\n    sound_wait(30);\n    sound_result[3]=Audio_Delay;\n    sound_result[4]=Audio_MusicEnabled;\n    // Explicitly stop the sounding channel while leaving the stream running.\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(30);\n    Audio_SetMusicEnabled(1);\n    sound_wait(30);\n    Audio_StopMusic();\n    sound_result[5]=Audio_PlayingMusic;\n    sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-music"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_music.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-music.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_StopMusic": {
+    "review": "sound-source-20260916",
+    "record_sha256": "ede307a55126a0c3dd2a3431677cc474a1432bf0ac6b9ed9c7f77a9a10099892",
+    "purpose": [
+      "sound_Audio_StopMusic"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_stopmusic_effects"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_music.c",
+      "code": "// Original two-note phrase: pause preserves the cursor; the enable gate does not.\n#include \"gb_sound_example.h\"\n__prg_rom u8 song[]={\n    AUDIO_CMD_SET_INST,AUDIO_STREAM_CHANNEL_CH1,2,0xC0,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,33,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,40,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_LOOP\n};\nvoid main() {\n    u8 delay;\n    sound_begin(\"MUSIC PAUSE GATE\");\n    Audio_SetMasterVolume(3,3);\n    Audio_PlayMusic(0,song);\n    sound_wait(30);\n    delay=Audio_Delay;\n    Audio_SetPaused(1);\n    sound_wait(30);\n    sound_result[0]=(u8)(Audio_Delay==delay);\n    sound_result[1]=Audio_Paused;\n    Audio_SetPaused(0);\n    sound_wait(30);\n    sound_result[2]=Audio_Paused;\n    // Disabling suppresses note writes; the next 30 updates still consume data.\n    Audio_SetMusicEnabled(0);\n    sound_wait(30);\n    sound_result[3]=Audio_Delay;\n    sound_result[4]=Audio_MusicEnabled;\n    // Explicitly stop the sounding channel while leaving the stream running.\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(30);\n    Audio_SetMusicEnabled(1);\n    sound_wait(30);\n    Audio_StopMusic();\n    sound_result[5]=Audio_PlayingMusic;\n    sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-music"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_music.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-music.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetPaused": {
+    "review": "sound-source-20260916",
+    "record_sha256": "bacb9491a8428ff273065e8a8319fb95bdb52fc22bdb6ed0a003aca55a3e0640",
+    "purpose": [
+      "sound_Audio_SetPaused"
+    ],
+    "args": [
+      [
+        "on",
+        [
+          "sound_arg_on"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_gb_setup",
+      "sound_pause_ch3"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_music.c",
+      "code": "// Original two-note phrase: pause preserves the cursor; the enable gate does not.\n#include \"gb_sound_example.h\"\n__prg_rom u8 song[]={\n    AUDIO_CMD_SET_INST,AUDIO_STREAM_CHANNEL_CH1,2,0xC0,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,33,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,40,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_LOOP\n};\nvoid main() {\n    u8 delay;\n    sound_begin(\"MUSIC PAUSE GATE\");\n    Audio_SetMasterVolume(3,3);\n    Audio_PlayMusic(0,song);\n    sound_wait(30);\n    delay=Audio_Delay;\n    Audio_SetPaused(1);\n    sound_wait(30);\n    sound_result[0]=(u8)(Audio_Delay==delay);\n    sound_result[1]=Audio_Paused;\n    Audio_SetPaused(0);\n    sound_wait(30);\n    sound_result[2]=Audio_Paused;\n    // Disabling suppresses note writes; the next 30 updates still consume data.\n    Audio_SetMusicEnabled(0);\n    sound_wait(30);\n    sound_result[3]=Audio_Delay;\n    sound_result[4]=Audio_MusicEnabled;\n    // Explicitly stop the sounding channel while leaving the stream running.\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(30);\n    Audio_SetMusicEnabled(1);\n    sound_wait(30);\n    Audio_StopMusic();\n    sound_result[5]=Audio_PlayingMusic;\n    sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-music"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_music.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-music.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_PlaySFX": {
+    "review": "sound-source-20260916",
+    "record_sha256": "ea9281d6f555ff658c74aa0d97c79983b8dc658e89d56a35facd0a292aa7657c",
+    "purpose": [
+      "sound_Audio_PlaySFX"
+    ],
+    "args": [
+      [
+        "sfx",
+        [
+          "sound_arg_sfx"
+        ]
+      ],
+      [
+        "priority",
+        [
+          "sound_arg_priority"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_sfx_format",
+      "sound_sfx_restore"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_sfx.c",
+      "code": "// Each pair lasts one update. Priority controls replacement within each slot.\n#include \"gb_sound_example.h\"\n#pragma bank 2\n__prg_rom u8 effect[]={33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,\n    40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,0};\n__prg_rom u8 wave_effect[]={AUDIO_SFX_CH3_MARKER,\n    33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,\n    40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,0};\n#pragma bank 0\nvoid main() {\n    sound_begin(\"BANKED SOUND EFFECT\");\n    Audio_SetMasterVolume(3,3);\n    // Read the marker in bank 2 while restoring the caller's original mapping.\n    Audio_PlaySFXPannedBanked(2,effect,5,AUDIO_PAN_LEFT);\n    sound_result[0]=Audio_EffectPriority;\n    Audio_PlaySFXBanked(2,effect,4);\n    sound_result[1]=Audio_EffectPriority;\n    sound_wait(30);\n    Audio_PlaySFXPannedBanked(2,wave_effect,5,AUDIO_PAN_RIGHT);\n    sound_result[2]=Audio_EffectPriority3;\n    sound_wait(30);\n    // Implicit-bank entry points capture bank 2; the service restores bank 1.\n    __bankswitch(2);\n    Audio_PlaySFX(effect,5);\n    __bankswitch(1);\n    sound_result[3]=Audio_EffectBank;\n    sound_wait(30);\n    __bankswitch(2);\n    Audio_PlaySFXPanned(effect,5,AUDIO_PAN_RIGHT);\n    __bankswitch(1);\n    sound_wait(6);\n    Audio_StopSfx();\n    sound_result[4]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    // Disabling effects releases current owners; re-enable before the next request.\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(6);\n    Audio_SetSfxEnabled(0);\n    sound_result[5]=Audio_SfxEnabled;\n    sound_result[6]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    Audio_SetSfxEnabled(1);\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(30);\n    sound_result[7]=Audio_SfxEnabled;\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-sfx"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_sfx.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-sfx.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_PlaySFXBanked": {
+    "review": "sound-source-20260916",
+    "record_sha256": "467fed57f1579e83d72d14e32af5277e6f0d4cedc8b8ca07abf528dbac6be9d0",
+    "purpose": [
+      "sound_Audio_PlaySFXBanked"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "sound_arg_bank"
+        ]
+      ],
+      [
+        "sfx",
+        [
+          "sound_arg_sfx"
+        ]
+      ],
+      [
+        "priority",
+        [
+          "sound_arg_priority"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_sfx_format",
+      "sound_sfx_restore"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_sfx.c",
+      "code": "// Each pair lasts one update. Priority controls replacement within each slot.\n#include \"gb_sound_example.h\"\n#pragma bank 2\n__prg_rom u8 effect[]={33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,\n    40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,0};\n__prg_rom u8 wave_effect[]={AUDIO_SFX_CH3_MARKER,\n    33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,\n    40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,0};\n#pragma bank 0\nvoid main() {\n    sound_begin(\"BANKED SOUND EFFECT\");\n    Audio_SetMasterVolume(3,3);\n    // Read the marker in bank 2 while restoring the caller's original mapping.\n    Audio_PlaySFXPannedBanked(2,effect,5,AUDIO_PAN_LEFT);\n    sound_result[0]=Audio_EffectPriority;\n    Audio_PlaySFXBanked(2,effect,4);\n    sound_result[1]=Audio_EffectPriority;\n    sound_wait(30);\n    Audio_PlaySFXPannedBanked(2,wave_effect,5,AUDIO_PAN_RIGHT);\n    sound_result[2]=Audio_EffectPriority3;\n    sound_wait(30);\n    // Implicit-bank entry points capture bank 2; the service restores bank 1.\n    __bankswitch(2);\n    Audio_PlaySFX(effect,5);\n    __bankswitch(1);\n    sound_result[3]=Audio_EffectBank;\n    sound_wait(30);\n    __bankswitch(2);\n    Audio_PlaySFXPanned(effect,5,AUDIO_PAN_RIGHT);\n    __bankswitch(1);\n    sound_wait(6);\n    Audio_StopSfx();\n    sound_result[4]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    // Disabling effects releases current owners; re-enable before the next request.\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(6);\n    Audio_SetSfxEnabled(0);\n    sound_result[5]=Audio_SfxEnabled;\n    sound_result[6]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    Audio_SetSfxEnabled(1);\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(30);\n    sound_result[7]=Audio_SfxEnabled;\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-sfx"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_sfx.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-sfx.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_PlaySFXPanned": {
+    "review": "sound-source-20260916",
+    "record_sha256": "c4e43bb0089d919b4ce6b27f7b91e6927e154cc0daad5af42d16a0561ac6aa12",
+    "purpose": [
+      "sound_Audio_PlaySFXPanned"
+    ],
+    "args": [
+      [
+        "sfx",
+        [
+          "sound_arg_sfx"
+        ]
+      ],
+      [
+        "priority",
+        [
+          "sound_arg_priority"
+        ]
+      ],
+      [
+        "pan",
+        [
+          "sound_arg_pan"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_sfx_format",
+      "sound_sfx_restore"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_sfx.c",
+      "code": "// Each pair lasts one update. Priority controls replacement within each slot.\n#include \"gb_sound_example.h\"\n#pragma bank 2\n__prg_rom u8 effect[]={33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,\n    40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,0};\n__prg_rom u8 wave_effect[]={AUDIO_SFX_CH3_MARKER,\n    33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,\n    40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,0};\n#pragma bank 0\nvoid main() {\n    sound_begin(\"BANKED SOUND EFFECT\");\n    Audio_SetMasterVolume(3,3);\n    // Read the marker in bank 2 while restoring the caller's original mapping.\n    Audio_PlaySFXPannedBanked(2,effect,5,AUDIO_PAN_LEFT);\n    sound_result[0]=Audio_EffectPriority;\n    Audio_PlaySFXBanked(2,effect,4);\n    sound_result[1]=Audio_EffectPriority;\n    sound_wait(30);\n    Audio_PlaySFXPannedBanked(2,wave_effect,5,AUDIO_PAN_RIGHT);\n    sound_result[2]=Audio_EffectPriority3;\n    sound_wait(30);\n    // Implicit-bank entry points capture bank 2; the service restores bank 1.\n    __bankswitch(2);\n    Audio_PlaySFX(effect,5);\n    __bankswitch(1);\n    sound_result[3]=Audio_EffectBank;\n    sound_wait(30);\n    __bankswitch(2);\n    Audio_PlaySFXPanned(effect,5,AUDIO_PAN_RIGHT);\n    __bankswitch(1);\n    sound_wait(6);\n    Audio_StopSfx();\n    sound_result[4]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    // Disabling effects releases current owners; re-enable before the next request.\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(6);\n    Audio_SetSfxEnabled(0);\n    sound_result[5]=Audio_SfxEnabled;\n    sound_result[6]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    Audio_SetSfxEnabled(1);\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(30);\n    sound_result[7]=Audio_SfxEnabled;\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-sfx"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_sfx.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-sfx.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_PlaySFXPannedBanked": {
+    "review": "sound-source-20260916",
+    "record_sha256": "8fb73e14f16366133813ec0a899c609993221f3e1e609875922116f5efb65fba",
+    "purpose": [
+      "sound_Audio_PlaySFXPannedBanked"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "sound_arg_bank"
+        ]
+      ],
+      [
+        "sfx",
+        [
+          "sound_arg_sfx"
+        ]
+      ],
+      [
+        "priority",
+        [
+          "sound_arg_priority"
+        ]
+      ],
+      [
+        "pan",
+        [
+          "sound_arg_pan"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_sfx_format",
+      "sound_sfx_restore"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_sfx.c",
+      "code": "// Each pair lasts one update. Priority controls replacement within each slot.\n#include \"gb_sound_example.h\"\n#pragma bank 2\n__prg_rom u8 effect[]={33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,\n    40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,0};\n__prg_rom u8 wave_effect[]={AUDIO_SFX_CH3_MARKER,\n    33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,\n    40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,0};\n#pragma bank 0\nvoid main() {\n    sound_begin(\"BANKED SOUND EFFECT\");\n    Audio_SetMasterVolume(3,3);\n    // Read the marker in bank 2 while restoring the caller's original mapping.\n    Audio_PlaySFXPannedBanked(2,effect,5,AUDIO_PAN_LEFT);\n    sound_result[0]=Audio_EffectPriority;\n    Audio_PlaySFXBanked(2,effect,4);\n    sound_result[1]=Audio_EffectPriority;\n    sound_wait(30);\n    Audio_PlaySFXPannedBanked(2,wave_effect,5,AUDIO_PAN_RIGHT);\n    sound_result[2]=Audio_EffectPriority3;\n    sound_wait(30);\n    // Implicit-bank entry points capture bank 2; the service restores bank 1.\n    __bankswitch(2);\n    Audio_PlaySFX(effect,5);\n    __bankswitch(1);\n    sound_result[3]=Audio_EffectBank;\n    sound_wait(30);\n    __bankswitch(2);\n    Audio_PlaySFXPanned(effect,5,AUDIO_PAN_RIGHT);\n    __bankswitch(1);\n    sound_wait(6);\n    Audio_StopSfx();\n    sound_result[4]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    // Disabling effects releases current owners; re-enable before the next request.\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(6);\n    Audio_SetSfxEnabled(0);\n    sound_result[5]=Audio_SfxEnabled;\n    sound_result[6]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    Audio_SetSfxEnabled(1);\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(30);\n    sound_result[7]=Audio_SfxEnabled;\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-sfx"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_sfx.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-sfx.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_StopSfx": {
+    "review": "sound-source-20260916",
+    "record_sha256": "762bc8c4d28ba1f0368f40278e3ef376513dad0262cba27058a9f73ed7b15883",
+    "purpose": [
+      "sound_Audio_StopSfx"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_sfx_format",
+      "sound_sfx_restore"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_sfx.c",
+      "code": "// Each pair lasts one update. Priority controls replacement within each slot.\n#include \"gb_sound_example.h\"\n#pragma bank 2\n__prg_rom u8 effect[]={33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,\n    40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,0};\n__prg_rom u8 wave_effect[]={AUDIO_SFX_CH3_MARKER,\n    33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,\n    40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,0};\n#pragma bank 0\nvoid main() {\n    sound_begin(\"BANKED SOUND EFFECT\");\n    Audio_SetMasterVolume(3,3);\n    // Read the marker in bank 2 while restoring the caller's original mapping.\n    Audio_PlaySFXPannedBanked(2,effect,5,AUDIO_PAN_LEFT);\n    sound_result[0]=Audio_EffectPriority;\n    Audio_PlaySFXBanked(2,effect,4);\n    sound_result[1]=Audio_EffectPriority;\n    sound_wait(30);\n    Audio_PlaySFXPannedBanked(2,wave_effect,5,AUDIO_PAN_RIGHT);\n    sound_result[2]=Audio_EffectPriority3;\n    sound_wait(30);\n    // Implicit-bank entry points capture bank 2; the service restores bank 1.\n    __bankswitch(2);\n    Audio_PlaySFX(effect,5);\n    __bankswitch(1);\n    sound_result[3]=Audio_EffectBank;\n    sound_wait(30);\n    __bankswitch(2);\n    Audio_PlaySFXPanned(effect,5,AUDIO_PAN_RIGHT);\n    __bankswitch(1);\n    sound_wait(6);\n    Audio_StopSfx();\n    sound_result[4]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    // Disabling effects releases current owners; re-enable before the next request.\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(6);\n    Audio_SetSfxEnabled(0);\n    sound_result[5]=Audio_SfxEnabled;\n    sound_result[6]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    Audio_SetSfxEnabled(1);\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(30);\n    sound_result[7]=Audio_SfxEnabled;\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-sfx"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_sfx.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-sfx.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_StopChannel": {
+    "review": "sound-source-20260916",
+    "record_sha256": "d4790cb6a536bd7423bdd7500e399e261f129941f1d71ce744e889459487331e",
+    "purpose": [
+      "sound_Audio_StopChannel"
+    ],
+    "args": [
+      [
+        "ch",
+        [
+          "sound_arg_ch"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_stopchannel"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetMusicEnabled": {
+    "review": "sound-source-20260916",
+    "record_sha256": "3f95ba13db2821fe48dd8c2a5fa040aa5dbcb157c36d7346bce7f9a16278bfa4",
+    "purpose": [
+      "sound_Audio_SetMusicEnabled"
+    ],
+    "args": [
+      [
+        "on",
+        [
+          "sound_arg_on"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_gate"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_music.c",
+      "code": "// Original two-note phrase: pause preserves the cursor; the enable gate does not.\n#include \"gb_sound_example.h\"\n__prg_rom u8 song[]={\n    AUDIO_CMD_SET_INST,AUDIO_STREAM_CHANNEL_CH1,2,0xC0,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,33,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_NOTE,AUDIO_STREAM_CHANNEL_CH1,40,AUDIO_CMD_WAIT,59,\n    AUDIO_CMD_LOOP\n};\nvoid main() {\n    u8 delay;\n    sound_begin(\"MUSIC PAUSE GATE\");\n    Audio_SetMasterVolume(3,3);\n    Audio_PlayMusic(0,song);\n    sound_wait(30);\n    delay=Audio_Delay;\n    Audio_SetPaused(1);\n    sound_wait(30);\n    sound_result[0]=(u8)(Audio_Delay==delay);\n    sound_result[1]=Audio_Paused;\n    Audio_SetPaused(0);\n    sound_wait(30);\n    sound_result[2]=Audio_Paused;\n    // Disabling suppresses note writes; the next 30 updates still consume data.\n    Audio_SetMusicEnabled(0);\n    sound_wait(30);\n    sound_result[3]=Audio_Delay;\n    sound_result[4]=Audio_MusicEnabled;\n    // Explicitly stop the sounding channel while leaving the stream running.\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(30);\n    Audio_SetMusicEnabled(1);\n    sound_wait(30);\n    Audio_StopMusic();\n    sound_result[5]=Audio_PlayingMusic;\n    sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-music"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_music.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-music.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetSfxEnabled": {
+    "review": "sound-source-20260916",
+    "record_sha256": "2928722577d131ecf54e6255a5079f1761d33dd312f3efd29705bf3922fec8fe",
+    "purpose": [
+      "sound_Audio_SetSfxEnabled"
+    ],
+    "args": [
+      [
+        "on",
+        [
+          "sound_arg_on"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_sfx_restore",
+      "sound_sfx_disabled_request"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_sfx.c",
+      "code": "// Each pair lasts one update. Priority controls replacement within each slot.\n#include \"gb_sound_example.h\"\n#pragma bank 2\n__prg_rom u8 effect[]={33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,33,0xC0,\n    40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,40,0xC0,0};\n__prg_rom u8 wave_effect[]={AUDIO_SFX_CH3_MARKER,\n    33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,33,0x20,\n    40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,40,0x20,0};\n#pragma bank 0\nvoid main() {\n    sound_begin(\"BANKED SOUND EFFECT\");\n    Audio_SetMasterVolume(3,3);\n    // Read the marker in bank 2 while restoring the caller's original mapping.\n    Audio_PlaySFXPannedBanked(2,effect,5,AUDIO_PAN_LEFT);\n    sound_result[0]=Audio_EffectPriority;\n    Audio_PlaySFXBanked(2,effect,4);\n    sound_result[1]=Audio_EffectPriority;\n    sound_wait(30);\n    Audio_PlaySFXPannedBanked(2,wave_effect,5,AUDIO_PAN_RIGHT);\n    sound_result[2]=Audio_EffectPriority3;\n    sound_wait(30);\n    // Implicit-bank entry points capture bank 2; the service restores bank 1.\n    __bankswitch(2);\n    Audio_PlaySFX(effect,5);\n    __bankswitch(1);\n    sound_result[3]=Audio_EffectBank;\n    sound_wait(30);\n    __bankswitch(2);\n    Audio_PlaySFXPanned(effect,5,AUDIO_PAN_RIGHT);\n    __bankswitch(1);\n    sound_wait(6);\n    Audio_StopSfx();\n    sound_result[4]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    // Disabling effects releases current owners; re-enable before the next request.\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(6);\n    Audio_SetSfxEnabled(0);\n    sound_result[5]=Audio_SfxEnabled;\n    sound_result[6]=(u8)(Audio_EffectPointer==0);\n    sound_wait(24);\n    Audio_SetSfxEnabled(1);\n    Audio_PlaySFXBanked(2,effect,5);\n    sound_wait(30);\n    sound_result[7]=Audio_SfxEnabled;\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-sfx"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_sfx.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-sfx.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetMasterVolume": {
+    "review": "sound-source-20260916",
+    "record_sha256": "2ce669835ffbe3bff8b13680d5921d4b4a94262e5b962c5194b78698d5a388d5",
+    "purpose": [
+      "sound_Audio_SetMasterVolume"
+    ],
+    "args": [
+      [
+        "left",
+        [
+          "sound_arg_left"
+        ]
+      ],
+      [
+        "right",
+        [
+          "sound_arg_right"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [],
+    "example": {
+      "program": "samples/api-examples/gb/sound_mix.c",
+      "code": "// A sustained pulse moves left, right and center, then fades to a quieter level.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"PAN AND VOLUME\");\n    Audio_SetMasterVolume(7,7);\n    Audio_Ch1NoteOn(33,0xC0,2);\n    Audio_SetPan(AUDIO_CHANNEL_CH1,AUDIO_PAN_LEFT);\n    sound_result[0]=NR51;\n    sound_wait(30);\n    // Packed low two bits are CH1: 2 means right. Other channels remain centered.\n    Audio_SetPanPacked(2);\n    sound_result[1]=NR51;\n    sound_wait(30);\n    Audio_SetPanPacked(0);\n    sound_result[2]=NR51;\n    Audio_FadeToMasterVolume(1,1,5);\n    sound_wait(30);\n    sound_result[3]=NR50;\n    sound_result[4]=Audio_FadeActive;\n    sound_wait(30);\n    // Cancel halfway through a rise: retain volume 4 instead of reaching 7.\n    Audio_FadeToMasterVolume(7,7,5);\n    sound_wait(15);\n    Audio_CancelMasterVolumeFade();\n    sound_result[5]=NR50;\n    sound_wait(30);\n    sound_result[6]=NR50;\n    // A zero fade interval sets the target immediately. Level zero is not mute.\n    Audio_FadeToMasterVolume(0,0,0);\n    sound_result[7]=NR50;\n    sound_wait(30);\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-mix"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_mix.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-mix.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_FadeToMasterVolume": {
+    "review": "sound-source-20260916",
+    "record_sha256": "812464203455df7c3f5f1b1ab833b06bcd7e3a3883f6da5abe94242be563f942",
+    "purpose": [
+      "sound_Audio_FadeToMasterVolume"
+    ],
+    "args": [
+      [
+        "left",
+        [
+          "sound_arg_left"
+        ]
+      ],
+      [
+        "right",
+        [
+          "sound_arg_right"
+        ]
+      ],
+      [
+        "step_frames",
+        [
+          "sound_arg_step_frames"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_gb_setup"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_mix.c",
+      "code": "// A sustained pulse moves left, right and center, then fades to a quieter level.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"PAN AND VOLUME\");\n    Audio_SetMasterVolume(7,7);\n    Audio_Ch1NoteOn(33,0xC0,2);\n    Audio_SetPan(AUDIO_CHANNEL_CH1,AUDIO_PAN_LEFT);\n    sound_result[0]=NR51;\n    sound_wait(30);\n    // Packed low two bits are CH1: 2 means right. Other channels remain centered.\n    Audio_SetPanPacked(2);\n    sound_result[1]=NR51;\n    sound_wait(30);\n    Audio_SetPanPacked(0);\n    sound_result[2]=NR51;\n    Audio_FadeToMasterVolume(1,1,5);\n    sound_wait(30);\n    sound_result[3]=NR50;\n    sound_result[4]=Audio_FadeActive;\n    sound_wait(30);\n    // Cancel halfway through a rise: retain volume 4 instead of reaching 7.\n    Audio_FadeToMasterVolume(7,7,5);\n    sound_wait(15);\n    Audio_CancelMasterVolumeFade();\n    sound_result[5]=NR50;\n    sound_wait(30);\n    sound_result[6]=NR50;\n    // A zero fade interval sets the target immediately. Level zero is not mute.\n    Audio_FadeToMasterVolume(0,0,0);\n    sound_result[7]=NR50;\n    sound_wait(30);\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-mix"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_mix.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-mix.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_CancelMasterVolumeFade": {
+    "review": "sound-source-20260916",
+    "record_sha256": "e94a58824c089e0d3680105320cbfbf4b952f61ecd50c82f1165787baa7648fe",
+    "purpose": [
+      "sound_Audio_CancelMasterVolumeFade"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [],
+    "example": {
+      "program": "samples/api-examples/gb/sound_mix.c",
+      "code": "// A sustained pulse moves left, right and center, then fades to a quieter level.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"PAN AND VOLUME\");\n    Audio_SetMasterVolume(7,7);\n    Audio_Ch1NoteOn(33,0xC0,2);\n    Audio_SetPan(AUDIO_CHANNEL_CH1,AUDIO_PAN_LEFT);\n    sound_result[0]=NR51;\n    sound_wait(30);\n    // Packed low two bits are CH1: 2 means right. Other channels remain centered.\n    Audio_SetPanPacked(2);\n    sound_result[1]=NR51;\n    sound_wait(30);\n    Audio_SetPanPacked(0);\n    sound_result[2]=NR51;\n    Audio_FadeToMasterVolume(1,1,5);\n    sound_wait(30);\n    sound_result[3]=NR50;\n    sound_result[4]=Audio_FadeActive;\n    sound_wait(30);\n    // Cancel halfway through a rise: retain volume 4 instead of reaching 7.\n    Audio_FadeToMasterVolume(7,7,5);\n    sound_wait(15);\n    Audio_CancelMasterVolumeFade();\n    sound_result[5]=NR50;\n    sound_wait(30);\n    sound_result[6]=NR50;\n    // A zero fade interval sets the target immediately. Level zero is not mute.\n    Audio_FadeToMasterVolume(0,0,0);\n    sound_result[7]=NR50;\n    sound_wait(30);\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-mix"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_mix.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-mix.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetPan": {
+    "review": "sound-source-20260916",
+    "record_sha256": "dff70ba2f625a24abf0ee92abcdfc1384bbcef8ef3327f3ac6078d4bf805e5f0",
+    "purpose": [
+      "sound_Audio_SetPan"
+    ],
+    "args": [
+      [
+        "ch",
+        [
+          "sound_arg_ch"
+        ]
+      ],
+      [
+        "pan",
+        [
+          "sound_arg_pan"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_pan_invalid"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_mix.c",
+      "code": "// A sustained pulse moves left, right and center, then fades to a quieter level.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"PAN AND VOLUME\");\n    Audio_SetMasterVolume(7,7);\n    Audio_Ch1NoteOn(33,0xC0,2);\n    Audio_SetPan(AUDIO_CHANNEL_CH1,AUDIO_PAN_LEFT);\n    sound_result[0]=NR51;\n    sound_wait(30);\n    // Packed low two bits are CH1: 2 means right. Other channels remain centered.\n    Audio_SetPanPacked(2);\n    sound_result[1]=NR51;\n    sound_wait(30);\n    Audio_SetPanPacked(0);\n    sound_result[2]=NR51;\n    Audio_FadeToMasterVolume(1,1,5);\n    sound_wait(30);\n    sound_result[3]=NR50;\n    sound_result[4]=Audio_FadeActive;\n    sound_wait(30);\n    // Cancel halfway through a rise: retain volume 4 instead of reaching 7.\n    Audio_FadeToMasterVolume(7,7,5);\n    sound_wait(15);\n    Audio_CancelMasterVolumeFade();\n    sound_result[5]=NR50;\n    sound_wait(30);\n    sound_result[6]=NR50;\n    // A zero fade interval sets the target immediately. Level zero is not mute.\n    Audio_FadeToMasterVolume(0,0,0);\n    sound_result[7]=NR50;\n    sound_wait(30);\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-mix"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_mix.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-mix.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetPanPacked": {
+    "review": "sound-source-20260916",
+    "record_sha256": "d2abd448befab4b82da8990467ffcb331e15ac4d788552c08e76d4aaca359623",
+    "purpose": [
+      "sound_Audio_SetPanPacked"
+    ],
+    "args": [
+      [
+        "packed",
+        [
+          "sound_arg_packed"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [],
+    "example": {
+      "program": "samples/api-examples/gb/sound_mix.c",
+      "code": "// A sustained pulse moves left, right and center, then fades to a quieter level.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"PAN AND VOLUME\");\n    Audio_SetMasterVolume(7,7);\n    Audio_Ch1NoteOn(33,0xC0,2);\n    Audio_SetPan(AUDIO_CHANNEL_CH1,AUDIO_PAN_LEFT);\n    sound_result[0]=NR51;\n    sound_wait(30);\n    // Packed low two bits are CH1: 2 means right. Other channels remain centered.\n    Audio_SetPanPacked(2);\n    sound_result[1]=NR51;\n    sound_wait(30);\n    Audio_SetPanPacked(0);\n    sound_result[2]=NR51;\n    Audio_FadeToMasterVolume(1,1,5);\n    sound_wait(30);\n    sound_result[3]=NR50;\n    sound_result[4]=Audio_FadeActive;\n    sound_wait(30);\n    // Cancel halfway through a rise: retain volume 4 instead of reaching 7.\n    Audio_FadeToMasterVolume(7,7,5);\n    sound_wait(15);\n    Audio_CancelMasterVolumeFade();\n    sound_result[5]=NR50;\n    sound_wait(30);\n    sound_result[6]=NR50;\n    // A zero fade interval sets the target immediately. Level zero is not mute.\n    Audio_FadeToMasterVolume(0,0,0);\n    sound_result[7]=NR50;\n    sound_wait(30);\n    Audio_StopChannel(AUDIO_CHANNEL_CH1);\n    sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-mix"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_mix.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-mix.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_LoadWave": {
+    "review": "sound-source-20260916",
+    "record_sha256": "6b197caff3f31a62da09d144b6f8f2e0370a0d7e0b333902cdcafa1853d4a193",
+    "purpose": [
+      "sound_Audio_LoadWave"
+    ],
+    "args": [
+      [
+        "wave_id",
+        [
+          "sound_arg_wave_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_wave_trigger"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_wave.c",
+      "code": "// Compare a triangle preset with an original packed 32-sample pulse waveform.\n#include \"gb_sound_example.h\"\n__prg_rom u8 custom_wave[16]={0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0,0,0,0};\nvoid main() {\n    sound_begin(\"WAVE PRESET CUSTOM\");\n    Audio_SetMasterVolume(3,3);\n    Audio_LoadWave(AUDIO_WAVE_TRIANGLE);\n    Audio_Ch3NoteOn(33,AUDIO_CH3_LEVEL_100);\n    sound_wait(45); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // Loading copies all sixteen bytes and enables the DAC without triggering a note.\n    Audio_LoadCustomWave(custom_wave);\n    sound_result[0]=Audio_CustomWave[0]; sound_result[1]=Audio_CustomWave[8];\n    Audio_Ch3NoteOn(33,AUDIO_CH3_LEVEL_100);\n    sound_wait(45); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // The cache survives another preset load; select CUSTOM to reuse it.\n    Audio_LoadWave(AUDIO_WAVE_SAW);\n    Audio_LoadWave(AUDIO_WAVE_CUSTOM);\n    sound_result[2]=WAVE0; sound_result[3]=WAVE8;\n    Audio_Ch3NoteOn(33,AUDIO_CH3_LEVEL_100);\n    sound_wait(45); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-wave"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_wave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-wave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_LoadCustomWave": {
+    "review": "sound-source-20260916",
+    "record_sha256": "239c2a29828ea55203828d574f3e8cfcb176bfacb93ce0abb942d630b51dcbf7",
+    "purpose": [
+      "sound_Audio_LoadCustomWave"
+    ],
+    "args": [
+      [
+        "wave16",
+        [
+          "sound_arg_wave16"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_wave_lifetime"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_wave.c",
+      "code": "// Compare a triangle preset with an original packed 32-sample pulse waveform.\n#include \"gb_sound_example.h\"\n__prg_rom u8 custom_wave[16]={0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0,0,0,0};\nvoid main() {\n    sound_begin(\"WAVE PRESET CUSTOM\");\n    Audio_SetMasterVolume(3,3);\n    Audio_LoadWave(AUDIO_WAVE_TRIANGLE);\n    Audio_Ch3NoteOn(33,AUDIO_CH3_LEVEL_100);\n    sound_wait(45); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // Loading copies all sixteen bytes and enables the DAC without triggering a note.\n    Audio_LoadCustomWave(custom_wave);\n    sound_result[0]=Audio_CustomWave[0]; sound_result[1]=Audio_CustomWave[8];\n    Audio_Ch3NoteOn(33,AUDIO_CH3_LEVEL_100);\n    sound_wait(45); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // The cache survives another preset load; select CUSTOM to reuse it.\n    Audio_LoadWave(AUDIO_WAVE_SAW);\n    Audio_LoadWave(AUDIO_WAVE_CUSTOM);\n    sound_result[2]=WAVE0; sound_result[3]=WAVE8;\n    Audio_Ch3NoteOn(33,AUDIO_CH3_LEVEL_100);\n    sound_wait(45); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-wave"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_wave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-wave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetCh1Duty": {
+    "review": "sound-source-20260916",
+    "record_sha256": "cbc72b75b92ef281dcc167a6348302a600bfe47a998931dbfc07ffe1d4809902",
+    "purpose": [
+      "sound_Audio_SetCh1Duty"
+    ],
+    "args": [
+      [
+        "duty",
+        [
+          "sound_arg_duty"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_cache_only"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetCh2Duty": {
+    "review": "sound-source-20260916",
+    "record_sha256": "ac5e95b8cee2e10c559f8dd6179c69afdae14487941135e02fc3c1601dacb09f",
+    "purpose": [
+      "sound_Audio_SetCh2Duty"
+    ],
+    "args": [
+      [
+        "duty",
+        [
+          "sound_arg_duty"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_cache_only"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetCh3Level": {
+    "review": "sound-source-20260916",
+    "record_sha256": "0d45b88e99b79f6e98dd929b75738d6cc69d17064efcd5eefc908b7cb3eb161c",
+    "purpose": [
+      "sound_Audio_SetCh3Level"
+    ],
+    "args": [
+      [
+        "level",
+        [
+          "sound_arg_level"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_cache_only"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_SetCh4Param": {
+    "review": "sound-source-20260916",
+    "record_sha256": "c049e55f6a12c3ac2a1c9f147e80a5e4d784c104c82709d51579024347bca64d",
+    "purpose": [
+      "sound_Audio_SetCh4Param"
+    ],
+    "args": [
+      [
+        "param",
+        [
+          "sound_arg_param"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_cache_only"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_Ch1NoteOn": {
+    "review": "sound-source-20260916",
+    "record_sha256": "27d7b71e62999215c07028d6082ded72c14b739463a4bf1c82332b1f83b3ab5a",
+    "purpose": [
+      "sound_Audio_Ch1NoteOn"
+    ],
+    "args": [
+      [
+        "note",
+        [
+          "sound_arg_note"
+        ]
+      ],
+      [
+        "vol_env",
+        [
+          "sound_arg_vol_env"
+        ]
+      ],
+      [
+        "duty2",
+        [
+          "sound_arg_duty2"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_gb_note"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_Ch2NoteOn": {
+    "review": "sound-source-20260916",
+    "record_sha256": "404a22deaba0fd2a480b1f66b18cba0ab1905bec90c522518ce73b79d4b5573f",
+    "purpose": [
+      "sound_Audio_Ch2NoteOn"
+    ],
+    "args": [
+      [
+        "note",
+        [
+          "sound_arg_note"
+        ]
+      ],
+      [
+        "vol_env",
+        [
+          "sound_arg_vol_env"
+        ]
+      ],
+      [
+        "duty2",
+        [
+          "sound_arg_duty2"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_gb_note"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_Ch3NoteOn": {
+    "review": "sound-source-20260916",
+    "record_sha256": "f75ffa68abc6b3beeb62298c9f1095471c381b2f0a0f765d4a7d8931cac1e160",
+    "purpose": [
+      "sound_Audio_Ch3NoteOn"
+    ],
+    "args": [
+      [
+        "note",
+        [
+          "sound_arg_note"
+        ]
+      ],
+      [
+        "level",
+        [
+          "sound_arg_level"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_gb_note"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:Audio_Ch4NoteOn": {
+    "review": "sound-source-20260916",
+    "record_sha256": "d6f3bff871136185631d04adc20ef31f7929603b42766f1337bb56761fb9f178",
+    "purpose": [
+      "sound_Audio_Ch4NoteOn"
+    ],
+    "args": [
+      [
+        "param",
+        [
+          "sound_arg_param"
+        ]
+      ],
+      [
+        "vol_env",
+        [
+          "sound_arg_vol_env"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_noise_length"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_channels.c",
+      "code": "// Four isolated voices, each lasting 30 frames, separated by 15 silent frames.\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"FOUR SOUND CHANNELS\");\n    Audio_SetMasterVolume(3,3);\n    // CH1: A4, 50% duty, fixed envelope volume 12.\n    Audio_SetCh1Duty(2);\n    sound_result[0]=Audio_Ch1Duty;\n    Audio_Ch1NoteOn(33,0xC0,Audio_Ch1Duty);\n    sound_result[1]=NR12;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH1); sound_wait(15);\n    // CH2: A4, 25% duty. Changing the cached duty takes effect on this trigger.\n    Audio_SetCh2Duty(1);\n    sound_result[2]=Audio_Ch2Duty;\n    Audio_Ch2NoteOn(33,0xC0,Audio_Ch2Duty);\n    sound_result[3]=NR22;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH2); sound_wait(15);\n    // CH3: the initialized triangle wave, at 50% digital output level.\n    Audio_SetCh3Level(AUDIO_CH3_LEVEL_50);\n    sound_result[4]=Audio_Ch3Level;\n    Audio_Ch3NoteOn(33,Audio_Ch3Level);\n    sound_result[5]=NR32;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH3); sound_wait(15);\n    // CH4: a sustained noise burst; param is NR43, not a pitched note number.\n    Audio_SetCh4Param(0x35);\n    sound_result[6]=Audio_Ch4Param;\n    Audio_Ch4NoteOn(Audio_Ch4Param,0xC0);\n    sound_result[7]=NR43;\n    sound_wait(30); Audio_StopChannel(AUDIO_CHANNEL_CH4); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_channels.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-channels.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_Init": {
+    "review": "sound-source-20260916",
+    "record_sha256": "975ec24c48038714c917cad4b9724f322b933393cde29058a7ae70991907b724",
+    "purpose": [
+      "sound_AudioVBlank_Init"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_vb_format"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_vblank.c",
+      "code": "// Direct fixed-bank music with an actual VBlank ISR and a counting frame hook.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\n__wram u8 hook_count;\n__prg_rom u8 irq_song[]={30,0xFF,33,0xFF,0xFF,30,0xFF,40,0xFF,0xFF,0xFE};\nvoid frame_hook() { hook_count++; }\nvoid main() {\n    u8 before;\n    sound_begin(\"VBLANK MUSIC GATES\");\n    Audio_NoiseEffectActive=0;\n    AudioVBlank_Init();\n    sound_result[0]=AudioVBlank_MusicPlaying;\n    AudioVBlank_Ch1Envelope=0xC0;\n    Audio_SetMasterVolume(3,3);\n    hook_count=0; AudioVBlank_FrameHook=frame_hook;\n    AudioVBlank_SetMusic(irq_song);\n    AudioVBlank_Play();\n    AudioVBlank_EnableIrq();\n    sound_wait(45);\n    // Disable music processing while the hook and current note remain active.\n    __asm { DI }\n    AudioVBlank_SetEnabled(0); before=hook_count;\n    __asm { EI }\n    sound_wait(30);\n    sound_result[1]=(u8)(hook_count!=before);\n    __asm { DI }\n    AudioVBlank_Stop();\n    __asm { EI }\n    sound_wait(30);\n    __asm { DI }\n    AudioVBlank_SetEnabled(1); AudioVBlank_PlayMusic(irq_song);\n    __asm { EI }\n    sound_wait(45);\n    AudioVBlank_DisableIrq();\n    before=hook_count;\n    sound_wait(30);\n    sound_result[2]=(u8)(hook_count==before);\n    sound_result[3]=(u8)(AudioVBlank_IE&1);\n    AudioVBlank_Stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-vblank"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_vblank.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-vblank.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_SetMusic": {
+    "review": "sound-source-20260916",
+    "record_sha256": "6990cc2f2837f21b0bc0d7bc241428d14ba4358ac19a5069aff53436e1b9da8d",
+    "purpose": [
+      "sound_AudioVBlank_SetMusic"
+    ],
+    "args": [
+      [
+        "song",
+        [
+          "sound_arg_song"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_vb_format"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_vblank.c",
+      "code": "// Direct fixed-bank music with an actual VBlank ISR and a counting frame hook.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\n__wram u8 hook_count;\n__prg_rom u8 irq_song[]={30,0xFF,33,0xFF,0xFF,30,0xFF,40,0xFF,0xFF,0xFE};\nvoid frame_hook() { hook_count++; }\nvoid main() {\n    u8 before;\n    sound_begin(\"VBLANK MUSIC GATES\");\n    Audio_NoiseEffectActive=0;\n    AudioVBlank_Init();\n    sound_result[0]=AudioVBlank_MusicPlaying;\n    AudioVBlank_Ch1Envelope=0xC0;\n    Audio_SetMasterVolume(3,3);\n    hook_count=0; AudioVBlank_FrameHook=frame_hook;\n    AudioVBlank_SetMusic(irq_song);\n    AudioVBlank_Play();\n    AudioVBlank_EnableIrq();\n    sound_wait(45);\n    // Disable music processing while the hook and current note remain active.\n    __asm { DI }\n    AudioVBlank_SetEnabled(0); before=hook_count;\n    __asm { EI }\n    sound_wait(30);\n    sound_result[1]=(u8)(hook_count!=before);\n    __asm { DI }\n    AudioVBlank_Stop();\n    __asm { EI }\n    sound_wait(30);\n    __asm { DI }\n    AudioVBlank_SetEnabled(1); AudioVBlank_PlayMusic(irq_song);\n    __asm { EI }\n    sound_wait(45);\n    AudioVBlank_DisableIrq();\n    before=hook_count;\n    sound_wait(30);\n    sound_result[2]=(u8)(hook_count==before);\n    sound_result[3]=(u8)(AudioVBlank_IE&1);\n    AudioVBlank_Stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-vblank"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_vblank.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-vblank.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_Play": {
+    "review": "sound-source-20260916",
+    "record_sha256": "97f6078d6a707dda19c85dd94cb53f078aa51a51f6a503f8fcb0cf6f31d091d1",
+    "purpose": [
+      "sound_AudioVBlank_Play"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_vb_format"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_vblank.c",
+      "code": "// Direct fixed-bank music with an actual VBlank ISR and a counting frame hook.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\n__wram u8 hook_count;\n__prg_rom u8 irq_song[]={30,0xFF,33,0xFF,0xFF,30,0xFF,40,0xFF,0xFF,0xFE};\nvoid frame_hook() { hook_count++; }\nvoid main() {\n    u8 before;\n    sound_begin(\"VBLANK MUSIC GATES\");\n    Audio_NoiseEffectActive=0;\n    AudioVBlank_Init();\n    sound_result[0]=AudioVBlank_MusicPlaying;\n    AudioVBlank_Ch1Envelope=0xC0;\n    Audio_SetMasterVolume(3,3);\n    hook_count=0; AudioVBlank_FrameHook=frame_hook;\n    AudioVBlank_SetMusic(irq_song);\n    AudioVBlank_Play();\n    AudioVBlank_EnableIrq();\n    sound_wait(45);\n    // Disable music processing while the hook and current note remain active.\n    __asm { DI }\n    AudioVBlank_SetEnabled(0); before=hook_count;\n    __asm { EI }\n    sound_wait(30);\n    sound_result[1]=(u8)(hook_count!=before);\n    __asm { DI }\n    AudioVBlank_Stop();\n    __asm { EI }\n    sound_wait(30);\n    __asm { DI }\n    AudioVBlank_SetEnabled(1); AudioVBlank_PlayMusic(irq_song);\n    __asm { EI }\n    sound_wait(45);\n    AudioVBlank_DisableIrq();\n    before=hook_count;\n    sound_wait(30);\n    sound_result[2]=(u8)(hook_count==before);\n    sound_result[3]=(u8)(AudioVBlank_IE&1);\n    AudioVBlank_Stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-vblank"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_vblank.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-vblank.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_PlayMusic": {
+    "review": "sound-source-20260916",
+    "record_sha256": "dacf527377788a0db182a65552edb9194206bbf3b80f4601ea287d7d126ea7fe",
+    "purpose": [
+      "sound_AudioVBlank_PlayMusic"
+    ],
+    "args": [
+      [
+        "song",
+        [
+          "sound_arg_song"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_vb_format"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_vblank.c",
+      "code": "// Direct fixed-bank music with an actual VBlank ISR and a counting frame hook.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\n__wram u8 hook_count;\n__prg_rom u8 irq_song[]={30,0xFF,33,0xFF,0xFF,30,0xFF,40,0xFF,0xFF,0xFE};\nvoid frame_hook() { hook_count++; }\nvoid main() {\n    u8 before;\n    sound_begin(\"VBLANK MUSIC GATES\");\n    Audio_NoiseEffectActive=0;\n    AudioVBlank_Init();\n    sound_result[0]=AudioVBlank_MusicPlaying;\n    AudioVBlank_Ch1Envelope=0xC0;\n    Audio_SetMasterVolume(3,3);\n    hook_count=0; AudioVBlank_FrameHook=frame_hook;\n    AudioVBlank_SetMusic(irq_song);\n    AudioVBlank_Play();\n    AudioVBlank_EnableIrq();\n    sound_wait(45);\n    // Disable music processing while the hook and current note remain active.\n    __asm { DI }\n    AudioVBlank_SetEnabled(0); before=hook_count;\n    __asm { EI }\n    sound_wait(30);\n    sound_result[1]=(u8)(hook_count!=before);\n    __asm { DI }\n    AudioVBlank_Stop();\n    __asm { EI }\n    sound_wait(30);\n    __asm { DI }\n    AudioVBlank_SetEnabled(1); AudioVBlank_PlayMusic(irq_song);\n    __asm { EI }\n    sound_wait(45);\n    AudioVBlank_DisableIrq();\n    before=hook_count;\n    sound_wait(30);\n    sound_result[2]=(u8)(hook_count==before);\n    sound_result[3]=(u8)(AudioVBlank_IE&1);\n    AudioVBlank_Stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-vblank"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_vblank.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-vblank.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_Stop": {
+    "review": "sound-source-20260916",
+    "record_sha256": "1052c39d04b7e3e99ae59676415717deec177a807e4cede840b0f14b610fd579",
+    "purpose": [
+      "sound_AudioVBlank_Stop"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_vb_format"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_vblank.c",
+      "code": "// Direct fixed-bank music with an actual VBlank ISR and a counting frame hook.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\n__wram u8 hook_count;\n__prg_rom u8 irq_song[]={30,0xFF,33,0xFF,0xFF,30,0xFF,40,0xFF,0xFF,0xFE};\nvoid frame_hook() { hook_count++; }\nvoid main() {\n    u8 before;\n    sound_begin(\"VBLANK MUSIC GATES\");\n    Audio_NoiseEffectActive=0;\n    AudioVBlank_Init();\n    sound_result[0]=AudioVBlank_MusicPlaying;\n    AudioVBlank_Ch1Envelope=0xC0;\n    Audio_SetMasterVolume(3,3);\n    hook_count=0; AudioVBlank_FrameHook=frame_hook;\n    AudioVBlank_SetMusic(irq_song);\n    AudioVBlank_Play();\n    AudioVBlank_EnableIrq();\n    sound_wait(45);\n    // Disable music processing while the hook and current note remain active.\n    __asm { DI }\n    AudioVBlank_SetEnabled(0); before=hook_count;\n    __asm { EI }\n    sound_wait(30);\n    sound_result[1]=(u8)(hook_count!=before);\n    __asm { DI }\n    AudioVBlank_Stop();\n    __asm { EI }\n    sound_wait(30);\n    __asm { DI }\n    AudioVBlank_SetEnabled(1); AudioVBlank_PlayMusic(irq_song);\n    __asm { EI }\n    sound_wait(45);\n    AudioVBlank_DisableIrq();\n    before=hook_count;\n    sound_wait(30);\n    sound_result[2]=(u8)(hook_count==before);\n    sound_result[3]=(u8)(AudioVBlank_IE&1);\n    AudioVBlank_Stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-vblank"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_vblank.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-vblank.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_SetEnabled": {
+    "review": "sound-source-20260916",
+    "record_sha256": "45efb004099b989f0c266b569c026d6ec97a24f8f7b36b64e681251b45e0f430",
+    "purpose": [
+      "sound_AudioVBlank_SetEnabled"
+    ],
+    "args": [
+      [
+        "on",
+        [
+          "sound_arg_on"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_vb_format"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_vblank.c",
+      "code": "// Direct fixed-bank music with an actual VBlank ISR and a counting frame hook.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\n__wram u8 hook_count;\n__prg_rom u8 irq_song[]={30,0xFF,33,0xFF,0xFF,30,0xFF,40,0xFF,0xFF,0xFE};\nvoid frame_hook() { hook_count++; }\nvoid main() {\n    u8 before;\n    sound_begin(\"VBLANK MUSIC GATES\");\n    Audio_NoiseEffectActive=0;\n    AudioVBlank_Init();\n    sound_result[0]=AudioVBlank_MusicPlaying;\n    AudioVBlank_Ch1Envelope=0xC0;\n    Audio_SetMasterVolume(3,3);\n    hook_count=0; AudioVBlank_FrameHook=frame_hook;\n    AudioVBlank_SetMusic(irq_song);\n    AudioVBlank_Play();\n    AudioVBlank_EnableIrq();\n    sound_wait(45);\n    // Disable music processing while the hook and current note remain active.\n    __asm { DI }\n    AudioVBlank_SetEnabled(0); before=hook_count;\n    __asm { EI }\n    sound_wait(30);\n    sound_result[1]=(u8)(hook_count!=before);\n    __asm { DI }\n    AudioVBlank_Stop();\n    __asm { EI }\n    sound_wait(30);\n    __asm { DI }\n    AudioVBlank_SetEnabled(1); AudioVBlank_PlayMusic(irq_song);\n    __asm { EI }\n    sound_wait(45);\n    AudioVBlank_DisableIrq();\n    before=hook_count;\n    sound_wait(30);\n    sound_result[2]=(u8)(hook_count==before);\n    sound_result[3]=(u8)(AudioVBlank_IE&1);\n    AudioVBlank_Stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-vblank"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_vblank.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-vblank.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_EnableIrq": {
+    "review": "sound-source-20260916",
+    "record_sha256": "72a49f8682efb9df1e33e429ac2b99dff62ab9ccbafb8cfe3c008ed1d8be9058",
+    "purpose": [
+      "sound_AudioVBlank_EnableIrq"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_vb_format"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_vblank.c",
+      "code": "// Direct fixed-bank music with an actual VBlank ISR and a counting frame hook.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\n__wram u8 hook_count;\n__prg_rom u8 irq_song[]={30,0xFF,33,0xFF,0xFF,30,0xFF,40,0xFF,0xFF,0xFE};\nvoid frame_hook() { hook_count++; }\nvoid main() {\n    u8 before;\n    sound_begin(\"VBLANK MUSIC GATES\");\n    Audio_NoiseEffectActive=0;\n    AudioVBlank_Init();\n    sound_result[0]=AudioVBlank_MusicPlaying;\n    AudioVBlank_Ch1Envelope=0xC0;\n    Audio_SetMasterVolume(3,3);\n    hook_count=0; AudioVBlank_FrameHook=frame_hook;\n    AudioVBlank_SetMusic(irq_song);\n    AudioVBlank_Play();\n    AudioVBlank_EnableIrq();\n    sound_wait(45);\n    // Disable music processing while the hook and current note remain active.\n    __asm { DI }\n    AudioVBlank_SetEnabled(0); before=hook_count;\n    __asm { EI }\n    sound_wait(30);\n    sound_result[1]=(u8)(hook_count!=before);\n    __asm { DI }\n    AudioVBlank_Stop();\n    __asm { EI }\n    sound_wait(30);\n    __asm { DI }\n    AudioVBlank_SetEnabled(1); AudioVBlank_PlayMusic(irq_song);\n    __asm { EI }\n    sound_wait(45);\n    AudioVBlank_DisableIrq();\n    before=hook_count;\n    sound_wait(30);\n    sound_result[2]=(u8)(hook_count==before);\n    sound_result[3]=(u8)(AudioVBlank_IE&1);\n    AudioVBlank_Stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-vblank"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_vblank.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-vblank.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_DisableIrq": {
+    "review": "sound-source-20260916",
+    "record_sha256": "7643e3170571d3c5465e1fd46d438896d45b44a746d1ee438d56420bd729a173",
+    "purpose": [
+      "sound_AudioVBlank_DisableIrq"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_vb_format"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_vblank.c",
+      "code": "// Direct fixed-bank music with an actual VBlank ISR and a counting frame hook.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\n__wram u8 hook_count;\n__prg_rom u8 irq_song[]={30,0xFF,33,0xFF,0xFF,30,0xFF,40,0xFF,0xFF,0xFE};\nvoid frame_hook() { hook_count++; }\nvoid main() {\n    u8 before;\n    sound_begin(\"VBLANK MUSIC GATES\");\n    Audio_NoiseEffectActive=0;\n    AudioVBlank_Init();\n    sound_result[0]=AudioVBlank_MusicPlaying;\n    AudioVBlank_Ch1Envelope=0xC0;\n    Audio_SetMasterVolume(3,3);\n    hook_count=0; AudioVBlank_FrameHook=frame_hook;\n    AudioVBlank_SetMusic(irq_song);\n    AudioVBlank_Play();\n    AudioVBlank_EnableIrq();\n    sound_wait(45);\n    // Disable music processing while the hook and current note remain active.\n    __asm { DI }\n    AudioVBlank_SetEnabled(0); before=hook_count;\n    __asm { EI }\n    sound_wait(30);\n    sound_result[1]=(u8)(hook_count!=before);\n    __asm { DI }\n    AudioVBlank_Stop();\n    __asm { EI }\n    sound_wait(30);\n    __asm { DI }\n    AudioVBlank_SetEnabled(1); AudioVBlank_PlayMusic(irq_song);\n    __asm { EI }\n    sound_wait(45);\n    AudioVBlank_DisableIrq();\n    before=hook_count;\n    sound_wait(30);\n    sound_result[2]=(u8)(hook_count==before);\n    sound_result[3]=(u8)(AudioVBlank_IE&1);\n    AudioVBlank_Stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-vblank"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_vblank.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-vblank.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_RestoreCh1": {
+    "review": "sound-source-20260916",
+    "record_sha256": "c9d60d2a89dd446ef8943a3f24c82b8c231c723ec880a87264bc9a0727bec584",
+    "purpose": [
+      "sound_AudioVBlank_RestoreCh1"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_recover_owner"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_recovery.c",
+      "code": "// Exercise the recovery API with IRQ disabled and explicit effect ownership.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"EFFECT RECOVERY\");\n    Audio_NoiseEffectActive=0; AudioVBlank_Init();\n    Audio_SetMasterVolume(3,3);\n    AudioVBlank_MusicPlaying=1;\n    AudioVBlank_Ch1Envelope=0xC0; AudioVBlank_Ch1LatchedNote=33;\n    AudioVBlank_Ch3LatchedNote=33;\n    // Value 1 represents a suppressed BGM event and survives a release request.\n    AudioVBlank_RestoreCh1Pending=1;\n    AudioVBlank_RequestRestoreCh1();\n    sound_result[0]=AudioVBlank_RestoreCh1Pending;\n    AudioVBlank_RestoreCh1(); AudioVBlank_RestoreCh1Pending=0;\n    sound_wait(30);\n    // Without a pending event, RequestRestore creates release-only value 2.\n    AudioVBlank_RequestRestoreCh1();\n    sound_result[1]=AudioVBlank_RestoreCh1Pending;\n    AudioVBlank_RestoreCh1(); AudioVBlank_RestoreCh1Pending=0;\n    sound_wait(30);\n    AudioVBlank_RestoreCh3Pending=1;\n    AudioVBlank_RequestRestoreCh3();\n    sound_result[2]=AudioVBlank_RestoreCh3Pending;\n    AudioVBlank_RestoreCh3(); AudioVBlank_RestoreCh3Pending=0;\n    sound_wait(30);\n    AudioVBlank_RequestRestoreCh3();\n    sound_result[3]=AudioVBlank_RestoreCh3Pending;\n    AudioVBlank_RestoreCh3(); AudioVBlank_RestoreCh3Pending=0;\n    sound_wait(30);\n    AudioVBlank_Stop();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-recovery"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_recovery.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-recovery.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_RestoreCh3": {
+    "review": "sound-source-20260916",
+    "record_sha256": "88e9f22a68f2826376db9d15dd2cee08398866c9554b4bb01289fd9af65aa68f",
+    "purpose": [
+      "sound_AudioVBlank_RestoreCh3"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_recover_owner"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_recovery.c",
+      "code": "// Exercise the recovery API with IRQ disabled and explicit effect ownership.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"EFFECT RECOVERY\");\n    Audio_NoiseEffectActive=0; AudioVBlank_Init();\n    Audio_SetMasterVolume(3,3);\n    AudioVBlank_MusicPlaying=1;\n    AudioVBlank_Ch1Envelope=0xC0; AudioVBlank_Ch1LatchedNote=33;\n    AudioVBlank_Ch3LatchedNote=33;\n    // Value 1 represents a suppressed BGM event and survives a release request.\n    AudioVBlank_RestoreCh1Pending=1;\n    AudioVBlank_RequestRestoreCh1();\n    sound_result[0]=AudioVBlank_RestoreCh1Pending;\n    AudioVBlank_RestoreCh1(); AudioVBlank_RestoreCh1Pending=0;\n    sound_wait(30);\n    // Without a pending event, RequestRestore creates release-only value 2.\n    AudioVBlank_RequestRestoreCh1();\n    sound_result[1]=AudioVBlank_RestoreCh1Pending;\n    AudioVBlank_RestoreCh1(); AudioVBlank_RestoreCh1Pending=0;\n    sound_wait(30);\n    AudioVBlank_RestoreCh3Pending=1;\n    AudioVBlank_RequestRestoreCh3();\n    sound_result[2]=AudioVBlank_RestoreCh3Pending;\n    AudioVBlank_RestoreCh3(); AudioVBlank_RestoreCh3Pending=0;\n    sound_wait(30);\n    AudioVBlank_RequestRestoreCh3();\n    sound_result[3]=AudioVBlank_RestoreCh3Pending;\n    AudioVBlank_RestoreCh3(); AudioVBlank_RestoreCh3Pending=0;\n    sound_wait(30);\n    AudioVBlank_Stop();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-recovery"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_recovery.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-recovery.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_RequestRestoreCh1": {
+    "review": "sound-source-20260916",
+    "record_sha256": "a0eab7c35e36cea6d23df653008ae5eac3834764c12bc32aa2744f7edf96ff57",
+    "purpose": [
+      "sound_AudioVBlank_RequestRestoreCh1"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_recover_owner"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_recovery.c",
+      "code": "// Exercise the recovery API with IRQ disabled and explicit effect ownership.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"EFFECT RECOVERY\");\n    Audio_NoiseEffectActive=0; AudioVBlank_Init();\n    Audio_SetMasterVolume(3,3);\n    AudioVBlank_MusicPlaying=1;\n    AudioVBlank_Ch1Envelope=0xC0; AudioVBlank_Ch1LatchedNote=33;\n    AudioVBlank_Ch3LatchedNote=33;\n    // Value 1 represents a suppressed BGM event and survives a release request.\n    AudioVBlank_RestoreCh1Pending=1;\n    AudioVBlank_RequestRestoreCh1();\n    sound_result[0]=AudioVBlank_RestoreCh1Pending;\n    AudioVBlank_RestoreCh1(); AudioVBlank_RestoreCh1Pending=0;\n    sound_wait(30);\n    // Without a pending event, RequestRestore creates release-only value 2.\n    AudioVBlank_RequestRestoreCh1();\n    sound_result[1]=AudioVBlank_RestoreCh1Pending;\n    AudioVBlank_RestoreCh1(); AudioVBlank_RestoreCh1Pending=0;\n    sound_wait(30);\n    AudioVBlank_RestoreCh3Pending=1;\n    AudioVBlank_RequestRestoreCh3();\n    sound_result[2]=AudioVBlank_RestoreCh3Pending;\n    AudioVBlank_RestoreCh3(); AudioVBlank_RestoreCh3Pending=0;\n    sound_wait(30);\n    AudioVBlank_RequestRestoreCh3();\n    sound_result[3]=AudioVBlank_RestoreCh3Pending;\n    AudioVBlank_RestoreCh3(); AudioVBlank_RestoreCh3Pending=0;\n    sound_wait(30);\n    AudioVBlank_Stop();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-recovery"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_recovery.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-recovery.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "gb:AudioVBlank_RequestRestoreCh3": {
+    "review": "sound-source-20260916",
+    "record_sha256": "50898e89a0e4f24704a3a12effafe50ab43f74dbd7d56e2c4581e0d29c467c33",
+    "purpose": [
+      "sound_AudioVBlank_RequestRestoreCh3"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vb_setup",
+      "sound_recover_owner"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/sound_recovery.c",
+      "code": "// Exercise the recovery API with IRQ disabled and explicit effect ownership.\n#define SOUND_VBLANK\n#include \"gb_sound_example.h\"\nvoid main() {\n    sound_begin(\"EFFECT RECOVERY\");\n    Audio_NoiseEffectActive=0; AudioVBlank_Init();\n    Audio_SetMasterVolume(3,3);\n    AudioVBlank_MusicPlaying=1;\n    AudioVBlank_Ch1Envelope=0xC0; AudioVBlank_Ch1LatchedNote=33;\n    AudioVBlank_Ch3LatchedNote=33;\n    // Value 1 represents a suppressed BGM event and survives a release request.\n    AudioVBlank_RestoreCh1Pending=1;\n    AudioVBlank_RequestRestoreCh1();\n    sound_result[0]=AudioVBlank_RestoreCh1Pending;\n    AudioVBlank_RestoreCh1(); AudioVBlank_RestoreCh1Pending=0;\n    sound_wait(30);\n    // Without a pending event, RequestRestore creates release-only value 2.\n    AudioVBlank_RequestRestoreCh1();\n    sound_result[1]=AudioVBlank_RestoreCh1Pending;\n    AudioVBlank_RestoreCh1(); AudioVBlank_RestoreCh1Pending=0;\n    sound_wait(30);\n    AudioVBlank_RestoreCh3Pending=1;\n    AudioVBlank_RequestRestoreCh3();\n    sound_result[2]=AudioVBlank_RestoreCh3Pending;\n    AudioVBlank_RestoreCh3(); AudioVBlank_RestoreCh3Pending=0;\n    sound_wait(30);\n    AudioVBlank_RequestRestoreCh3();\n    sound_result[3]=AudioVBlank_RestoreCh3Pending;\n    AudioVBlank_RestoreCh3(); AudioVBlank_RestoreCh3Pending=0;\n    sound_wait(30);\n    AudioVBlank_Stop();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_gb-recovery"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\sound_recovery.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\gb-recovery.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_apu_init": {
+    "review": "sound-source-20260916",
+    "record_sha256": "7c06b52ff3c2a10d540744c46f68e14d9c545c64cce0733d2c2dbecb54dd9f49",
+    "purpose": [
+      "sound_nes_apu_init"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [],
+    "example": {
+      "program": "samples/api-examples/fc/sound_channels.c",
+      "code": "// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"APU CHANNELS AND BLIPS\");\n    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.\n    nes_sfx_square1(0xBC,253,0);\n    sound_result[0]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30);\n    nes_apu_channel_enable(0); sound_wait(15);\n    nes_sfx_square2(0x7C,253,0);\n    sound_result[1]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_triangle(0xFF,253,0);\n    sound_result[2]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_noise(0x3C,5,0);\n    sound_result[3]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_channels.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-channels.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_apu_channel_enable": {
+    "review": "sound-source-20260916",
+    "record_sha256": "139628d8fc24b3102d5c76e334779db8c1f30718bcd7524bb21a9a2171ea7616",
+    "purpose": [
+      "sound_nes_apu_channel_enable"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "sound_arg_mask"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [],
+    "example": {
+      "program": "samples/api-examples/fc/sound_channels.c",
+      "code": "// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"APU CHANNELS AND BLIPS\");\n    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.\n    nes_sfx_square1(0xBC,253,0);\n    sound_result[0]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30);\n    nes_apu_channel_enable(0); sound_wait(15);\n    nes_sfx_square2(0x7C,253,0);\n    sound_result[1]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_triangle(0xFF,253,0);\n    sound_result[2]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_noise(0x3C,5,0);\n    sound_result[3]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_channels.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-channels.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_apu_silence_all": {
+    "review": "sound-source-20260916",
+    "record_sha256": "0197683192be9baa1c8e8555ee88c691e68879f8dce23e54b33d44c00ae944f7",
+    "purpose": [
+      "sound_nes_apu_silence_all"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [],
+    "example": {
+      "program": "samples/api-examples/fc/sound_channels.c",
+      "code": "// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"APU CHANNELS AND BLIPS\");\n    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.\n    nes_sfx_square1(0xBC,253,0);\n    sound_result[0]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30);\n    nes_apu_channel_enable(0); sound_wait(15);\n    nes_sfx_square2(0x7C,253,0);\n    sound_result[1]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_triangle(0xFF,253,0);\n    sound_result[2]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_noise(0x3C,5,0);\n    sound_result[3]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_channels.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-channels.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_sfx_square1": {
+    "review": "sound-source-20260916",
+    "record_sha256": "c1f9b668b293c8cfff6b01cb460506244dfe42592210640be2e51079298cdf85",
+    "purpose": [
+      "sound_nes_sfx_square1"
+    ],
+    "args": [
+      [
+        "duty_volume",
+        [
+          "sound_arg_duty_volume"
+        ]
+      ],
+      [
+        "period",
+        [
+          "sound_period_apu"
+        ]
+      ],
+      [
+        "length_index",
+        [
+          "sound_arg_length_index"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_voices"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_channels.c",
+      "code": "// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"APU CHANNELS AND BLIPS\");\n    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.\n    nes_sfx_square1(0xBC,253,0);\n    sound_result[0]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30);\n    nes_apu_channel_enable(0); sound_wait(15);\n    nes_sfx_square2(0x7C,253,0);\n    sound_result[1]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_triangle(0xFF,253,0);\n    sound_result[2]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_noise(0x3C,5,0);\n    sound_result[3]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_channels.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-channels.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_sfx_square2": {
+    "review": "sound-source-20260916",
+    "record_sha256": "341b55b01587173a4130071d68ca9bff6732412594beef3fee9bbd8a8cd81a49",
+    "purpose": [
+      "sound_nes_sfx_square2"
+    ],
+    "args": [
+      [
+        "duty_volume",
+        [
+          "sound_arg_duty_volume"
+        ]
+      ],
+      [
+        "period",
+        [
+          "sound_period_apu"
+        ]
+      ],
+      [
+        "length_index",
+        [
+          "sound_arg_length_index"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_voices"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_channels.c",
+      "code": "// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"APU CHANNELS AND BLIPS\");\n    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.\n    nes_sfx_square1(0xBC,253,0);\n    sound_result[0]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30);\n    nes_apu_channel_enable(0); sound_wait(15);\n    nes_sfx_square2(0x7C,253,0);\n    sound_result[1]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_triangle(0xFF,253,0);\n    sound_result[2]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_noise(0x3C,5,0);\n    sound_result[3]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_channels.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-channels.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_sfx_triangle": {
+    "review": "sound-source-20260916",
+    "record_sha256": "10051a93d37e6885a81ca0239c6ea2bb8ffd823b715b332aa04507e35fde9895",
+    "purpose": [
+      "sound_nes_sfx_triangle"
+    ],
+    "args": [
+      [
+        "linear",
+        [
+          "sound_arg_linear"
+        ]
+      ],
+      [
+        "period",
+        [
+          "sound_period_apu"
+        ]
+      ],
+      [
+        "length_index",
+        [
+          "sound_arg_length_index"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_voices"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_channels.c",
+      "code": "// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"APU CHANNELS AND BLIPS\");\n    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.\n    nes_sfx_square1(0xBC,253,0);\n    sound_result[0]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30);\n    nes_apu_channel_enable(0); sound_wait(15);\n    nes_sfx_square2(0x7C,253,0);\n    sound_result[1]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_triangle(0xFF,253,0);\n    sound_result[2]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_noise(0x3C,5,0);\n    sound_result[3]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_channels.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-channels.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_sfx_noise": {
+    "review": "sound-source-20260916",
+    "record_sha256": "a83d60d1e675ae3f1b2f15a3d163a2e4b17162b9b539b81ccc76216dd9fcb368",
+    "purpose": [
+      "sound_nes_sfx_noise"
+    ],
+    "args": [
+      [
+        "volume",
+        [
+          "sound_noisevolume"
+        ]
+      ],
+      [
+        "period_mode",
+        [
+          "sound_arg_period_mode"
+        ]
+      ],
+      [
+        "length_index",
+        [
+          "sound_arg_length_index"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_voices"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_channels.c",
+      "code": "// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"APU CHANNELS AND BLIPS\");\n    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.\n    nes_sfx_square1(0xBC,253,0);\n    sound_result[0]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30);\n    nes_apu_channel_enable(0); sound_wait(15);\n    nes_sfx_square2(0x7C,253,0);\n    sound_result[1]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_triangle(0xFF,253,0);\n    sound_result[2]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_noise(0x3C,5,0);\n    sound_result[3]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_channels.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-channels.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_sfx_tick_blip": {
+    "review": "sound-source-20260916",
+    "record_sha256": "84759d4cfca100dbbc2a37d76afd80238d04d83bc61a544acf52fd2500878ee2",
+    "purpose": [
+      "sound_nes_sfx_tick_blip"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_voices"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_channels.c",
+      "code": "// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"APU CHANNELS AND BLIPS\");\n    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.\n    nes_sfx_square1(0xBC,253,0);\n    sound_result[0]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30);\n    nes_apu_channel_enable(0); sound_wait(15);\n    nes_sfx_square2(0x7C,253,0);\n    sound_result[1]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_triangle(0xFF,253,0);\n    sound_result[2]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_noise(0x3C,5,0);\n    sound_result[3]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_channels.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-channels.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_sfx_move_blip": {
+    "review": "sound-source-20260916",
+    "record_sha256": "6a66287440e282e5922a47d18818a1d4adf657054c4a843e41fe4634469d3730",
+    "purpose": [
+      "sound_nes_sfx_move_blip"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_voices"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_channels.c",
+      "code": "// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"APU CHANNELS AND BLIPS\");\n    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.\n    nes_sfx_square1(0xBC,253,0);\n    sound_result[0]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30);\n    nes_apu_channel_enable(0); sound_wait(15);\n    nes_sfx_square2(0x7C,253,0);\n    sound_result[1]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_triangle(0xFF,253,0);\n    sound_result[2]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_noise(0x3C,5,0);\n    sound_result[3]=(u8)(APU_STATUS&0x1F);\n    sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-channels"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_channels.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-channels.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_dmc_config": {
+    "review": "sound-source-20260916",
+    "record_sha256": "e819ea5925456f0e790e062a655b25d2710a2727ded66b2f2871633989e5ee29",
+    "purpose": [
+      "sound_nes_dmc_config"
+    ],
+    "args": [
+      [
+        "flags_rate",
+        [
+          "sound_arg_flags_rate"
+        ]
+      ],
+      [
+        "output_level",
+        [
+          "sound_arg_output_level"
+        ]
+      ],
+      [
+        "sample_addr",
+        [
+          "sound_arg_sample_addr"
+        ]
+      ],
+      [
+        "sample_len",
+        [
+          "sound_arg_sample_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_dmc"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_dmc.c",
+      "code": "// A 17-byte original delta pattern, aligned to a 64-byte DMC start boundary.\n#include \"fc_sound_example.h\"\n#pragma bank 0\n__aligned(64) __prg_rom u8 delta[17]={0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xAA};\nvoid main(void) {\n    sound_begin(\"DMC ORIGINAL DELTAS\");\n    sound_result[0]=(u8)(((u16)delta&63)==0);\n    sound_result[1]=(u8)((u16)delta>=0xC000);\n    // Loop at NTSC rate index 10; start the output accumulator at its midpoint.\n    nes_dmc_config(0x4A,64,(u16)delta,17);\n    nes_dmc_start();\n    sound_wait(60);\n    nes_dmc_stop(); sound_wait(30);\n    nes_dmc_play(0x4C,64,(u16)delta,17);\n    sound_wait(60);\n    nes_dmc_stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-dmc"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_dmc.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-dmc.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_dmc_start": {
+    "review": "sound-source-20260916",
+    "record_sha256": "7a2ff5b6752eb6f21a3b76d3e7c5b81a505761da1c54fbee5df9e71e9ff07d08",
+    "purpose": [
+      "sound_nes_dmc_start"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_dmc"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_dmc.c",
+      "code": "// A 17-byte original delta pattern, aligned to a 64-byte DMC start boundary.\n#include \"fc_sound_example.h\"\n#pragma bank 0\n__aligned(64) __prg_rom u8 delta[17]={0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xAA};\nvoid main(void) {\n    sound_begin(\"DMC ORIGINAL DELTAS\");\n    sound_result[0]=(u8)(((u16)delta&63)==0);\n    sound_result[1]=(u8)((u16)delta>=0xC000);\n    // Loop at NTSC rate index 10; start the output accumulator at its midpoint.\n    nes_dmc_config(0x4A,64,(u16)delta,17);\n    nes_dmc_start();\n    sound_wait(60);\n    nes_dmc_stop(); sound_wait(30);\n    nes_dmc_play(0x4C,64,(u16)delta,17);\n    sound_wait(60);\n    nes_dmc_stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-dmc"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_dmc.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-dmc.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_dmc_stop": {
+    "review": "sound-source-20260916",
+    "record_sha256": "91f431778c90450cd7f7b4284eb08a589a22bf40825d4fa3d13b21ce6f72024f",
+    "purpose": [
+      "sound_nes_dmc_stop"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_dmc"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_dmc.c",
+      "code": "// A 17-byte original delta pattern, aligned to a 64-byte DMC start boundary.\n#include \"fc_sound_example.h\"\n#pragma bank 0\n__aligned(64) __prg_rom u8 delta[17]={0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xAA};\nvoid main(void) {\n    sound_begin(\"DMC ORIGINAL DELTAS\");\n    sound_result[0]=(u8)(((u16)delta&63)==0);\n    sound_result[1]=(u8)((u16)delta>=0xC000);\n    // Loop at NTSC rate index 10; start the output accumulator at its midpoint.\n    nes_dmc_config(0x4A,64,(u16)delta,17);\n    nes_dmc_start();\n    sound_wait(60);\n    nes_dmc_stop(); sound_wait(30);\n    nes_dmc_play(0x4C,64,(u16)delta,17);\n    sound_wait(60);\n    nes_dmc_stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-dmc"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_dmc.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-dmc.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_dmc_play": {
+    "review": "sound-source-20260916",
+    "record_sha256": "88ecda5bd66a365ed93db94ebaca5fd32a4ac0a5e2f6f3e364bf612bdb1480d4",
+    "purpose": [
+      "sound_nes_dmc_play"
+    ],
+    "args": [
+      [
+        "flags_rate",
+        [
+          "sound_arg_flags_rate"
+        ]
+      ],
+      [
+        "output_level",
+        [
+          "sound_arg_output_level"
+        ]
+      ],
+      [
+        "sample_addr",
+        [
+          "sound_arg_sample_addr"
+        ]
+      ],
+      [
+        "sample_len",
+        [
+          "sound_arg_sample_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fc_dmc"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_dmc.c",
+      "code": "// A 17-byte original delta pattern, aligned to a 64-byte DMC start boundary.\n#include \"fc_sound_example.h\"\n#pragma bank 0\n__aligned(64) __prg_rom u8 delta[17]={0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xAA};\nvoid main(void) {\n    sound_begin(\"DMC ORIGINAL DELTAS\");\n    sound_result[0]=(u8)(((u16)delta&63)==0);\n    sound_result[1]=(u8)((u16)delta>=0xC000);\n    // Loop at NTSC rate index 10; start the output accumulator at its midpoint.\n    nes_dmc_config(0x4A,64,(u16)delta,17);\n    nes_dmc_start();\n    sound_wait(60);\n    nes_dmc_stop(); sound_wait(30);\n    nes_dmc_play(0x4C,64,(u16)delta,17);\n    sound_wait(60);\n    nes_dmc_stop(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-dmc"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_dmc.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-dmc.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc6_silence_all": {
+    "review": "sound-source-20260916",
+    "record_sha256": "36992d87ff341bea2597dd394f1ba16e08adfb8c6979b84f469aeba114fb853d",
+    "purpose": [
+      "sound_nes_vrc6_silence_all"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc6"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc6.c",
+      "code": "// Mapper 24: two pulse voices followed by the saw accumulator.\n#include \"fc_sound_example.h\"\n#include \"vrc6_sound.c\"\nvoid main(void) {\n    // The background font occupies the first four 1 KiB CHR windows.\n    *((u8*)0xD000)=0; *((u8*)0xD001)=1;\n    *((u8*)0xD002)=2; *((u8*)0xD003)=3;\n    sound_begin(\"VRC6 PULSE PULSE SAW\");\n    nes_vrc6_silence_all();\n    nes_vrc6_pulse1_set(0x7C,253);\n    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);\n    nes_vrc6_pulse2_set(0x3C,253);\n    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);\n    nes_vrc6_saw_set(32,289);\n    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);\n    nes_vrc6_silence_all();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc6"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc6.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc6_pulse1_set": {
+    "review": "sound-source-20260916",
+    "record_sha256": "e14ac4b22d7a85dfbb727d5cfd4b4c122b8aa956b022d6b3a37eae5770e32c8f",
+    "purpose": [
+      "sound_nes_vrc6_pulse1_set"
+    ],
+    "args": [
+      [
+        "control",
+        [
+          "sound_arg_control"
+        ]
+      ],
+      [
+        "period",
+        [
+          "sound_period_vrc"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc6"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc6.c",
+      "code": "// Mapper 24: two pulse voices followed by the saw accumulator.\n#include \"fc_sound_example.h\"\n#include \"vrc6_sound.c\"\nvoid main(void) {\n    // The background font occupies the first four 1 KiB CHR windows.\n    *((u8*)0xD000)=0; *((u8*)0xD001)=1;\n    *((u8*)0xD002)=2; *((u8*)0xD003)=3;\n    sound_begin(\"VRC6 PULSE PULSE SAW\");\n    nes_vrc6_silence_all();\n    nes_vrc6_pulse1_set(0x7C,253);\n    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);\n    nes_vrc6_pulse2_set(0x3C,253);\n    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);\n    nes_vrc6_saw_set(32,289);\n    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);\n    nes_vrc6_silence_all();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc6"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc6.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc6_pulse2_set": {
+    "review": "sound-source-20260916",
+    "record_sha256": "b4e42023fe94ef870e01a6813b1684cfd13997991c7a778edb1f219d4c197edc",
+    "purpose": [
+      "sound_nes_vrc6_pulse2_set"
+    ],
+    "args": [
+      [
+        "control",
+        [
+          "sound_arg_control"
+        ]
+      ],
+      [
+        "period",
+        [
+          "sound_period_vrc"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc6"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc6.c",
+      "code": "// Mapper 24: two pulse voices followed by the saw accumulator.\n#include \"fc_sound_example.h\"\n#include \"vrc6_sound.c\"\nvoid main(void) {\n    // The background font occupies the first four 1 KiB CHR windows.\n    *((u8*)0xD000)=0; *((u8*)0xD001)=1;\n    *((u8*)0xD002)=2; *((u8*)0xD003)=3;\n    sound_begin(\"VRC6 PULSE PULSE SAW\");\n    nes_vrc6_silence_all();\n    nes_vrc6_pulse1_set(0x7C,253);\n    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);\n    nes_vrc6_pulse2_set(0x3C,253);\n    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);\n    nes_vrc6_saw_set(32,289);\n    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);\n    nes_vrc6_silence_all();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc6"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc6.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc6_pulse1_off": {
+    "review": "sound-source-20260916",
+    "record_sha256": "5bde9b2514c6d70f793b8260d3ba0a9783393522897a8433f832f64b3e1ee491",
+    "purpose": [
+      "sound_nes_vrc6_pulse1_off"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc6"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc6.c",
+      "code": "// Mapper 24: two pulse voices followed by the saw accumulator.\n#include \"fc_sound_example.h\"\n#include \"vrc6_sound.c\"\nvoid main(void) {\n    // The background font occupies the first four 1 KiB CHR windows.\n    *((u8*)0xD000)=0; *((u8*)0xD001)=1;\n    *((u8*)0xD002)=2; *((u8*)0xD003)=3;\n    sound_begin(\"VRC6 PULSE PULSE SAW\");\n    nes_vrc6_silence_all();\n    nes_vrc6_pulse1_set(0x7C,253);\n    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);\n    nes_vrc6_pulse2_set(0x3C,253);\n    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);\n    nes_vrc6_saw_set(32,289);\n    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);\n    nes_vrc6_silence_all();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc6"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc6.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc6_pulse2_off": {
+    "review": "sound-source-20260916",
+    "record_sha256": "9d6db77ae2ca859e996c9015d37f0e73daead14f1675e3b0f22a888b7a9cbe7e",
+    "purpose": [
+      "sound_nes_vrc6_pulse2_off"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc6"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc6.c",
+      "code": "// Mapper 24: two pulse voices followed by the saw accumulator.\n#include \"fc_sound_example.h\"\n#include \"vrc6_sound.c\"\nvoid main(void) {\n    // The background font occupies the first four 1 KiB CHR windows.\n    *((u8*)0xD000)=0; *((u8*)0xD001)=1;\n    *((u8*)0xD002)=2; *((u8*)0xD003)=3;\n    sound_begin(\"VRC6 PULSE PULSE SAW\");\n    nes_vrc6_silence_all();\n    nes_vrc6_pulse1_set(0x7C,253);\n    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);\n    nes_vrc6_pulse2_set(0x3C,253);\n    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);\n    nes_vrc6_saw_set(32,289);\n    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);\n    nes_vrc6_silence_all();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc6"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc6.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc6_saw_set": {
+    "review": "sound-source-20260916",
+    "record_sha256": "ec2d64ff08d31159ad565ff12514f723f0c872ce7ea5c3c3f7de7bae724077cd",
+    "purpose": [
+      "sound_nes_vrc6_saw_set"
+    ],
+    "args": [
+      [
+        "rate",
+        [
+          "sound_arg_rate"
+        ]
+      ],
+      [
+        "period",
+        [
+          "sound_period_vrc"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc6"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc6.c",
+      "code": "// Mapper 24: two pulse voices followed by the saw accumulator.\n#include \"fc_sound_example.h\"\n#include \"vrc6_sound.c\"\nvoid main(void) {\n    // The background font occupies the first four 1 KiB CHR windows.\n    *((u8*)0xD000)=0; *((u8*)0xD001)=1;\n    *((u8*)0xD002)=2; *((u8*)0xD003)=3;\n    sound_begin(\"VRC6 PULSE PULSE SAW\");\n    nes_vrc6_silence_all();\n    nes_vrc6_pulse1_set(0x7C,253);\n    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);\n    nes_vrc6_pulse2_set(0x3C,253);\n    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);\n    nes_vrc6_saw_set(32,289);\n    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);\n    nes_vrc6_silence_all();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc6"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc6.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc6_saw_off": {
+    "review": "sound-source-20260916",
+    "record_sha256": "bfa754a11b0526a368b007f3d111f71a7ca5c02a801352f34108183daab71d2a",
+    "purpose": [
+      "sound_nes_vrc6_saw_off"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc6"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc6.c",
+      "code": "// Mapper 24: two pulse voices followed by the saw accumulator.\n#include \"fc_sound_example.h\"\n#include \"vrc6_sound.c\"\nvoid main(void) {\n    // The background font occupies the first four 1 KiB CHR windows.\n    *((u8*)0xD000)=0; *((u8*)0xD001)=1;\n    *((u8*)0xD002)=2; *((u8*)0xD003)=3;\n    sound_begin(\"VRC6 PULSE PULSE SAW\");\n    nes_vrc6_silence_all();\n    nes_vrc6_pulse1_set(0x7C,253);\n    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);\n    nes_vrc6_pulse2_set(0x3C,253);\n    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);\n    nes_vrc6_saw_set(32,289);\n    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);\n    nes_vrc6_silence_all();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc6"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc6.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc7_write": {
+    "review": "sound-source-20260916",
+    "record_sha256": "06c14c7235db24430843f4185e67fc89d406ed580277d693ba92117dce0fd4c8",
+    "purpose": [
+      "sound_nes_vrc7_write"
+    ],
+    "args": [
+      [
+        "reg",
+        [
+          "sound_arg_reg"
+        ]
+      ],
+      [
+        "value",
+        [
+          "sound_arg_value"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc7",
+      "sound_vrc7_shared"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc7.c",
+      "code": "// Mapper 85: an FM preset followed by a simple original user instrument.\n#include \"fc_sound_example.h\"\n#include \"vrc7_sound.c\"\n__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};\nvoid main(void) {\n    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.\n    *((u8*)0xA000)=0; *((u8*)0xA010)=1;\n    *((u8*)0xB000)=2; *((u8*)0xB010)=3;\n    *((u8*)0xC000)=4; *((u8*)0xC010)=5;\n    *((u8*)0xD000)=6; *((u8*)0xD010)=7;\n    sound_begin(\"VRC7 PRESET AND PATCH\");\n    nes_vrc7_silence_all();\n    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);\n    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);\n    nes_vrc7_set_user_patch(patch);\n    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);\n    sound_wait(60);\n    // Raw register 30 selects instrument zero and maximum attenuation.\n    nes_vrc7_write(0x30,0x0F);\n    nes_vrc7_key_off(0);\n    nes_vrc7_silence_all(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc7"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc7.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc7_set_user_patch": {
+    "review": "sound-source-20260916",
+    "record_sha256": "8af227406796dcefb184d52facfeb41502c4c40b5e4e615ce3df1867402534be",
+    "purpose": [
+      "sound_nes_vrc7_set_user_patch"
+    ],
+    "args": [
+      [
+        "patch8",
+        [
+          "sound_arg_patch8"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc7",
+      "sound_vrc7_shared"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc7.c",
+      "code": "// Mapper 85: an FM preset followed by a simple original user instrument.\n#include \"fc_sound_example.h\"\n#include \"vrc7_sound.c\"\n__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};\nvoid main(void) {\n    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.\n    *((u8*)0xA000)=0; *((u8*)0xA010)=1;\n    *((u8*)0xB000)=2; *((u8*)0xB010)=3;\n    *((u8*)0xC000)=4; *((u8*)0xC010)=5;\n    *((u8*)0xD000)=6; *((u8*)0xD010)=7;\n    sound_begin(\"VRC7 PRESET AND PATCH\");\n    nes_vrc7_silence_all();\n    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);\n    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);\n    nes_vrc7_set_user_patch(patch);\n    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);\n    sound_wait(60);\n    // Raw register 30 selects instrument zero and maximum attenuation.\n    nes_vrc7_write(0x30,0x0F);\n    nes_vrc7_key_off(0);\n    nes_vrc7_silence_all(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc7"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc7.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc7_channel_set": {
+    "review": "sound-source-20260916",
+    "record_sha256": "7077e5abb6126bd976e67920652ad818cd6de64d66cc092e67056cce1d090d21",
+    "purpose": [
+      "sound_nes_vrc7_channel_set"
+    ],
+    "args": [
+      [
+        "channel",
+        [
+          "sound_arg_channel"
+        ]
+      ],
+      [
+        "instrument",
+        [
+          "sound_arg_instrument"
+        ]
+      ],
+      [
+        "volume",
+        [
+          "sound_fmvolume"
+        ]
+      ],
+      [
+        "fnum",
+        [
+          "sound_arg_fnum"
+        ]
+      ],
+      [
+        "block",
+        [
+          "sound_arg_block"
+        ]
+      ],
+      [
+        "key_flags",
+        [
+          "sound_arg_key_flags"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc7",
+      "sound_vrc7_shared"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc7.c",
+      "code": "// Mapper 85: an FM preset followed by a simple original user instrument.\n#include \"fc_sound_example.h\"\n#include \"vrc7_sound.c\"\n__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};\nvoid main(void) {\n    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.\n    *((u8*)0xA000)=0; *((u8*)0xA010)=1;\n    *((u8*)0xB000)=2; *((u8*)0xB010)=3;\n    *((u8*)0xC000)=4; *((u8*)0xC010)=5;\n    *((u8*)0xD000)=6; *((u8*)0xD010)=7;\n    sound_begin(\"VRC7 PRESET AND PATCH\");\n    nes_vrc7_silence_all();\n    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);\n    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);\n    nes_vrc7_set_user_patch(patch);\n    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);\n    sound_wait(60);\n    // Raw register 30 selects instrument zero and maximum attenuation.\n    nes_vrc7_write(0x30,0x0F);\n    nes_vrc7_key_off(0);\n    nes_vrc7_silence_all(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc7"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc7.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc7_key_off": {
+    "review": "sound-source-20260916",
+    "record_sha256": "52a2131854b2b2eaef751f0fdd28da1af54f1f6800cf23ac1f532bba75a7a9af",
+    "purpose": [
+      "sound_nes_vrc7_key_off"
+    ],
+    "args": [
+      [
+        "channel",
+        [
+          "sound_arg_channel"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc7",
+      "sound_vrc7_shared"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc7.c",
+      "code": "// Mapper 85: an FM preset followed by a simple original user instrument.\n#include \"fc_sound_example.h\"\n#include \"vrc7_sound.c\"\n__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};\nvoid main(void) {\n    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.\n    *((u8*)0xA000)=0; *((u8*)0xA010)=1;\n    *((u8*)0xB000)=2; *((u8*)0xB010)=3;\n    *((u8*)0xC000)=4; *((u8*)0xC010)=5;\n    *((u8*)0xD000)=6; *((u8*)0xD010)=7;\n    sound_begin(\"VRC7 PRESET AND PATCH\");\n    nes_vrc7_silence_all();\n    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);\n    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);\n    nes_vrc7_set_user_patch(patch);\n    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);\n    sound_wait(60);\n    // Raw register 30 selects instrument zero and maximum attenuation.\n    nes_vrc7_write(0x30,0x0F);\n    nes_vrc7_key_off(0);\n    nes_vrc7_silence_all(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc7"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc7.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vrc7_silence_all": {
+    "review": "sound-source-20260916",
+    "record_sha256": "f23a5e2a76f34b1edcf3bf94dd06dcb72ae9863d449924eb0ee136b475398681",
+    "purpose": [
+      "sound_nes_vrc7_silence_all"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_vrc7",
+      "sound_vrc7_shared"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_vrc7.c",
+      "code": "// Mapper 85: an FM preset followed by a simple original user instrument.\n#include \"fc_sound_example.h\"\n#include \"vrc7_sound.c\"\n__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};\nvoid main(void) {\n    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.\n    *((u8*)0xA000)=0; *((u8*)0xA010)=1;\n    *((u8*)0xB000)=2; *((u8*)0xB010)=3;\n    *((u8*)0xC000)=4; *((u8*)0xC010)=5;\n    *((u8*)0xD000)=6; *((u8*)0xD010)=7;\n    sound_begin(\"VRC7 PRESET AND PATCH\");\n    nes_vrc7_silence_all();\n    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);\n    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);\n    nes_vrc7_set_user_patch(patch);\n    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);\n    sound_wait(60);\n    // Raw register 30 selects instrument zero and maximum attenuation.\n    nes_vrc7_write(0x30,0x0F);\n    nes_vrc7_key_off(0);\n    nes_vrc7_silence_all(); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-vrc7"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_vrc7.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__fds_sound_enable": {
+    "review": "sound-source-20260916",
+    "record_sha256": "2482e818a201d6e8bc8c6fc0e4726e1f536612bc78516bc1260577be71bd7617",
+    "purpose": [
+      "sound___fds_sound_enable"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fds"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_fds.c",
+      "code": "// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.\n#include \"fc_sound_example.h\"\n#include \"fds_sound.h\"\n#include \"nes_game.h\"\n__location(0x4087) u8 mod_control;\n__location(0x4085) u8 mod_counter;\nu8 triangle[64]; u8 modulation[32];\nvoid main(void) {\n    u8 i;\n    sound_begin(\"FDS WAVE AND VOLUME\");\n    for(i=0;i<32;i++) { triangle[i]=(u8)(i*2); triangle[63-i]=(u8)(i*2); modulation[i]=0; }\n    __fds_sound_enable();\n    // Halt/reset modulation before writing the 32 values (each writes two slots).\n    mod_control=0x80; mod_counter=0;\n    __fds_mod_load(modulation);\n    __fds_wave_load(triangle);\n    sound_result[0]=*((u8*)0x4040); sound_result[1]=*((u8*)0x405F);\n    __fds_freq_set(1031);\n    __fds_volume_set(24);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    // This macro forwards the same 64-byte load. Use raw envelope registers.\n    nes_fds_wave_load(triangle);\n    __fds_env_set(0x98,0x80,0);\n    __fds_freq_set(1545);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-fds"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_fds.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-fds.fds --mapper=fds --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__fds_wave_load": {
+    "review": "sound-source-20260916",
+    "record_sha256": "9c36468b43c7a99d0f60563daa6f664bb12f0f7775359be76395de3e568a444b",
+    "purpose": [
+      "sound___fds_wave_load"
+    ],
+    "args": [
+      [
+        "wave64",
+        [
+          "sound_arg_wave64"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fds"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_fds.c",
+      "code": "// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.\n#include \"fc_sound_example.h\"\n#include \"fds_sound.h\"\n#include \"nes_game.h\"\n__location(0x4087) u8 mod_control;\n__location(0x4085) u8 mod_counter;\nu8 triangle[64]; u8 modulation[32];\nvoid main(void) {\n    u8 i;\n    sound_begin(\"FDS WAVE AND VOLUME\");\n    for(i=0;i<32;i++) { triangle[i]=(u8)(i*2); triangle[63-i]=(u8)(i*2); modulation[i]=0; }\n    __fds_sound_enable();\n    // Halt/reset modulation before writing the 32 values (each writes two slots).\n    mod_control=0x80; mod_counter=0;\n    __fds_mod_load(modulation);\n    __fds_wave_load(triangle);\n    sound_result[0]=*((u8*)0x4040); sound_result[1]=*((u8*)0x405F);\n    __fds_freq_set(1031);\n    __fds_volume_set(24);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    // This macro forwards the same 64-byte load. Use raw envelope registers.\n    nes_fds_wave_load(triangle);\n    __fds_env_set(0x98,0x80,0);\n    __fds_freq_set(1545);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-fds"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_fds.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-fds.fds --mapper=fds --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__fds_mod_load": {
+    "review": "sound-source-20260916",
+    "record_sha256": "8e13b48d2db95af5a45ac9802e58071064e23c4a6e1c2266a438b27b69c5b0a0",
+    "purpose": [
+      "sound___fds_mod_load"
+    ],
+    "args": [
+      [
+        "mod32",
+        [
+          "sound_arg_mod32"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fds"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_fds.c",
+      "code": "// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.\n#include \"fc_sound_example.h\"\n#include \"fds_sound.h\"\n#include \"nes_game.h\"\n__location(0x4087) u8 mod_control;\n__location(0x4085) u8 mod_counter;\nu8 triangle[64]; u8 modulation[32];\nvoid main(void) {\n    u8 i;\n    sound_begin(\"FDS WAVE AND VOLUME\");\n    for(i=0;i<32;i++) { triangle[i]=(u8)(i*2); triangle[63-i]=(u8)(i*2); modulation[i]=0; }\n    __fds_sound_enable();\n    // Halt/reset modulation before writing the 32 values (each writes two slots).\n    mod_control=0x80; mod_counter=0;\n    __fds_mod_load(modulation);\n    __fds_wave_load(triangle);\n    sound_result[0]=*((u8*)0x4040); sound_result[1]=*((u8*)0x405F);\n    __fds_freq_set(1031);\n    __fds_volume_set(24);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    // This macro forwards the same 64-byte load. Use raw envelope registers.\n    nes_fds_wave_load(triangle);\n    __fds_env_set(0x98,0x80,0);\n    __fds_freq_set(1545);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-fds"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_fds.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-fds.fds --mapper=fds --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__fds_freq_set": {
+    "review": "sound-source-20260916",
+    "record_sha256": "ea2c58b05d87f43b7511511a8f4da7ecdf474c49c1a78d161ecd3b507517f052",
+    "purpose": [
+      "sound___fds_freq_set"
+    ],
+    "args": [
+      [
+        "freq",
+        [
+          "sound_arg_freq"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fds"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_fds.c",
+      "code": "// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.\n#include \"fc_sound_example.h\"\n#include \"fds_sound.h\"\n#include \"nes_game.h\"\n__location(0x4087) u8 mod_control;\n__location(0x4085) u8 mod_counter;\nu8 triangle[64]; u8 modulation[32];\nvoid main(void) {\n    u8 i;\n    sound_begin(\"FDS WAVE AND VOLUME\");\n    for(i=0;i<32;i++) { triangle[i]=(u8)(i*2); triangle[63-i]=(u8)(i*2); modulation[i]=0; }\n    __fds_sound_enable();\n    // Halt/reset modulation before writing the 32 values (each writes two slots).\n    mod_control=0x80; mod_counter=0;\n    __fds_mod_load(modulation);\n    __fds_wave_load(triangle);\n    sound_result[0]=*((u8*)0x4040); sound_result[1]=*((u8*)0x405F);\n    __fds_freq_set(1031);\n    __fds_volume_set(24);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    // This macro forwards the same 64-byte load. Use raw envelope registers.\n    nes_fds_wave_load(triangle);\n    __fds_env_set(0x98,0x80,0);\n    __fds_freq_set(1545);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-fds"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_fds.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-fds.fds --mapper=fds --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__fds_volume_set": {
+    "review": "sound-source-20260916",
+    "record_sha256": "9b56d038f8a704f33d4ad6d89b13d6aa6aadd4103900c7708aac2a9b93c1605e",
+    "purpose": [
+      "sound___fds_volume_set"
+    ],
+    "args": [
+      [
+        "vol",
+        [
+          "sound_arg_vol"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fds"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_fds.c",
+      "code": "// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.\n#include \"fc_sound_example.h\"\n#include \"fds_sound.h\"\n#include \"nes_game.h\"\n__location(0x4087) u8 mod_control;\n__location(0x4085) u8 mod_counter;\nu8 triangle[64]; u8 modulation[32];\nvoid main(void) {\n    u8 i;\n    sound_begin(\"FDS WAVE AND VOLUME\");\n    for(i=0;i<32;i++) { triangle[i]=(u8)(i*2); triangle[63-i]=(u8)(i*2); modulation[i]=0; }\n    __fds_sound_enable();\n    // Halt/reset modulation before writing the 32 values (each writes two slots).\n    mod_control=0x80; mod_counter=0;\n    __fds_mod_load(modulation);\n    __fds_wave_load(triangle);\n    sound_result[0]=*((u8*)0x4040); sound_result[1]=*((u8*)0x405F);\n    __fds_freq_set(1031);\n    __fds_volume_set(24);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    // This macro forwards the same 64-byte load. Use raw envelope registers.\n    nes_fds_wave_load(triangle);\n    __fds_env_set(0x98,0x80,0);\n    __fds_freq_set(1545);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-fds"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_fds.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-fds.fds --mapper=fds --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__fds_env_set": {
+    "review": "sound-source-20260916",
+    "record_sha256": "9a7ca96cc4260f2403afee29051c291633a439b12f1d5e4255d59329086bdb14",
+    "purpose": [
+      "sound___fds_env_set"
+    ],
+    "args": [
+      [
+        "speed",
+        [
+          "sound_arg_speed"
+        ]
+      ],
+      [
+        "gain",
+        [
+          "sound_arg_gain"
+        ]
+      ],
+      [
+        "mode",
+        [
+          "sound_arg_mode"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fds"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_fds.c",
+      "code": "// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.\n#include \"fc_sound_example.h\"\n#include \"fds_sound.h\"\n#include \"nes_game.h\"\n__location(0x4087) u8 mod_control;\n__location(0x4085) u8 mod_counter;\nu8 triangle[64]; u8 modulation[32];\nvoid main(void) {\n    u8 i;\n    sound_begin(\"FDS WAVE AND VOLUME\");\n    for(i=0;i<32;i++) { triangle[i]=(u8)(i*2); triangle[63-i]=(u8)(i*2); modulation[i]=0; }\n    __fds_sound_enable();\n    // Halt/reset modulation before writing the 32 values (each writes two slots).\n    mod_control=0x80; mod_counter=0;\n    __fds_mod_load(modulation);\n    __fds_wave_load(triangle);\n    sound_result[0]=*((u8*)0x4040); sound_result[1]=*((u8*)0x405F);\n    __fds_freq_set(1031);\n    __fds_volume_set(24);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    // This macro forwards the same 64-byte load. Use raw envelope registers.\n    nes_fds_wave_load(triangle);\n    __fds_env_set(0x98,0x80,0);\n    __fds_freq_set(1545);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-fds"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_fds.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-fds.fds --mapper=fds --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_fds_wave_load": {
+    "review": "sound-source-20260916",
+    "record_sha256": "f8360060f78fcb836f9417203189306bbbddba36be00a85d5e63707a1a0d7358",
+    "purpose": [
+      "sound_nes_fds_wave_load"
+    ],
+    "args": [
+      [
+        "wave64",
+        [
+          "sound_arg_wave64"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_fds"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_fds.c",
+      "code": "// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.\n#include \"fc_sound_example.h\"\n#include \"fds_sound.h\"\n#include \"nes_game.h\"\n__location(0x4087) u8 mod_control;\n__location(0x4085) u8 mod_counter;\nu8 triangle[64]; u8 modulation[32];\nvoid main(void) {\n    u8 i;\n    sound_begin(\"FDS WAVE AND VOLUME\");\n    for(i=0;i<32;i++) { triangle[i]=(u8)(i*2); triangle[63-i]=(u8)(i*2); modulation[i]=0; }\n    __fds_sound_enable();\n    // Halt/reset modulation before writing the 32 values (each writes two slots).\n    mod_control=0x80; mod_counter=0;\n    __fds_mod_load(modulation);\n    __fds_wave_load(triangle);\n    sound_result[0]=*((u8*)0x4040); sound_result[1]=*((u8*)0x405F);\n    __fds_freq_set(1031);\n    __fds_volume_set(24);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    // This macro forwards the same 64-byte load. Use raw envelope registers.\n    nes_fds_wave_load(triangle);\n    __fds_env_set(0x98,0x80,0);\n    __fds_freq_set(1545);\n    sound_wait(60);\n    __fds_volume_set(0); sound_wait(30);\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-fds"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_fds.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-fds.fds --mapper=fds --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_out_byte": {
+    "review": "sound-source-20260916",
+    "record_sha256": "42223e520fc3e8e9e7e0b5c4db09fa83f6983cc55ab6784f271199edccc9f2a7",
+    "purpose": [
+      "sound___midi_out_byte"
+    ],
+    "args": [
+      [
+        "byte",
+        [
+          "sound_arg_midi_byte"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_in_byte": {
+    "review": "sound-source-20260916",
+    "record_sha256": "982b286fd640b873a737ead8ba36397085ad47868e4321178e4689a129afda90",
+    "purpose": [
+      "sound___midi_in_byte"
+    ],
+    "args": [],
+    "returns": [
+      "sound_midi_return"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_note_on": {
+    "review": "sound-source-20260916",
+    "record_sha256": "6420f4d6ac80026a664124201eee9e2f7bb03fc71229dc0e730cc66583b154e7",
+    "purpose": [
+      "sound___midi_note_on"
+    ],
+    "args": [
+      [
+        "ch",
+        [
+          "sound_midi_ch"
+        ]
+      ],
+      [
+        "note",
+        [
+          "sound_midi_note"
+        ]
+      ],
+      [
+        "velocity",
+        [
+          "sound_arg_midi_velocity"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_note_off": {
+    "review": "sound-source-20260916",
+    "record_sha256": "ac62393fef9c849d9b969b0ed4a5095b392cd756adcba7f5f8796e39c5b91e3f",
+    "purpose": [
+      "sound___midi_note_off"
+    ],
+    "args": [
+      [
+        "ch",
+        [
+          "sound_midi_ch"
+        ]
+      ],
+      [
+        "note",
+        [
+          "sound_midi_note"
+        ]
+      ],
+      [
+        "velocity",
+        [
+          "sound_arg_midi_velocity"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_control_change": {
+    "review": "sound-source-20260916",
+    "record_sha256": "2741c28ba632e5a5d0ee284dc3e8b10d310960e13aabb8f4ffb0165cf24c9f6d",
+    "purpose": [
+      "sound___midi_control_change"
+    ],
+    "args": [
+      [
+        "ch",
+        [
+          "sound_midi_ch"
+        ]
+      ],
+      [
+        "cc",
+        [
+          "sound_arg_midi_cc"
+        ]
+      ],
+      [
+        "value",
+        [
+          "sound_midi_value"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_program_change": {
+    "review": "sound-source-20260916",
+    "record_sha256": "92a166f850892185aeb7852b6b9af8849a66b57c8ffb6ad6927bacf87358696f",
+    "purpose": [
+      "sound___midi_program_change"
+    ],
+    "args": [
+      [
+        "ch",
+        [
+          "sound_midi_ch"
+        ]
+      ],
+      [
+        "program",
+        [
+          "sound_arg_midi_program"
+        ]
+      ]
+    ],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_clock": {
+    "review": "sound-source-20260916",
+    "record_sha256": "e4757ec9d75b47d436b492a8d2aa5b345592149f3ea59c69d96687251fad93f4",
+    "purpose": [
+      "sound___midi_clock"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_start": {
+    "review": "sound-source-20260916",
+    "record_sha256": "86b8ba3dad6c0f6fbc930916a72711f6c177fb06598842555eb861ab020c2bec",
+    "purpose": [
+      "sound___midi_start"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_continue": {
+    "review": "sound-source-20260916",
+    "record_sha256": "73d71c2f1a58cd548d7191f75cb817a9479d416564d91ddcbf5d34c17e566928",
+    "purpose": [
+      "sound___midi_continue"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:__midi_stop": {
+    "review": "sound-source-20260916",
+    "record_sha256": "55dc95568397bcd65d5a8e1babf6343ec7994a85c800b5acbca36f7650c7486e",
+    "purpose": [
+      "sound___midi_stop"
+    ],
+    "args": [],
+    "returns": [
+      "sound_void"
+    ],
+    "notes": [
+      "sound_midi_notes"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/sound_midi.c",
+      "code": "// Controller-port byte encoding. This does not synthesize sound inside the FC.\n#define SOUND_PORT_ONLY\n#include \"fc_sound_example.h\"\nvoid main(void) {\n    sound_begin(\"MIDI PORT BYTES\");\n    // sound_begin has disabled DMC DMA and all internal APU voices. A compatible external circuit is required.\n    // Stop NMI and mask IRQ so neither can split a software-timed serial frame.\n    __ppu_ctrl_set(0); __irq_disable();\n    __midi_out_byte(0x7E);\n    __midi_program_change(2,5);\n    __midi_control_change(2,7,100);\n    __midi_note_on(2,69,96);\n    __midi_note_off(2,69,0);\n    __midi_clock(); __midi_start(); __midi_continue(); __midi_stop();\n    // The emulator's unconnected input bit is low. Reading returns zero here.\n    // A real input held high would block waiting for its start bit, without timeout.\n    sound_result[0]=__midi_in_byte();\n    sound_result[1]=1;\n    __ppu_ctrl_set(0x80); __irq_enable();\n    sound_end();\n}\n",
+      "standalone": true,
+      "expected": [
+        "sound_expected_fc-midi"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\sound_midi.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fc-midi.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm"
+    }
+  }
+}

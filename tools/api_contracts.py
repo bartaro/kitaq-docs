@@ -57,6 +57,9 @@ def render(record, contract, language, messages, ui):
             if contract['review'] in ['physics-source-20260915','wireframe-source-20260915']:
                 caption += ' — ' + ' '.join(messages[key][index].replace('`','') for key in example.get('expected', []))
             result.append('<figure class="example-result"><img class="screen" loading="lazy" src="' + prefix + html.escape(shot['image'], quote=True) + '" alt="' + html.escape(name + ': ' + caption, quote=True) + '"><figcaption>' + html.escape(caption) + '</figcaption></figure>')
+        for clip in example.get('verified_audio', []):
+            caption = clip['caption'] + ' — ' + ('確認した音声' if language == 'ja' else 'Captured audio')
+            result.append('<figure class="example-audio"><audio controls preload="none" aria-label="' + html.escape(name + ': ' + caption, quote=True) + '" src="' + prefix + html.escape(clip['audio'], quote=True) + '"></audio><figcaption>' + html.escape(caption) + '</figcaption></figure>')
         return ''.join(result)
     prefix = '' if language == 'ja' else '../'
     name = record['name']
@@ -179,6 +182,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_physics_examples(contracts))
     from api_wireframe_proofs import verified_examples as verified_wireframe_examples
     proofs.update(verified_wireframe_examples(contracts))
+    from api_sound_proofs import verified_examples as verified_sound_examples
+    proofs.update(verified_sound_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -244,13 +249,24 @@ def refresh_complete_headers(text, platform):
 def render_modules(text, platform, language, messages):
     """Place reviewed library introductions directly below their module headings."""
     text = re.sub(r'<!-- api-module:start -->.*?<!-- api-module:end -->','',text,flags=re.S)
+    # fds_sound.h declares compiler intrinsics, so it has no ordinary function
+    # cards in the library volume. Keep the header discoverable here and link
+    # each declaration to its complete compiler-reference lesson.
+    if platform == 'fc':
+        text = re.sub(r'<!-- fds-sound-module:start -->.*?<!-- fds-sound-module:end -->','',text,flags=re.S)
+        label = '関数の個別説明' if language == 'ja' else 'Function reference'
+        names = ['__fds_sound_enable','__fds_wave_load','__fds_mod_load','__fds_freq_set','__fds_volume_set','__fds_env_set']
+        links = ', '.join('<a href="kitaqfc.html#api-' + name + '"><code>' + name + '</code></a>' for name in names)
+        block = '<!-- fds-sound-module:start --><h3 id="module-fds_sound">fds_sound.h</h3><p>' + label + ': ' + links + '</p><!-- fds-sound-module:end -->'
+        text = text.replace('<h3 id="module-fixed">',block+'<h3 id="module-fixed">',1)
     index = ORDER.index(language)
     for path in sorted(SOURCE.glob('*modules.json')):
         for key, paragraphs in json.loads(path.read_text(encoding='utf-8')).items():
             owner, module = key.split(':')
             if owner != platform: continue
             pattern = r'(<h3\b[^>]*id="module-' + re.escape(module) + r'"[^>]*>.*?</h3>)'
-            block = '<!-- api-module:start --><div data-module-contract="' + html.escape(path.stem.removesuffix('_modules'), quote=True) + '-source-20260915">'
+            review_date = '20260916' if path.stem == 'sound_modules' else '20260915'
+            block = '<!-- api-module:start --><div data-module-contract="' + html.escape(path.stem.removesuffix('_modules'), quote=True) + '-source-' + review_date + '">'
             block += ''.join('<p>'+inline(messages[item][index])+'</p>' for item in paragraphs)
             block += '</div><!-- api-module:end -->'
             text = re.sub(pattern,lambda m:m[1]+block,text,count=1,flags=re.S)
@@ -1116,6 +1132,7 @@ def attach_verified_images(contracts, proofs):
         examples = [example] + example.get('additional', [])
         for item in examples:
             item['verified_images'] = []
+            item['verified_audio'] = []
         if not result.get('kind'):
             for hardware in ['dmg', 'cgb']:
                 image = 'verification/api-tiles/' + result['api'] + '-' + hardware + '.png'
@@ -1130,6 +1147,8 @@ def attach_verified_images(contracts, proofs):
                 raise ValueError('Screen does not identify exactly one sample: ' + key)
             caption = ('--cgb=' + run['target'] + ' / ' if result.get('kind') in ['cgb-palette', 'cgb-dma-wram'] else '') + run['mode'].upper()
             matching[0]['verified_images'].append({'image': run['image'], 'caption': caption})
+            if run.get('audio') and run.get('playback_clip',True):
+                matching[0]['verified_audio'].append({'audio': run['audio'], 'caption': caption})
         if not all(item['verified_images'] for item in examples):
             raise ValueError('Missing sample screen: ' + key)
 

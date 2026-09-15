@@ -32,6 +32,10 @@ def public_file(relative):
     path = Path(relative)
     if any(part.startswith('.') or part == '__pycache__' for part in path.parts):
         return False
+    if path.parts[:2] == ('verification','api-sound'):
+        if 'state' in path.parts or 'integration_test' in path.parts:return False
+        if 'fc-midi' in path.parts and path.suffix=='.wav':return False
+        return path.suffix in PUBLIC_EVIDENCE_SUFFIXES | {'.wav','.fds'}
     if path.parts[:2] in [('samples', 'out'), ('samples', 'sarakura-out')]:
         return False
     if path.suffix == '.pyc':

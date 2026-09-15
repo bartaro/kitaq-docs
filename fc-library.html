@@ -533,18 +533,55 @@ there is no clipping before the byte-sized endpoint arithmetic.</pre></div><h4>�
         }
         qy = (unsigned char)(qy + 1);
     }
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/attribute.h:12</p></details><h3 id="module-audio">audio.h — 音楽と効果音・音源制御</h3><details class="api searchable" id="api-nes_apu_channel_enable"><summary><code>nes_apu_channel_enable</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。機能を有効化します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_channel_enable(u8 mask);</code></pre></div><p><b>引数（左から順）：</b>u8 mask。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Replace all five channel-enable bits in APU_STATUS; this is not an additive enable.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_apu_channel_enable(u8 mask) {
-    nes_apu_channel_enable(mask);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_apu_channel_enable.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:43。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_channel_enable(u8 mask)
+}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/attribute.h:12</p></details><h3 id="module-audio">audio.h — 音楽と効果音・音源制御</h3><!-- api-module:start --><div data-module-contract="sound-source-20260916"><p>標準APUの2パルス・三角波・ノイズ・DMCを直接設定します。音楽シーケンサーや自動ミキサーではなく、ゲーム側が発音タイミングと音源の所有権を管理します。</p><p>このヘルパーはAPU_STATUSへ単一チャンネルのマスクを書き、ほかのチャンネルを無効化します。複数音を同時に鳴らすミキサーではありません。periodはパルス・三角波のタイマー値で、小さいほど高い音です。サンプルの周波数と時間はNTSC設定で確認しています。</p><p>DMCは$C000～$FFC0の64バイト境界からROMを読みます。長さは16×n+1バイト（1～4081）です。ヘルパーは境界・範囲を検査せず、バンクも切り替えません。サンプルは固定バンク0に独自データを__aligned(64)で置き、配置を実行時にも検査します。</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_apu_channel_enable" data-api-contract="sound-source-20260916"><summary><code>nes_apu_channel_enable</code></summary><p>APUの5チャンネルの有効化状態を、指定マスクで丸ごと置き換えます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_channel_enable(u8 mask);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>mask</code></dt><dd><p>APU_STATUSへ書く完全な有効化マスク。bit0～4はpulse1、pulse2、triangle、noise、DMCで、上位3ビットは捨てます。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.
+#include &quot;fc_sound_example.h&quot;
+void main(void) {
+    sound_begin(&quot;APU CHANNELS AND BLIPS&quot;);
+    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.
+    nes_sfx_square1(0xBC,253,0);
+    sound_result[0]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30);
+    nes_apu_channel_enable(0); sound_wait(15);
+    nes_sfx_square2(0x7C,253,0);
+    sound_result[1]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_triangle(0xFF,253,0);
+    sound_result[2]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_noise(0x3C,5,0);
+    sound_result[3]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>pulse1、pulse2、三角波、ノイズ、tick、moveの順です。タイマー253はNTSCでパルス約440Hz、三角波約220Hzになります。tickは約111Hz、moveは約174Hzで、moveの方が短く終わります。最後は無音です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-channels/ntsc/screen.png" alt="nes_apu_channel_enable: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_apu_channel_enable: NTSC — 確認した音声" src="verification/api-sound/fc-channels/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_channels.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_channels.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-channels.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:17</p><div class="original"><b>宣言の注記（原文）</b><pre>Replace all five channel-enable bits in APU_STATUS; this is not an additive enable.</pre></div><p class="source">kitaqfc/lib/audio.c:43</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_channel_enable(u8 mask)
 {
     APU_STATUS = (u8)(mask &amp; 0x1F);
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:17</p></details><details class="api searchable" id="api-nes_apu_init"><summary><code>nes_apu_init</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。初期状態を準備します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_init(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Disable frame IRQs, enable the four tonal/noise channels and install quiet
-control defaults. DMC remains disabled.</pre></div><h4>呼び出し例（周辺コードの断片）</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Control BF selects constant volume and halts the length counter, so this tone sustains.
-    // Call nes_apu_silence_all when the game should stop it; 20 is a length-table index, not frames.
-    nes_apu_init(); nes_sfx_square1(0xBF,400,20);
-    m_number(42);
-    while (1) { m_wait();  }
-}</code></pre></div><p class="source">出典：kitaq-docs/samples/fc_sound.c:13</p><p><a href="samples/fc_sound.c">この例の完全なプログラム</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:28。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_init(void)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_apu_init" data-api-contract="sound-source-20260916"><summary><code>nes_apu_init</code></summary><p>フレームIRQを無効にして4音源を有効化し、無音の制御値を設定します。DMCは無効です。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_init(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.
+#include &quot;fc_sound_example.h&quot;
+void main(void) {
+    sound_begin(&quot;APU CHANNELS AND BLIPS&quot;);
+    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.
+    nes_sfx_square1(0xBC,253,0);
+    sound_result[0]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30);
+    nes_apu_channel_enable(0); sound_wait(15);
+    nes_sfx_square2(0x7C,253,0);
+    sound_result[1]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_triangle(0xFF,253,0);
+    sound_result[2]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_noise(0x3C,5,0);
+    sound_result[3]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>pulse1、pulse2、三角波、ノイズ、tick、moveの順です。タイマー253はNTSCでパルス約440Hz、三角波約220Hzになります。tickは約111Hz、moveは約174Hzで、moveの方が短く終わります。最後は無音です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-channels/ntsc/screen.png" alt="nes_apu_init: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_apu_init: NTSC — 確認した音声" src="verification/api-sound/fc-channels/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_channels.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_channels.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-channels.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:15</p><div class="original"><b>宣言の注記（原文）</b><pre>Disable frame IRQs, enable the four tonal/noise channels and install quiet
+control defaults. DMC remains disabled.</pre></div><p class="source">kitaqfc/lib/audio.c:28</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_init(void)
 {
     APU_FRAME = 0x40;
     APU_STATUS = 0x0F;
@@ -556,7 +593,29 @@ control defaults. DMC remains disabled.</pre></div><h4>呼び出し例（周辺�
     NOISE_VOL = 0x10;
     DMC_FREQ = 0x00;
     DMC_RAW = 0x00;
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:15</p></details><details class="api searchable" id="api-nes_apu_silence_all"><summary><code>nes_apu_silence_all</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_silence_all(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Disable every channel and clear volume/DMC output settings used by this helper.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_apu_silence_all();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_apu_silence_all.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:49。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_silence_all(void)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_apu_silence_all" data-api-contract="sound-source-20260916"><summary><code>nes_apu_silence_all</code></summary><p>全チャンネルを無効化し、パルス・ノイズの音量とDMC出力を消します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_silence_all(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.
+#include &quot;fc_sound_example.h&quot;
+void main(void) {
+    sound_begin(&quot;APU CHANNELS AND BLIPS&quot;);
+    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.
+    nes_sfx_square1(0xBC,253,0);
+    sound_result[0]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30);
+    nes_apu_channel_enable(0); sound_wait(15);
+    nes_sfx_square2(0x7C,253,0);
+    sound_result[1]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_triangle(0xFF,253,0);
+    sound_result[2]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_noise(0x3C,5,0);
+    sound_result[3]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>pulse1、pulse2、三角波、ノイズ、tick、moveの順です。タイマー253はNTSCでパルス約440Hz、三角波約220Hzになります。tickは約111Hz、moveは約174Hzで、moveの方が短く終わります。最後は無音です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-channels/ntsc/screen.png" alt="nes_apu_silence_all: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_apu_silence_all: NTSC — 確認した音声" src="verification/api-sound/fc-channels/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_channels.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_channels.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-channels.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:19</p><div class="original"><b>宣言の注記（原文）</b><pre>Disable every channel and clear volume/DMC output settings used by this helper.</pre></div><p class="source">kitaqfc/lib/audio.c:49</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_apu_silence_all(void)
 {
     APU_STATUS = 0x00;
     SQ1_VOL = 0x10;
@@ -565,52 +624,174 @@ control defaults. DMC remains disabled.</pre></div><h4>呼び出し例（周辺�
     NOISE_VOL = 0x10;
     DMC_FREQ = 0x00;
     DMC_RAW = 0x00;
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:19</p></details><details class="api searchable" id="api-nes_dmc_config"><summary><code>nes_dmc_config</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_config(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len);</code></pre></div><p><b>引数（左から順）：</b>u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Convert a CPU sample address and byte length to DMC register units. Supply
-an address in 0xC000-0xFFC0 aligned to 64 bytes and a representable length
-16*n+1 in 1..4081; inputs are narrowed without validation or bank management.</pre></div><h4>呼び出し例（周辺コードの断片）</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_play(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len)
-{
-    nes_dmc_config(flags_rate, output_level, sample_addr, sample_len);
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_dmc_config" data-api-contract="sound-source-20260916"><summary><code>nes_dmc_config</code></summary><p>DMCの制御・出力初期値・開始アドレス・長さをレジスター単位へ変換して設定します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_config(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>flags_rate</code></dt><dd><p>DMCのbit7=IRQ、bit6=ループ、bit3～0=レート番号。サンプルではIRQを使いません。</p></dd><dt><code>output_level</code></dt><dd><p>DMC出力カウンターの初期値0～127。下位7ビットだけを書き込みます。</p></dd><dt><code>sample_addr</code></dt><dd><p>DMCデータ先頭のCPUアドレス。$C000～$FFC0の64バイト境界です。</p></dd><dt><code>sample_len</code></dt><dd><p>16×n+1のバイト数、1～4081。0や未対応の長さは渡さないでください。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>DMCは$C000～$FFC0の64バイト境界からROMを読みます。長さは16×n+1バイト（1～4081）です。ヘルパーは境界・範囲を検査せず、バンクも切り替えません。サンプルは固定バンク0に独自データを__aligned(64)で置き、配置を実行時にも検査します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// A 17-byte original delta pattern, aligned to a 64-byte DMC start boundary.
+#include &quot;fc_sound_example.h&quot;
+#pragma bank 0
+__aligned(64) __prg_rom u8 delta[17]={0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xAA};
+void main(void) {
+    sound_begin(&quot;DMC ORIGINAL DELTAS&quot;);
+    sound_result[0]=(u8)(((u16)delta&amp;63)==0);
+    sound_result[1]=(u8)((u16)delta&gt;=0xC000);
+    // Loop at NTSC rate index 10; start the output accumulator at its midpoint.
+    nes_dmc_config(0x4A,64,(u16)delta,17);
     nes_dmc_start();
-}</code></pre></div><p class="source">出典：kitaqfc/lib/audio.c:139</p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:115。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_config(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len)
+    sound_wait(60);
+    nes_dmc_stop(); sound_wait(30);
+    nes_dmc_play(0x4C,64,(u16)delta,17);
+    sound_wait(60);
+    nes_dmc_stop(); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>独自のデルタ列をレート10、無音区間、より速いレート12の順で再生します。途中のDMC停止後は出力カウンターが保持されるため、録音では過渡成分が残る場合があります。最後はAPU全停止です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-dmc/ntsc/screen.png" alt="nes_dmc_config: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_dmc_config: NTSC — 確認した音声" src="verification/api-sound/fc-dmc/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_dmc.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_dmc.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-dmc.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:38</p><div class="original"><b>宣言の注記（原文）</b><pre>Convert a CPU sample address and byte length to DMC register units. Supply
+an address in 0xC000-0xFFC0 aligned to 64 bytes and a representable length
+16*n+1 in 1..4081; inputs are narrowed without validation or bank management.</pre></div><p class="source">kitaqfc/lib/audio.c:115</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_config(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len)
 {
     DMC_FREQ = flags_rate;
     DMC_RAW = (u8)(output_level &amp; 0x7F);
     // Keep the sample bytes mapped at these CPU addresses during playback; this does not select a ROM bank.
     DMC_START = (u8)((sample_addr - 0xC000) &gt;&gt; 6);
     DMC_LEN = (u8)((sample_len - 1) &gt;&gt; 4);
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:38</p></details><details class="api searchable" id="api-nes_dmc_play"><summary><code>nes_dmc_play</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_play(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len);</code></pre></div><p><b>引数（左から順）：</b>u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Install sample parameters, then start DMC using the full-channel enable mask.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_dmc_play(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len) {
-    nes_dmc_play(flags_rate, output_level, sample_addr, sample_len);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_dmc_play.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:137。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_play(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_dmc_play" data-api-contract="sound-source-20260916"><summary><code>nes_dmc_play</code></summary><p>サンプルのDMC設定を行い、直後にDMCを開始します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_play(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>flags_rate</code></dt><dd><p>DMCのbit7=IRQ、bit6=ループ、bit3～0=レート番号。サンプルではIRQを使いません。</p></dd><dt><code>output_level</code></dt><dd><p>DMC出力カウンターの初期値0～127。下位7ビットだけを書き込みます。</p></dd><dt><code>sample_addr</code></dt><dd><p>DMCデータ先頭のCPUアドレス。$C000～$FFC0の64バイト境界です。</p></dd><dt><code>sample_len</code></dt><dd><p>16×n+1のバイト数、1～4081。0や未対応の長さは渡さないでください。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>DMCは$C000～$FFC0の64バイト境界からROMを読みます。長さは16×n+1バイト（1～4081）です。ヘルパーは境界・範囲を検査せず、バンクも切り替えません。サンプルは固定バンク0に独自データを__aligned(64)で置き、配置を実行時にも検査します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// A 17-byte original delta pattern, aligned to a 64-byte DMC start boundary.
+#include &quot;fc_sound_example.h&quot;
+#pragma bank 0
+__aligned(64) __prg_rom u8 delta[17]={0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xAA};
+void main(void) {
+    sound_begin(&quot;DMC ORIGINAL DELTAS&quot;);
+    sound_result[0]=(u8)(((u16)delta&amp;63)==0);
+    sound_result[1]=(u8)((u16)delta&gt;=0xC000);
+    // Loop at NTSC rate index 10; start the output accumulator at its midpoint.
+    nes_dmc_config(0x4A,64,(u16)delta,17);
+    nes_dmc_start();
+    sound_wait(60);
+    nes_dmc_stop(); sound_wait(30);
+    nes_dmc_play(0x4C,64,(u16)delta,17);
+    sound_wait(60);
+    nes_dmc_stop(); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>独自のデルタ列をレート10、無音区間、より速いレート12の順で再生します。途中のDMC停止後は出力カウンターが保持されるため、録音では過渡成分が残る場合があります。最後はAPU全停止です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-dmc/ntsc/screen.png" alt="nes_dmc_play: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_dmc_play: NTSC — 確認した音声" src="verification/api-sound/fc-dmc/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_dmc.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_dmc.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-dmc.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:44</p><div class="original"><b>宣言の注記（原文）</b><pre>Install sample parameters, then start DMC using the full-channel enable mask.</pre></div><p class="source">kitaqfc/lib/audio.c:137</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_play(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len)
 {
     nes_dmc_config(flags_rate, output_level, sample_addr, sample_len);
     nes_dmc_start();
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:44</p></details><details class="api searchable" id="api-nes_dmc_start"><summary><code>nes_dmc_start</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_start(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Enable DMC together with all four other channels by replacing the status mask.</pre></div><h4>呼び出し例（周辺コードの断片）</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>{
-    nes_dmc_config(flags_rate, output_level, sample_addr, sample_len);
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_dmc_start" data-api-contract="sound-source-20260916"><summary><code>nes_dmc_start</code></summary><p>APU_STATUS=0x1FとしてDMCとほかの4音源を有効化します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_start(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>DMCは$C000～$FFC0の64バイト境界からROMを読みます。長さは16×n+1バイト（1～4081）です。ヘルパーは境界・範囲を検査せず、バンクも切り替えません。サンプルは固定バンク0に独自データを__aligned(64)で置き、配置を実行時にも検査します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// A 17-byte original delta pattern, aligned to a 64-byte DMC start boundary.
+#include &quot;fc_sound_example.h&quot;
+#pragma bank 0
+__aligned(64) __prg_rom u8 delta[17]={0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xAA};
+void main(void) {
+    sound_begin(&quot;DMC ORIGINAL DELTAS&quot;);
+    sound_result[0]=(u8)(((u16)delta&amp;63)==0);
+    sound_result[1]=(u8)((u16)delta&gt;=0xC000);
+    // Loop at NTSC rate index 10; start the output accumulator at its midpoint.
+    nes_dmc_config(0x4A,64,(u16)delta,17);
     nes_dmc_start();
-}</code></pre></div><p class="source">出典：kitaqfc/lib/audio.c:140</p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:125。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_start(void)
+    sound_wait(60);
+    nes_dmc_stop(); sound_wait(30);
+    nes_dmc_play(0x4C,64,(u16)delta,17);
+    sound_wait(60);
+    nes_dmc_stop(); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>独自のデルタ列をレート10、無音区間、より速いレート12の順で再生します。途中のDMC停止後は出力カウンターが保持されるため、録音では過渡成分が残る場合があります。最後はAPU全停止です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-dmc/ntsc/screen.png" alt="nes_dmc_start: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_dmc_start: NTSC — 確認した音声" src="verification/api-sound/fc-dmc/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_dmc.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_dmc.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-dmc.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:40</p><div class="original"><b>宣言の注記（原文）</b><pre>Enable DMC together with all four other channels by replacing the status mask.</pre></div><p class="source">kitaqfc/lib/audio.c:125</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_start(void)
 {
     APU_STATUS = 0x1F;
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:40</p></details><details class="api searchable" id="api-nes_dmc_stop"><summary><code>nes_dmc_stop</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_stop(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Disable DMC while leaving all four other channel-enable bits set.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_dmc_stop();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_dmc_stop.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:131。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_stop(void)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_dmc_stop" data-api-contract="sound-source-20260916"><summary><code>nes_dmc_stop</code></summary><p>APU_STATUS=0x0FとしてDMCを止め、ほかの4音源の有効化ビットを立てます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_stop(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>DMCは$C000～$FFC0の64バイト境界からROMを読みます。長さは16×n+1バイト（1～4081）です。ヘルパーは境界・範囲を検査せず、バンクも切り替えません。サンプルは固定バンク0に独自データを__aligned(64)で置き、配置を実行時にも検査します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// A 17-byte original delta pattern, aligned to a 64-byte DMC start boundary.
+#include &quot;fc_sound_example.h&quot;
+#pragma bank 0
+__aligned(64) __prg_rom u8 delta[17]={0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xFF,0xFF,0,0,0xAA};
+void main(void) {
+    sound_begin(&quot;DMC ORIGINAL DELTAS&quot;);
+    sound_result[0]=(u8)(((u16)delta&amp;63)==0);
+    sound_result[1]=(u8)((u16)delta&gt;=0xC000);
+    // Loop at NTSC rate index 10; start the output accumulator at its midpoint.
+    nes_dmc_config(0x4A,64,(u16)delta,17);
+    nes_dmc_start();
+    sound_wait(60);
+    nes_dmc_stop(); sound_wait(30);
+    nes_dmc_play(0x4C,64,(u16)delta,17);
+    sound_wait(60);
+    nes_dmc_stop(); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>独自のデルタ列をレート10、無音区間、より速いレート12の順で再生します。途中のDMC停止後は出力カウンターが保持されるため、録音では過渡成分が残る場合があります。最後はAPU全停止です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-dmc/ntsc/screen.png" alt="nes_dmc_stop: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_dmc_stop: NTSC — 確認した音声" src="verification/api-sound/fc-dmc/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_dmc.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_dmc.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-dmc.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:42</p><div class="original"><b>宣言の注記（原文）</b><pre>Disable DMC while leaving all four other channel-enable bits set.</pre></div><p class="source">kitaqfc/lib/audio.c:131</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_dmc_stop(void)
 {
     APU_STATUS = 0x0F;
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:42</p></details><details class="api searchable" id="api-nes_sfx_move_blip"><summary><code>nes_sfx_move_blip</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_move_blip(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Trigger the predefined pulse-1 movement effect.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_sfx_move_blip();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_sfx_move_blip.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:107。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_move_blip(void)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_sfx_move_blip" data-api-contract="sound-source-20260916"><summary><code>nes_sfx_move_blip</code></summary><p>パルス1を0x5A・タイマー0x0280・長さ番号2で鳴らし、tickより高く短いmove音を作ります。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_move_blip(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このヘルパーはAPU_STATUSへ単一チャンネルのマスクを書き、ほかのチャンネルを無効化します。複数音を同時に鳴らすミキサーではありません。periodはパルス・三角波のタイマー値で、小さいほど高い音です。サンプルの周波数と時間はNTSC設定で確認しています。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.
+#include &quot;fc_sound_example.h&quot;
+void main(void) {
+    sound_begin(&quot;APU CHANNELS AND BLIPS&quot;);
+    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.
+    nes_sfx_square1(0xBC,253,0);
+    sound_result[0]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30);
+    nes_apu_channel_enable(0); sound_wait(15);
+    nes_sfx_square2(0x7C,253,0);
+    sound_result[1]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_triangle(0xFF,253,0);
+    sound_result[2]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_noise(0x3C,5,0);
+    sound_result[3]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>pulse1、pulse2、三角波、ノイズ、tick、moveの順です。タイマー253はNTSCでパルス約440Hz、三角波約220Hzになります。tickは約111Hz、moveは約174Hzで、moveの方が短く終わります。最後は無音です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-channels/ntsc/screen.png" alt="nes_sfx_move_blip: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_sfx_move_blip: NTSC — 確認した音声" src="verification/api-sound/fc-channels/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_channels.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_channels.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-channels.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:33</p><div class="original"><b>宣言の注記（原文）</b><pre>Trigger the predefined pulse-1 movement effect.</pre></div><p class="source">kitaqfc/lib/audio.c:107</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_move_blip(void)
 {
     nes_sfx_square1(0x5A, 0x0280, 2);
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:33</p></details><details class="api searchable" id="api-nes_sfx_noise"><summary><code>nes_sfx_noise</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_noise(u8 volume, u8 period_mode, u8 length_index);</code></pre></div><p><b>引数（左から順）：</b>u8 volume, u8 period_mode, u8 length_index。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Enable only noise and load envelope/control, period/mode and length fields.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_sfx_noise(u8 volume, u8 period_mode, u8 length_index) {
-    nes_sfx_noise(volume, period_mode, length_index);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_sfx_noise.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:92。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_noise(u8 volume, u8 period_mode, u8 length_index)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_sfx_noise" data-api-contract="sound-source-20260916"><summary><code>nes_sfx_noise</code></summary><p>ノイズだけを有効にし、エンベロープ・周期モード・長さ番号を書き込みます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_noise(u8 volume, u8 period_mode, u8 length_index);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>volume</code></dt><dd><p>ノイズ制御の生値。bit5=長さ停止、bit4=固定音量、bit3～0=音量またはエンベロープ間隔です。</p></dd><dt><code>period_mode</code></dt><dd><p>ノイズのbit7=短周期モード、bit3～0=周期テーブル番号。</p></dd><dt><code>length_index</code></dt><dd><p>長さテーブル番号0～31。フレーム数そのものではなく、値の下位5ビットをレジスターへ格納します。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このヘルパーはAPU_STATUSへ単一チャンネルのマスクを書き、ほかのチャンネルを無効化します。複数音を同時に鳴らすミキサーではありません。periodはパルス・三角波のタイマー値で、小さいほど高い音です。サンプルの周波数と時間はNTSC設定で確認しています。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.
+#include &quot;fc_sound_example.h&quot;
+void main(void) {
+    sound_begin(&quot;APU CHANNELS AND BLIPS&quot;);
+    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.
+    nes_sfx_square1(0xBC,253,0);
+    sound_result[0]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30);
+    nes_apu_channel_enable(0); sound_wait(15);
+    nes_sfx_square2(0x7C,253,0);
+    sound_result[1]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_triangle(0xFF,253,0);
+    sound_result[2]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_noise(0x3C,5,0);
+    sound_result[3]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>pulse1、pulse2、三角波、ノイズ、tick、moveの順です。タイマー253はNTSCでパルス約440Hz、三角波約220Hzになります。tickは約111Hz、moveは約174Hzで、moveの方が短く終わります。最後は無音です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-channels/ntsc/screen.png" alt="nes_sfx_noise: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_sfx_noise: NTSC — 確認した音声" src="verification/api-sound/fc-channels/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_channels.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_channels.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-channels.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:29</p><div class="original"><b>宣言の注記（原文）</b><pre>Enable only noise and load envelope/control, period/mode and length fields.</pre></div><p class="source">kitaqfc/lib/audio.c:92</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_noise(u8 volume, u8 period_mode, u8 length_index)
 {
     APU_STATUS = 0x08;
     NOISE_VOL = volume;
     NOISE_LO = period_mode;
     NOISE_HI = (u8)(length_index &lt;&lt; 3);
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:29</p></details><details class="api searchable" id="api-nes_sfx_square1"><summary><code>nes_sfx_square1</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_square1(u8 duty_volume, u16 period, u8 length_index);</code></pre></div><p><b>引数（左から順）：</b>u8 duty_volume, u16 period, u8 length_index。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Enable only pulse 1, disable its sweep and load control, 11-bit timer and
-length-table index. Starting this effect disables the other APU channels.</pre></div><h4>呼び出し例（周辺コードの断片）</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Control BF selects constant volume and halts the length counter, so this tone sustains.
-    // Call nes_apu_silence_all when the game should stop it; 20 is a length-table index, not frames.
-    nes_apu_init(); nes_sfx_square1(0xBF,400,20);
-    m_number(42);
-    while (1) { m_wait();  }
-}</code></pre></div><p class="source">出典：kitaq-docs/samples/fc_sound.c:13</p><p><a href="samples/fc_sound.c">この例の完全なプログラム</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:62。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_square1(u8 duty_volume, u16 period, u8 length_index)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_sfx_square1" data-api-contract="sound-source-20260916"><summary><code>nes_sfx_square1</code></summary><p>パルス1だけを有効にし、スイープを止め、制御値・タイマー・長さ番号を書き込みます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_square1(u8 duty_volume, u16 period, u8 length_index);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>duty_volume</code></dt><dd><p>パルス制御レジスターの生値。bit7～6=デューティ、bit5=長さ停止、bit4=固定音量、bit3～0=音量またはエンベロープ間隔。</p></dd><dt><code>period</code></dt><dd><p>11ビットタイマー値0～2047。パルスはCPU周波数/[16×(period+1)]、三角波はCPU周波数/[32×(period+1)]です。</p></dd><dt><code>length_index</code></dt><dd><p>長さテーブル番号0～31。フレーム数そのものではなく、値の下位5ビットをレジスターへ格納します。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このヘルパーはAPU_STATUSへ単一チャンネルのマスクを書き、ほかのチャンネルを無効化します。複数音を同時に鳴らすミキサーではありません。periodはパルス・三角波のタイマー値で、小さいほど高い音です。サンプルの周波数と時間はNTSC設定で確認しています。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.
+#include &quot;fc_sound_example.h&quot;
+void main(void) {
+    sound_begin(&quot;APU CHANNELS AND BLIPS&quot;);
+    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.
+    nes_sfx_square1(0xBC,253,0);
+    sound_result[0]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30);
+    nes_apu_channel_enable(0); sound_wait(15);
+    nes_sfx_square2(0x7C,253,0);
+    sound_result[1]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_triangle(0xFF,253,0);
+    sound_result[2]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_noise(0x3C,5,0);
+    sound_result[3]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>pulse1、pulse2、三角波、ノイズ、tick、moveの順です。タイマー253はNTSCでパルス約440Hz、三角波約220Hzになります。tickは約111Hz、moveは約174Hzで、moveの方が短く終わります。最後は無音です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-channels/ntsc/screen.png" alt="nes_sfx_square1: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_sfx_square1: NTSC — 確認した音声" src="verification/api-sound/fc-channels/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_channels.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_channels.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-channels.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:23</p><div class="original"><b>宣言の注記（原文）</b><pre>Enable only pulse 1, disable its sweep and load control, 11-bit timer and
+length-table index. Starting this effect disables the other APU channels.</pre></div><p class="source">kitaqfc/lib/audio.c:62</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_square1(u8 duty_volume, u16 period, u8 length_index)
 {
     APU_STATUS = 0x01;
     SQ1_SWEEP = 0x08;
@@ -618,27 +799,89 @@ length-table index. Starting this effect disables the other APU channels.</pre><
     SQ1_LO = (u8)period;
     // Only the low five length-index bits and low eleven timer bits reach the registers.
     SQ1_HI = (u8)((u8)(length_index &lt;&lt; 3) | (u8)((period &gt;&gt; 8) &amp; 0x07));
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:23</p></details><details class="api searchable" id="api-nes_sfx_square2"><summary><code>nes_sfx_square2</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_square2(u8 duty_volume, u16 period, u8 length_index);</code></pre></div><p><b>引数（左から順）：</b>u8 duty_volume, u16 period, u8 length_index。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Enable only pulse 2 and load its control/timer/length fields, disabling other channels.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_sfx_square2(u8 duty_volume, u16 period, u8 length_index) {
-    nes_sfx_square2(duty_volume, period, length_index);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_sfx_square2.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:73。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_square2(u8 duty_volume, u16 period, u8 length_index)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_sfx_square2" data-api-contract="sound-source-20260916"><summary><code>nes_sfx_square2</code></summary><p>パルス2だけを有効にし、スイープを止め、制御値・タイマー・長さ番号を書き込みます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_square2(u8 duty_volume, u16 period, u8 length_index);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>duty_volume</code></dt><dd><p>パルス制御レジスターの生値。bit7～6=デューティ、bit5=長さ停止、bit4=固定音量、bit3～0=音量またはエンベロープ間隔。</p></dd><dt><code>period</code></dt><dd><p>11ビットタイマー値0～2047。パルスはCPU周波数/[16×(period+1)]、三角波はCPU周波数/[32×(period+1)]です。</p></dd><dt><code>length_index</code></dt><dd><p>長さテーブル番号0～31。フレーム数そのものではなく、値の下位5ビットをレジスターへ格納します。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このヘルパーはAPU_STATUSへ単一チャンネルのマスクを書き、ほかのチャンネルを無効化します。複数音を同時に鳴らすミキサーではありません。periodはパルス・三角波のタイマー値で、小さいほど高い音です。サンプルの周波数と時間はNTSC設定で確認しています。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.
+#include &quot;fc_sound_example.h&quot;
+void main(void) {
+    sound_begin(&quot;APU CHANNELS AND BLIPS&quot;);
+    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.
+    nes_sfx_square1(0xBC,253,0);
+    sound_result[0]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30);
+    nes_apu_channel_enable(0); sound_wait(15);
+    nes_sfx_square2(0x7C,253,0);
+    sound_result[1]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_triangle(0xFF,253,0);
+    sound_result[2]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_noise(0x3C,5,0);
+    sound_result[3]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>pulse1、pulse2、三角波、ノイズ、tick、moveの順です。タイマー253はNTSCでパルス約440Hz、三角波約220Hzになります。tickは約111Hz、moveは約174Hzで、moveの方が短く終わります。最後は無音です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-channels/ntsc/screen.png" alt="nes_sfx_square2: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_sfx_square2: NTSC — 確認した音声" src="verification/api-sound/fc-channels/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_channels.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_channels.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-channels.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:25</p><div class="original"><b>宣言の注記（原文）</b><pre>Enable only pulse 2 and load its control/timer/length fields, disabling other channels.</pre></div><p class="source">kitaqfc/lib/audio.c:73</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_square2(u8 duty_volume, u16 period, u8 length_index)
 {
     APU_STATUS = 0x02;
     SQ2_SWEEP = 0x08;
     SQ2_VOL = duty_volume;
     SQ2_LO = (u8)period;
     SQ2_HI = (u8)((u8)(length_index &lt;&lt; 3) | (u8)((period &gt;&gt; 8) &amp; 0x07));
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:25</p></details><details class="api searchable" id="api-nes_sfx_tick_blip"><summary><code>nes_sfx_tick_blip</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_tick_blip(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Trigger the predefined pulse-1 tick effect; it inherits the exclusive-channel behavior.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_sfx_tick_blip();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_sfx_tick_blip.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:101。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_tick_blip(void)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_sfx_tick_blip" data-api-contract="sound-source-20260916"><summary><code>nes_sfx_tick_blip</code></summary><p>パルス1を0x9A・タイマー0x03F0・長さ番号4で鳴らし、短い低音のtickを作ります。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_tick_blip(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このヘルパーはAPU_STATUSへ単一チャンネルのマスクを書き、ほかのチャンネルを無効化します。複数音を同時に鳴らすミキサーではありません。periodはパルス・三角波のタイマー値で、小さいほど高い音です。サンプルの周波数と時間はNTSC設定で確認しています。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.
+#include &quot;fc_sound_example.h&quot;
+void main(void) {
+    sound_begin(&quot;APU CHANNELS AND BLIPS&quot;);
+    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.
+    nes_sfx_square1(0xBC,253,0);
+    sound_result[0]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30);
+    nes_apu_channel_enable(0); sound_wait(15);
+    nes_sfx_square2(0x7C,253,0);
+    sound_result[1]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_triangle(0xFF,253,0);
+    sound_result[2]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_noise(0x3C,5,0);
+    sound_result[3]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>pulse1、pulse2、三角波、ノイズ、tick、moveの順です。タイマー253はNTSCでパルス約440Hz、三角波約220Hzになります。tickは約111Hz、moveは約174Hzで、moveの方が短く終わります。最後は無音です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-channels/ntsc/screen.png" alt="nes_sfx_tick_blip: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_sfx_tick_blip: NTSC — 確認した音声" src="verification/api-sound/fc-channels/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_channels.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_channels.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-channels.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:31</p><div class="original"><b>宣言の注記（原文）</b><pre>Trigger the predefined pulse-1 tick effect; it inherits the exclusive-channel behavior.</pre></div><p class="source">kitaqfc/lib/audio.c:101</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_tick_blip(void)
 {
     nes_sfx_square1(0x9A, 0x03F0, 4);
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:31</p></details><details class="api searchable" id="api-nes_sfx_triangle"><summary><code>nes_sfx_triangle</code><span class="badge">実装あり</span></summary><p>音楽と効果音・音源制御に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_triangle(u8 linear, u16 period, u8 length_index);</code></pre></div><p><b>引数（左から順）：</b>u8 linear, u16 period, u8 length_index。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Enable only triangle and load linear-counter, timer and length fields.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_sfx_triangle(u8 linear, u16 period, u8 length_index) {
-    nes_sfx_triangle(linear, period, length_index);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_sfx_triangle.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/audio.c</code>:83。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_triangle(u8 linear, u16 period, u8 length_index)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_sfx_triangle" data-api-contract="sound-source-20260916"><summary><code>nes_sfx_triangle</code></summary><p>三角波だけを有効にし、線形カウンター・タイマー・長さ番号を書き込みます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_triangle(u8 linear, u16 period, u8 length_index);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>linear</code></dt><dd><p>三角波の線形カウンター。bit7=制御・長さ停止、下位7ビット=リロード値。</p></dd><dt><code>period</code></dt><dd><p>11ビットタイマー値0～2047。パルスはCPU周波数/[16×(period+1)]、三角波はCPU周波数/[32×(period+1)]です。</p></dd><dt><code>length_index</code></dt><dd><p>長さテーブル番号0～31。フレーム数そのものではなく、値の下位5ビットをレジスターへ格納します。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このヘルパーはAPU_STATUSへ単一チャンネルのマスクを書き、ほかのチャンネルを無効化します。複数音を同時に鳴らすミキサーではありません。periodはパルス・三角波のタイマー値で、小さいほど高い音です。サンプルの周波数と時間はNTSC設定で確認しています。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// NTSC: pulse A4 (~440 Hz), triangle A3 (~220 Hz), noise, then two short effects.
+#include &quot;fc_sound_example.h&quot;
+void main(void) {
+    sound_begin(&quot;APU CHANNELS AND BLIPS&quot;);
+    // Constant volume 12, length halt and 50% duty. Each helper replaces 4015.
+    nes_sfx_square1(0xBC,253,0);
+    sound_result[0]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30);
+    nes_apu_channel_enable(0); sound_wait(15);
+    nes_sfx_square2(0x7C,253,0);
+    sound_result[1]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_triangle(0xFF,253,0);
+    sound_result[2]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_noise(0x3C,5,0);
+    sound_result[3]=(u8)(APU_STATUS&amp;0x1F);
+    sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_tick_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    nes_sfx_move_blip(); sound_wait(30); nes_apu_silence_all(); sound_wait(15);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>pulse1、pulse2、三角波、ノイズ、tick、moveの順です。タイマー253はNTSCでパルス約440Hz、三角波約220Hzになります。tickは約111Hz、moveは約174Hzで、moveの方が短く終わります。最後は無音です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-channels/ntsc/screen.png" alt="nes_sfx_triangle: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_sfx_triangle: NTSC — 確認した音声" src="verification/api-sound/fc-channels/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_channels.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_channels.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-channels.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio.h:27</p><div class="original"><b>宣言の注記（原文）</b><pre>Enable only triangle and load linear-counter, timer and length fields.</pre></div><p class="source">kitaqfc/lib/audio.c:83</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_sfx_triangle(u8 linear, u16 period, u8 length_index)
 {
     APU_STATUS = 0x04;
     TRI_LINEAR = linear;
     TRI_LO = (u8)period;
     TRI_HI = (u8)((u8)(length_index &lt;&lt; 3) | (u8)((period &gt;&gt; 8) &amp; 0x07));
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/audio.h:27</p></details><h3 id="module-bank">bank.h — バンク番号付きのコード・データアクセス</h3><!-- api-module:start --><div data-module-contract="bank-source-20260915"><p>ROMバンクは、カートリッジ内の記憶領域をCPUのアドレス空間へ割り当てる単位です。同じCPUアドレスに別のバンクを表示できるため、16ビットのポインターだけではバンク付きデータを特定できません。BankPtrは、1バイトのバンク番号と2バイトのポインターを詰めた3バイトの記述子です。farptr_makeで作成し、farptr_read8、farptr_read16、farptr_readで内容にアクセスします。</p><p>FCの例はMMC3の論理バンクを使用します。バンク0の共通コードを$C000〜$FFFFに置き、選んだ16 KiBのバンクを$8000〜$BFFFに表示します。この番号はコンパイラのバンク番号であり、マッパーの8 KiB単位のレジスター値とは異なります。bank_switchでライブラリの記録を初期化してください。FCのfar_callは名前付き関数呼び出しのマクロです。関数のバンクを渡し、番号の取得には__bankofを使うと明確です。</p></div><!-- api-module:end --><details class="api searchable" id="api-bank_get_current" data-api-contract="bank-source-20260915"><summary><code>bank_get_current</code></summary><p>bank_switchが最後に記録したバンク番号を返します。カートリッジのレジスターではなく、ソフトウェア側の記録を読みます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 bank_get_current(void);</code></pre></div><h4>戻り値</h4><p>bank_switchが最後に保存したu8値です。初期化前は0です。</p><h4>使用条件と制限</h4><p>ライブラリの記録は0で始まり、カートリッジの起動時のマッピングを調べるものではありません。bank_switchで初期化してください。組み込み関数による直接切り替えやマッパーへの直接書き込みではこの記録を更新しないため、bank_get_currentで実際のハードウェア状態を検証することはできません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>starting_bank=bank_get_current(); // Last value recorded by bank_switch.
+}</code></pre></div></details></details><h3 id="module-bank">bank.h — バンク番号付きのコード・データアクセス</h3><!-- api-module:start --><div data-module-contract="bank-source-20260915"><p>ROMバンクは、カートリッジ内の記憶領域をCPUのアドレス空間へ割り当てる単位です。同じCPUアドレスに別のバンクを表示できるため、16ビットのポインターだけではバンク付きデータを特定できません。BankPtrは、1バイトのバンク番号と2バイトのポインターを詰めた3バイトの記述子です。farptr_makeで作成し、farptr_read8、farptr_read16、farptr_readで内容にアクセスします。</p><p>FCの例はMMC3の論理バンクを使用します。バンク0の共通コードを$C000〜$FFFFに置き、選んだ16 KiBのバンクを$8000〜$BFFFに表示します。この番号はコンパイラのバンク番号であり、マッパーの8 KiB単位のレジスター値とは異なります。bank_switchでライブラリの記録を初期化してください。FCのfar_callは名前付き関数呼び出しのマクロです。関数のバンクを渡し、番号の取得には__bankofを使うと明確です。</p></div><!-- api-module:end --><details class="api searchable" id="api-bank_get_current" data-api-contract="bank-source-20260915"><summary><code>bank_get_current</code></summary><p>bank_switchが最後に記録したバンク番号を返します。カートリッジのレジスターではなく、ソフトウェア側の記録を読みます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 bank_get_current(void);</code></pre></div><h4>戻り値</h4><p>bank_switchが最後に保存したu8値です。初期化前は0です。</p><h4>使用条件と制限</h4><p>ライブラリの記録は0で始まり、カートリッジの起動時のマッピングを調べるものではありません。bank_switchで初期化してください。組み込み関数による直接切り替えやマッパーへの直接書き込みではこの記録を更新しないため、bank_get_currentで実際のハードウェア状態を検証することはできません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>starting_bank=bank_get_current(); // Last value recorded by bank_switch.
 bank_expect(starting_bank==2,1);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>最初のbank_switch(2)でバンク2を記録して選びます。その後の直接切り替えではバンク1を選び、home1からA1を読みますが、bank_get_currentの記録は2です。戻すとhome2から再びB2を読めます。</p><p>完成プログラムでは、バンク番号と近アドレスによるデータの指定、バンクをまたぐコールバック、ライブラリの記録と実際のマッピングの区別を学べます。数値はすべて16進数です。BANK INとBANK OUTは02、BYTE HEXはD3、WORD HEXは5C7A、FAILED CHECKSとFIRST FAILUREはどちらも00が期待値です。CGBとFCは青字、DMGは黒字で表示します。</p><p>CALL COUNTは02です。far_callマクロと__farcallがそれぞれ1回コールバックを実行します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-bank/fc-mmc3/screen.png" alt="bank_get_current: MMC3"><figcaption>MMC3</figcaption></figure><p><a href="samples/api-examples/fc/banked_data_calls.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\banked_data_calls.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/bank.h:18</p><div class="original"><b>宣言の注記（原文）</b><pre>Read this wrapper&#x27;s bank shadow; arbitrary mapper writes do not update it.</pre></div><p class="source">kitaqfc/lib/bank.c:14</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 bank_get_current(void)
 {
@@ -976,7 +1219,7 @@ Changes to later slots take effect during the same traversal. Do not reenter thi
         if (entity_pool[(__safe_index u8)i].active != 0) fn(i);
         i = (u8)(i + 1);
     }
-}</code></pre></div></details></details><h3 id="module-fixed">fixed.h — Q8.8固定小数点と矩形</h3><!-- api-module:start --><div data-module-contract="batch100-source-20260915"><p>整数だけで座標や速度の小数部分を扱うQ8.8演算と、矩形・点の当たり判定です。各演算の精度と範囲の制限を確認してください。</p></div><!-- api-module:end --><details class="api searchable" id="api-fix_div" data-api-contract="batch100-source-20260915"><summary><code>fix_div</code></summary><p>Q8.8値を、入力を縮小してから除算します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>fix8 fix_div(fix8 a, fix8 b);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>a</code></dt><dd><p>演算の左辺となるQ8.8の値。</p></dd><dt><code>b</code></dt><dd><p>演算の右辺となるQ8.8の値。</p></dd></dl><h4>戻り値</h4><p>Q8.8の商を返します。<code>b == 0</code> の場合は0です。</p><h4>使用条件と制限</h4><p>式は <code>((a &gt;&gt; 4) * 256) / (b &gt;&gt; 4)</code> です。<code>b</code> が0以外でも <code>b &gt;&gt; 4</code> が0になる値（正の生の値1～15）は渡さないでください。積も16ビットに収めてください。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>result[3]=fix_div(768,512);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>3.0を2.0で割り、1.5（生の値384）を得ます。明示的なゼロ除算入力では0を返すことも確認します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-batch100/fc-math/nrom/screen.png" alt="fix_div: NROM"><figcaption>NROM</figcaption></figure><p><a href="samples/api-examples/fc/batch_math.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div></details></details><!-- fds-sound-module:start --><h3 id="module-fds_sound">fds_sound.h</h3><!-- api-module:start --><div data-module-contract="sound-source-20260916"><p>64段階の波形、変調テーブル、周波数、音量、エンベロープを操作する組み込み関数の宣言です。実装はKITAQFCコンパイラが生成します。</p><p>--mapper=fdsで.fdsを生成します。サンプルはディスク入出力を使わず音源を操作します。録音はKUROSAKIのRAM直接起動と音源モデルで確認しました。検証用の空のファームウェア領域はBIOS機能を提供せず、配布物にも含みません。通常のディスク起動や実機では別途適切な起動環境が必要です。</p></div><!-- api-module:end --><p>関数の個別説明: <a href="kitaqfc.html#api-__fds_sound_enable"><code>__fds_sound_enable</code></a>, <a href="kitaqfc.html#api-__fds_wave_load"><code>__fds_wave_load</code></a>, <a href="kitaqfc.html#api-__fds_mod_load"><code>__fds_mod_load</code></a>, <a href="kitaqfc.html#api-__fds_freq_set"><code>__fds_freq_set</code></a>, <a href="kitaqfc.html#api-__fds_volume_set"><code>__fds_volume_set</code></a>, <a href="kitaqfc.html#api-__fds_env_set"><code>__fds_env_set</code></a></p><!-- fds-sound-module:end --><h3 id="module-fixed">fixed.h — Q8.8固定小数点と矩形</h3><!-- api-module:start --><div data-module-contract="batch100-source-20260915"><p>整数だけで座標や速度の小数部分を扱うQ8.8演算と、矩形・点の当たり判定です。各演算の精度と範囲の制限を確認してください。</p></div><!-- api-module:end --><details class="api searchable" id="api-fix_div" data-api-contract="batch100-source-20260915"><summary><code>fix_div</code></summary><p>Q8.8値を、入力を縮小してから除算します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>fix8 fix_div(fix8 a, fix8 b);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>a</code></dt><dd><p>演算の左辺となるQ8.8の値。</p></dd><dt><code>b</code></dt><dd><p>演算の右辺となるQ8.8の値。</p></dd></dl><h4>戻り値</h4><p>Q8.8の商を返します。<code>b == 0</code> の場合は0です。</p><h4>使用条件と制限</h4><p>式は <code>((a &gt;&gt; 4) * 256) / (b &gt;&gt; 4)</code> です。<code>b</code> が0以外でも <code>b &gt;&gt; 4</code> が0になる値（正の生の値1～15）は渡さないでください。積も16ビットに収めてください。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>result[3]=fix_div(768,512);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>3.0を2.0で割り、1.5（生の値384）を得ます。明示的なゼロ除算入力では0を返すことも確認します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-batch100/fc-math/nrom/screen.png" alt="fix_div: NROM"><figcaption>NROM</figcaption></figure><p><a href="samples/api-examples/fc/batch_math.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\batch_math.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\batch_math.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fixed.h:35</p><div class="original"><b>宣言の注記（原文）</b><pre>Scale the reduced-precision quotient back to 8.8 and return zero for b == 0.
 Callers must also ensure (b &gt;&gt; 4) is nonzero; the explicit check only tests b.
 The intermediate product must fit the compiler&#x27;s integer arithmetic.</pre></div><p class="source">kitaqfc/lib/fixed.c:26</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>fix8 fix_div(fix8 a, fix8 b)
@@ -1406,7 +1649,36 @@ width. Caller-provided coordinates, storage and timing are not clipped or checke
     unsigned short ppu_addr;
     ppu_addr = (unsigned short)(nt_base + ((unsigned short)row &lt;&lt; 5));
     nes_ppu_stream_write(ppu_addr, src32, 32);
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/nametable_asset.h:24</p></details><h3 id="module-nes_game">nes_game.h — ゲーム向け操作名のマクロ</h3><!-- api-module:start --><div data-module-contract="oam-library-source-20260915"><p><code>nes_game.h</code>は、VRAMキュー、OAM・メタスプライト、コントローラー読み取り、マッパー割り込み、分割スクロール、FDS操作に読みやすいマクロ名を提供します。各マクロはコンパイラの組み込み関数へ展開されるため、診断やKUROSAKIメタデータにも実際のハードウェア操作が記録されます。キュー操作には組み込みキューを使い、OAM DMAマクロは引数を取りません。</p><p>使うヘッダーを明確に選んでください。<code>nes_game.h</code>と総合ヘッダー<code>fc.h</code>はマクロを定義します。C関数を使う場合は<code>runtime.h</code>や<code>metasprite.h</code>と各実装ファイルを組み合わせ、同名マクロを含めないか、先に<code>#undef</code>で解除します。引数なしのDMAマクロにC関数の<code>page</code>引数を渡すことはできません。</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_fds_farcall"><summary><code>nes_fds_farcall</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_farcall(bank, func)        __fds_overlay_farcall((bank), (func))</code></pre></div><p><b>引数（左から順）：</b>bank, func。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_fds_farcall(bank, func);</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_fds_farcall.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:41</p></details><details class="api searchable" id="api-nes_fds_load_bank"><summary><code>nes_fds_load_bank</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。データを読み込みします。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_load_bank(bank)            __fds_load_bank((bank))</code></pre></div><p><b>引数（左から順）：</b>bank。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_fds_load_bank(bank);</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_fds_load_bank.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:40</p></details><details class="api searchable" id="api-nes_fds_wave_load"><summary><code>nes_fds_wave_load</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。データを読み込みします。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_wave_load(wave64)          __fds_wave_load((wave64))</code></pre></div><p><b>引数（左から順）：</b>wave64。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_fds_wave_load(wave64);</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_fds_wave_load.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:39</p></details><details class="api searchable" id="api-nes_mapper_irq_ack"><summary><code>nes_mapper_irq_ack</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_mapper_irq_ack()               __mapper_irq_ack()</code></pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_mapper_irq_ack();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_mapper_irq_ack.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:36</p></details><details class="api searchable" id="api-nes_mapper_irq_disable"><summary><code>nes_mapper_irq_disable</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。機能を無効化します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_mapper_irq_disable()           __mapper_irq_disable()</code></pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_mapper_irq_disable();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_mapper_irq_disable.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:35</p></details><details class="api searchable" id="api-nes_mapper_irq_enable"><summary><code>nes_mapper_irq_enable</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。機能を有効化します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_mapper_irq_enable()            __mapper_irq_enable()</code></pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_mapper_irq_enable();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_mapper_irq_enable.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:34</p></details><details class="api searchable" id="api-nes_mapper_irq_set"><summary><code>nes_mapper_irq_set</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。値や動作条件を設定します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_mapper_irq_set(scanline)       __mapper_irq_set((scanline))</code></pre></div><p><b>引数（左から順）：</b>scanline。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_mapper_irq_set(scanline);</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_mapper_irq_set.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:33</p></details><details class="api searchable" id="api-nes_oam_clear" data-api-contract="oam-library-source-20260915"><summary><code>nes_oam_clear</code></summary><p><code>nes_game.h</code>のマクロです。構文欄の組み込み関数へ展開されます。このヘッダーをインクルードすれば使え、この操作のためにC実装ファイルを追加する必要はありません。</p><p>ページ02のシャドーバッファにある64個のスプライトすべてのYを<code>0xF0</code>にして非表示にします。タイル番号・属性・X座標は変更しません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_oam_clear()                    __oam_clear()</code></pre></div><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>これらの操作はCPU RAMの<code>0x0200–0x02FF</code>を書き換えます。ハードウェアOAMへ即座に反映されるわけではありません。ページを完成させてから<code>__oam_dma</code>で転送してください。スプライトライブラリの確保フラグ・座標配列・使用数は更新しません。準備途中のページを割り込み処理で変更・転送しないようにします。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_sprite_set(63,144,111,128,0); // Seed the CLEAR row with a visible entry.
+}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/nametable_asset.h:24</p></details><h3 id="module-nes_game">nes_game.h — ゲーム向け操作名のマクロ</h3><!-- api-module:start --><div data-module-contract="oam-library-source-20260915"><p><code>nes_game.h</code>は、VRAMキュー、OAM・メタスプライト、コントローラー読み取り、マッパー割り込み、分割スクロール、FDS操作に読みやすいマクロ名を提供します。各マクロはコンパイラの組み込み関数へ展開されるため、診断やKUROSAKIメタデータにも実際のハードウェア操作が記録されます。キュー操作には組み込みキューを使い、OAM DMAマクロは引数を取りません。</p><p>使うヘッダーを明確に選んでください。<code>nes_game.h</code>と総合ヘッダー<code>fc.h</code>はマクロを定義します。C関数を使う場合は<code>runtime.h</code>や<code>metasprite.h</code>と各実装ファイルを組み合わせ、同名マクロを含めないか、先に<code>#undef</code>で解除します。引数なしのDMAマクロにC関数の<code>page</code>引数を渡すことはできません。</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_fds_farcall"><summary><code>nes_fds_farcall</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_farcall(bank, func)        __fds_overlay_farcall((bank), (func))</code></pre></div><p><b>引数（左から順）：</b>bank, func。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_fds_farcall(bank, func);</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_fds_farcall.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:41</p></details><details class="api searchable" id="api-nes_fds_load_bank"><summary><code>nes_fds_load_bank</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。データを読み込みします。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_load_bank(bank)            __fds_load_bank((bank))</code></pre></div><p><b>引数（左から順）：</b>bank。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_fds_load_bank(bank);</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_fds_load_bank.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:40</p></details><details class="api searchable" id="api-nes_fds_wave_load" data-api-contract="sound-source-20260916"><summary><code>nes_fds_wave_load</code></summary><p>__fds_wave_loadへ配列を渡すマクロです。64バイトの波形をロードします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_wave_load(wave64)          __fds_wave_load((wave64))</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>wave64</code></dt><dd><p>FDS波形の64バイト配列。各値は0～63の6ビット振幅です。NULLは検査しません。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>--mapper=fdsで.fdsを生成します。サンプルはディスク入出力を使わず音源を操作します。録音はKUROSAKIのRAM直接起動と音源モデルで確認しました。検証用の空のファームウェア領域はBIOS機能を提供せず、配布物にも含みません。通常のディスク起動や実機では別途適切な起動環境が必要です。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;fds_sound.h&quot;
+#include &quot;nes_game.h&quot;
+__location(0x4087) u8 mod_control;
+__location(0x4085) u8 mod_counter;
+u8 triangle[64]; u8 modulation[32];
+void main(void) {
+    u8 i;
+    sound_begin(&quot;FDS WAVE AND VOLUME&quot;);
+    for(i=0;i&lt;32;i++) { triangle[i]=(u8)(i*2); triangle[63-i]=(u8)(i*2); modulation[i]=0; }
+    __fds_sound_enable();
+    // Halt/reset modulation before writing the 32 values (each writes two slots).
+    mod_control=0x80; mod_counter=0;
+    __fds_mod_load(modulation);
+    __fds_wave_load(triangle);
+    sound_result[0]=*((u8*)0x4040); sound_result[1]=*((u8*)0x405F);
+    __fds_freq_set(1031);
+    __fds_volume_set(24);
+    sound_wait(60);
+    __fds_volume_set(0); sound_wait(30);
+    // This macro forwards the same 64-byte load. Use raw envelope registers.
+    nes_fds_wave_load(triangle);
+    __fds_env_set(0x98,0x80,0);
+    __fds_freq_set(1545);
+    sound_wait(60);
+    __fds_volume_set(0); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>独自の64段階三角波で約440Hz、無音、約660Hz、無音の順です。2回目はnes_fds_wave_loadと生のエンベロープ設定を使います。これは音源モデルと直接起動の検証であり、BIOS経由のディスク起動の検証ではありません。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-fds/ntsc/screen.png" alt="nes_fds_wave_load: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_fds_wave_load: NTSC — 確認した音声" src="verification/api-sound/fc-fds/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_fds.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_fds.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-fds.fds --mapper=fds --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/nes_game.h:39</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_wave_load(wave64)          __fds_wave_load((wave64))</code></pre></div></details></details><details class="api searchable" id="api-nes_mapper_irq_ack"><summary><code>nes_mapper_irq_ack</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_mapper_irq_ack()               __mapper_irq_ack()</code></pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_mapper_irq_ack();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_mapper_irq_ack.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:36</p></details><details class="api searchable" id="api-nes_mapper_irq_disable"><summary><code>nes_mapper_irq_disable</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。機能を無効化します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_mapper_irq_disable()           __mapper_irq_disable()</code></pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_mapper_irq_disable();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_mapper_irq_disable.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:35</p></details><details class="api searchable" id="api-nes_mapper_irq_enable"><summary><code>nes_mapper_irq_enable</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。機能を有効化します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_mapper_irq_enable()            __mapper_irq_enable()</code></pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_mapper_irq_enable();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_mapper_irq_enable.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:34</p></details><details class="api searchable" id="api-nes_mapper_irq_set"><summary><code>nes_mapper_irq_set</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。値や動作条件を設定します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_mapper_irq_set(scanline)       __mapper_irq_set((scanline))</code></pre></div><p><b>引数（左から順）：</b>scanline。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_mapper_irq_set(scanline);</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_mapper_irq_set.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:33</p></details><details class="api searchable" id="api-nes_oam_clear" data-api-contract="oam-library-source-20260915"><summary><code>nes_oam_clear</code></summary><p><code>nes_game.h</code>のマクロです。構文欄の組み込み関数へ展開されます。このヘッダーをインクルードすれば使え、この操作のためにC実装ファイルを追加する必要はありません。</p><p>ページ02のシャドーバッファにある64個のスプライトすべてのYを<code>0xF0</code>にして非表示にします。タイル番号・属性・X座標は変更しません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_oam_clear()                    __oam_clear()</code></pre></div><h4>戻り値</h4><p>ありません（<code>void</code>）。</p><h4>使用条件と制限</h4><p>これらの操作はCPU RAMの<code>0x0200–0x02FF</code>を書き換えます。ハードウェアOAMへ即座に反映されるわけではありません。ページを完成させてから<code>__oam_dma</code>で転送してください。スプライトライブラリの確保フラグ・座標配列・使用数は更新しません。準備途中のページを割り込み処理で変更・転送しないようにします。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_sprite_set(63,144,111,128,0); // Seed the CLEAR row with a visible entry.
 nes_oam_clear(); // Set every Y byte to 240; tile, attributes and X are retained.</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>操作ごとに見出し付きの行を分けたサンプルです。SETとMOVEは(144,16)・(144,32)の8×8右向き矢印、TILEは(144,48)の緑の四角、ATTRは(144,64)の上下左右を反転した矢印です。HIDEの(144,80)とCLEARの(144,112)には何も表示されません。METAは(136,96)と(144,96)の2個組で、2個目を左右反転します。NEXT 07は5・6番へ書き込んだ後の次の位置です。矢印の輪郭は赤、軸は緑、先端の一部は青です。検証では画像ごとに8,704ピクセルと転送後のOAMデータを照合します。実機では未検証です。</p><p>ALIASESのプログラムは<code>nes_game.h</code>のマクロで各行を準備し、<code>nes_oam_dma()</code>でページ02を送ります。TRANSFERには(144,128)の8×8矢印が表示されます。<code>runtime.c</code>や<code>metasprite.c</code>を組み込まずに使うマクロ版の例です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-oam-library/aliases/screen.png" alt="nes_oam_clear: ALIASES"><figcaption>ALIASES</figcaption></figure><p><a href="samples/api-examples/fc/oam_aliases.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\oam_aliases.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --nes-chr=.\kitaq-docs\samples\sprite_example.chr -o .\out\oam_aliases.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/nes_game.h:21</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_oam_clear()                    __oam_clear()</code></pre></div></details></details><details class="api searchable" id="api-nes_oam_dma" data-api-contract="oam-library-source-20260915"><summary><code>nes_oam_dma</code></summary><p>同じ名前に2つの形式があります。引数なしのマクロ<code>nes_oam_dma()</code>は<code>__oam_dma()</code>を通じてページ02を転送します。C関数<code>nes_oam_dma(page)</code>は指定した256バイトのCPUメモリページを転送します。どちらもOAMADDRを0にしてページ全体を転送し、転送元は変更しません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_oam_dma()                      __oam_dma()
 
@@ -2380,38 +2652,158 @@ if (check_result!=1) failures++; // This alias also measures length in bytes.</c
 .\kitaqfc\kitaqfc.exe .\kitaqfc\lib\vram.c .\kitaq-docs\samples\api-examples\fc\vram_queue_shapes.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\vram_queue_shapes.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\vram_shapes.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vram.h:33</p><div class="original"><b>宣言の注記（原文）</b><pre>Alias the byte-copy queue helper; len remains a byte count, not a tile count.</pre></div><p class="source">kitaqfc/lib/vram.c:87</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 vram_queue_tiles(u16 dst, const void* src, u16 len)
 {
     return vram_queue_memcpy(dst, src, len);
-}</code></pre></div></details></details><h3 id="module-vrc6_sound">vrc6_sound.h — VRC6拡張音源</h3><details class="api searchable" id="api-nes_vrc6_pulse1_off"><summary><code>nes_vrc6_pulse1_off</code><span class="badge">実装あり</span></summary><p>VRC6拡張音源に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse1_off(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Disable pulse 1 by clearing its high timer/enable register.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_vrc6_pulse1_off();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc6_pulse1_off.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc6_sound.c</code>:43。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse1_off(void)
+}</code></pre></div></details></details><h3 id="module-vrc6_sound">vrc6_sound.h — VRC6拡張音源</h3><!-- api-module:start --><div data-module-contract="sound-source-20260916"><p>このレジスター配線には--mapper=vrc6（mapper 24）を使います。VRC6を搭載しないカートリッジでは発音しません。periodの下位12ビットだけを使い、周波数制御レジスター$9003は設定しません。</p><p>VRC6_PULSE_DUTY_12/25/50/75は値0x00/0x10/0x20/0x30の名前です。接尾辞を実測デューティ比と解釈しないでください。KUROSAKIではコードdの比率は(d+1)/16です。</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_vrc6_pulse1_off" data-api-contract="sound-source-20260916"><summary><code>nes_vrc6_pulse1_off</code></summary><p>VRC6パルス1の上位タイマー・有効化レジスターを0にして停止します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse1_off(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このレジスター配線には--mapper=vrc6（mapper 24）を使います。VRC6を搭載しないカートリッジでは発音しません。periodの下位12ビットだけを使い、周波数制御レジスター$9003は設定しません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 24: two pulse voices followed by the saw accumulator.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc6_sound.c&quot;
+void main(void) {
+    // The background font occupies the first four 1 KiB CHR windows.
+    *((u8*)0xD000)=0; *((u8*)0xD001)=1;
+    *((u8*)0xD002)=2; *((u8*)0xD003)=3;
+    sound_begin(&quot;VRC6 PULSE PULSE SAW&quot;);
+    nes_vrc6_silence_all();
+    nes_vrc6_pulse1_set(0x7C,253);
+    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);
+    nes_vrc6_pulse2_set(0x3C,253);
+    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);
+    nes_vrc6_saw_set(32,289);
+    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);
+    nes_vrc6_silence_all();
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>VRC6のパルス1、デューティの異なるパルス2、ノコギリ波を各45フレーム鳴らし、15フレームずつ休みます。3音の音程はおよそ440Hzで、最後は3音源とも停止します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc6/ntsc/screen.png" alt="nes_vrc6_pulse1_off: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc6_pulse1_off: NTSC — 確認した音声" src="verification/api-sound/fc-vrc6/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc6.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc6.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc6_sound.h:22</p><div class="original"><b>宣言の注記（原文）</b><pre>Disable pulse 1 by clearing its high timer/enable register.</pre></div><p class="source">kitaqfc/lib/vrc6_sound.c:43</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse1_off(void)
 {
     VRC6_P1_HI = 0x00;
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc6_sound.h:22</p></details><details class="api searchable" id="api-nes_vrc6_pulse1_set"><summary><code>nes_vrc6_pulse1_set</code><span class="badge">実装あり</span></summary><p>VRC6拡張音源に関するAPIです。値や動作条件を設定します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse1_set(u8 control, u16 period);</code></pre></div><p><b>引数（左から順）：</b>u8 control, u16 period。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Write pulse-1 control and the low 12 timer bits, then enable the channel.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_vrc6_pulse1_set(u8 control, u16 period) {
-    nes_vrc6_pulse1_set(control, period);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc6_pulse1_set.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc6_sound.c</code>:27。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse1_set(u8 control, u16 period)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc6_pulse1_set" data-api-contract="sound-source-20260916"><summary><code>nes_vrc6_pulse1_set</code></summary><p>VRC6パルス1の制御値と12ビットタイマーを書き、発音を有効にします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse1_set(u8 control, u16 period);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>control</code></dt><dd><p>VRC6パルス制御。bit7=ゲート、bit6～4=デューティコード、bit3～0=音量0～15。</p></dd><dt><code>period</code></dt><dd><p>12ビットタイマー値0～4095。上位4ビットは捨てます。サンプルではパルス253、ノコギリ波289を使います。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このレジスター配線には--mapper=vrc6（mapper 24）を使います。VRC6を搭載しないカートリッジでは発音しません。periodの下位12ビットだけを使い、周波数制御レジスター$9003は設定しません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 24: two pulse voices followed by the saw accumulator.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc6_sound.c&quot;
+void main(void) {
+    // The background font occupies the first four 1 KiB CHR windows.
+    *((u8*)0xD000)=0; *((u8*)0xD001)=1;
+    *((u8*)0xD002)=2; *((u8*)0xD003)=3;
+    sound_begin(&quot;VRC6 PULSE PULSE SAW&quot;);
+    nes_vrc6_silence_all();
+    nes_vrc6_pulse1_set(0x7C,253);
+    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);
+    nes_vrc6_pulse2_set(0x3C,253);
+    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);
+    nes_vrc6_saw_set(32,289);
+    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);
+    nes_vrc6_silence_all();
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>VRC6のパルス1、デューティの異なるパルス2、ノコギリ波を各45フレーム鳴らし、15フレームずつ休みます。3音の音程はおよそ440Hzで、最後は3音源とも停止します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc6/ntsc/screen.png" alt="nes_vrc6_pulse1_set: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc6_pulse1_set: NTSC — 確認した音声" src="verification/api-sound/fc-vrc6/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc6.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc6.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc6_sound.h:18</p><div class="original"><b>宣言の注記（原文）</b><pre>Write pulse-1 control and the low 12 timer bits, then enable the channel.</pre></div><p class="source">kitaqfc/lib/vrc6_sound.c:27</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse1_set(u8 control, u16 period)
 {
     VRC6_P1_CTRL = control;
     VRC6_P1_LO = (u8)period;
     VRC6_P1_HI = (u8)(0x80 | ((period &gt;&gt; 8) &amp; 0x0F));
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc6_sound.h:18</p></details><details class="api searchable" id="api-nes_vrc6_pulse2_off"><summary><code>nes_vrc6_pulse2_off</code><span class="badge">実装あり</span></summary><p>VRC6拡張音源に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse2_off(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Disable pulse 2 by clearing its high timer/enable register.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_vrc6_pulse2_off();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc6_pulse2_off.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc6_sound.c</code>:49。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse2_off(void)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc6_pulse2_off" data-api-contract="sound-source-20260916"><summary><code>nes_vrc6_pulse2_off</code></summary><p>VRC6パルス2の上位タイマー・有効化レジスターを0にして停止します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse2_off(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このレジスター配線には--mapper=vrc6（mapper 24）を使います。VRC6を搭載しないカートリッジでは発音しません。periodの下位12ビットだけを使い、周波数制御レジスター$9003は設定しません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 24: two pulse voices followed by the saw accumulator.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc6_sound.c&quot;
+void main(void) {
+    // The background font occupies the first four 1 KiB CHR windows.
+    *((u8*)0xD000)=0; *((u8*)0xD001)=1;
+    *((u8*)0xD002)=2; *((u8*)0xD003)=3;
+    sound_begin(&quot;VRC6 PULSE PULSE SAW&quot;);
+    nes_vrc6_silence_all();
+    nes_vrc6_pulse1_set(0x7C,253);
+    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);
+    nes_vrc6_pulse2_set(0x3C,253);
+    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);
+    nes_vrc6_saw_set(32,289);
+    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);
+    nes_vrc6_silence_all();
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>VRC6のパルス1、デューティの異なるパルス2、ノコギリ波を各45フレーム鳴らし、15フレームずつ休みます。3音の音程はおよそ440Hzで、最後は3音源とも停止します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc6/ntsc/screen.png" alt="nes_vrc6_pulse2_off: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc6_pulse2_off: NTSC — 確認した音声" src="verification/api-sound/fc-vrc6/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc6.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc6.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc6_sound.h:24</p><div class="original"><b>宣言の注記（原文）</b><pre>Disable pulse 2 by clearing its high timer/enable register.</pre></div><p class="source">kitaqfc/lib/vrc6_sound.c:49</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse2_off(void)
 {
     VRC6_P2_HI = 0x00;
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc6_sound.h:24</p></details><details class="api searchable" id="api-nes_vrc6_pulse2_set"><summary><code>nes_vrc6_pulse2_set</code><span class="badge">実装あり</span></summary><p>VRC6拡張音源に関するAPIです。値や動作条件を設定します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse2_set(u8 control, u16 period);</code></pre></div><p><b>引数（左から順）：</b>u8 control, u16 period。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Write pulse-2 control and the low 12 timer bits, then enable the channel.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_vrc6_pulse2_set(u8 control, u16 period) {
-    nes_vrc6_pulse2_set(control, period);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc6_pulse2_set.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc6_sound.c</code>:35。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse2_set(u8 control, u16 period)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc6_pulse2_set" data-api-contract="sound-source-20260916"><summary><code>nes_vrc6_pulse2_set</code></summary><p>VRC6パルス2の制御値と12ビットタイマーを書き、発音を有効にします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse2_set(u8 control, u16 period);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>control</code></dt><dd><p>VRC6パルス制御。bit7=ゲート、bit6～4=デューティコード、bit3～0=音量0～15。</p></dd><dt><code>period</code></dt><dd><p>12ビットタイマー値0～4095。上位4ビットは捨てます。サンプルではパルス253、ノコギリ波289を使います。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このレジスター配線には--mapper=vrc6（mapper 24）を使います。VRC6を搭載しないカートリッジでは発音しません。periodの下位12ビットだけを使い、周波数制御レジスター$9003は設定しません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 24: two pulse voices followed by the saw accumulator.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc6_sound.c&quot;
+void main(void) {
+    // The background font occupies the first four 1 KiB CHR windows.
+    *((u8*)0xD000)=0; *((u8*)0xD001)=1;
+    *((u8*)0xD002)=2; *((u8*)0xD003)=3;
+    sound_begin(&quot;VRC6 PULSE PULSE SAW&quot;);
+    nes_vrc6_silence_all();
+    nes_vrc6_pulse1_set(0x7C,253);
+    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);
+    nes_vrc6_pulse2_set(0x3C,253);
+    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);
+    nes_vrc6_saw_set(32,289);
+    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);
+    nes_vrc6_silence_all();
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>VRC6のパルス1、デューティの異なるパルス2、ノコギリ波を各45フレーム鳴らし、15フレームずつ休みます。3音の音程はおよそ440Hzで、最後は3音源とも停止します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc6/ntsc/screen.png" alt="nes_vrc6_pulse2_set: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc6_pulse2_set: NTSC — 確認した音声" src="verification/api-sound/fc-vrc6/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc6.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc6.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc6_sound.h:20</p><div class="original"><b>宣言の注記（原文）</b><pre>Write pulse-2 control and the low 12 timer bits, then enable the channel.</pre></div><p class="source">kitaqfc/lib/vrc6_sound.c:35</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_pulse2_set(u8 control, u16 period)
 {
     VRC6_P2_CTRL = control;
     VRC6_P2_LO = (u8)period;
     VRC6_P2_HI = (u8)(0x80 | ((period &gt;&gt; 8) &amp; 0x0F));
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc6_sound.h:20</p></details><details class="api searchable" id="api-nes_vrc6_saw_off"><summary><code>nes_vrc6_saw_off</code><span class="badge">実装あり</span></summary><p>VRC6拡張音源に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_saw_off(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Disable the saw channel by clearing its high timer/enable register.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_vrc6_saw_off();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc6_saw_off.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc6_sound.c</code>:63。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_saw_off(void)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc6_saw_off" data-api-contract="sound-source-20260916"><summary><code>nes_vrc6_saw_off</code></summary><p>VRC6ノコギリ波の上位タイマー・有効化レジスターを0にして停止します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_saw_off(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このレジスター配線には--mapper=vrc6（mapper 24）を使います。VRC6を搭載しないカートリッジでは発音しません。periodの下位12ビットだけを使い、周波数制御レジスター$9003は設定しません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 24: two pulse voices followed by the saw accumulator.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc6_sound.c&quot;
+void main(void) {
+    // The background font occupies the first four 1 KiB CHR windows.
+    *((u8*)0xD000)=0; *((u8*)0xD001)=1;
+    *((u8*)0xD002)=2; *((u8*)0xD003)=3;
+    sound_begin(&quot;VRC6 PULSE PULSE SAW&quot;);
+    nes_vrc6_silence_all();
+    nes_vrc6_pulse1_set(0x7C,253);
+    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);
+    nes_vrc6_pulse2_set(0x3C,253);
+    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);
+    nes_vrc6_saw_set(32,289);
+    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);
+    nes_vrc6_silence_all();
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>VRC6のパルス1、デューティの異なるパルス2、ノコギリ波を各45フレーム鳴らし、15フレームずつ休みます。3音の音程はおよそ440Hzで、最後は3音源とも停止します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc6/ntsc/screen.png" alt="nes_vrc6_saw_off: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc6_saw_off: NTSC — 確認した音声" src="verification/api-sound/fc-vrc6/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc6.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc6.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc6_sound.h:28</p><div class="original"><b>宣言の注記（原文）</b><pre>Disable the saw channel by clearing its high timer/enable register.</pre></div><p class="source">kitaqfc/lib/vrc6_sound.c:63</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_saw_off(void)
 {
     VRC6_SAW_HI = 0x00;
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc6_sound.h:28</p></details><details class="api searchable" id="api-nes_vrc6_saw_set"><summary><code>nes_vrc6_saw_set</code><span class="badge">実装あり</span></summary><p>VRC6拡張音源に関するAPIです。値や動作条件を設定します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_saw_set(u8 rate, u16 period);</code></pre></div><p><b>引数（左から順）：</b>u8 rate, u16 period。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Mask the saw accumulation rate to six bits, load a 12-bit timer and enable output.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_vrc6_saw_set(u8 rate, u16 period) {
-    nes_vrc6_saw_set(rate, period);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc6_saw_set.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc6_sound.c</code>:55。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_saw_set(u8 rate, u16 period)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc6_saw_set" data-api-contract="sound-source-20260916"><summary><code>nes_vrc6_saw_set</code></summary><p>VRC6ノコギリ波の6ビット加算値と12ビットタイマーを書き、発音を有効にします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_saw_set(u8 rate, u16 period);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>rate</code></dt><dd><p>ノコギリ波の加算値0～63。下位6ビットを使用します。</p></dd><dt><code>period</code></dt><dd><p>12ビットタイマー値0～4095。上位4ビットは捨てます。サンプルではパルス253、ノコギリ波289を使います。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このレジスター配線には--mapper=vrc6（mapper 24）を使います。VRC6を搭載しないカートリッジでは発音しません。periodの下位12ビットだけを使い、周波数制御レジスター$9003は設定しません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 24: two pulse voices followed by the saw accumulator.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc6_sound.c&quot;
+void main(void) {
+    // The background font occupies the first four 1 KiB CHR windows.
+    *((u8*)0xD000)=0; *((u8*)0xD001)=1;
+    *((u8*)0xD002)=2; *((u8*)0xD003)=3;
+    sound_begin(&quot;VRC6 PULSE PULSE SAW&quot;);
+    nes_vrc6_silence_all();
+    nes_vrc6_pulse1_set(0x7C,253);
+    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);
+    nes_vrc6_pulse2_set(0x3C,253);
+    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);
+    nes_vrc6_saw_set(32,289);
+    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);
+    nes_vrc6_silence_all();
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>VRC6のパルス1、デューティの異なるパルス2、ノコギリ波を各45フレーム鳴らし、15フレームずつ休みます。3音の音程はおよそ440Hzで、最後は3音源とも停止します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc6/ntsc/screen.png" alt="nes_vrc6_saw_set: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc6_saw_set: NTSC — 確認した音声" src="verification/api-sound/fc-vrc6/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc6.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc6.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc6_sound.h:26</p><div class="original"><b>宣言の注記（原文）</b><pre>Mask the saw accumulation rate to six bits, load a 12-bit timer and enable output.</pre></div><p class="source">kitaqfc/lib/vrc6_sound.c:55</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_saw_set(u8 rate, u16 period)
 {
     VRC6_SAW_RATE = (u8)(rate &amp; 0x3F);
     VRC6_SAW_LO = (u8)period;
     VRC6_SAW_HI = (u8)(0x80 | ((period &gt;&gt; 8) &amp; 0x0F));
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc6_sound.h:26</p></details><details class="api searchable" id="api-nes_vrc6_silence_all"><summary><code>nes_vrc6_silence_all</code><span class="badge">実装あり</span></summary><p>VRC6拡張音源に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_silence_all(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Clear channel-enable/high-timer registers and output controls for all VRC6 voices.
-Requires the VRC6 register layout used by this module. No mapper setup or global frequency-control write is included.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_vrc6_silence_all();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc6_silence_all.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc6_sound.c</code>:16。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_silence_all(void)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc6_silence_all" data-api-contract="sound-source-20260916"><summary><code>nes_vrc6_silence_all</code></summary><p>VRC6の3音源を無効化し、パルス制御とノコギリ波の加算値を0にします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_silence_all(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>このレジスター配線には--mapper=vrc6（mapper 24）を使います。VRC6を搭載しないカートリッジでは発音しません。periodの下位12ビットだけを使い、周波数制御レジスター$9003は設定しません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 24: two pulse voices followed by the saw accumulator.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc6_sound.c&quot;
+void main(void) {
+    // The background font occupies the first four 1 KiB CHR windows.
+    *((u8*)0xD000)=0; *((u8*)0xD001)=1;
+    *((u8*)0xD002)=2; *((u8*)0xD003)=3;
+    sound_begin(&quot;VRC6 PULSE PULSE SAW&quot;);
+    nes_vrc6_silence_all();
+    nes_vrc6_pulse1_set(0x7C,253);
+    sound_wait(45); nes_vrc6_pulse1_off(); sound_wait(15);
+    nes_vrc6_pulse2_set(0x3C,253);
+    sound_wait(45); nes_vrc6_pulse2_off(); sound_wait(15);
+    nes_vrc6_saw_set(32,289);
+    sound_wait(45); nes_vrc6_saw_off(); sound_wait(15);
+    nes_vrc6_silence_all();
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>VRC6のパルス1、デューティの異なるパルス2、ノコギリ波を各45フレーム鳴らし、15フレームずつ休みます。3音の音程はおよそ440Hzで、最後は3音源とも停止します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc6/ntsc/screen.png" alt="nes_vrc6_silence_all: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc6_silence_all: NTSC — 確認した音声" src="verification/api-sound/fc-vrc6/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc6.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc6.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc6.nes --mapper=vrc6 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc6_sound.h:16</p><div class="original"><b>宣言の注記（原文）</b><pre>Clear channel-enable/high-timer registers and output controls for all VRC6 voices.
+Requires the VRC6 register layout used by this module. No mapper setup or global frequency-control write is included.</pre></div><p class="source">kitaqfc/lib/vrc6_sound.c:16</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc6_silence_all(void)
 {
     VRC6_P1_HI = 0x00;
     VRC6_P2_HI = 0x00;
@@ -2419,11 +2811,32 @@ Requires the VRC6 register layout used by this module. No mapper setup or global
     VRC6_P1_CTRL = 0x00;
     VRC6_P2_CTRL = 0x00;
     VRC6_SAW_RATE = 0x00;
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc6_sound.h:16</p></details><h3 id="module-vrc7_sound">vrc7_sound.h — VRC7 FM音源</h3><details class="api searchable" id="api-nes_vrc7_channel_set"><summary><code>nes_vrc7_channel_set</code><span class="badge">実装あり</span></summary><p>VRC7 FM音源に関するAPIです。値や動作条件を設定します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_channel_set(u8 channel, u8 instrument, u8 volume, u16 fnum, u8 block, u8 key_flags);</code></pre></div><p><b>引数（左から順）：</b>u8 channel, u8 instrument, u8 volume, u16 fnum, u8 block, u8 key_flags。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Validate channel 0..5, then pack a 9-bit frequency, 3-bit block, key flags,
+}</code></pre></div></details></details><h3 id="module-vrc7_sound">vrc7_sound.h — VRC7 FM音源</h3><!-- api-module:start --><div data-module-contract="sound-source-20260916"><p>--mapper=vrc7（mapper 85）用です。レジスター選択とデータ書き込みの組を割り込みと競合させないでください。書き込み待ち時間はヘルパーに含まれていません。録音はKUROSAKIのFMモデルの出力で、実機の音色・待ち時間の検証ではありません。</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_vrc7_channel_set" data-api-contract="sound-source-20260916"><summary><code>nes_vrc7_channel_set</code></summary><p>1つのFM音源の周波数・ブロック・キー・楽器・減衰を設定します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_channel_set(u8 channel, u8 instrument, u8 volume, u16 fnum, u8 block, u8 key_flags);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>channel</code></dt><dd><p>VRC7チャンネル0～5。6以上は何もしません。</p></dd><dt><code>instrument</code></dt><dd><p>楽器番号0～15。0は独自パッチ、1～15はプリセットです。下位4ビットを使います。</p></dd><dt><code>volume</code></dt><dd><p>VRC7の減衰量0～15。0が最大音量で、15が最大減衰です。下位4ビットを使います。</p></dd><dt><code>fnum</code></dt><dd><p>周波数番号0～511。ブロックと組み合わせて音程を決めます。下位9ビットを使います。</p></dd><dt><code>block</code></dt><dd><p>オクターブのブロック番号0～7。下位3ビットを使います。</p></dd><dt><code>key_flags</code></dt><dd><p>0x10でキーオン、0x20でサステイン指定。ほかのビットは捨てます。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>--mapper=vrc7（mapper 85）用です。レジスター選択とデータ書き込みの組を割り込みと競合させないでください。書き込み待ち時間はヘルパーに含まれていません。録音はKUROSAKIのFMモデルの出力で、実機の音色・待ち時間の検証ではありません。</p><p>楽器0は全チャンネルで共有します。channel_setはキー・周波数上位を楽器・減衰より先に書きます。key_off後の次の音は周波数上位とブロックも設定し直します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 85: an FM preset followed by a simple original user instrument.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc7_sound.c&quot;
+__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};
+void main(void) {
+    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.
+    *((u8*)0xA000)=0; *((u8*)0xA010)=1;
+    *((u8*)0xB000)=2; *((u8*)0xB010)=3;
+    *((u8*)0xC000)=4; *((u8*)0xC010)=5;
+    *((u8*)0xD000)=6; *((u8*)0xD010)=7;
+    sound_begin(&quot;VRC7 PRESET AND PATCH&quot;);
+    nes_vrc7_silence_all();
+    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);
+    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);
+    nes_vrc7_set_user_patch(patch);
+    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);
+    sound_wait(60);
+    // Raw register 30 selects instrument zero and maximum attenuation.
+    nes_vrc7_write(0x30,0x0F);
+    nes_vrc7_key_off(0);
+    nes_vrc7_silence_all(); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>プリセット楽器1と、サステインを有効にした独自の楽器0を各60フレーム鳴らします。音程を揃えて音色を比較し、最後にキーオフと最大減衰で止めます。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc7/ntsc/screen.png" alt="nes_vrc7_channel_set: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc7_channel_set: NTSC — 確認した音声" src="verification/api-sound/fc-vrc7/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc7.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc7.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc7_sound.h:18</p><div class="original"><b>宣言の注記（原文）</b><pre>Validate channel 0..5, then pack a 9-bit frequency, 3-bit block, key flags,
 instrument and volume nibbles into its registers. Volume is the raw hardware
-attenuation field, not a linear loudness value.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_vrc7_channel_set(u8 channel, u8 instrument, u8 volume, u16 fnum, u8 block, u8 key_flags) {
-    nes_vrc7_channel_set(channel, instrument, volume, fnum, block, key_flags);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc7_channel_set.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc7_sound.c</code>:32。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_channel_set(u8 channel, u8 instrument, u8 volume, u16 fnum, u8 block, u8 key_flags)
+attenuation field, not a linear loudness value.</pre></div><p class="source">kitaqfc/lib/vrc7_sound.c:32</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_channel_set(u8 channel, u8 instrument, u8 volume, u16 fnum, u8 block, u8 key_flags)
 {
     u8 reg;
     u8 hi;
@@ -2434,20 +2847,58 @@ attenuation field, not a linear loudness value.</pre></div><h4>引数受け渡�
     // Key/frequency-high is written before instrument/attenuation; this sequence is not an atomic note update.
     nes_vrc7_write((u8)(0x20 + reg), hi);
     nes_vrc7_write((u8)(0x30 + reg), (u8)(((instrument &amp; 0x0F) &lt;&lt; 4) | (volume &amp; 0x0F)));
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc7_sound.h:18</p></details><details class="api searchable" id="api-nes_vrc7_key_off"><summary><code>nes_vrc7_key_off</code><span class="badge">実装あり</span></summary><p>VRC7 FM音源に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_key_off(u8 channel);</code></pre></div><p><b>引数（左から順）：</b>u8 channel。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Clear the channel&#x27;s entire frequency-high/block/key register, not just the
-key-on bit. A later note must restore frequency and block settings.</pre></div><h4>呼び出し例（周辺コードの断片）</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>i = 0;
-    while (i &lt; 6) {
-        nes_vrc7_key_off(i);
-        nes_vrc7_write((u8)(0x30 + i), 0x0F);
-        i = (u8)(i + 1);
-    }
-}</code></pre></div><p class="source">出典：kitaqfc/lib/vrc7_sound.c:59</p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc7_sound.c</code>:47。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_key_off(u8 channel)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc7_key_off" data-api-contract="sound-source-20260916"><summary><code>nes_vrc7_key_off</code></summary><p>指定チャンネルの周波数上位・ブロック・キーのレジスター全体を0にします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_key_off(u8 channel);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>channel</code></dt><dd><p>VRC7チャンネル0～5。6以上は何もしません。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>--mapper=vrc7（mapper 85）用です。レジスター選択とデータ書き込みの組を割り込みと競合させないでください。書き込み待ち時間はヘルパーに含まれていません。録音はKUROSAKIのFMモデルの出力で、実機の音色・待ち時間の検証ではありません。</p><p>楽器0は全チャンネルで共有します。channel_setはキー・周波数上位を楽器・減衰より先に書きます。key_off後の次の音は周波数上位とブロックも設定し直します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 85: an FM preset followed by a simple original user instrument.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc7_sound.c&quot;
+__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};
+void main(void) {
+    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.
+    *((u8*)0xA000)=0; *((u8*)0xA010)=1;
+    *((u8*)0xB000)=2; *((u8*)0xB010)=3;
+    *((u8*)0xC000)=4; *((u8*)0xC010)=5;
+    *((u8*)0xD000)=6; *((u8*)0xD010)=7;
+    sound_begin(&quot;VRC7 PRESET AND PATCH&quot;);
+    nes_vrc7_silence_all();
+    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);
+    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);
+    nes_vrc7_set_user_patch(patch);
+    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);
+    sound_wait(60);
+    // Raw register 30 selects instrument zero and maximum attenuation.
+    nes_vrc7_write(0x30,0x0F);
+    nes_vrc7_key_off(0);
+    nes_vrc7_silence_all(); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>プリセット楽器1と、サステインを有効にした独自の楽器0を各60フレーム鳴らします。音程を揃えて音色を比較し、最後にキーオフと最大減衰で止めます。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc7/ntsc/screen.png" alt="nes_vrc7_key_off: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc7_key_off: NTSC — 確認した音声" src="verification/api-sound/fc-vrc7/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc7.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc7.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc7_sound.h:21</p><div class="original"><b>宣言の注記（原文）</b><pre>Clear the channel&#x27;s entire frequency-high/block/key register, not just the
+key-on bit. A later note must restore frequency and block settings.</pre></div><p class="source">kitaqfc/lib/vrc7_sound.c:47</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_key_off(u8 channel)
 {
     if (channel &gt;= 6) return;
     nes_vrc7_write((u8)(0x20 + channel), 0x00);
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc7_sound.h:21</p></details><details class="api searchable" id="api-nes_vrc7_set_user_patch"><summary><code>nes_vrc7_set_user_patch</code><span class="badge">実装あり</span></summary><p>VRC7 FM音源に関するAPIです。値や動作条件を設定します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_set_user_patch(const u8* patch8);</code></pre></div><p><b>引数（左から順）：</b>const u8* patch8。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Copy eight caller-supplied patch bytes into user-instrument registers 0..7.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void example_nes_vrc7_set_user_patch(const u8* patch8) {
-    nes_vrc7_set_user_patch(patch8);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc7_set_user_patch.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc7_sound.c</code>:16。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_set_user_patch(const u8* patch8)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc7_set_user_patch" data-api-contract="sound-source-20260916"><summary><code>nes_vrc7_set_user_patch</code></summary><p>8バイトをVRC7の楽器0レジスターへ順番に書き込みます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_set_user_patch(const u8* patch8);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>patch8</code></dt><dd><p>楽器0の設定となる8バイト配列。NULLは検査しません。読み込み中にバンクを切り替えないでください。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>--mapper=vrc7（mapper 85）用です。レジスター選択とデータ書き込みの組を割り込みと競合させないでください。書き込み待ち時間はヘルパーに含まれていません。録音はKUROSAKIのFMモデルの出力で、実機の音色・待ち時間の検証ではありません。</p><p>楽器0は全チャンネルで共有します。channel_setはキー・周波数上位を楽器・減衰より先に書きます。key_off後の次の音は周波数上位とブロックも設定し直します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 85: an FM preset followed by a simple original user instrument.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc7_sound.c&quot;
+__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};
+void main(void) {
+    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.
+    *((u8*)0xA000)=0; *((u8*)0xA010)=1;
+    *((u8*)0xB000)=2; *((u8*)0xB010)=3;
+    *((u8*)0xC000)=4; *((u8*)0xC010)=5;
+    *((u8*)0xD000)=6; *((u8*)0xD010)=7;
+    sound_begin(&quot;VRC7 PRESET AND PATCH&quot;);
+    nes_vrc7_silence_all();
+    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);
+    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);
+    nes_vrc7_set_user_patch(patch);
+    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);
+    sound_wait(60);
+    // Raw register 30 selects instrument zero and maximum attenuation.
+    nes_vrc7_write(0x30,0x0F);
+    nes_vrc7_key_off(0);
+    nes_vrc7_silence_all(); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>プリセット楽器1と、サステインを有効にした独自の楽器0を各60フレーム鳴らします。音程を揃えて音色を比較し、最後にキーオフと最大減衰で止めます。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc7/ntsc/screen.png" alt="nes_vrc7_set_user_patch: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc7_set_user_patch: NTSC — 確認した音声" src="verification/api-sound/fc-vrc7/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc7.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc7.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc7_sound.h:14</p><div class="original"><b>宣言の注記（原文）</b><pre>Copy eight caller-supplied patch bytes into user-instrument registers 0..7.</pre></div><p class="source">kitaqfc/lib/vrc7_sound.c:16</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_set_user_patch(const u8* patch8)
 {
     const u8* p;
     u8 i;
@@ -2458,7 +2909,30 @@ key-on bit. A later note must restore frequency and block settings.</pre></div><
         p = p + 1;
         i = (u8)(i + 1);
     }
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc7_sound.h:14</p></details><details class="api searchable" id="api-nes_vrc7_silence_all"><summary><code>nes_vrc7_silence_all</code><span class="badge">実装あり</span></summary><p>VRC7 FM音源に関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_silence_all(void);</code></pre></div><div class="original"><b>宣言に付属する原注記</b><pre>Key off all six voices and set instrument zero with maximum attenuation.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_vrc7_silence_all();</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_vrc7_silence_all.c" download>この断片を保存</a></p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc7_sound.c</code>:54。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_silence_all(void)
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc7_silence_all" data-api-contract="sound-source-20260916"><summary><code>nes_vrc7_silence_all</code></summary><p>6音源すべてをキーオフし、楽器0・最大減衰に設定します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_silence_all(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>--mapper=vrc7（mapper 85）用です。レジスター選択とデータ書き込みの組を割り込みと競合させないでください。書き込み待ち時間はヘルパーに含まれていません。録音はKUROSAKIのFMモデルの出力で、実機の音色・待ち時間の検証ではありません。</p><p>楽器0は全チャンネルで共有します。channel_setはキー・周波数上位を楽器・減衰より先に書きます。key_off後の次の音は周波数上位とブロックも設定し直します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 85: an FM preset followed by a simple original user instrument.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc7_sound.c&quot;
+__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};
+void main(void) {
+    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.
+    *((u8*)0xA000)=0; *((u8*)0xA010)=1;
+    *((u8*)0xB000)=2; *((u8*)0xB010)=3;
+    *((u8*)0xC000)=4; *((u8*)0xC010)=5;
+    *((u8*)0xD000)=6; *((u8*)0xD010)=7;
+    sound_begin(&quot;VRC7 PRESET AND PATCH&quot;);
+    nes_vrc7_silence_all();
+    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);
+    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);
+    nes_vrc7_set_user_patch(patch);
+    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);
+    sound_wait(60);
+    // Raw register 30 selects instrument zero and maximum attenuation.
+    nes_vrc7_write(0x30,0x0F);
+    nes_vrc7_key_off(0);
+    nes_vrc7_silence_all(); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>プリセット楽器1と、サステインを有効にした独自の楽器0を各60フレーム鳴らします。音程を揃えて音色を比較し、最後にキーオフと最大減衰で止めます。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc7/ntsc/screen.png" alt="nes_vrc7_silence_all: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc7_silence_all: NTSC — 確認した音声" src="verification/api-sound/fc-vrc7/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc7.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc7.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc7_sound.h:23</p><div class="original"><b>宣言の注記（原文）</b><pre>Key off all six voices and set instrument zero with maximum attenuation.</pre></div><p class="source">kitaqfc/lib/vrc7_sound.c:54</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_silence_all(void)
 {
     u8 i;
     i = 0;
@@ -2467,19 +2941,36 @@ key-on bit. A later note must restore frequency and block settings.</pre></div><
         nes_vrc7_write((u8)(0x30 + i), 0x0F);
         i = (u8)(i + 1);
     }
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc7_sound.h:23</p></details><details class="api searchable" id="api-nes_vrc7_write"><summary><code>nes_vrc7_write</code><span class="badge">実装あり</span></summary><p>VRC7 FM音源に関するAPIです。値を書き込みします。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_write(u8 reg, u8 value);</code></pre></div><p><b>引数（左から順）：</b>u8 reg, u8 value。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><div class="original"><b>宣言に付属する原注記</b><pre>Write register selection followed immediately by data. No explicit device
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_vrc7_write" data-api-contract="sound-source-20260916"><summary><code>nes_vrc7_write</code></summary><p>VRC7のレジスター選択ポートへ番号を書き、続いてデータポートへ値を書きます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_write(u8 reg, u8 value);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>reg</code></dt><dd><p>VRC7レジスター番号。チャンネル0では0x10=周波数下位、0x20=上位・ブロック・キー、0x30=楽器・減衰です。</p></dd><dt><code>value</code></dt><dd><p>選択したVRC7レジスターへ書く1バイト。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>--mapper=vrc7（mapper 85）用です。レジスター選択とデータ書き込みの組を割り込みと競合させないでください。書き込み待ち時間はヘルパーに含まれていません。録音はKUROSAKIのFMモデルの出力で、実機の音色・待ち時間の検証ではありません。</p><p>楽器0は全チャンネルで共有します。channel_setはキー・周波数上位を楽器・減衰より先に書きます。key_off後の次の音は周波数上位とブロックも設定し直します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 85: an FM preset followed by a simple original user instrument.
+#include &quot;fc_sound_example.h&quot;
+#include &quot;vrc7_sound.c&quot;
+__prg_rom u8 patch[8]={0x21,0x21,0x3F,0x00,0xF0,0xF0,0x0F,0x0F};
+void main(void) {
+    // Map the supplied 8 KiB font as eight consecutive 1 KiB CHR windows.
+    *((u8*)0xA000)=0; *((u8*)0xA010)=1;
+    *((u8*)0xB000)=2; *((u8*)0xB010)=3;
+    *((u8*)0xC000)=4; *((u8*)0xC010)=5;
+    *((u8*)0xD000)=6; *((u8*)0xD010)=7;
+    sound_begin(&quot;VRC7 PRESET AND PATCH&quot;);
+    nes_vrc7_silence_all();
+    nes_vrc7_channel_set(0,1,3,290,4,VRC7_KEY_ON);
+    sound_wait(60); nes_vrc7_key_off(0); sound_wait(30);
+    nes_vrc7_set_user_patch(patch);
+    nes_vrc7_channel_set(0,0,3,290,4,VRC7_KEY_ON);
+    sound_wait(60);
+    // Raw register 30 selects instrument zero and maximum attenuation.
+    nes_vrc7_write(0x30,0x0F);
+    nes_vrc7_key_off(0);
+    nes_vrc7_silence_all(); sound_wait(30);
+    sound_end();
+}</code></pre></div><h4>期待する結果</h4><p>プリセット楽器1と、サステインを有効にした独自の楽器0を各60フレーム鳴らします。音程を揃えて音色を比較し、最後にキーオフと最大減衰で止めます。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sound/fc-vrc7/ntsc/screen.png" alt="nes_vrc7_write: NTSC"><figcaption>NTSC</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="nes_vrc7_write: NTSC — 確認した音声" src="verification/api-sound/fc-vrc7/ntsc/sound.wav"></audio><figcaption>NTSC — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/sound_vrc7.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\sound_vrc7.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fc-vrc7.nes --mapper=vrc7 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/vrc7_sound.h:12</p><div class="original"><b>宣言の注記（原文）</b><pre>Write register selection followed immediately by data. No explicit device
 settling delay or cartridge detection is inserted by this wrapper.
-The caller must arrange device timing and serialize register/data pairs against interrupt writers.</pre></div><h4>呼び出し例（周辺コードの断片）</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>i = 0;
-    while (i &lt; 8) {
-        nes_vrc7_write(i, *p);
-        p = p + 1;
-        i = (u8)(i + 1);
-    }
-}</code></pre></div><p class="source">出典：kitaqfc/lib/vrc7_sound.c:23</p><p class="source"><b>結合する本体：</b><code>kitaqfc/lib/vrc7_sound.c</code>:8。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_write(u8 reg, u8 value)
+The caller must arrange device timing and serialize register/data pairs against interrupt writers.</pre></div><p class="source">kitaqfc/lib/vrc7_sound.c:8</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void nes_vrc7_write(u8 reg, u8 value)
 {
     VRC7_ADDR = reg;
     VRC7_DATA = value;
-}</code></pre></div></details><p class="source">宣言・識別子の出典：kitaqfc/lib/vrc7_sound.h:12</p></details><h2 id="headers">構造体・定数・ヘッダー全文</h2><p>関数形式でないマクロ、構造体、配列上限、enum、別名はここで確認できます。元のコメントを含む採取時点のヘッダー全文です。</p><details class="searchable"><summary><code>actor.h</code> — ゲームアクターの配列</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>/*
+}</code></pre></div></details></details><h2 id="headers">構造体・定数・ヘッダー全文</h2><p>関数形式でないマクロ、構造体、配列上限、enum、別名はここで確認できます。元のコメントを含む採取時点のヘッダー全文です。</p><details class="searchable"><summary><code>actor.h</code> — ゲームアクターの配列</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>/*
  * Optional declarations for the phase 11 actor helper.
  */
 
@@ -3356,8 +3847,9 @@ void __rob_send_byte(u8 pattern);
 void __serial_tx_bit(u8 bit);
 // Read 4017 bit 4 and normalize it to 0 or 1; an external serial adapter supplies the signal.
 u8 __serial_rx_bit(void);
-// Send start-low, eight least-significant-first bits and stop-high using fixed NOP delays.
-// Instruction and interrupt overhead is additional; the emitted loop does not establish a verified MIDI baud rate.
+// Send start-low, eight least-significant-first bits and stop-high in 57-cycle
+// NTSC bit cells (about 31400 bps). Stop DMC DMA and mask IRQ/NMI during transfers;
+// PAL timing and electrical adapter compatibility are not established here.
 void __midi_out_byte(u8 byte);
 // Block for a low start signal and sample eight bits. No timeout, framing check or receive buffer is provided.
 u8 __midi_in_byte(void);

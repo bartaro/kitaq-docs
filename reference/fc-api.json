@@ -2109,7 +2109,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fds_sound_enable();"
+      "new_example": "__fds_sound_enable();",
+      "implementation_excerpt": "case \"__fds_sound_enable\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Imm(0x83));\n                    EmitAsm(\"STA\", Mem(0x4023));\n                    EmitAsm(\"LDA\", Imm(0x00));\n                    EmitAsm(\"STA\", Mem(0x4089));\n                    EmitAsm(\"LDA\", Imm(0x00));\n                    EmitAsm(\"STA\", Mem(0x408A));\n                    return true;\n                // Wave, modulation and frequency operations pass word arguments to their dedicated helpers.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4981
+      }
     },
     {
       "name": "__fds_wave_load",
@@ -2125,7 +2130,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_fds_wave_load(const u8* wave64) {\n    __fds_wave_load(wave64);\n}"
+      "new_example": "void example_fds_wave_load(const u8* wave64) {\n    __fds_wave_load(wave64);\n}",
+      "implementation_excerpt": "case \"__fds_wave_load\":\n                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2}, \"__fds_wave_load\");\n\nEmitHelperStart(\"__fds_wave_load\");\n            EmitAsm(\"LDA\", Imm(0x80)); EmitAsm(\"STA\", Mem(0x4089));\n            EmitAsm(\"LDY\", Imm(0));\n            string waveLoop = NewGeneratedLabel(\"fds_wave_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, waveLoop));\n            EmitAsm(\"LDA\", IndY(CallArgBase));\n            EmitAsm(\"STA\", new AsmOperand(0x4040, AddressMode.AbsoluteY));\n            EmitAsm(\"INY\"); EmitAsm(\"CPY\", Imm(64)); EmitAsm(\"BNE\", Rel(waveLoop));\n            EmitAsm(\"LDA\", Imm(0x00)); EmitAsm(\"STA\", Mem(0x4089));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4991
+      }
     },
     {
       "name": "__fds_mod_load",
@@ -2141,7 +2151,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_fds_mod_load(const u8* mod32) {\n    __fds_mod_load(mod32);\n}"
+      "new_example": "void example_fds_mod_load(const u8* mod32) {\n    __fds_mod_load(mod32);\n}",
+      "implementation_excerpt": "case \"__fds_mod_load\":\n                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2}, \"__fds_mod_load\");\n\nEmitHelperStart(\"__fds_mod_load\");\n            EmitAsm(\"LDY\", Imm(0));\n            string modLoop = NewGeneratedLabel(\"fds_mod_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, modLoop));\n            EmitAsm(\"LDA\", IndY(CallArgBase));\n            EmitAsm(\"STA\", Mem(0x4088));\n            EmitAsm(\"INY\"); EmitAsm(\"CPY\", Imm(32)); EmitAsm(\"BNE\", Rel(modLoop));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4993
+      }
     },
     {
       "name": "__fds_freq_set",
@@ -2157,7 +2172,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_fds_freq_set(u16 freq) {\n    __fds_freq_set(freq);\n}"
+      "new_example": "void example_fds_freq_set(u16 freq) {\n    __fds_freq_set(freq);\n}",
+      "implementation_excerpt": "case \"__fds_freq_set\":\n                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2}, \"__fds_freq_set\");\n                // Clamp the direct volume field to six bits and set the fixed-volume control bit.\n\nEmitHelperStart(\"__fds_freq_set\");\n            EmitAsm(\"LDA\", Mem(CallArgBase)); EmitAsm(\"STA\", Mem(0x4082));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"AND\", Imm(0x0F)); EmitAsm(\"STA\", Mem(0x4083));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4995
+      }
     },
     {
       "name": "__fds_volume_set",
@@ -2173,7 +2193,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_fds_volume_set(u8 vol) {\n    __fds_volume_set(vol);\n}"
+      "new_example": "void example_fds_volume_set(u8 vol) {\n    __fds_volume_set(vol);\n}",
+      "implementation_excerpt": "case \"__fds_volume_set\":\n                    if (!Need(1)) return true;\n                    Load1(args[0]);\n                    EmitAsm(\"AND\", Imm(0x3F));\n                    EmitAsm(\"ORA\", Imm(0x80));\n                    EmitAsm(\"STA\", Mem(0x4080));\n                    return true;",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4998
+      }
     },
     {
       "name": "__fds_env_set",
@@ -2189,7 +2214,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_fds_env_set(u8 speed, u8 gain, u8 mode) {\n    __fds_env_set(speed, gain, mode);\n}"
+      "new_example": "void example_fds_env_set(u8 speed, u8 gain, u8 mode) {\n    __fds_env_set(speed, gain, mode);\n}",
+      "implementation_excerpt": "case \"__fds_env_set\":\n                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1}, \"__fds_env_set\");\n                // File helpers use byte identifiers and word memory addresses/lengths.\n\nEmitHelperStart(\"__fds_env_set\");\n            EmitAsm(\"LDA\", Mem(CallArgBase)); EmitAsm(\"STA\", Mem(0x4080));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", Mem(0x4084));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2)); EmitAsm(\"STA\", Mem(0x408A));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 5005
+      }
     },
     {
       "name": "fix_from_int",
@@ -5015,15 +5045,20 @@
       "args": "u8 byte",
       "signature": "void __midi_out_byte(u8 byte);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 287,
-      "comment": "Send start-low, eight least-significant-first bits and stop-high using fixed NOP delays.\nInstruction and interrupt overhead is additional; the emitted loop does not establish a verified MIDI baud rate.",
+      "line": 288,
+      "comment": "Send start-low, eight least-significant-first bits and stop-high in 57-cycle\nNTSC bit cells (about 31400 bps). Stop DMC DMA and mask IRQ/NMI during transfers;\nPAL timing and electrical adapter compatibility are not established here.",
       "body": "",
       "kind": "function",
       "module": "intrinsics",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_midi_out_byte(u8 byte) {\n    __midi_out_byte(byte);\n}"
+      "new_example": "void example_midi_out_byte(u8 byte) {\n    __midi_out_byte(byte);\n}",
+      "implementation_excerpt": "case \"__midi_out_byte\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1}, funcName);\n\nEmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4593
+      }
     },
     {
       "name": "__midi_in_byte",
@@ -5031,7 +5066,7 @@
       "args": "void",
       "signature": "u8 __midi_in_byte(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 289,
+      "line": 290,
       "comment": "Block for a low start signal and sample eight bits. No timeout, framing check or receive buffer is provided.",
       "body": "",
       "kind": "function",
@@ -5039,7 +5074,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__midi_in_byte();"
+      "new_example": "__midi_in_byte();",
+      "implementation_excerpt": "case \"__midi_in_byte\": if (!Need(0)) return true; EmitAsm(\"JSR\", Abs(\"__midi_in_byte\")); return true;\n                // Pack MIDI message fields as bytes; real-time commands below load their fixed status byte directly.\n\nEmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4594
+      }
     },
     {
       "name": "__midi_note_on",
@@ -5047,7 +5087,7 @@
       "args": "u8 ch, u8 note, u8 velocity",
       "signature": "void __midi_note_on(u8 ch, u8 note, u8 velocity);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 291,
+      "line": 292,
       "comment": "Send 90|(ch&0F), note and velocity. Supply 7-bit data bytes; they are not masked by this helper.",
       "body": "",
       "kind": "function",
@@ -5055,7 +5095,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_midi_note_on(u8 ch, u8 note, u8 velocity) {\n    __midi_note_on(ch, note, velocity);\n}"
+      "new_example": "void example_midi_note_on(u8 ch, u8 note, u8 velocity) {\n    __midi_note_on(ch, note, velocity);\n}",
+      "implementation_excerpt": "case \"__midi_note_on\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1}, funcName);\n\nEmitHelperStart(\"__midi_note_on\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"AND\", Imm(0x0F));\n            EmitAsm(\"ORA\", Imm(0x90));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4596
+      }
     },
     {
       "name": "__midi_note_off",
@@ -5063,7 +5108,7 @@
       "args": "u8 ch, u8 note, u8 velocity",
       "signature": "void __midi_note_off(u8 ch, u8 note, u8 velocity);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 293,
+      "line": 294,
       "comment": "Send 80|(ch&0F), note and velocity through the same synchronous serial path.",
       "body": "",
       "kind": "function",
@@ -5071,7 +5116,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_midi_note_off(u8 ch, u8 note, u8 velocity) {\n    __midi_note_off(ch, note, velocity);\n}"
+      "new_example": "void example_midi_note_off(u8 ch, u8 note, u8 velocity) {\n    __midi_note_off(ch, note, velocity);\n}",
+      "implementation_excerpt": "case \"__midi_note_off\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1}, funcName);\n\nEmitHelperStart(\"__midi_note_off\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"AND\", Imm(0x0F));\n            EmitAsm(\"ORA\", Imm(0x80));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4597
+      }
     },
     {
       "name": "__midi_control_change",
@@ -5079,7 +5129,7 @@
       "args": "u8 ch, u8 cc, u8 value",
       "signature": "void __midi_control_change(u8 ch, u8 cc, u8 value);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 295,
+      "line": 296,
       "comment": "Send B0|(ch&0F), controller and value; both data arguments must be valid 7-bit values.",
       "body": "",
       "kind": "function",
@@ -5087,7 +5137,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_midi_control_change(u8 ch, u8 cc, u8 value) {\n    __midi_control_change(ch, cc, value);\n}"
+      "new_example": "void example_midi_control_change(u8 ch, u8 cc, u8 value) {\n    __midi_control_change(ch, cc, value);\n}",
+      "implementation_excerpt": "case \"__midi_control_change\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1}, funcName);\n\nEmitHelperStart(\"__midi_control_change\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"AND\", Imm(0x0F));\n            EmitAsm(\"ORA\", Imm(0xB0));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4598
+      }
     },
     {
       "name": "__midi_program_change",
@@ -5095,7 +5150,7 @@
       "args": "u8 ch, u8 program",
       "signature": "void __midi_program_change(u8 ch, u8 program);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 297,
+      "line": 298,
       "comment": "Send C0|(ch&0F) followed by the caller-supplied 7-bit program value.",
       "body": "",
       "kind": "function",
@@ -5103,7 +5158,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_midi_program_change(u8 ch, u8 program) {\n    __midi_program_change(ch, program);\n}"
+      "new_example": "void example_midi_program_change(u8 ch, u8 program) {\n    __midi_program_change(ch, program);\n}",
+      "implementation_excerpt": "case \"__midi_program_change\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1}, funcName);\n                // Real-time MIDI commands send a single status byte through the common output routine.\n\nEmitHelperStart(\"__midi_program_change\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"AND\", Imm(0x0F));\n            EmitAsm(\"ORA\", Imm(0xC0));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4599
+      }
     },
     {
       "name": "__midi_clock",
@@ -5111,7 +5171,7 @@
       "args": "void",
       "signature": "void __midi_clock(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 299,
+      "line": 300,
       "comment": "Transmit the single realtime byte F8 synchronously; this does not schedule future ticks.",
       "body": "",
       "kind": "function",
@@ -5119,7 +5179,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__midi_clock();"
+      "new_example": "__midi_clock();",
+      "implementation_excerpt": "case \"__midi_clock\": if (!Need(0)) return true; EmitAsm(\"LDA\", Imm(0xF8)); EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\")); return true;\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4601
+      }
     },
     {
       "name": "__midi_start",
@@ -5127,7 +5192,7 @@
       "args": "void",
       "signature": "void __midi_start(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 301,
+      "line": 302,
       "comment": "Transmit realtime Start (FA) through the serial adapter path.",
       "body": "",
       "kind": "function",
@@ -5135,7 +5200,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__midi_start();"
+      "new_example": "__midi_start();",
+      "implementation_excerpt": "case \"__midi_start\": if (!Need(0)) return true; EmitAsm(\"LDA\", Imm(0xFA)); EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\")); return true;\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4602
+      }
     },
     {
       "name": "__midi_continue",
@@ -5143,7 +5213,7 @@
       "args": "void",
       "signature": "void __midi_continue(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 303,
+      "line": 304,
       "comment": "Transmit realtime Continue (FB) through the serial adapter path.",
       "body": "",
       "kind": "function",
@@ -5151,7 +5221,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__midi_continue();"
+      "new_example": "__midi_continue();",
+      "implementation_excerpt": "case \"__midi_continue\": if (!Need(0)) return true; EmitAsm(\"LDA\", Imm(0xFB)); EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\")); return true;\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4603
+      }
     },
     {
       "name": "__midi_stop",
@@ -5159,7 +5234,7 @@
       "args": "void",
       "signature": "void __midi_stop(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 305,
+      "line": 306,
       "comment": "Transmit realtime Stop (FC) through the serial adapter path.",
       "body": "",
       "kind": "function",
@@ -5167,7 +5242,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__midi_stop();"
+      "new_example": "__midi_stop();",
+      "implementation_excerpt": "case \"__midi_stop\": if (!Need(0)) return true; EmitAsm(\"LDA\", Imm(0xFC)); EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\")); return true;\n                // Sprite helpers modify the runtime OAM representation; DMA remains a separate operation.\n\nEmitHelperStart(\"__kq_midi_out_a\");\n            bool midiScratchInZeroPage = _runtimeIntrinsicTmp0Address <= 0xFF;\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            // Unroll so neither branch cost nor payload bits change the baud.\n            // Each data edge: 44 NOP cycles + LSR zp (5) + LDA/ADC (4) + STA (4).\n            for (int bit = 0; bit < 8; bit++)\n            {\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n                EmitAsm(\"LSR\", Mem(_runtimeIntrinsicTmp0Address));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"ADC\", Imm(0));\n                EmitAsm(\"STA\", Mem(0x4016));\n            }\n            // 51 delay cycles plus LDA/STA (6) place the stop bit 57 cycles later.\n            for (int delay = 0; delay < 24; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitMidiBitDelay(); // Hold stop high for at least one full bit cell.\n            EmitAsm(\"RTS\");\n\n            EmitHelperStart(\"__midi_out_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_midi_out_a\"));\n            EmitAsm(\"RTS\");\n\n            // Poll in nine-cycle steps, then sample near data-bit centers.\n            // IRQ/NMI masking belongs to the caller; no timeout/framing status is returned.\n            EmitHelperStart(\"__midi_in_byte\");\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string waitStart = NewGeneratedLabel(\"midi_wait_start\");\n            _assembly.Add(Expr.Make(Tag.Label, waitStart));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            EmitAsm(\"BNE\", Rel(waitStart));\n            // 81 cycles from the start-detect read to the first data read.\n            // Polling uncertainty is at most nine cycles within a 57-cycle cell.\n            for (int delay = 0; delay < 35; delay++) EmitAsm(\"NOP\");\n            EmitAsm(\"BIT\", Mem(CallArgBase));\n            for (int bit = 0; bit < 8; bit++)\n            {\n                EmitAsm(\"LDA\", Mem(0x4017));\n                EmitAsm(\"AND\", Imm(0x10));\n                EmitAsm(\"CMP\", Imm(0x10));\n                EmitAsm(\"ROR\", Mem(_runtimeIntrinsicTmp0Address));\n                for (int delay = 0; delay < (midiScratchInZeroPage ? 22 : 20); delay++) EmitAsm(\"NOP\");\n                if (!midiScratchInZeroPage) EmitAsm(\"BIT\", Mem(CallArgBase));\n            }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Compose the channelized note-on status, then send note and velocity arguments.\n            ",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4604
+      }
     },
     {
       "name": "__mapper_id",
@@ -6068,7 +6148,8 @@
       "definition": null,
       "availability": "macro",
       "example": null,
-      "new_example": "nes_fds_wave_load(wave64);"
+      "new_example": "nes_fds_wave_load(wave64);",
+      "implementation_excerpt": "#define nes_fds_wave_load(wave64)          __fds_wave_load((wave64))"
     },
     {
       "name": "nes_fds_load_bank",
