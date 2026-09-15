@@ -6,6 +6,7 @@ language code and need only cover the active editions.
 """
 ORDER = ['en', 'ja', 'ko', 'zh-CN', 'zh-TW', 'es', 'pt', 'fr', 'de']
 ACTIVE_LANGUAGES = ['ja', 'en']
+VISIBLE_LANGUAGES = ['en', 'ja']
 PAUSED_LANGUAGES = [language for language in ORDER if language not in ACTIVE_LANGUAGES]
 
 

@@ -9,6 +9,7 @@ import json
 import re
 from urllib.parse import urlsplit, unquote
 from publication_languages import ORDER, ACTIVE_LANGUAGES
+from languages import refresh_language_navigation
 
 SITE = Path(__file__).resolve().parents[1]
 LANGUAGES = ORDER
@@ -59,6 +60,7 @@ def normalize(language):
     folder = SITE if language == 'ja' else SITE / language
     prefix = '' if language == 'ja' else '../'
     for path in folder.glob('*.html'):
+        refresh_language_navigation(path, language)
         original = path.read_bytes()
         text = original.decode('utf-8').replace('\r\n', '\n')
         if path.name == 'verification.html':

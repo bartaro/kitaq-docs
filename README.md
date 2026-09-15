@@ -5,13 +5,6 @@
 | --- | --- |
 | English | [KITAQGB](https://bartaro.github.io/kitaq-docs/en/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/en/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/en/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/en/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/en/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/en/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/en/sarakura.html) |
 | 日本語 | [KITAQGB](https://bartaro.github.io/kitaq-docs/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/sarakura.html) |
-| 한국어 | [KITAQGB](https://bartaro.github.io/kitaq-docs/ko/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/ko/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/ko/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/ko/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/ko/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/ko/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/ko/sarakura.html) |
-| 简体中文 | [KITAQGB](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/zh-CN/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/zh-CN/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/zh-CN/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/zh-CN/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/zh-CN/sarakura.html) |
-| 繁體中文 | [KITAQGB](https://bartaro.github.io/kitaq-docs/zh-TW/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/zh-TW/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/zh-TW/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/zh-TW/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/zh-TW/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/zh-TW/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/zh-TW/sarakura.html) |
-| Español | [KITAQGB](https://bartaro.github.io/kitaq-docs/es/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/es/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/es/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/es/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/es/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/es/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/es/sarakura.html) |
-| Português (Brasil) | [KITAQGB](https://bartaro.github.io/kitaq-docs/pt/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/pt/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/pt/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/pt/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/pt/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/pt/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/pt/sarakura.html) |
-| Français | [KITAQGB](https://bartaro.github.io/kitaq-docs/fr/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/fr/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/fr/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/fr/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/fr/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/fr/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/fr/sarakura.html) |
-| Deutsch | [KITAQGB](https://bartaro.github.io/kitaq-docs/de/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/de/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/de/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/de/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/de/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/de/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/de/sarakura.html) |
 <!-- manual-language-links:end -->
 
 <!-- ai-prompts:start -->
@@ -30,7 +23,7 @@ Fill in the requirements, then give the complete prompt to your AI assistant. It
 
 
 
-[English](#english) | [日本語](#japanese) | [한국어](README.ko.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [Español](README.es.md) | [Português (Brasil)](README.pt-BR.md) | [Français](README.fr.md) | [Deutsch](README.de.md)
+[English](#english) | [日本語](#japanese)
 
 <a name="english"></a>
 
@@ -40,7 +33,7 @@ Fill in the requirements, then give the complete prompt to your AI assistant. It
 
 ### HTML manuals
 
-Seven complete volumes are available in nine languages, based on the source snapshot of September 14, 2026. Every edition contains the same 1,055 API entries and 47 complete sample programs. Open `en/index.html` for English or `index.html` for Japanese; each volume provides language navigation. The sample explanations identify the tested behavior and conditions.
+Seven volumes are presented in Japanese and English, based on the source snapshot of September 14, 2026. The reference inventory contains 1,055 API entries and 47 complete sample programs. Open `en/index.html` for English or `index.html` for Japanese; each volume provides language navigation. The sample explanations identify the tested behavior and conditions.
 
 Original source excerpts and captured tool output are preserved verbatim. See [GitHub setup](GITHUB_SETUP.md) and [publication checks](PUBLICATION_CHECKS.md). The HTML files support offline reading, searching within a volume, copying code and printing.
 
@@ -116,9 +109,9 @@ KOKURA-GUI, KUROSAKI-GUI and PLITA are excluded from this upload. The published 
 
 [日本語 / Japanese](https://bartaro.github.io/kitaq-docs/) / [English](https://bartaro.github.io/kitaq-docs/en/) / [ソースの取得と配置](GITHUB_SETUP.md)
 
-### 9言語のHTMLマニュアル
+### 日本語・英語のHTMLマニュアル
 
-2026年9月14日のソースに基づく7冊のマニュアルを9言語で収録しています。各言語版に共通の1,055個のAPI項目と47本の完全なサンプルプログラムがあります。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。検証記録には使用したソース、実行ファイル、試験条件を記載しています。
+2026年9月14日のソースに基づく7冊のマニュアルを日本語・英語で収録しています。各言語版に共通の1,055個のAPI項目と47本の完全なサンプルプログラムがあります。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。検証記録には使用したソース、実行ファイル、試験条件を記載しています。
 
 全言語に同じ1,055件のAPIと47本の完成サンプルを収録しています。元のソース抜粋とツール出力は原文のまま保持しています。[取得・配置手順](GITHUB_SETUP.md)と[公開時の確認記録](PUBLICATION_CHECKS.md)も参照してください。
 `index.html` を開いてください。オフラインで閲覧・巻内検索・コードのコピー・印刷ができます。

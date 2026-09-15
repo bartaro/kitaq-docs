@@ -7,7 +7,7 @@
 
 填写需求后，将完整提示词交给 AI。内容涵盖实现、模拟器测试、SARAKURA 分析以及修复后的复测。
 
-[KITAQGB](https://bartaro.github.io/kitaq-docs/zh-CN/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/zh-CN/loop-engineering.html#fc)
+KITAQGB · KITAQFC
 <!-- ai-prompts:end -->
 
 ## 直接打开各工具的手册
@@ -16,14 +16,6 @@
 
 | 分册 | 内容 |
 | --- | --- |
-| [KITAQGB](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqgb.html) | Game Boy语法、内建操作与构建。 |
-| [KITAQGB库](https://bartaro.github.io/kitaq-docs/zh-CN/gb-library.html) | Game Boy支持库。 |
-| [KOKURA](https://bartaro.github.io/kitaq-docs/zh-CN/kokura.html) | 执行、输入、观察与记录。 |
-| [KITAQFC](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqfc.html) | Famicom/NES语法、内建操作与构建。 |
-| [KITAQFC库](https://bartaro.github.io/kitaq-docs/zh-CN/fc-library.html) | Famicom/NES支持库。 |
-| [KUROSAKI](https://bartaro.github.io/kitaq-docs/zh-CN/kurosaki.html) | 执行、保存与分析。 |
-| [SARAKURA](https://bartaro.github.io/kitaq-docs/zh-CN/sarakura.html) | 诊断与复测。 |
-| [验证记录](https://bartaro.github.io/kitaq-docs/zh-CN/verification.html) | 实际构建、运行及图像比较结果。 |
 
 ## HTML手册
 

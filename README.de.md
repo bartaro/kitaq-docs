@@ -7,18 +7,18 @@
 
 Tragen Sie die Anforderungen ein und geben Sie den vollständigen Prompt an Ihre KI weiter. Er umfasst die Implementierung, Emulator-Tests, die Analyse mit SARAKURA und die erneute Prüfung nach Korrekturen.
 
-[KITAQGB](https://bartaro.github.io/kitaq-docs/de/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/de/loop-engineering.html#fc)
+KITAQGB · KITAQFC
 <!-- ai-prompts:end -->
 
 ## Direkt zum deutschen Handbuch
 
-- [KITAQGB](https://bartaro.github.io/kitaq-docs/de/kitaqgb.html)
-- [KITAQGB-Bibliothek](https://bartaro.github.io/kitaq-docs/de/gb-library.html)
-- [KOKURA](https://bartaro.github.io/kitaq-docs/de/kokura.html)
-- [KITAQFC](https://bartaro.github.io/kitaq-docs/de/kitaqfc.html)
-- [KITAQFC-Bibliothek](https://bartaro.github.io/kitaq-docs/de/fc-library.html)
-- [KUROSAKI](https://bartaro.github.io/kitaq-docs/de/kurosaki.html)
-- [SARAKURA](https://bartaro.github.io/kitaq-docs/de/sarakura.html)
+- KITAQGB
+- KITAQGB-Bibliothek
+- KOKURA
+- KITAQFC
+- KITAQFC-Bibliothek
+- KUROSAKI
+- SARAKURA
 
 [Japanische Ausgabe](https://bartaro.github.io/kitaq-docs/) / [Englische Ausgabe](https://bartaro.github.io/kitaq-docs/en/) / [Repositorys beziehen und anordnen](GITHUB_SETUP.md)
 

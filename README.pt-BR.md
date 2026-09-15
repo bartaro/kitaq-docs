@@ -7,7 +7,7 @@
 
 Preencha os requisitos e envie o prompt completo ao assistente de IA. Ele abrange implementação, testes no emulador, análise com SARAKURA e verificação das correções.
 
-[KITAQGB](https://bartaro.github.io/kitaq-docs/pt/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/pt/loop-engineering.html#fc)
+KITAQGB · KITAQFC
 <!-- ai-prompts:end -->
 
 ## Abrir o manual de cada ferramenta
@@ -16,14 +16,6 @@ Os links abaixo levam diretamente ao volume em português brasileiro.
 
 | Volume | Conteúdo |
 | --- | --- |
-| [KITAQGB](https://bartaro.github.io/kitaq-docs/pt/kitaqgb.html) | Sintaxe, operações intrínsecas e compilação para Game Boy. |
-| [Biblioteca KITAQGB](https://bartaro.github.io/kitaq-docs/pt/gb-library.html) | Funções das bibliotecas para Game Boy. |
-| [KOKURA](https://bartaro.github.io/kitaq-docs/pt/kokura.html) | Execução, entrada, observação e gravação. |
-| [KITAQFC](https://bartaro.github.io/kitaq-docs/pt/kitaqfc.html) | Sintaxe, operações intrínsecas e compilação para Famicom/NES. |
-| [Biblioteca KITAQFC](https://bartaro.github.io/kitaq-docs/pt/fc-library.html) | Funções das bibliotecas para Famicom/NES. |
-| [KUROSAKI](https://bartaro.github.io/kitaq-docs/pt/kurosaki.html) | Execução, salvamento e análise. |
-| [SARAKURA](https://bartaro.github.io/kitaq-docs/pt/sarakura.html) | Diagnósticos e repetição de testes. |
-| [Verificação](https://bartaro.github.io/kitaq-docs/pt/verification.html) | Registros de compilação, execução e comparação de imagens. |
 
 ## Manuais em HTML
 

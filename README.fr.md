@@ -7,7 +7,7 @@
 
 Renseignez les besoins, puis transmettez le prompt complet à votre assistant IA. Il couvre l’implémentation, les tests dans l’émulateur, l’analyse avec SARAKURA et la vérification des corrections.
 
-[KITAQGB](https://bartaro.github.io/kitaq-docs/fr/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/fr/loop-engineering.html#fc)
+KITAQGB · KITAQFC
 <!-- ai-prompts:end -->
 
 ## Manuels HTML
@@ -18,14 +18,6 @@ Les extraits source et les sorties enregistrées des outils sont conservés sans
 
 | Volume en français | Contenu |
 | --- | --- |
-| [KITAQGB](https://bartaro.github.io/kitaq-docs/fr/kitaqgb.html) | Syntaxe, fonctions intrinsèques et compilation |
-| [Bibliothèque KITAQGB](https://bartaro.github.io/kitaq-docs/fr/gb-library.html) | Bibliothèques GB/CGB |
-| [KOKURA](https://bartaro.github.io/kitaq-docs/fr/kokura.html) | Exécution, commandes, observation et enregistrement |
-| [KITAQFC](https://bartaro.github.io/kitaq-docs/fr/kitaqfc.html) | Syntaxe, fonctions intrinsèques et compilation |
-| [Bibliothèque KITAQFC](https://bartaro.github.io/kitaq-docs/fr/fc-library.html) | Bibliothèques NES/Famicom |
-| [KUROSAKI](https://bartaro.github.io/kitaq-docs/fr/kurosaki.html) | Exécution, sauvegarde et analyse |
-| [SARAKURA](https://bartaro.github.io/kitaq-docs/fr/sarakura.html) | Diagnostics et nouveaux tests |
-| [Vérifications](https://bartaro.github.io/kitaq-docs/fr/verification.html) | Compilations, exécutions et comparaisons de pixels consignées |
 
 Le sommaire et le début du volume 1 expliquent les deux sens du nom et mentionnent NORCAL. Les lettres, chiffres et symboles utilisent le fichier fourni `samples/assets/ascii.c`. Les ressources GB sont réordonnées selon les codes ASCII ; les ressources FC sont converties dans les plans de bits NES. Les dessins des glyphes restent inchangés.
 

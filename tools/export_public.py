@@ -13,6 +13,7 @@ import stat
 import subprocess
 from public_presentation import SITE, normalize, public_file
 from publication_languages import ACTIVE_LANGUAGES, PAUSED_LANGUAGES
+from languages import refresh_language_navigation
 
 
 def digest(path):
@@ -79,13 +80,21 @@ def main():
         if digest(target) != expected:
             raise ValueError('Export hash mismatch: ' + name)
         copied.append({'path': name, 'sha256': expected})
+    # A visibility change may update the navigation of paused editions, but must
+    # never regenerate or replace their translated body content.
+    navigation_updated=[]
+    for language in PAUSED_LANGUAGES:
+        for page in (destination/language).glob('*.html'):
+            check_path(page,destination)
+            if refresh_language_navigation(page,language):
+                navigation_updated.append(page.relative_to(destination).as_posix())
     ignore = destination / '.gitignore'
     marker = '# Local verification records are not public documentation.'
     text = ignore.read_text(encoding='utf-8') if ignore.exists() else ''
     if marker not in text:
         text += '\n' + marker + '\n/verification/**/*.txt\n/verification/**/*.log\n/verification/**/*.json\n/verification/**/*.md\n'
         ignore.write_text(text, encoding='utf-8')
-    manifest = {'active_languages': ACTIVE_LANGUAGES, 'preserved_languages': PAUSED_LANGUAGES,
+    manifest = {'active_languages': ACTIVE_LANGUAGES, 'preserved_languages': PAUSED_LANGUAGES, 'navigation_updated': navigation_updated,
                 'copied': copied, 'removed': removed, 'protected_evidence_backup_verified': True}
     args.manifest.parent.mkdir(parents=True, exist_ok=True)
     args.manifest.write_text(json.dumps(manifest, indent=2), encoding='utf-8')

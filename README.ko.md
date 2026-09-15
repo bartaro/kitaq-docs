@@ -7,7 +7,7 @@
 
 요구 사항을 작성한 뒤 프롬프트 전체를 AI에 전달하세요. 구현, 에뮬레이터 테스트, SARAKURA 분석, 수정 후 재검증까지 다룹니다.
 
-[KITAQGB](https://bartaro.github.io/kitaq-docs/ko/loop-engineering.html#gb) · [KITAQFC](https://bartaro.github.io/kitaq-docs/ko/loop-engineering.html#fc)
+KITAQGB · KITAQFC
 <!-- ai-prompts:end -->
 
 ## 도구별 설명서 바로 열기
@@ -16,14 +16,6 @@
 
 | 설명서 | 내용 |
 | --- | --- |
-| [KITAQGB](https://bartaro.github.io/kitaq-docs/ko/kitaqgb.html) | 게임보이용 문법, 내장 연산, 빌드 방법. |
-| [KITAQGB 라이브러리](https://bartaro.github.io/kitaq-docs/ko/gb-library.html) | 게임보이용 라이브러리 함수. |
-| [KOKURA](https://bartaro.github.io/kitaq-docs/ko/kokura.html) | 실행, 입력, 관찰, 기록. |
-| [KITAQFC](https://bartaro.github.io/kitaq-docs/ko/kitaqfc.html) | 패미컴/NES용 문법, 내장 연산, 빌드 방법. |
-| [KITAQFC 라이브러리](https://bartaro.github.io/kitaq-docs/ko/fc-library.html) | 패미컴/NES용 라이브러리 함수. |
-| [KUROSAKI](https://bartaro.github.io/kitaq-docs/ko/kurosaki.html) | 실행, 저장, 분석. |
-| [SARAKURA](https://bartaro.github.io/kitaq-docs/ko/sarakura.html) | 진단과 재검증. |
-| [검증 기록](https://bartaro.github.io/kitaq-docs/ko/verification.html) | 빌드, 실행, 화면 비교 결과. |
 
 ## HTML 설명서
 
