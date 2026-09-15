@@ -16,7 +16,7 @@ class Text(HTMLParser):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--browser',action='store_true')
-    parser.add_argument('--suite',choices=['input','padrepeat','expansion','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library'],default='input');args=parser.parse_args()
+    parser.add_argument('--suite',choices=['input','padrepeat','expansion','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros'],default='input');args=parser.parse_args()
     messages,ui,contracts=api_contracts.load()
     inputs={key:value for key,value in contracts.items() if value['review']==args.suite+'-source-20260915'}
     results=[]
@@ -43,7 +43,7 @@ def main():
                         for message in additional['expected']:assert messages[message][index].replace('`','') in content,(language,key,message)
                     assert 'verification.html#api-'+platform+'-'+name in card,(language,key,'proof link')
                     results.append({'language':language,'api':key,'card':'passed'})
-    assert len(results)==len(inputs)*9 and len(inputs)=={'input':35,'padrepeat':6,'expansion':6,'vram':30,'vram-memory':9,'vramq':10,'cgb-palette':28,'cgb-dma-wram':8,'asset':17,'bank':32,'sprite':28,'oam':1,'fc-oam':9,'oam-library':8}[args.suite], len(results)
+    assert len(results)==len(inputs)*9 and len(inputs)=={'input':35,'padrepeat':6,'expansion':6,'vram':30,'vram-memory':9,'vramq':10,'cgb-palette':28,'cgb-dma-wram':8,'asset':17,'bank':32,'sprite':28,'oam':1,'fc-oam':9,'oam-library':8,'vram-macros':5}[args.suite], len(results)
     modules=json.loads((api_contracts.SOURCE/(args.suite+'_modules.json')).read_text(encoding='utf-8')) if args.suite in ['input','vram','cgb-palette','asset','bank','sprite','oam-library'] else {}
     module_count=0
     for index,language in enumerate(api_contracts.ORDER):
@@ -74,6 +74,7 @@ def main():
                 if args.suite=='bank':cases=[('gb','gb-library','far_call'),('gb','kitaqgb','__farcall_ptr'),('fc','fc-library','farptr_read16'),('fc','kitaqfc','__prg_bank_set')]
                 if args.suite=='sprite':cases=[('gb','gb-library','sprite_set_flags'),('gb','gb-library','metasprite_draw'),('fc','fc-library','sprite_set_pos'),('fc','fc-library','sprite_max_scanline_count')]
                 if args.suite=='oam':cases=[('gb','kitaqgb','__oam_dma')]
+                if args.suite=='vram-macros':cases=[('fc','fc-library',name) for name in ['nes_vram_copy','nes_vram_commit','nes_vram_clear_queue']]
                 if args.suite=='oam-library':cases=[('fc','fc-library',name) for name in ['nes_oam_dma','nes_metasprite_draw','OAM_FairDraw']]
                 if args.suite=='fc-oam':cases=[('fc','kitaqfc',name) for name in ['__sprite_set','__metasprite_draw','__oam_dma_page']]
                 for platform,volume,name in cases:
@@ -96,7 +97,7 @@ def main():
             browser.close()
     report={'cards':results,'module_introductions':module_count,'browser':browser_results,'status':'passed'}
     report_name='document_checks.json' if args.browser else 'static_document_checks.json'
-    evidence_folder={'input':'api-input','padrepeat':'api-pad-repeat','expansion':'api-expansion-input','vram':'api-vram','vram-memory':'api-vram-memory','vramq':'api-vramq','cgb-palette':'api-cgb-palette','cgb-dma-wram':'api-cgb-dma-wram','asset':'api-asset','bank':'api-bank','sprite':'api-sprite','oam':'api-oam','fc-oam':'api-fc-oam','oam-library':'api-oam-library'}[args.suite]
+    evidence_folder={'input':'api-input','padrepeat':'api-pad-repeat','expansion':'api-expansion-input','vram':'api-vram','vram-memory':'api-vram-memory','vramq':'api-vramq','cgb-palette':'api-cgb-palette','cgb-dma-wram':'api-cgb-dma-wram','asset':'api-asset','bank':'api-bank','sprite':'api-sprite','oam':'api-oam','fc-oam':'api-fc-oam','oam-library':'api-oam-library','vram-macros':'api-vram-macros'}[args.suite]
     (SITE/'verification'/evidence_folder/report_name).write_text(json.dumps(report,indent=2),encoding='utf-8')
     print(str(len(results))+' localized cards; '+str(len(browser_results))+' browser image/return checks passed.')
 

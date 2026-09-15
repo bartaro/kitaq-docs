@@ -95,7 +95,7 @@ def render(record, contract, language, messages, ui):
         if record.get('implementation_source'):
             origin = record['implementation_source']
             out.append('<p class="source">'+html.escape(origin['path'])+':'+str(origin['line'])+'</p>')
-        out.append(code(record['implementation_excerpt'], 'csharp'))
+        out.append(code(record['implementation_excerpt'], 'c' if record.get('kind') == 'macro' else 'csharp'))
     out.append('</details></details>')
     return ''.join(out)
 
@@ -143,6 +143,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_vram_examples(contracts))
     proofs.update(verified_vram_examples(contracts, 'vram-memory', {'gb': {'dmg', 'cgb'}}))
     proofs.update(verified_vram_examples(contracts, 'vramq', {'fc': {'nrom'}}))
+    proofs.update(verified_vram_examples(contracts, 'vram-macros', {'fc': {'nrom'}}))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -260,6 +261,14 @@ def verified_vram_examples(contracts, family='vram', modes=None):
     if not path.exists(): return {}
     runs = json.loads(path.read_text(encoding='utf-8'))['records']
     if len(runs)!=sum(len(values) for values in modes.values()) or not all(r['passed'] for r in runs): return {}
+    if family=='vram-macros':
+        repos=SITE.parents[1]/'publish/github_20260912'
+        if not repos.exists():repos=SITE.parent
+        for run in runs:
+            if run['frames']!=240 or any(run[key]!=0 for key in ['label_pixel_mismatches','geometry_pixel_mismatches','geometry_color_mismatches']):return {}
+            for name,expected in run['library_sha256'].items():
+                source=repos/'kitaqfc/lib'/name
+                if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('VRAM macro source changed: '+name)
     verified = {}
     for key,contract in contracts.items():
         if contract['review']!=family+'-source-20260915': continue
@@ -555,7 +564,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros']:
                 if not example.get('additional'):
                     block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:

@@ -55,6 +55,6 @@ for name,(purpose,args,returns,notes) in rows.items():
     contracts['fc:'+name]=contract;evidence[name]=dict(record_sha256=fingerprint,header=header,implementation=impl)
 (HERE/'oam_library_contracts.json').write_text(json.dumps(contracts,ensure_ascii=False,indent=2),encoding='utf-8')
 (HERE/'oam_library_review_sources.json').write_text(json.dumps(dict(source_sha256={name:hashlib.sha256((REPOS/'kitaqfc/lib'/name).read_bytes()).hexdigest() for name in sources},records=evidence),indent=2),encoding='utf-8')
-(HERE/'oam-library_modules.json').write_text(json.dumps({'fc:nes_game':['ol_macro','ol_headers'],'fc:metasprite':['ol_meta_dual','ol_c_setup'],'fc:oam_fair':['ol_fair','ol_fair_setup']},indent=2),encoding='utf-8')
+(HERE/'oam-library_modules.json').write_text(json.dumps({'fc:nes_game':['vm_module','ol_headers'],'fc:metasprite':['ol_meta_dual','ol_c_setup'],'fc:oam_fair':['ol_fair','ol_fair_setup']},indent=2),encoding='utf-8')
 inventory.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
 print('8 OAM library contracts bound to source; both forms of two shared names included.')
