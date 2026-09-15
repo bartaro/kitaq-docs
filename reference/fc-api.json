@@ -4140,7 +4140,8 @@
         "path": "kitaq-docs/samples/fc_sprite.c",
         "line": 13,
         "code": "    __palette_sp_load(manual_pal); __sprite_set(0,70,80,65,0);\n    __ppu_mask_set(0x1E);\n    while (1) { m_wait(); __oam_dma(); }\n}"
-      }
+      },
+      "implementation_excerpt": "case \"__oam_dma\": if (!Need(0)) return true; EmitAsm(\"LDA\", Imm(0)); EmitAsm(\"STA\", Mem(0x2003)); EmitAsm(\"LDA\", Imm(0x02)); EmitAsm(\"STA\", Mem(0x4014)); return true;"
     },
     {
       "name": "__oam_dma_page",
@@ -4156,7 +4157,8 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_oam_dma_page(u8 page) {\n    __oam_dma_page(page);\n}"
+      "new_example": "void example_oam_dma_page(u8 page) {\n    __oam_dma_page(page);\n}",
+      "implementation_excerpt": "case \"__oam_dma_page\": if (!Need(1)) return true; EmitAsm(\"LDA\", Imm(0)); EmitAsm(\"STA\", Mem(0x2003)); Load1(args[0]); EmitAsm(\"STA\", Mem(0x4014)); return true;"
     },
     {
       "name": "__oam_clear",
@@ -4172,7 +4174,8 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__oam_clear();"
+      "new_example": "__oam_clear();",
+      "implementation_excerpt": "EmitHelperStart(\"__oam_clear\");\n            EmitAsm(\"LDX\", Imm(0));\n            EmitAsm(\"LDA\", Imm(0xF0));\n            string loop = NewGeneratedLabel(\"oam_clear_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"STA\", new AsmOperand(0x0200, AddressMode.AbsoluteX));\n            EmitAsm(\"INX\"); EmitAsm(\"INX\"); EmitAsm(\"INX\"); EmitAsm(\"INX\");\n            EmitAsm(\"BNE\", Rel(loop));\n            EmitAsm(\"RTS\");"
     },
     {
       "name": "__sprite_set",
@@ -4191,7 +4194,8 @@
         "path": "kitaq-docs/samples/fc_sprite.c",
         "line": 11,
         "code": "    m_init();\n    m_text(2,3,\"SPRITE\");\n    __palette_sp_load(manual_pal); __sprite_set(0,70,80,65,0);\n    __ppu_mask_set(0x1E);\n    while (1) { m_wait(); __oam_dma(); }\n}"
-      }
+      },
+      "implementation_excerpt": "EmitHelperStart(\"__sprite_set\");\n            EmitSpriteIndexToX();\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2)); EmitAsm(\"STA\", new AsmOperand(OamRamBase + 0, AddressMode.AbsoluteX));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3)); EmitAsm(\"STA\", new AsmOperand(OamRamBase + 1, AddressMode.AbsoluteX));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 4)); EmitAsm(\"STA\", new AsmOperand(OamRamBase + 2, AddressMode.AbsoluteX));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", new AsmOperand(OamRamBase + 3, AddressMode.AbsoluteX));\n            EmitAsm(\"RTS\");"
     },
     {
       "name": "__sprite_move",
@@ -4210,7 +4214,8 @@
         "path": "kitaqfc/lib/sprite.c",
         "line": 67,
         "code": "    kq_sprite_x[id] = x;\n    kq_sprite_y[id] = y;\n    __sprite_move(id, x, y);\n}\n\n// Replace the tile byte of a valid OAM slot without changing allocation state.\nvoid sprite_set_tile(u8 id, u8 tile)"
-      }
+      },
+      "implementation_excerpt": "EmitHelperStart(\"__sprite_move\");\n            EmitSpriteIndexToX();\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2)); EmitAsm(\"STA\", new AsmOperand(OamRamBase + 0, AddressMode.AbsoluteX));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", new AsmOperand(OamRamBase + 3, AddressMode.AbsoluteX));\n            EmitAsm(\"RTS\");"
     },
     {
       "name": "__sprite_tile",
@@ -4229,7 +4234,8 @@
         "path": "kitaqfc/lib/sprite.c",
         "line": 74,
         "code": "{\n    if (sprite_valid(id) == 0) return;\n    __sprite_tile(id, tile);\n}\n\n// Replace the hardware attribute byte of a valid OAM slot.\nvoid sprite_set_flags(u8 id, u8 flags)"
-      }
+      },
+      "implementation_excerpt": "EmitHelperStart(\"__sprite_tile\");\n            EmitSpriteIndexToX();\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", new AsmOperand(OamRamBase + 1, AddressMode.AbsoluteX));\n            EmitAsm(\"RTS\");"
     },
     {
       "name": "__sprite_attr",
@@ -4248,7 +4254,8 @@
         "path": "kitaqfc/lib/sprite.c",
         "line": 81,
         "code": "{\n    if (sprite_valid(id) == 0) return;\n    __sprite_attr(id, flags);\n}\n\n// Mark the software position off screen and hide its OAM entry without freeing it.\nvoid sprite_hide(u8 id)"
-      }
+      },
+      "implementation_excerpt": "EmitHelperStart(\"__sprite_attr\");\n            EmitSpriteIndexToX();\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", new AsmOperand(OamRamBase + 2, AddressMode.AbsoluteX));\n            EmitAsm(\"RTS\");"
     },
     {
       "name": "__sprite_hide",
@@ -4267,7 +4274,8 @@
         "path": "kitaqfc/lib/sprite.c",
         "line": 29,
         "code": "        kq_sprite_x[i] = 0;\n        kq_sprite_y[i] = 0;\n        __sprite_hide(i);\n        i = (u8)(i + 1);\n    }\n}\n"
-      }
+      },
+      "implementation_excerpt": "EmitHelperStart(\"__sprite_hide\");\n            EmitSpriteIndexToX();\n            EmitAsm(\"LDA\", Imm(0xF0)); EmitAsm(\"STA\", new AsmOperand(OamRamBase + 0, AddressMode.AbsoluteX));\n            EmitAsm(\"RTS\");"
     },
     {
       "name": "__metasprite_draw",
@@ -4283,7 +4291,8 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_metasprite_draw(u8 oam_index, u8 base_x, u8 base_y, const u8* metasprite) {\n    return __metasprite_draw(oam_index, base_x, base_y, metasprite);\n}"
+      "new_example": "u8 example_metasprite_draw(u8 oam_index, u8 base_x, u8 base_y, const u8* metasprite) {\n    return __metasprite_draw(oam_index, base_x, base_y, metasprite);\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__metasprite_draw\");\n            // args: oam_index, base_x, base_y, metasprite_ptr16.\n            // stream: dx, dy, tile, attr ... dx=$FF terminates. Returns next OAM index in A.\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"ASL\");\n            EmitAsm(\"ASL\");\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp2Address)); // dst byte offset\n            string msLoop = NewGeneratedLabel(\"metasprite_loop\");\n            string msDone = NewGeneratedLabel(\"metasprite_done\");\n            _assembly.Add(Expr.Make(Tag.Label, msLoop));\n            EmitAsm(\"LDY\", Imm(0));\n            EmitAsm(\"LDA\", IndY(CallArgBase + 3));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(msDone));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address)); // dx\n            EmitAsm(\"LDX\", Mem(_runtimeIntrinsicTmp2Address));\n            EmitAsm(\"INY\");\n            EmitAsm(\"LDA\", IndY(CallArgBase + 3));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Mem(CallArgBase + 2));\n            EmitAsm(\"STA\", new AsmOperand(OamRamBase + 0, AddressMode.AbsoluteX));\n            EmitAsm(\"INY\");\n            EmitAsm(\"LDA\", IndY(CallArgBase + 3));\n            EmitAsm(\"STA\", new AsmOperand(OamRamBase + 1, AddressMode.AbsoluteX));\n            EmitAsm(\"INY\");\n            EmitAsm(\"LDA\", IndY(CallArgBase + 3));\n            EmitAsm(\"STA\", new AsmOperand(OamRamBase + 2, AddressMode.AbsoluteX));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", new AsmOperand(OamRamBase + 3, AddressMode.AbsoluteX));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp2Address));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Imm(4));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp2Address));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Imm(4));\n            EmitAsm(\"STA\", Mem(CallArgBase + 3));\n            // Propagate stream-pointer page carry after consuming the complete four-byte record.\n            string msPtrOk = NewGeneratedLabel(\"metasprite_ptr_ok\");\n            EmitAsm(\"BCC\", Rel(msPtrOk));\n            EmitAsm(\"INC\", Mem(CallArgBase + 4));\n            _assembly.Add(Expr.Make(Tag.Label, msPtrOk));\n            EmitAsm(\"JMP\", Abs(msLoop));\n            _assembly.Add(Expr.Make(Tag.Label, msDone));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp2Address));\n            EmitAsm(\"LSR\");\n            EmitAsm(\"LSR\");\n            EmitAsm(\"RTS\");"
     },
     {
       "name": "__pad_read1",
