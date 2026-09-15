@@ -149,6 +149,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_vram_examples(contracts, 'vram-macros', {'fc': {'nrom'}}))
     proofs.update(verified_runtime_queue_examples(contracts))
     proofs.update(verified_runtime_ppu_examples(contracts))
+    proofs.update(verified_ppu_declaration_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -266,7 +267,7 @@ def verified_vram_examples(contracts, family='vram', modes=None):
     if not path.exists(): return {}
     runs = json.loads(path.read_text(encoding='utf-8'))['records']
     if len(runs)!=sum(len(values) for values in modes.values()) or not all(r['passed'] for r in runs): return {}
-    if family in ['vram-macros','runtime-queue','runtime-ppu']:
+    if family in ['vram-macros','runtime-queue','runtime-ppu','ppu-declarations']:
         repos=SITE.parents[1]/'publish/github_20260912'
         if not repos.exists():repos=SITE.parent
         for run in runs:
@@ -341,6 +342,41 @@ def verified_runtime_ppu_examples(contracts):
         selected=[r for r in runs if r['source'] in programs]
         if len(selected)!=len(programs):raise ValueError('Missing PPU API form: '+key)
         result[key]=dict(api=key.split(':')[1],kind='runtime-ppu',runs=selected,state_path='verification/api-runtime-ppu/state_checks.json',state_count=14)
+    return result
+
+
+def verified_ppu_declaration_examples(contracts):
+    """Separate expected unresolved symbols from successful alternative execution."""
+    folder=SITE/'verification/api-ppu-declarations'
+    if not (folder/'results.json').exists() or not (folder/'state_checks.json').exists():return {}
+    runs=json.loads((folder/'results.json').read_text(encoding='utf-8'))['records']
+    state=json.loads((folder/'state_checks.json').read_text(encoding='utf-8'))
+    if len(runs)!=1 or not runs[0]['passed']:return {}
+    if len(state['declarations'])!=4 or len(state['alternatives'])!=4:return {}
+    for row in state['declarations']:
+        if not row['passed'] or row['build_exit']==0 or not row['diagnostic_present'] or row['rom_created']:return {}
+        case=folder/'declarations'/row['name']
+        if row['expected_diagnostic'] not in (case/'build.txt').read_text(encoding='utf-8',errors='replace'):return {}
+        if hashlib.sha256((case/'case.c').read_bytes()).hexdigest()!=row['source_sha256']:raise ValueError('Declaration build source changed')
+    if not all(r['passed'] and r['actual']==r['expected'] for r in state['alternatives']):return {}
+    repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    for name,expected in state['library_sha256'].items():
+        source=repos/'kitaqfc/lib'/name
+        if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('PPU declaration source changed: '+name)
+    script=repos/'kitaqfc/scripts/test-ppu-declarations.py'
+    if script.exists() and hashlib.sha256(script.read_bytes()).hexdigest()!=state['script_sha256']:raise ValueError('Declaration test script changed')
+    run=runs[0]
+    if run['frames']!=240 or run['geometry_pixels_checked']!=34816 or any(run[k]!=0 for k in ['label_pixel_mismatches','geometry_pixel_mismatches','geometry_color_mismatches','ppu_writes_while_rendering']):return {}
+    if run['compiler_sha256']!=state['compiler_sha256'] or run['emulator_sha256']!=state['emulator_sha256'] or run['library_sha256']!=state['library_sha256']:return {}
+    for name,expected in {run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}.items():
+        if hashlib.sha256((SITE/name).read_bytes()).hexdigest()!=expected:raise ValueError('Alternative image/source changed: '+name)
+    result={}
+    for key,contract in contracts.items():
+        if contract['review']!='ppu-declarations-source-20260915':continue
+        if contract['example']['program']!=run['source']:raise ValueError('Alternative program mismatch')
+        name=key.split(':')[1]
+        result[key]=dict(api=name,kind='ppu-declarations',runs=runs,state_path='verification/api-ppu-declarations/state_checks.json',state_count=8,declaration_path='verification/api-ppu-declarations/declarations/'+name+'/build.txt')
     return result
 
 
@@ -621,7 +657,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue','runtime-ppu']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue','runtime-ppu','ppu-declarations']:
                 if not example.get('additional'):
                     block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
@@ -636,6 +672,8 @@ def publish_verification(language, contracts, proofs, messages, ui):
                 records_path = 'verification/api-'+result['kind']+'/results.json'
                 if result.get('diagnostics_path'):
                     block.append('<p><a href="'+prefix+result['diagnostics_path']+'">KQ2102 / KQ2103</a></p>')
+                if result.get('declaration_path'):
+                    block.append('<p><a href="'+prefix+result['declaration_path']+'">'+html.escape(messages['pd_rejected_build'][index])+'</a></p>')
                 if result.get('state_path'):
                     block.append('<p><a href="'+prefix+result['state_path']+'">'+html.escape(messages['verification_records'][index])+' ('+str(result['state_count'])+')</a></p>')
                 block.append('<p><a href="'+prefix+example['program']+'">'+html.escape(ui['download'][index])+'</a> · <a href="'+prefix+records_path+'">'+html.escape(messages['verification_records'][index])+'</a></p></section>')

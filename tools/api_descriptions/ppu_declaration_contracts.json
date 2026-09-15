@@ -1,0 +1,111 @@
+{
+  "fc:nes_ppu_screen_off": {
+    "review": "ppu-declarations-source-20260915",
+    "purpose": [
+      "pd_off"
+    ],
+    "args": [],
+    "returns": [
+      "pd_return"
+    ],
+    "notes": [
+      "pd_scope"
+    ],
+    "record_sha256": "7f2dfb21b0dc7c0bdfec76dad6403db26f11acdd7cf79c533b2f36dde3f38d20",
+    "example": {
+      "program": "samples/api-examples/fc/ppu_implemented.c",
+      "code": "// Use the implemented intrinsic; nes_ppu_screen_off has no function body.\n__ppu_off();__ppu_ctrl_set(0); // Also disable NMI for this bulk preparation.",
+      "expected": [
+        "pd_scene"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\ppu_implemented.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\ppu_implemented.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_ppu_screen_on": {
+    "review": "ppu-declarations-source-20260915",
+    "purpose": [
+      "pd_on"
+    ],
+    "args": [
+      [
+        "ctrl / mask",
+        [
+          "pd_controls"
+        ]
+      ]
+    ],
+    "returns": [
+      "pd_return"
+    ],
+    "notes": [
+      "pd_scope"
+    ],
+    "record_sha256": "96b50a63610fff717a9e359a1f56321c4dba35206718443924a538f39cc8c080",
+    "example": {
+      "program": "samples/api-examples/fc/ppu_implemented.c",
+      "code": "__scroll_set(0,0);__ppu_ctrl_set(0x80);__ppu_mask_set(0x0A);\n// NMI and background rendering are now enabled, with left-edge background visible.",
+      "expected": [
+        "pd_scene"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\ppu_implemented.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\ppu_implemented.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_ppu_load_palette": {
+    "review": "ppu-declarations-source-20260915",
+    "purpose": [
+      "pd_palette"
+    ],
+    "args": [
+      [
+        "pal32",
+        [
+          "pd_pal_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "pd_return"
+    ],
+    "notes": [
+      "pd_scope"
+    ],
+    "record_sha256": "b0854715beadb4a0e1b67f64b2692ffebff05fdd2220edbeefc8a1ec4ceca298",
+    "example": {
+      "program": "samples/api-examples/fc/ppu_implemented.c",
+      "code": "__palette_bg_load(stream_palette); // Sixteen background palette bytes.\n__palette_sp_load(stream_palette); // Sixteen sprite palette bytes.\n// Palette reads are immediate; both halves use the same original sample palette.\n__ppu_addr(0x3F00);\nfor(i=0;i<32;i++)if(sample_ppudata!=stream_palette[(u8)(i&15)])failures=1;",
+      "expected": [
+        "pd_scene"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\ppu_implemented.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\ppu_implemented.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_ppu_clear_nt": {
+    "review": "ppu-declarations-source-20260915",
+    "purpose": [
+      "pd_clear"
+    ],
+    "args": [
+      [
+        "nt_base / tile / attr",
+        [
+          "pd_nt_args"
+        ]
+      ]
+    ],
+    "returns": [
+      "pd_return"
+    ],
+    "notes": [
+      "pd_scope"
+    ],
+    "record_sha256": "ffea3d98b511d168a318a9dd73e534e39d605b2837d847a0600349d26b9451a4",
+    "example": {
+      "program": "samples/api-examples/fc/ppu_implemented.c",
+      "code": "__nametable_rect_nt(0,0,0,32,30,0); // All 960 tile cells of nametable zero.\n__vram_fill(0x23C0,0,64); // Its 64 packed attribute bytes are separate.\n// Nametable reads are buffered: discard one read, then inspect all 1024 bytes.\n__ppu_addr(0x2000);discarded_read=sample_ppudata;\nfor(i=0;i<1024;i++)if(sample_ppudata!=0)failures=1;",
+      "expected": [
+        "pd_scene"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\ppu_implemented.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\ppu_implemented.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+    }
+  }
+}
