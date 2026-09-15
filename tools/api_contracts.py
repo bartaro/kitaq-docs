@@ -159,6 +159,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_runtime_ppu_examples(contracts))
     proofs.update(verified_ppu_declaration_examples(contracts))
     proofs.update(verified_ppu_intrinsic_examples(contracts))
+    proofs.update(verified_interrupt_intrinsic_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -638,6 +639,45 @@ def verified_cgb_palette_examples(contracts):
                 if not source.exists() or hashlib.sha256(source.read_bytes()).hexdigest()!=expected:
                     raise ValueError('CGB palette library changed: '+str(source))
         result[key] = {'api':key.split(':')[1],'kind':'cgb-palette','runs':runs}
+    return result
+
+
+def verified_interrupt_intrinsic_examples(contracts):
+    """Require observed mask/counter states and the matching 360-frame screen."""
+    folder = SITE / 'verification/api-interrupt-intrinsics'
+    if not (folder / 'results.json').exists(): return {}
+    state = json.loads((folder / 'state_checks.json').read_text(encoding='utf-8'))
+    if len(state['cases']) != 21 or not all(row['passed'] and row['actual'] == row['expected'] for row in state['cases']):
+        raise ValueError('IRQ/NMI state verification is incomplete')
+    repos = SITE.parents[1] / 'publish/github_20260912'
+    if not repos.exists(): repos = SITE.parent
+    files = {
+        'kitaqfc/scripts/test-interrupt-intrinsics.py': state['script_sha256'],
+        'kitaqfc/kitaqfc.exe': state['compiler_sha256'],
+        'kurosaki/kurosaki.exe': state['emulator_sha256'],
+        'kitaqfc/lib/intrinsics.h': state['header_sha256'],
+    }
+    review = json.loads((SOURCE / 'interrupt_intrinsic_review_sources.json').read_text(encoding='utf-8'))
+    files.update(review['source_sha256'])
+    for name, expected in files.items():
+        path = repos / name
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+            raise ValueError('IRQ/NMI verification source changed: ' + name)
+    runs = json.loads((folder / 'results.json').read_text(encoding='utf-8'))['records']
+    if len(runs) != 1: raise ValueError('IRQ/NMI sample run missing')
+    run = runs[0]
+    if not (run['passed'] and run['frames'] == 360 and run['label_pixel_mismatches'] == 0 and run['color_mismatches'] == 0 and run['colored_pixels'] == 4118 and run['ppu_writes_while_rendering'] == 0):
+        raise ValueError('IRQ/NMI sample screen failed verification')
+    for name, expected in {run['source']: run['source_sha256'], run['image']: run['image_sha256'], **run['support_sha256']}.items():
+        if hashlib.sha256((SITE / name).read_bytes()).hexdigest() != expected:
+            raise ValueError('IRQ/NMI sample evidence changed: ' + name)
+    if run['compiler_sha256'] != state['compiler_sha256'] or run['emulator_sha256'] != state['emulator_sha256'] or run['header_sha256'] != state['header_sha256']:
+        raise ValueError('IRQ/NMI sample and state checks use different tools')
+    result = {}
+    for key, contract in contracts.items():
+        if contract['review'] != 'interrupt-intrinsics-source-20260915': continue
+        if contract['example']['program'] != run['source']: raise ValueError('IRQ/NMI sample mismatch: ' + key)
+        result[key] = {'api': key.split(':')[1], 'kind': 'interrupt-intrinsics', 'runs': runs}
     return result
 
 

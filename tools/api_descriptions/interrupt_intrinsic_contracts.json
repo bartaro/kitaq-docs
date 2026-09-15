@@ -1,0 +1,273 @@
+{
+  "fc:__nmi_enable": {
+    "review": "interrupt-intrinsics-source-20260915",
+    "purpose": [
+      "ni_enable"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "ni_nmi_timing"
+    ],
+    "record_sha256": "326613165255b77d661c9d3188b357a4d6e4a676fb9e7ed200f7527dad4352ef",
+    "example": {
+      "program": "samples/api-examples/fc/interrupt_intrinsics.c",
+      "code": "__nmi_enable(); // Preserve the PPUCTRL shadow's other bits; CPU I stays set.\n__nmi_wait(); // The default NMI handler still runs with IRQ masked.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\interrupt_intrinsics.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\font.chr -o .\\out\\interrupt_intrinsics.nes --no-cache --no-disasm",
+      "expected": [
+        "ni_demo_irq",
+        "ni_demo_nmi"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: NMI",
+        "url": "https://www.nesdev.org/wiki/NMI"
+      },
+      {
+        "title": "NESdev: CPU interrupts",
+        "url": "https://www.nesdev.org/wiki/Interrupts"
+      }
+    ]
+  },
+  "fc:__nmi_disable": {
+    "review": "interrupt-intrinsics-source-20260915",
+    "purpose": [
+      "ni_disable"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "ni_nmi_timing"
+    ],
+    "record_sha256": "9044761e42aaa598a1fbcd5ae2707b7477f16ce54888331a83bc15447cdd8b2d",
+    "example": {
+      "program": "samples/api-examples/fc/interrupt_intrinsics.c",
+      "code": "__nmi_disable();\nbefore_count=__nmi_ready();\nfor(i=0;i<2000;i++)frozen=__nmi_ready();\nfrozen=(u8)(frozen-before_count); // No default-handler advances while off.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\interrupt_intrinsics.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\font.chr -o .\\out\\interrupt_intrinsics.nes --no-cache --no-disasm",
+      "expected": [
+        "ni_demo_irq",
+        "ni_demo_nmi"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: NMI",
+        "url": "https://www.nesdev.org/wiki/NMI"
+      },
+      {
+        "title": "NESdev: CPU interrupts",
+        "url": "https://www.nesdev.org/wiki/Interrupts"
+      }
+    ]
+  },
+  "fc:__nmi_wait": {
+    "review": "interrupt-intrinsics-source-20260915",
+    "purpose": [
+      "ni_wait"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "ni_handler"
+    ],
+    "record_sha256": "baec589840cf478619ee570251f3c02fec930bafdcdc6c6f1351fcf851dc3110",
+    "example": {
+      "program": "samples/api-examples/fc/interrupt_intrinsics.c",
+      "code": "__nmi_wait();__nmi_wait();__nmi_wait();\ndelta=(u8)(__nmi_ready()-before_count); // Three completed default NMIs.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\interrupt_intrinsics.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\font.chr -o .\\out\\interrupt_intrinsics.nes --no-cache --no-disasm",
+      "expected": [
+        "ni_demo_irq",
+        "ni_demo_nmi"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: NMI",
+        "url": "https://www.nesdev.org/wiki/NMI"
+      },
+      {
+        "title": "NESdev: CPU interrupts",
+        "url": "https://www.nesdev.org/wiki/Interrupts"
+      }
+    ]
+  },
+  "fc:__nmi_ready": {
+    "review": "interrupt-intrinsics-source-20260915",
+    "purpose": [
+      "ni_ready"
+    ],
+    "args": [],
+    "returns": [
+      "ni_counter_byte"
+    ],
+    "notes": [
+      "ni_handler"
+    ],
+    "record_sha256": "7f32226ea172b5876ec619977a29a04c3e464aefde1a5b0e4e6c870c40937ea4",
+    "example": {
+      "program": "samples/api-examples/fc/interrupt_intrinsics.c",
+      "code": "before_count=__nmi_ready(); // A wrapping byte, not a Boolean ready flag.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\interrupt_intrinsics.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\font.chr -o .\\out\\interrupt_intrinsics.nes --no-cache --no-disasm",
+      "expected": [
+        "ni_demo_irq",
+        "ni_demo_nmi"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: NMI",
+        "url": "https://www.nesdev.org/wiki/NMI"
+      },
+      {
+        "title": "NESdev: CPU interrupts",
+        "url": "https://www.nesdev.org/wiki/Interrupts"
+      }
+    ]
+  },
+  "fc:__irq_disable": {
+    "review": "interrupt-intrinsics-source-20260915",
+    "purpose": [
+      "ni_irq_disable"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "ni_irq_scope"
+    ],
+    "record_sha256": "d94004d3b89743bbf20c2f09c4318b45f7b1fdc54da7ea7d99b220eff4923ea1",
+    "example": {
+      "program": "samples/api-examples/fc/interrupt_intrinsics.c",
+      "code": "__irq_disable();\ndisabled=(__irq_save()&4)>>2; // The CPU I bit must be 1.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\interrupt_intrinsics.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\font.chr -o .\\out\\interrupt_intrinsics.nes --no-cache --no-disasm",
+      "expected": [
+        "ni_demo_irq",
+        "ni_demo_nmi"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: NMI",
+        "url": "https://www.nesdev.org/wiki/NMI"
+      },
+      {
+        "title": "NESdev: CPU interrupts",
+        "url": "https://www.nesdev.org/wiki/Interrupts"
+      }
+    ]
+  },
+  "fc:__irq_enable": {
+    "review": "interrupt-intrinsics-source-20260915",
+    "purpose": [
+      "ni_irq_enable"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "ni_irq_scope"
+    ],
+    "record_sha256": "d14680a4a7d8b4d7bc1200aab73ad92a00f34ec42397f2f35140e8977297a963",
+    "example": {
+      "program": "samples/api-examples/fc/interrupt_intrinsics.c",
+      "code": "__irq_enable();\nenabled=(__irq_save()&4)>>2; // Save returns the old I bit: 0, then masks IRQ.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\interrupt_intrinsics.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\font.chr -o .\\out\\interrupt_intrinsics.nes --no-cache --no-disasm",
+      "expected": [
+        "ni_demo_irq",
+        "ni_demo_nmi"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: NMI",
+        "url": "https://www.nesdev.org/wiki/NMI"
+      },
+      {
+        "title": "NESdev: CPU interrupts",
+        "url": "https://www.nesdev.org/wiki/Interrupts"
+      }
+    ]
+  },
+  "fc:__irq_save": {
+    "review": "interrupt-intrinsics-source-20260915",
+    "purpose": [
+      "ni_save"
+    ],
+    "args": [],
+    "returns": [
+      "ni_status_byte"
+    ],
+    "notes": [
+      "ni_irq_scope"
+    ],
+    "record_sha256": "1a436c11d081d87dd6b38bad3d3d566237d42c0d9761358a7f17d3b9082a3595",
+    "example": {
+      "program": "samples/api-examples/fc/interrupt_intrinsics.c",
+      "code": "saved_state=__irq_save(); // Save all processor-status bits, then set I.\ninside=(__irq_save()&4)>>2; // IRQ remains masked inside this section.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\interrupt_intrinsics.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\font.chr -o .\\out\\interrupt_intrinsics.nes --no-cache --no-disasm",
+      "expected": [
+        "ni_demo_irq",
+        "ni_demo_nmi"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: NMI",
+        "url": "https://www.nesdev.org/wiki/NMI"
+      },
+      {
+        "title": "NESdev: CPU interrupts",
+        "url": "https://www.nesdev.org/wiki/Interrupts"
+      }
+    ]
+  },
+  "fc:__irq_restore": {
+    "review": "interrupt-intrinsics-source-20260915",
+    "purpose": [
+      "ni_restore"
+    ],
+    "args": [
+      [
+        "state",
+        [
+          "ni_status_byte"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "ni_irq_scope"
+    ],
+    "record_sha256": "f230831177fc3ad10a6c6d901c9bbeca06807cd7af9fe7ed3105d59bccae5a6c",
+    "example": {
+      "program": "samples/api-examples/fc/interrupt_intrinsics.c",
+      "code": "__irq_restore(saved_state); // Restore the caller's original IRQ mask.\nrestored=(__irq_save()&4)>>2; // Original I was 0; this probe masks it again.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\interrupt_intrinsics.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\font.chr -o .\\out\\interrupt_intrinsics.nes --no-cache --no-disasm",
+      "expected": [
+        "ni_demo_irq",
+        "ni_demo_nmi"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: NMI",
+        "url": "https://www.nesdev.org/wiki/NMI"
+      },
+      {
+        "title": "NESdev: CPU interrupts",
+        "url": "https://www.nesdev.org/wiki/Interrupts"
+      }
+    ]
+  }
+}

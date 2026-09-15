@@ -4105,7 +4105,13 @@
         "path": "kitaqfc/lib/sprite.c",
         "line": 102,
         "code": "void sprite_flush_oam(void)\n{\n    __nmi_wait();\n    __oam_dma();\n}\n\n// Read the maintained allocation counter. Metasprite placement also treats it"
-      }
+      },
+      "arity_only": false,
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4509
+      },
+      "implementation_excerpt": "case \"__nmi_wait\": if (!Need(0)) return true; EmitAsm(\"JSR\", Abs(\"__nmi_wait\")); return true;\n                // Return the current NMI counter byte; callers decide how to compare it with their previous value.\n\nvoid EmitHelperNmiWait()\n        {\n            EmitHelperStart(\"__nmi_wait\");\n            EmitAsm(\"LDA\", Mem(_runtimeNmiCounterAddress));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            string loop = NewGeneratedLabel(\"nmi_wait_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", Mem(_runtimeNmiCounterAddress));\n            EmitAsm(\"CMP\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"BEQ\", Rel(loop));\n            EmitAsm(\"RTS\");\n        }\n\n// The default NMI executes the queued VRAM work and increments the runtime frame counter before RTI.\n            if (!_functions.ContainsKey(\"__nes_nmi\"))\n            {\n                EmitPlacement(0, true);\n                _assembly.Add(Expr.Make(Tag.Function, \"__kq_nmi_default\"));\n                // NMI may interrupt argument evaluation, a pointer dispatch or an ordinary expression.\n                // Preserve registers and every shared byte touched by the queue executor; RTI restores P.\n                EmitAsm(\"PHA\"); EmitAsm(\"TXA\"); EmitAsm(\"PHA\"); EmitAsm(\"TYA\"); EmitAsm(\"PHA\");\n                int[] queueScratch = { CallArgBase, CallArgBase + 1, CallArgBase + 2,\n                    _runtimeIntrinsicTmp0Address, _runtimeIntrinsicTmp1Address, _runtimeIntrinsicTmp2Address };\n                foreach (int address in queueScratch) { EmitAsm(\"LDA\", Mem(address)); EmitAsm(\"PHA\"); }\n                EmitAsm(\"JSR\", Abs(\"__vramq_exec\"));\n                EmitAsm(\"INC\", Mem(_runtimeNmiCounterAddress));\n                foreach (int address in queueScratch.Reverse()) { EmitAsm(\"PLA\"); EmitAsm(\"STA\", Mem(address)); }\n                EmitAsm(\"PLA\"); EmitAsm(\"TAY\"); EmitAsm(\"PLA\"); EmitAsm(\"TAX\"); EmitAsm(\"PLA\");\n                EmitAsm(\"RTI\");\n            }"
     },
     {
       "name": "__nmi_ready",
@@ -4121,7 +4127,13 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__nmi_ready();"
+      "new_example": "__nmi_ready();",
+      "arity_only": false,
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4511
+      },
+      "implementation_excerpt": "case \"__nmi_ready\": if (!Need(0)) return true; EmitAsm(\"LDA\", Mem(_runtimeNmiCounterAddress)); return true;\n                // Reset OAMADDR and transfer page 02; the page-selecting variant evaluates its own byte argument.\n\n// The default NMI executes the queued VRAM work and increments the runtime frame counter before RTI.\n            if (!_functions.ContainsKey(\"__nes_nmi\"))\n            {\n                EmitPlacement(0, true);\n                _assembly.Add(Expr.Make(Tag.Function, \"__kq_nmi_default\"));\n                // NMI may interrupt argument evaluation, a pointer dispatch or an ordinary expression.\n                // Preserve registers and every shared byte touched by the queue executor; RTI restores P.\n                EmitAsm(\"PHA\"); EmitAsm(\"TXA\"); EmitAsm(\"PHA\"); EmitAsm(\"TYA\"); EmitAsm(\"PHA\");\n                int[] queueScratch = { CallArgBase, CallArgBase + 1, CallArgBase + 2,\n                    _runtimeIntrinsicTmp0Address, _runtimeIntrinsicTmp1Address, _runtimeIntrinsicTmp2Address };\n                foreach (int address in queueScratch) { EmitAsm(\"LDA\", Mem(address)); EmitAsm(\"PHA\"); }\n                EmitAsm(\"JSR\", Abs(\"__vramq_exec\"));\n                EmitAsm(\"INC\", Mem(_runtimeNmiCounterAddress));\n                foreach (int address in queueScratch.Reverse()) { EmitAsm(\"PLA\"); EmitAsm(\"STA\", Mem(address)); }\n                EmitAsm(\"PLA\"); EmitAsm(\"TAY\"); EmitAsm(\"PLA\"); EmitAsm(\"TAX\"); EmitAsm(\"PLA\");\n                EmitAsm(\"RTI\");\n            }"
     },
     {
       "name": "__nmi_enable",
@@ -4140,7 +4152,13 @@
         "path": "kitaqfc/lib/system.c",
         "line": 12,
         "code": "    system_vblank_callback = 0;\n    // NMI waits require a running PPU and its enabled NMI source, independently of the CPU IRQ mask.\n    __nmi_enable();\n}\n\n// Wait for NMI and count the completed wait. Unlike the GB implementation, this\n// FC wrapper does not invoke the callback stored by system_set_vblank_callback."
-      }
+      },
+      "arity_only": false,
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4498
+      },
+      "implementation_excerpt": "case \"__nmi_enable\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(_runtimePpuCtrlShadowAddress)); EmitAsm(\"ORA\", Imm(0x80)); EmitAsm(\"STA\", Mem(_runtimePpuCtrlShadowAddress)); EmitAsm(\"STA\", Mem(0x2000)); return true;"
     },
     {
       "name": "__nmi_disable",
@@ -4156,7 +4174,13 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__nmi_disable();"
+      "new_example": "__nmi_disable();",
+      "arity_only": false,
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4501
+      },
+      "implementation_excerpt": "case \"__nmi_disable\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(_runtimePpuCtrlShadowAddress)); EmitAsm(\"AND\", Imm(0x7F)); EmitAsm(\"STA\", Mem(_runtimePpuCtrlShadowAddress)); EmitAsm(\"STA\", Mem(0x2000)); return true;"
     },
     {
       "name": "__irq_disable",
@@ -4175,7 +4199,13 @@
         "path": "kitaqfc/lib/system.c",
         "line": 51,
         "code": "void system_disable_interrupts(void)\n{\n    __irq_disable();\n}"
-      }
+      },
+      "arity_only": false,
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4504
+      },
+      "implementation_excerpt": "case \"__irq_disable\": if (!Need(0)) return true; EmitAsm(\"SEI\"); return true;"
     },
     {
       "name": "__irq_enable",
@@ -4194,7 +4224,13 @@
         "path": "kitaqfc/lib/system.c",
         "line": 45,
         "code": "void system_enable_interrupts(void)\n{\n    __irq_enable();\n}\n\n// Disable maskable CPU IRQs; this does not disable the PPU's NMI source.\nvoid system_disable_interrupts(void)"
-      }
+      },
+      "arity_only": false,
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4505
+      },
+      "implementation_excerpt": "case \"__irq_enable\": if (!Need(0)) return true; EmitAsm(\"CLI\"); return true;\n                // Return the saved processor status in A after masking IRQs; restore consumes a status byte, not a Boolean."
     },
     {
       "name": "__irq_save",
@@ -4210,7 +4246,13 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__irq_save();"
+      "new_example": "__irq_save();",
+      "arity_only": false,
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4507
+      },
+      "implementation_excerpt": "case \"__irq_save\": if (!Need(0)) return true; EmitAsm(\"PHP\"); EmitAsm(\"SEI\"); EmitAsm(\"PLA\"); return true;"
     },
     {
       "name": "__irq_restore",
@@ -4226,7 +4268,13 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_irq_restore(u8 state) {\n    __irq_restore(state);\n}"
+      "new_example": "void example_irq_restore(u8 state) {\n    __irq_restore(state);\n}",
+      "arity_only": false,
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4508
+      },
+      "implementation_excerpt": "case \"__irq_restore\": if (!Need(1)) return true; Load1(args[0]); EmitAsm(\"PHA\"); EmitAsm(\"PLP\"); return true;"
     },
     {
       "name": "__oam_dma",
