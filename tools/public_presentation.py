@@ -8,9 +8,10 @@ import html
 import json
 import re
 from urllib.parse import urlsplit, unquote
+from publication_languages import ORDER, ACTIVE_LANGUAGES
 
 SITE = Path(__file__).resolve().parents[1]
-LANGUAGES = ['en', 'ja', 'ko', 'zh-CN', 'zh-TW', 'es', 'pt', 'fr', 'de']
+LANGUAGES = ORDER
 PUBLIC_EVIDENCE_SUFFIXES = {'.png', '.gb', '.nes', '.c', '.html'}
 INTRO = [
     'Captured emulator screens appear beside the sample explanations. Compare the output with the stated expected result; a screen alone does not verify sound, controller input, peripherals or physical hardware.',
@@ -52,6 +53,8 @@ def private_link(page, url):
 
 
 def normalize(language):
+    if language not in ACTIVE_LANGUAGES:
+        raise ValueError('Updates are paused for this edition: ' + language)
     index = LANGUAGES.index(language)
     folder = SITE if language == 'ja' else SITE / language
     prefix = '' if language == 'ja' else '../'
@@ -101,5 +104,5 @@ def normalize(language):
 
 
 if __name__ == '__main__':
-    for language in LANGUAGES:
+    for language in ACTIVE_LANGUAGES:
         normalize(language)

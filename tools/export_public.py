@@ -11,7 +11,8 @@ from pathlib import Path
 import shutil
 import stat
 import subprocess
-from public_presentation import SITE, LANGUAGES, normalize, public_file
+from public_presentation import SITE, normalize, public_file
+from publication_languages import ACTIVE_LANGUAGES, PAUSED_LANGUAGES
 
 
 def digest(path):
@@ -40,7 +41,7 @@ def main():
     for private in [backup, args.manifest.absolute()]:
         if private.resolve().is_relative_to(destination.resolve()):
             raise ValueError('Keep the backup and manifest outside the public repository')
-    for language in LANGUAGES:
+    for language in ACTIVE_LANGUAGES:
         normalize(language)
     tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=destination).decode().split('\0')
     removed, copied = [], []
@@ -65,6 +66,8 @@ def main():
         if not source.is_file() or not public_file(source.relative_to(SITE)):
             continue
         name = source.relative_to(SITE).as_posix()
+        if source.relative_to(SITE).parts[0] in PAUSED_LANGUAGES:
+            continue
         target = destination / name
         check_path(source, SITE)
         check_path(target, destination)
@@ -82,7 +85,8 @@ def main():
     if marker not in text:
         text += '\n' + marker + '\n/verification/**/*.txt\n/verification/**/*.log\n/verification/**/*.json\n/verification/**/*.md\n'
         ignore.write_text(text, encoding='utf-8')
-    manifest = {'copied': copied, 'removed': removed, 'protected_evidence_backup_verified': True}
+    manifest = {'active_languages': ACTIVE_LANGUAGES, 'preserved_languages': PAUSED_LANGUAGES,
+                'copied': copied, 'removed': removed, 'protected_evidence_backup_verified': True}
     args.manifest.parent.mkdir(parents=True, exist_ok=True)
     args.manifest.write_text(json.dumps(manifest, indent=2), encoding='utf-8')
     print(json.dumps({'copied': len(copied), 'removed': len(removed)}))

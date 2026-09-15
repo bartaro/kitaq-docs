@@ -11,10 +11,10 @@ from html.parser import HTMLParser
 import json
 from pathlib import Path
 import re
+from publication_languages import ORDER, ACTIVE_LANGUAGES, authored_translations
 
 SITE = Path(__file__).resolve().parents[1]
 SOURCE = SITE / 'tools/api_descriptions'
-ORDER = ['en', 'ja', 'ko', 'zh-CN', 'zh-TW', 'es', 'pt', 'fr', 'de']
 
 
 def load():
@@ -23,9 +23,7 @@ def load():
         for key, value in json.loads(path.read_text(encoding='utf-8')).items():
             if key in messages:
                 raise ValueError('Duplicate authored message: ' + key)
-            if len(value) != len(ORDER) or not all(isinstance(v, str) and v.strip() for v in value):
-                raise ValueError('Nine authored translations required: ' + key)
-            messages[key] = value
+            messages[key] = authored_translations(value, key)
     ui = json.loads((SOURCE / 'ui.json').read_text(encoding='utf-8'))
     contracts = {}
     for path in sorted(SOURCE.glob('*contracts.json')):
@@ -144,6 +142,8 @@ class CardRanges(HTMLParser):
 
 
 def publish(language, require_complete=False):
+    if language not in ACTIVE_LANGUAGES:
+        raise ValueError('Updates are paused for this edition: ' + language)
     messages, ui, contracts = load()
     folder = SITE if language == 'ja' else SITE / language
     proofs = verified_tile_examples(contracts)
@@ -198,7 +198,7 @@ def publish(language, require_complete=False):
     publish_verification(language, contracts, proofs, messages, ui)
     from public_presentation import normalize
     normalize(language)
-    return {'reviewed': len(contracts), 'remaining': len(coverage), 'missing': coverage}
+    return {'active_languages': ACTIVE_LANGUAGES, 'reviewed': len(contracts), 'remaining': len(coverage), 'missing': coverage}
 
 
 def render_modules(text, platform, language, messages):
@@ -802,10 +802,10 @@ def publish_verification(language, contracts, proofs, messages, ui):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--language', choices=ORDER)
+    parser.add_argument('--language', choices=ACTIVE_LANGUAGES)
     parser.add_argument('--require-complete', action='store_true')
     args = parser.parse_args()
-    for language in ([args.language] if args.language else ORDER):
+    for language in ([args.language] if args.language else ACTIVE_LANGUAGES):
         report = publish(language, args.require_complete)
         print(language + ': ' + str(report['reviewed']) + ' reviewed; ' + str(report['remaining']) + ' remaining')
     (SOURCE / 'coverage.json').write_text(json.dumps(report, indent=2), encoding='utf-8')

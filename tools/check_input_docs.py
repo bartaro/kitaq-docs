@@ -20,7 +20,8 @@ def main():
     messages,ui,contracts=api_contracts.load()
     inputs={key:value for key,value in contracts.items() if args.suite=='all' or value['review']==args.suite+'-source-20260915'}
     results=[]
-    for index,language in enumerate(api_contracts.ORDER):
+    for language in api_contracts.ACTIVE_LANGUAGES:
+        index=api_contracts.ORDER.index(language)
         folder=SITE if language=='ja' else SITE/language
         for platform in ['gb','fc']:
             for volume in ['kitaq'+platform,platform+'-library']:
@@ -46,10 +47,11 @@ def main():
                     assert 'verification.html#api-' not in card,(language,key,'external proof link')
                     assert not re.search(r'href="[^"]*verification/[^"#]*\.(?:txt|json|log)',card),(language,key,'raw log link')
                     results.append({'language':language,'api':key,'card':'passed'})
-    assert len(results)==len(inputs)*9 and len(inputs)=={'all':len(contracts),'memory-intrinsics':12,'interrupt-intrinsics':8,'input':35,'padrepeat':6,'expansion':6,'vram':30,'vram-memory':9,'vramq':10,'cgb-palette':28,'cgb-dma-wram':8,'asset':17,'bank':32,'sprite':28,'oam':1,'fc-oam':9,'oam-library':8,'vram-macros':5,'runtime-queue':4,'runtime-ppu':7,'ppu-declarations':4,'ppu-intrinsics':21}[args.suite], len(results)
+    assert len(results)==len(inputs)*len(api_contracts.ACTIVE_LANGUAGES) and len(inputs)=={'all':len(contracts),'memory-intrinsics':12,'interrupt-intrinsics':8,'input':35,'padrepeat':6,'expansion':6,'vram':30,'vram-memory':9,'vramq':10,'cgb-palette':28,'cgb-dma-wram':8,'asset':17,'bank':32,'sprite':28,'oam':1,'fc-oam':9,'oam-library':8,'vram-macros':5,'runtime-queue':4,'runtime-ppu':7,'ppu-declarations':4,'ppu-intrinsics':21}[args.suite], len(results)
     modules=json.loads((api_contracts.SOURCE/(args.suite+'_modules.json')).read_text(encoding='utf-8')) if args.suite in ['input','vram','cgb-palette','asset','bank','sprite','oam-library','runtime-queue','runtime-ppu'] else {}
     module_count=0
-    for index,language in enumerate(api_contracts.ORDER):
+    for language in api_contracts.ACTIVE_LANGUAGES:
+        index=api_contracts.ORDER.index(language)
         folder=SITE if language=='ja' else SITE/language
         for key,keys in modules.items():
             platform,name=key.split(':')
@@ -64,7 +66,7 @@ def main():
         with sync_playwright() as playwright:
             browser=playwright.chromium.launch(executable_path='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless=True)
             page=browser.new_page(viewport={'width':1100,'height':850})
-            for language in api_contracts.ORDER:
+            for language in api_contracts.ACTIVE_LANGUAGES:
                 folder=SITE if language=='ja' else SITE/language
                 cases=[('gb','kitaqgb','__readpadex'),('fc','kitaqfc','__pad_dirs'),('fc','fc-library','input_repeat'),('fc','fc-library','nes_pad_repeat_step')] if args.suite=='input' else [('gb','kitaqgb','__padrep_lr'),('gb','kitaqgb','__padrep_mask')]
                 if args.suite=='expansion':cases=[('fc','kitaqfc',name) for name in ['__pad_read1_d1','__exp_pad_read2','__mic_read2p']]
@@ -102,7 +104,7 @@ def main():
                     page.locator('#api-'+name+'[open]').wait_for(state='visible')
                     browser_results.append({'language':language,'api':platform+':'+name,'inline_images':'passed'})
             browser.close()
-    report={'cards':results,'module_introductions':module_count,'browser':browser_results,'status':'passed'}
+    report={'languages':api_contracts.ACTIVE_LANGUAGES,'cards':results,'module_introductions':module_count,'browser':browser_results,'status':'passed'}
     report_name='document_checks.json' if args.browser else 'static_document_checks.json'
     evidence_folder={'all':'.','memory-intrinsics':'api-memory-intrinsics','interrupt-intrinsics':'api-interrupt-intrinsics','input':'api-input','padrepeat':'api-pad-repeat','expansion':'api-expansion-input','vram':'api-vram','vram-memory':'api-vram-memory','vramq':'api-vramq','cgb-palette':'api-cgb-palette','cgb-dma-wram':'api-cgb-dma-wram','asset':'api-asset','bank':'api-bank','sprite':'api-sprite','oam':'api-oam','fc-oam':'api-fc-oam','oam-library':'api-oam-library','vram-macros':'api-vram-macros','runtime-queue':'api-runtime-queue','runtime-ppu':'api-runtime-ppu','ppu-declarations':'api-ppu-declarations','ppu-intrinsics':'api-ppu-intrinsics'}[args.suite]
     (SITE/'verification'/evidence_folder/report_name).write_text(json.dumps(report,indent=2),encoding='utf-8')

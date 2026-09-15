@@ -6,6 +6,12 @@ reference inventory contains 1,055 API entries and 47 complete introductory
 sample programs. Individual API documentation and sample verification are
 ongoing; `tools/api_descriptions/coverage.json` identifies the reviewed entries.
 
+Active documentation updates and API checks currently target Japanese and English.
+The other seven published editions are retained without applying new API edits.
+`tools/publication_languages.py` controls this selection independently of the
+stable translation-table order. New authored messages may use `ja` and `en` keys;
+translations for paused editions are not required to publish an active edition.
+
 Captured emulator screens appear beside the corresponding sample explanations,
 including the expected shapes, positions and colors where those are checked.
 The descriptions state the tested conditions and remaining limitations. Emulator
@@ -33,6 +39,7 @@ For complete introductory samples, use `tools/verify_samples.py --runtime` and
 allowlist. It omits raw verification records and backs up excluded tracked files
 outside the destination before removing them. This prevents a new documentation
 build from publishing local logs again.
+The exporter also preserves the directories of paused language editions.
 
 ## Published scope
 
