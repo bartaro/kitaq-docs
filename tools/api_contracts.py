@@ -164,6 +164,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_bit_intrinsic_examples(contracts))
     proofs.update(verified_rng_examples(contracts))
     proofs.update(verified_flags_examples(contracts))
+    proofs.update(verified_rle_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -691,6 +692,42 @@ def verified_memory_intrinsic_examples(contracts):
 
 def verified_bit_intrinsic_examples(contracts):
     return verified_buffer_intrinsic_examples(contracts, 'bit', 136)
+
+
+def verified_rle_examples(contracts):
+    """Require decoded bytes, guards, bank restoration and matching tile pictures."""
+    selected_contracts={k:c for k,c in contracts.items() if c['review']=='rle-source-20260915'}
+    if not selected_contracts:return {}
+    folder=SITE/'verification/api-rle';repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    review=json.loads((SOURCE/'rle_review_sources.json').read_text(encoding='utf-8'))
+    for name,expected in review['source_sha256'].items():
+        if sha(repos/name)!=expected:raise ValueError('RLE implementation changed: '+name)
+    state=json.loads((folder/'state/results.json').read_text(encoding='utf-8'))
+    if len(state['cases'])!=42 or len({r['name'] for r in state['cases']})!=42:raise ValueError('RLE verification matrix incomplete')
+    for path,key in [(repos/'kitaqgb/kitaqgb.exe','compiler_sha256'),(repos/'kokura/kokura-cli.exe','emulator_sha256'),(SITE/'tools/check_rle_state.py','script_sha256')]:
+        if sha(path)!=state[key]:raise ValueError('RLE verification tool changed')
+    for name,expected in state['source_sha256'].items():
+        if sha(repos/name)!=expected:raise ValueError('RLE state source changed')
+    for row in state['cases']:
+        if not(row['passed'] and row['build_exit']==0 and row['runtime_exit']==0 and len(row['actual'])==528 and row['actual']==row['expected'] and row['result']==row['expected_result']):raise ValueError('RLE byte/state verification failed: '+row['name'])
+        case=folder/'state'/row['name']
+        if sha(case/'case.c')!=row['source_sha256'] or sha(case/'case.gb')!=row['rom_sha256']:raise ValueError('RLE fixture changed')
+    runs=json.loads((folder/'results.json').read_text(encoding='utf-8'))['records']
+    if len(runs)!=2 or {(r['platform'],r['mode']) for r in runs}!={('gb','dmg'),('gb','cgb')}:raise ValueError('RLE sample variants missing')
+    for run in runs:
+        if not(run['passed'] and run['frames']==240 and run['label_pixel_mismatches']==0 and run['geometry_pixel_mismatches']==0 and run['color_mismatches']==0 and run['colored_pixels']>0):raise ValueError('RLE sample screen failed')
+        if any(run[k]!=state[k] for k in ['compiler_sha256','emulator_sha256']):raise ValueError('RLE sample tool mismatch')
+        if run['header_sha256']!=review['source_sha256']['kitaqgb/lib/rpg.h'] or run['library_sha256']!=review['source_sha256']['kitaqgb/lib/rle.c']:raise ValueError('RLE sample source mismatch')
+        for name,expected in {run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}.items():
+            if sha(SITE/name)!=expected:raise ValueError('RLE sample changed: '+name)
+        if sha((SITE/run['image']).with_name('example.gb'))!=run['rom_sha256']:raise ValueError('RLE teaching ROM changed')
+    result={}
+    for key,contract in selected_contracts.items():
+        if any(r['source']!=contract['example']['program'] for r in runs):raise ValueError('RLE teaching program mismatch')
+        result[key]={'api':key.split(':')[1],'kind':'rle','runs':runs}
+    return result
 
 
 def verified_flags_examples(contracts):

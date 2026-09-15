@@ -1,0 +1,138 @@
+{
+  "gb:rle_decode": {
+    "review": "rle-source-20260915",
+    "purpose": [
+      "rle_near"
+    ],
+    "args": [
+      [
+        "dst",
+        [
+          "rle_ram_dst"
+        ]
+      ],
+      [
+        "src",
+        [
+          "rle_src"
+        ]
+      ]
+    ],
+    "returns": [
+      "rle_return"
+    ],
+    "notes": [
+      "rle_format",
+      "rle_bounds",
+      "rle_ram_timing",
+      "rle_bank_context",
+      "rle_build"
+    ],
+    "record_sha256": "cc99b8b610867740fc54823c160ac29cb8723fbbcae4dc387f48dc00b0c8201c",
+    "example": {
+      "program": "samples/api-examples/gb/rle_shapes.c",
+      "code": "near_count=rle_decode(near_buffer+1,local_rle); // 48 bytes in writable RAM.\n__vram_copy(0x8800,near_buffer+1,near_count); // Upload those bytes while the LCD is off.",
+      "expected": [
+        "rle_demo_near",
+        "rle_shapes",
+        "rle_proof"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\rle_shapes.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\rle_shapes.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm"
+    }
+  },
+  "gb:rle_decode_far": {
+    "review": "rle-source-20260915",
+    "purpose": [
+      "rle_far"
+    ],
+    "args": [
+      [
+        "dst",
+        [
+          "rle_ram_dst"
+        ]
+      ],
+      [
+        "bank",
+        [
+          "rle_bank"
+        ]
+      ],
+      [
+        "src",
+        [
+          "rle_far_src"
+        ]
+      ]
+    ],
+    "returns": [
+      "rle_return"
+    ],
+    "notes": [
+      "rle_format",
+      "rle_bounds",
+      "rle_ram_timing",
+      "rle_bank_context",
+      "rle_build"
+    ],
+    "record_sha256": "cd7f4c56731b88344a14892b4d469a06ebab648b4badf5b01bd5cca7288c3ea9",
+    "example": {
+      "program": "samples/api-examples/gb/rle_shapes.c",
+      "code": "far_count=rle_decode_far(far_buffer+1,2,banked_rle); // Read encoded pairs from ROM bank 2.\nif(*rle_bank_marker!=0xA1)failures++; // ROM bank 1 must be visible again.\n__vram_copy(0x8830,far_buffer+1,far_count);",
+      "expected": [
+        "rle_demo_far",
+        "rle_shapes",
+        "rle_proof"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\rle_shapes.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\rle_shapes.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm"
+    }
+  },
+  "gb:__rle_decode_vram": {
+    "review": "rle-source-20260915",
+    "purpose": [
+      "rle_vram"
+    ],
+    "args": [
+      [
+        "dst",
+        [
+          "rle_vram_dst"
+        ]
+      ],
+      [
+        "bank",
+        [
+          "rle_bank"
+        ]
+      ],
+      [
+        "src",
+        [
+          "rle_far_src"
+        ]
+      ]
+    ],
+    "returns": [
+      "rle_return"
+    ],
+    "notes": [
+      "rle_format",
+      "rle_bounds",
+      "rle_vram_timing",
+      "rle_vbk",
+      "rle_bank_context",
+      "rle_build"
+    ],
+    "record_sha256": "ccb3e125680f619c8443c68e0c4f5c0c4c759065ff0a8c0d41eec70e38a5b43a",
+    "example": {
+      "program": "samples/api-examples/gb/rle_shapes.c",
+      "code": "vram_count=__rle_decode_vram(0x8860,2,banked_rle); // Expand directly to 48 bytes of tile data.\nif(*rle_bank_marker!=0xA1)failures++;",
+      "expected": [
+        "rle_demo_vram",
+        "rle_shapes",
+        "rle_proof"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\rle_shapes.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\rle_shapes.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k --no-cache --no-disasm"
+    }
+  }
+}
