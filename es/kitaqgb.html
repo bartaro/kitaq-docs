@@ -3009,11 +3009,413 @@ void flag_set(u16 id)</code></pre></div><p class="source">Origen: kitaqgb/lib/fl
     __memset(data,0,4); __bit_set(data,3); __bit_toggle(data,1);
     __memcpy(copy,data,4); m_number(copy[0]);
     while (1) { m_wait();  }
-}</code></pre></div><p class="source">Origen: kitaq-docs/samples/gb_bits_memory.c:14</p><p><a href="../samples/gb_bits_memory.c">Programa completo de este ejemplo</a></p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:188</p></details><details class="api searchable" id="api-__copy16"><summary><code>__copy16</code><span class="badge">Función intrínseca del compilador</span></summary><p>Copiar datos. Módulo: Números aleatorios, texto, mapas, guardado y servicios RPG/ADV/SLG. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __copy16(void* dst, const void* src);</code></pre></div><p><b>Argumentos, de izquierda a derecha: </b>void* dst, const void* src. Para arrays y punteros, reserva memoria suficiente y mantenla válida hasta que termine el procesamiento.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void example_copy16(void* dst, const void* src) {
-    __copy16(dst, src);
-}</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__copy16.c">Descargar este fragmento</a></p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:177</p></details><details class="api searchable" id="api-__copy32"><summary><code>__copy32</code><span class="badge">Función intrínseca del compilador</span></summary><p>Copiar datos. Módulo: Números aleatorios, texto, mapas, guardado y servicios RPG/ADV/SLG. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __copy32(void* dst, const void* src);</code></pre></div><p><b>Argumentos, de izquierda a derecha: </b>void* dst, const void* src. Para arrays y punteros, reserva memoria suficiente y mantenla válida hasta que termine el procesamiento.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void example_copy32(void* dst, const void* src) {
-    __copy32(dst, src);
-}</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__copy32.c">Descargar este fragmento</a></p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:178</p></details><details class="api searchable" id="api-__far_memcpy" data-api-contract="asset-source-20260915"><summary><code>__far_memcpy</code></summary><p>Selecciona temporalmente un banco de ROM, copia <code>len</code> bytes de <code>src</code> a <code>dst</code> en orden de direcciones creciente y restaura el banco guardado por el compilador. En esta plataforma, <code>__farmemcpy</code> y <code>__far_memcpy</code> comparten la implementación.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __far_memcpy(void* dst, u8 bank, const void* src, u16 len);</code></pre></div><h4>Parámetros</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>Destino en memoria escribible, con espacio para todos los bytes copiados. Salvo en una transferencia de cero bytes, no se comprueba si el destino es nulo o inválido.</p></dd><dt><code>bank</code></dt><dd><p>Selector de banco de 8 bits para la ROM de origen. Use un banco admitido por el cartucho y la distribución del compilador; se especifica por separado de la dirección.</p></dd><dt><code>src</code></dt><dd><p>Puntero cercano a bytes legibles del banco de ROM seleccionado. No incluye el número de banco.</p></dd><dt><code>len</code></dt><dd><p>Cantidad de bytes, de 0 a 65535. Con cero no se copia memoria, pero sí se selecciona y restaura el banco.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Condiciones y límites</h4><p>Mantenga todo el origen en el mapeo de ROM previsto y todo el destino en memoria escribible. La copia no cambia automáticamente de banco al cruzar una ventana, no trata solapamientos como <code>memmove</code> ni sincroniza escrituras en VRAM. Para VRAM, use las API de transferencia gráfica.</p><p>Los ejemplos sitúan el código llamante en el banco fijo 0 para que cambiar el banco de origen no retire el código en ejecución. Las transferencias son síncronas. No las interrumpa con otra copia que cambie bancos ni suponga que la función garantiza por sí sola la seguridad de todas las interrupciones.</p><p>La rutina de GB restaura el banco registrado por el compilador. Manténgalo actualizado con <code>__bankswitch</code>; escribir directamente en el mapper no lo actualiza. La posición de HRAM que guarda el banco de retorno es compartida, por lo que no admite transferencias anidadas que la sobrescriban.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__far_memcpy(buffer,2,asset_shapes,32); // Same backend as __farmemcpy.
+}</code></pre></div><p class="source">Origen: kitaq-docs/samples/gb_bits_memory.c:14</p><p><a href="../samples/gb_bits_memory.c">Programa completo de este ejemplo</a></p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:188</p></details><details class="api searchable" id="api-__copy16" data-api-contract="memory-intrinsics-source-20260915"><summary><code>__copy16</code></summary><p>Copia exactamente 16 bytes de <code>src</code> a <code>dst</code>, sin argumento de longitud. Por ejemplo, permite copiar un registro de 16 bytes o un tile de GB/NES situado en memoria accesible por la CPU. El 16 indica bytes, no bits; la llamada no carga gráficos en el hardware de vídeo.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __copy16(void* dst, const void* src);</code></pre></div><h4>Parámetros</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>Puntero al primer byte escribible del destino. Reserva espacio contiguo para toda la operación; la función no asigna un búfer.</p></dd><dt><code>src</code></dt><dd><p>Puntero al primer byte legible del origen. Todo el intervalo debe permanecer accesible y sin cambios durante la copia.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Condiciones y límites</h4><p>Usa regiones de origen y destino que no se solapen. Estas rutinas copian hacia delante y no ofrecen la seguridad de <code>memmove</code> para zonas superpuestas; escribir sobre bytes del origen aún no leídos puede corromper la copia.</p><p>La operación termina antes de devolver el control. No cambia bancos de ROM/RAM ni recorta el intervalo al límite del búfer. Mantén estable el mapa de memoria, usa regiones válidas y coordina el acceso con las interrupciones que utilicen los mismos búferes.</p><p>En GB son accesos ordinarios de la CPU a memoria. No esperan un momento seguro para acceder a VRAM/OAM, no inician DMA ni seleccionan bancos de VRAM/WRAM de CGB. Para esas tareas, usa las API específicas de transferencia gráfica.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>memory_reset();
+__copy16(memory_destination+1,memory_source+1);
+memory_copy_16=memory_check(16,0); // Exactly 16 bytes, not 16 bits.</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>El ejemplo usa <code>__copy16</code> para copiar 16 bytes con un patrón conocido desde el desplazamiento 1. <code>memory_check</code> compara los arrays completos de origen y destino; la fila <code>COPY16</code> debe mostrar <code>016</code>. El primer byte queda como protección y también se comprueba que los bytes posteriores al bloque no cambien.</p><p>El programa completo inicializa dos búferes de 264 bytes antes de cada operación y comprueba todos los bytes del origen, del destino y de las zonas de protección. Debe mostrar COPY WORD 257, FILL WORD 257, COPY BYTE 255, FILL BYTE 255, COPY16 016, COPY32 032, ZERO CALLS 002 y FAILED 000. WORD/BYTE indican el tamaño del contador, no el de los elementos copiados. Los números proceden de las comprobaciones del ejemplo; estas funciones void no devuelven valores.</p><p>Las capturas muestran letras negras sobre blanco en DMG, azules sobre blanco en CGB y azules sobre negro en FC. El ejemplo verifica operaciones de RAM; el texto presenta sus resultados, no una primitiva de dibujo. Otras pruebas en emulador cubren 88 casos por plataforma, con longitudes constantes y calculadas en ejecución de 0, 1, 16, 17, 32, 33, 64, 65 y 255 bytes, más 256 y 257 para los contadores de 16 bits. No se ha probado en hardware real.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-dmg/screen.png" alt="__copy16: DMG"><figcaption>DMG</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-cgb/screen.png" alt="__copy16: CGB"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/memory_intrinsics.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\memory_intrinsics.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\memory_intrinsics.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/lib/rpg.h:177</p><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:8221</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>if (funcName == &quot;__copy16&quot; || funcName == &quot;__copy32&quot;)
+            {
+                if (args.Length != 2) Error(expr, funcName + &quot;(dst, src) expects 2 arguments&quot;);
+
+                int copyLen = (funcName == &quot;__copy16&quot;) ? 16 : 32;
+                CompileIntoHL(args[0]); EmitAsm(&quot;PUSH_HL&quot;); // dst
+                CompileIntoHL(args[1]); EmitAsm(&quot;PUSH_HL&quot;); // src
+                EmitAsm(&quot;LD_BC_IMM&quot;, new AsmOperand(copyLen, AddressMode.Immediate16));
+                EmitAsm(&quot;POP_DE&quot;); // src
+                EmitAsm(&quot;POP_HL&quot;); // dst
+                EmitRamMemcpyLoop(funcName.TrimStart(&#x27;_&#x27;));
+                return;
+            }
+
+void EmitRamMemcpyLoop(string labelPrefix)
+    {
+        AsmOperand loop = MakeUniqueLabel(labelPrefix + &quot;_loop&quot;);
+        AsmOperand done = MakeUniqueLabel(labelPrefix + &quot;_done&quot;);
+
+        EmitLabel(loop);
+        EmitAsm(&quot;LD_A_B&quot;);
+        EmitAsm(&quot;OR_C&quot;);
+        EmitAsm(&quot;JR_Z&quot;, done);
+        EmitAsm(&quot;LD_A_DE&quot;);
+        EmitAsm(&quot;LDI_HL_A&quot;);
+        EmitAsm(&quot;INC_DE&quot;);
+        EmitAsm(&quot;DEC_BC&quot;);
+        EmitAsm(&quot;JR&quot;, loop);
+        EmitLabel(done);
+    }
+
+// kitaqgb/kitaqgb/Lowerer.cs:2116
+if (expr.MatchAny(Tag.Call, out callFunc, out callArgs))
+        {
+            string knownCallName;
+            if (callFunc != null &amp;&amp; callFunc.Match(Tag.Name, out knownCallName) &amp;&amp;
+                knownCallName == &quot;__cgb_is_cgb&quot; &amp;&amp;
+                callArgs != null &amp;&amp; callArgs.Length == 0 &amp;&amp;
+                // A resolved target configuration can replace the zero-argument CGB query with a literal.
+                Program.TryGetKnownCgbRuntimeValue(out int knownCgbValue))
+            {
+                return Expr.Make(Tag.Integer, knownCgbValue).WithSource(expr.Source);
+            }
+
+            Expr newFunc = LowerExpr(ctx, callFunc, false, prefix);
+
+            // Optimization (post-A3): when we must spill a non-atomic argument into a temp,
+            // prefer a u8 temp if the *parameter type* is u8-like.
+            // This preserves semantics (implicit truncation to u8) while avoiding needless
+            // u16 temporaries created by integer promotions.
+            CType[] paramTypes = null;
+            string __fname = null;
+            if (newFunc.Match(Tag.Name, out __fname))
+            {
+                paramTypes = ctx.FindFuncParams(__fname);
+                if (paramTypes == null)
+                {
+                    CType fnTypeFromName;
+                    if (TryGetCallableFunctionType(ctx.FindTypeOfName(__fname), out fnTypeFromName))
+                        paramTypes = fnTypeFromName.ParamTypes;
+                }
+            }
+            else
+            {
+                CType fnTypeFromExpr;
+                if (TryGetCallableFunctionType(InferType(ctx, newFunc), out fnTypeFromExpr))
+                    paramTypes = fnTypeFromExpr.ParamTypes;
+            }
+
+            Expr[] newArgs = new Expr[callArgs.Length];
+            for (int i = 0; i &lt; callArgs.Length; i++)
+            {
+                Expr a = LowerExpr(ctx, callArgs[i], allowExtract, prefix);
+                bool preserveConstantArgIntrinsic = false;
+                if (a.MatchAny(Tag.Call, out Expr argFunc, out Expr[] _argCallArgs) &amp;&amp;
+                    argFunc.Match(Tag.Name, out string argFuncName))
+                {
+                    preserveConstantArgIntrinsic = (argFuncName == &quot;__bankof&quot; || argFuncName == &quot;__cgb_is_cgb&quot;);
+                }
+                // Keep evaluable constants and special intrinsic/bank operands visible to code generation instead of spilling them.
+                bool preserveCompileTimeConstantArg = ctx.Global.TryEvalConstInt(a, out _);
+                bool preserveFarcallBankArg = (__fname == &quot;__farcall&quot; &amp;&amp; i == 0);
+
+                if (allowExtract &amp;&amp; !preserveFarcallBankArg &amp;&amp; !preserveConstantArgIntrinsic &amp;&amp; !preserveCompileTimeConstantArg &amp;&amp; !IsAtom(a))
+                {
+                    // If we know the callee&#x27;s parameter type, use it to choose a smaller temp.
+                    // Example: (u8)(row*32) passed to a u8 param should spill as u8, not u16.
+                    CType spillAs = null;
+                    if (paramTypes != null &amp;&amp; i &lt; paramTypes.Length)
+                    {
+                        CType pt = paramTypes[i];
+                        if (IsU8Like(pt)) spillAs = CType.UInt8;
+                    }
+                    if (spillAs == null) spillAs = InferType(ctx, a);
+                    if (!IsAggregateType(spillAs) &amp;&amp; SizeOfType(spillAs) &lt;= 2)
+                        a = SpillToTemp(ctx, a, spillAs, prefix);
+                }
+                newArgs[i] = a;
+            }
+
+            // Lint: const discard for argument passing
+            // Warn when passing a const-qualified pointer (or const array decay) to a non-const pointer parameter.
+            // Suppress when the argument has an explicit cast, or inside __unsafe.
+            if (!ctx.InUnsafe &amp;&amp; paramTypes != null)
+            {
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+                    if (!IsPointerToNonConst(pt)) continue;
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at != null &amp;&amp; (IsPointerToConst(at) || IsArrayOfConst(at)))
+                    {
+                        string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                        WarnConstDiscard(expr, $&quot;argument {i} to &#x27;{fn}&#x27;&quot;);
+                        break; // keep it quiet: one warning per call is enough
+                    }
+                }
+            }
+
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    FilePosition argPos = newArgs[i].Source;
+                    if (string.IsNullOrEmpty(argPos.Filename) || argPos.Filename == &quot;&lt;unknown&gt;&quot;)
+                        argPos = expr.Source;
+                    WarnImplicitNarrowingIfNeeded(ctx, newArgs[i], InferType(ctx, newArgs[i]), paramTypes[i], argPos,
+                        &quot;argument &quot; + i + &quot; to &#x27;&quot; + fn + &quot;&#x27;&quot;);
+                }
+            }
+
+            // Lint: __enum_strict argument passing.
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at == null) continue;
+
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    if (IsStrictEnum(pt))
+                    {
+                        if (!IsSameEnum(pt, at))
+                        {
+                            Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                                &quot;argument {0} to &#x27;{1}&#x27; expects __enum_strict {2}, got {3}; cast explicitly to silence&quot;,
+                                i, fn, pt.Show(), at.Show());
+                        }
+                    }
+                    else if (IsPlainInteger(pt) &amp;&amp; IsStrictEnum(at))
+                    {
+                        Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                            &quot;argument {0} to &#x27;{1}&#x27; passes __enum_strict {2} to integer parameter {3}; cast explicitly to silence&quot;,
+                            i, fn, at.Show(), pt.Show());
+                    }
+                }
+            }
+
+            if (!ctx.InUnsafe)
+                RestrictAliasLint(ctx, newFunc, newArgs, expr.Source);
+
+            // __slice(ptr,len) helper: represent a &quot;slice&quot; (ptr+len) in the IR.
+            // Semantics: evaluate both arguments, result type is the pointer/array (same as arg0).
+            // Bounds checks are injected only with -Zcheck (see Program.CheckSliceBounds).
+            // Note: keep the intrinsic name conservative to avoid collisions (&quot;slice&quot; is allowed only
+            // when there is no declared function named &quot;slice&quot;).
+            if (newFunc.Match(Tag.Name, out string __sfname))
+            {
+                bool isSliceIntrinsic = (__sfname == &quot;__slice&quot;) || (__sfname == &quot;slice&quot; &amp;&amp; ctx.FindFuncParams(&quot;slice&quot;) == null);
+                if (isSliceIntrinsic)
+                {
+                    if (newArgs.Length != 2)
+                    {
+                        Program.Error(expr.Source, ErrorCode.ParseError, &quot;{0}: expected 2 arguments: __slice(ptr,len)&quot;, __sfname);
+                    }
+                    else
+                    {
+                        CType pty = InferType(ctx, newArgs[0]);
+                        if (pty == null || !(pty.IsPointer || pty.IsArray))
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: first argument must be a pointer or array, got: {1}&quot;, __sfname, (pty == null ? &quot;&lt;unknown&gt;&quot; : pty.Show()));
+
+                        CType lty = InferType(ctx, newArgs[1]);
+                        if (lty == null || !lty.IsInteger)
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: second argument must be an integer length, got: {1}&quot;, __sfname, (lty == null ? &quot;&lt;unknown&gt;&quot; : lty.Show()));
+                    }
+
+                    return Expr.Make(Tag.Slice, newArgs[0], newArgs[1]).WithSource(expr.Source);
+                }
+            }
+
+            return MakeCall(newFunc, newArgs).WithSource(expr.Source);
+        }</code></pre></div></details></details><details class="api searchable" id="api-__copy32" data-api-contract="memory-intrinsics-source-20260915"><summary><code>__copy32</code></summary><p>Copia exactamente 32 bytes de <code>src</code> a <code>dst</code>, sin argumento de longitud. Úsalo para un registro fijo de 32 bytes o dos patrones de tile contiguos de 16 bytes en memoria accesible por la CPU. Copia byte a byte hacia direcciones crecientes; no realiza una lectura única de 32 bits ni cambia de banco.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __copy32(void* dst, const void* src);</code></pre></div><h4>Parámetros</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>Puntero al primer byte escribible del destino. Reserva espacio contiguo para toda la operación; la función no asigna un búfer.</p></dd><dt><code>src</code></dt><dd><p>Puntero al primer byte legible del origen. Todo el intervalo debe permanecer accesible y sin cambios durante la copia.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Condiciones y límites</h4><p>Usa regiones de origen y destino que no se solapen. Estas rutinas copian hacia delante y no ofrecen la seguridad de <code>memmove</code> para zonas superpuestas; escribir sobre bytes del origen aún no leídos puede corromper la copia.</p><p>La operación termina antes de devolver el control. No cambia bancos de ROM/RAM ni recorta el intervalo al límite del búfer. Mantén estable el mapa de memoria, usa regiones válidas y coordina el acceso con las interrupciones que utilicen los mismos búferes.</p><p>En GB son accesos ordinarios de la CPU a memoria. No esperan un momento seguro para acceder a VRAM/OAM, no inician DMA ni seleccionan bancos de VRAM/WRAM de CGB. Para esas tareas, usa las API específicas de transferencia gráfica.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>memory_reset();
+__copy32(memory_destination+1,memory_source+1);
+memory_copy_32=memory_check(32,0);</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>El ejemplo usa <code>__copy32</code> para copiar 32 bytes con un patrón conocido desde el desplazamiento 1. <code>memory_check</code> compara los arrays completos de origen y destino; la fila <code>COPY32</code> debe mostrar <code>032</code>. El primer byte queda como protección y también se comprueba que los bytes posteriores al bloque no cambien.</p><p>El programa completo inicializa dos búferes de 264 bytes antes de cada operación y comprueba todos los bytes del origen, del destino y de las zonas de protección. Debe mostrar COPY WORD 257, FILL WORD 257, COPY BYTE 255, FILL BYTE 255, COPY16 016, COPY32 032, ZERO CALLS 002 y FAILED 000. WORD/BYTE indican el tamaño del contador, no el de los elementos copiados. Los números proceden de las comprobaciones del ejemplo; estas funciones void no devuelven valores.</p><p>Las capturas muestran letras negras sobre blanco en DMG, azules sobre blanco en CGB y azules sobre negro en FC. El ejemplo verifica operaciones de RAM; el texto presenta sus resultados, no una primitiva de dibujo. Otras pruebas en emulador cubren 88 casos por plataforma, con longitudes constantes y calculadas en ejecución de 0, 1, 16, 17, 32, 33, 64, 65 y 255 bytes, más 256 y 257 para los contadores de 16 bits. No se ha probado en hardware real.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-dmg/screen.png" alt="__copy32: DMG"><figcaption>DMG</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-cgb/screen.png" alt="__copy32: CGB"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/memory_intrinsics.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\memory_intrinsics.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\memory_intrinsics.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/lib/rpg.h:178</p><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:8221</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>if (funcName == &quot;__copy16&quot; || funcName == &quot;__copy32&quot;)
+            {
+                if (args.Length != 2) Error(expr, funcName + &quot;(dst, src) expects 2 arguments&quot;);
+
+                int copyLen = (funcName == &quot;__copy16&quot;) ? 16 : 32;
+                CompileIntoHL(args[0]); EmitAsm(&quot;PUSH_HL&quot;); // dst
+                CompileIntoHL(args[1]); EmitAsm(&quot;PUSH_HL&quot;); // src
+                EmitAsm(&quot;LD_BC_IMM&quot;, new AsmOperand(copyLen, AddressMode.Immediate16));
+                EmitAsm(&quot;POP_DE&quot;); // src
+                EmitAsm(&quot;POP_HL&quot;); // dst
+                EmitRamMemcpyLoop(funcName.TrimStart(&#x27;_&#x27;));
+                return;
+            }
+
+void EmitRamMemcpyLoop(string labelPrefix)
+    {
+        AsmOperand loop = MakeUniqueLabel(labelPrefix + &quot;_loop&quot;);
+        AsmOperand done = MakeUniqueLabel(labelPrefix + &quot;_done&quot;);
+
+        EmitLabel(loop);
+        EmitAsm(&quot;LD_A_B&quot;);
+        EmitAsm(&quot;OR_C&quot;);
+        EmitAsm(&quot;JR_Z&quot;, done);
+        EmitAsm(&quot;LD_A_DE&quot;);
+        EmitAsm(&quot;LDI_HL_A&quot;);
+        EmitAsm(&quot;INC_DE&quot;);
+        EmitAsm(&quot;DEC_BC&quot;);
+        EmitAsm(&quot;JR&quot;, loop);
+        EmitLabel(done);
+    }
+
+// kitaqgb/kitaqgb/Lowerer.cs:2116
+if (expr.MatchAny(Tag.Call, out callFunc, out callArgs))
+        {
+            string knownCallName;
+            if (callFunc != null &amp;&amp; callFunc.Match(Tag.Name, out knownCallName) &amp;&amp;
+                knownCallName == &quot;__cgb_is_cgb&quot; &amp;&amp;
+                callArgs != null &amp;&amp; callArgs.Length == 0 &amp;&amp;
+                // A resolved target configuration can replace the zero-argument CGB query with a literal.
+                Program.TryGetKnownCgbRuntimeValue(out int knownCgbValue))
+            {
+                return Expr.Make(Tag.Integer, knownCgbValue).WithSource(expr.Source);
+            }
+
+            Expr newFunc = LowerExpr(ctx, callFunc, false, prefix);
+
+            // Optimization (post-A3): when we must spill a non-atomic argument into a temp,
+            // prefer a u8 temp if the *parameter type* is u8-like.
+            // This preserves semantics (implicit truncation to u8) while avoiding needless
+            // u16 temporaries created by integer promotions.
+            CType[] paramTypes = null;
+            string __fname = null;
+            if (newFunc.Match(Tag.Name, out __fname))
+            {
+                paramTypes = ctx.FindFuncParams(__fname);
+                if (paramTypes == null)
+                {
+                    CType fnTypeFromName;
+                    if (TryGetCallableFunctionType(ctx.FindTypeOfName(__fname), out fnTypeFromName))
+                        paramTypes = fnTypeFromName.ParamTypes;
+                }
+            }
+            else
+            {
+                CType fnTypeFromExpr;
+                if (TryGetCallableFunctionType(InferType(ctx, newFunc), out fnTypeFromExpr))
+                    paramTypes = fnTypeFromExpr.ParamTypes;
+            }
+
+            Expr[] newArgs = new Expr[callArgs.Length];
+            for (int i = 0; i &lt; callArgs.Length; i++)
+            {
+                Expr a = LowerExpr(ctx, callArgs[i], allowExtract, prefix);
+                bool preserveConstantArgIntrinsic = false;
+                if (a.MatchAny(Tag.Call, out Expr argFunc, out Expr[] _argCallArgs) &amp;&amp;
+                    argFunc.Match(Tag.Name, out string argFuncName))
+                {
+                    preserveConstantArgIntrinsic = (argFuncName == &quot;__bankof&quot; || argFuncName == &quot;__cgb_is_cgb&quot;);
+                }
+                // Keep evaluable constants and special intrinsic/bank operands visible to code generation instead of spilling them.
+                bool preserveCompileTimeConstantArg = ctx.Global.TryEvalConstInt(a, out _);
+                bool preserveFarcallBankArg = (__fname == &quot;__farcall&quot; &amp;&amp; i == 0);
+
+                if (allowExtract &amp;&amp; !preserveFarcallBankArg &amp;&amp; !preserveConstantArgIntrinsic &amp;&amp; !preserveCompileTimeConstantArg &amp;&amp; !IsAtom(a))
+                {
+                    // If we know the callee&#x27;s parameter type, use it to choose a smaller temp.
+                    // Example: (u8)(row*32) passed to a u8 param should spill as u8, not u16.
+                    CType spillAs = null;
+                    if (paramTypes != null &amp;&amp; i &lt; paramTypes.Length)
+                    {
+                        CType pt = paramTypes[i];
+                        if (IsU8Like(pt)) spillAs = CType.UInt8;
+                    }
+                    if (spillAs == null) spillAs = InferType(ctx, a);
+                    if (!IsAggregateType(spillAs) &amp;&amp; SizeOfType(spillAs) &lt;= 2)
+                        a = SpillToTemp(ctx, a, spillAs, prefix);
+                }
+                newArgs[i] = a;
+            }
+
+            // Lint: const discard for argument passing
+            // Warn when passing a const-qualified pointer (or const array decay) to a non-const pointer parameter.
+            // Suppress when the argument has an explicit cast, or inside __unsafe.
+            if (!ctx.InUnsafe &amp;&amp; paramTypes != null)
+            {
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+                    if (!IsPointerToNonConst(pt)) continue;
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at != null &amp;&amp; (IsPointerToConst(at) || IsArrayOfConst(at)))
+                    {
+                        string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                        WarnConstDiscard(expr, $&quot;argument {i} to &#x27;{fn}&#x27;&quot;);
+                        break; // keep it quiet: one warning per call is enough
+                    }
+                }
+            }
+
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    FilePosition argPos = newArgs[i].Source;
+                    if (string.IsNullOrEmpty(argPos.Filename) || argPos.Filename == &quot;&lt;unknown&gt;&quot;)
+                        argPos = expr.Source;
+                    WarnImplicitNarrowingIfNeeded(ctx, newArgs[i], InferType(ctx, newArgs[i]), paramTypes[i], argPos,
+                        &quot;argument &quot; + i + &quot; to &#x27;&quot; + fn + &quot;&#x27;&quot;);
+                }
+            }
+
+            // Lint: __enum_strict argument passing.
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at == null) continue;
+
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    if (IsStrictEnum(pt))
+                    {
+                        if (!IsSameEnum(pt, at))
+                        {
+                            Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                                &quot;argument {0} to &#x27;{1}&#x27; expects __enum_strict {2}, got {3}; cast explicitly to silence&quot;,
+                                i, fn, pt.Show(), at.Show());
+                        }
+                    }
+                    else if (IsPlainInteger(pt) &amp;&amp; IsStrictEnum(at))
+                    {
+                        Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                            &quot;argument {0} to &#x27;{1}&#x27; passes __enum_strict {2} to integer parameter {3}; cast explicitly to silence&quot;,
+                            i, fn, at.Show(), pt.Show());
+                    }
+                }
+            }
+
+            if (!ctx.InUnsafe)
+                RestrictAliasLint(ctx, newFunc, newArgs, expr.Source);
+
+            // __slice(ptr,len) helper: represent a &quot;slice&quot; (ptr+len) in the IR.
+            // Semantics: evaluate both arguments, result type is the pointer/array (same as arg0).
+            // Bounds checks are injected only with -Zcheck (see Program.CheckSliceBounds).
+            // Note: keep the intrinsic name conservative to avoid collisions (&quot;slice&quot; is allowed only
+            // when there is no declared function named &quot;slice&quot;).
+            if (newFunc.Match(Tag.Name, out string __sfname))
+            {
+                bool isSliceIntrinsic = (__sfname == &quot;__slice&quot;) || (__sfname == &quot;slice&quot; &amp;&amp; ctx.FindFuncParams(&quot;slice&quot;) == null);
+                if (isSliceIntrinsic)
+                {
+                    if (newArgs.Length != 2)
+                    {
+                        Program.Error(expr.Source, ErrorCode.ParseError, &quot;{0}: expected 2 arguments: __slice(ptr,len)&quot;, __sfname);
+                    }
+                    else
+                    {
+                        CType pty = InferType(ctx, newArgs[0]);
+                        if (pty == null || !(pty.IsPointer || pty.IsArray))
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: first argument must be a pointer or array, got: {1}&quot;, __sfname, (pty == null ? &quot;&lt;unknown&gt;&quot; : pty.Show()));
+
+                        CType lty = InferType(ctx, newArgs[1]);
+                        if (lty == null || !lty.IsInteger)
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: second argument must be an integer length, got: {1}&quot;, __sfname, (lty == null ? &quot;&lt;unknown&gt;&quot; : lty.Show()));
+                    }
+
+                    return Expr.Make(Tag.Slice, newArgs[0], newArgs[1]).WithSource(expr.Source);
+                }
+            }
+
+            return MakeCall(newFunc, newArgs).WithSource(expr.Source);
+        }</code></pre></div></details></details><details class="api searchable" id="api-__far_memcpy" data-api-contract="asset-source-20260915"><summary><code>__far_memcpy</code></summary><p>Selecciona temporalmente un banco de ROM, copia <code>len</code> bytes de <code>src</code> a <code>dst</code> en orden de direcciones creciente y restaura el banco guardado por el compilador. En esta plataforma, <code>__farmemcpy</code> y <code>__far_memcpy</code> comparten la implementación.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __far_memcpy(void* dst, u8 bank, const void* src, u16 len);</code></pre></div><h4>Parámetros</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>Destino en memoria escribible, con espacio para todos los bytes copiados. Salvo en una transferencia de cero bytes, no se comprueba si el destino es nulo o inválido.</p></dd><dt><code>bank</code></dt><dd><p>Selector de banco de 8 bits para la ROM de origen. Use un banco admitido por el cartucho y la distribución del compilador; se especifica por separado de la dirección.</p></dd><dt><code>src</code></dt><dd><p>Puntero cercano a bytes legibles del banco de ROM seleccionado. No incluye el número de banco.</p></dd><dt><code>len</code></dt><dd><p>Cantidad de bytes, de 0 a 65535. Con cero no se copia memoria, pero sí se selecciona y restaura el banco.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Condiciones y límites</h4><p>Mantenga todo el origen en el mapeo de ROM previsto y todo el destino en memoria escribible. La copia no cambia automáticamente de banco al cruzar una ventana, no trata solapamientos como <code>memmove</code> ni sincroniza escrituras en VRAM. Para VRAM, use las API de transferencia gráfica.</p><p>Los ejemplos sitúan el código llamante en el banco fijo 0 para que cambiar el banco de origen no retire el código en ejecución. Las transferencias son síncronas. No las interrumpa con otra copia que cambie bancos ni suponga que la función garantiza por sí sola la seguridad de todas las interrupciones.</p><p>La rutina de GB restaura el banco registrado por el compilador. Manténgalo actualizado con <code>__bankswitch</code>; escribir directamente en el mapper no lo actualiza. La posición de HRAM que guarda el banco de retorno es compartida, por lo que no admite transferencias anidadas que la sobrescriban.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>__far_memcpy(buffer,2,asset_shapes,32); // Same backend as __farmemcpy.
 expect(*asset_bank_marker==0xA1,29);
 for(i=0;i&lt;32;i++) expect(buffer[(__safe_index u8)i]==expected_shape_byte(i),32);
 buffer[32]=0x55;
@@ -3032,20 +3434,1391 @@ expect(buffer[32]==0x55 &amp;&amp; *asset_bank_marker==0xA1,30);</code></pre></d
         while (x &lt; w) {
             map_row[x] = __farpeek8(map_current.bank_tiles, map_current.tiles + base_index + x);
             x++;
-        }</code></pre></div><p class="source">Origen: kitaqgb/lib/map.c:55</p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:181</p></details><details class="api searchable" id="api-__memcpy"><summary><code>__memcpy</code><span class="badge">Función intrínseca del compilador</span></summary><p>Copia len bytes del origen al destino. El código que llama debe proporcionar memoria suficiente y bancos accesibles.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __memcpy(void* dst, const void* src, u16 count);</code></pre></div><p><b>Argumentos, de izquierda a derecha: </b>void* dst, const void* src, u16 count. Para arrays y punteros, reserva memoria suficiente y mantenla válida hasta que termine el procesamiento.</p><h4>Ejemplo de llamada con código de contexto</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 data[4]; u8 copy[4];
-    __memset(data,0,4); __bit_set(data,3); __bit_toggle(data,1);
-    __memcpy(copy,data,4); m_number(copy[0]);
-    while (1) { m_wait();  }
-}</code></pre></div><p class="source">Origen: kitaq-docs/samples/gb_bits_memory.c:15</p><p><a href="../samples/gb_bits_memory.c">Programa completo de este ejemplo</a></p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:142</p></details><details class="api searchable" id="api-__memcpy_small"><summary><code>__memcpy_small</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Números aleatorios, texto, mapas, guardado y servicios RPG/ADV/SLG. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __memcpy_small(void* dst, const void* src, u8 len);</code></pre></div><p><b>Argumentos, de izquierda a derecha: </b>void* dst, const void* src, u8 len. Para arrays y punteros, reserva memoria suficiente y mantenla válida hasta que termine el procesamiento.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void example_memcpy_small(void* dst, const void* src, u8 len) {
-    __memcpy_small(dst, src, len);
-}</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__memcpy_small.c">Descargar este fragmento</a></p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:175</p></details><details class="api searchable" id="api-__memset"><summary><code>__memset</code><span class="badge">Función intrínseca del compilador</span></summary><p>Rellena una región con un valor de byte repetido. len se expresa en bytes.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __memset(void* dst, u8 value, u16 count);</code></pre></div><p><b>Argumentos, de izquierda a derecha: </b>void* dst, u8 value, u16 count. Para arrays y punteros, reserva memoria suficiente y mantenla válida hasta que termine el procesamiento.</p><h4>Ejemplo de llamada con código de contexto</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>m_text(2,3,"BITS MEMORY");
-    u8 data[4]; u8 copy[4];
-    __memset(data,0,4); __bit_set(data,3); __bit_toggle(data,1);
-    __memcpy(copy,data,4); m_number(copy[0]);
-    while (1) { m_wait();  }
-}</code></pre></div><p class="source">Origen: kitaq-docs/samples/gb_bits_memory.c:14</p><p><a href="../samples/gb_bits_memory.c">Programa completo de este ejemplo</a></p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:141</p></details><details class="api searchable" id="api-__memset_small"><summary><code>__memset_small</code><span class="badge">Función intrínseca del compilador</span></summary><p>Establecer un valor o una condición de funcionamiento. Módulo: Números aleatorios, texto, mapas, guardado y servicios RPG/ADV/SLG. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __memset_small(void* dst, u8 value, u8 len);</code></pre></div><p><b>Argumentos, de izquierda a derecha: </b>void* dst, u8 value, u8 len. Para arrays y punteros, reserva memoria suficiente y mantenla válida hasta que termine el procesamiento.</p><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void example_memset_small(void* dst, u8 value, u8 len) {
-    __memset_small(dst, value, len);
-}</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__memset_small.c">Descargar este fragmento</a></p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:176</p></details><details class="api searchable" id="api-__rle_decode_vram"><summary><code>__rle_decode_vram</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Números aleatorios, texto, mapas, guardado y servicios RPG/ADV/SLG. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u16 __rle_decode_vram(u16 dst, u8 bank, const void* src);</code></pre></div><p><b>Argumentos, de izquierda a derecha: </b>u16 dst, u8 bank, const void* src. Para arrays y punteros, reserva memoria suficiente y mantenla válida hasta que termine el procesamiento.</p><p><b>Tipo de retorno: </b><code>u16</code>. Las notas originales y las condiciones de retorno de la implementación definen el significado y los valores de éxito o fallo.</p><div class="original"><b>Notas originales de la declaración, sin modificar</b><pre>Compiler intrinsic, separate from the RAM rle_decode helpers below; it is not a bounded-stream API.</pre></div><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u16 example_rle_decode_vram(u16 dst, u8 bank, const void* src) {
+        }</code></pre></div><p class="source">Origen: kitaqgb/lib/map.c:55</p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:181</p></details><details class="api searchable" id="api-__memcpy" data-api-contract="memory-intrinsics-source-20260915"><summary><code>__memcpy</code></summary><p>Copia de <code>src</code> a <code>dst</code> el número de bytes indicado. El contador de 16 bits permite transferir más de 255 bytes, por ejemplo una tabla completa en RAM. Lee y escribe en orden creciente de direcciones.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __memcpy(void* dst, const void* src, u16 count);</code></pre></div><h4>Parámetros</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>Puntero al primer byte escribible del destino. Reserva espacio contiguo para toda la operación; la función no asigna un búfer.</p></dd><dt><code>src</code></dt><dd><p>Puntero al primer byte legible del origen. Todo el intervalo debe permanecer accesible y sin cambios durante la copia.</p></dd><dt><code>count</code></dt><dd><p>Número de bytes como <code>u16</code> (0–65535), no de elementos. El máximo del tipo no implica que la máquina disponga de un búfer válido de ese tamaño. Todo el intervalo debe caber en el mapa de memoria seleccionado.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Condiciones y límites</h4><p>Un contador a cero no transfiere bytes. Los efectos secundarios de las expresiones de los argumentos sí se ejecutan: el ejemplo pasa dos funciones que devuelven punteros y comprueba que ambas se llaman aunque la longitud sea cero.</p><p>Usa regiones de origen y destino que no se solapen. Estas rutinas copian hacia delante y no ofrecen la seguridad de <code>memmove</code> para zonas superpuestas; escribir sobre bytes del origen aún no leídos puede corromper la copia.</p><p>La operación termina antes de devolver el control. No cambia bancos de ROM/RAM ni recorta el intervalo al límite del búfer. Mantén estable el mapa de memoria, usa regiones válidas y coordina el acceso con las interrupciones que utilicen los mismos búferes.</p><p>En GB son accesos ordinarios de la CPU a memoria. No esperan un momento seguro para acceder a VRAM/OAM, no inician DMA ni seleccionan bancos de VRAM/WRAM de CGB. Para esas tareas, usa las API específicas de transferencia gráfica.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>memory_reset();
+__memcpy(memory_destination+1,memory_source+1,257);
+memory_copy_word=memory_check(257,0); // 257 copied bytes; guards unchanged.</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>El ejemplo usa <code>__memcpy</code> para copiar 257 bytes con un patrón conocido desde el desplazamiento 1. <code>memory_check</code> compara los arrays completos de origen y destino; la fila <code>COPY WORD</code> debe mostrar <code>257</code>. El primer byte queda como protección y también se comprueba que los bytes posteriores al bloque no cambien.</p><p>El programa completo inicializa dos búferes de 264 bytes antes de cada operación y comprueba todos los bytes del origen, del destino y de las zonas de protección. Debe mostrar COPY WORD 257, FILL WORD 257, COPY BYTE 255, FILL BYTE 255, COPY16 016, COPY32 032, ZERO CALLS 002 y FAILED 000. WORD/BYTE indican el tamaño del contador, no el de los elementos copiados. Los números proceden de las comprobaciones del ejemplo; estas funciones void no devuelven valores.</p><p>Las capturas muestran letras negras sobre blanco en DMG, azules sobre blanco en CGB y azules sobre negro en FC. El ejemplo verifica operaciones de RAM; el texto presenta sus resultados, no una primitiva de dibujo. Otras pruebas en emulador cubren 88 casos por plataforma, con longitudes constantes y calculadas en ejecución de 0, 1, 16, 17, 32, 33, 64, 65 y 255 bytes, más 256 y 257 para los contadores de 16 bits. No se ha probado en hardware real.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-dmg/screen.png" alt="__memcpy: DMG"><figcaption>DMG</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-cgb/screen.png" alt="__memcpy: CGB"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/memory_intrinsics.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\memory_intrinsics.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\memory_intrinsics.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/lib/rpg.h:142</p><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:9050</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>if (funcName == &quot;__memcpy&quot; || funcName == &quot;__memcpy_small&quot;)
+            {
+                // Select byte or word count semantics before optional fixed-array bounds diagnostics.
+                bool useU8Count = (funcName == &quot;__memcpy_small&quot;);
+                if (args.Length != 3) { Error(expr, &quot;__memcpy requires 3 arguments&quot;); return; }
+
+                bool doCheck = Program.CheckMemCopy &amp;&amp; !InUnsafe;
+                bool hasDst = false, hasSrc = false;
+                int dstBytes = 0, srcBytes = 0;
+                string dstName = null, srcName = null;
+                if (doCheck)
+                {
+                    hasDst = TryGetFixedArrayByteLength(args[0], out dstBytes, out dstName);
+                    hasSrc = TryGetFixedArrayByteLength(args[1], out srcBytes, out srcName);
+                }
+
+                bool isConstCountAny = args[2].Match(Tag.Integer, out int constCountAny);
+                int normalizedConstCount = constCountAny;
+                if (isConstCountAny &amp;&amp; useU8Count)
+                    normalizedConstCount &amp;= 0xFF;
+
+                if (doCheck &amp;&amp; isConstCountAny)
+                {
+                    if (hasDst &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &gt; dstBytes)
+                    {
+                        Program.Warning(args[2].Source, &quot;__memcpy count {0} exceeds fixed dst array &#x27;{1}&#x27; size {2} bytes (-Zcheck)&quot;, normalizedConstCount, dstName, dstBytes);
+                        EmitAsm(&quot;JP&quot;, EnsureCheckTrap());
+                        return;
+                    }
+                    if (hasSrc &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &gt; srcBytes)
+                    {
+                        Program.Warning(args[2].Source, &quot;__memcpy count {0} exceeds fixed src array &#x27;{1}&#x27; size {2} bytes (-Zcheck)&quot;, normalizedConstCount, srcName, srcBytes);
+                        EmitAsm(&quot;JP&quot;, EnsureCheckTrap());
+                        return;
+                    }
+                }
+
+                if (isConstCountAny &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &lt;= 16)
+                {
+                    if (normalizedConstCount == 0) return;
+
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    CompileIntoHL(args[1]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    EmitAsm(&quot;POP_DE&quot;);
+                    EmitAsm(&quot;POP_HL&quot;);
+
+                    for (int k = 0; k &lt; normalizedConstCount; k++)
+                    {
+                        EmitAsm(&quot;LD_A_DE&quot;);
+                        EmitAsm(&quot;LDI_HL_A&quot;);
+                        EmitAsm(&quot;INC_DE&quot;);
+                    }
+                    return;
+                }
+
+                if (isConstCountAny &amp;&amp; normalizedConstCount &gt; 16 &amp;&amp; normalizedConstCount &lt;= 255)
+                {
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    CompileIntoHL(args[1]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    EmitAsm(&quot;POP_DE&quot;);
+                    EmitAsm(&quot;POP_HL&quot;);
+
+                    if (normalizedConstCount &lt;= 64)
+                    {
+                        int blocks8 = normalizedConstCount / 8;
+                        int rem8 = normalizedConstCount % 8;
+                        if (blocks8 &gt; 0)
+                        {
+                            EmitAsm(&quot;LD_B_IMM&quot;, new AsmOperand(blocks8, AddressMode.Immediate));
+                            // Advance source and destination through eight-byte groups, then emit the remaining constant bytes.
+                            AsmOperand loop8 = MakeUniqueLabel(&quot;memcpy8_loop&quot;);
+                            EmitLabel(loop8);
+                            for (int k = 0; k &lt; 8; k++)
+                            {
+                                EmitAsm(&quot;LD_A_DE&quot;);
+                                EmitAsm(&quot;LDI_HL_A&quot;);
+                                EmitAsm(&quot;INC_DE&quot;);
+                            }
+                            EmitAsm(&quot;DEC_B&quot;);
+                            EmitAsm(&quot;JP_NZ&quot;, loop8);
+                        }
+                        for (int k = 0; k &lt; rem8; k++)
+                        {
+                            EmitAsm(&quot;LD_A_DE&quot;);
+                            EmitAsm(&quot;LDI_HL_A&quot;);
+                            EmitAsm(&quot;INC_DE&quot;);
+                        }
+                        return;
+                    }
+
+                    int blocks16 = normalizedConstCount / 16;
+                    int rem16 = normalizedConstCount % 16;
+                    if (blocks16 &gt; 0)
+                    {
+                        EmitAsm(&quot;LD_B_IMM&quot;, new AsmOperand(blocks16, AddressMode.Immediate));
+                        // Use sixteen-byte groups while keeping the residual copy length known at compile time.
+                        AsmOperand loop16 = MakeUniqueLabel(&quot;memcpy16_loop&quot;);
+                        EmitLabel(loop16);
+                        for (int k = 0; k &lt; 16; k++)
+                        {
+                            EmitAsm(&quot;LD_A_DE&quot;);
+                            EmitAsm(&quot;LDI_HL_A&quot;);
+                            EmitAsm(&quot;INC_DE&quot;);
+                        }
+                        EmitAsm(&quot;DEC_B&quot;);
+                        EmitAsm(&quot;JP_NZ&quot;, loop16);
+                    }
+                    for (int k = 0; k &lt; rem16; k++)
+                    {
+                        EmitAsm(&quot;LD_A_DE&quot;);
+                        EmitAsm(&quot;LDI_HL_A&quot;);
+                        EmitAsm(&quot;INC_DE&quot;);
+                    }
+                    return;
+                }
+
+                if (useU8Count)
+                {
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+
+                    CompileIntoHL(args[1]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+
+                    CompileIntoA(args[2]);
+                    EmitAsm(&quot;LD_B_A&quot;);
+                    if (doCheck)
+                    {
+                        if (hasDst) EmitU8LeqConstOrTrapInA(dstBytes);
+                        if (hasSrc) EmitU8LeqConstOrTrapInA(srcBytes);
+                    }
+
+                    AsmOperand doneLabel = MakeUniqueLabel(&quot;memcpy_small_done&quot;);
+                    AsmOperand smallLoopLabel = MakeUniqueLabel(&quot;memcpy_small_loop&quot;);
+                    EmitAsm(&quot;OR_A&quot;);
+                    EmitAsm(&quot;POP_DE&quot;);
+                    EmitAsm(&quot;POP_HL&quot;);
+                    EmitAsm(&quot;JP_Z&quot;, doneLabel);
+
+                    EmitLabel(smallLoopLabel);
+                    EmitAsm(&quot;LD_A_DE&quot;);
+                    EmitAsm(&quot;LDI_HL_A&quot;);
+                    EmitAsm(&quot;INC_DE&quot;);
+                    EmitAsm(&quot;DEC_B&quot;);
+                    EmitAsm(&quot;JP_NZ&quot;, smallLoopLabel);
+                    EmitLabel(doneLabel);
+                    return;
+                }
+
+                CompileIntoHL(args[0]);
+                EmitAsm(&quot;PUSH_HL&quot;);
+
+                CompileIntoHL(args[1]);
+                EmitAsm(&quot;PUSH_HL&quot;);
+
+                CompileIntoHL(args[2]);
+                if (doCheck &amp;&amp; !isConstCountAny)
+                {
+                    if (hasDst) EmitU16LeqConstOrTrap(dstBytes);
+                    if (hasSrc) EmitU16LeqConstOrTrap(srcBytes);
+                }
+                EmitAsm(&quot;LD_B_H&quot;);
+                EmitAsm(&quot;LD_C_L&quot;);
+
+                EmitAsm(&quot;POP_DE&quot;);
+                EmitAsm(&quot;POP_HL&quot;);
+
+                AsmOperand loopLabel = MakeUniqueLabel(&quot;memcpy_loop&quot;);
+                AsmOperand wordDoneLabel = MakeUniqueLabel(&quot;memcpy_done&quot;);
+                // A zero word count must skip the first write as well as the loop.
+                EmitAsm(&quot;LD_A_B&quot;);
+                EmitAsm(&quot;OR_C&quot;);
+                EmitAsm(&quot;JP_Z&quot;, wordDoneLabel);
+                EmitLabel(loopLabel);
+
+                EmitAsm(&quot;LD_A_DE&quot;);
+                EmitAsm(&quot;LDI_HL_A&quot;);
+                EmitAsm(&quot;INC_DE&quot;);
+
+                EmitAsm(&quot;DEC_BC&quot;);
+                EmitAsm(&quot;LD_A_B&quot;);
+                EmitAsm(&quot;OR_C&quot;);
+                EmitAsm(&quot;JP_NZ&quot;, loopLabel);
+                EmitLabel(wordDoneLabel);
+
+                return;
+            }
+
+// kitaqgb/kitaqgb/Lowerer.cs:2116
+if (expr.MatchAny(Tag.Call, out callFunc, out callArgs))
+        {
+            string knownCallName;
+            if (callFunc != null &amp;&amp; callFunc.Match(Tag.Name, out knownCallName) &amp;&amp;
+                knownCallName == &quot;__cgb_is_cgb&quot; &amp;&amp;
+                callArgs != null &amp;&amp; callArgs.Length == 0 &amp;&amp;
+                // A resolved target configuration can replace the zero-argument CGB query with a literal.
+                Program.TryGetKnownCgbRuntimeValue(out int knownCgbValue))
+            {
+                return Expr.Make(Tag.Integer, knownCgbValue).WithSource(expr.Source);
+            }
+
+            Expr newFunc = LowerExpr(ctx, callFunc, false, prefix);
+
+            // Optimization (post-A3): when we must spill a non-atomic argument into a temp,
+            // prefer a u8 temp if the *parameter type* is u8-like.
+            // This preserves semantics (implicit truncation to u8) while avoiding needless
+            // u16 temporaries created by integer promotions.
+            CType[] paramTypes = null;
+            string __fname = null;
+            if (newFunc.Match(Tag.Name, out __fname))
+            {
+                paramTypes = ctx.FindFuncParams(__fname);
+                if (paramTypes == null)
+                {
+                    CType fnTypeFromName;
+                    if (TryGetCallableFunctionType(ctx.FindTypeOfName(__fname), out fnTypeFromName))
+                        paramTypes = fnTypeFromName.ParamTypes;
+                }
+            }
+            else
+            {
+                CType fnTypeFromExpr;
+                if (TryGetCallableFunctionType(InferType(ctx, newFunc), out fnTypeFromExpr))
+                    paramTypes = fnTypeFromExpr.ParamTypes;
+            }
+
+            Expr[] newArgs = new Expr[callArgs.Length];
+            for (int i = 0; i &lt; callArgs.Length; i++)
+            {
+                Expr a = LowerExpr(ctx, callArgs[i], allowExtract, prefix);
+                bool preserveConstantArgIntrinsic = false;
+                if (a.MatchAny(Tag.Call, out Expr argFunc, out Expr[] _argCallArgs) &amp;&amp;
+                    argFunc.Match(Tag.Name, out string argFuncName))
+                {
+                    preserveConstantArgIntrinsic = (argFuncName == &quot;__bankof&quot; || argFuncName == &quot;__cgb_is_cgb&quot;);
+                }
+                // Keep evaluable constants and special intrinsic/bank operands visible to code generation instead of spilling them.
+                bool preserveCompileTimeConstantArg = ctx.Global.TryEvalConstInt(a, out _);
+                bool preserveFarcallBankArg = (__fname == &quot;__farcall&quot; &amp;&amp; i == 0);
+
+                if (allowExtract &amp;&amp; !preserveFarcallBankArg &amp;&amp; !preserveConstantArgIntrinsic &amp;&amp; !preserveCompileTimeConstantArg &amp;&amp; !IsAtom(a))
+                {
+                    // If we know the callee&#x27;s parameter type, use it to choose a smaller temp.
+                    // Example: (u8)(row*32) passed to a u8 param should spill as u8, not u16.
+                    CType spillAs = null;
+                    if (paramTypes != null &amp;&amp; i &lt; paramTypes.Length)
+                    {
+                        CType pt = paramTypes[i];
+                        if (IsU8Like(pt)) spillAs = CType.UInt8;
+                    }
+                    if (spillAs == null) spillAs = InferType(ctx, a);
+                    if (!IsAggregateType(spillAs) &amp;&amp; SizeOfType(spillAs) &lt;= 2)
+                        a = SpillToTemp(ctx, a, spillAs, prefix);
+                }
+                newArgs[i] = a;
+            }
+
+            // Lint: const discard for argument passing
+            // Warn when passing a const-qualified pointer (or const array decay) to a non-const pointer parameter.
+            // Suppress when the argument has an explicit cast, or inside __unsafe.
+            if (!ctx.InUnsafe &amp;&amp; paramTypes != null)
+            {
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+                    if (!IsPointerToNonConst(pt)) continue;
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at != null &amp;&amp; (IsPointerToConst(at) || IsArrayOfConst(at)))
+                    {
+                        string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                        WarnConstDiscard(expr, $&quot;argument {i} to &#x27;{fn}&#x27;&quot;);
+                        break; // keep it quiet: one warning per call is enough
+                    }
+                }
+            }
+
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    FilePosition argPos = newArgs[i].Source;
+                    if (string.IsNullOrEmpty(argPos.Filename) || argPos.Filename == &quot;&lt;unknown&gt;&quot;)
+                        argPos = expr.Source;
+                    WarnImplicitNarrowingIfNeeded(ctx, newArgs[i], InferType(ctx, newArgs[i]), paramTypes[i], argPos,
+                        &quot;argument &quot; + i + &quot; to &#x27;&quot; + fn + &quot;&#x27;&quot;);
+                }
+            }
+
+            // Lint: __enum_strict argument passing.
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at == null) continue;
+
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    if (IsStrictEnum(pt))
+                    {
+                        if (!IsSameEnum(pt, at))
+                        {
+                            Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                                &quot;argument {0} to &#x27;{1}&#x27; expects __enum_strict {2}, got {3}; cast explicitly to silence&quot;,
+                                i, fn, pt.Show(), at.Show());
+                        }
+                    }
+                    else if (IsPlainInteger(pt) &amp;&amp; IsStrictEnum(at))
+                    {
+                        Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                            &quot;argument {0} to &#x27;{1}&#x27; passes __enum_strict {2} to integer parameter {3}; cast explicitly to silence&quot;,
+                            i, fn, at.Show(), pt.Show());
+                    }
+                }
+            }
+
+            if (!ctx.InUnsafe)
+                RestrictAliasLint(ctx, newFunc, newArgs, expr.Source);
+
+            // __slice(ptr,len) helper: represent a &quot;slice&quot; (ptr+len) in the IR.
+            // Semantics: evaluate both arguments, result type is the pointer/array (same as arg0).
+            // Bounds checks are injected only with -Zcheck (see Program.CheckSliceBounds).
+            // Note: keep the intrinsic name conservative to avoid collisions (&quot;slice&quot; is allowed only
+            // when there is no declared function named &quot;slice&quot;).
+            if (newFunc.Match(Tag.Name, out string __sfname))
+            {
+                bool isSliceIntrinsic = (__sfname == &quot;__slice&quot;) || (__sfname == &quot;slice&quot; &amp;&amp; ctx.FindFuncParams(&quot;slice&quot;) == null);
+                if (isSliceIntrinsic)
+                {
+                    if (newArgs.Length != 2)
+                    {
+                        Program.Error(expr.Source, ErrorCode.ParseError, &quot;{0}: expected 2 arguments: __slice(ptr,len)&quot;, __sfname);
+                    }
+                    else
+                    {
+                        CType pty = InferType(ctx, newArgs[0]);
+                        if (pty == null || !(pty.IsPointer || pty.IsArray))
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: first argument must be a pointer or array, got: {1}&quot;, __sfname, (pty == null ? &quot;&lt;unknown&gt;&quot; : pty.Show()));
+
+                        CType lty = InferType(ctx, newArgs[1]);
+                        if (lty == null || !lty.IsInteger)
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: second argument must be an integer length, got: {1}&quot;, __sfname, (lty == null ? &quot;&lt;unknown&gt;&quot; : lty.Show()));
+                    }
+
+                    return Expr.Make(Tag.Slice, newArgs[0], newArgs[1]).WithSource(expr.Source);
+                }
+            }
+
+            return MakeCall(newFunc, newArgs).WithSource(expr.Source);
+        }</code></pre></div></details></details><details class="api searchable" id="api-__memcpy_small" data-api-contract="memory-intrinsics-source-20260915"><summary><code>__memcpy_small</code></summary><p>Copia un bloque de hasta 255 bytes con un contador de 8 bits. Usa esta variante cuando la longitud quepa en un byte. <code>_small</code> indica el tamaño del contador; no garantiza un tiempo de ejecución ni un tamaño de código concretos.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __memcpy_small(void* dst, const void* src, u8 len);</code></pre></div><h4>Parámetros</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>Puntero al primer byte escribible del destino. Reserva espacio contiguo para toda la operación; la función no asigna un búfer.</p></dd><dt><code>src</code></dt><dd><p>Puntero al primer byte legible del origen. Todo el intervalo debe permanecer accesible y sin cambios durante la copia.</p></dd><dt><code>len</code></dt><dd><p>Número de bytes como <code>u8</code>: 0–255. No pases 256 para representar un bloque completo de 256 bytes: esa longitud no cabe en el parámetro. Para 256 bytes o más, usa la función correspondiente sin <code>_small</code>.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Condiciones y límites</h4><p>Un contador a cero no transfiere bytes. Los efectos secundarios de las expresiones de los argumentos sí se ejecutan: el ejemplo pasa dos funciones que devuelven punteros y comprueba que ambas se llaman aunque la longitud sea cero.</p><p>Usa regiones de origen y destino que no se solapen. Estas rutinas copian hacia delante y no ofrecen la seguridad de <code>memmove</code> para zonas superpuestas; escribir sobre bytes del origen aún no leídos puede corromper la copia.</p><p>La operación termina antes de devolver el control. No cambia bancos de ROM/RAM ni recorta el intervalo al límite del búfer. Mantén estable el mapa de memoria, usa regiones válidas y coordina el acceso con las interrupciones que utilicen los mismos búferes.</p><p>En GB son accesos ordinarios de la CPU a memoria. No esperan un momento seguro para acceder a VRAM/OAM, no inician DMA ni seleccionan bancos de VRAM/WRAM de CGB. Para esas tareas, usa las API específicas de transferencia gráfica.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>memory_reset();
+__memcpy_small(memory_destination+1,memory_source+1,255);
+memory_copy_byte=memory_check(255,0); // Maximum representable byte count.</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>El ejemplo usa <code>__memcpy_small</code> para copiar 255 bytes con un patrón conocido desde el desplazamiento 1. <code>memory_check</code> compara los arrays completos de origen y destino; la fila <code>COPY BYTE</code> debe mostrar <code>255</code>. El primer byte queda como protección y también se comprueba que los bytes posteriores al bloque no cambien.</p><p>El programa completo inicializa dos búferes de 264 bytes antes de cada operación y comprueba todos los bytes del origen, del destino y de las zonas de protección. Debe mostrar COPY WORD 257, FILL WORD 257, COPY BYTE 255, FILL BYTE 255, COPY16 016, COPY32 032, ZERO CALLS 002 y FAILED 000. WORD/BYTE indican el tamaño del contador, no el de los elementos copiados. Los números proceden de las comprobaciones del ejemplo; estas funciones void no devuelven valores.</p><p>Las capturas muestran letras negras sobre blanco en DMG, azules sobre blanco en CGB y azules sobre negro en FC. El ejemplo verifica operaciones de RAM; el texto presenta sus resultados, no una primitiva de dibujo. Otras pruebas en emulador cubren 88 casos por plataforma, con longitudes constantes y calculadas en ejecución de 0, 1, 16, 17, 32, 33, 64, 65 y 255 bytes, más 256 y 257 para los contadores de 16 bits. No se ha probado en hardware real.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-dmg/screen.png" alt="__memcpy_small: DMG"><figcaption>DMG</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-cgb/screen.png" alt="__memcpy_small: CGB"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/memory_intrinsics.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\memory_intrinsics.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\memory_intrinsics.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/lib/rpg.h:175</p><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:9050</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>if (funcName == &quot;__memcpy&quot; || funcName == &quot;__memcpy_small&quot;)
+            {
+                // Select byte or word count semantics before optional fixed-array bounds diagnostics.
+                bool useU8Count = (funcName == &quot;__memcpy_small&quot;);
+                if (args.Length != 3) { Error(expr, &quot;__memcpy requires 3 arguments&quot;); return; }
+
+                bool doCheck = Program.CheckMemCopy &amp;&amp; !InUnsafe;
+                bool hasDst = false, hasSrc = false;
+                int dstBytes = 0, srcBytes = 0;
+                string dstName = null, srcName = null;
+                if (doCheck)
+                {
+                    hasDst = TryGetFixedArrayByteLength(args[0], out dstBytes, out dstName);
+                    hasSrc = TryGetFixedArrayByteLength(args[1], out srcBytes, out srcName);
+                }
+
+                bool isConstCountAny = args[2].Match(Tag.Integer, out int constCountAny);
+                int normalizedConstCount = constCountAny;
+                if (isConstCountAny &amp;&amp; useU8Count)
+                    normalizedConstCount &amp;= 0xFF;
+
+                if (doCheck &amp;&amp; isConstCountAny)
+                {
+                    if (hasDst &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &gt; dstBytes)
+                    {
+                        Program.Warning(args[2].Source, &quot;__memcpy count {0} exceeds fixed dst array &#x27;{1}&#x27; size {2} bytes (-Zcheck)&quot;, normalizedConstCount, dstName, dstBytes);
+                        EmitAsm(&quot;JP&quot;, EnsureCheckTrap());
+                        return;
+                    }
+                    if (hasSrc &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &gt; srcBytes)
+                    {
+                        Program.Warning(args[2].Source, &quot;__memcpy count {0} exceeds fixed src array &#x27;{1}&#x27; size {2} bytes (-Zcheck)&quot;, normalizedConstCount, srcName, srcBytes);
+                        EmitAsm(&quot;JP&quot;, EnsureCheckTrap());
+                        return;
+                    }
+                }
+
+                if (isConstCountAny &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &lt;= 16)
+                {
+                    if (normalizedConstCount == 0) return;
+
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    CompileIntoHL(args[1]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    EmitAsm(&quot;POP_DE&quot;);
+                    EmitAsm(&quot;POP_HL&quot;);
+
+                    for (int k = 0; k &lt; normalizedConstCount; k++)
+                    {
+                        EmitAsm(&quot;LD_A_DE&quot;);
+                        EmitAsm(&quot;LDI_HL_A&quot;);
+                        EmitAsm(&quot;INC_DE&quot;);
+                    }
+                    return;
+                }
+
+                if (isConstCountAny &amp;&amp; normalizedConstCount &gt; 16 &amp;&amp; normalizedConstCount &lt;= 255)
+                {
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    CompileIntoHL(args[1]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    EmitAsm(&quot;POP_DE&quot;);
+                    EmitAsm(&quot;POP_HL&quot;);
+
+                    if (normalizedConstCount &lt;= 64)
+                    {
+                        int blocks8 = normalizedConstCount / 8;
+                        int rem8 = normalizedConstCount % 8;
+                        if (blocks8 &gt; 0)
+                        {
+                            EmitAsm(&quot;LD_B_IMM&quot;, new AsmOperand(blocks8, AddressMode.Immediate));
+                            // Advance source and destination through eight-byte groups, then emit the remaining constant bytes.
+                            AsmOperand loop8 = MakeUniqueLabel(&quot;memcpy8_loop&quot;);
+                            EmitLabel(loop8);
+                            for (int k = 0; k &lt; 8; k++)
+                            {
+                                EmitAsm(&quot;LD_A_DE&quot;);
+                                EmitAsm(&quot;LDI_HL_A&quot;);
+                                EmitAsm(&quot;INC_DE&quot;);
+                            }
+                            EmitAsm(&quot;DEC_B&quot;);
+                            EmitAsm(&quot;JP_NZ&quot;, loop8);
+                        }
+                        for (int k = 0; k &lt; rem8; k++)
+                        {
+                            EmitAsm(&quot;LD_A_DE&quot;);
+                            EmitAsm(&quot;LDI_HL_A&quot;);
+                            EmitAsm(&quot;INC_DE&quot;);
+                        }
+                        return;
+                    }
+
+                    int blocks16 = normalizedConstCount / 16;
+                    int rem16 = normalizedConstCount % 16;
+                    if (blocks16 &gt; 0)
+                    {
+                        EmitAsm(&quot;LD_B_IMM&quot;, new AsmOperand(blocks16, AddressMode.Immediate));
+                        // Use sixteen-byte groups while keeping the residual copy length known at compile time.
+                        AsmOperand loop16 = MakeUniqueLabel(&quot;memcpy16_loop&quot;);
+                        EmitLabel(loop16);
+                        for (int k = 0; k &lt; 16; k++)
+                        {
+                            EmitAsm(&quot;LD_A_DE&quot;);
+                            EmitAsm(&quot;LDI_HL_A&quot;);
+                            EmitAsm(&quot;INC_DE&quot;);
+                        }
+                        EmitAsm(&quot;DEC_B&quot;);
+                        EmitAsm(&quot;JP_NZ&quot;, loop16);
+                    }
+                    for (int k = 0; k &lt; rem16; k++)
+                    {
+                        EmitAsm(&quot;LD_A_DE&quot;);
+                        EmitAsm(&quot;LDI_HL_A&quot;);
+                        EmitAsm(&quot;INC_DE&quot;);
+                    }
+                    return;
+                }
+
+                if (useU8Count)
+                {
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+
+                    CompileIntoHL(args[1]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+
+                    CompileIntoA(args[2]);
+                    EmitAsm(&quot;LD_B_A&quot;);
+                    if (doCheck)
+                    {
+                        if (hasDst) EmitU8LeqConstOrTrapInA(dstBytes);
+                        if (hasSrc) EmitU8LeqConstOrTrapInA(srcBytes);
+                    }
+
+                    AsmOperand doneLabel = MakeUniqueLabel(&quot;memcpy_small_done&quot;);
+                    AsmOperand smallLoopLabel = MakeUniqueLabel(&quot;memcpy_small_loop&quot;);
+                    EmitAsm(&quot;OR_A&quot;);
+                    EmitAsm(&quot;POP_DE&quot;);
+                    EmitAsm(&quot;POP_HL&quot;);
+                    EmitAsm(&quot;JP_Z&quot;, doneLabel);
+
+                    EmitLabel(smallLoopLabel);
+                    EmitAsm(&quot;LD_A_DE&quot;);
+                    EmitAsm(&quot;LDI_HL_A&quot;);
+                    EmitAsm(&quot;INC_DE&quot;);
+                    EmitAsm(&quot;DEC_B&quot;);
+                    EmitAsm(&quot;JP_NZ&quot;, smallLoopLabel);
+                    EmitLabel(doneLabel);
+                    return;
+                }
+
+                CompileIntoHL(args[0]);
+                EmitAsm(&quot;PUSH_HL&quot;);
+
+                CompileIntoHL(args[1]);
+                EmitAsm(&quot;PUSH_HL&quot;);
+
+                CompileIntoHL(args[2]);
+                if (doCheck &amp;&amp; !isConstCountAny)
+                {
+                    if (hasDst) EmitU16LeqConstOrTrap(dstBytes);
+                    if (hasSrc) EmitU16LeqConstOrTrap(srcBytes);
+                }
+                EmitAsm(&quot;LD_B_H&quot;);
+                EmitAsm(&quot;LD_C_L&quot;);
+
+                EmitAsm(&quot;POP_DE&quot;);
+                EmitAsm(&quot;POP_HL&quot;);
+
+                AsmOperand loopLabel = MakeUniqueLabel(&quot;memcpy_loop&quot;);
+                AsmOperand wordDoneLabel = MakeUniqueLabel(&quot;memcpy_done&quot;);
+                // A zero word count must skip the first write as well as the loop.
+                EmitAsm(&quot;LD_A_B&quot;);
+                EmitAsm(&quot;OR_C&quot;);
+                EmitAsm(&quot;JP_Z&quot;, wordDoneLabel);
+                EmitLabel(loopLabel);
+
+                EmitAsm(&quot;LD_A_DE&quot;);
+                EmitAsm(&quot;LDI_HL_A&quot;);
+                EmitAsm(&quot;INC_DE&quot;);
+
+                EmitAsm(&quot;DEC_BC&quot;);
+                EmitAsm(&quot;LD_A_B&quot;);
+                EmitAsm(&quot;OR_C&quot;);
+                EmitAsm(&quot;JP_NZ&quot;, loopLabel);
+                EmitLabel(wordDoneLabel);
+
+                return;
+            }
+
+// kitaqgb/kitaqgb/Lowerer.cs:2116
+if (expr.MatchAny(Tag.Call, out callFunc, out callArgs))
+        {
+            string knownCallName;
+            if (callFunc != null &amp;&amp; callFunc.Match(Tag.Name, out knownCallName) &amp;&amp;
+                knownCallName == &quot;__cgb_is_cgb&quot; &amp;&amp;
+                callArgs != null &amp;&amp; callArgs.Length == 0 &amp;&amp;
+                // A resolved target configuration can replace the zero-argument CGB query with a literal.
+                Program.TryGetKnownCgbRuntimeValue(out int knownCgbValue))
+            {
+                return Expr.Make(Tag.Integer, knownCgbValue).WithSource(expr.Source);
+            }
+
+            Expr newFunc = LowerExpr(ctx, callFunc, false, prefix);
+
+            // Optimization (post-A3): when we must spill a non-atomic argument into a temp,
+            // prefer a u8 temp if the *parameter type* is u8-like.
+            // This preserves semantics (implicit truncation to u8) while avoiding needless
+            // u16 temporaries created by integer promotions.
+            CType[] paramTypes = null;
+            string __fname = null;
+            if (newFunc.Match(Tag.Name, out __fname))
+            {
+                paramTypes = ctx.FindFuncParams(__fname);
+                if (paramTypes == null)
+                {
+                    CType fnTypeFromName;
+                    if (TryGetCallableFunctionType(ctx.FindTypeOfName(__fname), out fnTypeFromName))
+                        paramTypes = fnTypeFromName.ParamTypes;
+                }
+            }
+            else
+            {
+                CType fnTypeFromExpr;
+                if (TryGetCallableFunctionType(InferType(ctx, newFunc), out fnTypeFromExpr))
+                    paramTypes = fnTypeFromExpr.ParamTypes;
+            }
+
+            Expr[] newArgs = new Expr[callArgs.Length];
+            for (int i = 0; i &lt; callArgs.Length; i++)
+            {
+                Expr a = LowerExpr(ctx, callArgs[i], allowExtract, prefix);
+                bool preserveConstantArgIntrinsic = false;
+                if (a.MatchAny(Tag.Call, out Expr argFunc, out Expr[] _argCallArgs) &amp;&amp;
+                    argFunc.Match(Tag.Name, out string argFuncName))
+                {
+                    preserveConstantArgIntrinsic = (argFuncName == &quot;__bankof&quot; || argFuncName == &quot;__cgb_is_cgb&quot;);
+                }
+                // Keep evaluable constants and special intrinsic/bank operands visible to code generation instead of spilling them.
+                bool preserveCompileTimeConstantArg = ctx.Global.TryEvalConstInt(a, out _);
+                bool preserveFarcallBankArg = (__fname == &quot;__farcall&quot; &amp;&amp; i == 0);
+
+                if (allowExtract &amp;&amp; !preserveFarcallBankArg &amp;&amp; !preserveConstantArgIntrinsic &amp;&amp; !preserveCompileTimeConstantArg &amp;&amp; !IsAtom(a))
+                {
+                    // If we know the callee&#x27;s parameter type, use it to choose a smaller temp.
+                    // Example: (u8)(row*32) passed to a u8 param should spill as u8, not u16.
+                    CType spillAs = null;
+                    if (paramTypes != null &amp;&amp; i &lt; paramTypes.Length)
+                    {
+                        CType pt = paramTypes[i];
+                        if (IsU8Like(pt)) spillAs = CType.UInt8;
+                    }
+                    if (spillAs == null) spillAs = InferType(ctx, a);
+                    if (!IsAggregateType(spillAs) &amp;&amp; SizeOfType(spillAs) &lt;= 2)
+                        a = SpillToTemp(ctx, a, spillAs, prefix);
+                }
+                newArgs[i] = a;
+            }
+
+            // Lint: const discard for argument passing
+            // Warn when passing a const-qualified pointer (or const array decay) to a non-const pointer parameter.
+            // Suppress when the argument has an explicit cast, or inside __unsafe.
+            if (!ctx.InUnsafe &amp;&amp; paramTypes != null)
+            {
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+                    if (!IsPointerToNonConst(pt)) continue;
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at != null &amp;&amp; (IsPointerToConst(at) || IsArrayOfConst(at)))
+                    {
+                        string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                        WarnConstDiscard(expr, $&quot;argument {i} to &#x27;{fn}&#x27;&quot;);
+                        break; // keep it quiet: one warning per call is enough
+                    }
+                }
+            }
+
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    FilePosition argPos = newArgs[i].Source;
+                    if (string.IsNullOrEmpty(argPos.Filename) || argPos.Filename == &quot;&lt;unknown&gt;&quot;)
+                        argPos = expr.Source;
+                    WarnImplicitNarrowingIfNeeded(ctx, newArgs[i], InferType(ctx, newArgs[i]), paramTypes[i], argPos,
+                        &quot;argument &quot; + i + &quot; to &#x27;&quot; + fn + &quot;&#x27;&quot;);
+                }
+            }
+
+            // Lint: __enum_strict argument passing.
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at == null) continue;
+
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    if (IsStrictEnum(pt))
+                    {
+                        if (!IsSameEnum(pt, at))
+                        {
+                            Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                                &quot;argument {0} to &#x27;{1}&#x27; expects __enum_strict {2}, got {3}; cast explicitly to silence&quot;,
+                                i, fn, pt.Show(), at.Show());
+                        }
+                    }
+                    else if (IsPlainInteger(pt) &amp;&amp; IsStrictEnum(at))
+                    {
+                        Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                            &quot;argument {0} to &#x27;{1}&#x27; passes __enum_strict {2} to integer parameter {3}; cast explicitly to silence&quot;,
+                            i, fn, at.Show(), pt.Show());
+                    }
+                }
+            }
+
+            if (!ctx.InUnsafe)
+                RestrictAliasLint(ctx, newFunc, newArgs, expr.Source);
+
+            // __slice(ptr,len) helper: represent a &quot;slice&quot; (ptr+len) in the IR.
+            // Semantics: evaluate both arguments, result type is the pointer/array (same as arg0).
+            // Bounds checks are injected only with -Zcheck (see Program.CheckSliceBounds).
+            // Note: keep the intrinsic name conservative to avoid collisions (&quot;slice&quot; is allowed only
+            // when there is no declared function named &quot;slice&quot;).
+            if (newFunc.Match(Tag.Name, out string __sfname))
+            {
+                bool isSliceIntrinsic = (__sfname == &quot;__slice&quot;) || (__sfname == &quot;slice&quot; &amp;&amp; ctx.FindFuncParams(&quot;slice&quot;) == null);
+                if (isSliceIntrinsic)
+                {
+                    if (newArgs.Length != 2)
+                    {
+                        Program.Error(expr.Source, ErrorCode.ParseError, &quot;{0}: expected 2 arguments: __slice(ptr,len)&quot;, __sfname);
+                    }
+                    else
+                    {
+                        CType pty = InferType(ctx, newArgs[0]);
+                        if (pty == null || !(pty.IsPointer || pty.IsArray))
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: first argument must be a pointer or array, got: {1}&quot;, __sfname, (pty == null ? &quot;&lt;unknown&gt;&quot; : pty.Show()));
+
+                        CType lty = InferType(ctx, newArgs[1]);
+                        if (lty == null || !lty.IsInteger)
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: second argument must be an integer length, got: {1}&quot;, __sfname, (lty == null ? &quot;&lt;unknown&gt;&quot; : lty.Show()));
+                    }
+
+                    return Expr.Make(Tag.Slice, newArgs[0], newArgs[1]).WithSource(expr.Source);
+                }
+            }
+
+            return MakeCall(newFunc, newArgs).WithSource(expr.Source);
+        }</code></pre></div></details></details><details class="api searchable" id="api-__memset" data-api-contract="memory-intrinsics-source-20260915"><summary><code>__memset</code></summary><p>Rellena el destino con un mismo valor de un byte. El contador de 16 bits resulta útil para vaciar un búfer grande o inicializar una tabla. Por ejemplo, <code>0x5A</code> escribe <code>5A 5A 5A…</code>; no repite un entero de varios bytes.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __memset(void* dst, u8 value, u16 count);</code></pre></div><h4>Parámetros</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>Puntero al primer byte escribible del destino. Reserva espacio contiguo para toda la operación; la función no asigna un búfer.</p></dd><dt><code>value</code></dt><dd><p>Byte que se repite en cada dirección del destino: 0–255. Usa 0 para poner el intervalo a cero. Para inicializar un array de <code>u16</code> con un número distinto de cero, asigna ese valor a cada elemento.</p></dd><dt><code>count</code></dt><dd><p>Número de bytes como <code>u16</code> (0–65535), no de elementos. El máximo del tipo no implica que la máquina disponga de un búfer válido de ese tamaño. Todo el intervalo debe caber en el mapa de memoria seleccionado.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Condiciones y límites</h4><p>Un contador a cero no transfiere bytes. Los efectos secundarios de las expresiones de los argumentos sí se ejecutan: el ejemplo pasa dos funciones que devuelven punteros y comprueba que ambas se llaman aunque la longitud sea cero.</p><p>La operación termina antes de devolver el control. No cambia bancos de ROM/RAM ni recorta el intervalo al límite del búfer. Mantén estable el mapa de memoria, usa regiones válidas y coordina el acceso con las interrupciones que utilicen los mismos búferes.</p><p>En GB son accesos ordinarios de la CPU a memoria. No esperan un momento seguro para acceder a VRAM/OAM, no inician DMA ni seleccionan bancos de VRAM/WRAM de CGB. Para esas tareas, usa las API específicas de transferencia gráfica.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>memory_reset();
+__memset(memory_destination+1,0x5A,257);
+memory_fill_word=memory_check(257,1); // Repeat one byte, not a 16-bit word.</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>El ejemplo usa <code>__memset</code> para rellenar 257 bytes desde el desplazamiento 1 con <code>0x5A</code>. <code>memory_check</code> exige que todos esos bytes valgan <code>0x5A</code>, que los bytes de protección sigan en <code>0xCC</code> y que el búfer de origen separado no cambie. La fila <code>FILL WORD</code> debe mostrar <code>257</code>.</p><p>El programa completo inicializa dos búferes de 264 bytes antes de cada operación y comprueba todos los bytes del origen, del destino y de las zonas de protección. Debe mostrar COPY WORD 257, FILL WORD 257, COPY BYTE 255, FILL BYTE 255, COPY16 016, COPY32 032, ZERO CALLS 002 y FAILED 000. WORD/BYTE indican el tamaño del contador, no el de los elementos copiados. Los números proceden de las comprobaciones del ejemplo; estas funciones void no devuelven valores.</p><p>Las capturas muestran letras negras sobre blanco en DMG, azules sobre blanco en CGB y azules sobre negro en FC. El ejemplo verifica operaciones de RAM; el texto presenta sus resultados, no una primitiva de dibujo. Otras pruebas en emulador cubren 88 casos por plataforma, con longitudes constantes y calculadas en ejecución de 0, 1, 16, 17, 32, 33, 64, 65 y 255 bytes, más 256 y 257 para los contadores de 16 bits. No se ha probado en hardware real.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-dmg/screen.png" alt="__memset: DMG"><figcaption>DMG</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-cgb/screen.png" alt="__memset: CGB"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/memory_intrinsics.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\memory_intrinsics.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\memory_intrinsics.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/lib/rpg.h:141</p><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:8892</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>if (funcName == &quot;__memset&quot; || funcName == &quot;__memset_small&quot;)
+            {
+                // The small API truncates its count to a byte; the general API uses a word count.
+                bool useU8Count = (funcName == &quot;__memset_small&quot;);
+                if (args.Length != 3) { Error(expr, &quot;__memset requires 3 arguments&quot;); return; }
+
+                // -Zcheck: fixed-array range check for memset length
+                bool doCheck = Program.CheckMemCopy &amp;&amp; !InUnsafe;
+                bool hasDst = false;
+                int dstBytes = 0;
+                string dstName = null;
+                if (doCheck)
+                    hasDst = TryGetFixedArrayByteLength(args[0], out dstBytes, out dstName);
+
+                bool isConstCountAny = args[2].Match(Tag.Integer, out int constCountAny);
+                int normalizedConstCount = constCountAny;
+                if (isConstCountAny &amp;&amp; useU8Count)
+                    normalizedConstCount &amp;= 0xFF;
+
+                if (doCheck &amp;&amp; hasDst &amp;&amp; isConstCountAny &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &gt; dstBytes)
+                {
+                    Program.Warning(args[2].Source, &quot;__memset count {0} exceeds fixed array &#x27;{1}&#x27; size {2} bytes (-Zcheck)&quot;, normalizedConstCount, dstName, dstBytes);
+                    EmitAsm(&quot;JP&quot;, EnsureCheckTrap());
+                    return;
+                }
+
+                // Size-specialized memset for small constant counts (&lt;=16): unrolled stores.
+                if (isConstCountAny &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &lt;= 16)
+                {
+                    if (normalizedConstCount == 0) return;
+
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    CompileIntoA(args[1]);
+                    EmitAsm(&quot;POP_HL&quot;);
+
+                    for (int k = 0; k &lt; normalizedConstCount; k++)
+                        EmitAsm(&quot;LDI_HL_A&quot;);
+                    return;
+                }
+
+                // Size-specialized memset for constant counts beyond 16
+                if (isConstCountAny &amp;&amp; normalizedConstCount &gt;= 0)
+                {
+                    if (normalizedConstCount == 0) return;
+
+                    if (normalizedConstCount &gt; 16 &amp;&amp; normalizedConstCount &lt;= 64)
+                    {
+                        int blocks8 = normalizedConstCount / 8;
+                        int rem = normalizedConstCount % 8;
+
+                        CompileIntoHL(args[0]);
+                        EmitAsm(&quot;PUSH_HL&quot;);
+                        CompileIntoA(args[1]);
+                        EmitAsm(&quot;POP_HL&quot;);
+
+                        if (blocks8 &gt; 0)
+                        {
+                            EmitAsm(&quot;LD_B_IMM&quot;, new AsmOperand(blocks8, AddressMode.Immediate));
+                            // Emit groups of eight stores followed by the constant remainder for medium fills.
+                            AsmOperand loop8 = MakeUniqueLabel(&quot;memset8_loop&quot;);
+                            EmitLabel(loop8);
+                            for (int k = 0; k &lt; 8; k++) EmitAsm(&quot;LDI_HL_A&quot;);
+                            EmitAsm(&quot;DEC_B&quot;);
+                            EmitAsm(&quot;JP_NZ&quot;, loop8);
+                        }
+                        for (int k = 0; k &lt; rem; k++) EmitAsm(&quot;LDI_HL_A&quot;);
+                        return;
+                    }
+
+                    if (normalizedConstCount &lt;= 255)
+                    {
+                        int blocks16 = normalizedConstCount / 16;
+                        int rem = normalizedConstCount % 16;
+
+                        CompileIntoHL(args[0]);
+                        EmitAsm(&quot;PUSH_HL&quot;);
+                        CompileIntoA(args[1]);
+                        EmitAsm(&quot;POP_HL&quot;);
+
+                        if (blocks16 &gt; 0)
+                        {
+                            EmitAsm(&quot;LD_B_IMM&quot;, new AsmOperand(blocks16, AddressMode.Immediate));
+                            // Use sixteen-store groups for larger byte-range constant fills.
+                            AsmOperand loop16 = MakeUniqueLabel(&quot;memset16_loop&quot;);
+                            EmitLabel(loop16);
+                            for (int k = 0; k &lt; 16; k++) EmitAsm(&quot;LDI_HL_A&quot;);
+                            EmitAsm(&quot;DEC_B&quot;);
+                            EmitAsm(&quot;JP_NZ&quot;, loop16);
+                        }
+                        for (int k = 0; k &lt; rem; k++) EmitAsm(&quot;LDI_HL_A&quot;);
+                        return;
+                    }
+                }
+
+                if (useU8Count)
+                {
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+
+                    CompileIntoA(args[1]);
+                    EmitAsm(&quot;LD_D_A&quot;);
+
+                    CompileIntoA(args[2]);
+                    EmitAsm(&quot;LD_B_A&quot;);
+                    if (doCheck &amp;&amp; hasDst)
+                        EmitU8LeqConstOrTrapInA(dstBytes);
+
+                    AsmOperand doneLabel = MakeUniqueLabel(&quot;memset_small_done&quot;);
+                    AsmOperand smallLoopLabel = MakeUniqueLabel(&quot;memset_small_loop&quot;);
+                    EmitAsm(&quot;OR_A&quot;);
+                    EmitAsm(&quot;POP_HL&quot;);
+                    EmitAsm(&quot;JP_Z&quot;, doneLabel);
+                    EmitAsm(&quot;LD_A_D&quot;);
+                    EmitLabel(smallLoopLabel);
+                    EmitAsm(&quot;LDI_HL_A&quot;);
+                    EmitAsm(&quot;DEC_B&quot;);
+                    EmitAsm(&quot;JP_NZ&quot;, smallLoopLabel);
+                    EmitLabel(doneLabel);
+                    return;
+                }
+
+                CompileIntoHL(args[0]);
+                EmitAsm(&quot;PUSH_HL&quot;);
+
+                CompileIntoHL(args[2]);
+                if (doCheck &amp;&amp; hasDst &amp;&amp; !isConstCountAny)
+                    EmitU16LeqConstOrTrap(dstBytes);
+                EmitAsm(&quot;LD_B_H&quot;);
+                EmitAsm(&quot;LD_C_L&quot;);
+
+                CompileIntoA(args[1]);
+                EmitAsm(&quot;LD_D_A&quot;);
+
+                EmitAsm(&quot;POP_HL&quot;);
+
+                AsmOperand loopLabel = MakeUniqueLabel(&quot;memset_loop&quot;);
+                AsmOperand wordDoneLabel = MakeUniqueLabel(&quot;memset_done&quot;);
+                // A zero word count must skip the first write as well as the loop.
+                EmitAsm(&quot;LD_A_B&quot;);
+                EmitAsm(&quot;OR_C&quot;);
+                EmitAsm(&quot;JP_Z&quot;, wordDoneLabel);
+                EmitLabel(loopLabel);
+
+                EmitAsm(&quot;LD_A_D&quot;);
+                EmitAsm(&quot;LDI_HL_A&quot;);
+
+                EmitAsm(&quot;DEC_BC&quot;);
+                EmitAsm(&quot;LD_A_B&quot;);
+                EmitAsm(&quot;OR_C&quot;);
+                EmitAsm(&quot;JP_NZ&quot;, loopLabel);
+                EmitLabel(wordDoneLabel);
+
+                return;
+            }
+
+// kitaqgb/kitaqgb/Lowerer.cs:2116
+if (expr.MatchAny(Tag.Call, out callFunc, out callArgs))
+        {
+            string knownCallName;
+            if (callFunc != null &amp;&amp; callFunc.Match(Tag.Name, out knownCallName) &amp;&amp;
+                knownCallName == &quot;__cgb_is_cgb&quot; &amp;&amp;
+                callArgs != null &amp;&amp; callArgs.Length == 0 &amp;&amp;
+                // A resolved target configuration can replace the zero-argument CGB query with a literal.
+                Program.TryGetKnownCgbRuntimeValue(out int knownCgbValue))
+            {
+                return Expr.Make(Tag.Integer, knownCgbValue).WithSource(expr.Source);
+            }
+
+            Expr newFunc = LowerExpr(ctx, callFunc, false, prefix);
+
+            // Optimization (post-A3): when we must spill a non-atomic argument into a temp,
+            // prefer a u8 temp if the *parameter type* is u8-like.
+            // This preserves semantics (implicit truncation to u8) while avoiding needless
+            // u16 temporaries created by integer promotions.
+            CType[] paramTypes = null;
+            string __fname = null;
+            if (newFunc.Match(Tag.Name, out __fname))
+            {
+                paramTypes = ctx.FindFuncParams(__fname);
+                if (paramTypes == null)
+                {
+                    CType fnTypeFromName;
+                    if (TryGetCallableFunctionType(ctx.FindTypeOfName(__fname), out fnTypeFromName))
+                        paramTypes = fnTypeFromName.ParamTypes;
+                }
+            }
+            else
+            {
+                CType fnTypeFromExpr;
+                if (TryGetCallableFunctionType(InferType(ctx, newFunc), out fnTypeFromExpr))
+                    paramTypes = fnTypeFromExpr.ParamTypes;
+            }
+
+            Expr[] newArgs = new Expr[callArgs.Length];
+            for (int i = 0; i &lt; callArgs.Length; i++)
+            {
+                Expr a = LowerExpr(ctx, callArgs[i], allowExtract, prefix);
+                bool preserveConstantArgIntrinsic = false;
+                if (a.MatchAny(Tag.Call, out Expr argFunc, out Expr[] _argCallArgs) &amp;&amp;
+                    argFunc.Match(Tag.Name, out string argFuncName))
+                {
+                    preserveConstantArgIntrinsic = (argFuncName == &quot;__bankof&quot; || argFuncName == &quot;__cgb_is_cgb&quot;);
+                }
+                // Keep evaluable constants and special intrinsic/bank operands visible to code generation instead of spilling them.
+                bool preserveCompileTimeConstantArg = ctx.Global.TryEvalConstInt(a, out _);
+                bool preserveFarcallBankArg = (__fname == &quot;__farcall&quot; &amp;&amp; i == 0);
+
+                if (allowExtract &amp;&amp; !preserveFarcallBankArg &amp;&amp; !preserveConstantArgIntrinsic &amp;&amp; !preserveCompileTimeConstantArg &amp;&amp; !IsAtom(a))
+                {
+                    // If we know the callee&#x27;s parameter type, use it to choose a smaller temp.
+                    // Example: (u8)(row*32) passed to a u8 param should spill as u8, not u16.
+                    CType spillAs = null;
+                    if (paramTypes != null &amp;&amp; i &lt; paramTypes.Length)
+                    {
+                        CType pt = paramTypes[i];
+                        if (IsU8Like(pt)) spillAs = CType.UInt8;
+                    }
+                    if (spillAs == null) spillAs = InferType(ctx, a);
+                    if (!IsAggregateType(spillAs) &amp;&amp; SizeOfType(spillAs) &lt;= 2)
+                        a = SpillToTemp(ctx, a, spillAs, prefix);
+                }
+                newArgs[i] = a;
+            }
+
+            // Lint: const discard for argument passing
+            // Warn when passing a const-qualified pointer (or const array decay) to a non-const pointer parameter.
+            // Suppress when the argument has an explicit cast, or inside __unsafe.
+            if (!ctx.InUnsafe &amp;&amp; paramTypes != null)
+            {
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+                    if (!IsPointerToNonConst(pt)) continue;
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at != null &amp;&amp; (IsPointerToConst(at) || IsArrayOfConst(at)))
+                    {
+                        string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                        WarnConstDiscard(expr, $&quot;argument {i} to &#x27;{fn}&#x27;&quot;);
+                        break; // keep it quiet: one warning per call is enough
+                    }
+                }
+            }
+
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    FilePosition argPos = newArgs[i].Source;
+                    if (string.IsNullOrEmpty(argPos.Filename) || argPos.Filename == &quot;&lt;unknown&gt;&quot;)
+                        argPos = expr.Source;
+                    WarnImplicitNarrowingIfNeeded(ctx, newArgs[i], InferType(ctx, newArgs[i]), paramTypes[i], argPos,
+                        &quot;argument &quot; + i + &quot; to &#x27;&quot; + fn + &quot;&#x27;&quot;);
+                }
+            }
+
+            // Lint: __enum_strict argument passing.
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at == null) continue;
+
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    if (IsStrictEnum(pt))
+                    {
+                        if (!IsSameEnum(pt, at))
+                        {
+                            Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                                &quot;argument {0} to &#x27;{1}&#x27; expects __enum_strict {2}, got {3}; cast explicitly to silence&quot;,
+                                i, fn, pt.Show(), at.Show());
+                        }
+                    }
+                    else if (IsPlainInteger(pt) &amp;&amp; IsStrictEnum(at))
+                    {
+                        Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                            &quot;argument {0} to &#x27;{1}&#x27; passes __enum_strict {2} to integer parameter {3}; cast explicitly to silence&quot;,
+                            i, fn, at.Show(), pt.Show());
+                    }
+                }
+            }
+
+            if (!ctx.InUnsafe)
+                RestrictAliasLint(ctx, newFunc, newArgs, expr.Source);
+
+            // __slice(ptr,len) helper: represent a &quot;slice&quot; (ptr+len) in the IR.
+            // Semantics: evaluate both arguments, result type is the pointer/array (same as arg0).
+            // Bounds checks are injected only with -Zcheck (see Program.CheckSliceBounds).
+            // Note: keep the intrinsic name conservative to avoid collisions (&quot;slice&quot; is allowed only
+            // when there is no declared function named &quot;slice&quot;).
+            if (newFunc.Match(Tag.Name, out string __sfname))
+            {
+                bool isSliceIntrinsic = (__sfname == &quot;__slice&quot;) || (__sfname == &quot;slice&quot; &amp;&amp; ctx.FindFuncParams(&quot;slice&quot;) == null);
+                if (isSliceIntrinsic)
+                {
+                    if (newArgs.Length != 2)
+                    {
+                        Program.Error(expr.Source, ErrorCode.ParseError, &quot;{0}: expected 2 arguments: __slice(ptr,len)&quot;, __sfname);
+                    }
+                    else
+                    {
+                        CType pty = InferType(ctx, newArgs[0]);
+                        if (pty == null || !(pty.IsPointer || pty.IsArray))
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: first argument must be a pointer or array, got: {1}&quot;, __sfname, (pty == null ? &quot;&lt;unknown&gt;&quot; : pty.Show()));
+
+                        CType lty = InferType(ctx, newArgs[1]);
+                        if (lty == null || !lty.IsInteger)
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: second argument must be an integer length, got: {1}&quot;, __sfname, (lty == null ? &quot;&lt;unknown&gt;&quot; : lty.Show()));
+                    }
+
+                    return Expr.Make(Tag.Slice, newArgs[0], newArgs[1]).WithSource(expr.Source);
+                }
+            }
+
+            return MakeCall(newFunc, newArgs).WithSource(expr.Source);
+        }</code></pre></div></details></details><details class="api searchable" id="api-__memset_small" data-api-contract="memory-intrinsics-source-20260915"><summary><code>__memset_small</code></summary><p>Rellena hasta 255 bytes consecutivos con un mismo valor, usando un contador de 8 bits. Sirve para inicializar un búfer de trabajo pequeño. Si necesitas más de 255 bytes, utiliza <code>__memset</code>.</p><h4>Sintaxis</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>void __memset_small(void* dst, u8 value, u8 len);</code></pre></div><h4>Parámetros</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>Puntero al primer byte escribible del destino. Reserva espacio contiguo para toda la operación; la función no asigna un búfer.</p></dd><dt><code>value</code></dt><dd><p>Byte que se repite en cada dirección del destino: 0–255. Usa 0 para poner el intervalo a cero. Para inicializar un array de <code>u16</code> con un número distinto de cero, asigna ese valor a cada elemento.</p></dd><dt><code>len</code></dt><dd><p>Número de bytes como <code>u8</code>: 0–255. No pases 256 para representar un bloque completo de 256 bytes: esa longitud no cabe en el parámetro. Para 256 bytes o más, usa la función correspondiente sin <code>_small</code>.</p></dd></dl><h4>Valor devuelto</h4><p>Ninguno (<code>void</code>).</p><h4>Condiciones y límites</h4><p>Un contador a cero no transfiere bytes. Los efectos secundarios de las expresiones de los argumentos sí se ejecutan: el ejemplo pasa dos funciones que devuelven punteros y comprueba que ambas se llaman aunque la longitud sea cero.</p><p>La operación termina antes de devolver el control. No cambia bancos de ROM/RAM ni recorta el intervalo al límite del búfer. Mantén estable el mapa de memoria, usa regiones válidas y coordina el acceso con las interrupciones que utilicen los mismos búferes.</p><p>En GB son accesos ordinarios de la CPU a memoria. No esperan un momento seguro para acceder a VRAM/OAM, no inician DMA ni seleccionan bancos de VRAM/WRAM de CGB. Para esas tareas, usa las API específicas de transferencia gráfica.</p><h4>Ejemplo de uso</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>memory_reset();
+__memset_small(memory_destination+1,0x5A,255);
+memory_fill_byte=memory_check(255,1);</code></pre></div><p>Este fragmento muestra la llamada. Antes de incorporarlo a un programa completo, cumple los requisitos de inicialización y de los búferes indicados.</p><h4>Resultado esperado</h4><p>El ejemplo usa <code>__memset_small</code> para rellenar 255 bytes desde el desplazamiento 1 con <code>0x5A</code>. <code>memory_check</code> exige que todos esos bytes valgan <code>0x5A</code>, que los bytes de protección sigan en <code>0xCC</code> y que el búfer de origen separado no cambie. La fila <code>FILL BYTE</code> debe mostrar <code>255</code>.</p><p>El programa completo inicializa dos búferes de 264 bytes antes de cada operación y comprueba todos los bytes del origen, del destino y de las zonas de protección. Debe mostrar COPY WORD 257, FILL WORD 257, COPY BYTE 255, FILL BYTE 255, COPY16 016, COPY32 032, ZERO CALLS 002 y FAILED 000. WORD/BYTE indican el tamaño del contador, no el de los elementos copiados. Los números proceden de las comprobaciones del ejemplo; estas funciones void no devuelven valores.</p><p>Las capturas muestran letras negras sobre blanco en DMG, azules sobre blanco en CGB y azules sobre negro en FC. El ejemplo verifica operaciones de RAM; el texto presenta sus resultados, no una primitiva de dibujo. Otras pruebas en emulador cubren 88 casos por plataforma, con longitudes constantes y calculadas en ejecución de 0, 1, 16, 17, 32, 33, 64, 65 y 255 bytes, más 256 y 257 para los contadores de 16 bits. No se ha probado en hardware real.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-dmg/screen.png" alt="__memset_small: DMG"><figcaption>DMG</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-memory-intrinsics/gb-cgb/screen.png" alt="__memset_small: CGB"><figcaption>CGB</figcaption></figure><p><a href="../samples/api-examples/gb/memory_intrinsics.c">Programa de ejemplo completo</a></p><h4>Comando de compilación</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\memory_intrinsics.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\memory_intrinsics.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementación y código fuente</summary><p class="source">kitaqgb/lib/rpg.h:176</p><p class="source">kitaqgb/kitaqgb/CodeGenerator.cs:8892</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copiar</button><pre><code>if (funcName == &quot;__memset&quot; || funcName == &quot;__memset_small&quot;)
+            {
+                // The small API truncates its count to a byte; the general API uses a word count.
+                bool useU8Count = (funcName == &quot;__memset_small&quot;);
+                if (args.Length != 3) { Error(expr, &quot;__memset requires 3 arguments&quot;); return; }
+
+                // -Zcheck: fixed-array range check for memset length
+                bool doCheck = Program.CheckMemCopy &amp;&amp; !InUnsafe;
+                bool hasDst = false;
+                int dstBytes = 0;
+                string dstName = null;
+                if (doCheck)
+                    hasDst = TryGetFixedArrayByteLength(args[0], out dstBytes, out dstName);
+
+                bool isConstCountAny = args[2].Match(Tag.Integer, out int constCountAny);
+                int normalizedConstCount = constCountAny;
+                if (isConstCountAny &amp;&amp; useU8Count)
+                    normalizedConstCount &amp;= 0xFF;
+
+                if (doCheck &amp;&amp; hasDst &amp;&amp; isConstCountAny &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &gt; dstBytes)
+                {
+                    Program.Warning(args[2].Source, &quot;__memset count {0} exceeds fixed array &#x27;{1}&#x27; size {2} bytes (-Zcheck)&quot;, normalizedConstCount, dstName, dstBytes);
+                    EmitAsm(&quot;JP&quot;, EnsureCheckTrap());
+                    return;
+                }
+
+                // Size-specialized memset for small constant counts (&lt;=16): unrolled stores.
+                if (isConstCountAny &amp;&amp; normalizedConstCount &gt;= 0 &amp;&amp; normalizedConstCount &lt;= 16)
+                {
+                    if (normalizedConstCount == 0) return;
+
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+                    CompileIntoA(args[1]);
+                    EmitAsm(&quot;POP_HL&quot;);
+
+                    for (int k = 0; k &lt; normalizedConstCount; k++)
+                        EmitAsm(&quot;LDI_HL_A&quot;);
+                    return;
+                }
+
+                // Size-specialized memset for constant counts beyond 16
+                if (isConstCountAny &amp;&amp; normalizedConstCount &gt;= 0)
+                {
+                    if (normalizedConstCount == 0) return;
+
+                    if (normalizedConstCount &gt; 16 &amp;&amp; normalizedConstCount &lt;= 64)
+                    {
+                        int blocks8 = normalizedConstCount / 8;
+                        int rem = normalizedConstCount % 8;
+
+                        CompileIntoHL(args[0]);
+                        EmitAsm(&quot;PUSH_HL&quot;);
+                        CompileIntoA(args[1]);
+                        EmitAsm(&quot;POP_HL&quot;);
+
+                        if (blocks8 &gt; 0)
+                        {
+                            EmitAsm(&quot;LD_B_IMM&quot;, new AsmOperand(blocks8, AddressMode.Immediate));
+                            // Emit groups of eight stores followed by the constant remainder for medium fills.
+                            AsmOperand loop8 = MakeUniqueLabel(&quot;memset8_loop&quot;);
+                            EmitLabel(loop8);
+                            for (int k = 0; k &lt; 8; k++) EmitAsm(&quot;LDI_HL_A&quot;);
+                            EmitAsm(&quot;DEC_B&quot;);
+                            EmitAsm(&quot;JP_NZ&quot;, loop8);
+                        }
+                        for (int k = 0; k &lt; rem; k++) EmitAsm(&quot;LDI_HL_A&quot;);
+                        return;
+                    }
+
+                    if (normalizedConstCount &lt;= 255)
+                    {
+                        int blocks16 = normalizedConstCount / 16;
+                        int rem = normalizedConstCount % 16;
+
+                        CompileIntoHL(args[0]);
+                        EmitAsm(&quot;PUSH_HL&quot;);
+                        CompileIntoA(args[1]);
+                        EmitAsm(&quot;POP_HL&quot;);
+
+                        if (blocks16 &gt; 0)
+                        {
+                            EmitAsm(&quot;LD_B_IMM&quot;, new AsmOperand(blocks16, AddressMode.Immediate));
+                            // Use sixteen-store groups for larger byte-range constant fills.
+                            AsmOperand loop16 = MakeUniqueLabel(&quot;memset16_loop&quot;);
+                            EmitLabel(loop16);
+                            for (int k = 0; k &lt; 16; k++) EmitAsm(&quot;LDI_HL_A&quot;);
+                            EmitAsm(&quot;DEC_B&quot;);
+                            EmitAsm(&quot;JP_NZ&quot;, loop16);
+                        }
+                        for (int k = 0; k &lt; rem; k++) EmitAsm(&quot;LDI_HL_A&quot;);
+                        return;
+                    }
+                }
+
+                if (useU8Count)
+                {
+                    CompileIntoHL(args[0]);
+                    EmitAsm(&quot;PUSH_HL&quot;);
+
+                    CompileIntoA(args[1]);
+                    EmitAsm(&quot;LD_D_A&quot;);
+
+                    CompileIntoA(args[2]);
+                    EmitAsm(&quot;LD_B_A&quot;);
+                    if (doCheck &amp;&amp; hasDst)
+                        EmitU8LeqConstOrTrapInA(dstBytes);
+
+                    AsmOperand doneLabel = MakeUniqueLabel(&quot;memset_small_done&quot;);
+                    AsmOperand smallLoopLabel = MakeUniqueLabel(&quot;memset_small_loop&quot;);
+                    EmitAsm(&quot;OR_A&quot;);
+                    EmitAsm(&quot;POP_HL&quot;);
+                    EmitAsm(&quot;JP_Z&quot;, doneLabel);
+                    EmitAsm(&quot;LD_A_D&quot;);
+                    EmitLabel(smallLoopLabel);
+                    EmitAsm(&quot;LDI_HL_A&quot;);
+                    EmitAsm(&quot;DEC_B&quot;);
+                    EmitAsm(&quot;JP_NZ&quot;, smallLoopLabel);
+                    EmitLabel(doneLabel);
+                    return;
+                }
+
+                CompileIntoHL(args[0]);
+                EmitAsm(&quot;PUSH_HL&quot;);
+
+                CompileIntoHL(args[2]);
+                if (doCheck &amp;&amp; hasDst &amp;&amp; !isConstCountAny)
+                    EmitU16LeqConstOrTrap(dstBytes);
+                EmitAsm(&quot;LD_B_H&quot;);
+                EmitAsm(&quot;LD_C_L&quot;);
+
+                CompileIntoA(args[1]);
+                EmitAsm(&quot;LD_D_A&quot;);
+
+                EmitAsm(&quot;POP_HL&quot;);
+
+                AsmOperand loopLabel = MakeUniqueLabel(&quot;memset_loop&quot;);
+                AsmOperand wordDoneLabel = MakeUniqueLabel(&quot;memset_done&quot;);
+                // A zero word count must skip the first write as well as the loop.
+                EmitAsm(&quot;LD_A_B&quot;);
+                EmitAsm(&quot;OR_C&quot;);
+                EmitAsm(&quot;JP_Z&quot;, wordDoneLabel);
+                EmitLabel(loopLabel);
+
+                EmitAsm(&quot;LD_A_D&quot;);
+                EmitAsm(&quot;LDI_HL_A&quot;);
+
+                EmitAsm(&quot;DEC_BC&quot;);
+                EmitAsm(&quot;LD_A_B&quot;);
+                EmitAsm(&quot;OR_C&quot;);
+                EmitAsm(&quot;JP_NZ&quot;, loopLabel);
+                EmitLabel(wordDoneLabel);
+
+                return;
+            }
+
+// kitaqgb/kitaqgb/Lowerer.cs:2116
+if (expr.MatchAny(Tag.Call, out callFunc, out callArgs))
+        {
+            string knownCallName;
+            if (callFunc != null &amp;&amp; callFunc.Match(Tag.Name, out knownCallName) &amp;&amp;
+                knownCallName == &quot;__cgb_is_cgb&quot; &amp;&amp;
+                callArgs != null &amp;&amp; callArgs.Length == 0 &amp;&amp;
+                // A resolved target configuration can replace the zero-argument CGB query with a literal.
+                Program.TryGetKnownCgbRuntimeValue(out int knownCgbValue))
+            {
+                return Expr.Make(Tag.Integer, knownCgbValue).WithSource(expr.Source);
+            }
+
+            Expr newFunc = LowerExpr(ctx, callFunc, false, prefix);
+
+            // Optimization (post-A3): when we must spill a non-atomic argument into a temp,
+            // prefer a u8 temp if the *parameter type* is u8-like.
+            // This preserves semantics (implicit truncation to u8) while avoiding needless
+            // u16 temporaries created by integer promotions.
+            CType[] paramTypes = null;
+            string __fname = null;
+            if (newFunc.Match(Tag.Name, out __fname))
+            {
+                paramTypes = ctx.FindFuncParams(__fname);
+                if (paramTypes == null)
+                {
+                    CType fnTypeFromName;
+                    if (TryGetCallableFunctionType(ctx.FindTypeOfName(__fname), out fnTypeFromName))
+                        paramTypes = fnTypeFromName.ParamTypes;
+                }
+            }
+            else
+            {
+                CType fnTypeFromExpr;
+                if (TryGetCallableFunctionType(InferType(ctx, newFunc), out fnTypeFromExpr))
+                    paramTypes = fnTypeFromExpr.ParamTypes;
+            }
+
+            Expr[] newArgs = new Expr[callArgs.Length];
+            for (int i = 0; i &lt; callArgs.Length; i++)
+            {
+                Expr a = LowerExpr(ctx, callArgs[i], allowExtract, prefix);
+                bool preserveConstantArgIntrinsic = false;
+                if (a.MatchAny(Tag.Call, out Expr argFunc, out Expr[] _argCallArgs) &amp;&amp;
+                    argFunc.Match(Tag.Name, out string argFuncName))
+                {
+                    preserveConstantArgIntrinsic = (argFuncName == &quot;__bankof&quot; || argFuncName == &quot;__cgb_is_cgb&quot;);
+                }
+                // Keep evaluable constants and special intrinsic/bank operands visible to code generation instead of spilling them.
+                bool preserveCompileTimeConstantArg = ctx.Global.TryEvalConstInt(a, out _);
+                bool preserveFarcallBankArg = (__fname == &quot;__farcall&quot; &amp;&amp; i == 0);
+
+                if (allowExtract &amp;&amp; !preserveFarcallBankArg &amp;&amp; !preserveConstantArgIntrinsic &amp;&amp; !preserveCompileTimeConstantArg &amp;&amp; !IsAtom(a))
+                {
+                    // If we know the callee&#x27;s parameter type, use it to choose a smaller temp.
+                    // Example: (u8)(row*32) passed to a u8 param should spill as u8, not u16.
+                    CType spillAs = null;
+                    if (paramTypes != null &amp;&amp; i &lt; paramTypes.Length)
+                    {
+                        CType pt = paramTypes[i];
+                        if (IsU8Like(pt)) spillAs = CType.UInt8;
+                    }
+                    if (spillAs == null) spillAs = InferType(ctx, a);
+                    if (!IsAggregateType(spillAs) &amp;&amp; SizeOfType(spillAs) &lt;= 2)
+                        a = SpillToTemp(ctx, a, spillAs, prefix);
+                }
+                newArgs[i] = a;
+            }
+
+            // Lint: const discard for argument passing
+            // Warn when passing a const-qualified pointer (or const array decay) to a non-const pointer parameter.
+            // Suppress when the argument has an explicit cast, or inside __unsafe.
+            if (!ctx.InUnsafe &amp;&amp; paramTypes != null)
+            {
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+                    if (!IsPointerToNonConst(pt)) continue;
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at != null &amp;&amp; (IsPointerToConst(at) || IsArrayOfConst(at)))
+                    {
+                        string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                        WarnConstDiscard(expr, $&quot;argument {i} to &#x27;{fn}&#x27;&quot;);
+                        break; // keep it quiet: one warning per call is enough
+                    }
+                }
+            }
+
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    FilePosition argPos = newArgs[i].Source;
+                    if (string.IsNullOrEmpty(argPos.Filename) || argPos.Filename == &quot;&lt;unknown&gt;&quot;)
+                        argPos = expr.Source;
+                    WarnImplicitNarrowingIfNeeded(ctx, newArgs[i], InferType(ctx, newArgs[i]), paramTypes[i], argPos,
+                        &quot;argument &quot; + i + &quot; to &#x27;&quot; + fn + &quot;&#x27;&quot;);
+                }
+            }
+
+            // Lint: __enum_strict argument passing.
+            if (paramTypes != null)
+            {
+                string fn = __fname ?? &quot;&lt;call&gt;&quot;;
+                for (int i = 0; i &lt; newArgs.Length &amp;&amp; i &lt; paramTypes.Length; i++)
+                {
+                    CType pt = paramTypes[i];
+                    if (pt == null) continue;
+
+                    CType at = InferType(ctx, newArgs[i]);
+                    if (at == null) continue;
+
+                    if (HasTopLevelCast(newArgs[i])) continue;
+
+                    if (IsStrictEnum(pt))
+                    {
+                        if (!IsSameEnum(pt, at))
+                        {
+                            Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                                &quot;argument {0} to &#x27;{1}&#x27; expects __enum_strict {2}, got {3}; cast explicitly to silence&quot;,
+                                i, fn, pt.Show(), at.Show());
+                        }
+                    }
+                    else if (IsPlainInteger(pt) &amp;&amp; IsStrictEnum(at))
+                    {
+                        Program.Warning(expr.Source, ErrorCode.EnumStrictMix,
+                            &quot;argument {0} to &#x27;{1}&#x27; passes __enum_strict {2} to integer parameter {3}; cast explicitly to silence&quot;,
+                            i, fn, at.Show(), pt.Show());
+                    }
+                }
+            }
+
+            if (!ctx.InUnsafe)
+                RestrictAliasLint(ctx, newFunc, newArgs, expr.Source);
+
+            // __slice(ptr,len) helper: represent a &quot;slice&quot; (ptr+len) in the IR.
+            // Semantics: evaluate both arguments, result type is the pointer/array (same as arg0).
+            // Bounds checks are injected only with -Zcheck (see Program.CheckSliceBounds).
+            // Note: keep the intrinsic name conservative to avoid collisions (&quot;slice&quot; is allowed only
+            // when there is no declared function named &quot;slice&quot;).
+            if (newFunc.Match(Tag.Name, out string __sfname))
+            {
+                bool isSliceIntrinsic = (__sfname == &quot;__slice&quot;) || (__sfname == &quot;slice&quot; &amp;&amp; ctx.FindFuncParams(&quot;slice&quot;) == null);
+                if (isSliceIntrinsic)
+                {
+                    if (newArgs.Length != 2)
+                    {
+                        Program.Error(expr.Source, ErrorCode.ParseError, &quot;{0}: expected 2 arguments: __slice(ptr,len)&quot;, __sfname);
+                    }
+                    else
+                    {
+                        CType pty = InferType(ctx, newArgs[0]);
+                        if (pty == null || !(pty.IsPointer || pty.IsArray))
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: first argument must be a pointer or array, got: {1}&quot;, __sfname, (pty == null ? &quot;&lt;unknown&gt;&quot; : pty.Show()));
+
+                        CType lty = InferType(ctx, newArgs[1]);
+                        if (lty == null || !lty.IsInteger)
+                            Program.Error(expr.Source, ErrorCode.ExpectedType, &quot;{0}: second argument must be an integer length, got: {1}&quot;, __sfname, (lty == null ? &quot;&lt;unknown&gt;&quot; : lty.Show()));
+                    }
+
+                    return Expr.Make(Tag.Slice, newArgs[0], newArgs[1]).WithSource(expr.Source);
+                }
+            }
+
+            return MakeCall(newFunc, newArgs).WithSource(expr.Source);
+        }</code></pre></div></details></details><details class="api searchable" id="api-__rle_decode_vram"><summary><code>__rle_decode_vram</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Números aleatorios, texto, mapas, guardado y servicios RPG/ADV/SLG. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u16 __rle_decode_vram(u16 dst, u8 bank, const void* src);</code></pre></div><p><b>Argumentos, de izquierda a derecha: </b>u16 dst, u8 bank, const void* src. Para arrays y punteros, reserva memoria suficiente y mantenla válida hasta que termine el procesamiento.</p><p><b>Tipo de retorno: </b><code>u16</code>. Las notas originales y las condiciones de retorno de la implementación definen el significado y los valores de éxito o fallo.</p><div class="original"><b>Notas originales de la declaración, sin modificar</b><pre>Compiler intrinsic, separate from the RAM rle_decode helpers below; it is not a bounded-stream API.</pre></div><h4>Ejemplo de paso de argumentos</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u16 example_rle_decode_vram(u16 dst, u8 bank, const void* src) {
     return __rle_decode_vram(dst, bank, src);
 }</code></pre></div><p>Prepara la inicialización de los objetos, los tamaños de los búferes, los bancos de ROM y el estado del dispositivo en el código que llama. Este fragmento de función no se ha ejecutado de forma aislada.</p><p><a download="" href="../samples/api-fragments/gb/__rle_decode_vram.c">Descargar este fragmento</a></p><p class="source">Origen de la declaración o del identificador: kitaqgb/lib/rpg.h:191</p></details><details class="api searchable" id="api-__rng8"><summary><code>__rng8</code><span class="badge">Función intrínseca del compilador</span></summary><p>Realizar la operación indicada por los argumentos. Módulo: Números aleatorios, texto, mapas, guardado y servicios RPG/ADV/SLG. La declaración, las notas originales y la implementación que aparecen a continuación especifican las unidades, los terminadores y las condiciones de retorno.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 __rng8();</code></pre></div><p><b>Tipo de retorno: </b><code>u8</code>. Las notas originales y las condiciones de retorno de la implementación definen el significado y los valores de éxito o fallo.</p><h4>Ejemplo de llamada con código de contexto</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copiar</button><pre><code>u8 rng8()
 {

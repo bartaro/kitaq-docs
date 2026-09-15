@@ -160,6 +160,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_ppu_declaration_examples(contracts))
     proofs.update(verified_ppu_intrinsic_examples(contracts))
     proofs.update(verified_interrupt_intrinsic_examples(contracts))
+    proofs.update(verified_memory_intrinsic_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -678,6 +679,51 @@ def verified_interrupt_intrinsic_examples(contracts):
         if contract['review'] != 'interrupt-intrinsics-source-20260915': continue
         if contract['example']['program'] != run['source']: raise ValueError('IRQ/NMI sample mismatch: ' + key)
         result[key] = {'api': key.split(':')[1], 'kind': 'interrupt-intrinsics', 'runs': runs}
+    return result
+
+
+def verified_memory_intrinsic_examples(contracts):
+    """Require full RAM comparisons and matching source, tool and screen hashes."""
+    folder=SITE/'verification/api-memory-intrinsics'
+    if not (folder/'results.json').exists():return {}
+    repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    review=json.loads((SOURCE/'memory_intrinsic_review_sources.json').read_text(encoding='utf-8'))
+    for name,expected in review['source_sha256'].items():
+        if hashlib.sha256((repos/name).read_bytes()).hexdigest()!=expected:
+            raise ValueError('Memory intrinsic source changed: '+name)
+    runs=json.loads((folder/'results.json').read_text(encoding='utf-8'))['records']
+    if {(r['platform'],r['mode']) for r in runs}!={('gb','dmg'),('gb','cgb'),('fc','nrom')} or len(runs)!=3:
+        raise ValueError('Memory intrinsic screen variants missing')
+    result={}
+    for platform in ['gb','fc']:
+        state=json.loads((folder/platform/'state_checks.json').read_text(encoding='utf-8'))
+        if len(state['cases'])!=88 or not all(r['passed'] and r['actual']==r['expected'] for r in state['cases']):
+            raise ValueError('Memory range/state checks failed')
+        if hashlib.sha256((SITE/'tools/check_memory_intrinsic_state.py').read_bytes()).hexdigest()!=state['script_sha256']:
+            raise ValueError('Memory state checker changed')
+        for row in state['cases']:
+            case=folder/platform/row['name']
+            for name,expected in [('case.c',row['source_sha256']),('case.'+('gb' if platform=='gb' else 'nes'),row['rom_sha256'])]:
+                if hashlib.sha256((case/name).read_bytes()).hexdigest()!=expected:
+                    raise ValueError('Memory state fixture changed: '+str(case/name))
+        compiler=repos/('kitaq'+platform)/('kitaq'+platform+'.exe')
+        emulator=repos/('kokura/kokura-cli.exe' if platform=='gb' else 'kurosaki/kurosaki.exe')
+        for path,key in [(compiler,'compiler_sha256'),(emulator,'emulator_sha256')]:
+            if hashlib.sha256(path.read_bytes()).hexdigest()!=state[key]:raise ValueError('Memory verification tool changed')
+        selected=[r for r in runs if r['platform']==platform]
+        for run in selected:
+            if not (run['passed'] and run['frames']==240 and run['label_pixel_mismatches']==0 and run['color_mismatches']==0 and run['colored_pixels']>0 and run['ppu_writes_while_rendering']==0):
+                raise ValueError('Memory sample screen failed verification')
+            if any(run[key]!=state[key] for key in ['compiler_sha256','emulator_sha256']):raise ValueError('Memory sample uses different tools')
+            header='kitaq'+platform+'/lib/'+('rpg.h' if platform=='gb' else 'intrinsics.h')
+            if run['header_sha256']!=review['source_sha256'][header]:raise ValueError('Memory sample header changed')
+            for name,expected in {run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}.items():
+                if hashlib.sha256((SITE/name).read_bytes()).hexdigest()!=expected:raise ValueError('Memory sample changed: '+name)
+        for key,contract in contracts.items():
+            if not key.startswith(platform+':') or contract['review']!='memory-intrinsics-source-20260915':continue
+            if any(contract['example']['program']!=run['source'] for run in selected):raise ValueError('Memory sample mismatch')
+            result[key]={'api':key.split(':')[1],'kind':'memory-intrinsics','runs':selected}
     return result
 
 

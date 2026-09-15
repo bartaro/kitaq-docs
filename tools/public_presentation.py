@@ -34,6 +34,10 @@ def public_file(relative):
         return False
     if path.suffix == '.pyc':
         return False
+    # Per-case memory snapshots and fixtures are private authoring evidence.
+    # The three teaching ROMs/screens have distinct gb-dmg, gb-cgb and fc-nrom folders.
+    if path.parts[:2] == ('verification', 'api-memory-intrinsics') and len(path.parts)>2 and path.parts[2] in ('gb','fc'):
+        return False
     return path.parts[0] != 'verification' or path.suffix in PUBLIC_EVIDENCE_SUFFIXES
 
 
