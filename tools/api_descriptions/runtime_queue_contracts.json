@@ -1,0 +1,141 @@
+{
+  "fc:nes_vram_queue_clear": {
+    "review": "runtime-queue-source-20260915",
+    "purpose": [
+      "rq_clear"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "rq_storage",
+      "rq_setup",
+      "rq_timing"
+    ],
+    "record_sha256": "d350718c413217e4b75b3b58a360c460a3a2bac5ad8ed5013b7dd56f67cd3df5",
+    "example": {
+      "program": "samples/api-examples/fc/runtime_queue.c",
+      "code": "nes_vram_queue_clear(); // Discard all records AND clear the overflow latch.\nif(nes_vram_queue_used!=0 || nes_vram_queue_overflow!=0)failures++;",
+      "expected": [
+        "rq_counts",
+        "rq_shapes"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\runtime_queue.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\runtime_queue.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vram_queue_try_write": {
+    "review": "runtime-queue-source-20260915",
+    "purpose": [
+      "rq_write"
+    ],
+    "args": [
+      [
+        "ppu_addr",
+        [
+          "vq_dst_fc"
+        ]
+      ],
+      [
+        "src",
+        [
+          "rq_source"
+        ]
+      ],
+      [
+        "len",
+        [
+          "rq_length"
+        ]
+      ]
+    ],
+    "returns": [
+      "rq_result"
+    ],
+    "notes": [
+      "rq_storage",
+      "rq_setup",
+      "rq_timing"
+    ],
+    "record_sha256": "4b0237a07849f85b21d4980bf157236f1b19dbea041f5c8c477fa166bf42a9d7",
+    "example": {
+      "program": "samples/api-examples/fc/runtime_queue.c",
+      "code": "if(nes_vram_queue_try_write(0x2040,source_bytes,127)!=1)failures++;\nsource_bytes[0]=3; // The queued first tile stays 1: payload was copied immediately.",
+      "expected": [
+        "rq_counts",
+        "rq_shapes"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\runtime_queue.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\runtime_queue.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vram_queue_try_fill": {
+    "review": "runtime-queue-source-20260915",
+    "purpose": [
+      "rq_fill"
+    ],
+    "args": [
+      [
+        "ppu_addr",
+        [
+          "vq_dst_fc"
+        ]
+      ],
+      [
+        "value",
+        [
+          "vq_fill_value"
+        ]
+      ],
+      [
+        "len",
+        [
+          "rq_length"
+        ]
+      ]
+    ],
+    "returns": [
+      "rq_result"
+    ],
+    "notes": [
+      "rq_storage",
+      "rq_setup",
+      "rq_timing"
+    ],
+    "record_sha256": "7c06437ff571d90eec9437ffd9cc97b7ce81a1a904e5c93e26a1329401747527",
+    "example": {
+      "program": "samples/api-examples/fc/runtime_queue.c",
+      "code": "if(nes_vram_queue_try_fill(0x2100,fill_value,127)!=1)failures++;\nfill_value=3; // The queued fill remains the solid tile 1.",
+      "expected": [
+        "rq_counts",
+        "rq_shapes"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\runtime_queue.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\runtime_queue.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+    }
+  },
+  "fc:nes_vram_queue_nmi_flush": {
+    "review": "runtime-queue-source-20260915",
+    "purpose": [
+      "rq_flush"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "rq_storage",
+      "rq_setup",
+      "rq_timing",
+      "vq_dst_fc"
+    ],
+    "record_sha256": "570a85fedf6ddf7c8208fd13572e88aa86387822c89d757ae74d1f7235696eca",
+    "example": {
+      "program": "samples/api-examples/fc/runtime_queue.c",
+      "code": "// Rendering and NMI are disabled; PPUCTRL selects increment 1.\nnes_vram_queue_nmi_flush(); // No commit flag: consume all queued records now.\nafter_flush=nes_vram_queue_used;\nif(after_flush!=0)failures++;",
+      "expected": [
+        "rq_counts",
+        "rq_shapes"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\runtime_queue.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\runtime_queue.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+    }
+  }
+}

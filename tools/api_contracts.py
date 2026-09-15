@@ -144,6 +144,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_vram_examples(contracts, 'vram-memory', {'gb': {'dmg', 'cgb'}}))
     proofs.update(verified_vram_examples(contracts, 'vramq', {'fc': {'nrom'}}))
     proofs.update(verified_vram_examples(contracts, 'vram-macros', {'fc': {'nrom'}}))
+    proofs.update(verified_runtime_queue_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -261,7 +262,7 @@ def verified_vram_examples(contracts, family='vram', modes=None):
     if not path.exists(): return {}
     runs = json.loads(path.read_text(encoding='utf-8'))['records']
     if len(runs)!=sum(len(values) for values in modes.values()) or not all(r['passed'] for r in runs): return {}
-    if family=='vram-macros':
+    if family in ['vram-macros','runtime-queue']:
         repos=SITE.parents[1]/'publish/github_20260912'
         if not repos.exists():repos=SITE.parent
         for run in runs:
@@ -285,6 +286,26 @@ def verified_vram_examples(contracts, family='vram', modes=None):
                     raise ValueError('VRAM example evidence changed: '+file)
         verified[key]={'api':key.split(':')[1],'kind':family,'runs':selected}
     return verified
+
+
+def verified_runtime_queue_examples(contracts):
+    """Bind copied-payload queue images to boundary, memory and NMI state tests."""
+    results=verified_vram_examples(contracts,'runtime-queue',{'fc':{'nrom'}})
+    path=SITE/'verification/api-runtime-queue/state_checks.json'
+    if not path.exists():return {}
+    state=json.loads(path.read_text(encoding='utf-8'))
+    if len(state['cases'])!=13 or not all(r['passed'] and r['result']==r['expected_result'] and r['vram']==r['expected_vram'] and r['data_writes']==r['expected_writes'] for r in state['cases']):return {}
+    repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    for name,expected in state['library_sha256'].items():
+        source=repos/'kitaqfc/lib'/name
+        if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('Runtime queue state-test source changed: '+name)
+    script=repos/'kitaqfc/scripts/test-runtime-queue.py'
+    if script.exists() and hashlib.sha256(script.read_bytes()).hexdigest()!=state['script_sha256']:raise ValueError('Runtime queue state-test script changed')
+    for result in results.values():
+        if not all(r['compiler_sha256']==state['compiler_sha256'] and r['ppu_writes_while_rendering']==0 and r['geometry_pixels_checked']==18432 for r in result['runs']):return {}
+        result.update(state_path=path.relative_to(SITE).as_posix(),state_count=13)
+    return results
 
 
 def verified_oam_library_examples(contracts):
@@ -321,7 +342,7 @@ def verified_oam_library_examples(contracts):
             for name,expected in run['library_sha256'].items():
                 source=repos/'kitaqfc/lib'/name
                 if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('OAM library source changed: '+name)
-        result[key]={'api':key.split(':')[1],'kind':'oam-library','runs':selected,'state_path':state_path.relative_to(SITE).as_posix()}
+        result[key]={'api':key.split(':')[1],'kind':'oam-library','runs':selected,'state_path':state_path.relative_to(SITE).as_posix(),'state_count':17}
     return result
 
 
@@ -564,7 +585,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros']:
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue']:
                 if not example.get('additional'):
                     block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
@@ -580,7 +601,7 @@ def publish_verification(language, contracts, proofs, messages, ui):
                 if result.get('diagnostics_path'):
                     block.append('<p><a href="'+prefix+result['diagnostics_path']+'">KQ2102 / KQ2103</a></p>')
                 if result.get('state_path'):
-                    block.append('<p><a href="'+prefix+result['state_path']+'">'+html.escape(messages['verification_records'][index])+' (17)</a></p>')
+                    block.append('<p><a href="'+prefix+result['state_path']+'">'+html.escape(messages['verification_records'][index])+' ('+str(result['state_count'])+')</a></p>')
                 block.append('<p><a href="'+prefix+example['program']+'">'+html.escape(ui['download'][index])+'</a> · <a href="'+prefix+records_path+'">'+html.escape(messages['verification_records'][index])+'</a></p></section>')
                 continue
             diagram = example['image']
