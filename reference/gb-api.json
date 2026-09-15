@@ -6427,8 +6427,8 @@
       "args": "s16 a, s8 b",
       "signature": "s16 __smul16x8(s16 a, s8 b);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 8,
-      "comment": "",
+      "line": 9,
+      "comment": "Multiply a signed word by a signed byte; divide by 256, truncating toward zero.",
       "body": "",
       "kind": "function",
       "module": "physics2d",
@@ -6438,6 +6438,11 @@
         "path": "kitaqgb/lib/physics2d.c",
         "line": 562,
         "code": "{\n    if (body == 0) return;\n    body->vx = (s16)__smul16x8(body->vx, (s8)friction_q8);\n    body->vy = (s16)__smul16x8(body->vy, (s8)friction_q8);\n}\n\n// For one active dynamic body, add gravity, clamp each velocity axis and then"
+      },
+      "implementation_excerpt": "if (funcName == \"__smul16x8\")\n            {\n                if (args.Length != 2) Error(expr, \"__smul16x8 requires 2 arguments\");\n\n                EmitDotTermToHL(args[0], args[1], signed: true, q1_7: false, labelPrefix: \"__smul16x8\");\n                LastCallReturnsHL = true;\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+        "line": 11477
       }
     },
     {
@@ -6446,7 +6451,7 @@
       "args": "KQWorld2D* world, KQBody2D* bodies, u8 body_count",
       "signature": "void kq2d_world_init(KQWorld2D* world, KQBody2D* bodies, u8 body_count);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 37,
+      "line": 38,
       "comment": "Retain the caller-owned body array without initializing its elements.\nSet gravity to (0,32), four contact iterations and a per-axis speed limit of 512.\nA null world is ignored; the array must outlive subsequent world operations.",
       "body": "",
       "kind": "function",
@@ -6475,7 +6480,7 @@
       "args": "KQWorld2D* world",
       "signature": "void kq2d_step(KQWorld2D* world);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 42,
+      "line": 43,
       "comment": "Advance active dynamic bodies, then visit each active unordered pair for\nthe configured contact passes (zero means one). Static bodies still participate\nas obstacles. The world borrows its array and shares non-reentrant ASM scratch.\nThis is discrete integration; fast bodies can pass through thin obstacles.",
       "body": "",
       "kind": "function",
@@ -6504,7 +6509,7 @@
       "args": "KQWorld2D* world, KQBody2D* body",
       "signature": "void kq2d_integrate_body(KQWorld2D* world, KQBody2D* body);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 46,
+      "line": 47,
       "comment": "For one active dynamic body, add gravity, clamp each velocity axis and then\nadd velocity to position. Null inputs are ignored; no contacts are solved.\nUse a nonnegative speed limit and keep additions in signed 16-bit range.",
       "body": "",
       "kind": "function",
@@ -6530,7 +6535,7 @@
       "args": "const KQBody2D* a, const KQBody2D* b",
       "signature": "u8 kq2d_overlap_aabb(const KQBody2D* a, const KQBody2D* b);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 50,
+      "line": 51,
       "comment": "Test strict overlap of two centered boxes; touching edges return false.\nBoth pointers must be valid. Active/mass flags are ignored, and coordinate\ndifferences and extent sums must fit the signed 16-bit calculations.",
       "body": "",
       "kind": "function",
@@ -6559,7 +6564,7 @@
       "args": "KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y",
       "signature": "void kq2d_body_init(KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 53,
+      "line": 54,
       "comment": "Initialize an active unit-inverse-mass body at the supplied center and half\nextents, with zero velocity and reserved restitution set to zero. Null is ignored.",
       "body": "",
       "kind": "function",
@@ -6588,7 +6593,7 @@
       "args": "KQBody2D* body, s16 x, s16 y",
       "signature": "void kq2d_body_set_pos(KQBody2D* body, s16 x, s16 y);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 55,
+      "line": 56,
       "comment": "Replace the center without altering velocity, extents or activity. Null is ignored.",
       "body": "",
       "kind": "function",
@@ -6614,7 +6619,7 @@
       "args": "KQBody2D* body, s16 vx, s16 vy",
       "signature": "void kq2d_body_set_velocity(KQBody2D* body, s16 vx, s16 vy);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 57,
+      "line": 58,
       "comment": "Replace velocity without clamping or checking activity/mass. Null is ignored.",
       "body": "",
       "kind": "function",
@@ -6643,7 +6648,7 @@
       "args": "KQBody2D* body, s16 gravity_x, s16 gravity_y, s16 max_speed",
       "signature": "void kq2d_body_apply_gravity(KQBody2D* body, s16 gravity_x, s16 gravity_y, s16 max_speed);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 61,
+      "line": 62,
       "comment": "Add gravity and clamp each velocity axis separately for an active dynamic\nbody. Null, inactive and static bodies are ignored. Supply a nonnegative limit\nand avoid overflow in the additions before clamping; position is unchanged.",
       "body": "",
       "kind": "function",
@@ -6669,7 +6674,7 @@
       "args": "KQBody2D* body, u8 friction_q8",
       "signature": "void kq2d_body_apply_friction(KQBody2D* body, u8 friction_q8);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 65,
+      "line": 66,
       "comment": "Scale both velocities through the signed 8-bit coefficient intrinsic.\nDespite the unsigned parameter, values 128..255 become negative coefficients;\nthis is not a full-range unsigned Q8 damping helper. Null is ignored.",
       "body": "",
       "kind": "function",
@@ -6695,7 +6700,7 @@
       "args": "KQRect a, KQRect b",
       "signature": "u8 kq2d_rect_intersect(KQRect a, KQRect b);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 68,
+      "line": 69,
       "comment": "Delegate strict rectangle overlap to the fixed-point utility; edge-only\ncontact is false. Coordinate-plus-size sums must remain representable as s16.",
       "body": "",
       "kind": "function",
@@ -6721,7 +6726,7 @@
       "args": "s16 x, s16 y, KQRect r",
       "signature": "u8 kq2d_point_in_rect(s16 x, s16 y, KQRect r);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 71,
+      "line": 72,
       "comment": "Delegate the half-open point test: include left/top and exclude right/bottom.\nCoordinate-plus-size sums must remain representable as s16.",
       "body": "",
       "kind": "function",
@@ -6747,7 +6752,7 @@
       "args": "s16 value, s16 coefficient",
       "signature": "s16 kq2d_scale_q8(s16 value, s16 coefficient);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 87,
+      "line": 88,
       "comment": "Truncates toward zero, including negative values; coefficient is -256..256.",
       "body": "",
       "kind": "function",
@@ -6776,7 +6781,7 @@
       "args": "KQBody2D* body, s16 max_speed",
       "signature": "void kq2d_body_limit_speed(KQBody2D* body, s16 max_speed);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 91,
+      "line": 92,
       "comment": "Conservative circular bound, with a shared Q8 scale for both components.\nQuantizes toward zero; very small limits relative to input may yield zero.\nComponents and positive max_speed must be <= 16383 in magnitude.",
       "body": "",
       "kind": "function",
@@ -6802,7 +6807,7 @@
       "args": "KQBody2D* body, const KQSurface2D* surface",
       "signature": "s16 kq2d_body_resolve_surface(KQBody2D* body, const KQSurface2D* surface);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 94,
+      "line": 95,
       "comment": "Kinematic surface response; returns incoming normal speed, or zero if separating.\nCaller resolves penetration separately. Relative components must fit +/-8191.",
       "body": "",
       "kind": "function",
@@ -6828,7 +6833,7 @@
       "args": "s16 start_gap, s16 end_gap",
       "signature": "u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap);",
       "path": "kitaqgb/lib/physics2d.h",
-      "line": 97,
+      "line": 98,
       "comment": "Linear crossing time in Q8 (0..256); positive separation is outside.\nReturns 0 for initial overlap, 256 for no crossing. Gaps must fit +/-8191.",
       "body": "",
       "kind": "function",
@@ -12944,7 +12949,7 @@
         "args": "",
         "signature": "void Wire3DCGB_Init();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5804,
+        "line": 5817,
         "comment": "Initialize the CGB-only 128x96 renderer: enable double speed, turn the\nLCD off at VBlank, clear both tile banks, load HUD/generated tiles, and\ninstall a 16x12 column-major viewport. Start with blank tile bank 1, scroll\nzero, default BG palettes, color 2 and a zero camera. Reset queues and\nclear the bank-2 stage. Call BeginFrame before drawing to initialize\nocclusion state. Initialization replaces LCD/tile/map state globally.",
         "body": "void Wire3DCGB_Init()\n{\n    w3dcgb_u8 row;\n    w3dcgb_u8 col;\n    w3dcgb_u8 tid;\n    w3dcgb_u8 tile_index;\n    w3dcgb_u16 off;\n\n    w3dcgb_full_mode = 0;\n    w3dcgb_atomic_maps = 0;\n    Wire3DCGB_EnableDoubleSpeed();\n    w3dcgb_wait_vblank_start();\n    w3dcgb_reg_lcdc = 0;\n\n    w3dcgb_clear_vram_asm();\n    w3dcgb_load_hud_tiles();\n#ifndef WIRE3DCGB_MINIMAL_RUNTIME\n    w3dcgb_load_fast_map_tiles();\n    w3dcgb_load_fast_stamp_tiles();\n#endif\n    w3dcgb_fill_bg_map_asm();\n    w3dcgb_fill_attr_map_asm();\n\n    row = 0;\n    while (row < W3DCGB_TILE_H)\n    {\n        off = (w3dcgb_u16)((w3dcgb_u16)row << 5);\n        tile_index = row;\n        col = 0;\n        while (col < W3DCGB_TILE_W)\n        {\n            if (tile_index < 112) tid = (w3dcgb_u8)(0x90 + tile_index);\n            else tid = (w3dcgb_u8)(tile_index - 112);\n            w3dcgb_bg_map_9800[(w3dcgb_u16)(off + (w3dcgb_u16)col)] = tid;\n            tile_index = (w3dcgb_u8)(tile_index + W3DCGB_TILE_H);\n            col = (w3dcgb_u8)(col + 1);\n        }\n        row = (w3dcgb_u8)(row + 1);\n    }\n\n    w3dcgb_select_blank_render_bank_asm();\n\n    w3dcgb_reg_scx = 0;\n    w3dcgb_reg_scy = 0;\n    w3dcgb_reg_bgp = 0xB4;\n    Wire3DCGB_SetPaletteRGB15(\n        WIRE3DCGB_RGB15(0, 0, 2),\n        WIRE3DCGB_RGB15(10, 20, 31),\n        WIRE3DCGB_RGB15(31, 31, 31),\n        WIRE3DCGB_RGB15(31, 14, 4));\n    w3dcgb_line_color = WIRE3DCGB_COLOR_DEFAULT;\n    w3dcgb_reg_lcdc = 0x81;\n    w3dcgb_bgq_count = 0;\n    w3dcgb_dirty_count = 0;\n    w3dcgb_prev_dirty_count = 0;\n    w3dcgb_dirty_min_tile = 0xFF;\n    w3dcgb_dirty_max_tile = 0;\n    w3dcgb_prev_dirty_min_tile = 0xFF;\n    w3dcgb_prev_dirty_max_tile = 0;\n    w3dcgb_display_tile_bank = 1;\n    w3dcgb_pending_tile_bank = 1;\n\n    Wire3DCGB_SetCamera((w3dcgb_i16)0, (w3dcgb_i16)0, (w3dcgb_i16)0, 0, 0, 0);\n    w3dcgb_clear_stage_asm();\n}",
         "kind": "function"
@@ -12970,7 +12975,7 @@
         "args": "",
         "signature": "void Wire3DCGB_InitFullScreen();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5876,
+        "line": 5889,
         "comment": "Initialize the CGB-only 160x144 tile allocator. Clear both tile banks\nand map 9800, set scroll/palettes/color/camera, reset tile counts and\nlookup/span state, then enable unsigned BG tile addressing. HUD tiles\nare not loaded. Reserve its fixed WRAM lookup, payload and address lists\nand keep the same WRAM bank mapped through full-screen rendering.",
         "body": "void Wire3DCGB_InitFullScreen()\n{\n    w3dcgb_atomic_maps = 0;\n    Wire3DCGB_EnableDoubleSpeed();\n    w3dcgb_wait_vblank_start();\n    w3dcgb_reg_lcdc = 0;\n\n    w3dcgb_clear_vram_asm();\n    w3dcgb_full_clear_map_asm();\n    w3dcgb_reg_scx = 0;\n    w3dcgb_reg_scy = 0;\n    w3dcgb_reg_bgp = 0xB4;\n    Wire3DCGB_SetPaletteRGB15(\n        WIRE3DCGB_RGB15(0, 0, 2),\n        WIRE3DCGB_RGB15(10, 20, 31),\n        WIRE3DCGB_RGB15(31, 31, 31),\n        WIRE3DCGB_RGB15(31, 14, 4));\n    w3dcgb_line_color = WIRE3DCGB_COLOR_DEFAULT;\n    w3dcgb_bgq_count = 0;\n    w3dcgb_dirty_count = 0;\n    w3dcgb_prev_dirty_count = 0;\n    w3dcgb_display_tile_bank = 0;\n    w3dcgb_pending_tile_bank = 0;\n    w3dcgb_full_tile_count = 0;\n    w3dcgb_full_prev_tile_count = 0;\n    w3dcgb_full_overflow = 0;\n    w3dcgb_full_mode = 1;\n\n    Wire3DCGB_SetCamera((w3dcgb_i16)0, (w3dcgb_i16)0, (w3dcgb_i16)0, 0, 0, 0);\n    w3dcgb_full_begin_asm();\n    w3dcgb_reg_lcdc = 0x91;\n}",
         "kind": "function"
@@ -12996,7 +13001,7 @@
         "args": "",
         "signature": "void Wire3DCGB_InitFastMapLite();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5914,
+        "line": 5927,
         "comment": "Initialize a CGB tile-map renderer with HUD and 48 precomputed outline\ntiles. Clear tile VRAM/maps, reset scroll/palettes/camera and select normal\nmode. This omits normal pixel-viewport map layout and generated cube stamps;\nuse the FastMap APIs for this mode. Clear the bank-2 stage and mark fast\nmap preparation pending. Full-runtime build required.",
         "body": "void Wire3DCGB_InitFastMapLite()\n{\n    w3dcgb_atomic_maps = 0;\n    w3dcgb_full_mode = 0;\n    Wire3DCGB_EnableDoubleSpeed();\n    w3dcgb_wait_vblank_start();\n    w3dcgb_reg_lcdc = 0;\n\n    w3dcgb_clear_vram_asm();\n    w3dcgb_load_hud_tiles();\n    w3dcgb_load_fast_map_tiles_lite_asm();\n    w3dcgb_fill_bg_map_asm();\n    w3dcgb_fill_attr_map_asm();\n\n    w3dcgb_reg_scx = 0;\n    w3dcgb_reg_scy = 0;\n    w3dcgb_reg_bgp = 0xB4;\n    Wire3DCGB_SetPaletteRGB15(\n        WIRE3DCGB_RGB15(0, 0, 2),\n        WIRE3DCGB_RGB15(10, 20, 31),\n        WIRE3DCGB_RGB15(31, 31, 31),\n        WIRE3DCGB_RGB15(31, 14, 4));\n    w3dcgb_line_color = WIRE3DCGB_COLOR_DEFAULT;\n    w3dcgb_reg_lcdc = 0x81;\n    w3dcgb_bgq_count = 0;\n    w3dcgb_dirty_count = 0;\n    w3dcgb_prev_dirty_count = 0;\n    w3dcgb_dirty_min_tile = 0xFF;\n    w3dcgb_dirty_max_tile = 0;\n    w3dcgb_prev_dirty_min_tile = 0xFF;\n    w3dcgb_prev_dirty_max_tile = 0;\n    w3dcgb_fast_map_ready = 0;\n    w3dcgb_display_tile_bank = 0;\n    w3dcgb_pending_tile_bank = 0;\n\n    Wire3DCGB_SetCamera((w3dcgb_i16)0, (w3dcgb_i16)0, (w3dcgb_i16)0, 0, 0, 0);\n    w3dcgb_clear_stage_asm();\n}",
         "kind": "function"
@@ -13022,7 +13027,7 @@
         "args": "",
         "signature": "void Wire3DCGB_EnableDoubleSpeed();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 910,
+        "line": 911,
         "comment": "On CGB, return if KEY1 already reports double speed; otherwise request\nthe speed switch and call the STOP helper. This API assumes CGB hardware\nand does not provide a monochrome fallback.",
         "body": "void Wire3DCGB_EnableDoubleSpeed()\n{\n    if ((w3dcgb_reg_key1 & 0x80) != 0) return;\n    w3dcgb_reg_key1 = 1;\n    w3dcgb_cgb_speed_switch_asm();\n}",
         "kind": "function"
@@ -13030,7 +13035,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5814,
+        "line": 5827,
         "code": "    w3dcgb_full_mode = 0;\n    w3dcgb_atomic_maps = 0;\n    Wire3DCGB_EnableDoubleSpeed();\n    w3dcgb_wait_vblank_start();\n    w3dcgb_reg_lcdc = 0;\n\n    w3dcgb_clear_vram_asm();"
       }
     },
@@ -13051,7 +13056,7 @@
         "args": "w3dcgb_u8 scx, w3dcgb_u8 scy",
         "signature": "void Wire3DCGB_SetScreenOffset(w3dcgb_u8 scx, w3dcgb_u8 scy);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 920,
+        "line": 921,
         "comment": "Write SCX/SCY immediately, without waiting for VBlank or changing projected\ncoordinates. The caller chooses when a visible scroll change is acceptable.",
         "body": "void Wire3DCGB_SetScreenOffset(w3dcgb_u8 scx, w3dcgb_u8 scy)\n{\n    w3dcgb_reg_scx = scx;\n    w3dcgb_reg_scy = scy;\n}",
         "kind": "function"
@@ -13077,7 +13082,7 @@
         "args": "w3dcgb_u16 color0, w3dcgb_u16 color1, w3dcgb_u16 color2, w3dcgb_u16 color3",
         "signature": "void Wire3DCGB_SetPaletteRGB15(w3dcgb_u16 color0, w3dcgb_u16 color1, w3dcgb_u16 color2, w3dcgb_u16 color3);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 941,
+        "line": 942,
         "comment": "Set BG palette zero to the four supplied RGB15 colors. Palettes 1..3\nshare color0 and repeat their respective nonzero color in entries 1..3,\nallowing monochrome stamp tiles to be recolored by attributes. Supply a\nvalid palette-access window, normally LCD-off setup or VBlank.",
         "body": "void Wire3DCGB_SetPaletteRGB15(w3dcgb_u16 color0, w3dcgb_u16 color1, w3dcgb_u16 color2, w3dcgb_u16 color3)\n{\n    w3dcgb_write_bg_color(0, color0);\n    w3dcgb_write_bg_color(1, color1);\n    w3dcgb_write_bg_color(2, color2);\n    w3dcgb_write_bg_color(3, color3);\n\n    w3dcgb_write_bg_color(4, color0);\n    w3dcgb_write_bg_color(5, color1);\n    w3dcgb_write_bg_color(6, color1);\n    w3dcgb_write_bg_color(7, color1);\n\n    w3dcgb_write_bg_color(8, color0);\n    w3dcgb_write_bg_color(9, color2);\n    w3dcgb_write_bg_color(10, color2);\n    w3dcgb_write_bg_color(11, color2);\n\n    w3dcgb_write_bg_color(12, color0);\n    w3dcgb_write_bg_color(13, color3);\n    w3dcgb_write_bg_color(14, color3);\n    w3dcgb_write_bg_color(15, color3);\n}",
         "kind": "function"
@@ -13085,7 +13090,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5849,
+        "line": 5862,
         "code": "    w3dcgb_reg_scy = 0;\n    w3dcgb_reg_bgp = 0xB4;\n    Wire3DCGB_SetPaletteRGB15(\n        WIRE3DCGB_RGB15(0, 0, 2),\n        WIRE3DCGB_RGB15(10, 20, 31),\n        WIRE3DCGB_RGB15(31, 31, 31),\n        WIRE3DCGB_RGB15(31, 14, 4));"
       }
     },
@@ -13106,7 +13111,7 @@
         "args": "w3dcgb_u8 color",
         "signature": "void Wire3DCGB_SetLineColor(w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 969,
+        "line": 970,
         "comment": "Store color & 3. Use the named line colors 1..3: normal lines OR their\nbitplanes, so intersecting colors combine; full-screen fast lines replace\nthe pixel color. Line color zero is treated as 3, not as an eraser.\nNormal-mode point drawing separately supports color zero for erasure.",
         "body": "void Wire3DCGB_SetLineColor(w3dcgb_u8 color)\n{\n    w3dcgb_line_color = (w3dcgb_u8)(color & 3);\n}",
         "kind": "function"
@@ -13114,7 +13119,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6186,
+        "line": 6199,
         "code": "    w3dcgb_u8 old_color;\n    old_color = w3dcgb_line_color;\n    Wire3DCGB_SetLineColor(color);\n    Wire3DCGB_DrawLine2D(ax, ay, bx, by);\n    w3dcgb_line_color = old_color;\n}\n"
       }
     },
@@ -13135,7 +13140,7 @@
         "args": "",
         "signature": "w3dcgb_u8 Wire3DCGB_GetLineColor();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 976,
+        "line": 977,
         "comment": "Return the currently stored two-bit line color without changing drawing state.",
         "body": "w3dcgb_u8 Wire3DCGB_GetLineColor()\n{\n    return w3dcgb_line_color;\n}",
         "kind": "function"
@@ -13161,7 +13166,7 @@
         "args": "",
         "signature": "void Wire3DCGB_ClearFrameTiles();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6046,
+        "line": 6059,
         "comment": "For the 128x96 renderer, wait for VBlank, disable the LCD, clear the stage\nand frame tile ranges in both banks, reset map attributes, then enable LCDC\n0x81. Clear dirty flags/counts but not sparse min/max history. This does\nnot reset full_mode and is not a full-screen reinitializer.",
         "body": "void Wire3DCGB_ClearFrameTiles()\n{\n    w3dcgb_u8 i;\n\n    w3dcgb_wait_vblank_start();\n    w3dcgb_reg_lcdc = 0;\n    w3dcgb_clear_stage_asm();\n    w3dcgb_clear_frame_tiles_vram_asm();\n    w3dcgb_fill_attr_map_asm();\n    w3dcgb_reg_lcdc = 0x81;\n\n    i = 0;\n    while (i < W3DCGB_DIRTY_TILE_LIMIT)\n    {\n        w3dcgb_dirty_flags[(__safe_index w3dcgb_u8)i] = 0;\n        w3dcgb_prev_dirty_flags[(__safe_index w3dcgb_u8)i] = 0;\n        i = (w3dcgb_u8)(i + 1);\n    }\n    w3dcgb_dirty_count = 0;\n    w3dcgb_prev_dirty_count = 0;\n}",
         "kind": "function"
@@ -13187,7 +13192,7 @@
         "args": "",
         "signature": "void Wire3DCGB_BeginFrame();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5960,
+        "line": 5973,
         "comment": "In normal mode, select full-stage transfer, clear all staged pixels and\nthe bitmap mask, reset mask bounds, and disable occlusion. In full-screen\nmode, reset that mode's allocator/spans instead. Pending BG writes remain queued.\nFull-runtime build required.",
         "body": "void Wire3DCGB_BeginFrame()\n{\n    if (w3dcgb_full_mode != 0)\n    {\n        w3dcgb_full_begin_asm();\n        return;\n    }\n    w3dcgb_full_frame_transfer = 1;\n    w3dcgb_clear_stage_asm();\n    w3dcgb_clear_occlusion_mask_asm();\n    w3dcgb_occ_min_x = (w3dcgb_u8)(WIRE3DCGB_SCREEN_W - 1);\n    w3dcgb_occ_min_y = (w3dcgb_u8)(WIRE3DCGB_SCREEN_H - 1);\n    w3dcgb_occ_max_x = 0;\n    w3dcgb_occ_max_y = 0;\n    w3dcgb_occlusion_active = 0;\n}",
         "kind": "function"
@@ -13213,7 +13218,7 @@
         "args": "",
         "signature": "void Wire3DCGB_BeginFrameFast();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5981,
+        "line": 5994,
         "comment": "Perform the same normal/full-screen frame reset as BeginFrame, while\nfirst marking both previous sparse-history ranges as the entire 192-tile\nviewport. This prevents a subsequent sparse upload from trusting stale banks.",
         "body": "void Wire3DCGB_BeginFrameFast()\n{\n    w3dcgb_older_dirty_min_tile = 0;\n    w3dcgb_older_dirty_max_tile = 191;\n    w3dcgb_prev_dirty_min_tile = 0;\n    w3dcgb_prev_dirty_max_tile = 191;\n    if (w3dcgb_full_mode != 0)\n    {\n        w3dcgb_full_begin_asm();\n        return;\n    }\n    w3dcgb_full_frame_transfer = 1;\n    w3dcgb_clear_stage_asm();\n    w3dcgb_clear_occlusion_mask_asm();\n    w3dcgb_occ_min_x = (w3dcgb_u8)(WIRE3DCGB_SCREEN_W - 1);\n    w3dcgb_occ_min_y = (w3dcgb_u8)(WIRE3DCGB_SCREEN_H - 1);\n    w3dcgb_occ_max_x = 0;\n    w3dcgb_occ_max_y = 0;\n    w3dcgb_occlusion_active = 0;\n}",
         "kind": "function"
@@ -13239,7 +13244,7 @@
         "args": "",
         "signature": "void Wire3DCGB_BeginFrameSparse();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6006,
+        "line": 6019,
         "comment": "Select sparse transfer and clear the entire 128x96 stage, avoiding stale\npixels when the dirty range expands. Reset mask bounds and disable\nocclusion; PAINTER_ONLY builds skip clearing the unused bitmap mask.\nFull-screen mode delegates to its own allocator reset.",
         "body": "void Wire3DCGB_BeginFrameSparse()\n{\n    if (w3dcgb_full_mode != 0)\n    {\n        w3dcgb_full_begin_asm();\n        return;\n    }\n    w3dcgb_full_frame_transfer = 0;\n    w3dcgb_dirty_count = 0;\n    /* One ASM pass is faster than repeated range-growth clears and guarantees\n       that newly exposed dirty tiles can never copy stale stage pixels. */\n    w3dcgb_clear_stage_asm();\n#ifndef WIRE3DCGB_PAINTER_ONLY\n    /* A Z-sorted painter erases silhouettes directly in the stage and never\n       reads the separate front-to-back coverage mask. */\n    w3dcgb_clear_occlusion_mask_asm();\n#endif\n    w3dcgb_occ_min_x = (w3dcgb_u8)(WIRE3DCGB_SCREEN_W - 1);\n    w3dcgb_occ_min_y = (w3dcgb_u8)(WIRE3DCGB_SCREEN_H - 1);\n    w3dcgb_occ_max_x = 0;\n    w3dcgb_occ_max_y = 0;\n    w3dcgb_occlusion_active = 0;\n}",
         "kind": "function"
@@ -13265,7 +13270,7 @@
         "args": "",
         "signature": "void Wire3DCGB_ClearSparseStageFast();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6033,
+        "line": 6046,
         "comment": "Clear the entire bank-2 stage and mark the full 128x96 viewport dirty.\nDespite its name this is not a partial clear and does not preserve staged\npixels. It neither clears occlusion nor selects a transfer mode.",
         "body": "void Wire3DCGB_ClearSparseStageFast()\n{\n    w3dcgb_clear_stage_asm();\n    w3dcgb_mark_dirty_rect(0, 0,\n                           (w3dcgb_u8)(WIRE3DCGB_SCREEN_W - 1),\n                           (w3dcgb_u8)(WIRE3DCGB_SCREEN_H - 1));\n}",
         "kind": "function"
@@ -13291,7 +13296,7 @@
         "args": "w3dcgb_u8 min_x, w3dcgb_u8 min_y, w3dcgb_u8 max_x, w3dcgb_u8 max_y",
         "signature": "void Wire3DCGB_MarkDirtyRect2D(w3dcgb_u8 min_x, w3dcgb_u8 min_y, w3dcgb_u8 max_x, w3dcgb_u8 max_y);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 1117,
+        "line": 1118,
         "comment": "Mark an inclusive pixel rectangle for later transfer without drawing it.\nSupply ordered endpoints; values beyond 127/95 are clamped to the border.\nThis tracks 128x96 tiles, not the full-screen tile allocator.",
         "body": "void Wire3DCGB_MarkDirtyRect2D(w3dcgb_u8 min_x, w3dcgb_u8 min_y, w3dcgb_u8 max_x, w3dcgb_u8 max_y)\n{\n    w3dcgb_mark_dirty_rect(min_x, min_y, max_x, max_y);\n}",
         "kind": "function"
@@ -13317,7 +13322,7 @@
         "args": "w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 pitch, w3dcgb_i8 yaw, w3dcgb_i8 roll",
         "signature": "void Wire3DCGB_SetCamera(w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 pitch, w3dcgb_i8 yaw, w3dcgb_i8 roll);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6072,
+        "line": 6085,
         "comment": "Store camera position and angles without changing existing pixels. Rotation\nhelpers use the low four angle bits (16 steps per turn). Screen offsets are\nseparate LCD registers and are not changed by this call.",
         "body": "void Wire3DCGB_SetCamera(w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 pitch, w3dcgb_i8 yaw, w3dcgb_i8 roll)\n{\n    w3dcgb_cam_x = x;\n    w3dcgb_cam_y = y;\n    w3dcgb_cam_z = z;\n    w3dcgb_cam_pitch = pitch;\n    w3dcgb_cam_yaw = yaw;\n    w3dcgb_cam_roll = roll;\n}",
         "kind": "function"
@@ -13325,7 +13330,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5866,
+        "line": 5879,
         "code": "    w3dcgb_pending_tile_bank = 1;\n\n    Wire3DCGB_SetCamera((w3dcgb_i16)0, (w3dcgb_i16)0, (w3dcgb_i16)0, 0, 0, 0);\n    w3dcgb_clear_stage_asm();\n}\n\n#ifndef WIRE3DCGB_MINIMAL_RUNTIME"
       }
     },
@@ -13346,7 +13351,7 @@
         "args": "const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz",
         "signature": "void Wire3DCGB_DrawModel(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6821,
+        "line": 6834,
         "comment": "Draw a model at unity Q8 scale (256), using DrawModelScaled contracts.",
         "body": "void Wire3DCGB_DrawModel(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz)\n{\n    Wire3DCGB_DrawModelScaled(model, x, y, z, rx, ry, rz, 256);\n}",
         "kind": "function"
@@ -13372,7 +13377,7 @@
         "args": "const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_i16 scale_q8",
         "signature": "void Wire3DCGB_DrawModelScaled(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_i16 scale_q8);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7122,
+        "line": 7135,
         "comment": "Project up to 24 vertices with positive Q8 scale; nonpositive scale means\nunity. Skip unity multiplication and zero-angle rotations. Intermediates\nmust fit s16. Build up to 16 front-face flags when adjacency filtering is\navailable, then draw depth-valid edges with valid vertex indices. The model\nedge count is not capped at 64. There is no near-plane clipping. Replace\nthe shared projection cache and OR line colors into the normal 128x96 stage.\nThis path does not mark sparse bounds; arrange a full upload or explicitly\ninvalidate frame history before a sparse upload.",
         "body": "void Wire3DCGB_DrawModelScaled(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_i16 scale_q8)\n{\n    w3dcgb_u8 i;\n    w3dcgb_u8 count;\n    w3dcgb_u8 edge_count;\n    w3dcgb_u8 face_count;\n    w3dcgb_u8 camera_unrotated;\n    w3dcgb_u8 unit_scale;\n\n    if (model == 0) return;\n    if (model->vertices == 0) return;\n    if (model->edges == 0) return;\n    if (scale_q8 <= 0) scale_q8 = 256;\n\n    count = model->vertex_count;\n    if (count > WIRE3DCGB_MODEL_VERTEX_LIMIT) count = WIRE3DCGB_MODEL_VERTEX_LIMIT;\n    unit_scale = 0;\n    if (scale_q8 == 256) unit_scale = 1;\n    camera_unrotated = 0;\n    if ((w3dcgb_cam_yaw == 0) && (w3dcgb_cam_pitch == 0) && (w3dcgb_cam_roll == 0))\n    {\n        camera_unrotated = 1;\n    }\n\n    i = 0;\n    while (i < count)\n    {\n        const Wire3DCGB_Vec3* v;\n        w3dcgb_i16 vx;\n        w3dcgb_i16 vy;\n        w3dcgb_i16 vz;\n        w3dcgb_u8 sx;\n        w3dcgb_u8 sy;\n        w3dcgb_u8 projected;\n\n        v = &model->vertices[(__safe_index w3dcgb_u8)i];\n        if (unit_scale != 0)\n        {\n            vx = v->x;\n            vy = v->y;\n            vz = v->z;\n        }\n        else\n        {\n            vx = (w3dcgb_i16)((v->x * scale_q8) >> 8);\n            vy = (w3dcgb_i16)((v->y * scale_q8) >> 8);\n            vz = (w3dcgb_i16)((v->z * scale_q8) >> 8);\n        }\n\n        if (ry != 0) w3dcgb_rotate_y(&vx, &vz, (w3dcgb_i8)ry);\n        if (rx != 0) w3dcgb_rotate_x(&vy, &vz, (w3dcgb_i8)rx);\n        if (rz != 0) w3dcgb_rotate_z(&vx, &vy, (w3dcgb_i8)rz);\n\n        vx = (w3dcgb_i16)(vx + x);\n        vy = (w3dcgb_i16)(vy + y);\n        vz = (w3dcgb_i16)(vz + z);\n\n        if (camera_unrotated != 0)\n        {\n            vx = (w3dcgb_i16)(vx - w3dcgb_cam_x);\n            vy = (w3dcgb_i16)(vy - w3dcgb_cam_y);\n            vz = (w3dcgb_i16)(vz - w3dcgb_cam_z);\n            projected = w3dcgb_project_camera_space(vx, vy, vz, &sx, &sy);\n        }\n        else\n        {\n            projected = w3dcgb_project_world(vx, vy, vz, &sx, &sy);\n        }\n\n        if (projected != 0)\n        {\n            w3dcgb_screen_x[(__safe_index w3dcgb_u8)i] = sx;\n            w3dcgb_screen_y[(__safe_index w3dcgb_u8)i] = sy;\n            w3dcgb_screen_visible[(__safe_index w3dcgb_u8)i] = 1;\n        }\n        else\n        {\n            w3dcgb_screen_visible[(__safe_index w3dcgb_u8)i] = 0;\n        }\n        i = (w3dcgb_u8)(i + 1);\n    }\n\n    face_count = model->face_count;\n    if (face_count > WIRE3DCGB_MODEL_FACE_LIMIT) face_count = WIRE3DCGB_MODEL_FACE_LIMIT;\n    if ((model->flags & WIRE3DCGB_MODEL_HIDDEN_LINES) && (model->faces != 0) && (model->edge_faces != 0))\n    {\n        w3dcgb_build_face_visibility(model, count, face_count);\n    }\n\n    edge_count = model->edge_count;\n    i = 0;\n    while (i < edge_count)\n    {\n        const Wire3DCGB_Edge* e;\n        e = &model->edges[(__safe_index w3dcgb_u8)i];\n        if ((e->a < count) && (e->b < count))\n        {\n            if (w3dcgb_screen_visible[(__safe_index w3dcgb_u8)e->a] &&\n                w3dcgb_screen_visible[(__safe_index w3dcgb_u8)e->b] &&\n                w3dcgb_is_edge_visible(model, i, face_count))\n            {\n                w3dcgb_draw_model_line(\n                    w3dcgb_screen_x[(__safe_index w3dcgb_u8)e->a],\n                    w3dcgb_screen_y[(__safe_index w3dcgb_u8)e->a],\n                    w3dcgb_screen_x[(__safe_index w3dcgb_u8)e->b],\n                    w3dcgb_screen_y[(__safe_index w3dcgb_u8)e->b]);\n            }\n        }\n        i = (w3dcgb_u8)(i + 1);\n    }\n}",
         "kind": "function"
@@ -13380,7 +13385,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6779,
+        "line": 6792,
         "code": "            else w3dcgb_occlusion_active = 1;\n            if (obj->color != 0) Wire3DCGB_SetLineColor(obj->color);\n            Wire3DCGB_DrawModelScaled(obj->model, obj->x, obj->y, obj->z, (w3dcgb_i8)obj->rx, (w3dcgb_i8)obj->ry, (w3dcgb_i8)obj->rz, obj->scale_q8);\n            w3dcgb_occlusion_active = 0;\n            w3dcgb_mark_model_occluder(obj->model);\n        }\n        i = (w3dcgb_u8)(i + 1);"
       }
     },
@@ -13401,7 +13406,7 @@
         "args": "const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawModelColor(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6827,
+        "line": 6840,
         "comment": "Draw a model at unity Q8 scale with a temporary color, restoring it afterward.",
         "body": "void Wire3DCGB_DrawModelColor(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_u8 color)\n{\n    Wire3DCGB_DrawModelScaledColor(model, x, y, z, rx, ry, rz, 256, color);\n}",
         "kind": "function"
@@ -13427,7 +13432,7 @@
         "args": "const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_i16 scale_q8, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawModelScaledColor(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_i16 scale_q8, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7236,
+        "line": 7249,
         "comment": "Select color & 3 around DrawModelScaled and restore entry color afterward.",
         "body": "void Wire3DCGB_DrawModelScaledColor(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_i16 scale_q8, w3dcgb_u8 color)\n{\n    w3dcgb_u8 old_color;\n    old_color = w3dcgb_line_color;\n    Wire3DCGB_SetLineColor(color);\n    Wire3DCGB_DrawModelScaled(model, x, y, z, rx, ry, rz, scale_q8);\n    w3dcgb_line_color = old_color;\n}",
         "kind": "function"
@@ -13435,7 +13440,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6829,
+        "line": 6842,
         "code": "void Wire3DCGB_DrawModelColor(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_u8 color)\n{\n    Wire3DCGB_DrawModelScaledColor(model, x, y, z, rx, ry, rz, 256, color);\n}\n\n#pragma bank 1\n// For a hidden-line model with vertices/faces, transform at most 24 vertices"
       }
     },
@@ -13456,7 +13461,7 @@
         "args": "const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_i16 scale_q8",
         "signature": "void Wire3DCGB_EraseModelFaces(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_i16 scale_q8);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6839,
+        "line": 6852,
         "comment": "For a hidden-line model with vertices/faces, transform at most 24 vertices\nand erase front-facing triangles among at most 16 faces. Nonpositive scale\nmeans unity; this path still multiplies at unity and runs all three rotation\nhelpers at zero angles. Reject invalid/depth-failed faces. Replace the shared\nprojection cache and use the normal C stage clearer, which requires the\ncaller or allocation to provide the correct WRAM mapping.",
         "body": "void Wire3DCGB_EraseModelFaces(const Wire3DCGB_Model* model, w3dcgb_i16 x, w3dcgb_i16 y, w3dcgb_i16 z, w3dcgb_i8 rx, w3dcgb_i8 ry, w3dcgb_i8 rz, w3dcgb_i16 scale_q8)\n{\n    w3dcgb_u8 i;\n    w3dcgb_u8 count;\n    w3dcgb_u8 face_count;\n\n    if (model == 0) return;\n    if (model->vertices == 0) return;\n    if (model->faces == 0) return;\n    if ((model->flags & WIRE3DCGB_MODEL_HIDDEN_LINES) == 0) return;\n    if (scale_q8 <= 0) scale_q8 = 256;\n\n    count = model->vertex_count;\n    if (count > WIRE3DCGB_MODEL_VERTEX_LIMIT) count = WIRE3DCGB_MODEL_VERTEX_LIMIT;\n\n    i = 0;\n    while (i < count)\n    {\n        const Wire3DCGB_Vec3* v;\n        w3dcgb_i16 vx;\n        w3dcgb_i16 vy;\n        w3dcgb_i16 vz;\n        w3dcgb_u8 sx;\n        w3dcgb_u8 sy;\n\n        v = &model->vertices[(__safe_index w3dcgb_u8)i];\n        vx = (w3dcgb_i16)((v->x * scale_q8) >> 8);\n        vy = (w3dcgb_i16)((v->y * scale_q8) >> 8);\n        vz = (w3dcgb_i16)((v->z * scale_q8) >> 8);\n\n        w3dcgb_rotate_y(&vx, &vz, (w3dcgb_i8)ry);\n        w3dcgb_rotate_x(&vy, &vz, (w3dcgb_i8)rx);\n        w3dcgb_rotate_z(&vx, &vy, (w3dcgb_i8)rz);\n\n        vx = (w3dcgb_i16)(vx + x);\n        vy = (w3dcgb_i16)(vy + y);\n        vz = (w3dcgb_i16)(vz + z);\n\n        if (w3dcgb_project_world(vx, vy, vz, &sx, &sy))\n        {\n            w3dcgb_screen_x[(__safe_index w3dcgb_u8)i] = sx;\n            w3dcgb_screen_y[(__safe_index w3dcgb_u8)i] = sy;\n            w3dcgb_screen_visible[(__safe_index w3dcgb_u8)i] = 1;\n        }\n        else\n        {\n            w3dcgb_screen_visible[(__safe_index w3dcgb_u8)i] = 0;\n        }\n        i = (w3dcgb_u8)(i + 1);\n    }\n\n    face_count = model->face_count;\n    if (face_count > WIRE3DCGB_MODEL_FACE_LIMIT) face_count = WIRE3DCGB_MODEL_FACE_LIMIT;\n    w3dcgb_build_face_visibility(model, count, face_count);\n\n    i = 0;\n    while (i < face_count)\n    {\n        const Wire3DCGB_Face* f;\n        f = &model->faces[(__safe_index w3dcgb_u8)i];\n        if (w3dcgb_face_visible[(__safe_index w3dcgb_u8)i] &&\n            w3dcgb_screen_visible[(__safe_index w3dcgb_u8)f->a] &&\n            w3dcgb_screen_visible[(__safe_index w3dcgb_u8)f->b] &&\n            w3dcgb_screen_visible[(__safe_index w3dcgb_u8)f->c])\n        {\n            w3dcgb_clear_triangle(\n                w3dcgb_screen_x[(__safe_index w3dcgb_u8)f->a],\n                w3dcgb_screen_y[(__safe_index w3dcgb_u8)f->a],\n                w3dcgb_screen_x[(__safe_index w3dcgb_u8)f->b],\n                w3dcgb_screen_y[(__safe_index w3dcgb_u8)f->b],\n                w3dcgb_screen_x[(__safe_index w3dcgb_u8)f->c],\n                w3dcgb_screen_y[(__safe_index w3dcgb_u8)f->c]);\n        }\n        i = (w3dcgb_u8)(i + 1);\n    }\n}",
         "kind": "function"
@@ -13482,7 +13487,7 @@
         "args": "w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by, w3dcgb_u8 cx, w3dcgb_u8 cy",
         "signature": "void Wire3DCGB_EraseTriangle2D(w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by, w3dcgb_u8 cx, w3dcgb_u8 cy);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6919,
+        "line": 6932,
         "comment": "Erase a triangle through the normal C stage clearer. Its clipped spans\nmark touched tiles dirty; caller/allocation must provide the stage WRAM mapping.",
         "body": "void Wire3DCGB_EraseTriangle2D(w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by, w3dcgb_u8 cx, w3dcgb_u8 cy)\n{\n    w3dcgb_clear_triangle(ax, ay, bx, by, cx, cy);\n}",
         "kind": "function"
@@ -13508,7 +13513,7 @@
         "args": "w3dcgb_u8 y, w3dcgb_u8 x0, w3dcgb_u8 x1",
         "signature": "void Wire3DCGB_EraseSpan2D(w3dcgb_u8 y, w3dcgb_u8 x0, w3dcgb_u8 x1);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6929,
+        "line": 6942,
         "comment": "Order X endpoints, reject an off-screen row or left edge, and clamp the\nright edge to 127. Mark the range dirty and use the ASM span clearer, which\nselects and restores WRAM bank 2.",
         "body": "void Wire3DCGB_EraseSpan2D(w3dcgb_u8 y, w3dcgb_u8 x0, w3dcgb_u8 x1)\n{\n    w3dcgb_u8 tx;\n\n    if (x0 > x1)\n    {\n        tx = x0;\n        x0 = x1;\n        x1 = tx;\n    }\n    if ((y >= WIRE3DCGB_SCREEN_H) || (x0 >= WIRE3DCGB_SCREEN_W)) return;\n    if (x1 >= WIRE3DCGB_SCREEN_W) x1 = WIRE3DCGB_SCREEN_W - 1;\n    w3dcgb_mark_dirty_rect(x0, y, x1, y);\n    w3dcgb_mask_span_y = y;\n    w3dcgb_mask_span_min_x = x0;\n    w3dcgb_mask_span_max_x = x1;\n    w3dcgb_stage_clear_span_asm();\n}",
         "kind": "function"
@@ -13534,7 +13539,7 @@
         "args": "w3dcgb_i16 x0, w3dcgb_i16 y0, w3dcgb_i16 x1, w3dcgb_i16 y1, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawLineClipped2D(w3dcgb_i16 x0, w3dcgb_i16 y0, w3dcgb_i16 x1, w3dcgb_i16 y1, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7471,
+        "line": 7484,
         "comment": "Clip a signed 2D line to the selected viewport, then draw with temporary\ncolor. Inputs outside +/-2047 are rejected. Fully in-bounds 128x96 lines\nuse a fast path; other lines use outcodes and bounded integer intersections\nwith an eight-iteration guard. Accepted normal-mode lines mark dirty bounds.\nThis is screen clipping only, with no 3D projection or depth clipping.",
         "body": "void Wire3DCGB_DrawLineClipped2D(w3dcgb_i16 x0, w3dcgb_i16 y0,\n                               w3dcgb_i16 x1, w3dcgb_i16 y1, w3dcgb_u8 color)\n{\n    w3dcgb_u8 c0;\n    w3dcgb_u8 c1;\n    w3dcgb_u8 outside;\n    w3dcgb_u8 guard;\n    w3dcgb_i16 x;\n    w3dcgb_i16 y;\n    c0 = 0;\n    c1 = 0;\n    if ((((x0 | y0 | x1 | y1) & 0xFF80) != 0) || (y0 >= 96) || (y1 >= 96))\n    {\n        if ((x0 < -2047) || (x0 > 2047) || (y0 < -2047) || (y0 > 2047) ||\n            (x1 < -2047) || (x1 > 2047) || (y1 < -2047) || (y1 > 2047)) return;\n        c0 = w3dcgb_clip_outcode(x0, y0);\n        c1 = w3dcgb_clip_outcode(x1, y1);\n    }\n    guard = 0;\n    while (guard < 8)\n    {\n        if ((c0 | c1) == 0)\n        {\n            /* The existing ASM rasterizer handles the hot, in-window path. */\n            if (w3dcgb_full_mode == 0) w3dcgb_mark_dirty_line((w3dcgb_u8)x0, (w3dcgb_u8)y0,\n                                  (w3dcgb_u8)x1, (w3dcgb_u8)y1);\n            Wire3DCGB_DrawLine2DColor((w3dcgb_u8)x0, (w3dcgb_u8)y0,\n                                    (w3dcgb_u8)x1, (w3dcgb_u8)y1, color);\n            return;\n        }\n        if ((c0 & c1) != 0) return;\n        outside = c0;\n        if (outside == 0) outside = c1;\n        if ((outside & 12) != 0)\n        {\n            y = 0;\n            if ((outside & 8) != 0) y = WIRE3DCGB_SCREEN_H - 1;\n            if (((outside & 8) != 0) && (w3dcgb_full_mode != 0)) y = WIRE3DCGB_FULL_SCREEN_H - 1;\n            x = (w3dcgb_i16)(x0 + w3dcgb_clip_muldiv((w3dcgb_i16)(x1 - x0),\n                (w3dcgb_i16)(y - y0), (w3dcgb_i16)(y1 - y0)));\n        }\n        else\n        {\n            x = 0;\n            if ((outside & 2) != 0) x = WIRE3DCGB_SCREEN_W - 1;\n            if (((outside & 2) != 0) && (w3dcgb_full_mode != 0)) x = WIRE3DCGB_FULL_SCREEN_W - 1;\n            y = (w3dcgb_i16)(y0 + w3dcgb_clip_muldiv((w3dcgb_i16)(y1 - y0),\n                (w3dcgb_i16)(x - x0), (w3dcgb_i16)(x1 - x0)));\n        }\n        if (outside == c0) { x0 = x; y0 = y; c0 = w3dcgb_clip_outcode(x0, y0); }\n        else { x1 = x; y1 = y; c1 = w3dcgb_clip_outcode(x1, y1); }\n        guard = (w3dcgb_u8)(guard + 1);\n    }\n}",
         "kind": "function"
@@ -13542,7 +13547,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7594,
+        "line": 7607,
         "code": "        a = edges[(__safe_index w3dcgb_u8)i].a;\n        b = edges[(__safe_index w3dcgb_u8)i].b;\n        Wire3DCGB_DrawLineClipped2D((w3dcgb_i16)(cx + vx[(__safe_index w3dcgb_u8)a]),\n            (w3dcgb_i16)(cy + vy[(__safe_index w3dcgb_u8)a]),\n            (w3dcgb_i16)(cx + vx[(__safe_index w3dcgb_u8)b]),\n            (w3dcgb_i16)(cy + vy[(__safe_index w3dcgb_u8)b]), color);\n        i = (w3dcgb_u8)(i + 1);"
       }
     },
@@ -13563,7 +13568,7 @@
         "args": "const Wire3DCGB_Edge* edges, w3dcgb_u8 edge_count, const w3dcgb_i16* vx, const w3dcgb_i16* vy, w3dcgb_u8 vertex_count, w3dcgb_i16 cx, w3dcgb_i16 cy, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawEdgeListClipped2D(const Wire3DCGB_Edge* edges, w3dcgb_u8 edge_count, const w3dcgb_i16* vx, const w3dcgb_i16* vy, w3dcgb_u8 vertex_count, w3dcgb_i16 cx, w3dcgb_i16 cy, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7532,
+        "line": 7545,
         "comment": "Validate pointers, 1..24 vertices, at most 64 edges, every index and\ninput coordinates/centers in +/-2047 before drawing. Fully visible geometry\nuses signed-byte scratch and the fast indexed path; other edges use the\nsigned line clipper. That clipper may reject translated endpoints beyond\n+/-2047 even when individual inputs passed. Replace shared screen scratch\nand preserve the previous color through the called line APIs.",
         "body": "void Wire3DCGB_DrawEdgeListClipped2D(const Wire3DCGB_Edge* edges, w3dcgb_u8 edge_count,\n    const w3dcgb_i16* vx, const w3dcgb_i16* vy, w3dcgb_u8 vertex_count,\n    w3dcgb_i16 cx, w3dcgb_i16 cy, w3dcgb_u8 color)\n{\n    w3dcgb_u8 i;\n    w3dcgb_u8 a;\n    w3dcgb_u8 b;\n    w3dcgb_u8 inside;\n    w3dcgb_i16 x;\n    w3dcgb_i16 y;\n    w3dcgb_i16 min_x;\n    w3dcgb_i16 min_y;\n    w3dcgb_i16 max_x;\n    w3dcgb_i16 max_y;\n    if ((edges == 0) || (vx == 0) || (vy == 0)) return;\n    if ((cx < -2047) || (cx > 2047) || (cy < -2047) || (cy > 2047)) return;\n    if ((vertex_count == 0) || (vertex_count > WIRE3DCGB_MODEL_VERTEX_LIMIT) ||\n        (edge_count > WIRE3DCGB_MODEL_EDGE_LIMIT)) return;\n    i = 0;\n    while (i < edge_count)\n    {\n        if ((edges[(__safe_index w3dcgb_u8)i].a >= vertex_count) ||\n            (edges[(__safe_index w3dcgb_u8)i].b >= vertex_count)) return;\n        i = (w3dcgb_u8)(i + 1);\n    }\n    min_x = 32767;\n    min_y = 32767;\n    max_x = -32767;\n    max_y = -32767;\n    inside = 1;\n    i = 0;\n    while (i < vertex_count)\n    {\n        if ((vx[(__safe_index w3dcgb_u8)i] < -2047) ||\n            (vx[(__safe_index w3dcgb_u8)i] > 2047) ||\n            (vy[(__safe_index w3dcgb_u8)i] < -2047) ||\n            (vy[(__safe_index w3dcgb_u8)i] > 2047)) return;\n        x = (w3dcgb_i16)(cx + vx[(__safe_index w3dcgb_u8)i]);\n        y = (w3dcgb_i16)(cy + vy[(__safe_index w3dcgb_u8)i]);\n        if (x < min_x) min_x = x;\n        if (x > max_x) max_x = x;\n        if (y < min_y) min_y = y;\n        if (y > max_y) max_y = y;\n        /* Reuse projected-vertex scratch; drawing is non-reentrant. */\n        w3dcgb_screen_x[(__safe_index w3dcgb_u8)i] = (w3dcgb_u8)(x - 64);\n        w3dcgb_screen_y[(__safe_index w3dcgb_u8)i] = (w3dcgb_u8)(y - 48);\n        i = (w3dcgb_u8)(i + 1);\n    }\n    if ((w3dcgb_clip_outcode(min_x, min_y) | w3dcgb_clip_outcode(max_x, max_y)) != 0) inside = 0;\n    if (inside != 0)\n    {\n        if (w3dcgb_full_mode == 0) w3dcgb_mark_dirty_rect((w3dcgb_u8)min_x,\n            (w3dcgb_u8)min_y, (w3dcgb_u8)max_x, (w3dcgb_u8)max_y);\n        Wire3DCGB_DrawEdgeList2D(edges, edge_count, (const w3dcgb_i8*)w3dcgb_screen_x,\n            (const w3dcgb_i8*)w3dcgb_screen_y, 64, 48, color);\n        return;\n    }\n    i = 0;\n    while (i < edge_count)\n    {\n        a = edges[(__safe_index w3dcgb_u8)i].a;\n        b = edges[(__safe_index w3dcgb_u8)i].b;\n        Wire3DCGB_DrawLineClipped2D((w3dcgb_i16)(cx + vx[(__safe_index w3dcgb_u8)a]),\n            (w3dcgb_i16)(cy + vy[(__safe_index w3dcgb_u8)a]),\n            (w3dcgb_i16)(cx + vx[(__safe_index w3dcgb_u8)b]),\n            (w3dcgb_i16)(cy + vy[(__safe_index w3dcgb_u8)b]), color);\n        i = (w3dcgb_u8)(i + 1);\n    }\n}",
         "kind": "function"
@@ -13589,7 +13594,7 @@
         "args": "w3dcgb_i16 value, w3dcgb_i16 z",
         "signature": "w3dcgb_i16 Wire3DCGB_ProjectAxis48(w3dcgb_i16 value, w3dcgb_i16 z);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7428,
+        "line": 7441,
         "comment": "Approximate value*48/z without a camera or screen-center offset. Negative\nor very small Z becomes 4. For Z above 255, shift depth and magnitude\nright together until depth fits a byte, then cap magnitude at 160.\nReturn a signed offset; this helper does not reject near/far depths.",
         "body": "w3dcgb_i16 Wire3DCGB_ProjectAxis48(w3dcgb_i16 value, w3dcgb_i16 z)\n{\n    w3dcgb_projection_value = value;\n    w3dcgb_projection_z = z;\n    w3dcgb_project_axis48_asm();\n    return w3dcgb_projection_result;\n}",
         "kind": "function"
@@ -13615,7 +13620,7 @@
         "args": "",
         "signature": "void Wire3DCGB_InvalidateFrameHistory();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7438,
+        "line": 7451,
         "comment": "Mark current and both previous sparse ranges as all 192 normal-mode\ntiles. Pixel data is not cleared; subsequent uploads cannot trust old ranges.",
         "body": "void Wire3DCGB_InvalidateFrameHistory()\n{\n    w3dcgb_dirty_min_tile = 0;\n    w3dcgb_dirty_max_tile = 191;\n    w3dcgb_prev_dirty_min_tile = 0;\n    w3dcgb_prev_dirty_max_tile = 191;\n    w3dcgb_older_dirty_min_tile = 0;\n    w3dcgb_older_dirty_max_tile = 191;\n}",
         "kind": "function"
@@ -13641,7 +13646,7 @@
         "args": "",
         "signature": "void Wire3DCGB_EnableAtomicMaps();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5723,
+        "line": 5736,
         "comment": "Enable map flipping once during 128x96 startup; ignore full-screen mode\nor an already-enabled setting. With LCD on, wait for VBlank, disable it,\ncopy both banks of 9800 to 9C00, and assign viewport attributes to tile\nbanks 0/1 respectively. Restore LCDC with map 9C00 selected and VBK zero.\nBoth BG maps become reserved. Queued HUD tile numbers are mirrored.",
         "body": "void Wire3DCGB_EnableAtomicMaps()\n{\n    if ((w3dcgb_full_mode != 0) || (w3dcgb_atomic_maps != 0)) return;\n    __asm {\nw3dam_wait:\n        LDH_A_MEM 68\n        CP_IMM 144\n        JR_C w3dam_wait\n        LDH_A_MEM 64\n        PUSH_AF\n        XOR_A\n        LDH_MEM_A 64\n        LDH_MEM_A 79\n        LD_HL_IMM 0x9800\n        LD_DE_IMM 0x9C00\n        LD_B_IMM 4\nw3dam_copy_page:\n        LD_C_IMM 0\nw3dam_copy_byte:\n        LD_A_HL\n        INC_HL\n        LD_DE_A\n        INC_DE\n        DEC_C\n        JR_NZ w3dam_copy_byte\n        DEC_B\n        JR_NZ w3dam_copy_page\n        LDH_A_MEM 79\n        AND_IMM 1\n        JR_NZ w3dam_attrs\n        LD_A_IMM 1\n        LDH_MEM_A 79\n        LD_HL_IMM 0x9800\n        LD_DE_IMM 0x9C00\n        LD_B_IMM 4\n        JR w3dam_copy_page\nw3dam_attrs:\n        LD_HL_IMM 0x9800\n        LD_DE_IMM 0x9C00\n        LD_B_IMM 12\nw3dam_row:\n        LD_C_IMM 16\nw3dam_cell:\n        XOR_A\n        LDI_HL_A\n        LD_A_IMM 8\n        LD_DE_A\n        INC_DE\n        DEC_C\n        JR_NZ w3dam_cell\n        LD_A_L\n        ADD_A_IMM 16\n        LD_L_A\n        JR_NC w3dam_hl_ready\n        INC_H\nw3dam_hl_ready:\n        LD_A_E\n        ADD_A_IMM 16\n        LD_E_A\n        JR_NC w3dam_de_ready\n        INC_D\nw3dam_de_ready:\n        DEC_B\n        JR_NZ w3dam_row\n        LD_A_IMM 1\n        LD_MEM_A w3dcgb_atomic_maps\n        XOR_A\n        LDH_MEM_A 79\n        POP_AF\n        OR_IMM 8\n        LDH_MEM_A 64\n        RET\n    }\n}",
         "kind": "function"
@@ -13667,7 +13672,7 @@
         "args": "w3dcgb_u8 x0, w3dcgb_u8 y0, w3dcgb_u8 x1, w3dcgb_u8 y1",
         "signature": "void Wire3DCGB_EraseRect2D(w3dcgb_u8 x0, w3dcgb_u8 y0, w3dcgb_u8 x1, w3dcgb_u8 y1);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6952,
+        "line": 6965,
         "comment": "Order and clip the rectangle to 128x96. Full-height left strips of 16 or\n24 pixels use bank-preserving ASM clears and dirty marking. Other rectangles\nuse C row clears and require the correct stage WRAM mapping from the caller.",
         "body": "void Wire3DCGB_EraseRect2D(w3dcgb_u8 x0, w3dcgb_u8 y0, w3dcgb_u8 x1, w3dcgb_u8 y1)\n{\n    w3dcgb_u8 t;\n    w3dcgb_u8 y;\n\n    if (x0 > x1)\n    {\n        t = x0;\n        x0 = x1;\n        x1 = t;\n    }\n    if (y0 > y1)\n    {\n        t = y0;\n        y0 = y1;\n        y1 = t;\n    }\n    if (x0 >= WIRE3DCGB_SCREEN_W) return;\n    if (y0 >= WIRE3DCGB_SCREEN_H) return;\n    if (x1 >= WIRE3DCGB_SCREEN_W) x1 = (w3dcgb_u8)(WIRE3DCGB_SCREEN_W - 1);\n    if (y1 >= WIRE3DCGB_SCREEN_H) y1 = (w3dcgb_u8)(WIRE3DCGB_SCREEN_H - 1);\n\n    if ((x0 == 0) &&\n        (x1 == 15) &&\n        (y0 == 0) &&\n        (y1 == (w3dcgb_u8)(WIRE3DCGB_SCREEN_H - 1)))\n    {\n        w3dcgb_erase_left_guard16_asm();\n        w3dcgb_mark_dirty_rect(0, 0, 15, (w3dcgb_u8)(WIRE3DCGB_SCREEN_H - 1));\n        return;\n    }\n    if ((x0 == 0) &&\n        (x1 == 23) &&\n        (y0 == 0) &&\n        (y1 == (w3dcgb_u8)(WIRE3DCGB_SCREEN_H - 1)))\n    {\n        w3dcgb_erase_left_guard24_asm();\n        w3dcgb_mark_dirty_rect(0, 0, 23, (w3dcgb_u8)(WIRE3DCGB_SCREEN_H - 1));\n        return;\n    }\n\n    y = y0;\n    while (y <= y1)\n    {\n        w3dcgb_stage_clear_span(y, x0, x1);\n        if (y == y1) break;\n        y = (w3dcgb_u8)(y + 1);\n    }\n}",
         "kind": "function"
@@ -13693,7 +13698,7 @@
         "args": "",
         "signature": "void Wire3DCGB_EraseLeftGuard24Fast();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7006,
+        "line": 7019,
         "comment": "Clear the leftmost 24 stage columns through bank-preserving ASM. No dirty\nrange is marked; sparse-transfer callers must include the cleared tiles.",
         "body": "void Wire3DCGB_EraseLeftGuard24Fast()\n{\n    w3dcgb_erase_left_guard24_asm();\n}",
         "kind": "function"
@@ -13719,7 +13724,7 @@
         "args": "",
         "signature": "void Wire3DCGB_DrawWhiteBorderFast();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7095,
+        "line": 7108,
         "comment": "Write a one-pixel color-2 border around the normal stage, preserving\ninterior pixels and WRAM bank selection. Its visible color depends on the\npalette. No dirty range is marked; sparse callers must arrange its upload.",
         "body": "void Wire3DCGB_DrawWhiteBorderFast()\n{\n    w3dcgb_draw_white_border_asm();\n}",
         "kind": "function"
@@ -13745,7 +13750,7 @@
         "args": "",
         "signature": "void Wire3DCGB_ClearOcclusionMask();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 1698,
+        "line": 1699,
         "comment": "Clear full-screen span history when full_mode is set; otherwise clear the\n128x96 bitmap mask and its bounds. This does not erase displayed/staged\npixels or change whether occlusion testing is enabled.",
         "body": "void Wire3DCGB_ClearOcclusionMask()\n{\n    if (w3dcgb_full_mode != 0) w3dcgb_full_clear_spans_asm();\n    else w3dcgb_clear_occlusion_mask();\n}",
         "kind": "function"
@@ -13771,7 +13776,7 @@
         "args": "w3dcgb_u8 active",
         "signature": "void Wire3DCGB_SetOcclusionActive(w3dcgb_u8 active);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 1706,
+        "line": 1707,
         "comment": "Normalize active to zero or one and store it as the occlusion switch.\nNo mask clearing or geometry marking occurs.",
         "body": "void Wire3DCGB_SetOcclusionActive(w3dcgb_u8 active)\n{\n    if (active == 0) w3dcgb_occlusion_active = 0;\n    else w3dcgb_occlusion_active = 1;\n}",
         "kind": "function"
@@ -13797,7 +13802,7 @@
         "args": "w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by, w3dcgb_u8 cx, w3dcgb_u8 cy",
         "signature": "void Wire3DCGB_MarkTriangle2D(w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by, w3dcgb_u8 cx, w3dcgb_u8 cy);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 1716,
+        "line": 1717,
         "comment": "Mark a screen-space triangle without drawing pixels or enabling occlusion.\nSupply vertices inside the selected viewport. The active ASM adds a one-pixel\nX guard, limited to 0..127 in 128x96 mode or 0..159 in 160x144 mode.\nThis function does not clip arbitrary out-of-bounds triangles.",
         "body": "void Wire3DCGB_MarkTriangle2D(w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by, w3dcgb_u8 cx, w3dcgb_u8 cy)\n{\n    w3dcgb_mark_triangle(ax, ay, bx, by, cx, cy);\n}",
         "kind": "function"
@@ -13823,7 +13828,7 @@
         "args": "const w3dcgb_u8* profile, w3dcgb_u8 count, w3dcgb_i8 y0, w3dcgb_u8 x, w3dcgb_u8 y",
         "signature": "void Wire3DCGB_MarkPackedSilhouette2D(const w3dcgb_u8* profile, w3dcgb_u8 count, w3dcgb_i8 y0, w3dcgb_u8 x, w3dcgb_u8 y);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 1727,
+        "line": 1728,
         "comment": "Mark up to 29 silhouette rows in the 128x96 bitmap mask. Each packed byte\nuses its high nibble for center offset (nibble-7), low nibble for half-width;\n0xFF skips a row. Place rows at y+y0+i, expand spans by two pixels, and clip\nto the viewport. profile must contain count readable bytes; null is ignored.\nThis does not update full-screen spans or enable occlusion.",
         "body": "void Wire3DCGB_MarkPackedSilhouette2D(const w3dcgb_u8* profile, w3dcgb_u8 count,\n                                     w3dcgb_i8 y0, w3dcgb_u8 x, w3dcgb_u8 y)\n{\n    w3dcgb_u8 i;\n    w3dcgb_u8 packed;\n    w3dcgb_u8 half_width;\n    w3dcgb_i16 center;\n    w3dcgb_i16 left;\n    w3dcgb_i16 right;\n    w3dcgb_i16 row;\n\n    if (profile == 0) return;\n    if (count > 29) count = 29;\n    i = 0;\n    while (i < count)\n    {\n        packed = profile[(__safe_index w3dcgb_u8)i];\n        if (packed != 0xFF)\n        {\n            row = (w3dcgb_i16)((w3dcgb_i16)y + (w3dcgb_i16)y0 + (w3dcgb_i16)i);\n            if ((row >= 0) && (row < WIRE3DCGB_SCREEN_H))\n            {\n                center = (w3dcgb_i16)((w3dcgb_i16)x + (w3dcgb_i16)(packed >> 4) - 7);\n                half_width = (w3dcgb_u8)(packed & 15);\n                /* Two-pixel guard covers rasterized endpoints at 22.5-degree views. */\n                left = (w3dcgb_i16)(center - (w3dcgb_i16)half_width - 2);\n                right = (w3dcgb_i16)(center + (w3dcgb_i16)half_width + 2);\n                if ((right >= 0) && (left < WIRE3DCGB_SCREEN_W))\n                {\n                    if (left < 0) left = 0;\n                    if (right >= WIRE3DCGB_SCREEN_W) right = WIRE3DCGB_SCREEN_W - 1;\n                    w3dcgb_mask_span_y = (w3dcgb_u8)row;\n                    w3dcgb_mask_span_min_x = (w3dcgb_u8)left;\n                    w3dcgb_mask_span_max_x = (w3dcgb_u8)right;\n                    w3dcgb_mask_set_span_asm();\n                }\n            }\n        }\n        i = (w3dcgb_u8)(i + 1);\n    }\n}",
         "kind": "function"
@@ -13849,7 +13854,7 @@
         "args": "const w3dcgb_u8* profile, w3dcgb_u8 count, w3dcgb_i8 y0, w3dcgb_u8 x, w3dcgb_u8 y",
         "signature": "void Wire3DCGB_ErasePackedSilhouette2D(const w3dcgb_u8* profile, w3dcgb_u8 count, w3dcgb_i8 y0, w3dcgb_u8 x, w3dcgb_u8 y);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 1774,
+        "line": 1775,
         "comment": "Erase up to 29 packed silhouette rows from both staged bitplanes. Format,\nplacement, two-pixel guard and clipping match MarkPackedSilhouette2D; null\nis ignored. The ASM span writer selects/restores WRAM bank 2 but does not\nmark dirty tiles. In sparse mode the caller must ensure erased tiles are\nincluded in the upload range. This API targets the 128x96 stage.",
         "body": "void Wire3DCGB_ErasePackedSilhouette2D(const w3dcgb_u8* profile, w3dcgb_u8 count,\n                                      w3dcgb_i8 y0, w3dcgb_u8 x, w3dcgb_u8 y)\n{\n    w3dcgb_u8 i;\n    w3dcgb_u8 packed;\n    w3dcgb_u8 half_width;\n    w3dcgb_i16 center;\n    w3dcgb_i16 left;\n    w3dcgb_i16 right;\n    w3dcgb_i16 row;\n\n    if (profile == 0) return;\n    if (count > 29) count = 29;\n    i = 0;\n    while (i < count)\n    {\n        packed = profile[(__safe_index w3dcgb_u8)i];\n        if (packed != 0xFF)\n        {\n            row = (w3dcgb_i16)((w3dcgb_i16)y + (w3dcgb_i16)y0 + (w3dcgb_i16)i);\n            if ((row >= 0) && (row < WIRE3DCGB_SCREEN_H))\n            {\n                center = (w3dcgb_i16)((w3dcgb_i16)x + (w3dcgb_i16)(packed >> 4) - 7);\n                half_width = (w3dcgb_u8)(packed & 15);\n                left = (w3dcgb_i16)(center - (w3dcgb_i16)half_width - 2);\n                right = (w3dcgb_i16)(center + (w3dcgb_i16)half_width + 2);\n                if ((right >= 0) && (left < WIRE3DCGB_SCREEN_W))\n                {\n                    if (left < 0) left = 0;\n                    if (right >= WIRE3DCGB_SCREEN_W) right = WIRE3DCGB_SCREEN_W - 1;\n                    w3dcgb_mask_span_y = (w3dcgb_u8)row;\n                    w3dcgb_mask_span_min_x = (w3dcgb_u8)left;\n                    w3dcgb_mask_span_max_x = (w3dcgb_u8)right;\n                    w3dcgb_stage_clear_span_asm();\n                }\n            }\n        }\n        i = (w3dcgb_u8)(i + 1);\n    }\n}",
         "kind": "function"
@@ -13875,7 +13880,7 @@
         "args": "Wire3DCGB_Object* objects, w3dcgb_u8 count",
         "signature": "void Wire3DCGB_DrawScene(Wire3DCGB_Object* objects, w3dcgb_u8 count);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6724,
+        "line": 6737,
         "comment": "Sort at most eight objects near-to-far by camera-space origin depth,\nwithout changing the caller array. Clear the mask, draw visible models\nagainst earlier coverage, then add their faces as occluders. Model arrays\nand face indices must be valid. Color zero inherits the current color,\npossibly from the preceding object. Restore entry color and disable\nocclusion at the end. This model path targets the normal 128x96 stage.",
         "body": "void Wire3DCGB_DrawScene(Wire3DCGB_Object* objects, w3dcgb_u8 count)\n{\n    w3dcgb_u8 scene_count;\n    w3dcgb_u8 i;\n    w3dcgb_u8 old_color;\n\n    if (objects == 0) return;\n\n    scene_count = count;\n    if (scene_count > WIRE3DCGB_SCENE_OBJECT_LIMIT) scene_count = WIRE3DCGB_SCENE_OBJECT_LIMIT;\n\n    i = 0;\n    while (i < scene_count)\n    {\n        w3dcgb_scene_order[(__safe_index w3dcgb_u8)i] = i;\n        w3dcgb_scene_depth[(__safe_index w3dcgb_u8)i] = w3dcgb_scene_object_depth(&objects[(__safe_index w3dcgb_u8)i]);\n        i = (w3dcgb_u8)(i + 1);\n    }\n\n    i = 0;\n    while (i < scene_count)\n    {\n        w3dcgb_u8 j;\n        j = (w3dcgb_u8)(i + 1);\n        while (j < scene_count)\n        {\n            w3dcgb_u8 oi;\n            w3dcgb_u8 oj;\n            oi = w3dcgb_scene_order[(__safe_index w3dcgb_u8)i];\n            oj = w3dcgb_scene_order[(__safe_index w3dcgb_u8)j];\n\n            if (w3dcgb_scene_depth[(__safe_index w3dcgb_u8)oj] < w3dcgb_scene_depth[(__safe_index w3dcgb_u8)oi])\n            {\n                w3dcgb_scene_order[(__safe_index w3dcgb_u8)i] = oj;\n                w3dcgb_scene_order[(__safe_index w3dcgb_u8)j] = oi;\n            }\n            j = (w3dcgb_u8)(j + 1);\n        }\n        i = (w3dcgb_u8)(i + 1);\n    }\n\n    old_color = w3dcgb_line_color;\n    w3dcgb_clear_occlusion_mask();\n    w3dcgb_occlusion_active = 0;\n\n    i = 0;\n    while (i < scene_count)\n    {\n        Wire3DCGB_Object* obj;\n        obj = &objects[(__safe_index w3dcgb_u8)w3dcgb_scene_order[(__safe_index w3dcgb_u8)i]];\n        if ((obj->visible != 0) && (obj->model != 0))\n        {\n            if (i == 0) w3dcgb_occlusion_active = 0;\n            else w3dcgb_occlusion_active = 1;\n            if (obj->color != 0) Wire3DCGB_SetLineColor(obj->color);\n            Wire3DCGB_DrawModelScaled(obj->model, obj->x, obj->y, obj->z, (w3dcgb_i8)obj->rx, (w3dcgb_i8)obj->ry, (w3dcgb_i8)obj->rz, obj->scale_q8);\n            w3dcgb_occlusion_active = 0;\n            w3dcgb_mark_model_occluder(obj->model);\n        }\n        i = (w3dcgb_u8)(i + 1);\n    }\n\n    w3dcgb_occlusion_active = 0;\n    w3dcgb_line_color = old_color;\n}",
         "kind": "function"
@@ -13901,7 +13906,7 @@
         "args": "Wire3DCGB_FastCube* cubes, w3dcgb_u8 count, w3dcgb_u8 hidden_enabled, w3dcgb_u8 selected",
         "signature": "void Wire3DCGB_DrawFastCubes(Wire3DCGB_FastCube* cubes, w3dcgb_u8 count, w3dcgb_u8 hidden_enabled, w3dcgb_u8 selected);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6571,
+        "line": 6584,
         "comment": "Draw at most three 2D cube approximations, sorted far-to-near by raw Z\nwithout reordering the caller array. Null/empty input is ignored. selected\nis an original array index. Camera/rotation are unused and color is not restored.",
         "body": "void Wire3DCGB_DrawFastCubes(Wire3DCGB_FastCube* cubes, w3dcgb_u8 count, w3dcgb_u8 hidden_enabled, w3dcgb_u8 selected)\n{\n    w3dcgb_u8 scene_count;\n    w3dcgb_u8 a;\n    w3dcgb_u8 b;\n    w3dcgb_u8 c;\n    w3dcgb_u8 x;\n\n    if (cubes == 0) return;\n    scene_count = count;\n    if (scene_count == 0) return;\n    if (scene_count > 3) scene_count = 3;\n\n    a = 0;\n    b = 1;\n    c = 2;\n    if (scene_count == 1)\n    {\n        w3dcgb_draw_fast_cube_one(&cubes[0], hidden_enabled, (w3dcgb_u8)(selected == 0));\n        return;\n    }\n\n    if (scene_count == 2)\n    {\n        if (cubes[0].z < cubes[1].z)\n        {\n            w3dcgb_draw_fast_cube_one(&cubes[1], hidden_enabled, (w3dcgb_u8)(selected == 1));\n            w3dcgb_draw_fast_cube_one(&cubes[0], hidden_enabled, (w3dcgb_u8)(selected == 0));\n        }\n        else\n        {\n            w3dcgb_draw_fast_cube_one(&cubes[0], hidden_enabled, (w3dcgb_u8)(selected == 0));\n            w3dcgb_draw_fast_cube_one(&cubes[1], hidden_enabled, (w3dcgb_u8)(selected == 1));\n        }\n        return;\n    }\n\n    if (cubes[a].z < cubes[b].z)\n    {\n        w3dcgb_u8 t;\n        t = a;\n        a = b;\n        b = t;\n    }\n    if (cubes[b].z < cubes[c].z)\n    {\n        w3dcgb_u8 t;\n        t = b;\n        b = c;\n        c = t;\n    }\n    if (cubes[a].z < cubes[b].z)\n    {\n        w3dcgb_u8 t;\n        t = a;\n        a = b;\n        b = t;\n    }\n\n    w3dcgb_draw_fast_cube_one(&cubes[a], hidden_enabled, (w3dcgb_u8)(selected == a));\n    w3dcgb_draw_fast_cube_one(&cubes[b], hidden_enabled, (w3dcgb_u8)(selected == b));\n    w3dcgb_draw_fast_cube_one(&cubes[c], hidden_enabled, (w3dcgb_u8)(selected == c));\n}",
         "kind": "function"
@@ -13927,7 +13932,7 @@
         "args": "w3dcgb_u8 hidden_enabled, w3dcgb_u8 selected",
         "signature": "void Wire3DCGB_DrawFastStatus(w3dcgb_u8 hidden_enabled, w3dcgb_u8 selected);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6694,
+        "line": 6707,
         "comment": "Draw small selection/hidden-mode indicators in color 3 and mark their\nnormal-mode bounds dirty. selected is expected in 0..2; it is not checked.\nThese indicators use lines, not font tiles, and the old color is not restored.",
         "body": "void Wire3DCGB_DrawFastStatus(w3dcgb_u8 hidden_enabled, w3dcgb_u8 selected)\n{\n    w3dcgb_u8 x;\n\n    w3dcgb_mark_dirty_rect(0, 0, 31, 7);\n    w3dcgb_mark_dirty_rect(116, 0, 127, 7);\n\n    x = (w3dcgb_u8)(4 + (selected * 8));\n    w3dcgb_line_color = WIRE3DCGB_COLOR_HIGH;\n    w3dcgb_draw_line_raw(x, 3, (w3dcgb_u8)(x + 5), 3);\n    w3dcgb_draw_line_raw(x, 6, (w3dcgb_u8)(x + 5), 6);\n    if (hidden_enabled != 0)\n    {\n        w3dcgb_draw_line_raw(118, 3, 124, 3);\n        w3dcgb_draw_line_raw(118, 6, 124, 6);\n    }\n    else\n    {\n        w3dcgb_draw_line_raw(118, 3, 124, 6);\n        w3dcgb_draw_line_raw(118, 6, 124, 3);\n    }\n}",
         "kind": "function"
@@ -13953,7 +13958,7 @@
         "args": "Wire3DCGB_FastCube* cubes, w3dcgb_u8 count, w3dcgb_u8 hidden_enabled, w3dcgb_u8 selected",
         "signature": "void Wire3DCGB_DrawFastCubeFrame(Wire3DCGB_FastCube* cubes, w3dcgb_u8 count, w3dcgb_u8 hidden_enabled, w3dcgb_u8 selected);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 8526,
+        "line": 8539,
         "comment": "Prepare the map, erase prior bounds/status cells, sort up to three cube\nstamps far-to-near by raw Z, then draw and upload numbers/attributes at\nVBlank. The caller array is not reordered. Non-null count zero clears\nold stamps; a null array is a complete no-op. selected & 3 chooses the\nstatus cell only, not a cube highlight. Requires loaded cube stamps, the\nfull runtime and consistent FastMap WRAM mapping; it does not initialize them.",
         "body": "void Wire3DCGB_DrawFastCubeFrame(Wire3DCGB_FastCube* cubes, w3dcgb_u8 count, w3dcgb_u8 hidden_enabled, w3dcgb_u8 selected)\n{\n    w3dcgb_u8 i;\n    w3dcgb_u8 scene_count;\n    w3dcgb_u8 a;\n    w3dcgb_u8 b;\n    w3dcgb_u8 c;\n    w3dcgb_u8 x;\n\n    if (cubes == 0) return;\n    scene_count = count;\n    if (scene_count > 3) scene_count = 3;\n\n    w3dcgb_fast_map_prepare();\n\n    i = 0;\n    while (i < w3dcgb_fast_prev_count)\n    {\n        w3dcgb_fast_map_clear_rect(\n            w3dcgb_fast_prev_x[(__safe_index w3dcgb_u8)i],\n            w3dcgb_fast_prev_y[(__safe_index w3dcgb_u8)i],\n            w3dcgb_fast_prev_w[(__safe_index w3dcgb_u8)i],\n            w3dcgb_fast_prev_h[(__safe_index w3dcgb_u8)i]);\n        i = (w3dcgb_u8)(i + 1);\n    }\n    w3dcgb_fast_map_clear_rect(0, 0, 4, 1);\n    w3dcgb_fast_map_clear_rect(14, 0, 2, 1);\n\n    if (scene_count == 0)\n    {\n        w3dcgb_fast_prev_count = 0;\n        w3dcgb_wait_vblank_start();\n        w3dcgb_fast_map_flush_gdma_asm();\n        return;\n    }\n\n    a = 0;\n    b = 1;\n    c = 2;\n    if (scene_count == 1)\n    {\n        w3dcgb_fast_map_draw_cube_one(&cubes[0], hidden_enabled, (w3dcgb_u8)(selected == 0), 0);\n        w3dcgb_fast_prev_count = 1;\n    }\n    else if (scene_count == 2)\n    {\n        if (cubes[0].z < cubes[1].z)\n        {\n            w3dcgb_fast_map_draw_cube_one(&cubes[1], hidden_enabled, (w3dcgb_u8)(selected == 1), 1);\n            w3dcgb_fast_map_draw_cube_one(&cubes[0], hidden_enabled, (w3dcgb_u8)(selected == 0), 0);\n        }\n        else\n        {\n            w3dcgb_fast_map_draw_cube_one(&cubes[0], hidden_enabled, (w3dcgb_u8)(selected == 0), 0);\n            w3dcgb_fast_map_draw_cube_one(&cubes[1], hidden_enabled, (w3dcgb_u8)(selected == 1), 1);\n        }\n        w3dcgb_fast_prev_count = 2;\n    }\n    else\n    {\n        if (cubes[a].z < cubes[b].z)\n        {\n            w3dcgb_u8 t;\n            t = a;\n            a = b;\n            b = t;\n        }\n        if (cubes[b].z < cubes[c].z)\n        {\n            w3dcgb_u8 t;\n            t = b;\n            b = c;\n            c = t;\n        }\n        if (cubes[a].z < cubes[b].z)\n        {\n            w3dcgb_u8 t;\n            t = a;\n            a = b;\n            b = t;\n        }\n        w3dcgb_fast_map_draw_cube_one(&cubes[a], hidden_enabled, (w3dcgb_u8)(selected == a), a);\n        w3dcgb_fast_map_draw_cube_one(&cubes[b], hidden_enabled, (w3dcgb_u8)(selected == b), b);\n        w3dcgb_fast_map_draw_cube_one(&cubes[c], hidden_enabled, (w3dcgb_u8)(selected == c), c);\n        w3dcgb_fast_prev_count = 3;\n    }\n\n    x = (w3dcgb_u8)(selected & 3);\n    w3dcgb_fast_map_or_cell((w3dcgb_i16)x, (w3dcgb_i16)0, WIRE3DCGB_COLOR_HIGH, 15);\n    if (hidden_enabled != 0) w3dcgb_fast_map_or_cell((w3dcgb_i16)15, (w3dcgb_i16)0, WIRE3DCGB_COLOR_HIGH, 15);\n    else w3dcgb_fast_map_or_cell((w3dcgb_i16)14, (w3dcgb_i16)0, WIRE3DCGB_COLOR_LOW, 15);\n\n    w3dcgb_wait_vblank_start();\n    w3dcgb_fast_map_flush_gdma_asm();\n}",
         "kind": "function"
@@ -13979,7 +13984,7 @@
         "args": "w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_i16 z, w3dcgb_u8 phase, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawFastProjectile(w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_i16 z, w3dcgb_u8 phase, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6639,
+        "line": 6652,
         "comment": "Draw a six-edge projectile at an already-projected center using four\ndepth size bands and four phase orientations. Reject centers outside\nX=10..117 or Y=10..85, mark the bounds dirty and leave the requested color\nselected. This uses the normal rasterizer and does not apply the camera.",
         "body": "void Wire3DCGB_DrawFastProjectile(w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_i16 z,\n                                  w3dcgb_u8 phase, w3dcgb_u8 color)\n{\n    w3dcgb_u8 radius;\n    w3dcgb_u8 half;\n    w3dcgb_u8 depth;\n    w3dcgb_u8 ax;\n    w3dcgb_u8 ay;\n    w3dcgb_u8 bx;\n    w3dcgb_u8 by;\n    w3dcgb_u8 cx;\n    w3dcgb_u8 cy;\n    w3dcgb_u8 dx;\n    w3dcgb_u8 dy;\n    w3dcgb_u8 spin;\n\n    if ((x < 10) || (x > 117) || (y < 10) || (y > 85)) return;\n    radius = 3;\n    depth = 1;\n    if (z <= 160) { radius = 4; depth = 2; }\n    if (z <= 112) { radius = 5; depth = 3; }\n    if (z <= 64) { radius = 7; depth = 4; }\n    half = (w3dcgb_u8)(radius >> 1);\n\n    ax = x;\n    ay = (w3dcgb_u8)(y - radius);\n    bx = (w3dcgb_u8)(x - radius);\n    by = (w3dcgb_u8)(y + half);\n    cx = (w3dcgb_u8)(x + radius);\n    cy = by;\n    spin = (w3dcgb_u8)((phase >> 3) & 3);\n    dx = (w3dcgb_u8)(x + depth);\n    dy = (w3dcgb_u8)(y - depth);\n    if (spin == 1) dy = (w3dcgb_u8)(y + depth);\n    else if (spin == 2)\n    {\n        dx = (w3dcgb_u8)(x - depth);\n        dy = (w3dcgb_u8)(y + depth);\n    }\n    else if (spin == 3) dx = (w3dcgb_u8)(x - depth);\n\n    w3dcgb_mark_dirty_rect((w3dcgb_u8)(x - radius), (w3dcgb_u8)(y - radius),\n                           (w3dcgb_u8)(x + radius), (w3dcgb_u8)(y + radius));\n    w3dcgb_line_color = color;\n    w3dcgb_draw_line_raw(ax, ay, bx, by);\n    w3dcgb_draw_line_raw(bx, by, cx, cy);\n    w3dcgb_draw_line_raw(cx, cy, ax, ay);\n    w3dcgb_draw_line_raw(ax, ay, dx, dy);\n    w3dcgb_draw_line_raw(bx, by, dx, dy);\n    w3dcgb_draw_line_raw(cx, cy, dx, dy);\n}",
         "kind": "function"
@@ -14005,7 +14010,7 @@
         "args": "",
         "signature": "void Wire3DCGB_FastMapBegin();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7863,
+        "line": 7876,
         "comment": "Mark FastMap prepared and clear tile numbers/attributes in its 16x12\nviewport. Shadow columns 16..31 are retained even though flush copies\n32 columns per row. Requires the full runtime and a stable FastMap WRAM\nmapping; this does not initialize hardware or upload the map.",
         "body": "void Wire3DCGB_FastMapBegin()\n{\n    w3dcgb_fast_map_ready = 1;\n    w3dcgb_fast_map_clear_rect(0, 0, 16, 12);\n}",
         "kind": "function"
@@ -14031,7 +14036,7 @@
         "args": "",
         "signature": "void Wire3DCGB_FastMapBeginTilesOnly();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7872,
+        "line": 7885,
         "comment": "Mark FastMap prepared and clear only its 16x12 tile-number viewport.\nKeep attributes and columns 16..31. Requires the full runtime and the\nintended WRAM mapping; hardware initialization/upload is separate.",
         "body": "void Wire3DCGB_FastMapBeginTilesOnly()\n{\n    w3dcgb_fast_map_ready = 1;\n    w3dcgb_fm_x0 = 0;\n    w3dcgb_fm_y0 = 0;\n    w3dcgb_fm_count_x = 16;\n    w3dcgb_fm_count_y = 12;\n    w3dcgb_fast_map_clear_rect_asm();\n}",
         "kind": "function"
@@ -14057,7 +14062,7 @@
         "args": "w3dcgb_u8 tx, w3dcgb_u8 ty, w3dcgb_u8 color, w3dcgb_u8 mask",
         "signature": "void Wire3DCGB_FastMapCell(w3dcgb_u8 tx, w3dcgb_u8 ty, w3dcgb_u8 color, w3dcgb_u8 mask);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7886,
+        "line": 7899,
         "comment": "Add outline sides to a cell: bits 1/2/4/8 mean top/bottom/left/right.\nSame-color masks combine; another color replaces the old mask. Zero mask\nis ignored, zero color means MAIN, and color above 3 clamps to 3. Target\nthe 16x12 shadow with stable WRAM mapping; full runtime required.",
         "body": "void Wire3DCGB_FastMapCell(w3dcgb_u8 tx, w3dcgb_u8 ty, w3dcgb_u8 color, w3dcgb_u8 mask)\n{\n    w3dcgb_fast_map_or_cell((w3dcgb_i16)tx, (w3dcgb_i16)ty, color, mask);\n}",
         "kind": "function"
@@ -14083,7 +14088,7 @@
         "args": "w3dcgb_u8 tx0, w3dcgb_u8 ty0, w3dcgb_u8 tx1, w3dcgb_u8 ty1, w3dcgb_u8 color, w3dcgb_u8 sides",
         "signature": "void Wire3DCGB_FastMapRect(w3dcgb_u8 tx0, w3dcgb_u8 ty0, w3dcgb_u8 tx1, w3dcgb_u8 ty1, w3dcgb_u8 color, w3dcgb_u8 sides);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7896,
+        "line": 7909,
         "comment": "Order and clip byte tile coordinates to 16x12, then replace selected\nborder cells. Side bits 1/2/4/8 mean top/bottom/left/right. Zero color\nmeans MAIN; values above 3 clamp to 3. Attributes and interior cells remain.\nUse at least two rows/columns for distinct corners; coincident corners\nare overwritten in sequence. Requires full runtime and stable WRAM mapping.",
         "body": "void Wire3DCGB_FastMapRect(w3dcgb_u8 tx0, w3dcgb_u8 ty0, w3dcgb_u8 tx1, w3dcgb_u8 ty1, w3dcgb_u8 color, w3dcgb_u8 sides)\n{\n    w3dcgb_u8 t;\n\n    if (tx0 > tx1)\n    {\n        t = tx0;\n        tx0 = tx1;\n        tx1 = t;\n    }\n    if (ty0 > ty1)\n    {\n        t = ty0;\n        ty0 = ty1;\n        ty1 = t;\n    }\n    if (tx0 >= 16) return;\n    if (ty0 >= 12) return;\n    if (tx1 >= 16) tx1 = 15;\n    if (ty1 >= 12) ty1 = 11;\n    if (color == 0) color = WIRE3DCGB_COLOR_MAIN;\n    if (color > 3) color = 3;\n\n    w3dcgb_fm_x0 = tx0;\n    w3dcgb_fm_y0 = ty0;\n    w3dcgb_fm_x1 = tx1;\n    w3dcgb_fm_y1 = ty1;\n    w3dcgb_fm_count_x = (w3dcgb_u8)(tx1 - tx0 + 1);\n    w3dcgb_fm_count_y = (w3dcgb_u8)(ty1 - ty0 + 1);\n    w3dcgb_fm_tile_base = (w3dcgb_u8)(W3DCGB_FAST_TILE_BASE + ((color - 1) << 4));\n    w3dcgb_fm_sides = (w3dcgb_u8)(sides & 15);\n    w3dcgb_fast_map_rect_asm();\n}",
         "kind": "function"
@@ -14109,7 +14114,7 @@
         "args": "",
         "signature": "void Wire3DCGB_FastMapFlush();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7934,
+        "line": 7947,
         "comment": "Wait for a fresh VBlank when LCD is enabled, then upload the first\ntwelve complete map rows of tile numbers and attributes to map 9800.\nLCD-off callers proceed immediately. Requires the full runtime, stable\nWRAM mapping and enough safe time for both immediate GDMA transfers.",
         "body": "void Wire3DCGB_FastMapFlush()\n{\n    w3dcgb_wait_vblank_start();\n    w3dcgb_fast_map_flush_gdma_asm();\n}",
         "kind": "function"
@@ -14135,7 +14140,7 @@
         "args": "",
         "signature": "void Wire3DCGB_FastMapFlushTilesOnly();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7943,
+        "line": 7956,
         "comment": "Wait for a fresh VBlank when LCD is enabled and upload only the first\ntwelve complete rows of tile numbers to map 9800. Attributes remain.\nRequires the full runtime, stable WRAM mapping and a safe GDMA interval.",
         "body": "void Wire3DCGB_FastMapFlushTilesOnly()\n{\n    w3dcgb_wait_vblank_start();\n    w3dcgb_fast_map_flush_tiles_gdma_asm();\n}",
         "kind": "function"
@@ -14213,7 +14218,7 @@
         "args": "w3dcgb_i16 ax, w3dcgb_i16 ay, w3dcgb_i16 az, w3dcgb_i16 bx, w3dcgb_i16 by, w3dcgb_i16 bz",
         "signature": "void Wire3DCGB_DrawLine3D(w3dcgb_i16 ax, w3dcgb_i16 ay, w3dcgb_i16 az, w3dcgb_i16 bx, w3dcgb_i16 by, w3dcgb_i16 bz);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6798,
+        "line": 6811,
         "comment": "Project both endpoints through the camera into the 128x96 viewport.\nReject the whole line if either endpoint fails the depth test; do not clip\nnear-plane crossings. DrawLine2D dispatches by mode, but projection remains\n128x96. Normal lines accumulate color planes and do not mark sparse bounds;\nuse a full upload or explicitly invalidate frame history for sparse upload.",
         "body": "void Wire3DCGB_DrawLine3D(w3dcgb_i16 ax, w3dcgb_i16 ay, w3dcgb_i16 az, w3dcgb_i16 bx, w3dcgb_i16 by, w3dcgb_i16 bz)\n{\n    w3dcgb_u8 sx0;\n    w3dcgb_u8 sy0;\n    w3dcgb_u8 sx1;\n    w3dcgb_u8 sy1;\n\n    if (w3dcgb_project_world(ax, ay, az, &sx0, &sy0) == 0) return;\n    if (w3dcgb_project_world(bx, by, bz, &sx1, &sy1) == 0) return;\n    Wire3DCGB_DrawLine2D(sx0, sy0, sx1, sy1);\n}",
         "kind": "function"
@@ -14221,7 +14226,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6816,
+        "line": 6829,
         "code": "    old_color = w3dcgb_line_color;\n    Wire3DCGB_SetLineColor(color);\n    Wire3DCGB_DrawLine3D(ax, ay, az, bx, by, bz);\n    w3dcgb_line_color = old_color;\n}\n\n// Draw a model at unity Q8 scale (256), using DrawModelScaled contracts."
       }
     },
@@ -14242,7 +14247,7 @@
         "args": "w3dcgb_i16 ax, w3dcgb_i16 ay, w3dcgb_i16 az, w3dcgb_i16 bx, w3dcgb_i16 by, w3dcgb_i16 bz, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawLine3DColor(w3dcgb_i16 ax, w3dcgb_i16 ay, w3dcgb_i16 az, w3dcgb_i16 bx, w3dcgb_i16 by, w3dcgb_i16 bz, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6811,
+        "line": 6824,
         "comment": "Temporarily select color & 3 for DrawLine3D, then restore the old color.",
         "body": "void Wire3DCGB_DrawLine3DColor(w3dcgb_i16 ax, w3dcgb_i16 ay, w3dcgb_i16 az, w3dcgb_i16 bx, w3dcgb_i16 by, w3dcgb_i16 bz, w3dcgb_u8 color)\n{\n    w3dcgb_u8 old_color;\n    old_color = w3dcgb_line_color;\n    Wire3DCGB_SetLineColor(color);\n    Wire3DCGB_DrawLine3D(ax, ay, az, bx, by, bz);\n    w3dcgb_line_color = old_color;\n}",
         "kind": "function"
@@ -14268,7 +14273,7 @@
         "args": "w3dcgb_u8 x, w3dcgb_u8 y",
         "signature": "void Wire3DCGB_DrawPoint2D(w3dcgb_u8 x, w3dcgb_u8 y);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6089,
+        "line": 6102,
         "comment": "In normal mode, reject coordinates outside 128x96, mark sparse bounds\nand replace the staged pixel using the current color, including zero.\nFull-screen mode draws a coincident-endpoint fast line instead, so zero\nmeans color 3 and invalid coordinates latch that frame's overflow flag.\nDisplay transfer occurs later.",
         "body": "void Wire3DCGB_DrawPoint2D(w3dcgb_u8 x, w3dcgb_u8 y)\n{\n    w3dcgb_u8 tile;\n    if (w3dcgb_full_mode != 0)\n    {\n        w3dcgb_line_x0 = x;\n        w3dcgb_line_y0 = y;\n        w3dcgb_line_x1 = x;\n        w3dcgb_line_y1 = y;\n        w3dcgb_full_line_fast_asm();\n        return;\n    }\n    if (x >= WIRE3DCGB_SCREEN_W) return;\n    if (y >= WIRE3DCGB_SCREEN_H) return;\n    if (w3dcgb_full_frame_transfer == 0)\n    {\n        tile = (w3dcgb_u8)(((x >> 3) * W3DCGB_TILE_H) + (y >> 3));\n        if (tile < w3dcgb_dirty_min_tile) w3dcgb_dirty_min_tile = tile;\n        if (tile > w3dcgb_dirty_max_tile) w3dcgb_dirty_max_tile = tile;\n    }\n    w3dcgb_plot_x = x;\n    w3dcgb_plot_y = y;\n    w3dcgb_plot_stage_asm();\n}",
         "kind": "function"
@@ -14294,7 +14299,7 @@
         "args": "w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 turn, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawTinyModel2D(w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 turn, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6119,
+        "line": 6132,
         "comment": "Draw a six-pixel marker through the 128x96 plotter while preserving line\ncolor. Centers outside X=3..124 or Y=3..92 are ignored. The low five turn\nbits select left/straight/right nose and tail offsets; this is not a general\n3D transform and does not dispatch to the full-screen renderer.",
         "body": "void Wire3DCGB_DrawTinyModel2D(w3dcgb_u8 x, w3dcgb_u8 y,\n                               w3dcgb_u8 turn, w3dcgb_u8 color)\n{\n    w3dcgb_u8 nose_x;\n    w3dcgb_u8 tail_x;\n    w3dcgb_u8 old_color;\n    if ((x < 3) || (x > 124) || (y < 3) || (y > 92)) return;\n\n    nose_x = x;\n    tail_x = x;\n    turn = (w3dcgb_u8)(turn & 31);\n    if (turn < 12)\n    {\n        nose_x = (w3dcgb_u8)(x + 1);\n        tail_x = (w3dcgb_u8)(x - 1);\n    }\n    else if (turn >= 20)\n    {\n        nose_x = (w3dcgb_u8)(x - 1);\n        tail_x = (w3dcgb_u8)(x + 1);\n    }\n\n    old_color = w3dcgb_line_color;\n    w3dcgb_line_color = (w3dcgb_u8)(color & 3);\n    w3dcgb_plot_x = nose_x;\n    w3dcgb_plot_y = (w3dcgb_u8)(y - 2);\n    w3dcgb_plot_stage_asm();\n    w3dcgb_plot_x = x;\n    w3dcgb_plot_y = (w3dcgb_u8)(y - 1);\n    w3dcgb_plot_stage_asm();\n    w3dcgb_plot_x = (w3dcgb_u8)(x - 2);\n    w3dcgb_plot_y = (w3dcgb_u8)(y + 1);\n    w3dcgb_plot_stage_asm();\n    w3dcgb_plot_x = (w3dcgb_u8)(x + 2);\n    w3dcgb_plot_stage_asm();\n    w3dcgb_plot_x = x;\n    w3dcgb_plot_y = y;\n    w3dcgb_plot_stage_asm();\n    w3dcgb_plot_x = tail_x;\n    w3dcgb_plot_y = (w3dcgb_u8)(y + 2);\n    w3dcgb_plot_stage_asm();\n    w3dcgb_line_color = old_color;\n}",
         "kind": "function"
@@ -14320,7 +14325,7 @@
         "args": "w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by",
         "signature": "void Wire3DCGB_DrawLine2D(w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6169,
+        "line": 6182,
         "comment": "Store byte endpoints and invoke the normal or full-screen line rasterizer.\nProvide coordinates inside the selected viewport; use DrawLineClipped2D\nfor signed/off-screen geometry. Normal lines OR color planes and do not\nmark sparse bounds; use the clipped API or InvalidateFrameHistory before\na sparse upload. Full-screen lines replace colors and use tile allocation.\nBoth active line paths treat color zero as 3, not as an eraser.",
         "body": "void Wire3DCGB_DrawLine2D(w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by)\n{\n    w3dcgb_line_x0 = ax;\n    w3dcgb_line_y0 = ay;\n    w3dcgb_line_x1 = bx;\n    w3dcgb_line_y1 = by;\n    if (w3dcgb_full_mode != 0) w3dcgb_full_line_fast_asm();\n    else w3dcgb_line_stage_asm();\n}",
         "kind": "function"
@@ -14328,7 +14333,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6187,
+        "line": 6200,
         "code": "    old_color = w3dcgb_line_color;\n    Wire3DCGB_SetLineColor(color);\n    Wire3DCGB_DrawLine2D(ax, ay, bx, by);\n    w3dcgb_line_color = old_color;\n}\n\n#ifndef WIRE3DCGB_MINIMAL_RUNTIME"
       }
     },
@@ -14349,7 +14354,7 @@
         "args": "w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawLine2DColor(w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6182,
+        "line": 6195,
         "comment": "Set color & 3 around DrawLine2D and restore the previous color. Follow\nthat function's coordinate, color-combination and sparse-range contracts;\nzero does not erase a line in either active renderer.",
         "body": "void Wire3DCGB_DrawLine2DColor(w3dcgb_u8 ax, w3dcgb_u8 ay, w3dcgb_u8 bx, w3dcgb_u8 by, w3dcgb_u8 color)\n{\n    w3dcgb_u8 old_color;\n    old_color = w3dcgb_line_color;\n    Wire3DCGB_SetLineColor(color);\n    Wire3DCGB_DrawLine2D(ax, ay, bx, by);\n    w3dcgb_line_color = old_color;\n}",
         "kind": "function"
@@ -14357,7 +14362,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7497,
+        "line": 7510,
         "code": "            if (w3dcgb_full_mode == 0) w3dcgb_mark_dirty_line((w3dcgb_u8)x0, (w3dcgb_u8)y0,\n                                  (w3dcgb_u8)x1, (w3dcgb_u8)y1);\n            Wire3DCGB_DrawLine2DColor((w3dcgb_u8)x0, (w3dcgb_u8)y0,\n                                    (w3dcgb_u8)x1, (w3dcgb_u8)y1, color);\n            return;\n        }\n        if ((c0 & c1) != 0) return;"
       }
     },
@@ -14378,7 +14383,7 @@
         "args": "const Wire3DCGB_Model* model, const w3dcgb_i8* vertex_x, const w3dcgb_i8* vertex_y, const w3dcgb_u8* edge_mask, w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawMaskedModel2D(const Wire3DCGB_Model* model, const w3dcgb_i8* vertex_x, const w3dcgb_i8* vertex_y, const w3dcgb_u8* edge_mask, w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6198,
+        "line": 6211,
         "comment": "Draw enabled model edges using signed-byte preprojected offsets around\n(x,y). Mask bits are least-significant-first, eight edges per byte. All\npointers and vertex indices must be valid; edge_mask[0] is read even for\nzero edges. No counts are capped. Keep translated endpoints within the\nviewport before their byte conversion; negative values would wrap.\nPreserve the previous line color and dispatch by the active mode.",
         "body": "void Wire3DCGB_DrawMaskedModel2D(const Wire3DCGB_Model* model,\n                                 const w3dcgb_i8* vertex_x, const w3dcgb_i8* vertex_y,\n                                 const w3dcgb_u8* edge_mask,\n                                 w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 color)\n{\n    w3dcgb_u8 i;\n    w3dcgb_u8 bit;\n    w3dcgb_u8 mask_index;\n    w3dcgb_u8 mask;\n    w3dcgb_u8 a;\n    w3dcgb_u8 b;\n    w3dcgb_u8 old_color;\n\n    old_color = w3dcgb_line_color;\n    w3dcgb_line_color = (w3dcgb_u8)(color & 3);\n    i = 0;\n    bit = 1;\n    mask_index = 0;\n    mask = edge_mask[0];\n    while (i < model->edge_count)\n    {\n        if ((mask & bit) != 0)\n        {\n            a = model->edges[(__safe_index w3dcgb_u8)i].a;\n            b = model->edges[(__safe_index w3dcgb_u8)i].b;\n            w3dcgb_line_x0 = (w3dcgb_u8)((w3dcgb_i16)x + (w3dcgb_i16)vertex_x[(__safe_index w3dcgb_u8)a]);\n            w3dcgb_line_y0 = (w3dcgb_u8)((w3dcgb_i16)y + (w3dcgb_i16)vertex_y[(__safe_index w3dcgb_u8)a]);\n            w3dcgb_line_x1 = (w3dcgb_u8)((w3dcgb_i16)x + (w3dcgb_i16)vertex_x[(__safe_index w3dcgb_u8)b]);\n            w3dcgb_line_y1 = (w3dcgb_u8)((w3dcgb_i16)y + (w3dcgb_i16)vertex_y[(__safe_index w3dcgb_u8)b]);\n            if (w3dcgb_full_mode != 0) w3dcgb_full_line_fast_asm();\n            else w3dcgb_line_stage_asm();\n        }\n        i = (w3dcgb_u8)(i + 1);\n        bit = (w3dcgb_u8)(bit << 1);\n        if ((bit == 0) && (i < model->edge_count))\n        {\n            bit = 1;\n            mask_index = (w3dcgb_u8)(mask_index + 1);\n            mask = edge_mask[(__safe_index w3dcgb_u8)mask_index];\n        }\n    }\n    w3dcgb_line_color = old_color;\n}",
         "kind": "function"
@@ -14404,7 +14409,7 @@
         "args": "const Wire3DCGB_Edge* edges, w3dcgb_u8 edge_count, const w3dcgb_i8* vertex_x, const w3dcgb_i8* vertex_y, w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawEdgeList2D(const Wire3DCGB_Edge* edges, w3dcgb_u8 edge_count, const w3dcgb_i8* vertex_x, const w3dcgb_i8* vertex_y, w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6330,
+        "line": 6343,
         "comment": "Draw up to 64 indexed edges from signed-byte offsets around (cx,cy).\nNull arrays are ignored; indices must address readable vertices. Keep the\ntranslated endpoints in the viewport before byte conversion, which wraps.\nDispatch by mode and preserve the old color; no vertex-count check occurs.",
         "body": "void Wire3DCGB_DrawEdgeList2D(const Wire3DCGB_Edge* edges, w3dcgb_u8 edge_count,\n                             const w3dcgb_i8* vertex_x, const w3dcgb_i8* vertex_y,\n                             w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 color)\n{\n    w3dcgb_u8 i;\n    w3dcgb_u8 a;\n    w3dcgb_u8 b;\n    w3dcgb_u8 old_color;\n\n    if (edges == 0) return;\n    if (vertex_x == 0) return;\n    if (vertex_y == 0) return;\n    if (edge_count > WIRE3DCGB_MODEL_EDGE_LIMIT) edge_count = WIRE3DCGB_MODEL_EDGE_LIMIT;\n\n    old_color = w3dcgb_line_color;\n    w3dcgb_line_color = (w3dcgb_u8)(color & 3);\n    if (w3dcgb_full_mode == 0)\n    {\n        w3dcgb_edge_list_ptr = edges;\n        w3dcgb_edge_x_ptr = vertex_x;\n        w3dcgb_edge_y_ptr = vertex_y;\n        w3dcgb_edge_remaining = edge_count;\n        w3dcgb_edge_center_x = x;\n        w3dcgb_edge_center_y = y;\n        w3dcgb_edge_list_asm();\n        w3dcgb_line_color = old_color;\n        return;\n    }\n    i = 0;\n    while (i < edge_count)\n    {\n        a = edges[(__safe_index w3dcgb_u8)i].a;\n        b = edges[(__safe_index w3dcgb_u8)i].b;\n        w3dcgb_line_x0 = (w3dcgb_u8)((w3dcgb_i16)x + (w3dcgb_i16)vertex_x[(__safe_index w3dcgb_u8)a]);\n        w3dcgb_line_y0 = (w3dcgb_u8)((w3dcgb_i16)y + (w3dcgb_i16)vertex_y[(__safe_index w3dcgb_u8)a]);\n        w3dcgb_line_x1 = (w3dcgb_u8)((w3dcgb_i16)x + (w3dcgb_i16)vertex_x[(__safe_index w3dcgb_u8)b]);\n        w3dcgb_line_y1 = (w3dcgb_u8)((w3dcgb_i16)y + (w3dcgb_i16)vertex_y[(__safe_index w3dcgb_u8)b]);\n        if (w3dcgb_full_mode != 0) w3dcgb_full_line_fast_asm();\n        else w3dcgb_line_stage_asm();\n        i = (w3dcgb_u8)(i + 1);\n    }\n    w3dcgb_line_color = old_color;\n}",
         "kind": "function"
@@ -14412,7 +14417,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7585,
+        "line": 7598,
         "code": "        if (w3dcgb_full_mode == 0) w3dcgb_mark_dirty_rect((w3dcgb_u8)min_x,\n            (w3dcgb_u8)min_y, (w3dcgb_u8)max_x, (w3dcgb_u8)max_y);\n        Wire3DCGB_DrawEdgeList2D(edges, edge_count, (const w3dcgb_i8*)w3dcgb_screen_x,\n            (const w3dcgb_i8*)w3dcgb_screen_y, 64, 48, color);\n        return;\n    }\n    i = 0;"
       }
     },
@@ -14433,7 +14438,7 @@
         "args": "const w3dcgb_u8* line_xy, w3dcgb_u8 line_count, w3dcgb_u8 color",
         "signature": "void Wire3DCGB_DrawLineList2DColor(const w3dcgb_u8* line_xy, w3dcgb_u8 line_count, w3dcgb_u8 color);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 6377,
+        "line": 6390,
         "comment": "Draw up to 64 records of four bytes (x0,y0,x1,y1), ignoring a null list.\nEndpoints must lie in the selected viewport. Preserve the previous color\nand dispatch each line to the normal or full-screen rasterizer.",
         "body": "void Wire3DCGB_DrawLineList2DColor(const w3dcgb_u8* line_xy,\n                                  w3dcgb_u8 line_count, w3dcgb_u8 color)\n{\n    w3dcgb_u8 i;\n    w3dcgb_u8 offset;\n    w3dcgb_u8 old_color;\n    if (line_xy == 0) return;\n    if (line_count > WIRE3DCGB_MODEL_EDGE_LIMIT) line_count = WIRE3DCGB_MODEL_EDGE_LIMIT;\n\n    old_color = w3dcgb_line_color;\n    w3dcgb_line_color = (w3dcgb_u8)(color & 3);\n    i = 0;\n    offset = 0;\n    while (i < line_count)\n    {\n        w3dcgb_line_x0 = line_xy[(__safe_index w3dcgb_u8)offset];\n        offset = (w3dcgb_u8)(offset + 1);\n        w3dcgb_line_y0 = line_xy[(__safe_index w3dcgb_u8)offset];\n        offset = (w3dcgb_u8)(offset + 1);\n        w3dcgb_line_x1 = line_xy[(__safe_index w3dcgb_u8)offset];\n        offset = (w3dcgb_u8)(offset + 1);\n        w3dcgb_line_y1 = line_xy[(__safe_index w3dcgb_u8)offset];\n        offset = (w3dcgb_u8)(offset + 1);\n        if (w3dcgb_full_mode != 0) w3dcgb_full_line_fast_asm();\n        else w3dcgb_line_stage_asm();\n        i = (w3dcgb_u8)(i + 1);\n    }\n    w3dcgb_line_color = old_color;\n}",
         "kind": "function"
@@ -14459,7 +14464,7 @@
         "args": "w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 tile",
         "signature": "void Wire3DCGB_PutBgTile(w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 tile);",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 896,
+        "line": 897,
         "comment": "Queue a tile-number write for a 32x32 BG map. Ignore invalid coordinates\nand submissions after 48 pending writes. EndFrame flushes this private queue;\natomic-map mode mirrors writes to both BG maps. Attributes are not queued.",
         "body": "void Wire3DCGB_PutBgTile(w3dcgb_u8 x, w3dcgb_u8 y, w3dcgb_u8 tile)\n{\n    if (x >= 32) return;\n    if (y >= 32) return;\n    if (w3dcgb_bgq_count >= W3DCGB_BG_QUEUE_LIMIT) return;\n    w3dcgb_bgq_x[(__safe_index w3dcgb_u8)w3dcgb_bgq_count] = x;\n    w3dcgb_bgq_y[(__safe_index w3dcgb_u8)w3dcgb_bgq_count] = y;\n    w3dcgb_bgq_tile[(__safe_index w3dcgb_u8)w3dcgb_bgq_count] = tile;\n    w3dcgb_bgq_count = (w3dcgb_u8)(w3dcgb_bgq_count + 1);\n}",
         "kind": "function"
@@ -14485,7 +14490,7 @@
         "args": "",
         "signature": "void Wire3DCGB_EndFrame();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7607,
+        "line": 7620,
         "comment": "Normal mode flushes queued BG writes, transfers the full stage and\npresents the completed tile bank. Full-screen mode transfers/presents its\nallocated tiles and does not flush the HUD queue. Requires an enabled LCD\nand the transfer helpers' bank/interrupt contracts; may span multiple frames.",
         "body": "void Wire3DCGB_EndFrame()\n{\n    if (w3dcgb_full_mode != 0)\n    {\n        w3dcgb_full_transfer_asm();\n        w3dcgb_full_present_asm();\n        return;\n    }\n    if (w3dcgb_bgq_count != 0)\n    {\n        w3dcgb_wait_vblank_start();\n        w3dcgb_flush_bg_queue();\n    }\n    w3dcgb_transfer_stage_asm();\n    w3dcgb_present_stage_asm();\n}",
         "kind": "function"
@@ -14511,7 +14516,7 @@
         "args": "",
         "signature": "void Wire3DCGB_EndFrameFast();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7628,
+        "line": 7641,
         "comment": "Transfer and present the complete selected-mode frame without flushing\nthe BG queue. It does not consume queued HUD writes. Requires the same\nLCD/bank/interrupt conditions as EndFrame; full-runtime build required.",
         "body": "void Wire3DCGB_EndFrameFast()\n{\n    if (w3dcgb_full_mode != 0)\n    {\n        w3dcgb_full_transfer_asm();\n        w3dcgb_full_present_asm();\n        return;\n    }\n    w3dcgb_transfer_stage_asm();\n    w3dcgb_present_stage_asm();\n}",
         "kind": "function"
@@ -14537,7 +14542,7 @@
         "args": "",
         "signature": "void Wire3DCGB_EndFrameSparse();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7643,
+        "line": 7656,
         "comment": "In normal mode, wait for a fresh VBlank and invoke EndFrameSparseNow.\nFull-screen mode uses its full transfer/presentation instead. Requires the\nfull runtime and an enabled LCD; it is not guaranteed to complete in one frame.",
         "body": "void Wire3DCGB_EndFrameSparse()\n{\n    if (w3dcgb_full_mode != 0)\n    {\n        w3dcgb_full_transfer_asm();\n        w3dcgb_full_present_asm();\n        return;\n    }\n    w3dcgb_wait_vblank_start();\n    Wire3DCGB_EndFrameSparseNow();\n}",
         "kind": "function"
@@ -14563,7 +14568,7 @@
         "args": "",
         "signature": "void Wire3DCGB_EndFrameSparseNow();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7661,
+        "line": 7674,
         "comment": "Flush queued BG writes, upload the sparse current/N-2 tile range to the\nback bank and present it. Skip the initial fresh-VBlank wait, but normal\nmap mode still waits when restoring its blank HUD tile; DMA/presentation\nmay also wait. Full-runtime full-screen mode delegates to its own path.\nRequire an enabled LCD and keep SVBK/VBK stable while DMA is active.",
         "body": "void Wire3DCGB_EndFrameSparseNow()\n{\n#ifndef WIRE3DCGB_MINIMAL_RUNTIME\n    if (w3dcgb_full_mode != 0)\n    {\n        w3dcgb_full_transfer_asm();\n        w3dcgb_full_present_asm();\n        return;\n    }\n#endif\n    /* Atomic mode never writes a displayed tile and does not need a\n       frame-long VBlank wait before starting an off-screen upload. */\n    if (w3dcgb_atomic_maps == 0) w3dcgb_restore_hud_blank_tile_asm();\n    if (w3dcgb_bgq_count != 0) w3dcgb_flush_bg_queue();\n    w3dcgb_transfer_dirty_tiles();\n    w3dcgb_present_stage_asm();\n}",
         "kind": "function"
@@ -14571,7 +14576,7 @@
       "availability": "implementation",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7652,
+        "line": 7665,
         "code": "    }\n    w3dcgb_wait_vblank_start();\n    Wire3DCGB_EndFrameSparseNow();\n}\n#endif\n\n// Flush queued BG writes, upload the sparse current/N-2 tile range to the"
       }
     },
@@ -14592,7 +14597,7 @@
         "args": "",
         "signature": "w3dcgb_u8 Wire3DCGB_GetFullScreenTileCount();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7682,
+        "line": 7695,
         "comment": "Return the current full-screen allocation count (up to 127). This is\nnot a byte count or the number of visible/nonzero pixels. Full runtime only.",
         "body": "w3dcgb_u8 Wire3DCGB_GetFullScreenTileCount()\n{\n    return w3dcgb_full_tile_count;\n}",
         "kind": "function"
@@ -14618,7 +14623,7 @@
         "args": "",
         "signature": "w3dcgb_u8 Wire3DCGB_GetFullScreenOverflow();",
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 7691,
+        "line": 7704,
         "comment": "Return the full-screen frame fault flag: the fast line path sets it for\ntile allocation exhaustion or an invalid coordinate. Once set, further\nfast-path plots are suppressed until BeginFrame resets it. This is not a\ngeneral hardware status flag; the getter requires the full runtime.",
         "body": "w3dcgb_u8 Wire3DCGB_GetFullScreenOverflow()\n{\n    return w3dcgb_full_overflow;\n}",
         "kind": "function"
@@ -14642,7 +14647,7 @@
       "availability": "macro",
       "example": {
         "path": "kitaqgb/lib/wire3d_cgb.c",
-        "line": 5850,
+        "line": 5863,
         "code": "    w3dcgb_reg_bgp = 0xB4;\n    Wire3DCGB_SetPaletteRGB15(\n        WIRE3DCGB_RGB15(0, 0, 2),\n        WIRE3DCGB_RGB15(10, 20, 31),\n        WIRE3DCGB_RGB15(31, 31, 31),\n        WIRE3DCGB_RGB15(31, 14, 4));\n    w3dcgb_line_color = WIRE3DCGB_COLOR_DEFAULT;"
       }
     },
@@ -15339,7 +15344,7 @@
       "signature": "void Wire3D_BeginFrame();",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 34,
-      "comment": "Compatibility alias: Wire3DDMG_BeginFrame; WIRE3D_DMG_HEIGHT = 96.\nClear staged pixels and occlusion mask and disable occlusion filtering.\nThis leaves the displayed VRAM frame and pending BG tile queue unchanged.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nClear staged pixels and occlusion mask and disable occlusion filtering.\nThis leaves the displayed VRAM frame and pending BG tile queue unchanged.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15368,7 +15373,7 @@
       "signature": "void Wire3D_DrawLine2D(w3ddmg_u8 ax, w3ddmg_u8 ay, w3ddmg_u8 bx, w3ddmg_u8 by);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 35,
-      "comment": "Compatibility alias: Wire3DDMG_DrawLine2D; WIRE3D_DMG_HEIGHT = 96.\nDraw a connected line into the 128x96 stage, including endpoints. During\nDrawScene, use the coarse five-sample occlusion rejection; otherwise draw directly.\nSupply viewport coordinates. VRAM is updated only by EndFrame.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nDraw a connected line into the 128x96 stage, including endpoints. During\nDrawScene, use the coarse five-sample occlusion rejection; otherwise draw directly.\nSupply viewport coordinates. VRAM is updated only by EndFrame.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15394,7 +15399,7 @@
       "signature": "void Wire3D_DrawLine3D(w3ddmg_i16 ax, w3ddmg_i16 ay, w3ddmg_i16 az, w3ddmg_i16 bx, w3ddmg_i16 by, w3ddmg_i16 bz);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 36,
-      "comment": "Compatibility alias: Wire3DDMG_DrawLine3D; WIRE3D_DMG_HEIGHT = 96.\nProject both world endpoints and draw only when both pass the depth range.\nDo not intersect a crossing segment with near/far planes; projected endpoints\nare independently clamped to the screen edges.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nProject both world endpoints and draw only when both pass the depth range.\nDo not intersect a crossing segment with near/far planes; projected endpoints\nare independently clamped to the screen edges.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15420,7 +15425,7 @@
       "signature": "void Wire3D_DrawModel(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_i8 rx, w3ddmg_i8 ry, w3ddmg_i8 rz);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 37,
-      "comment": "Compatibility alias: Wire3DDMG_DrawModel; WIRE3D_DMG_HEIGHT = 96.\nDraw an unscaled model by delegating to DrawModelScaled with scale 256.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nDraw an unscaled model by delegating to DrawModelScaled with scale 256.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15449,7 +15454,7 @@
       "signature": "void Wire3D_DrawModelScaled(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_i8 rx, w3ddmg_i8 ry, w3ddmg_i8 rz, w3ddmg_i16 scale_q8);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 38,
-      "comment": "Compatibility alias: Wire3DDMG_DrawModelScaled; WIRE3D_DMG_HEIGHT = 96.\nScale, rotate in Y/X/Z order, translate and project at most 24 vertices;\nthen draw up to 16 edges filtered by yaw masks and optional front-facing faces.\nNonpositive scale becomes unity (256). Null model/vertex/edge pointers are\nignored; referenced tables must remain readable. Keep scale products and\ntranslations in signed 16-bit range. Depth-crossing edges are dropped, not clipped.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nScale, rotate in Y/X/Z order, translate and project at most 24 vertices;\nthen draw up to 16 edges filtered by yaw masks and optional front-facing faces.\nNonpositive scale becomes unity (256). Null model/vertex/edge pointers are\nignored; referenced tables must remain readable. Keep scale products and\ntranslations in signed 16-bit range. Depth-crossing edges are dropped, not clipped.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15475,7 +15480,7 @@
       "signature": "void Wire3D_DrawScene(Wire3DDMG_Object* objects, w3ddmg_u8 count);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 39,
-      "comment": "Compatibility alias: Wire3DDMG_DrawScene; WIRE3D_DMG_HEIGHT = 96.\nProcess at most the first eight objects, sorted near to far by transformed\norigin depth. Draw visible valid models, then mark their front-face bounding\nrectangles to reject fully sampled later lines. This approximates inter-object\nocclusion, not a depth buffer. It clears its mask but retains existing staged\npixels. Null arrays are ignored; objects and their data must remain readable.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nProcess at most the first eight objects, sorted near to far by transformed\norigin depth. Draw visible valid models, then mark their front-face bounding\nrectangles to reject fully sampled later lines. This approximates inter-object\nocclusion, not a depth buffer. It clears its mask but retains existing staged\npixels. Null arrays are ignored; objects and their data must remain readable.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15501,7 +15506,7 @@
       "signature": "void Wire3D_EndFrame();",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 42,
-      "comment": "Compatibility alias: Wire3DDMG_EndFrame; WIRE3D_DMG_HEIGHT = 96.\nWait for the next VBlank, flush pending BG map writes, then copy the stage\nto VRAM while polling access windows. Copying consumes the staged pixels.\nThe transfer may extend beyond VBlank; this is not an atomic frame swap.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nWait for the next VBlank, flush pending BG map writes, then copy the stage\nto VRAM while polling access windows. Copying consumes the staged pixels.\nThe transfer may extend beyond VBlank; this is not an atomic frame swap.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15530,7 +15535,7 @@
       "signature": "void Wire3D_EraseModelFaces(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_i8 rx, w3ddmg_i8 ry, w3ddmg_i8 rz, w3ddmg_i16 scale_q8);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 43,
-      "comment": "Compatibility alias: Wire3DDMG_EraseModelFaces; WIRE3D_DMG_HEIGHT = 96.\nProject up to 24 vertices and erase front-facing triangle interiors from\nthe stage for a model with hidden-line flags and face data. Nonpositive scale\nmeans 256 (unity). Up to 16 faces are considered; depth-crossing faces are\nskipped. This also replaces shared projection caches, but does not update VRAM.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nProject up to 24 vertices and erase front-facing triangle interiors from\nthe stage for a model with hidden-line flags and face data. Nonpositive scale\nmeans 256 (unity). Up to 16 faces are considered; depth-crossing faces are\nskipped. This also replaces shared projection caches, but does not update VRAM.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15556,7 +15561,7 @@
       "signature": "void Wire3D_EraseSpan2D(w3ddmg_u8 y, w3ddmg_u8 x0, w3ddmg_u8 x1);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 44,
-      "comment": "Compatibility alias: Wire3DDMG_EraseSpan2D; WIRE3D_DMG_HEIGHT = 96.\nOrder the X endpoints and erase the inclusive staged span. Both endpoints\nmust be in 0..127; invalid Y is ignored. The routine does not clip X for you.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nOrder the X endpoints and erase the inclusive staged span. Both endpoints\nmust be in 0..127; invalid Y is ignored. The routine does not clip X for you.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15582,7 +15587,7 @@
       "signature": "void Wire3D_EraseTriangle2D(w3ddmg_u8 ax, w3ddmg_u8 ay, w3ddmg_u8 bx, w3ddmg_u8 by, w3ddmg_u8 cx, w3ddmg_u8 cy);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 45,
-      "comment": "Compatibility alias: Wire3DDMG_EraseTriangle2D; WIRE3D_DMG_HEIGHT = 96.\nErase a triangle from staged pixels using integer scanline intersections.\nSupply viewport coordinates. Degenerate triangles are ignored; the occlusion\nmask and VRAM are unchanged.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nErase a triangle from staged pixels using integer scanline intersections.\nSupply viewport coordinates. Degenerate triangles are ignored; the occlusion\nmask and VRAM are unchanged.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15608,7 +15613,7 @@
       "signature": "void Wire3D_Init();",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 47,
-      "comment": "Compatibility alias: Wire3DDMG_Init; WIRE3D_DMG_HEIGHT = 96.\nTake over the LCD: wait for VBlank, switch it off, clear 6144 tile bytes and\nthe BG map, install HUD tiles and the 128x96 signed-tile viewport, then enable\nBG display with scroll zero and BGP=0xB4. Reset camera, BG queue and stage.\nReserve 0xD000..0xDFFF for staging and retain its WRAM bank mapping.\nCall BeginFrame before drawing to initialize the occlusion state as well.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nTake over the LCD: wait for VBlank, switch it off, clear 6144 tile bytes and\nthe BG map, install HUD tiles and the 128x96 signed-tile viewport, then enable\nBG display with scroll zero and BGP=0xB4. Reset camera, BG queue and stage.\nReserve 0xD000..0xDFFF for staging and retain its WRAM bank mapping.\nCall BeginFrame before drawing to initialize the occlusion state as well.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15637,7 +15642,7 @@
       "signature": "w3ddmg_u8 Wire3D_ProjectPoint(w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8* sx, w3ddmg_u8* sy);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 50,
-      "comment": "Compatibility alias: Wire3DDMG_ProjectPoint; WIRE3D_DMG_HEIGHT = 96.\nProject a world point with the current camera. Return zero for rejected\ndepth, leaving outputs unchanged; success writes clamped 128x96 coordinates.\nOutput pointers must be valid. Screen clamping is not geometric clipping.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nProject a world point with the current camera. Return zero for rejected\ndepth, leaving outputs unchanged; success writes clamped 128x96 coordinates.\nOutput pointers must be valid. Screen clamping is not geometric clipping.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15663,7 +15668,7 @@
       "signature": "void Wire3D_PutBgTile(w3ddmg_u8 x, w3ddmg_u8 y, w3ddmg_u8 tile);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 51,
-      "comment": "Compatibility alias: Wire3DDMG_PutBgTile; WIRE3D_DMG_HEIGHT = 96.\nQueue a tile write to the 32x32 map at 0x9800 for EndFrame. Invalid map\ncoordinates and submissions beyond 48 pending writes are silently ignored.\nThis queue is separate from the general vram library queue.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nQueue a tile write to the 32x32 map at 0x9800 for EndFrame. Invalid map\ncoordinates and submissions beyond 48 pending writes are silently ignored.\nThis queue is separate from the general vram library queue.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15689,7 +15694,7 @@
       "signature": "w3ddmg_u16 Wire3D_SelectEdgeMask(const Wire3DDMG_Model* model, w3ddmg_i8 rx, w3ddmg_i8 ry, w3ddmg_i8 rz);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 52,
-      "comment": "Compatibility alias: Wire3DDMG_SelectEdgeMask; WIRE3D_DMG_HEIGHT = 96.\nSelect a precomputed mask from the low four bits of object yaw; pitch,\nroll and camera orientation are ignored. Use 16, 8, 4 or 2 bins; other positive\ncounts select entry zero (counts >=16 use the first 16). Missing data returns\n0xFFFF. Keep the mask table readable through the current data-pointer mapping.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nSelect a precomputed mask from the low four bits of object yaw; pitch,\nroll and camera orientation are ignored. Use 16, 8, 4 or 2 bins; other positive\ncounts select entry zero (counts >=16 use the first 16). Missing data returns\n0xFFFF. Keep the mask table readable through the current data-pointer mapping.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15715,7 +15720,7 @@
       "signature": "void Wire3D_SetCamera(w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_i8 pitch, w3ddmg_i8 yaw, w3ddmg_i8 roll);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 53,
-      "comment": "Compatibility alias: Wire3DDMG_SetCamera; WIRE3D_DMG_HEIGHT = 96.\nStore camera position and angles for later draws; a full turn is 16 angle\nsteps. No existing drawing is reprojected and no input range validation occurs.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nStore camera position and angles for later draws; a full turn is 16 angle\nsteps. No existing drawing is reprojected and no input range validation occurs.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15741,7 +15746,7 @@
       "signature": "void Wire3D_SetPalette(w3ddmg_u8 bgp);",
       "path": "kitaqgb/lib/wire3d.h",
       "line": 54,
-      "comment": "Compatibility alias: Wire3DDMG_SetPalette; WIRE3D_DMG_HEIGHT = 96.\nWrite the raw DMG BGP palette encoding immediately; no frame synchronization occurs.",
+      "comment": "WIRE3D_DMG_HEIGHT = 96.\nWrite the raw DMG BGP palette encoding immediately; no frame synchronization occurs.",
       "body": "",
       "kind": "function",
       "module": "wire3d",
@@ -15767,7 +15772,7 @@
       "signature": "void DMG3D_BeginFrame();",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 17,
-      "comment": "Compatibility alias: Wire3DDMG_BeginFrame; WIRE3D_DMG_HEIGHT = 120.\nDisable occlusion filtering only. Stage clearing normally happens during\ntransfer, and Init supplies the first clean stage. This does not discard an\nunsubmitted frame, clear the mask, or reset pending BG writes/dirty flags.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nDisable occlusion filtering only. Stage clearing normally happens during\ntransfer, and Init supplies the first clean stage. This does not discard an\nunsubmitted frame, clear the mask, or reset pending BG writes/dirty flags.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -15796,7 +15801,7 @@
       "signature": "void DMG3D_DrawIndexedEdges(const Wire3DDMG_Vec3* vertices, w3ddmg_u8 vertex_count, const w3ddmg_u8* edges, w3ddmg_u8 edge_count, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 scale);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 20,
-      "comment": "Compatibility alias: Wire3DDMG_DrawIndexedEdges; WIRE3D_DMG_HEIGHT = 120.\nDraw byte-pair edge indices after integer scaling and translation; scale\nzero means one, and there is no object rotation or face filtering. Project at\nmost 24 vertices. Supply at most 128 edge pairs because byte offsets wrap\nafter 255. Invalid vertex IDs/depth-rejected endpoints are skipped; null arrays\nare ignored. Keep coordinate products/sums representable as s16.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nDraw byte-pair edge indices after integer scaling and translation; scale\nzero means one, and there is no object rotation or face filtering. Project at\nmost 24 vertices. Supply at most 128 edge pairs because byte offsets wrap\nafter 255. Invalid vertex IDs/depth-rejected endpoints are skipped; null arrays\nare ignored. Keep coordinate products/sums representable as s16.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -15822,7 +15827,7 @@
       "signature": "void DMG3D_DrawLine2D(w3ddmg_u8 ax, w3ddmg_u8 ay, w3ddmg_u8 bx, w3ddmg_u8 by);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 21,
-      "comment": "Compatibility alias: Wire3DDMG_DrawLine2D; WIRE3D_DMG_HEIGHT = 120.\nMark the bounding tile rectangle when dirty transfer is enabled, then draw\na connected staged line. Scene drawing may reject it using five mask samples.\nSupply 128x120 viewport endpoints; low-level pixel bounds checks do not clip\nthe segment geometrically.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nMark the bounding tile rectangle when dirty transfer is enabled, then draw\na connected staged line. Scene drawing may reject it using five mask samples.\nSupply 128x120 viewport endpoints; low-level pixel bounds checks do not clip\nthe segment geometrically.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -15848,7 +15853,7 @@
       "signature": "void DMG3D_DrawLine3D(w3ddmg_i16 ax, w3ddmg_i16 ay, w3ddmg_i16 az, w3ddmg_i16 bx, w3ddmg_i16 by, w3ddmg_i16 bz);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 22,
-      "comment": "Compatibility alias: Wire3DDMG_DrawLine3D; WIRE3D_DMG_HEIGHT = 120.\nProject both world endpoints and draw only when both pass the depth range.\nDo not intersect a crossing segment with near/far planes; projected endpoints\nare independently clamped to the screen edges.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nProject both world endpoints and draw only when both pass the depth range.\nDo not intersect a crossing segment with near/far planes; projected endpoints\nare independently clamped to the screen edges.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -15877,7 +15882,7 @@
       "signature": "void DMG3D_DrawModel(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 rx, w3ddmg_u8 ry, w3ddmg_u8 rz);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 23,
-      "comment": "Compatibility alias: Wire3DDMG_DrawModel; WIRE3D_DMG_HEIGHT = 120.\nDraw an unscaled model by delegating to DrawModelScaled with scale 256.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nDraw an unscaled model by delegating to DrawModelScaled with scale 256.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -15903,7 +15908,7 @@
       "signature": "void DMG3D_DrawModelScaled(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 rx, w3ddmg_u8 ry, w3ddmg_u8 rz, w3ddmg_i16 scale_q8);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 24,
-      "comment": "Compatibility alias: Wire3DDMG_DrawModelScaled; WIRE3D_DMG_HEIGHT = 120.\nScale up to 24 vertices, rotate Y/X/Z, translate and project, then traverse\nall edge_count entries (a byte count) with optional adjacent-face filtering.\nFace scratch is capped at 16; edge tables must contain all declared entries.\nNonpositive scale means 256. Null model/vertex/edge pointers are ignored.\nKeep products/translations in signed 16-bit range; depth-crossing edges are dropped.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nScale up to 24 vertices, rotate Y/X/Z, translate and project, then traverse\nall edge_count entries (a byte count) with optional adjacent-face filtering.\nFace scratch is capped at 16; edge tables must contain all declared entries.\nNonpositive scale means 256. Null model/vertex/edge pointers are ignored.\nKeep products/translations in signed 16-bit range; depth-crossing edges are dropped.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -15929,7 +15934,7 @@
       "signature": "void DMG3D_DrawScene(Wire3DDMG_Object* objects, w3ddmg_u8 count);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 25,
-      "comment": "Compatibility alias: Wire3DDMG_DrawScene; WIRE3D_DMG_HEIGHT = 120.\nSort at most eight object origins by camera depth, near to far. Draw visible\nvalid models and mark front-face bounding rectangles for later objects. The\nfirst sorted slot bypasses mask tests and the last needs no new occluder.\nThis is coarse line rejection, not a depth buffer. Null/empty input is ignored;\ncaller data and the current projection cache must remain valid during traversal.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nSort at most eight object origins by camera depth, near to far. Draw visible\nvalid models and mark front-face bounding rectangles for later objects. The\nfirst sorted slot bypasses mask tests and the last needs no new occluder.\nThis is coarse line rejection, not a depth buffer. Null/empty input is ignored;\ncaller data and the current projection cache must remain valid during traversal.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -15955,7 +15960,7 @@
       "signature": "void DMG3D_EndFrame();",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 28,
-      "comment": "Compatibility alias: Wire3DDMG_EndFrame; WIRE3D_DMG_HEIGHT = 120.\nWait for the next VBlank and flush BG writes, then optionally consume the\nauxiliary strips before uploading either dirty tiles or the entire main stage.\nAuxiliary/main source overlap makes that ordering significant. STAT polling\ncontinues across access windows; the update need not fit one VBlank.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nWait for the next VBlank and flush BG writes, then optionally consume the\nauxiliary strips before uploading either dirty tiles or the entire main stage.\nAuxiliary/main source overlap makes that ordering significant. STAT polling\ncontinues across access windows; the update need not fit one VBlank.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -15984,7 +15989,7 @@
       "signature": "void DMG3D_EraseModelFaces(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 rx, w3ddmg_u8 ry, w3ddmg_u8 rz, w3ddmg_i16 scale_q8);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 29,
-      "comment": "Compatibility alias: Wire3DDMG_EraseModelFaces; WIRE3D_DMG_HEIGHT = 120.\nProject up to 24 vertices and erase front-facing triangle interiors from\nthe stage for a model with hidden-line flags and face data. Nonpositive scale\nmeans 256 (unity). Up to 16 faces are considered; depth-crossing faces are\nskipped. This also replaces shared projection caches, but does not update VRAM.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nProject up to 24 vertices and erase front-facing triangle interiors from\nthe stage for a model with hidden-line flags and face data. Nonpositive scale\nmeans 256 (unity). Up to 16 faces are considered; depth-crossing faces are\nskipped. This also replaces shared projection caches, but does not update VRAM.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16010,7 +16015,7 @@
       "signature": "void DMG3D_EraseSpan2D(w3ddmg_u8 y, w3ddmg_u8 x0, w3ddmg_u8 x1);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 30,
-      "comment": "Compatibility alias: Wire3DDMG_EraseSpan2D; WIRE3D_DMG_HEIGHT = 120.\nOrder the X endpoints and erase the inclusive staged span. Both endpoints\nmust be in 0..127; invalid Y is ignored. The routine does not clip X for you.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nOrder the X endpoints and erase the inclusive staged span. Both endpoints\nmust be in 0..127; invalid Y is ignored. The routine does not clip X for you.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16036,7 +16041,7 @@
       "signature": "void DMG3D_EraseTriangle2D(w3ddmg_u8 ax, w3ddmg_u8 ay, w3ddmg_u8 bx, w3ddmg_u8 by, w3ddmg_u8 cx, w3ddmg_u8 cy);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 31,
-      "comment": "Compatibility alias: Wire3DDMG_EraseTriangle2D; WIRE3D_DMG_HEIGHT = 120.\nErase a triangle from staged pixels using integer scanline intersections.\nSupply viewport coordinates. Degenerate triangles are ignored; the occlusion\nmask and VRAM are unchanged.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nErase a triangle from staged pixels using integer scanline intersections.\nSupply viewport coordinates. Degenerate triangles are ignored; the occlusion\nmask and VRAM are unchanged.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16062,7 +16067,7 @@
       "signature": "void DMG3D_Init();",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 35,
-      "comment": "Compatibility alias: Wire3DDMG_Init; WIRE3D_DMG_HEIGHT = 120.\nTake over LCD state, clear tile VRAM and the BG map, and install a 16x15\nviewport beginning at map tile (3,1). Set scroll (8,0), BGP=0xB4 and BG display.\nReset camera, queues, transfer modes, both dirty tables and stage. Reserve\n0xD000..0xDFFF and retain its WRAM mapping; auxiliary storage aliases it.\nCall BeginFrame before drawing to establish occlusion state.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nTake over LCD state, clear tile VRAM and the BG map, and install a 16x15\nviewport beginning at map tile (3,1). Set scroll (8,0), BGP=0xB4 and BG display.\nReset camera, queues, transfer modes, both dirty tables and stage. Reserve\n0xD000..0xDFFF and retain its WRAM mapping; auxiliary storage aliases it.\nCall BeginFrame before drawing to establish occlusion state.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16091,7 +16096,7 @@
       "signature": "w3ddmg_u8 DMG3D_ProjectPoint(w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8* sx, w3ddmg_u8* sy);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 43,
-      "comment": "Compatibility alias: Wire3DDMG_ProjectPoint; WIRE3D_DMG_HEIGHT = 120.\nProject a world point with the current camera. Return zero for invalid\ndepth without changing outputs; success writes clamped 128x120 coordinates.\nBoth output pointers must be valid. Coordinate differences must fit s16.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nProject a world point with the current camera. Return zero for invalid\ndepth without changing outputs; success writes clamped 128x120 coordinates.\nBoth output pointers must be valid. Coordinate differences must fit s16.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16117,7 +16122,7 @@
       "signature": "void DMG3D_PutBgTile(w3ddmg_u8 x, w3ddmg_u8 y, w3ddmg_u8 tile);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 44,
-      "comment": "Compatibility alias: Wire3DDMG_PutBgTile; WIRE3D_DMG_HEIGHT = 120.\nQueue a tile write to the 32x32 map at 0x9800 for EndFrame. Invalid map\ncoordinates and submissions beyond 48 pending writes are silently ignored.\nThis queue is separate from the general vram library queue.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nQueue a tile write to the 32x32 map at 0x9800 for EndFrame. Invalid map\ncoordinates and submissions beyond 48 pending writes are silently ignored.\nThis queue is separate from the general vram library queue.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16143,7 +16148,7 @@
       "signature": "void DMG3D_RotatePoint(w3ddmg_i16* x, w3ddmg_i16* y, w3ddmg_i16* z, w3ddmg_u8 rx, w3ddmg_u8 ry, w3ddmg_u8 rz);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 46,
-      "comment": "Compatibility alias: Wire3DDMG_RotatePoint; WIRE3D_DMG_HEIGHT = 120.\nRotate in place in Y/X/Z order using 16 steps per full turn. A null\ncomponent pointer makes the whole call a no-op; use distinct pointers.\nEach axis rotation clamps its inputs to +/-220.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nRotate in place in Y/X/Z order using 16 steps per full turn. A null\ncomponent pointer makes the whole call a no-op; use distinct pointers.\nEach axis rotation clamps its inputs to +/-220.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16169,7 +16174,7 @@
       "signature": "void DMG3D_SetAuxTransfer(w3ddmg_u8 flag);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 50,
-      "comment": "Compatibility alias: Wire3DDMG_SetAuxTransfer; WIRE3D_DMG_HEIGHT = 120.\nStore the EndFrame auxiliary-transfer gate; any nonzero value enables it.\nNo data is copied or cleared here. Auxiliary source bytes alias the main stage.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nStore the EndFrame auxiliary-transfer gate; any nonzero value enables it.\nNo data is copied or cleared here. Auxiliary source bytes alias the main stage.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16195,7 +16200,7 @@
       "signature": "void DMG3D_SetCamera(w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 pitch, w3ddmg_u8 yaw, w3ddmg_u8 roll);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 51,
-      "comment": "Compatibility alias: Wire3DDMG_SetCamera; WIRE3D_DMG_HEIGHT = 120.\nStore camera position and angles for later draws; a full turn is 16 angle\nsteps. No existing drawing is reprojected and no input range validation occurs.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nStore camera position and angles for later draws; a full turn is 16 angle\nsteps. No existing drawing is reprojected and no input range validation occurs.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16221,7 +16226,7 @@
       "signature": "void DMG3D_SetDirtyTransfer(w3ddmg_u8 flag);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 52,
-      "comment": "Compatibility alias: Wire3DDMG_SetDirtyTransfer; WIRE3D_DMG_HEIGHT = 120.\nStore the dirty-transfer gate and clear both dirty histories and the main\nstage, even if the value is unchanged. VRAM is retained; enabling this over an\nold image can leave unmarked old tiles, so arrange a clean displayed baseline.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nStore the dirty-transfer gate and clear both dirty histories and the main\nstage, even if the value is unchanged. VRAM is retained; enabling this over an\nold image can leave unmarked old tiles, so arrange a clean displayed baseline.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16250,7 +16255,7 @@
       "signature": "void DMG3D_SetPalette(w3ddmg_u8 bgp);",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 53,
-      "comment": "Compatibility alias: Wire3DDMG_SetPalette; WIRE3D_DMG_HEIGHT = 120.\nWrite the raw DMG BGP palette encoding immediately; no frame synchronization occurs.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nWrite the raw DMG BGP palette encoding immediately; no frame synchronization occurs.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16276,7 +16281,7 @@
       "signature": "void DMG3D_TransferAuxNow();",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 57,
-      "comment": "Compatibility alias: Wire3DDMG_TransferAuxNow; WIRE3D_DMG_HEIGHT = 120.\nUpload and consume auxiliary source strips immediately, independent of the\nauxiliary gate. No VBlank-start wait or dirty-history/BG-queue update occurs.\nThe source overlaps the main stage and must be coordinated with its upload.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nUpload and consume auxiliary source strips immediately, independent of the\nauxiliary gate. No VBlank-start wait or dirty-history/BG-queue update occurs.\nThe source overlaps the main stage and must be coordinated with its upload.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",
@@ -16302,7 +16307,7 @@
       "signature": "void DMG3D_TransferMainNow();",
       "path": "kitaqgb/lib/dmg3d.h",
       "line": 58,
-      "comment": "Compatibility alias: Wire3DDMG_TransferMainNow; WIRE3D_DMG_HEIGHT = 120.\nUpload and consume the full main stage immediately, polling STAT but not\nwaiting for the next VBlank. Ignore transfer gates and leave dirty histories\nand BG tile queue unchanged; the caller coordinates the frame lifecycle.",
+      "comment": "WIRE3D_DMG_HEIGHT = 120.\nUpload and consume the full main stage immediately, polling STAT but not\nwaiting for the next VBlank. Ignore transfer gates and leave dirty histories\nand BG tile queue unchanged; the caller coordinates the frame lifecycle.",
       "body": "",
       "kind": "function",
       "module": "dmg3d",

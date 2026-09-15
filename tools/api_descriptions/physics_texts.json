@@ -1,0 +1,434 @@
+{
+  "phys_void": {
+    "ja": "戻り値はありません。更新されるフィールドと反映時期を、この項目で説明しています。",
+    "en": "No return value. This entry describes the fields updated and when they take effect."
+  },
+  "phys_units": {
+    "ja": "座標・半径・半サイズ・速度・重力は、呼び出し側で統一した整数単位を使います。1回のstepが1時間刻みです。サンプルは1単位＝1ピクセルです。位置を自動的にQ8.8へ変換したり、描画したりはしません。",
+    "en": "Choose consistent integer units for positions, radii, half extents, velocities and gravity. One step is one simulation tick. The samples use one unit per pixel. These routines neither convert positions to Q8.8 automatically nor render them."
+  },
+  "phys_range": {
+    "ja": "加算・差・半サイズの和・接触補正の積を、符号付き16ビットの範囲に収めてください。速度制限は加算後に適用されるため、加算時のオーバーフローは防げません。",
+    "en": "Keep sums, differences, combined half extents and contact-correction products within signed 16-bit range. Velocity limits apply after addition and cannot prevent overflow during that addition."
+  },
+  "phys_storage": {
+    "ja": "worldは配列を借りて使います。配列やbodyの領域確保・寿命管理は呼び出し側の責任です。worldの初期化だけでは配列要素は初期化されません。",
+    "en": "A world borrows its array. The caller allocates and owns body storage and keeps it alive. Initializing a world does not initialize its array elements."
+  },
+  "phys_step2": {
+    "ja": "接触補正は侵入の浅い軸を選び、同値ならY軸を選びます。逆質量で位置補正を分けますが、動く2物体の軸方向速度は単純平均、固定物との衝突では0になります。restitution_q8はこのソルバーでは使いません。高速なすり抜けを防ぐ連続衝突判定ではありません。",
+    "en": "Contacts resolve along the shallower penetration axis, choosing Y on a tie. Position correction uses inverse masses, but two dynamic bodies receive their simple average axis velocity; collision with a static body zeros that component. This solver does not use restitution_q8. It is discrete collision handling and can miss fast crossings."
+  },
+  "phys_scratch": {
+    "ja": "矩形の積分・衝突処理は共有作業領域を使います。同じ物理処理を割り込みから重ねて呼び出さないでください。",
+    "en": "Box integration and collision routines use shared scratch storage. Do not re-enter these physics routines from an interrupt."
+  },
+  "phys_bank3": {
+    "ja": "physics3d.cはROMバンク2に配置されます。サンプルはMBC5・128KB ROMで、本体を先に読み込み、mainをバンク0に配置しています。呼び出し中に外部処理でROMバンクを切り替えないでください。",
+    "en": "physics3d.c resides in ROM bank 2. The sample uses an MBC5 128 KB ROM, includes that implementation first and places main in bank 0. Do not change the ROM mapping externally during a call."
+  },
+  "phys_step3": {
+    "ja": "侵入量が最小の軸で接触を解決し、同値ならX、Y、Zの順を優先します。接近中だけ、両者の反発係数の平均（0～256に制限）と逆質量で反発を計算します。高速なすり抜け、回転、角運動量、摩擦は扱いません。",
+    "en": "Contacts use the least-penetrating axis, preferring X, then Y, then Z on ties. Only closing motion produces a bounce, using inverse masses and the average restitution clamped to 0..256. Fast tunnelling, rotation, angular momentum and friction are not handled."
+  },
+  "phys_impact": {
+    "ja": "last_impact_speedには軸方向の接近速度の最大値が記録されます。動的な有効bodyは積分時に0へ戻り、固定・無効bodyは値を保持します。break_speedやKQ3D_BODY_BROKENを見て自動的に壊す処理はありません。破壊判定・flags・activeの更新はゲーム側で行います。",
+    "en": "last_impact_speed records the maximum closing speed along a contact axis. Integration clears it for active dynamic bodies; static and inactive bodies retain it. Neither break_speed nor KQ3D_BODY_BROKEN triggers automatic destruction. The game decides when to break a body and changes flags/active itself."
+  },
+  "phys_circle_limits": {
+    "ja": "円の距離と法線は整数近似です。成分を255以下へ縮小しても、二乗和が65535を超える場合があります。中心差・半径和・逆質量和を有効範囲に収め、重み計算のinv_mass_q8×255も32767以下にしてください（サンプルは64）。",
+    "en": "Circle distance and normals are integer approximations. Reducing each component to at most 255 does not guarantee that the squared-distance sum fits 65535. Keep center differences, radius sums and inverse-mass sums representable, and keep inv_mass_q8 * 255 within 32767 in the weight calculation; the sample uses 64."
+  },
+  "phys_arg_world": {
+    "ja": "更新または参照するワールドへのポインタ。配列と設定値を保持します。",
+    "en": "Pointer to the world holding the body array and simulation settings."
+  },
+  "phys_arg_bodies": {
+    "ja": "呼び出し側が保持するbody配列の先頭。body_count個の要素を用意します。",
+    "en": "Start of a caller-owned body array containing body_count elements."
+  },
+  "phys_arg_body_count": {
+    "ja": "配列中のbody数（0～255）。無効な要素も個数に含めます。",
+    "en": "Number of array slots, 0..255, including inactive entries."
+  },
+  "phys_arg_body": {
+    "ja": "変更するbodyへのポインタ。この関数が使わないフィールドは保持されます。",
+    "en": "Pointer to the body to modify. Fields not used by this operation are retained."
+  },
+  "phys_arg_x": {
+    "ja": "中心または点のX座標。サンプルではピクセル単位です。",
+    "en": "X coordinate of the center or point, in pixels in the sample."
+  },
+  "phys_arg_y": {
+    "ja": "中心または点のY座標。サンプルでは下向きが正です。",
+    "en": "Y coordinate of the center or point; positive is downward in the sample."
+  },
+  "phys_arg_z": {
+    "ja": "中心のZ座標。サンプルでは上面図の縦軸に表示します。",
+    "en": "Z coordinate of the center, shown vertically in the sample top view."
+  },
+  "phys_arg_half_x": {
+    "ja": "X方向の半サイズ。箱の全幅はこの値の2倍です。",
+    "en": "Half extent along X; the full box width is twice this value."
+  },
+  "phys_arg_half_y": {
+    "ja": "Y方向の半サイズ。箱の全高はこの値の2倍です。",
+    "en": "Half extent along Y; the full box height is twice this value."
+  },
+  "phys_arg_half_z": {
+    "ja": "Z方向の半サイズ。奥行きはこの値の2倍です。",
+    "en": "Half extent along Z; full depth is twice this value."
+  },
+  "phys_arg_vx": {
+    "ja": "X方向の1刻み当たりの変位。位置と同じ単位です。",
+    "en": "X displacement per simulation tick, in the same units as position."
+  },
+  "phys_arg_vy": {
+    "ja": "Y方向の1刻み当たりの変位。位置と同じ単位です。",
+    "en": "Y displacement per simulation tick, in the same units as position."
+  },
+  "phys_arg_gravity_x": {
+    "ja": "この呼び出しでX速度へ加える加速度。",
+    "en": "Acceleration added to X velocity by this call."
+  },
+  "phys_arg_gravity_y": {
+    "ja": "この呼び出しでY速度へ加える加速度。",
+    "en": "Acceleration added to Y velocity by this call."
+  },
+  "phys_arg_max_speed": {
+    "ja": "速度の上限。軸ごとの制限か合成速度の制限かは関数ごとに異なります。",
+    "en": "Speed limit; the entry specifies whether this limits each axis or the combined vector."
+  },
+  "phys_arg_surface": {
+    "ja": "面の法線・移動速度・反発・摩擦を指定したKQSurface2Dへのポインタ。",
+    "en": "Pointer to a KQSurface2D containing its normal, velocity, bounce and friction settings."
+  },
+  "phys_arg_value": {
+    "ja": "倍率を掛ける符号付き16ビットの値。",
+    "en": "Signed 16-bit value to scale."
+  },
+  "phys_arg_coefficient": {
+    "ja": "256を1.0とする符号付き係数（−256～256）。",
+    "en": "Signed coefficient in -256..256, with 256 representing 1.0."
+  },
+  "phys_arg_start_gap": {
+    "ja": "刻み開始時の面までの符号付き距離。正は面の外側です。",
+    "en": "Signed gap at the start of the tick; positive means outside the surface."
+  },
+  "phys_arg_end_gap": {
+    "ja": "刻み終了時の面までの符号付き距離。負は面を通過した側です。",
+    "en": "Signed gap at the end of the tick; negative means past the surface."
+  },
+  "phys_arg_mass_q8": {
+    "ja": "256を質量1.0とする値。0以下は固定物体です。",
+    "en": "Mass value with 256 representing 1.0; nonpositive values create a static body."
+  },
+  "phys_arg_r": {
+    "ja": "左上座標x/yと幅w・高さhを持つKQRectの値。",
+    "en": "KQRect value containing a top-left x/y position and width/height w/h."
+  },
+  "phys_arg_friction_q8": {
+    "ja": "残す速度の倍率です。この関数ではs8へ変換され、128～255は負の係数になる点に注意してください。",
+    "en": "Velocity multiplier retained by this function. It is converted to s8, so 128..255 become negative coefficients."
+  },
+  "phys_arg_min_x": {
+    "ja": "境界の左端。円の中心の最小値はmin_x＋radiusです。",
+    "en": "Left boundary; a circle center is limited to at least min_x + radius."
+  },
+  "phys_arg_min_y": {
+    "ja": "境界の上端。円の中心の最小値はmin_y＋radiusです。",
+    "en": "Top boundary; a circle center is limited to at least min_y + radius."
+  },
+  "phys_arg_max_x": {
+    "ja": "境界の右端。円の中心の最大値はmax_x−radiusです。",
+    "en": "Right boundary; a circle center is limited to at most max_x - radius."
+  },
+  "phys_arg_max_y": {
+    "ja": "境界の下端。円の中心の最大値はmax_y−radiusです。",
+    "en": "Bottom boundary; a circle center is limited to at most max_y - radius."
+  },
+  "phys_expected_body2d": {
+    "ja": "左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床の上でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。DMGではすべて黒で描きます。数値検証では初期値、設定、積分、矩形・点判定、符号付き倍率も確認します。",
+    "en": "Left shows the initial state; right shows one tick later. A red 16x16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). DMG renders all marks in black. RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."
+  },
+  "phys_expected_surface": {
+    "ja": "赤い物体の位置は変わりません。緑の速度線は左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)・(88,48)、物体中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の例では(300,400)が(147,196)になります。DMGでは全て黒です。",
+    "en": "The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,-8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48)/(88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. The speed-limit example reduces (300,400) to (147,196). All marks are black on DMG."
+  },
+  "phys_expected_circle": {
+    "ja": "半径6の赤い円が、左の中心(24,24)から右の(54,24)へ進みます。図内の境界は(4,4)～(60,60)です。右壁で中心が54に制限され、X速度は32から−15へ変わります。壁反発128/256に続き、減衰255/256が掛かります。図の原点は画面(8,48)・(88,48)。DMGでは円と枠を黒で表示します。",
+    "en": "A red radius-6 circle moves from center (24,24) on the left to (54,24) on the right. Local bounds are (4,4)..(60,60). The right wall clamps the center to 54 and changes X velocity from 32 to -15: wall restitution 128/256 is followed by damping 255/256. Panel origins are screen (8,48)/(88,48). DMG shows the circle and boundary in black."
+  },
+  "phys_expected_body3d": {
+    "ja": "左はX/Y正面図、右はX/Z上面図です。緑の枠が初期位置(24,24,16)、赤い箱が1刻み後の(36,24,24)、青い領域が固定障害物です。X速度16は−14へ反発し、Z速度8は保持されます。衝撃値は16ですが、break_speed=1でもflagsは0のままです。図の原点は画面(8,48)・(88,48)。DMGでは枠・箱・障害物が黒になります。",
+    "en": "Left is the X/Y front view and right is the X/Z top view. Green outlines mark the initial (24,24,16); red boxes show (36,24,24) after one tick; blue regions are the static obstacle. X velocity bounces from 16 to -14 while Z velocity stays 8. Impact is 16, but flags remain zero despite break_speed=1. Panel origins are screen (8,48)/(88,48). All marks are black on DMG."
+  },
+  "phys_kq2d_world_init_purpose": {
+    "ja": "2Dワールドへ配列を関連付け、重力(0,32)、接触反復4回、軸速度上限512を設定します。",
+    "en": "Attach an array to a 2D world and set gravity (0,32), four contact iterations and a per-axis speed limit of 512."
+  },
+  "phys_init2": {
+    "ja": "restitution_q8は0に設定します。bodyがNULLなら何もしません。半サイズは正の値を指定してください。",
+    "en": "Sets restitution_q8 to zero. A NULL body is ignored. Supply positive half extents."
+  },
+  "phys_kq2d_body_init_purpose": {
+    "ja": "中心と半サイズを設定し、速度0・逆質量256・有効状態の矩形bodyを作ります。",
+    "en": "Initialize a centered box with the supplied half extents, zero velocity, inverse mass 256 and active status."
+  },
+  "phys_setters": {
+    "ja": "NULLは無視します。無効bodyや固定bodyも、NULL以外なら変更します。",
+    "en": "NULL is ignored. Inactive and static bodies are still changed when the pointer is valid."
+  },
+  "phys_kq2d_body_set_pos_purpose": {
+    "ja": "bodyの中心座標だけを置き換えます。速度・大きさ・有効状態を変更しません。",
+    "en": "Replace only the body center, retaining velocity, extents and activity."
+  },
+  "phys_kq2d_body_set_velocity_purpose": {
+    "ja": "bodyの速度を直接設定します。上限への制限や位置更新は行いません。",
+    "en": "Set velocity directly without clamping it or updating position."
+  },
+  "phys_dynamic": {
+    "ja": "NULL・active=0・inv_mass_q8<=0のbodyは無視します。速度上限には0以上を指定します。",
+    "en": "Ignore NULL, inactive and nonpositive-inverse-mass bodies. Supply a nonnegative speed limit."
+  },
+  "phys_kq2d_body_apply_gravity_purpose": {
+    "ja": "有効な動的bodyの速度に重力を足し、各軸を±max_speedに制限します。位置は更新しません。",
+    "en": "Add gravity to an active dynamic body and clamp each axis to +/-max_speed without updating position."
+  },
+  "phys_no_contacts": {
+    "ja": "この呼び出し単独では他のbodyとの衝突を解決しません。worldがNULLの場合も何もしません。",
+    "en": "This call does not resolve contacts with other bodies. A NULL world is also ignored."
+  },
+  "phys_kq2d_integrate_body_purpose": {
+    "ja": "1個の動的bodyへワールドの重力と軸速度制限を適用し、その速度を位置へ足します。",
+    "en": "Apply world gravity and per-axis speed limits to one dynamic body, then add its velocity to position."
+  },
+  "phys_step_null": {
+    "ja": "worldまたは配列がNULLなら何もしません。solver_iterations=0でも接触処理は1回行います。",
+    "en": "A NULL world or array is ignored. A zero solver_iterations value still performs one contact pass."
+  },
+  "phys_kq2d_step_purpose": {
+    "ja": "有効な動的bodyを積分した後、配列内の有効なbody同士の接触をまとめて解決します。",
+    "en": "Integrate active dynamic bodies, then resolve contacts among active array entries."
+  },
+  "phys_friction_quirk": {
+    "ja": "0～127は0～127/256の倍率です。128～255はs8への変換で負になり、速度を反転させます。0～255の正の減衰が必要なら、各速度にkq2d_scale_q8を使ってください。積の端数は0方向へ切り捨てます。NULLは無視します。",
+    "en": "Values 0..127 give multipliers 0..127/256. Values 128..255 become negative after the s8 conversion and reverse velocity. For positive damping across 0..255, use kq2d_scale_q8 on each velocity instead. Products truncate toward zero. NULL is ignored."
+  },
+  "phys_kq2d_body_apply_friction_purpose": {
+    "ja": "両軸の速度を符号付き8ビット係数/256で縮小します。位置や有効状態は調べません。",
+    "en": "Scale both velocity components by a signed-byte coefficient divided by 256 without checking position or activity."
+  },
+  "phys_overlap_return": {
+    "ja": "内部が重なれば1、接触のみまたは離れていれば0です。",
+    "en": "Returns 1 for interior overlap and 0 for touching or separated shapes."
+  },
+  "phys_kq2d_overlap_aabb_pair": {
+    "ja": "有効なbodyへのポインタ。照会はactive・質量・flagsを無視します。",
+    "en": "Valid body pointer; the query ignores activity, mass and flags."
+  },
+  "phys_kq2d_overlap_aabb_purpose": {
+    "ja": "中心と半サイズで表した2個の矩形が、X・Y両軸で厳密に重なるか調べます。",
+    "en": "Test strict overlap of two centered boxes on both X and Y."
+  },
+  "phys_kq3d_overlap_aabb_pair": {
+    "ja": "有効なbodyへのポインタ。照会はactive・質量・flagsを無視します。",
+    "en": "Valid body pointer; the query ignores activity, mass and flags."
+  },
+  "phys_kq3d_overlap_aabb_purpose": {
+    "ja": "中心と半サイズで表した2個の箱が、X・Y・Zの全軸で厳密に重なるか調べます。",
+    "en": "Test strict overlap of two centered boxes on all three axes."
+  },
+  "phys_rect_value": {
+    "ja": "左上座標と幅・高さを持つKQRectの値。幅と高さには正の値を指定します。",
+    "en": "KQRect value with top-left coordinates and positive width and height."
+  },
+  "phys_rect_nonpositive": {
+    "ja": "0以下の幅や高さを除外するチェックはありません。bodyの中心・半サイズをそのままKQRectへ入れないでください。",
+    "en": "Nonpositive dimensions are not explicitly rejected. Do not copy a body center and half extents directly into a KQRect."
+  },
+  "phys_kq2d_rect_intersect_purpose": {
+    "ja": "左上座標・幅・高さで表した2個の矩形について、内部の重なりを調べます。",
+    "en": "Test interior overlap of two rectangles represented by top-left positions and sizes."
+  },
+  "phys_point_return": {
+    "ja": "範囲内なら1、範囲外なら0です。",
+    "en": "Returns 1 inside and 0 outside."
+  },
+  "phys_kq2d_point_in_rect_purpose": {
+    "ja": "点が矩形の左端・上端を含み、右端・下端を含まない範囲内にあるか調べます。",
+    "en": "Test whether a point lies in a rectangle including its left/top edges but excluding right/bottom."
+  },
+  "phys_smul_round": {
+    "ja": "係数の範囲は−128～127で、256が1.0という倍率です。積の端数は正負どちらも0方向へ切り捨てます。例：−257×64/256は−64です。",
+    "en": "The coefficient range is -128..127, scaled with 256 representing 1.0. Products truncate toward zero for either sign: -257*64/256 returns -64."
+  },
+  "phys_smul_return": {
+    "ja": "符号付き16ビットの積/256を返します。",
+    "en": "Returns the signed 16-bit scaled product."
+  },
+  "phys_smul_a": {
+    "ja": "倍率を掛ける符号付き16ビット値。",
+    "en": "Signed 16-bit value to scale."
+  },
+  "phys_smul_b": {
+    "ja": "符号付き8ビット係数。−128～127を指定します。",
+    "en": "Signed byte coefficient in -128..127."
+  },
+  "phys___smul16x8_purpose": {
+    "ja": "符号付き16ビット値と符号付き8ビット係数を掛け、積/256の端数を0方向へ切り捨てます。",
+    "en": "Multiply a signed 16-bit value by a signed 8-bit coefficient, divide by 256 and truncate toward zero."
+  },
+  "phys_scale_range": {
+    "ja": "係数は−256～256だけを指定してください。±256では倍率が±1になります。value=−32768とcoefficient=−256の組み合わせの数学的な結果32768はs16に収まりません。",
+    "en": "Use coefficients only in -256..256; +/-256 gives +/-1. The mathematical result for value=-32768 and coefficient=-256 is 32768 and cannot fit s16."
+  },
+  "phys_scale_return": {
+    "ja": "0方向に切り捨てた符号付き16ビットの結果を返します。",
+    "en": "Returns the signed 16-bit result truncated toward zero."
+  },
+  "phys_kq2d_scale_q8_purpose": {
+    "ja": "符号付き係数/256を掛け、正負どちらも0方向へ切り捨てます。",
+    "en": "Multiply by a signed coefficient divided by 256, truncating toward zero for either sign."
+  },
+  "phys_limit": {
+    "ja": "各速度の絶対値と正のmax_speedは16383以下にしてください。上限0以下は速度を0にします。NULLは無視しますが、activeや質量は無視して変更します。整数量子化により上限より小さくなり、ごく小さい倍率では0になります。",
+    "en": "Keep velocity magnitudes and a positive max_speed within 16383. A nonpositive limit zeros velocity. NULL is ignored, but activity and mass do not suppress modification. Integer quantization can undershoot the limit and tiny scale factors can produce zero."
+  },
+  "phys_kq2d_body_limit_speed_purpose": {
+    "ja": "速度ベクトルの長さを保守的に見積もり、両軸を同じ倍率で縮小して合成速度を制限します。",
+    "en": "Estimate vector length conservatively and scale both axes together to limit combined speed."
+  },
+  "phys_toi": {
+    "ja": "距離は±8191以内にしてください。開始距離0以下は0、終了距離0以上は256です。初期重なりと時刻0、交差なしとちょうど終点での接触は同じ戻り値になります。位置は変更しません。",
+    "en": "Keep gaps within +/-8191. A nonpositive start returns 0; a nonnegative end returns 256. Initial overlap and time zero share a return value, as do no crossing and contact exactly at the endpoint. No position is changed."
+  },
+  "phys_toi_return": {
+    "ja": "0～256のQ8時刻を返します。192は刻みの75%です。",
+    "en": "Returns Q8 time in 0..256; 192 is 75% of the tick."
+  },
+  "phys_kq2d_surface_toi_q8_purpose": {
+    "ja": "開始・終了の符号付き距離から、線形運動で面を横切る刻み内時刻を見積もります。",
+    "en": "Estimate the within-tick crossing time from signed start/end gaps under linear motion."
+  },
+  "phys_surface": {
+    "ja": "法線は256を長さ1とするQ8単位ベクトルです。相対速度の各成分は±8191以内、thresholdとkickは0以上、係数は0～255にします。閾値を厳密に超えた時だけ反発係数を使い、kickを最低反発速度として適用します。NULLや離れる動きは無変更です。接触検出・めり込み解消は別途必要で、activeや質量の判定はしません。",
+    "en": "Use a Q8 unit normal with length 256. Keep relative components within +/-8191, threshold/kick nonnegative and coefficients in 0..255. Restitution applies only strictly above the threshold, with kick as a minimum rebound speed. NULL inputs or separating motion leave velocity unchanged. Contact detection and penetration correction are separate; activity and mass are not checked."
+  },
+  "phys_surface_return": {
+    "ja": "面へ向かう法線速度の正の大きさを返します。NULLまたは離れる動きでは0です。",
+    "en": "Returns the positive incoming normal speed, or 0 for NULL inputs or separating motion."
+  },
+  "phys_kq2d_body_resolve_surface_purpose": {
+    "ja": "移動する面との相対速度を使い、法線方向の反発・最低反発速度と接線摩擦を速度へ適用します。",
+    "en": "Use velocity relative to a moving surface to apply normal bounce, minimum bounce speed and tangential friction."
+  },
+  "phys_circle_init": {
+    "ja": "境界は無効で初期範囲は(0,0)～(159,143)、壁反発は240、壁摩擦は16です。円の初期化関数はないため、各bodyの全フィールドを呼び出し側で設定します。NULL worldは無視します。",
+    "en": "Bounds start disabled with values (0,0)..(159,143); wall restitution is 240 and wall friction 16. There is no circle-body initializer: assign every body field in the caller. A NULL world is ignored."
+  },
+  "phys_kq2dc_world_init_purpose": {
+    "ja": "円のワールドへ配列を関連付け、重力0・反復4・軸速度上限768・減衰252/256を設定します。",
+    "en": "Attach a circle array and set zero gravity, four passes, per-axis limit 768 and damping 252/256."
+  },
+  "phys_bounds": {
+    "ja": "NULL worldは無視します。上下・左右の順序や円が収まるかは検証しないため、幅・高さを円の直径以上にしてください。実際の位置補正はstepで行います。",
+    "en": "NULL is ignored. Ordering and fit are not validated, so provide width and height at least as large as the circle diameter. A step performs the actual position correction."
+  },
+  "phys_kq2dc_set_bounds_purpose": {
+    "ja": "円の行動範囲を保存して境界処理を有効にします。現在の位置は動かしません。",
+    "en": "Store and enable circle-world bounds without moving bodies immediately."
+  },
+  "phys_circle_query": {
+    "ja": "有効な2ポインタと正の半径が必要です。active・質量は無視します。縮小・整数平方根により、幾何学的に厳密な距離判定とは一致しない場合があります。",
+    "en": "Requires two valid pointers and positive radii. Activity and mass are ignored. Reduction and integer square roots can differ from an exact geometric distance test."
+  },
+  "phys_circle_a": {
+    "ja": "判定する1個目の円への有効なポインタ。",
+    "en": "Valid pointer to the first circle."
+  },
+  "phys_circle_b": {
+    "ja": "判定する2個目の円への有効なポインタ。",
+    "en": "Valid pointer to the second circle."
+  },
+  "phys_kq2dc_overlap_circle_purpose": {
+    "ja": "縮小した中心距離と半径和を使い、2個の円の内部が重なるか近似判定します。",
+    "en": "Approximate interior overlap using reduced center distance and the radius sum."
+  },
+  "phys_circle_step": {
+    "ja": "最後に速度の−1～1を0へ揃えます。減衰255でも完全維持ではありません。静止した円同士の重なりは解消されない場合があります。固定円も有効な境界に押し戻されます。反復0は1回、NULL world/配列は無視します。速度更新で接触の訪問順が変わり得る、離散的で量子化されたソルバーです。",
+    "en": "Finally snaps velocity components in -1..1 to zero. Even damping 255 loses some speed. Overlaps between resting circles can remain. Static circles are also moved inside enabled bounds. Zero iterations means one pass; NULL world/array is ignored. This discrete, quantized solver can visit contacts in a different order as velocities change."
+  },
+  "phys_kq2dc_step_purpose": {
+    "ja": "円を積分し、境界・円同士の接触を解決してから線形減衰を掛けます。",
+    "en": "Integrate circles, resolve bounds and circle contacts, then apply linear damping."
+  },
+  "phys_kq3d_world_init_purpose": {
+    "ja": "3Dワールドへ配列を関連付け、重力(0,24,0)・反復4・軸速度上限512を設定します。",
+    "en": "Attach a body array to a 3D world with gravity (0,24,0), four passes and per-axis speed limit 512."
+  },
+  "phys_init3": {
+    "ja": "反発係数は224、break_speedは0です。質量設定はkq3d_body_set_massと同じ規則です。NULLは無視し、半サイズの妥当性は呼び出し側が保証します。",
+    "en": "Restitution is 224 and break_speed is zero. Mass follows kq3d_body_set_mass rules. NULL is ignored; the caller supplies valid half extents."
+  },
+  "phys_kq3d_body_init_purpose": {
+    "ja": "3Dの中心・半サイズ・質量を設定し、速度・加速度・衝撃値・flagsを0にして有効化します。",
+    "en": "Initialize 3D center, half extents and mass; zero velocity, acceleration, impact and flags, and activate the body."
+  },
+  "phys_mass": {
+    "ja": "0以下は逆質量0の固定物体です。正なら32767/max(mass,64)を整数除算し、最低1とします。保存するmassは元の値のままで、正確なQ8逆数ではありません。mass=256ではinv_mass=127です。速度やactiveは変更せず、NULLは無視します。",
+    "en": "Nonpositive mass gives inverse mass zero (static). Positive mass uses integer 32767/max(mass,64), with a minimum of 1. Stored mass retains the requested value: the weight is not an exact Q8 reciprocal. Mass 256 gives inverse mass 127. Velocity/activity stay unchanged; NULL is ignored."
+  },
+  "phys_kq3d_body_set_mass_purpose": {
+    "ja": "要求した質量を保存し、接触補正・反発に使う逆質量の重みを計算します。",
+    "en": "Store the requested mass and compute an inverse-mass weight for correction and bounce."
+  },
+  "phys_accel": {
+    "ja": "ax・ay・azは呼び出し後も保持され、次の積分でも加算します。この関数単独では衝突を解決しません。NULL、無効、固定bodyは変更しません。",
+    "en": "ax/ay/az persist and apply again on the next integration. This function alone does not resolve contacts. NULL, inactive and static bodies are not modified."
+  },
+  "phys_kq3d_integrate_body_purpose": {
+    "ja": "1個の有効な動的bodyの衝撃値を消去し、重力とbody固有の加速度を足して、軸速度制限後に位置を進めます。",
+    "en": "Clear one active dynamic body’s impact, add world gravity and body acceleration, clamp each velocity axis and advance position."
+  },
+  "phys_impulse_range": {
+    "ja": "反発の中間式impact×(256+restitution)や補正量×逆質量もs16です。完全反発256ではimpactを63以下にするなど、積が32767を超えない設定にしてください。",
+    "en": "The intermediate impact*(256+restitution) and correction*inverse-mass products are also s16. Keep products within 32767; for example, with restitution 256 keep impact at most 63."
+  },
+  "phys_kq3d_step_purpose": {
+    "ja": "ワールド内の有効な動的bodyを積分し、有効な全bodyの接触補正・反発・衝撃値の記録を行います。",
+    "en": "Integrate active dynamic bodies and resolve contact correction, bounce and impact records among active world entries."
+  },
+  "phys_dot_coeff": {
+    "ja": "対応軸の符号付き8ビット係数（−128～127）。倍率は係数/256です。",
+    "en": "Signed byte coefficient for this axis (-128..127), scaled by 1/256."
+  },
+  "phys_dot_value": {
+    "ja": "対応する係数を掛ける符号付き16ビット成分。位置に限らず速度にも使えます。",
+    "en": "Signed 16-bit component to multiply by the matching coefficient; it may represent position or velocity."
+  },
+  "phys_dot_round": {
+    "ja": "各項を先に0方向へ切り捨てるため、積の総和を最後に1回だけシフトする内積とは端数が異なります。係数に1.0=256は格納できません。最終和は飽和しません。",
+    "en": "Truncating each term toward zero first can differ from shifting the full sum once. A coefficient cannot store 1.0=256. The final sum is not saturated."
+  },
+  "phys_dot_return": {
+    "ja": "量子化した3項の和をs16で返します。",
+    "en": "Returns the sum of three quantized terms as s16."
+  },
+  "phys_kq3d_dot_q8_8_purpose": {
+    "ja": "3軸の符号付き積をそれぞれ256で割り、0方向へ切り捨ててから足し合わせます。",
+    "en": "Divide each of three signed products by 256, truncate each toward zero, then add the terms."
+  },
+  "phys_module2": {
+    "ja": "矩形bodyの積分・AABB接触と、個別に使える面応答を提供します。中心と半サイズで矩形を表し、active=0は処理対象外、inv_mass_q8<=0は固定物体です。KQRectは中心形式ではなく左上＋幅・高さです。bodyの反発係数は矩形ペアのソルバーでは使わず、面応答ではKQSurface2Dの係数を使います。",
+    "en": "Provides box integration/AABB contacts and an optional surface-response solver. Bodies use centers and half extents; active=0 excludes a slot and inv_mass_q8<=0 makes it static. KQRect instead uses top-left coordinates and width/height. Box-pair contacts do not use the body restitution field; surface responses use KQSurface2D coefficients."
+  },
+  "phys_module_circle": {
+    "ja": "円の半径、逆質量、反発、接線摩擦、世界の減衰と境界を扱います。bodyは呼び出し側で全フィールドを設定します。bodyのfriction_q8と壁のwall_friction_q8は「除く接線運動」、linear_damping_q8は「残す速度」の割合です。0～255の係数は256で割って使うため255も正確な1.0ではありません。",
+    "en": "Supports circle radius, inverse mass, restitution, tangential friction, world damping and bounds. The caller initializes every body field. Body friction_q8 and wall_friction_q8 describe tangential motion removed, whereas linear_damping_q8 describes velocity retained. Byte coefficients are divided by 256, so 255 is not exactly 1.0."
+  },
+  "phys_module3": {
+    "ja": "回転しない3Dの箱を中心と各軸の半サイズで表す物理ライブラリです。質量・逆質量は接触の重み、restitution_q8は反発係数、ax/ay/azは持続する加速度です。表示は別の処理で行います。サンプルは同じ物体を正面と上面に描き、Z方向の動きと壁の反発を分けて示します。",
+    "en": "Physics for nonrotating 3D boxes represented by centers and per-axis half extents. Mass/inverse mass weight contacts, restitution_q8 controls bounce and ax/ay/az provide persistent acceleration. Rendering is separate. The sample draws front and top views of the same body to show depth movement and wall bounce."
+  }
+}

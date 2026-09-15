@@ -38,6 +38,10 @@ def inline(text):
     return ''.join('<code>' + html.escape(part[1:-1]) + '</code>' if part.startswith('`')
                    else html.escape(part) for part in re.split(r'(`[^`]+`)', text))
 
+def display_code(text):
+    """Remove invisible trailing spaces from displayed code, preserving lines."""
+    return '\n'.join(line.rstrip() for line in text.strip().splitlines())
+
 
 def render(record, contract, language, messages, ui):
     index = ORDER.index(language)
@@ -45,11 +49,13 @@ def render(record, contract, language, messages, ui):
     def prose(key): return inline((messages if key in messages else ui)[key][index])
     def paragraphs(keys): return ''.join('<p>' + prose(key) + '</p>' for key in keys)
     def code(text, kind='c'):
-        return '<div class="codebox"><span class="lang">' + kind + '</span><button class="copy" type="button">' + label('copy') + '</button><pre><code>' + html.escape(text.strip()) + '</code></pre></div>'
+        return '<div class="codebox"><span class="lang">' + kind + '</span><button class="copy" type="button">' + label('copy') + '</button><pre><code>' + html.escape(display_code(text)) + '</code></pre></div>'
     def images(example):
         result = []
         for shot in example.get('verified_images', []):
             caption = shot['caption']
+            if contract['review'] in ['physics-source-20260915','wireframe-source-20260915']:
+                caption += ' — ' + ' '.join(messages[key][index].replace('`','') for key in example.get('expected', []))
             result.append('<figure class="example-result"><img class="screen" loading="lazy" src="' + prefix + html.escape(shot['image'], quote=True) + '" alt="' + html.escape(name + ': ' + caption, quote=True) + '"><figcaption>' + html.escape(caption) + '</figcaption></figure>')
         return ''.join(result)
     prefix = '' if language == 'ja' else '../'
@@ -169,6 +175,10 @@ def publish(language, require_complete=False):
     proofs.update(verified_dialogue_examples(contracts))
     proofs.update(verified_batch100_examples(contracts))
     proofs.update(verified_batch200_examples(contracts))
+    from api_physics_proofs import verified_examples as verified_physics_examples
+    proofs.update(verified_physics_examples(contracts))
+    from api_wireframe_proofs import verified_examples as verified_wireframe_examples
+    proofs.update(verified_wireframe_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -206,6 +216,9 @@ def publish(language, require_complete=False):
             for start, end, replacement in reversed(edits):
                 text = text[:start] + replacement + text[end:]
             text = render_modules(text, platform, language, messages)
+            if platform == 'fc':
+                from api_physics_proofs import render_fc_module
+                text = render_fc_module(text, language)
             text = refresh_complete_headers(text, platform)
             path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
     publish_verification(language, contracts, proofs, messages, ui)

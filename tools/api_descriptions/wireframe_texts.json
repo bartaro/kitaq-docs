@@ -1,0 +1,3290 @@
+{
+  "wire_Wire3DCGB_Init_notes": {
+    "ja": "倍速へ切り替え、LCDを停止して両タイルバンクとマップを設定します。HUD・生成タイル、既定パレット、色2、カメラ0を用意します。描画前にBeginFrameを呼びます。",
+    "en": "Initialize the CGB-only 128x96 renderer: enable double speed, turn the\nLCD off at VBlank, clear both tile banks, load HUD/generated tiles, and\ninstall a 16x12 column-major viewport. Start with blank tile bank 1, scroll\nzero, default BG palettes, color 2 and a zero camera. Reset queues and\nclear the bank-2 stage. Call BeginFrame before drawing to initialize\nocclusion state. Initialization replaces LCD/tile/map state globally."
+  },
+  "wire_cgb_memory": {
+    "ja": "CGB専用です。通常ステージはWRAMバンク2のD300～DEFFを予約します。共有状態を使うため割り込みから再入しないでください。サンプルは固定スタックと完全版ランタイムを使います。",
+    "en": "CGB only. Normal staging reserves D300..DEFF in WRAM bank 2. Shared state makes these routines non-reentrant; do not call them recursively from interrupts. Samples use a fixed stack and the full runtime."
+  },
+  "wire_Wire3DCGB_Init_purpose": {
+    "ja": "CGBの128×96ピクセル描画を初期化します。",
+    "en": "Initialize the CGB 128x96 pixel renderer."
+  },
+  "wire_wire_cgb_raster_expected": {
+    "ja": "基本の線・点・消去・座標変換を1画面で確認するサンプルです。 赤い枠に青い斜線、緑の点と横線、青いL字、右上に緑の数字0を描きます。",
+    "en": "This sample demonstrates basic lines, points, erasure and projection in one frame. A red frame contains a blue diagonal, with a green point and horizontal line, a blue L and a green zero at the upper right."
+  },
+  "wire_Wire3DCGB_Init_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_InitFullScreen_notes": {
+    "ja": "両タイルバンク、マップ9800、カメラ、パレット、割り当て表を設定します。HUDタイルは読み込みません。1フレームの使用上限は127タイルです。描画中はWRAMバンクの対応を保持します。",
+    "en": "Initialize the CGB-only 160x144 tile allocator. Clear both tile banks\nand map 9800, set scroll/palettes/color/camera, reset tile counts and\nlookup/span state, then enable unsigned BG tile addressing. HUD tiles\nare not loaded. Reserve its fixed WRAM lookup, payload and address lists\nand keep the same WRAM bank mapped through full-screen rendering."
+  },
+  "wire_Wire3DCGB_InitFullScreen_purpose": {
+    "ja": "160×144ピクセルの画面を、使用タイルを割り当てる方式で初期化します。",
+    "en": "Initialize a 160x144 renderer that allocates tiles as pixels are drawn."
+  },
+  "wire_wire_cgb_full_expected": {
+    "ja": "画面座標(8,8)～(151,135)の大きな枠を描きます。上と左が赤、下が青、右が緑で、64タイルを使用しoverflowは0です。",
+    "en": "A large frame spans (8,8)..(151,135): red top/left, blue bottom and green right. It uses 64 tiles with overflow zero."
+  },
+  "wire_Wire3DCGB_InitFullScreen_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_InitFastMapLite_notes": {
+    "ja": "HUDと48個の輪郭タイルを読み込みます。通常のピクセル表示用マップと立方体スタンプは用意しません。FastMap系の関数で描画・転送してください。完全版ランタイムが必要です。",
+    "en": "Initialize a CGB tile-map renderer with HUD and 48 precomputed outline\ntiles. Clear tile VRAM/maps, reset scroll/palettes/camera and select normal\nmode. This omits normal pixel-viewport map layout and generated cube stamps;\nuse the FastMap APIs for this mode. Clear the bank-2 stage and mark fast\nmap preparation pending. Full-runtime build required."
+  },
+  "wire_Wire3DCGB_InitFastMapLite_purpose": {
+    "ja": "輪郭タイルを並べるFastMap描画を初期化します。",
+    "en": "Initialize FastMap rendering with precomputed outline tiles."
+  },
+  "wire_wire_cgb_fastmap_expected": {
+    "ja": "赤い角、青い大きな矩形、緑の1タイルの枠を描きます。最初に置いた左上の赤いセルは消え、属性を保持する更新も確認できます。",
+    "en": "A red corner, large blue rectangle and one-tile green frame demonstrate outline cells. The initial upper-left red cell disappears while the tiles-only update retains attributes."
+  },
+  "wire_Wire3DCGB_InitFastMapLite_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EnableDoubleSpeed_notes": {
+    "ja": "既に倍速なら何もしません。それ以外はKEY1で切り替えを要求しSTOPを実行します。CGB専用であり、DMGへの代替処理はありません。",
+    "en": "On CGB, return if KEY1 already reports double speed; otherwise request\nthe speed switch and call the STOP helper. This API assumes CGB hardware\nand does not provide a monochrome fallback."
+  },
+  "wire_Wire3DCGB_EnableDoubleSpeed_purpose": {
+    "ja": "CGBのCPUを倍速動作へ切り替えます。",
+    "en": "Switch the CGB CPU to double-speed operation."
+  },
+  "wire_Wire3DCGB_EnableDoubleSpeed_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_SetScreenOffset_notes": {
+    "ja": "画面への表示位置だけを動かし、投影座標やカメラは変更しません。VBlankを待たないため、表示中に変更する時期は呼び出し側で選びます。",
+    "en": "Write SCX/SCY immediately, without waiting for VBlank or changing projected\ncoordinates. The caller chooses when a visible scroll change is acceptable."
+  },
+  "wire_Wire3DCGB_SetScreenOffset_purpose": {
+    "ja": "表示のスクロールレジスタSCX・SCYを直接設定します。",
+    "en": "Set the LCD scroll registers SCX and SCY directly."
+  },
+  "wire_Wire3DCGB_SetScreenOffset_arg_scx": {
+    "ja": "SCXへ書くスクロール量（ピクセル）。",
+    "en": "Pixel scroll offset written to SCX."
+  },
+  "wire_Wire3DCGB_SetScreenOffset_arg_scy": {
+    "ja": "SCYへ書くスクロール量（ピクセル）。",
+    "en": "Pixel scroll offset written to SCY."
+  },
+  "wire_Wire3DCGB_SetScreenOffset_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_SetPaletteRGB15_notes": {
+    "ja": "パレット0に4色を設定し、パレット1～3は共通の背景色と各線色で構成します。RGB15形式を渡します。LCD停止中などパレットへ安全に書き込める期間に呼びます。",
+    "en": "Set BG palette zero to the four supplied RGB15 colors. Palettes 1..3\nshare color0 and repeat their respective nonzero color in entries 1..3,\nallowing monochrome stamp tiles to be recolored by attributes. Supply a\nvalid palette-access window, normally LCD-off setup or VBlank."
+  },
+  "wire_Wire3DCGB_SetPaletteRGB15_purpose": {
+    "ja": "線の4色と、スタンプを着色する背景パレットを設定します。",
+    "en": "Set the four drawing colors and background palettes used to tint stamps."
+  },
+  "wire_Wire3DCGB_SetPaletteRGB15_arg_color0": {
+    "ja": "パレット番号0のRGB15色。",
+    "en": "RGB15 color at palette entry 0."
+  },
+  "wire_Wire3DCGB_SetPaletteRGB15_arg_color1": {
+    "ja": "パレット番号1のRGB15色。",
+    "en": "RGB15 color at palette entry 1."
+  },
+  "wire_Wire3DCGB_SetPaletteRGB15_arg_color2": {
+    "ja": "パレット番号2のRGB15色。",
+    "en": "RGB15 color at palette entry 2."
+  },
+  "wire_Wire3DCGB_SetPaletteRGB15_arg_color3": {
+    "ja": "パレット番号3のRGB15色。",
+    "en": "RGB15 color at palette entry 3."
+  },
+  "wire_Wire3DCGB_SetPaletteRGB15_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_SetLineColor_notes": {
+    "ja": "colorの下位2ビットを保存します。通常の線はビット面をOR合成し、色1と2の交点は3になります。全画面の線は置換です。線の色0は3として扱い、消去にはなりません。",
+    "en": "Store color & 3. Use the named line colors 1..3: normal lines OR their\nbitplanes, so intersecting colors combine; full-screen fast lines replace\nthe pixel color. Line color zero is treated as 3, not as an eraser.\nNormal-mode point drawing separately supports color zero for erasure."
+  },
+  "wire_Wire3DCGB_SetLineColor_purpose": {
+    "ja": "以後の線描画に使う色番号を保存します。",
+    "en": "Select the color index for subsequent line drawing."
+  },
+  "wire_Wire3DCGB_SetLineColor_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_SetLineColor_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_GetLineColor_notes": {
+    "ja": "状態を変更しません。通常は0～3です。FastCubesやFastProjectileには有効な色1～3を渡してください。これらの内部処理は渡した値を直接保存する場合があります。",
+    "en": "Return the currently stored two-bit line color without changing drawing state."
+  },
+  "wire_Wire3DCGB_GetLineColor_purpose": {
+    "ja": "現在保存されている線の色番号を読み取ります。",
+    "en": "Read the currently stored line-color index."
+  },
+  "wire_Wire3DCGB_GetLineColor_return": {
+    "ja": "現在保存されている線色の値。",
+    "en": "The currently stored line-color value."
+  },
+  "wire_Wire3DCGB_ClearFrameTiles_notes": {
+    "ja": "VBlankでLCDを停止し、両タイルバンクと属性をリセットします。sparse範囲の履歴は保持し、full_modeも変えません。全画面モードの再初期化には使いません。",
+    "en": "For the 128x96 renderer, wait for VBlank, disable the LCD, clear the stage\nand frame tile ranges in both banks, reset map attributes, then enable LCDC\n0x81. Clear dirty flags/counts but not sparse min/max history. This does\nnot reset full_mode and is not a full-screen reinitializer."
+  },
+  "wire_Wire3DCGB_ClearFrameTiles_purpose": {
+    "ja": "128×96の表示タイルとステージを消去して描画面を空にします。",
+    "en": "Clear the displayed 128x96 frame tiles and the stage."
+  },
+  "wire_wire_cgb_sparse_expected": {
+    "ja": "前の赤と青の枠を消し、最後の緑の枠(80,8)～(112,32)だけを表示します。sparse転送と履歴更新を確認する例です。",
+    "en": "Earlier red and blue frames disappear, leaving only the final green frame at (80,8)..(112,32), demonstrating sparse upload and history management."
+  },
+  "wire_Wire3DCGB_ClearFrameTiles_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_BeginFrame_notes": {
+    "ja": "通常モードではステージとマスクを消し、全体転送を選択します。全画面ではタイル割り当てと区間情報をリセットします。隠線処理を解除しますが背景予約は保持します。",
+    "en": "In normal mode, select full-stage transfer, clear all staged pixels and\nthe bitmap mask, reset mask bounds, and disable occlusion. In full-screen\nmode, reset that mode's allocator/spans instead. Pending BG writes remain queued.\nFull-runtime build required."
+  },
+  "wire_Wire3DCGB_BeginFrame_purpose": {
+    "ja": "現在の描画モードで新しい空のフレームを開始します。",
+    "en": "Start a new empty frame in the selected rendering mode."
+  },
+  "wire_Wire3DCGB_BeginFrame_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_BeginFrameFast_notes": {
+    "ja": "BeginFrame相当の処理に加え、2つの過去範囲を192タイル全体へ広げます。次のsparse転送が古いバンクの狭い範囲を信用するのを防ぎます。",
+    "en": "Perform the same normal/full-screen frame reset as BeginFrame, while\nfirst marking both previous sparse-history ranges as the entire 192-tile\nviewport. This prevents a subsequent sparse upload from trusting stale banks."
+  },
+  "wire_Wire3DCGB_BeginFrameFast_purpose": {
+    "ja": "画面を消去して開始し、過去のsparse転送範囲を全画面として扱わせます。",
+    "en": "Begin a cleared frame and invalidate the previous sparse ranges to cover the whole viewport."
+  },
+  "wire_Wire3DCGB_BeginFrameFast_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_BeginFrameSparse_notes": {
+    "ja": "通常モードでもステージ全体を消去します。前のフレームの外側へ範囲が広がっても古いピクセルを持ち越しません。隠線設定を解除し、全画面モードでは専用の割り当てリセットを行います。",
+    "en": "Select sparse transfer and clear the entire 128x96 stage, avoiding stale\npixels when the dirty range expands. Reset mask bounds and disable\nocclusion; PAINTER_ONLY builds skip clearing the unused bitmap mask.\nFull-screen mode delegates to its own allocator reset."
+  },
+  "wire_Wire3DCGB_BeginFrameSparse_purpose": {
+    "ja": "変更範囲を使う転送用のフレームを開始します。",
+    "en": "Begin a frame for sparse-range transfer."
+  },
+  "wire_Wire3DCGB_BeginFrameSparse_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_ClearSparseStageFast_notes": {
+    "ja": "部分消去ではありません。ステージ内の全ピクセルを失います。隠線マスクを消したり、転送モードを選んだりする処理はありません。",
+    "en": "Clear the entire bank-2 stage and mark the full 128x96 viewport dirty.\nDespite its name this is not a partial clear and does not preserve staged\npixels. It neither clears occlusion nor selects a transfer mode."
+  },
+  "wire_Wire3DCGB_ClearSparseStageFast_purpose": {
+    "ja": "ステージ全体を消去し、128×96全体を転送対象として記録します。",
+    "en": "Clear the entire stage and mark the whole 128x96 viewport for upload."
+  },
+  "wire_Wire3DCGB_ClearSparseStageFast_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_MarkDirtyRect2D_notes": {
+    "ja": "描画は行いません。最小・最大の順で指定し、上限127/95を超える値は端へ制限します。128×96用のタイル範囲であり、全画面の割り当て表は操作しません。",
+    "en": "Mark an inclusive pixel rectangle for later transfer without drawing it.\nSupply ordered endpoints; values beyond 127/95 are clamped to the border.\nThis tracks 128x96 tiles, not the full-screen tile allocator."
+  },
+  "wire_Wire3DCGB_MarkDirtyRect2D_purpose": {
+    "ja": "指定したピクセル矩形を、後の転送が必要な範囲へ追加します。",
+    "en": "Add a pixel rectangle to the range requiring a later upload."
+  },
+  "wire_Wire3DCGB_MarkDirtyRect2D_arg_min_x": {
+    "ja": "最小側のX端点（表示領域内のピクセル）。",
+    "en": "Lower X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_MarkDirtyRect2D_arg_min_y": {
+    "ja": "最小側のY端点（表示領域内のピクセル）。",
+    "en": "Lower Y endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_MarkDirtyRect2D_arg_max_x": {
+    "ja": "最大側のX端点（表示領域内のピクセル）。",
+    "en": "Upper X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_MarkDirtyRect2D_arg_max_y": {
+    "ja": "最大側のX端点（表示領域内のピクセル）。",
+    "en": "Upper X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_MarkDirtyRect2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_SetCamera_notes": {
+    "ja": "角度は下位4ビットを使います。描画済みのピクセルやLCDのスクロール位置を変更しません。",
+    "en": "Store camera position and angles without changing existing pixels. Rotation\nhelpers use the low four angle bits (16 steps per turn). Screen offsets are\nseparate LCD registers and are not changed by this call."
+  },
+  "wire_Wire3DCGB_SetCamera_purpose": {
+    "ja": "投影に使うカメラの位置と16段階の姿勢を保存します。",
+    "en": "Store camera position and orientation for projection, using 16 angle steps per turn."
+  },
+  "wire_Wire3DCGB_SetCamera_arg_x": {
+    "ja": "世界座標でのカメラのX成分。",
+    "en": "World-space X component of the camera."
+  },
+  "wire_Wire3DCGB_SetCamera_arg_y": {
+    "ja": "世界座標でのカメラのY成分。",
+    "en": "World-space Y component of the camera."
+  },
+  "wire_Wire3DCGB_SetCamera_arg_z": {
+    "ja": "世界座標でのカメラのZ成分。",
+    "en": "World-space Z component of the camera."
+  },
+  "wire_Wire3DCGB_SetCamera_arg_pitch": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_SetCamera_arg_yaw": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_SetCamera_arg_roll": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_wire_cgb_models_expected": {
+    "ja": "赤・青・緑の等倍と縮小モデル、交差する3D線を比較します。カメラ付き投影と回転省略投影もRAMの値で確認します。",
+    "en": "Compare unity and scaled models in red, blue and green and crossing 3D lines. RAM values also check camera projection and its no-rotation variant."
+  },
+  "wire_Wire3DCGB_SetCamera_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawModel_notes": {
+    "ja": "DrawModelScaledへ倍率256を渡します。通常の128×96ステージ用で、sparse範囲は記録しません。全体転送を使うか、履歴を無効化して転送してください。",
+    "en": "Draw a model at unity Q8 scale (256), using DrawModelScaled contracts."
+  },
+  "wire_Wire3DCGB_DrawModel_purpose": {
+    "ja": "3Dモデルを指定した位置・回転で等倍描画します。",
+    "en": "Draw a 3D model at the supplied position and rotation at unity scale."
+  },
+  "wire_Wire3DCGB_DrawModel_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DCGB_DrawModel_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModel_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModel_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModel_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModel_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModel_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModel_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_notes": {
+    "ja": "頂点24・面16まで処理しますがedge_countを64には制限しません。倍率256は等倍、0以下も等倍です。近面をまたぐ辺のクリッピングはありません。共有投影領域を上書きし、通常ステージに色面をORします。",
+    "en": "Project up to 24 vertices with positive Q8 scale; nonpositive scale means\nunity. Skip unity multiplication and zero-angle rotations. Intermediates\nmust fit s16. Build up to 16 front-face flags when adjacency filtering is\navailable, then draw depth-valid edges with valid vertex indices. The model\nedge count is not capped at 64. There is no near-plane clipping. Replace\nthe shared projection cache and OR line colors into the normal 128x96 stage.\nThis path does not mark sparse bounds; arrange a full upload or explicitly\ninvalidate frame history before a sparse upload."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_purpose": {
+    "ja": "モデルを拡大縮小・回転・投影し、選択された辺を現在色で描きます。",
+    "en": "Scale, rotate and project a model, then draw its selected edges in the current color."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_arg_scale_q8": {
+    "ja": "256を等倍とする拡大率。0以下も等倍として扱います。",
+    "en": "Scale with 256 as unity; nonpositive values also mean unity."
+  },
+  "wire_Wire3DCGB_DrawModelScaled_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawModelColor_notes": {
+    "ja": "DrawModelScaledの制限に従います。描画後は呼び出し前の色に戻します。",
+    "en": "Draw a model at unity Q8 scale with a temporary color, restoring it afterward."
+  },
+  "wire_Wire3DCGB_DrawModelColor_purpose": {
+    "ja": "等倍モデルを一時的な指定色で描きます。",
+    "en": "Draw a unity-scale model in a temporary color."
+  },
+  "wire_Wire3DCGB_DrawModelColor_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DCGB_DrawModelColor_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModelColor_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModelColor_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModelColor_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModelColor_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModelColor_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModelColor_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawModelColor_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_notes": {
+    "ja": "colorの下位2ビットを使い、描画後は元の色に戻します。通常のモデル描画と同じ頂点・面・転送範囲の条件に従います。",
+    "en": "Select color & 3 around DrawModelScaled and restore entry color afterward."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_purpose": {
+    "ja": "モデルの倍率と一時的な線色を指定して描きます。",
+    "en": "Draw a model with a chosen scale and temporary line color."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_arg_scale_q8": {
+    "ja": "256を等倍とする拡大率。0以下も等倍として扱います。",
+    "en": "Scale with 256 as unity; nonpositive values also mean unity."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawModelScaledColor_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_notes": {
+    "ja": "隠線フラグと面データが必要です。頂点24・面16まで処理します。通常のC側ステージ消去を使うため、呼び出し側でWRAMバンク2を選択します。",
+    "en": "For a hidden-line model with vertices/faces, transform at most 24 vertices\nand erase front-facing triangles among at most 16 faces. Nonpositive scale\nmeans unity; this path still multiplies at unity and runs all three rotation\nhelpers at zero angles. Reject invalid/depth-failed faces. Replace the shared\nprojection cache and use the normal C stage clearer, which requires the\ncaller or allocation to provide the correct WRAM mapping."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_purpose": {
+    "ja": "投影したモデルの手前向きの面から、ステージのピクセルを消去します。",
+    "en": "Erase staged pixels inside projected front-facing model faces."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_arg_scale_q8": {
+    "ja": "256を等倍とする拡大率。0以下も等倍として扱います。",
+    "en": "Scale with 256 as unity; nonpositive values also mean unity."
+  },
+  "wire_wire_cgb_faces_expected": {
+    "ja": "塗った領域から投影した面を消し、線が残る場所と消える場所を確認します。",
+    "en": "Projected faces erase a filled region, making the retained and cleared areas visible."
+  },
+  "wire_Wire3DCGB_EraseModelFaces_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EraseTriangle2D_notes": {
+    "ja": "横区間を表示領域へ制限し、触れたタイルをdirtyにします。呼び出し側でステージのWRAMバンク2を選択します。",
+    "en": "Erase a triangle through the normal C stage clearer. Its clipped spans\nmark touched tiles dirty; caller/allocation must provide the stage WRAM mapping."
+  },
+  "wire_Wire3DCGB_EraseTriangle2D_purpose": {
+    "ja": "三角形の内部を通常ステージの両色面から消去します。",
+    "en": "Erase a triangle from both color planes of the normal stage."
+  },
+  "wire_Wire3DCGB_EraseTriangle2D_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_EraseTriangle2D_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_EraseTriangle2D_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_EraseTriangle2D_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_EraseTriangle2D_arg_cx": {
+    "ja": "頂点CのX座標（表示領域内のピクセル）。",
+    "en": "Vertex C X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_EraseTriangle2D_arg_cy": {
+    "ja": "頂点CのY座標（表示領域内のピクセル）。",
+    "en": "Vertex C Y coordinate in viewport pixels."
+  },
+  "wire_wire_cgb_erase_expected": {
+    "ja": "赤・青・緑の塗りつぶしから、三角形・横一列・矩形・圧縮輪郭を消して黒い穴を作ります。",
+    "en": "Triangles, horizontal spans, rectangles and packed silhouettes cut black holes in red, blue and green filled panels."
+  },
+  "wire_Wire3DCGB_EraseTriangle2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EraseSpan2D_notes": {
+    "ja": "Xを並べ替え、右端を127へ制限します。行または左端が範囲外なら無視します。該当タイルも転送対象に記録します。",
+    "en": "Order X endpoints, reject an off-screen row or left edge, and clamp the\nright edge to 127. Mark the range dirty and use the ASM span clearer, which\nselects and restores WRAM bank 2."
+  },
+  "wire_Wire3DCGB_EraseSpan2D_purpose": {
+    "ja": "1行の横区間を、WRAMバンクを保存・復元しながら消去します。",
+    "en": "Erase a horizontal span while saving and restoring the WRAM bank selection."
+  },
+  "wire_Wire3DCGB_EraseSpan2D_arg_y": {
+    "ja": "消去する行のY座標（ピクセル）。",
+    "en": "Pixel Y coordinate of the row to erase."
+  },
+  "wire_Wire3DCGB_EraseSpan2D_arg_x0": {
+    "ja": "最小側のX端点（表示領域内のピクセル）。",
+    "en": "Lower X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_EraseSpan2D_arg_x1": {
+    "ja": "最大側のX端点（表示領域内のピクセル）。",
+    "en": "Upper X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_EraseSpan2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawLineClipped2D_notes": {
+    "ja": "各入力は±2047以内です。最大8回の交点計算で切り詰めます。通常モードではdirty範囲も記録します。3D投影や奥行き方向のクリッピングは行わず、描画後は元の色へ戻します。",
+    "en": "Signed endpoints, clipped before conversion to the rasterizer's u8 ABI.\nClip a signed 2D line to the selected viewport, then draw with temporary\ncolor. Inputs outside +/-2047 are rejected. Fully in-bounds 128x96 lines\nuse a fast path; other lines use outcodes and bounded integer intersections\nwith an eight-iteration guard. Accepted normal-mode lines mark dirty bounds.\nThis is screen clipping only, with no 3D projection or depth clipping."
+  },
+  "wire_Wire3DCGB_DrawLineClipped2D_purpose": {
+    "ja": "符号付きの画面座標を表示領域へ切り詰め、指定色の線を描きます。",
+    "en": "Clip signed screen coordinates to the viewport and draw a line in the requested color."
+  },
+  "wire_Wire3DCGB_DrawLineClipped2D_arg_x0": {
+    "ja": "最小側のX端点（表示領域内のピクセル）。",
+    "en": "Lower X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_DrawLineClipped2D_arg_y0": {
+    "ja": "最小側のY端点（表示領域内のピクセル）。",
+    "en": "Lower Y endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_DrawLineClipped2D_arg_x1": {
+    "ja": "最大側のX端点（表示領域内のピクセル）。",
+    "en": "Upper X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_DrawLineClipped2D_arg_y1": {
+    "ja": "最大側のY端点（表示領域内のピクセル）。",
+    "en": "Upper Y endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_DrawLineClipped2D_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawLineClipped2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_notes": {
+    "ja": "頂点1～24・辺64以下で、全インデックスとポインタが必要です。各座標と中心は±2047以内。加算後に±2047を超える端点は線クリッパーで拒否される場合があります。色を保持し、共有画面作業領域を書き換えます。",
+    "en": "Validate pointers, 1..24 vertices, at most 64 edges, every index and\ninput coordinates/centers in +/-2047 before drawing. Fully visible geometry\nuses signed-byte scratch and the fast indexed path; other edges use the\nsigned line clipper. That clipper may reject translated endpoints beyond\n+/-2047 even when individual inputs passed. Replace shared screen scratch\nand preserve the previous color through the called line APIs."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_purpose": {
+    "ja": "符号付きの投影済み頂点と辺を検証して、画面外の辺を切り詰めて描きます。",
+    "en": "Validate signed projected vertices and edges, then clip and draw the edge list."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_arg_edges": {
+    "ja": "辺の両端の頂点番号。構造体またはバイト対という宣言の形式に従います。",
+    "en": "Vertex indices for each edge, in the declared struct or byte-pair format."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_arg_edge_count": {
+    "ja": "辺の本数。",
+    "en": "Number of edges."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_arg_vx": {
+    "ja": "クリッピング前の符号付き16ビットX変位配列。",
+    "en": "Signed 16-bit X-offset array before clipping."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_arg_vy": {
+    "ja": "クリッピング前の符号付き16ビットY変位配列。",
+    "en": "Signed 16-bit Y-offset array before clipping."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_arg_vertex_count": {
+    "ja": "頂点配列の要素数。",
+    "en": "Number of vertex-array entries."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_arg_cx": {
+    "ja": "表示領域内の中心X座標（ピクセル）。",
+    "en": "Center X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_arg_cy": {
+    "ja": "表示領域内の中心Y座標（ピクセル）。",
+    "en": "Center Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_wire_cgb_lists_expected": {
+    "ja": "赤い上下2辺、青い正方形、左端で切れた緑の枠、緑の6ピクセル記号、赤い弾を描き、各リスト形式を比較します。",
+    "en": "Two red horizontal edges, a blue square, a clipped green frame, a green six-pixel marker and a red projectile compare the list formats."
+  },
+  "wire_Wire3DCGB_DrawEdgeListClipped2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_ProjectAxis48_notes": {
+    "ja": "カメラや画面中心は加えません。小さい・負のZは4にし、Zが255を超える間は深度と成分を一緒に右シフトします。成分の大きさは160へ制限します。近面・遠面での拒否はありません。",
+    "en": "Approximate value*48/z without a camera or screen-center offset. Negative\nor very small Z becomes 4. For Z above 255, shift depth and magnitude\nright together until depth fits a byte, then cap magnitude at 160.\nReturn a signed offset; this helper does not reject near/far depths."
+  },
+  "wire_Wire3DCGB_ProjectAxis48_purpose": {
+    "ja": "1成分を奥行きで割り、焦点距離48相当の画面上の変位へ近似変換します。",
+    "en": "Approximate one projected offset with a focal length of 48."
+  },
+  "wire_Wire3DCGB_ProjectAxis48_arg_value": {
+    "ja": "投影する符号付き16ビットの成分。",
+    "en": "Signed 16-bit component to project."
+  },
+  "wire_Wire3DCGB_ProjectAxis48_arg_z": {
+    "ja": "大きさの選択または投影に使う奥行き。",
+    "en": "Depth used to select size or compute projection."
+  },
+  "wire_Wire3DCGB_ProjectAxis48_return": {
+    "ja": "近似投影した符号付き16ビットの変位。",
+    "en": "The approximate signed 16-bit projected offset."
+  },
+  "wire_Wire3DCGB_InvalidateFrameHistory_notes": {
+    "ja": "ピクセルは消しません。範囲を記録しない描画関数の後や、バンクの内容を信用できない場合に、sparse転送へ全域を含めさせます。",
+    "en": "Mark current and both previous sparse ranges as all 192 normal-mode\ntiles. Pixel data is not cleared; subsequent uploads cannot trust old ranges."
+  },
+  "wire_Wire3DCGB_InvalidateFrameHistory_purpose": {
+    "ja": "現在と過去2つの転送範囲を192タイル全体へ広げます。",
+    "en": "Expand current and two previous transfer ranges to all 192 normal-mode tiles."
+  },
+  "wire_Wire3DCGB_InvalidateFrameHistory_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EnableAtomicMaps_notes": {
+    "ja": "初期化時に1回呼びます。全画面または設定済みなら無視します。LCDを停止して9800を9C00へ複写し、それぞれの属性を別のタイルバンクへ割り当てます。両マップを予約し、HUD予約も両方へ反映します。",
+    "en": "Startup-only: reserves both BG maps; queued HUD tiles are mirrored.\nEnable map flipping once during 128x96 startup; ignore full-screen mode\nor an already-enabled setting. With LCD on, wait for VBlank, disable it,\ncopy both banks of 9800 to 9C00, and assign viewport attributes to tile\nbanks 0/1 respectively. Restore LCDC with map 9C00 selected and VBK zero.\nBoth BG maps become reserved. Queued HUD tile numbers are mirrored."
+  },
+  "wire_Wire3DCGB_EnableAtomicMaps_purpose": {
+    "ja": "128×96表示を2つの背景マップの切り替えで提示するよう設定します。",
+    "en": "Configure 128x96 presentation to alternate between two background maps."
+  },
+  "wire_Wire3DCGB_EnableAtomicMaps_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EraseRect2D_notes": {
+    "ja": "座標を並べ替え128×96へ制限します。高さ全体の左16/24列は専用ASMを使いますが、一般の矩形はC処理なので呼び出し側でWRAMバンク2を選択します。",
+    "en": "Order and clip the rectangle to 128x96. Full-height left strips of 16 or\n24 pixels use bank-preserving ASM clears and dirty marking. Other rectangles\nuse C row clears and require the correct stage WRAM mapping from the caller."
+  },
+  "wire_Wire3DCGB_EraseRect2D_purpose": {
+    "ja": "矩形内の通常ステージのピクセルを消去します。",
+    "en": "Erase a rectangle from the normal stage."
+  },
+  "wire_Wire3DCGB_EraseRect2D_arg_x0": {
+    "ja": "最小側のX端点（表示領域内のピクセル）。",
+    "en": "Lower X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_EraseRect2D_arg_y0": {
+    "ja": "最小側のY端点（表示領域内のピクセル）。",
+    "en": "Lower Y endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_EraseRect2D_arg_x1": {
+    "ja": "最大側のX端点（表示領域内のピクセル）。",
+    "en": "Upper X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_EraseRect2D_arg_y1": {
+    "ja": "最大側のY端点（表示領域内のピクセル）。",
+    "en": "Upper Y endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DCGB_EraseRect2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EraseLeftGuard24Fast_notes": {
+    "ja": "WRAMバンクを保存・復元します。dirty範囲を記録しないため、sparse転送では消去したタイルを別途含めます。",
+    "en": "Clear the leftmost 24 stage columns through bank-preserving ASM. No dirty\nrange is marked; sparse-transfer callers must include the cleared tiles."
+  },
+  "wire_Wire3DCGB_EraseLeftGuard24Fast_purpose": {
+    "ja": "通常ステージの左24列を一括で消去します。",
+    "en": "Clear the leftmost 24 columns of the normal stage."
+  },
+  "wire_wire_cgb_guard_expected": {
+    "ja": "左24列の消去と外周描画を比較します。内側の左24列は黒、残る帯は赤、色番号2の外周は青です。",
+    "en": "The left 24 columns are cleared, a red strip remains, and the color-index-2 outer border is blue."
+  },
+  "wire_Wire3DCGB_EraseLeftGuard24Fast_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawWhiteBorderFast_notes": {
+    "ja": "実際の色はパレットによって決まります。サンプルでは青です。内部とWRAMバンクを保持し、dirty範囲は記録しません。",
+    "en": "Write a one-pixel color-2 border around the normal stage, preserving\ninterior pixels and WRAM bank selection. Its visible color depends on the\npalette. No dirty range is marked; sparse callers must arrange its upload."
+  },
+  "wire_Wire3DCGB_DrawWhiteBorderFast_purpose": {
+    "ja": "128×96ステージの外周に色番号2の1ピクセル枠を描きます。",
+    "en": "Draw a one-pixel color-index-2 border around the 128x96 stage."
+  },
+  "wire_Wire3DCGB_DrawWhiteBorderFast_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_ClearOcclusionMask_notes": {
+    "ja": "表示中・ステージのピクセルと隠線の有効設定は変更しません。現在モードに対応するマスクを消去します。",
+    "en": "Clear full-screen span history when full_mode is set; otherwise clear the\n128x96 bitmap mask and its bounds. This does not erase displayed/staged\npixels or change whether occlusion testing is enabled."
+  },
+  "wire_Wire3DCGB_ClearOcclusionMask_purpose": {
+    "ja": "隠線判定用のマスクまたは全画面の区間履歴を空にします。",
+    "en": "Clear the occlusion bitmap or full-screen span history."
+  },
+  "wire_wire_cgb_mask_expected": {
+    "ja": "三角形のマスクで赤い横線の中央を隠し、圧縮輪郭のマスクで青い線を隠します。緑の輪郭が遮蔽領域の位置を示します。",
+    "en": "A triangle masks the middle of red scanlines; a packed silhouette masks blue lines. Green outlines locate the occluding region."
+  },
+  "wire_Wire3DCGB_ClearOcclusionMask_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_SetOcclusionActive_notes": {
+    "ja": "0を無効、それ以外を1として保存します。マスクの消去や面の登録は別途行います。",
+    "en": "Normalize active to zero or one and store it as the occlusion switch.\nNo mask clearing or geometry marking occurs."
+  },
+  "wire_Wire3DCGB_SetOcclusionActive_purpose": {
+    "ja": "後続の線に隠線判定を適用するかを設定します。",
+    "en": "Enable or disable occlusion testing for subsequent lines."
+  },
+  "wire_Wire3DCGB_SetOcclusionActive_arg_active": {
+    "ja": "0で隠線判定を無効、それ以外で有効にします。",
+    "en": "Zero disables occlusion testing; any other value enables it."
+  },
+  "wire_Wire3DCGB_SetOcclusionActive_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_MarkTriangle2D_notes": {
+    "ja": "ピクセルは描かず、隠線処理も自動では有効にしません。頂点は表示領域内に指定します。左右に1ピクセルの余裕を加え、通常モードは127、全画面は159で右端を制限します。",
+    "en": "Mark a screen-space triangle without drawing pixels or enabling occlusion.\nSupply vertices inside the selected viewport. The active ASM adds a one-pixel\nX guard, limited to 0..127 in 128x96 mode or 0..159 in 160x144 mode.\nThis function does not clip arbitrary out-of-bounds triangles."
+  },
+  "wire_Wire3DCGB_MarkTriangle2D_purpose": {
+    "ja": "三角形を、後から描く線を隠す領域として登録します。",
+    "en": "Register a triangle as coverage that can hide subsequently drawn lines."
+  },
+  "wire_Wire3DCGB_MarkTriangle2D_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_MarkTriangle2D_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_MarkTriangle2D_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_MarkTriangle2D_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_MarkTriangle2D_arg_cx": {
+    "ja": "頂点CのX座標（表示領域内のピクセル）。",
+    "en": "Vertex C X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_MarkTriangle2D_arg_cy": {
+    "ja": "頂点CのY座標（表示領域内のピクセル）。",
+    "en": "Vertex C Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_MarkTriangle2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_MarkPackedSilhouette2D_notes": {
+    "ja": "最大29行です。上位4ビット−7が中心ずれ、下位4ビットが半幅、0xFFは行を省略します。y+y0から配置し、左右に2ピクセルを加えて切り詰めます。NULLは無視し、隠線設定や全画面区間は変更しません。",
+    "en": "Mark up to 29 silhouette rows in the 128x96 bitmap mask. Each packed byte\nuses its high nibble for center offset (nibble-7), low nibble for half-width;\n0xFF skips a row. Place rows at y+y0+i, expand spans by two pixels, and clip\nto the viewport. profile must contain count readable bytes; null is ignored.\nThis does not update full-screen spans or enable occlusion."
+  },
+  "wire_Wire3DCGB_MarkPackedSilhouette2D_purpose": {
+    "ja": "圧縮した行別の輪郭を、128×96の隠線マスクへ登録します。",
+    "en": "Mark a packed row-by-row silhouette in the 128x96 occlusion bitmap."
+  },
+  "wire_Wire3DCGB_MarkPackedSilhouette2D_arg_profile": {
+    "ja": "1行1バイトの輪郭配列。0xFFは行を省略します。",
+    "en": "One-byte-per-row silhouette array; 0xFF skips a row."
+  },
+  "wire_Wire3DCGB_MarkPackedSilhouette2D_arg_count": {
+    "ja": "渡した配列の要素数。関数固有の処理上限は注意事項を参照してください。",
+    "en": "Number of supplied array entries; see the operation-specific processing limit."
+  },
+  "wire_Wire3DCGB_MarkPackedSilhouette2D_arg_y0": {
+    "ja": "中心Yから先頭行までの符号付きずれ。",
+    "en": "Signed offset from center Y to the first silhouette row."
+  },
+  "wire_Wire3DCGB_MarkPackedSilhouette2D_arg_x": {
+    "ja": "表示領域内の中心X座標（ピクセル）。",
+    "en": "Center X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_MarkPackedSilhouette2D_arg_y": {
+    "ja": "表示領域内の中心Y座標（ピクセル）。",
+    "en": "Center Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_MarkPackedSilhouette2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_ErasePackedSilhouette2D_notes": {
+    "ja": "最大29行、配置・2ピクセルの余裕・形式はMarkPackedSilhouette2Dと共通です。ASMがWRAMバンク2を保存・復元します。dirty範囲は記録しないため転送対象を別途確保します。",
+    "en": "Erase up to 29 packed silhouette rows from both staged bitplanes. Format,\nplacement, two-pixel guard and clipping match MarkPackedSilhouette2D; null\nis ignored. The ASM span writer selects/restores WRAM bank 2 but does not\nmark dirty tiles. In sparse mode the caller must ensure erased tiles are\nincluded in the upload range. This API targets the 128x96 stage."
+  },
+  "wire_Wire3DCGB_ErasePackedSilhouette2D_purpose": {
+    "ja": "圧縮した輪郭の内側を、通常ステージの両色面から消去します。",
+    "en": "Erase a packed silhouette from both color planes of the normal stage."
+  },
+  "wire_Wire3DCGB_ErasePackedSilhouette2D_arg_profile": {
+    "ja": "1行1バイトの輪郭配列。0xFFは行を省略します。",
+    "en": "One-byte-per-row silhouette array; 0xFF skips a row."
+  },
+  "wire_Wire3DCGB_ErasePackedSilhouette2D_arg_count": {
+    "ja": "渡した配列の要素数。関数固有の処理上限は注意事項を参照してください。",
+    "en": "Number of supplied array entries; see the operation-specific processing limit."
+  },
+  "wire_Wire3DCGB_ErasePackedSilhouette2D_arg_y0": {
+    "ja": "中心Yから先頭行までの符号付きずれ。",
+    "en": "Signed offset from center Y to the first silhouette row."
+  },
+  "wire_Wire3DCGB_ErasePackedSilhouette2D_arg_x": {
+    "ja": "表示領域内の中心X座標（ピクセル）。",
+    "en": "Center X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_ErasePackedSilhouette2D_arg_y": {
+    "ja": "表示領域内の中心Y座標（ピクセル）。",
+    "en": "Center Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_ErasePackedSilhouette2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawScene_notes": {
+    "ja": "呼び出し側の配列は並べ替えません。通常128×96用です。color=0はその時点の色を引き継ぎます。マスクを消してから描き、終了時に元の色を戻して隠線設定を解除します。モデルの面・頂点番号は有効なものを用意します。",
+    "en": "Sort at most eight objects near-to-far by camera-space origin depth,\nwithout changing the caller array. Clear the mask, draw visible models\nagainst earlier coverage, then add their faces as occluders. Model arrays\nand face indices must be valid. Color zero inherits the current color,\npossibly from the preceding object. Restore entry color and disable\nocclusion at the end. This model path targets the normal 128x96 stage."
+  },
+  "wire_Wire3DCGB_DrawScene_purpose": {
+    "ja": "最大8物体を近い順に描き、手前のモデルの面で後方の線を隠します。",
+    "en": "Draw up to eight objects near to far, using earlier model faces to occlude later lines."
+  },
+  "wire_Wire3DCGB_DrawScene_arg_objects": {
+    "ja": "位置・回転・倍率・visibleを持つ物体配列。",
+    "en": "Object array containing positions, rotations, scales and visibility flags."
+  },
+  "wire_Wire3DCGB_DrawScene_arg_count": {
+    "ja": "渡した配列の要素数。関数固有の処理上限は注意事項を参照してください。",
+    "en": "Number of supplied array entries; see the operation-specific processing limit."
+  },
+  "wire_wire_cgb_scene_expected": {
+    "ja": "手前の赤い正方形(46,30)～(82,66)が、後方の青い横線の中央を隠します。青線は左右だけに見えることを期待します。",
+    "en": "A near red square at (46,30)..(82,66) hides the middle of a farther blue horizontal line; only the left and right segments remain visible."
+  },
+  "wire_Wire3DCGB_DrawScene_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawFastCubes_notes": {
+    "ja": "生のZで遠い順に描き、カメラと回転は使いません。selectedは元配列の番号です。NULL・0個は無視し、配列を並べ替えません。描画後の色は元に戻しません。",
+    "en": "Draw at most three 2D cube approximations, sorted far-to-near by raw Z\nwithout reordering the caller array. Null/empty input is ignored. selected\nis an original array index. Camera/rotation are unused and color is not restored."
+  },
+  "wire_Wire3DCGB_DrawFastCubes_purpose": {
+    "ja": "最大3個の立方体を、奥行きに応じた大きさの2D輪郭で素早く表現します。",
+    "en": "Draw up to three cubes as depth-sized 2D outlines."
+  },
+  "wire_Wire3DCGB_DrawFastCubes_arg_cubes": {
+    "ja": "簡易立方体の位置・角度・色の配列。",
+    "en": "Array of positions, angles and colors for fast cube drawing."
+  },
+  "wire_Wire3DCGB_DrawFastCubes_arg_count": {
+    "ja": "渡した配列の要素数。関数固有の処理上限は注意事項を参照してください。",
+    "en": "Number of supplied array entries; see the operation-specific processing limit."
+  },
+  "wire_Wire3DCGB_DrawFastCubes_arg_hidden_enabled": {
+    "ja": "0なら隠れた辺も表示し、それ以外なら簡易的に隠します。",
+    "en": "Zero includes hidden edges; nonzero selects simplified hidden-edge removal."
+  },
+  "wire_Wire3DCGB_DrawFastCubes_arg_selected": {
+    "ja": "選択物体の元配列番号。スタンプ版では状態表示の番号です。",
+    "en": "Original array index of the selected object; the stamp API uses it for a status indicator."
+  },
+  "wire_wire_cgb_cubes_expected": {
+    "ja": "左の近い赤い立方体を大きく、右の遠い青い立方体を小さく描きます。赤い立方体の中心の緑の十字が選択状態です。",
+    "en": "A nearby red cube on the left is larger than a distant blue cube on the right. A green cross marks the selected red cube."
+  },
+  "wire_Wire3DCGB_DrawFastCubes_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawFastStatus_notes": {
+    "ja": "色3で描き、範囲もdirtyへ追加します。文字タイルではありません。selectedは0～2を指定し、値の検査は行いません。元の色は復元しません。",
+    "en": "Draw small selection/hidden-mode indicators in color 3 and mark their\nnormal-mode bounds dirty. selected is expected in 0..2; it is not checked.\nThese indicators use lines, not font tiles, and the old color is not restored."
+  },
+  "wire_Wire3DCGB_DrawFastStatus_purpose": {
+    "ja": "選択中の物体と隠線モードを示す、小さな線状の表示を描きます。",
+    "en": "Draw small line indicators for object selection and hidden-line mode."
+  },
+  "wire_Wire3DCGB_DrawFastStatus_arg_hidden_enabled": {
+    "ja": "0なら隠れた辺も表示し、それ以外なら簡易的に隠します。",
+    "en": "Zero includes hidden edges; nonzero selects simplified hidden-edge removal."
+  },
+  "wire_Wire3DCGB_DrawFastStatus_arg_selected": {
+    "ja": "選択物体の元配列番号。スタンプ版では状態表示の番号です。",
+    "en": "Original array index of the selected object; the stamp API uses it for a status indicator."
+  },
+  "wire_Wire3DCGB_DrawFastStatus_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawFastCubeFrame_notes": {
+    "ja": "32×32スタンプを8ピクセル単位で配置し、生のZで遠い順に並べます。Initで生成タイルを準備し、安定したFastMapのWRAM対応を保ちます。selectedの下位2ビットは状態表示の位置です。NULLは完全に無視、非NULLで0個なら古い表示を消します。",
+    "en": "Prepare the map, erase prior bounds/status cells, sort up to three cube\nstamps far-to-near by raw Z, then draw and upload numbers/attributes at\nVBlank. The caller array is not reordered. Non-null count zero clears\nold stamps; a null array is a complete no-op. selected & 3 chooses the\nstatus cell only, not a cube highlight. Requires loaded cube stamps, the\nfull runtime and consistent FastMap WRAM mapping; it does not initialize them."
+  },
+  "wire_Wire3DCGB_DrawFastCubeFrame_purpose": {
+    "ja": "立方体スタンプの前フレームを消し、最大3個の配置と状態表示を背景マップへ転送します。",
+    "en": "Replace the preceding cube-stamp frame and upload up to three stamps plus status indicators."
+  },
+  "wire_Wire3DCGB_DrawFastCubeFrame_arg_cubes": {
+    "ja": "簡易立方体の位置・角度・色の配列。",
+    "en": "Array of positions, angles and colors for fast cube drawing."
+  },
+  "wire_Wire3DCGB_DrawFastCubeFrame_arg_count": {
+    "ja": "渡した配列の要素数。関数固有の処理上限は注意事項を参照してください。",
+    "en": "Number of supplied array entries; see the operation-specific processing limit."
+  },
+  "wire_Wire3DCGB_DrawFastCubeFrame_arg_hidden_enabled": {
+    "ja": "0なら隠れた辺も表示し、それ以外なら簡易的に隠します。",
+    "en": "Zero includes hidden edges; nonzero selects simplified hidden-edge removal."
+  },
+  "wire_Wire3DCGB_DrawFastCubeFrame_arg_selected": {
+    "ja": "選択物体の元配列番号。スタンプ版では状態表示の番号です。",
+    "en": "Original array index of the selected object; the stamp API uses it for a status indicator."
+  },
+  "wire_wire_cgb_stamp_expected": {
+    "ja": "古い立方体スタンプを消し、(72,32)を起点とする32×32の赤い立方体と、上端の緑の状態表示を描きます。",
+    "en": "The old cube stamp disappears. A red 32x32 cube begins at (72,32), with green status indicators at the top."
+  },
+  "wire_Wire3DCGB_DrawFastCubeFrame_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawFastProjectile_notes": {
+    "ja": "中心はX=10～117、Y=10～85です。4段階の大きさと(phase>>3)&3の向きを使います。カメラは適用せず、範囲をdirtyへ記録し、指定色を保持します。",
+    "en": "Draw a six-edge projectile at an already-projected center using four\ndepth size bands and four phase orientations. Reject centers outside\nX=10..117 or Y=10..85, mark the bounds dirty and leave the requested color\nselected. This uses the normal rasterizer and does not apply the camera."
+  },
+  "wire_Wire3DCGB_DrawFastProjectile_purpose": {
+    "ja": "投影済みの中心に、奥行きと位相で変わる6辺の弾を描きます。",
+    "en": "Draw a six-edge projectile at an already projected center, with size and orientation selected by depth and phase."
+  },
+  "wire_Wire3DCGB_DrawFastProjectile_arg_x": {
+    "ja": "表示領域内の中心X座標（ピクセル）。",
+    "en": "Center X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawFastProjectile_arg_y": {
+    "ja": "表示領域内の中心Y座標（ピクセル）。",
+    "en": "Center Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawFastProjectile_arg_z": {
+    "ja": "大きさの選択または投影に使う奥行き。",
+    "en": "Depth used to select size or compute projection."
+  },
+  "wire_Wire3DCGB_DrawFastProjectile_arg_phase": {
+    "ja": "8カウントで向きが変わる回転位相。",
+    "en": "Rotation phase, advancing one orientation every eight counts."
+  },
+  "wire_Wire3DCGB_DrawFastProjectile_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawFastProjectile_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_FastMapBegin_notes": {
+    "ja": "シャドーマップの16～31列は保持します。ハードウェア初期化と転送は行いません。完全版ランタイムと安定したWRAM対応が必要です。",
+    "en": "Mark FastMap prepared and clear tile numbers/attributes in its 16x12\nviewport. Shadow columns 16..31 are retained even though flush copies\n32 columns per row. Requires the full runtime and a stable FastMap WRAM\nmapping; this does not initialize hardware or upload the map."
+  },
+  "wire_Wire3DCGB_FastMapBegin_purpose": {
+    "ja": "FastMapの16×12セルのタイル番号と属性を空にします。",
+    "en": "Clear tile numbers and attributes in the 16x12 FastMap viewport."
+  },
+  "wire_Wire3DCGB_FastMapBegin_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_FastMapBeginTilesOnly_notes": {
+    "ja": "属性と16～31列は保持します。背景色の設定を残して番号を入れ替える場合に使います。転送は別の操作です。",
+    "en": "Mark FastMap prepared and clear only its 16x12 tile-number viewport.\nKeep attributes and columns 16..31. Requires the full runtime and the\nintended WRAM mapping; hardware initialization/upload is separate."
+  },
+  "wire_Wire3DCGB_FastMapBeginTilesOnly_purpose": {
+    "ja": "FastMapの16×12セルのタイル番号だけを消去します。",
+    "en": "Clear only tile numbers in the 16x12 FastMap viewport."
+  },
+  "wire_Wire3DCGB_FastMapBeginTilesOnly_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_FastMapCell_notes": {
+    "ja": "maskの1/2/4/8が上/下/左/右です。同色の辺は合成し、違う色は置換します。mask=0は無視、color=0は2、3超は3です。16×12の範囲に描きます。",
+    "en": "Add outline sides to a cell: bits 1/2/4/8 mean top/bottom/left/right.\nSame-color masks combine; another color replaces the old mask. Zero mask\nis ignored, zero color means MAIN, and color above 3 clamps to 3. Target\nthe 16x12 shadow with stable WRAM mapping; full runtime required."
+  },
+  "wire_Wire3DCGB_FastMapCell_purpose": {
+    "ja": "1セルへ、指定色の上・下・左・右の輪郭を追加します。",
+    "en": "Add selected top, bottom, left and right outline sides to one map cell."
+  },
+  "wire_Wire3DCGB_FastMapCell_arg_tx": {
+    "ja": "タイル単位のX座標。",
+    "en": "Tile-coordinate X position."
+  },
+  "wire_Wire3DCGB_FastMapCell_arg_ty": {
+    "ja": "タイル単位のY座標。",
+    "en": "Tile-coordinate Y position."
+  },
+  "wire_Wire3DCGB_FastMapCell_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_FastMapCell_arg_mask": {
+    "ja": "セルの辺指定。1=上、2=下、4=左、8=右。",
+    "en": "Cell-side mask: 1=top, 2=bottom, 4=left, 8=right."
+  },
+  "wire_Wire3DCGB_FastMapCell_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_FastMapRect_notes": {
+    "ja": "座標を並べ替え16×12へ制限します。sidesの1/2/4/8が上/下/左/右です。内部は保持します。角を区別するには縦横2セル以上を使います。重なる角は順に上書きされます。",
+    "en": "Order and clip byte tile coordinates to 16x12, then replace selected\nborder cells. Side bits 1/2/4/8 mean top/bottom/left/right. Zero color\nmeans MAIN; values above 3 clamp to 3. Attributes and interior cells remain.\nUse at least two rows/columns for distinct corners; coincident corners\nare overwritten in sequence. Requires full runtime and stable WRAM mapping."
+  },
+  "wire_Wire3DCGB_FastMapRect_purpose": {
+    "ja": "タイル単位の矩形へ、指定した側の輪郭を配置します。",
+    "en": "Place selected outline sides around a tile-coordinate rectangle."
+  },
+  "wire_Wire3DCGB_FastMapRect_arg_tx0": {
+    "ja": "タイル単位のX座標。",
+    "en": "Tile-coordinate X position."
+  },
+  "wire_Wire3DCGB_FastMapRect_arg_ty0": {
+    "ja": "タイル単位のY座標。",
+    "en": "Tile-coordinate Y position."
+  },
+  "wire_Wire3DCGB_FastMapRect_arg_tx1": {
+    "ja": "タイル単位のX座標。",
+    "en": "Tile-coordinate X position."
+  },
+  "wire_Wire3DCGB_FastMapRect_arg_ty1": {
+    "ja": "タイル単位のY座標。",
+    "en": "Tile-coordinate Y position."
+  },
+  "wire_Wire3DCGB_FastMapRect_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_FastMapRect_arg_sides": {
+    "ja": "矩形の辺指定。1=上、2=下、4=左、8=右。",
+    "en": "Rectangle-side mask: 1=top, 2=bottom, 4=left, 8=right."
+  },
+  "wire_Wire3DCGB_FastMapRect_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_FastMapFlush_notes": {
+    "ja": "1行32列をマップ9800へ送ります。LCD有効時は新しいVBlankを待ち、停止中は直ちに進みます。GDMAに必要な安全な期間とWRAM対応を確保します。",
+    "en": "Wait for a fresh VBlank when LCD is enabled, then upload the first\ntwelve complete map rows of tile numbers and attributes to map 9800.\nLCD-off callers proceed immediately. Requires the full runtime, stable\nWRAM mapping and enough safe time for both immediate GDMA transfers."
+  },
+  "wire_Wire3DCGB_FastMapFlush_purpose": {
+    "ja": "シャドーマップの先頭12行のタイル番号と属性をVRAMへ転送します。",
+    "en": "Upload the first twelve complete rows of shadow tile numbers and attributes to VRAM."
+  },
+  "wire_Wire3DCGB_FastMapFlush_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_FastMapFlushTilesOnly_notes": {
+    "ja": "属性は変更しません。LCD有効時は新しいVBlankを待ちます。1行32列を転送し、完全版ランタイムと安全なGDMA期間が必要です。",
+    "en": "Wait for a fresh VBlank when LCD is enabled and upload only the first\ntwelve complete rows of tile numbers to map 9800. Attributes remain.\nRequires the full runtime, stable WRAM mapping and a safe GDMA interval."
+  },
+  "wire_Wire3DCGB_FastMapFlushTilesOnly_purpose": {
+    "ja": "シャドーマップの先頭12行のタイル番号だけをVRAMへ転送します。",
+    "en": "Upload only tile numbers in the first twelve complete shadow-map rows."
+  },
+  "wire_Wire3DCGB_FastMapFlushTilesOnly_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_ProjectPoint_notes": {
+    "ja": "深度8～255を受理し、失敗時は0で出力を保持します。成功時は画面内へ制限した座標を書きます。全画面160×144用の投影ではありません。完全版ランタイムが必要です。",
+    "en": "Project a world-space point through the current camera to the 128x96 viewport.\nReturn zero for rejected depth and leave outputs unchanged; otherwise write\nclamped byte coordinates. Valid writable pointers are required. This is not\nthe 160x144 full-screen projector. Absent from MINIMAL_RUNTIME builds."
+  },
+  "wire_Wire3DCGB_ProjectPoint_purpose": {
+    "ja": "世界座標の点をカメラから128×96の画面座標へ投影します。",
+    "en": "Project a world-space point through the camera to the 128x96 viewport."
+  },
+  "wire_Wire3DCGB_ProjectPoint_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DCGB_ProjectPoint_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DCGB_ProjectPoint_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DCGB_ProjectPoint_arg_sx": {
+    "ja": "投影結果のX座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected X coordinate."
+  },
+  "wire_Wire3DCGB_ProjectPoint_arg_sy": {
+    "ja": "投影結果のY座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected Y coordinate."
+  },
+  "wire_Wire3DCGB_ProjectPoint_return": {
+    "ja": "投影成功時は1、深度で拒否した場合は0です。",
+    "en": "Returns 1 on successful projection or 0 on depth rejection."
+  },
+  "wire_Wire3DCGB_ProjectPointNoRotation_notes": {
+    "ja": "カメラ角度がすべて0の用途に使います。128×96へ投影し、深度拒否時は出力を保持します。カメラに角度を設定してもこの関数は無視します。",
+    "en": "Fast path for games whose camera pitch, yaw, and roll stay at zero.\nSubtract camera position and project to 128x96 while ignoring all camera angles.\nUse when camera pitch, yaw and roll are zero. Reject invalid depth without\nchanging output pointers; successful coordinates are clamped to the viewport.\nAbsent from MINIMAL_RUNTIME builds."
+  },
+  "wire_Wire3DCGB_ProjectPointNoRotation_purpose": {
+    "ja": "カメラ位置だけを差し引いて、回転計算なしで点を投影します。",
+    "en": "Project a point after subtracting camera position, without camera rotation."
+  },
+  "wire_Wire3DCGB_ProjectPointNoRotation_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DCGB_ProjectPointNoRotation_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DCGB_ProjectPointNoRotation_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DCGB_ProjectPointNoRotation_arg_sx": {
+    "ja": "投影結果のX座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected X coordinate."
+  },
+  "wire_Wire3DCGB_ProjectPointNoRotation_arg_sy": {
+    "ja": "投影結果のY座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected Y coordinate."
+  },
+  "wire_Wire3DCGB_ProjectPointNoRotation_return": {
+    "ja": "投影成功時は1、深度で拒否した場合は0です。",
+    "en": "Returns 1 on successful projection or 0 on depth rejection."
+  },
+  "wire_Wire3DCGB_DrawLine3D_notes": {
+    "ja": "片方でも深度範囲外なら線全体を省略します。投影は128×96基準です。通常の線はsparse範囲を記録しないため、全体転送か履歴無効化を使います。",
+    "en": "Project both endpoints through the camera into the 128x96 viewport.\nReject the whole line if either endpoint fails the depth test; do not clip\nnear-plane crossings. DrawLine2D dispatches by mode, but projection remains\n128x96. Normal lines accumulate color planes and do not mark sparse bounds;\nuse a full upload or explicitly invalidate frame history for sparse upload."
+  },
+  "wire_Wire3DCGB_DrawLine3D_purpose": {
+    "ja": "世界座標の両端をカメラで投影し、現在色の線を描きます。",
+    "en": "Project world-space endpoints through the camera and draw a line in the current color."
+  },
+  "wire_Wire3DCGB_DrawLine3D_arg_ax": {
+    "ja": "世界座標の始点のX成分。",
+    "en": "Start point’s world-space X component."
+  },
+  "wire_Wire3DCGB_DrawLine3D_arg_ay": {
+    "ja": "世界座標の始点のY成分。",
+    "en": "Start point’s world-space Y component."
+  },
+  "wire_Wire3DCGB_DrawLine3D_arg_az": {
+    "ja": "世界座標の始点のZ成分。",
+    "en": "Start point’s world-space Z component."
+  },
+  "wire_Wire3DCGB_DrawLine3D_arg_bx": {
+    "ja": "世界座標の終点のX成分。",
+    "en": "End point’s world-space X component."
+  },
+  "wire_Wire3DCGB_DrawLine3D_arg_by": {
+    "ja": "世界座標の終点のY成分。",
+    "en": "End point’s world-space Y component."
+  },
+  "wire_Wire3DCGB_DrawLine3D_arg_bz": {
+    "ja": "世界座標の終点のZ成分。",
+    "en": "End point’s world-space Z component."
+  },
+  "wire_Wire3DCGB_DrawLine3D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_notes": {
+    "ja": "colorの下位2ビットを使い、終了時に元の色へ戻します。投影・深度拒否・転送範囲の条件はDrawLine3Dに従います。",
+    "en": "Temporarily select color & 3 for DrawLine3D, then restore the old color."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_purpose": {
+    "ja": "3Dの線を一時的な指定色で描きます。",
+    "en": "Draw a 3D line in a temporary color."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_arg_ax": {
+    "ja": "世界座標の始点のX成分。",
+    "en": "Start point’s world-space X component."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_arg_ay": {
+    "ja": "世界座標の始点のY成分。",
+    "en": "Start point’s world-space Y component."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_arg_az": {
+    "ja": "世界座標の始点のZ成分。",
+    "en": "Start point’s world-space Z component."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_arg_bx": {
+    "ja": "世界座標の終点のX成分。",
+    "en": "End point’s world-space X component."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_arg_by": {
+    "ja": "世界座標の終点のY成分。",
+    "en": "End point’s world-space Y component."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_arg_bz": {
+    "ja": "世界座標の終点のZ成分。",
+    "en": "End point’s world-space Z component."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawLine3DColor_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawPoint2D_notes": {
+    "ja": "通常モードは128×96を検査し、dirty範囲を記録して色を置換します。色0なら消去できます。全画面では同一点の線として描くため0は色3、不正座標はoverflowを設定します。",
+    "en": "In normal mode, reject coordinates outside 128x96, mark sparse bounds\nand replace the staged pixel using the current color, including zero.\nFull-screen mode draws a coincident-endpoint fast line instead, so zero\nmeans color 3 and invalid coordinates latch that frame's overflow flag.\nDisplay transfer occurs later."
+  },
+  "wire_Wire3DCGB_DrawPoint2D_purpose": {
+    "ja": "現在色で1ピクセルを書き込みます。",
+    "en": "Write one pixel in the current color."
+  },
+  "wire_Wire3DCGB_DrawPoint2D_arg_x": {
+    "ja": "表示領域内の中心X座標（ピクセル）。",
+    "en": "Center X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawPoint2D_arg_y": {
+    "ja": "表示領域内の中心Y座標（ピクセル）。",
+    "en": "Center Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawPoint2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawTinyModel2D_notes": {
+    "ja": "中心はX=3～124、Y=3～92です。turnの下位5ビットを3区分で使います。一般の3D回転ではなく通常ステージ専用です。線色を復元します。",
+    "en": "Draw a six-pixel marker through the 128x96 plotter while preserving line\ncolor. Centers outside X=3..124 or Y=3..92 are ignored. The low five turn\nbits select left/straight/right nose and tail offsets; this is not a general\n3D transform and does not dispatch to the full-screen renderer."
+  },
+  "wire_Wire3DCGB_DrawTinyModel2D_purpose": {
+    "ja": "向きを示す6ピクセルの小さな記号を描きます。",
+    "en": "Draw a six-pixel marker whose nose and tail indicate direction."
+  },
+  "wire_Wire3DCGB_DrawTinyModel2D_arg_x": {
+    "ja": "表示領域内の中心X座標（ピクセル）。",
+    "en": "Center X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawTinyModel2D_arg_y": {
+    "ja": "表示領域内の中心Y座標（ピクセル）。",
+    "en": "Center Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawTinyModel2D_arg_turn": {
+    "ja": "下位5ビットで小さな記号の向きを選ぶ値。",
+    "en": "Value whose low five bits select the tiny marker direction."
+  },
+  "wire_Wire3DCGB_DrawTinyModel2D_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawTinyModel2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawLine2D_notes": {
+    "ja": "端点は表示領域内に用意し、外側の座標にはDrawLineClipped2Dを使います。通常は色面をORし、dirty範囲を記録しません。全画面はタイルを割り当て色を置換します。色0はどちらも3です。",
+    "en": "Store byte endpoints and invoke the normal or full-screen line rasterizer.\nProvide coordinates inside the selected viewport; use DrawLineClipped2D\nfor signed/off-screen geometry. Normal lines OR color planes and do not\nmark sparse bounds; use the clipped API or InvalidateFrameHistory before\na sparse upload. Full-screen lines replace colors and use tile allocation.\nBoth active line paths treat color zero as 3, not as an eraser."
+  },
+  "wire_Wire3DCGB_DrawLine2D_purpose": {
+    "ja": "画面座標の両端を含む線を、現在のモードで描きます。",
+    "en": "Draw an inclusive screen-space line using the active renderer."
+  },
+  "wire_Wire3DCGB_DrawLine2D_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawLine2D_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawLine2D_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawLine2D_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawLine2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawLine2DColor_notes": {
+    "ja": "DrawLine2Dと同じ座標・色合成・転送条件です。color&3を使いますが、0で線を消すことはできません。",
+    "en": "Set color & 3 around DrawLine2D and restore the previous color. Follow\nthat function's coordinate, color-combination and sparse-range contracts;\nzero does not erase a line in either active renderer."
+  },
+  "wire_Wire3DCGB_DrawLine2DColor_purpose": {
+    "ja": "画面上の線を、現在色を保持したまま指定色で描きます。",
+    "en": "Draw a screen-space line in a temporary color, preserving the selected color."
+  },
+  "wire_Wire3DCGB_DrawLine2DColor_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawLine2DColor_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawLine2DColor_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawLine2DColor_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawLine2DColor_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawLine2DColor_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_notes": {
+    "ja": "1バイト8辺で下位ビットから使います。全ポインタとインデックスを有効にし、0辺でもedge_mask[0]を用意します。個数制限はなく、中心加算後の座標を画面内に保ちます。色を復元します。",
+    "en": "Draw enabled model edges using signed-byte preprojected offsets around\n(x,y). Mask bits are least-significant-first, eight edges per byte. All\npointers and vertex indices must be valid; edge_mask[0] is read even for\nzero edges. No counts are capped. Keep translated endpoints within the\nviewport before their byte conversion; negative values would wrap.\nPreserve the previous line color and dispatch by the active mode."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_purpose": {
+    "ja": "投影済みの頂点と辺マスクから、有効な辺だけを描きます。",
+    "en": "Draw enabled model edges from preprojected vertices and an edge bitmask."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_arg_vertex_x": {
+    "ja": "投影済み頂点のX変位を並べた配列。",
+    "en": "Array of preprojected vertex X offsets."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_arg_vertex_y": {
+    "ja": "投影済み頂点のY変位を並べた配列。",
+    "en": "Array of preprojected vertex Y offsets."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_arg_edge_mask": {
+    "ja": "下位ビットから順に各辺の表示可否を表すバイト配列。",
+    "en": "Byte array with one visibility bit per edge, least-significant bit first."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_arg_x": {
+    "ja": "表示領域内の中心X座標（ピクセル）。",
+    "en": "Center X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_arg_y": {
+    "ja": "表示領域内の中心Y座標（ピクセル）。",
+    "en": "Center Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawMaskedModel2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_notes": {
+    "ja": "NULL配列は無視します。頂点個数は検査せず、番号は呼び出し側で保証します。中心加算後の座標を画面内に収め、バイト変換の巻き戻りを防ぎます。色を保持します。",
+    "en": "Draw up to 64 indexed edges from signed-byte offsets around (cx,cy).\nNull arrays are ignored; indices must address readable vertices. Keep the\ntranslated endpoints in the viewport before byte conversion, which wraps.\nDispatch by mode and preserve the old color; no vertex-count check occurs."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_purpose": {
+    "ja": "投影済みの符号付き8ビットの頂点変位から、最大64辺を描きます。",
+    "en": "Draw up to 64 edges from preprojected signed-byte vertex offsets."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_arg_edges": {
+    "ja": "辺の両端の頂点番号。構造体またはバイト対という宣言の形式に従います。",
+    "en": "Vertex indices for each edge, in the declared struct or byte-pair format."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_arg_edge_count": {
+    "ja": "辺の本数。",
+    "en": "Number of edges."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_arg_vertex_x": {
+    "ja": "投影済み頂点のX変位を並べた配列。",
+    "en": "Array of preprojected vertex X offsets."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_arg_vertex_y": {
+    "ja": "投影済み頂点のY変位を並べた配列。",
+    "en": "Array of preprojected vertex Y offsets."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_arg_x": {
+    "ja": "表示領域内の中心X座標（ピクセル）。",
+    "en": "Center X coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_arg_y": {
+    "ja": "表示領域内の中心Y座標（ピクセル）。",
+    "en": "Center Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawEdgeList2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_DrawLineList2DColor_notes": {
+    "ja": "各レコードはx0,y0,x1,y1です。最大64本、NULLは無視します。端点を表示領域内に指定し、描画後は元の色へ戻します。",
+    "en": "Draw up to 64 records of four bytes (x0,y0,x1,y1), ignoring a null list.\nEndpoints must lie in the selected viewport. Preserve the previous color\nand dispatch each line to the normal or full-screen rasterizer."
+  },
+  "wire_Wire3DCGB_DrawLineList2DColor_purpose": {
+    "ja": "4バイトで1本を表す画面座標の線リストを、指定色でまとめて描きます。",
+    "en": "Draw a list of four-byte screen-space line records in a chosen color."
+  },
+  "wire_Wire3DCGB_DrawLineList2DColor_arg_line_xy": {
+    "ja": "x0,y0,x1,y1を1組とするバイト配列。",
+    "en": "Byte array of x0,y0,x1,y1 records."
+  },
+  "wire_Wire3DCGB_DrawLineList2DColor_arg_line_count": {
+    "ja": "線レコードの個数。最大64本を処理します。",
+    "en": "Number of line records; at most 64 are processed."
+  },
+  "wire_Wire3DCGB_DrawLineList2DColor_arg_color": {
+    "ja": "描画色番号。通常は1=赤、2=青、3=緑をサンプルのパレットで使います。",
+    "en": "Drawing color index; sample palettes use 1=red, 2=blue and 3=green."
+  },
+  "wire_Wire3DCGB_DrawLineList2DColor_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_PutBgTile_notes": {
+    "ja": "32×32マップ・48件までで範囲外や超過分は無視します。属性は予約しません。atomic-map設定では両背景マップへ番号を反映します。全画面EndFrameはHUDキューを処理しません。",
+    "en": "Queue a tile-number write for a 32x32 BG map. Ignore invalid coordinates\nand submissions after 48 pending writes. EndFrame flushes this private queue;\natomic-map mode mirrors writes to both BG maps. Attributes are not queued."
+  },
+  "wire_Wire3DCGB_PutBgTile_purpose": {
+    "ja": "背景セルのタイル番号変更をEndFrameまで予約します。",
+    "en": "Queue a background tile-number change for EndFrame."
+  },
+  "wire_Wire3DCGB_PutBgTile_arg_x": {
+    "ja": "32×32背景マップ内のタイル単位のX座標。",
+    "en": "X tile coordinate in the 32x32 background map."
+  },
+  "wire_Wire3DCGB_PutBgTile_arg_y": {
+    "ja": "32×32背景マップ内のタイル単位のY座標。",
+    "en": "Y tile coordinate in the 32x32 background map."
+  },
+  "wire_Wire3DCGB_PutBgTile_arg_tile": {
+    "ja": "背景セルに置く8ビットのタイル番号。",
+    "en": "Eight-bit tile number for the background cell."
+  },
+  "wire_Wire3DCGB_PutBgTile_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EndFrame_notes": {
+    "ja": "通常モードは背景予約を処理してステージ全体を送ります。全画面では割り当て済みタイルを送り、HUD予約は処理しません。LCD有効状態が必要で、処理が複数フレームにまたがる場合があります。",
+    "en": "Normal mode flushes queued BG writes, transfers the full stage and\npresents the completed tile bank. Full-screen mode transfers/presents its\nallocated tiles and does not flush the HUD queue. Requires an enabled LCD\nand the transfer helpers' bank/interrupt contracts; may span multiple frames."
+  },
+  "wire_Wire3DCGB_EndFrame_purpose": {
+    "ja": "完成したフレームを転送して表示します。",
+    "en": "Upload and present the completed frame."
+  },
+  "wire_Wire3DCGB_EndFrame_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EndFrameFast_notes": {
+    "ja": "予約したHUD変更はキューに残ります。通常・全画面の各転送条件と完全版ランタイムが必要です。",
+    "en": "Transfer and present the complete selected-mode frame without flushing\nthe BG queue. It does not consume queued HUD writes. Requires the same\nLCD/bank/interrupt conditions as EndFrame; full-runtime build required."
+  },
+  "wire_Wire3DCGB_EndFrameFast_purpose": {
+    "ja": "背景予約を処理せず、完成したフレーム全体を転送して表示します。",
+    "en": "Upload and present a complete frame without flushing queued background writes."
+  },
+  "wire_Wire3DCGB_EndFrameFast_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EndFrameSparse_notes": {
+    "ja": "通常モードはEndFrameSparseNowを呼び、全画面では専用の全体転送を使います。LCDを有効にし、1フレーム内で終わるとは仮定しないでください。",
+    "en": "In normal mode, wait for a fresh VBlank and invoke EndFrameSparseNow.\nFull-screen mode uses its full transfer/presentation instead. Requires the\nfull runtime and an enabled LCD; it is not guaranteed to complete in one frame."
+  },
+  "wire_Wire3DCGB_EndFrameSparse_purpose": {
+    "ja": "新しいVBlankを待ち、必要範囲を転送して表示します。",
+    "en": "Wait for a fresh VBlank, then upload and present the required sparse ranges."
+  },
+  "wire_Wire3DCGB_EndFrameSparse_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_EndFrameSparseNow_notes": {
+    "ja": "内部のHUD復元・DMA・表示切り替えでは待つ場合があります。LCDを有効にし、DMA中のSVBK/VBKを外部から変更しないでください。全画面は専用経路へ進みます。",
+    "en": "Flush queued BG writes, upload the sparse current/N-2 tile range to the\nback bank and present it. Skip the initial fresh-VBlank wait, but normal\nmap mode still waits when restoring its blank HUD tile; DMA/presentation\nmay also wait. Full-runtime full-screen mode delegates to its own path.\nRequire an enabled LCD and keep SVBK/VBK stable while DMA is active."
+  },
+  "wire_Wire3DCGB_EndFrameSparseNow_purpose": {
+    "ja": "初回のVBlank待ちを省き、背景予約と現在・2回前の範囲を転送して表示します。",
+    "en": "Submit background writes and current/N-2 sparse ranges without the initial fresh-VBlank wait."
+  },
+  "wire_Wire3DCGB_EndFrameSparseNow_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DCGB_GetFullScreenTileCount_notes": {
+    "ja": "最大127です。バイト数、空きVRAM容量、表示ピクセル数ではありません。完全版ランタイムで使います。",
+    "en": "Return the current full-screen allocation count (up to 127). This is\nnot a byte count or the number of visible/nonzero pixels. Full runtime only."
+  },
+  "wire_allocation_before_plot": {
+    "ja": "全画面のタイル割り当ては、隠線・overflowによるピクセル書き込みの抑止より先に進みます。そのため、黒いままのタイルも個数に含まれます。異常後の描画呼び出しでも、個数が増える場合があります。",
+    "en": "Full-screen allocation runs before occlusion and overflow suppress pixel writes. Allocated tiles may remain black, and drawing after a fault can still increase the tile count."
+  },
+  "wire_Wire3DCGB_GetFullScreenTileCount_purpose": {
+    "ja": "現在フレームで割り当てた全画面用タイル数を返します。",
+    "en": "Return the number of full-screen tiles allocated in the current frame."
+  },
+  "wire_wire_cgb_capacity_expected": {
+    "ja": "異なるタイルに1点ずつ、赤い点を127個並べます。128個目の割り当てを試すとタイル数127のままoverflowが1になります。",
+    "en": "127 red dots occupy distinct tiles. Attempting a 128th allocation leaves the count at 127 and sets overflow to one."
+  },
+  "wire_Wire3DCGB_GetFullScreenTileCount_return": {
+    "ja": "割り当て済みタイル数（0～127）。",
+    "en": "Allocated tile count, 0..127."
+  },
+  "wire_Wire3DCGB_GetFullScreenOverflow_notes": {
+    "ja": "一度設定されると、そのフレームの後続の高速描画も抑止されます。BeginFrameで解除します。ハードウェア全体の状態ではありません。",
+    "en": "Return the full-screen frame fault flag: the fast line path sets it for\ntile allocation exhaustion or an invalid coordinate. Once set, further\nfast-path plots are suppressed until BeginFrame resets it. This is not a\ngeneral hardware status flag; the getter requires the full runtime."
+  },
+  "wire_Wire3DCGB_GetFullScreenOverflow_purpose": {
+    "ja": "全画面描画で座標不正またはタイル不足が起きたかを返します。",
+    "en": "Report an invalid coordinate or tile-allocation exhaustion in full-screen drawing."
+  },
+  "wire_Wire3DCGB_GetFullScreenOverflow_return": {
+    "ja": "異常なしは0、タイル不足または座標不正の検出後は1。",
+    "en": "Zero with no fault, or one after allocation exhaustion or an invalid coordinate."
+  },
+  "wire_WIRE3DCGB_RGB15_notes": {
+    "ja": "各引数は1回だけ評価します。下位5ビットを使うので範囲外は飽和せず巻き戻ります。赤がbit0～4、緑が5～9、青が10～14です。",
+    "en": "Pack the low five bits of each channel into RGB15; evaluate each argument once."
+  },
+  "wire_WIRE3DCGB_RGB15_purpose": {
+    "ja": "赤・緑・青の5ビット成分をCGBの15ビット色へ組み合わせます。",
+    "en": "Pack five-bit red, green and blue channels into a CGB 15-bit color."
+  },
+  "wire_WIRE3DCGB_RGB15_arg_r5": {
+    "ja": "赤の成分（0～31）。",
+    "en": "Red channel, 0..31."
+  },
+  "wire_WIRE3DCGB_RGB15_arg_g5": {
+    "ja": "緑の成分（0～31）。",
+    "en": "Green channel, 0..31."
+  },
+  "wire_WIRE3DCGB_RGB15_arg_b5": {
+    "ja": "青の成分（0～31）。",
+    "en": "Blue channel, 0..31."
+  },
+  "wire_WIRE3DCGB_RGB15_return": {
+    "ja": "3成分を組み合わせたu16のRGB15値。",
+    "en": "The packed RGB15 value as u16."
+  },
+  "wire_Wire3DDMG_Init_notes": {
+    "ja": "カメラ、背景書き込みキュー、ステージをリセットし、BGPを0xB4に設定します。描画前にBeginFrameを呼びます。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_Init();\nTake over the LCD: wait for VBlank, switch it off, clear 6144 tile bytes and\nthe BG map, install HUD tiles and the 128x96 signed-tile viewport, then enable\nBG display with scroll zero and BGP=0xB4. Reset camera, BG queue and stage.\nReserve 0xD000..0xDFFF for staging and retain its WRAM bank mapping.\nCall BeginFrame before drawing to initialize the occlusion state as well.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_Init();\nTake over LCD state, clear tile VRAM and the BG map, and install a 16x15\nviewport beginning at map tile (3,1). Set scroll (8,0), BGP=0xB4 and BG display.\nReset camera, queues, transfer modes, both dirty tables and stage. Reserve\n0xD000..0xDFFF and retain its WRAM mapping; auxiliary storage aliases it.\nCall BeginFrame before drawing to establish occlusion state."
+  },
+  "wire_dmg_profile_120": {
+    "ja": "このサンプルは128×120設定です。表示領域の原点は画面座標(16,8)です。WRAM D000～DFFFを予約し、CGBで使う場合もそのバンク対応を保持します。共有状態を使い、再入はできません。",
+    "en": "This sample uses the 128x120 profile. Its viewport starts at screen (16,8). Reserve WRAM D000..DFFF and keep its bank mapping stable on CGB too. Shared state is not reentrant."
+  },
+  "wire_profile_choice": {
+    "ja": "WIRE3D_DMG_HEIGHTは既定120です。96行設定はwire3d_dmg_96.cと組み合わせます。SelectEdgeMaskは96行、RotatePoint・DrawIndexedEdges・転送設定・直接転送は120行で提供します。",
+    "en": "WIRE3D_DMG_HEIGHT defaults to 120. Use wire3d_dmg_96.c for height 96. SelectEdgeMask is available at height 96; RotatePoint, DrawIndexedEdges, transfer gates and direct transfers require height 120."
+  },
+  "wire_Wire3DDMG_Init_purpose": {
+    "ja": "LCD・タイル・背景マップを初期化し、モノクロのワイヤーフレーム表示領域を用意します。",
+    "en": "Initialize the LCD, tiles and background map for a monochrome wireframe viewport."
+  },
+  "wire_wire_dmg120_raster_expected": {
+    "ja": "基本の線・点・消去・座標変換を1画面で確認するサンプルです。 左上の枠の上辺の中央が消え、斜線が中央に投影されます。出力拒否時の座標が91・92のままになることも調べます。",
+    "en": "This sample demonstrates basic lines, points, erasure and projection in one frame. The middle of the upper-left frame’s top edge is erased and a diagonal is projected near the center. Rejected projection preserves outputs 91 and 92."
+  },
+  "wire_Wire3DDMG_Init_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_BeginFrame_notes": {
+    "ja": "96行設定ではステージとマスクを消去します。120行設定ではピクセルを消去せず、転送時にステージを消費します。未転送の描画や背景キューを破棄する操作ではありません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_BeginFrame();\nClear staged pixels and occlusion mask and disable occlusion filtering.\nThis leaves the displayed VRAM frame and pending BG tile queue unchanged.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_BeginFrame();\nDisable occlusion filtering only. Stage clearing normally happens during\ntransfer, and Init supplies the first clean stage. This does not discard an\nunsubmitted frame, clear the mask, or reset pending BG writes/dirty flags."
+  },
+  "wire_Wire3DDMG_BeginFrame_purpose": {
+    "ja": "次のフレームの描画を開始し、隠線判定の適用を解除します。",
+    "en": "Begin drawing a frame and disable occlusion testing."
+  },
+  "wire_Wire3DDMG_BeginFrame_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_SetCamera_notes": {
+    "ja": "角度は16段階で1周します。既に描いた線は移動しません。座標差をs16の範囲に収めてください。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_SetCamera(w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_i8 pitch, w3ddmg_i8 yaw, w3ddmg_i8 roll);\nStore camera position and angles for later draws; a full turn is 16 angle\nsteps. No existing drawing is reprojected and no input range validation occurs.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_SetCamera(w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 pitch, w3ddmg_u8 yaw, w3ddmg_u8 roll);\nStore camera position and angles for later draws; a full turn is 16 angle\nsteps. No existing drawing is reprojected and no input range validation occurs."
+  },
+  "wire_Wire3DDMG_SetCamera_purpose": {
+    "ja": "後続の投影に使うカメラ位置と姿勢を保存します。",
+    "en": "Store the camera position and orientation for subsequent projection."
+  },
+  "wire_Wire3DDMG_SetCamera_arg_x": {
+    "ja": "世界座標でのカメラのX成分。",
+    "en": "World-space X component of the camera."
+  },
+  "wire_Wire3DDMG_SetCamera_arg_y": {
+    "ja": "世界座標でのカメラのY成分。",
+    "en": "World-space Y component of the camera."
+  },
+  "wire_Wire3DDMG_SetCamera_arg_z": {
+    "ja": "世界座標でのカメラのZ成分。",
+    "en": "World-space Z component of the camera."
+  },
+  "wire_Wire3DDMG_SetCamera_arg_pitch": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_SetCamera_arg_yaw": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_SetCamera_arg_roll": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_SetCamera_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_DrawModel_notes": {
+    "ja": "倍率256でDrawModelScaledを呼びます。面や隣接情報があるモデルの辺選択にも、その関数の条件が適用されます。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_DrawModel(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_i8 rx, w3ddmg_i8 ry, w3ddmg_i8 rz);\nDraw an unscaled model by delegating to DrawModelScaled with scale 256.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_DrawModel(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 rx, w3ddmg_u8 ry, w3ddmg_u8 rz);\nDraw an unscaled model by delegating to DrawModelScaled with scale 256."
+  },
+  "wire_Wire3DDMG_DrawModel_purpose": {
+    "ja": "頂点・辺のモデルを、指定位置・回転で等倍描画します。",
+    "en": "Draw a vertex-and-edge model at the requested position and rotation at unity scale."
+  },
+  "wire_Wire3DDMG_DrawModel_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DDMG_DrawModel_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DDMG_DrawModel_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DDMG_DrawModel_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DDMG_DrawModel_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_DrawModel_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_DrawModel_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_wire_dmg120_models_expected": {
+    "ja": "上段に等倍と半分のモデル、下段に同じ倍率の物体配列を描き、投影と倍率の関係を比較します。",
+    "en": "Unity and half-scale models appear above an object-array scene at the same scales, demonstrating projection and scaling."
+  },
+  "wire_Wire3DDMG_DrawModel_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_notes": {
+    "ja": "倍率256が等倍、0以下も等倍です。頂点は最大24、面は最大16。96行設定は辺も最大16、120行設定はedge_count個を参照します。NULLのモデル・頂点・辺配列は無視します。奥行き範囲をまたぐ辺は切り詰めず省略します。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_DrawModelScaled(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_i8 rx, w3ddmg_i8 ry, w3ddmg_i8 rz, w3ddmg_i16 scale_q8);\nScale, rotate in Y/X/Z order, translate and project at most 24 vertices;\nthen draw up to 16 edges filtered by yaw masks and optional front-facing faces.\nNonpositive scale becomes unity (256). Null model/vertex/edge pointers are\nignored; referenced tables must remain readable. Keep scale products and\ntranslations in signed 16-bit range. Depth-crossing edges are dropped, not clipped.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_DrawModelScaled(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 rx, w3ddmg_u8 ry, w3ddmg_u8 rz, w3ddmg_i16 scale_q8);\nScale up to 24 vertices, rotate Y/X/Z, translate and project, then traverse\nall edge_count entries (a byte count) with optional adjacent-face filtering.\nFace scratch is capped at 16; edge tables must contain all declared entries.\nNonpositive scale means 256. Null model/vertex/edge pointers are ignored.\nKeep products/translations in signed 16-bit range; depth-crossing edges are dropped."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_purpose": {
+    "ja": "モデルを拡大縮小し、Y・X・Zの順に回転、平行移動、投影して辺を描きます。",
+    "en": "Scale a model, rotate it in Y/X/Z order, translate and project its vertices, then draw edges."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_arg_scale_q8": {
+    "ja": "256を等倍とする拡大率。0以下も等倍として扱います。",
+    "en": "Scale with 256 as unity; nonpositive values also mean unity."
+  },
+  "wire_Wire3DDMG_DrawModelScaled_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_notes": {
+    "ja": "隠線フラグと面データが必要です。頂点24・面16まで処理し、投影できない面は省略します。倍率0以下は256です。投影用の共有作業領域を書き換えますが、画面転送は行いません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_EraseModelFaces(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_i8 rx, w3ddmg_i8 ry, w3ddmg_i8 rz, w3ddmg_i16 scale_q8);\nProject up to 24 vertices and erase front-facing triangle interiors from\nthe stage for a model with hidden-line flags and face data. Nonpositive scale\nmeans 256 (unity). Up to 16 faces are considered; depth-crossing faces are\nskipped. This also replaces shared projection caches, but does not update VRAM.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_EraseModelFaces(const Wire3DDMG_Model* model, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 rx, w3ddmg_u8 ry, w3ddmg_u8 rz, w3ddmg_i16 scale_q8);\nProject up to 24 vertices and erase front-facing triangle interiors from\nthe stage for a model with hidden-line flags and face data. Nonpositive scale\nmeans 256 (unity). Up to 16 faces are considered; depth-crossing faces are\nskipped. This also replaces shared projection caches, but does not update VRAM."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_purpose": {
+    "ja": "モデルの手前向きの三角形面を投影し、ステージ上の線を面の内側から消します。",
+    "en": "Project front-facing model triangles and erase staged pixels inside them."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_arg_scale_q8": {
+    "ja": "256を等倍とする拡大率。0以下も等倍として扱います。",
+    "en": "Scale with 256 as unity; nonpositive values also mean unity."
+  },
+  "wire_wire_dmg120_faces_expected": {
+    "ja": "塗った領域から投影した面を消し、線が残る場所と消える場所を確認します。",
+    "en": "Projected faces erase a filled region, making the retained and cleared areas visible."
+  },
+  "wire_Wire3DDMG_EraseModelFaces_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_EraseTriangle2D_notes": {
+    "ja": "表示領域内の頂点を指定します。面積0の三角形は無視します。マスクや表示済みVRAMは変更しません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_EraseTriangle2D(w3ddmg_u8 ax, w3ddmg_u8 ay, w3ddmg_u8 bx, w3ddmg_u8 by, w3ddmg_u8 cx, w3ddmg_u8 cy);\nErase a triangle from staged pixels using integer scanline intersections.\nSupply viewport coordinates. Degenerate triangles are ignored; the occlusion\nmask and VRAM are unchanged.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_EraseTriangle2D(w3ddmg_u8 ax, w3ddmg_u8 ay, w3ddmg_u8 bx, w3ddmg_u8 by, w3ddmg_u8 cx, w3ddmg_u8 cy);\nErase a triangle from staged pixels using integer scanline intersections.\nSupply viewport coordinates. Degenerate triangles are ignored; the occlusion\nmask and VRAM are unchanged."
+  },
+  "wire_Wire3DDMG_EraseTriangle2D_purpose": {
+    "ja": "画面座標で指定した三角形の内部を、行ごとの塗りつぶしで消去します。",
+    "en": "Erase a screen-space triangle from the stage using horizontal scanline spans."
+  },
+  "wire_Wire3DDMG_EraseTriangle2D_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_EraseTriangle2D_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_EraseTriangle2D_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_EraseTriangle2D_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_EraseTriangle2D_arg_cx": {
+    "ja": "頂点CのX座標（表示領域内のピクセル）。",
+    "en": "Vertex C X coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_EraseTriangle2D_arg_cy": {
+    "ja": "頂点CのY座標（表示領域内のピクセル）。",
+    "en": "Vertex C Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_EraseTriangle2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_EraseSpan2D_notes": {
+    "ja": "Xの左右は自動で並べ替えますが、両端を0～127に収めてください。範囲外のYは無視します。Xのクリッピングは行いません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_EraseSpan2D(w3ddmg_u8 y, w3ddmg_u8 x0, w3ddmg_u8 x1);\nOrder the X endpoints and erase the inclusive staged span. Both endpoints\nmust be in 0..127; invalid Y is ignored. The routine does not clip X for you.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_EraseSpan2D(w3ddmg_u8 y, w3ddmg_u8 x0, w3ddmg_u8 x1);\nOrder the X endpoints and erase the inclusive staged span. Both endpoints\nmust be in 0..127; invalid Y is ignored. The routine does not clip X for you."
+  },
+  "wire_Wire3DDMG_EraseSpan2D_purpose": {
+    "ja": "指定した1行の両端を含む横区間を消去します。",
+    "en": "Erase an inclusive horizontal span on one staged row."
+  },
+  "wire_Wire3DDMG_EraseSpan2D_arg_y": {
+    "ja": "消去する行のY座標（ピクセル）。",
+    "en": "Pixel Y coordinate of the row to erase."
+  },
+  "wire_Wire3DDMG_EraseSpan2D_arg_x0": {
+    "ja": "最小側のX端点（表示領域内のピクセル）。",
+    "en": "Lower X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DDMG_EraseSpan2D_arg_x1": {
+    "ja": "最大側のX端点（表示領域内のピクセル）。",
+    "en": "Upper X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3DDMG_EraseSpan2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_DrawScene_notes": {
+    "ja": "物体中心の奥行きで順序を決め、面の外接矩形と線上の5点で隠れ方を近似します。ピクセル単位の深度バッファではありません。visibleが有効なモデルを描き、配列自体は並べ替えません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_DrawScene(Wire3DDMG_Object* objects, w3ddmg_u8 count);\nProcess at most the first eight objects, sorted near to far by transformed\norigin depth. Draw visible valid models, then mark their front-face bounding\nrectangles to reject fully sampled later lines. This approximates inter-object\nocclusion, not a depth buffer. It clears its mask but retains existing staged\npixels. Null arrays are ignored; objects and their data must remain readable.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_DrawScene(Wire3DDMG_Object* objects, w3ddmg_u8 count);\nSort at most eight object origins by camera depth, near to far. Draw visible\nvalid models and mark front-face bounding rectangles for later objects. The\nfirst sorted slot bypasses mask tests and the last needs no new occluder.\nThis is coarse line rejection, not a depth buffer. Null/empty input is ignored;\ncaller data and the current projection cache must remain valid during traversal."
+  },
+  "wire_Wire3DDMG_DrawScene_purpose": {
+    "ja": "最大8個の物体をカメラに近い順に描き、手前の面で後方の辺を隠します。",
+    "en": "Draw up to eight objects near to far, using nearer faces to hide later edges."
+  },
+  "wire_Wire3DDMG_DrawScene_arg_objects": {
+    "ja": "位置・回転・倍率・visibleを持つ物体配列。",
+    "en": "Object array containing positions, rotations, scales and visibility flags."
+  },
+  "wire_Wire3DDMG_DrawScene_arg_count": {
+    "ja": "渡した配列の要素数。関数固有の処理上限は注意事項を参照してください。",
+    "en": "Number of supplied array entries; see the operation-specific processing limit."
+  },
+  "wire_Wire3DDMG_DrawScene_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_ProjectPoint_notes": {
+    "ja": "奥行き8～255だけを受理します。範囲外なら0を返し、出力値は保持します。成功時は画面端に制限した座標を書き込みます。座標制限は線の幾何学的クリッピングではありません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nw3ddmg_u8 Wire3DDMG_ProjectPoint(w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8* sx, w3ddmg_u8* sy);\nProject a world point with the current camera. Return zero for rejected\ndepth, leaving outputs unchanged; success writes clamped 128x96 coordinates.\nOutput pointers must be valid. Screen clamping is not geometric clipping.\n\nWIRE3D_DMG_HEIGHT = 120\nw3ddmg_u8 Wire3DDMG_ProjectPoint(w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8* sx, w3ddmg_u8* sy);\nProject a world point with the current camera. Return zero for invalid\ndepth without changing outputs; success writes clamped 128x120 coordinates.\nBoth output pointers must be valid. Coordinate differences must fit s16."
+  },
+  "wire_Wire3DDMG_ProjectPoint_purpose": {
+    "ja": "世界座標の点をカメラから見た画面座標へ変換します。",
+    "en": "Project a world-space point through the camera to viewport coordinates."
+  },
+  "wire_Wire3DDMG_ProjectPoint_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DDMG_ProjectPoint_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DDMG_ProjectPoint_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DDMG_ProjectPoint_arg_sx": {
+    "ja": "投影結果のX座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected X coordinate."
+  },
+  "wire_Wire3DDMG_ProjectPoint_arg_sy": {
+    "ja": "投影結果のY座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected Y coordinate."
+  },
+  "wire_Wire3DDMG_ProjectPoint_return": {
+    "ja": "投影成功時は1、深度で拒否した場合は0です。",
+    "en": "Returns 1 on successful projection or 0 on depth rejection."
+  },
+  "wire_Wire3DDMG_RotatePoint_notes": {
+    "ja": "120行設定で使います。16段階の角度でY・X・Zの順に回転し、各軸の回転前に成分を±220へ制限します。いずれかのポインタがNULLなら何もせず、各成分には別々の領域を指定します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_RotatePoint(w3ddmg_i16* x, w3ddmg_i16* y, w3ddmg_i16* z, w3ddmg_u8 rx, w3ddmg_u8 ry, w3ddmg_u8 rz);\nRotate in place in Y/X/Z order using 16 steps per full turn. A null\ncomponent pointer makes the whole call a no-op; use distinct pointers.\nEach axis rotation clamps its inputs to +/-220."
+  },
+  "wire_Wire3DDMG_RotatePoint_purpose": {
+    "ja": "1点のX・Y・Zを、指定した回転で直接書き換えます。",
+    "en": "Rotate one point in place by the supplied angles."
+  },
+  "wire_Wire3DDMG_RotatePoint_arg_x": {
+    "ja": "X成分を読み書きする独立したs16領域へのポインタ。",
+    "en": "Distinct writable s16 pointer for the X component."
+  },
+  "wire_Wire3DDMG_RotatePoint_arg_y": {
+    "ja": "Y成分を読み書きする独立したs16領域へのポインタ。",
+    "en": "Distinct writable s16 pointer for the Y component."
+  },
+  "wire_Wire3DDMG_RotatePoint_arg_z": {
+    "ja": "Z成分を読み書きする独立したs16領域へのポインタ。",
+    "en": "Distinct writable s16 pointer for the Z component."
+  },
+  "wire_Wire3DDMG_RotatePoint_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_RotatePoint_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_RotatePoint_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_RotatePoint_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_DrawLine3D_notes": {
+    "ja": "両端が奥行き範囲内の場合だけ描きます。近面・遠面との交点を計算する処理はありません。投影後の端点は個別に画面端へ制限されます。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_DrawLine3D(w3ddmg_i16 ax, w3ddmg_i16 ay, w3ddmg_i16 az, w3ddmg_i16 bx, w3ddmg_i16 by, w3ddmg_i16 bz);\nProject both world endpoints and draw only when both pass the depth range.\nDo not intersect a crossing segment with near/far planes; projected endpoints\nare independently clamped to the screen edges.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_DrawLine3D(w3ddmg_i16 ax, w3ddmg_i16 ay, w3ddmg_i16 az, w3ddmg_i16 bx, w3ddmg_i16 by, w3ddmg_i16 bz);\nProject both world endpoints and draw only when both pass the depth range.\nDo not intersect a crossing segment with near/far planes; projected endpoints\nare independently clamped to the screen edges."
+  },
+  "wire_Wire3DDMG_DrawLine3D_purpose": {
+    "ja": "世界座標の両端を投影して、1本の線を描きます。",
+    "en": "Project two world-space endpoints and draw a line between them."
+  },
+  "wire_Wire3DDMG_DrawLine3D_arg_ax": {
+    "ja": "世界座標の始点のX成分。",
+    "en": "Start point’s world-space X component."
+  },
+  "wire_Wire3DDMG_DrawLine3D_arg_ay": {
+    "ja": "世界座標の始点のY成分。",
+    "en": "Start point’s world-space Y component."
+  },
+  "wire_Wire3DDMG_DrawLine3D_arg_az": {
+    "ja": "世界座標の始点のZ成分。",
+    "en": "Start point’s world-space Z component."
+  },
+  "wire_Wire3DDMG_DrawLine3D_arg_bx": {
+    "ja": "世界座標の終点のX成分。",
+    "en": "End point’s world-space X component."
+  },
+  "wire_Wire3DDMG_DrawLine3D_arg_by": {
+    "ja": "世界座標の終点のY成分。",
+    "en": "End point’s world-space Y component."
+  },
+  "wire_Wire3DDMG_DrawLine3D_arg_bz": {
+    "ja": "世界座標の終点のZ成分。",
+    "en": "End point’s world-space Z component."
+  },
+  "wire_Wire3DDMG_DrawLine3D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_DrawLine2D_notes": {
+    "ja": "端点は表示領域内に指定します。斜線には接続用のピクセルを補います。120行設定でdirty転送を有効にすると外接するタイル範囲を記録します。VRAMへの反映は転送関数で行います。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_DrawLine2D(w3ddmg_u8 ax, w3ddmg_u8 ay, w3ddmg_u8 bx, w3ddmg_u8 by);\nDraw a connected line into the 128x96 stage, including endpoints. During\nDrawScene, use the coarse five-sample occlusion rejection; otherwise draw directly.\nSupply viewport coordinates. VRAM is updated only by EndFrame.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_DrawLine2D(w3ddmg_u8 ax, w3ddmg_u8 ay, w3ddmg_u8 bx, w3ddmg_u8 by);\nMark the bounding tile rectangle when dirty transfer is enabled, then draw\na connected staged line. Scene drawing may reject it using five mask samples.\nSupply 128x120 viewport endpoints; low-level pixel bounds checks do not clip\nthe segment geometrically."
+  },
+  "wire_Wire3DDMG_DrawLine2D_purpose": {
+    "ja": "画面座標の両端を含む、ピクセルが上下左右につながる線をステージへ描きます。",
+    "en": "Draw an inclusive, four-connected screen-space line into the stage."
+  },
+  "wire_Wire3DDMG_DrawLine2D_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_DrawLine2D_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_DrawLine2D_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_DrawLine2D_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_Wire3DDMG_DrawLine2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_notes": {
+    "ja": "120行設定用です。頂点24個まで、辺は128組以下にしてください。倍率0は1として扱い、物体回転や面による辺選択は行いません。NULL配列、不正な頂点番号、投影できない端点は無視します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_DrawIndexedEdges(const Wire3DDMG_Vec3* vertices, w3ddmg_u8 vertex_count, const w3ddmg_u8* edges, w3ddmg_u8 edge_count, w3ddmg_i16 x, w3ddmg_i16 y, w3ddmg_i16 z, w3ddmg_u8 scale);\nDraw byte-pair edge indices after integer scaling and translation; scale\nzero means one, and there is no object rotation or face filtering. Project at\nmost 24 vertices. Supply at most 128 edge pairs because byte offsets wrap\nafter 255. Invalid vertex IDs/depth-rejected endpoints are skipped; null arrays\nare ignored. Keep coordinate products/sums representable as s16."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_purpose": {
+    "ja": "頂点配列と2バイトずつの辺インデックスから、整数倍率の線モデルを描きます。",
+    "en": "Draw an integer-scaled line model from vertices and two-byte edge-index pairs."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_arg_vertices": {
+    "ja": "3D頂点の配列。",
+    "en": "Array of 3D vertices."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_arg_vertex_count": {
+    "ja": "頂点配列の要素数。",
+    "en": "Number of vertex-array entries."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_arg_edges": {
+    "ja": "辺の両端の頂点番号。構造体またはバイト対という宣言の形式に従います。",
+    "en": "Vertex indices for each edge, in the declared struct or byte-pair format."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_arg_edge_count": {
+    "ja": "辺の本数。",
+    "en": "Number of edges."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_arg_scale": {
+    "ja": "整数の拡大率。0は1として扱います。",
+    "en": "Integer scale; zero is treated as one."
+  },
+  "wire_wire_dmg120_direct_expected": {
+    "ja": "投影した横線と補助転送の8×8ブロックを表示し、ステージの元バイトが255から0へ消費されることを確認します。",
+    "en": "A projected horizontal line and an auxiliary 8x8 block demonstrate direct transfers; a source byte changes from 255 to 0 as it is consumed."
+  },
+  "wire_Wire3DDMG_DrawIndexedEdges_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_PutBgTile_notes": {
+    "ja": "座標は32×32マップのタイル単位です。48件まで予約でき、範囲外と超過分は無視します。EndFrameで反映する専用キューであり、一般のvramライブラリのキューとは別です。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_PutBgTile(w3ddmg_u8 x, w3ddmg_u8 y, w3ddmg_u8 tile);\nQueue a tile write to the 32x32 map at 0x9800 for EndFrame. Invalid map\ncoordinates and submissions beyond 48 pending writes are silently ignored.\nThis queue is separate from the general vram library queue.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_PutBgTile(w3ddmg_u8 x, w3ddmg_u8 y, w3ddmg_u8 tile);\nQueue a tile write to the 32x32 map at 0x9800 for EndFrame. Invalid map\ncoordinates and submissions beyond 48 pending writes are silently ignored.\nThis queue is separate from the general vram library queue."
+  },
+  "wire_Wire3DDMG_PutBgTile_purpose": {
+    "ja": "背景マップの1セルへのタイル番号書き込みを予約します。",
+    "en": "Queue one tile-number write to a background-map cell."
+  },
+  "wire_Wire3DDMG_PutBgTile_arg_x": {
+    "ja": "32×32背景マップ内のタイル単位のX座標。",
+    "en": "X tile coordinate in the 32x32 background map."
+  },
+  "wire_Wire3DDMG_PutBgTile_arg_y": {
+    "ja": "32×32背景マップ内のタイル単位のY座標。",
+    "en": "Y tile coordinate in the 32x32 background map."
+  },
+  "wire_Wire3DDMG_PutBgTile_arg_tile": {
+    "ja": "背景セルに置く8ビットのタイル番号。",
+    "en": "Eight-bit tile number for the background cell."
+  },
+  "wire_Wire3DDMG_PutBgTile_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_SetPalette_notes": {
+    "ja": "2ビットずつのハードウェア形式をそのまま渡します。VBlank待ちは行いません。CGBのRGBパレットは別途設定します。サンプルは0xFCで白地に黒線を表示します。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_SetPalette(w3ddmg_u8 bgp);\nWrite the raw DMG BGP palette encoding immediately; no frame synchronization occurs.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_SetPalette(w3ddmg_u8 bgp);\nWrite the raw DMG BGP palette encoding immediately; no frame synchronization occurs."
+  },
+  "wire_Wire3DDMG_SetPalette_purpose": {
+    "ja": "モノクロ背景パレットBGPの4階調の割り当てを直接変更します。",
+    "en": "Write the four-shade mapping of the monochrome background palette register BGP."
+  },
+  "wire_Wire3DDMG_SetPalette_arg_bgp": {
+    "ja": "4色の階調を2ビットずつ並べたBGPレジスタ値。",
+    "en": "BGP register value containing four two-bit shade assignments."
+  },
+  "wire_Wire3DDMG_SetPalette_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_SetAuxTransfer_notes": {
+    "ja": "120行設定用です。0で無効、それ以外で有効です。この呼び出しだけでは転送・消去を行いません。補助転送の元データはメインステージと重なります。",
+    "en": "WIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_SetAuxTransfer(w3ddmg_u8 flag);\nStore the EndFrame auxiliary-transfer gate; any nonzero value enables it.\nNo data is copied or cleared here. Auxiliary source bytes alias the main stage."
+  },
+  "wire_Wire3DDMG_SetAuxTransfer_purpose": {
+    "ja": "EndFrameで補助領域も転送するかどうかを設定します。",
+    "en": "Choose whether EndFrame also transfers the auxiliary strips."
+  },
+  "wire_Wire3DDMG_SetAuxTransfer_arg_flag": {
+    "ja": "0で転送機能を無効、それ以外で有効にします。",
+    "en": "Zero disables the transfer feature; any other value enables it."
+  },
+  "wire_wire_dmg120_aux_gate_expected": {
+    "ja": "メインステージの一部を補助転送へ渡し、画面座標(80,24)に8×8の黒いブロックを表示します。",
+    "en": "Part of the main stage is consumed by auxiliary transfer, producing a black 8x8 block at screen coordinate (80,24)."
+  },
+  "wire_Wire3DDMG_SetAuxTransfer_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_SetDirtyTransfer_notes": {
+    "ja": "値が同じでも現在・過去のdirty記録とステージを消去します。表示中のVRAMは保持します。古い画像が残る状態で有効化すると未登録のタイルが残り得るため、初期化直後など白紙の画面で設定します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_SetDirtyTransfer(w3ddmg_u8 flag);\nStore the dirty-transfer gate and clear both dirty histories and the main\nstage, even if the value is unchanged. VRAM is retained; enabling this over an\nold image can leave unmarked old tiles, so arrange a clean displayed baseline."
+  },
+  "wire_Wire3DDMG_SetDirtyTransfer_purpose": {
+    "ja": "120行表示のメイン転送を、変更タイル中心の転送へ切り替えます。",
+    "en": "Select dirty-tile transfer for the 120-row main viewport."
+  },
+  "wire_Wire3DDMG_SetDirtyTransfer_arg_flag": {
+    "ja": "0で転送機能を無効、それ以外で有効にします。",
+    "en": "Zero disables the transfer feature; any other value enables it."
+  },
+  "wire_wire_dmg120_dirty_expected": {
+    "ja": "左上の古い枠を消し、画面座標(96,88)～(120,112)に新しい枠だけを表示します。",
+    "en": "The old upper-left frame disappears, leaving only a new frame at screen coordinates (96,88)..(120,112)."
+  },
+  "wire_Wire3DDMG_SetDirtyTransfer_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_TransferMainNow_notes": {
+    "ja": "120行設定用です。STATでVRAMアクセスを待ちますが、次のVBlank開始は待ちません。転送設定に従わず、dirty記録や背景予約を変更しません。呼び出し側で表示周期を管理します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_TransferMainNow();\nUpload and consume the full main stage immediately, polling STAT but not\nwaiting for the next VBlank. Ignore transfer gates and leave dirty histories\nand BG tile queue unchanged; the caller coordinates the frame lifecycle."
+  },
+  "wire_Wire3DDMG_TransferMainNow_purpose": {
+    "ja": "メインステージ全体を直ちに転送し、読み出したステージを消去します。",
+    "en": "Immediately upload the whole main stage and clear the consumed source pixels."
+  },
+  "wire_Wire3DDMG_TransferMainNow_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_TransferAuxNow_notes": {
+    "ja": "120行設定用です。補助転送の有効設定にかかわらず実行し、VBlank開始・dirty記録・背景予約を扱いません。元領域D518＋256×列から56バイトずつを読みます。メインステージと重なるため転送順に注意します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_TransferAuxNow();\nUpload and consume auxiliary source strips immediately, independent of the\nauxiliary gate. No VBlank-start wait or dirty-history/BG-queue update occurs.\nThe source overlaps the main stage and must be coordinated with its upload."
+  },
+  "wire_Wire3DDMG_TransferAuxNow_purpose": {
+    "ja": "補助用の6本のストリップを直ちに転送し、元データを消去します。",
+    "en": "Immediately upload six auxiliary strips and clear their source bytes."
+  },
+  "wire_Wire3DDMG_TransferAuxNow_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_EndFrame_notes": {
+    "ja": "次のVBlankを待って背景予約を反映します。120行設定では有効な補助転送を先に行い、続いてメインを全体またはdirty転送します。ステージは転送で消費します。STAT待ちにより複数の表示期間にまたがる場合があります。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nvoid Wire3DDMG_EndFrame();\nWait for the next VBlank, flush pending BG map writes, then copy the stage\nto VRAM while polling access windows. Copying consumes the staged pixels.\nThe transfer may extend beyond VBlank; this is not an atomic frame swap.\n\nWIRE3D_DMG_HEIGHT = 120\nvoid Wire3DDMG_EndFrame();\nWait for the next VBlank and flush BG writes, then optionally consume the\nauxiliary strips before uploading either dirty tiles or the entire main stage.\nAuxiliary/main source overlap makes that ordering significant. STAT polling\ncontinues across access windows; the update need not fit one VBlank."
+  },
+  "wire_Wire3DDMG_EndFrame_purpose": {
+    "ja": "背景予約とステージの描画をVRAMへ反映します。",
+    "en": "Submit pending background writes and staged drawing to VRAM."
+  },
+  "wire_Wire3DDMG_EndFrame_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3DDMG_SelectEdgeMask_notes": {
+    "ja": "96行設定で使います。Y回転の下位4ビットを16・8・4・2区分へ割り当て、その他の正の個数では先頭を使います。X/Z回転とカメラは無視します。表はRAMに置き、未指定なら0xFFFFを返します。",
+    "en": "WIRE3D_DMG_HEIGHT = 96\nw3ddmg_u16 Wire3DDMG_SelectEdgeMask(const Wire3DDMG_Model* model, w3ddmg_i8 rx, w3ddmg_i8 ry, w3ddmg_i8 rz);\nSelect a precomputed mask from the low four bits of object yaw; pitch,\nroll and camera orientation are ignored. Use 16, 8, 4 or 2 bins; other positive\ncounts select entry zero (counts >=16 use the first 16). Missing data returns\n0xFFFF. Keep the mask table readable through the current data-pointer mapping."
+  },
+  "wire_dmg_profile_96": {
+    "ja": "このサンプルは128×96設定です。画面左上が表示領域の原点です。WRAM D000～DFFFを予約し、CGBで使う場合もそのバンク対応を保持します。共有状態を使い、再入はできません。",
+    "en": "This sample uses the 128x96 profile. Its viewport starts at screen (0,0). Reserve WRAM D000..DFFF and keep its bank mapping stable on CGB too. Shared state is not reentrant."
+  },
+  "wire_Wire3DDMG_SelectEdgeMask_purpose": {
+    "ja": "物体のY回転に対応する、事前計算済みの辺表示マスクを選びます。",
+    "en": "Select a precomputed edge-visibility mask for the object yaw."
+  },
+  "wire_Wire3DDMG_SelectEdgeMask_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3DDMG_SelectEdgeMask_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_SelectEdgeMask_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3DDMG_SelectEdgeMask_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_wire_dmg96_models_expected": {
+    "ja": "上段に等倍と半分のモデル、下段に同じ倍率の物体配列を描き、投影と倍率の関係を比較します。",
+    "en": "Unity and half-scale models appear above an object-array scene at the same scales, demonstrating projection and scaling."
+  },
+  "wire_Wire3DDMG_SelectEdgeMask_return": {
+    "ja": "表示する辺に対応する16ビットマスク。表がなければ0xFFFFです。",
+    "en": "A 16-bit edge visibility mask, or 0xFFFF when no table is supplied."
+  },
+  "wire_Wire3D_BeginFrame_notes": {
+    "ja": "96行設定ではステージとマスクを消去します。120行設定ではピクセルを消去せず、転送時にステージを消費します。未転送の描画や背景キューを破棄する操作ではありません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nClear staged pixels and occlusion mask and disable occlusion filtering.\nThis leaves the displayed VRAM frame and pending BG tile queue unchanged."
+  },
+  "wire_Wire3D_BeginFrame_purpose": {
+    "ja": "次のフレームの描画を開始し、隠線判定の適用を解除します。",
+    "en": "Begin drawing a frame and disable occlusion testing."
+  },
+  "wire_wire_wire3d_raster_expected": {
+    "ja": "基本の線・点・消去・座標変換を1画面で確認するサンプルです。 左上の枠の上辺の中央が消え、斜線が中央に投影されます。出力拒否時の座標が91・92のままになることも調べます。",
+    "en": "This sample demonstrates basic lines, points, erasure and projection in one frame. The middle of the upper-left frame’s top edge is erased and a diagonal is projected near the center. Rejected projection preserves outputs 91 and 92."
+  },
+  "wire_Wire3D_BeginFrame_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_DrawLine2D_notes": {
+    "ja": "端点は表示領域内に指定します。斜線には接続用のピクセルを補います。120行設定でdirty転送を有効にすると外接するタイル範囲を記録します。VRAMへの反映は転送関数で行います。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nDraw a connected line into the 128x96 stage, including endpoints. During\nDrawScene, use the coarse five-sample occlusion rejection; otherwise draw directly.\nSupply viewport coordinates. VRAM is updated only by EndFrame."
+  },
+  "wire_Wire3D_DrawLine2D_purpose": {
+    "ja": "画面座標の両端を含む、ピクセルが上下左右につながる線をステージへ描きます。",
+    "en": "Draw an inclusive, four-connected screen-space line into the stage."
+  },
+  "wire_Wire3D_DrawLine2D_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_Wire3D_DrawLine2D_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_Wire3D_DrawLine2D_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_Wire3D_DrawLine2D_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_Wire3D_DrawLine2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_DrawLine3D_notes": {
+    "ja": "両端が奥行き範囲内の場合だけ描きます。近面・遠面との交点を計算する処理はありません。投影後の端点は個別に画面端へ制限されます。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nProject both world endpoints and draw only when both pass the depth range.\nDo not intersect a crossing segment with near/far planes; projected endpoints\nare independently clamped to the screen edges."
+  },
+  "wire_Wire3D_DrawLine3D_purpose": {
+    "ja": "世界座標の両端を投影して、1本の線を描きます。",
+    "en": "Project two world-space endpoints and draw a line between them."
+  },
+  "wire_Wire3D_DrawLine3D_arg_ax": {
+    "ja": "世界座標の始点のX成分。",
+    "en": "Start point’s world-space X component."
+  },
+  "wire_Wire3D_DrawLine3D_arg_ay": {
+    "ja": "世界座標の始点のY成分。",
+    "en": "Start point’s world-space Y component."
+  },
+  "wire_Wire3D_DrawLine3D_arg_az": {
+    "ja": "世界座標の始点のZ成分。",
+    "en": "Start point’s world-space Z component."
+  },
+  "wire_Wire3D_DrawLine3D_arg_bx": {
+    "ja": "世界座標の終点のX成分。",
+    "en": "End point’s world-space X component."
+  },
+  "wire_Wire3D_DrawLine3D_arg_by": {
+    "ja": "世界座標の終点のY成分。",
+    "en": "End point’s world-space Y component."
+  },
+  "wire_Wire3D_DrawLine3D_arg_bz": {
+    "ja": "世界座標の終点のZ成分。",
+    "en": "End point’s world-space Z component."
+  },
+  "wire_Wire3D_DrawLine3D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_DrawModel_notes": {
+    "ja": "倍率256でDrawModelScaledを呼びます。面や隣接情報があるモデルの辺選択にも、その関数の条件が適用されます。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nDraw an unscaled model by delegating to DrawModelScaled with scale 256."
+  },
+  "wire_Wire3D_DrawModel_purpose": {
+    "ja": "頂点・辺のモデルを、指定位置・回転で等倍描画します。",
+    "en": "Draw a vertex-and-edge model at the requested position and rotation at unity scale."
+  },
+  "wire_Wire3D_DrawModel_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3D_DrawModel_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3D_DrawModel_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3D_DrawModel_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3D_DrawModel_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_DrawModel_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_DrawModel_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_wire_wire3d_models_expected": {
+    "ja": "上段に等倍と半分のモデル、下段に同じ倍率の物体配列を描き、投影と倍率の関係を比較します。",
+    "en": "Unity and half-scale models appear above an object-array scene at the same scales, demonstrating projection and scaling."
+  },
+  "wire_Wire3D_DrawModel_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_DrawModelScaled_notes": {
+    "ja": "倍率256が等倍、0以下も等倍です。頂点は最大24、面は最大16。96行設定は辺も最大16、120行設定はedge_count個を参照します。NULLのモデル・頂点・辺配列は無視します。奥行き範囲をまたぐ辺は切り詰めず省略します。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nScale, rotate in Y/X/Z order, translate and project at most 24 vertices;\nthen draw up to 16 edges filtered by yaw masks and optional front-facing faces.\nNonpositive scale becomes unity (256). Null model/vertex/edge pointers are\nignored; referenced tables must remain readable. Keep scale products and\ntranslations in signed 16-bit range. Depth-crossing edges are dropped, not clipped."
+  },
+  "wire_Wire3D_DrawModelScaled_purpose": {
+    "ja": "モデルを拡大縮小し、Y・X・Zの順に回転、平行移動、投影して辺を描きます。",
+    "en": "Scale a model, rotate it in Y/X/Z order, translate and project its vertices, then draw edges."
+  },
+  "wire_Wire3D_DrawModelScaled_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3D_DrawModelScaled_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3D_DrawModelScaled_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3D_DrawModelScaled_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3D_DrawModelScaled_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_DrawModelScaled_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_DrawModelScaled_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_DrawModelScaled_arg_scale_q8": {
+    "ja": "256を等倍とする拡大率。0以下も等倍として扱います。",
+    "en": "Scale with 256 as unity; nonpositive values also mean unity."
+  },
+  "wire_Wire3D_DrawModelScaled_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_DrawScene_notes": {
+    "ja": "物体中心の奥行きで順序を決め、面の外接矩形と線上の5点で隠れ方を近似します。ピクセル単位の深度バッファではありません。visibleが有効なモデルを描き、配列自体は並べ替えません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nProcess at most the first eight objects, sorted near to far by transformed\norigin depth. Draw visible valid models, then mark their front-face bounding\nrectangles to reject fully sampled later lines. This approximates inter-object\nocclusion, not a depth buffer. It clears its mask but retains existing staged\npixels. Null arrays are ignored; objects and their data must remain readable."
+  },
+  "wire_Wire3D_DrawScene_purpose": {
+    "ja": "最大8個の物体をカメラに近い順に描き、手前の面で後方の辺を隠します。",
+    "en": "Draw up to eight objects near to far, using nearer faces to hide later edges."
+  },
+  "wire_Wire3D_DrawScene_arg_objects": {
+    "ja": "位置・回転・倍率・visibleを持つ物体配列。",
+    "en": "Object array containing positions, rotations, scales and visibility flags."
+  },
+  "wire_Wire3D_DrawScene_arg_count": {
+    "ja": "渡した配列の要素数。関数固有の処理上限は注意事項を参照してください。",
+    "en": "Number of supplied array entries; see the operation-specific processing limit."
+  },
+  "wire_Wire3D_DrawScene_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_EndFrame_notes": {
+    "ja": "次のVBlankを待って背景予約を反映します。120行設定では有効な補助転送を先に行い、続いてメインを全体またはdirty転送します。ステージは転送で消費します。STAT待ちにより複数の表示期間にまたがる場合があります。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nWait for the next VBlank, flush pending BG map writes, then copy the stage\nto VRAM while polling access windows. Copying consumes the staged pixels.\nThe transfer may extend beyond VBlank; this is not an atomic frame swap."
+  },
+  "wire_Wire3D_EndFrame_purpose": {
+    "ja": "背景予約とステージの描画をVRAMへ反映します。",
+    "en": "Submit pending background writes and staged drawing to VRAM."
+  },
+  "wire_Wire3D_EndFrame_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_EraseModelFaces_notes": {
+    "ja": "隠線フラグと面データが必要です。頂点24・面16まで処理し、投影できない面は省略します。倍率0以下は256です。投影用の共有作業領域を書き換えますが、画面転送は行いません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nProject up to 24 vertices and erase front-facing triangle interiors from\nthe stage for a model with hidden-line flags and face data. Nonpositive scale\nmeans 256 (unity). Up to 16 faces are considered; depth-crossing faces are\nskipped. This also replaces shared projection caches, but does not update VRAM."
+  },
+  "wire_Wire3D_EraseModelFaces_purpose": {
+    "ja": "モデルの手前向きの三角形面を投影し、ステージ上の線を面の内側から消します。",
+    "en": "Project front-facing model triangles and erase staged pixels inside them."
+  },
+  "wire_Wire3D_EraseModelFaces_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3D_EraseModelFaces_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3D_EraseModelFaces_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3D_EraseModelFaces_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3D_EraseModelFaces_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_EraseModelFaces_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_EraseModelFaces_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_EraseModelFaces_arg_scale_q8": {
+    "ja": "256を等倍とする拡大率。0以下も等倍として扱います。",
+    "en": "Scale with 256 as unity; nonpositive values also mean unity."
+  },
+  "wire_wire_wire3d_faces_expected": {
+    "ja": "塗った領域から投影した面を消し、線が残る場所と消える場所を確認します。",
+    "en": "Projected faces erase a filled region, making the retained and cleared areas visible."
+  },
+  "wire_Wire3D_EraseModelFaces_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_EraseSpan2D_notes": {
+    "ja": "Xの左右は自動で並べ替えますが、両端を0～127に収めてください。範囲外のYは無視します。Xのクリッピングは行いません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nOrder the X endpoints and erase the inclusive staged span. Both endpoints\nmust be in 0..127; invalid Y is ignored. The routine does not clip X for you."
+  },
+  "wire_Wire3D_EraseSpan2D_purpose": {
+    "ja": "指定した1行の両端を含む横区間を消去します。",
+    "en": "Erase an inclusive horizontal span on one staged row."
+  },
+  "wire_Wire3D_EraseSpan2D_arg_y": {
+    "ja": "消去する行のY座標（ピクセル）。",
+    "en": "Pixel Y coordinate of the row to erase."
+  },
+  "wire_Wire3D_EraseSpan2D_arg_x0": {
+    "ja": "最小側のX端点（表示領域内のピクセル）。",
+    "en": "Lower X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3D_EraseSpan2D_arg_x1": {
+    "ja": "最大側のX端点（表示領域内のピクセル）。",
+    "en": "Upper X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_Wire3D_EraseSpan2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_EraseTriangle2D_notes": {
+    "ja": "表示領域内の頂点を指定します。面積0の三角形は無視します。マスクや表示済みVRAMは変更しません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nErase a triangle from staged pixels using integer scanline intersections.\nSupply viewport coordinates. Degenerate triangles are ignored; the occlusion\nmask and VRAM are unchanged."
+  },
+  "wire_Wire3D_EraseTriangle2D_purpose": {
+    "ja": "画面座標で指定した三角形の内部を、行ごとの塗りつぶしで消去します。",
+    "en": "Erase a screen-space triangle from the stage using horizontal scanline spans."
+  },
+  "wire_Wire3D_EraseTriangle2D_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_Wire3D_EraseTriangle2D_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_Wire3D_EraseTriangle2D_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_Wire3D_EraseTriangle2D_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_Wire3D_EraseTriangle2D_arg_cx": {
+    "ja": "頂点CのX座標（表示領域内のピクセル）。",
+    "en": "Vertex C X coordinate in viewport pixels."
+  },
+  "wire_Wire3D_EraseTriangle2D_arg_cy": {
+    "ja": "頂点CのY座標（表示領域内のピクセル）。",
+    "en": "Vertex C Y coordinate in viewport pixels."
+  },
+  "wire_Wire3D_EraseTriangle2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_Init_notes": {
+    "ja": "カメラ、背景書き込みキュー、ステージをリセットし、BGPを0xB4に設定します。描画前にBeginFrameを呼びます。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nTake over the LCD: wait for VBlank, switch it off, clear 6144 tile bytes and\nthe BG map, install HUD tiles and the 128x96 signed-tile viewport, then enable\nBG display with scroll zero and BGP=0xB4. Reset camera, BG queue and stage.\nReserve 0xD000..0xDFFF for staging and retain its WRAM bank mapping.\nCall BeginFrame before drawing to initialize the occlusion state as well."
+  },
+  "wire_Wire3D_Init_purpose": {
+    "ja": "LCD・タイル・背景マップを初期化し、モノクロのワイヤーフレーム表示領域を用意します。",
+    "en": "Initialize the LCD, tiles and background map for a monochrome wireframe viewport."
+  },
+  "wire_Wire3D_Init_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_ProjectPoint_notes": {
+    "ja": "奥行き8～255だけを受理します。範囲外なら0を返し、出力値は保持します。成功時は画面端に制限した座標を書き込みます。座標制限は線の幾何学的クリッピングではありません。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nProject a world point with the current camera. Return zero for rejected\ndepth, leaving outputs unchanged; success writes clamped 128x96 coordinates.\nOutput pointers must be valid. Screen clamping is not geometric clipping."
+  },
+  "wire_Wire3D_ProjectPoint_purpose": {
+    "ja": "世界座標の点をカメラから見た画面座標へ変換します。",
+    "en": "Project a world-space point through the camera to viewport coordinates."
+  },
+  "wire_Wire3D_ProjectPoint_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_Wire3D_ProjectPoint_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_Wire3D_ProjectPoint_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_Wire3D_ProjectPoint_arg_sx": {
+    "ja": "投影結果のX座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected X coordinate."
+  },
+  "wire_Wire3D_ProjectPoint_arg_sy": {
+    "ja": "投影結果のY座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected Y coordinate."
+  },
+  "wire_Wire3D_ProjectPoint_return": {
+    "ja": "投影成功時は1、深度で拒否した場合は0です。",
+    "en": "Returns 1 on successful projection or 0 on depth rejection."
+  },
+  "wire_Wire3D_PutBgTile_notes": {
+    "ja": "座標は32×32マップのタイル単位です。48件まで予約でき、範囲外と超過分は無視します。EndFrameで反映する専用キューであり、一般のvramライブラリのキューとは別です。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nQueue a tile write to the 32x32 map at 0x9800 for EndFrame. Invalid map\ncoordinates and submissions beyond 48 pending writes are silently ignored.\nThis queue is separate from the general vram library queue."
+  },
+  "wire_Wire3D_PutBgTile_purpose": {
+    "ja": "背景マップの1セルへのタイル番号書き込みを予約します。",
+    "en": "Queue one tile-number write to a background-map cell."
+  },
+  "wire_Wire3D_PutBgTile_arg_x": {
+    "ja": "32×32背景マップ内のタイル単位のX座標。",
+    "en": "X tile coordinate in the 32x32 background map."
+  },
+  "wire_Wire3D_PutBgTile_arg_y": {
+    "ja": "32×32背景マップ内のタイル単位のY座標。",
+    "en": "Y tile coordinate in the 32x32 background map."
+  },
+  "wire_Wire3D_PutBgTile_arg_tile": {
+    "ja": "背景セルに置く8ビットのタイル番号。",
+    "en": "Eight-bit tile number for the background cell."
+  },
+  "wire_Wire3D_PutBgTile_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_SelectEdgeMask_notes": {
+    "ja": "96行設定で使います。Y回転の下位4ビットを16・8・4・2区分へ割り当て、その他の正の個数では先頭を使います。X/Z回転とカメラは無視します。表はRAMに置き、未指定なら0xFFFFを返します。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nSelect a precomputed mask from the low four bits of object yaw; pitch,\nroll and camera orientation are ignored. Use 16, 8, 4 or 2 bins; other positive\ncounts select entry zero (counts >=16 use the first 16). Missing data returns\n0xFFFF. Keep the mask table readable through the current data-pointer mapping."
+  },
+  "wire_Wire3D_SelectEdgeMask_purpose": {
+    "ja": "物体のY回転に対応する、事前計算済みの辺表示マスクを選びます。",
+    "en": "Select a precomputed edge-visibility mask for the object yaw."
+  },
+  "wire_Wire3D_SelectEdgeMask_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_Wire3D_SelectEdgeMask_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_SelectEdgeMask_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_SelectEdgeMask_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_SelectEdgeMask_return": {
+    "ja": "表示する辺に対応する16ビットマスク。表がなければ0xFFFFです。",
+    "en": "A 16-bit edge visibility mask, or 0xFFFF when no table is supplied."
+  },
+  "wire_Wire3D_SetCamera_notes": {
+    "ja": "角度は16段階で1周します。既に描いた線は移動しません。座標差をs16の範囲に収めてください。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nStore camera position and angles for later draws; a full turn is 16 angle\nsteps. No existing drawing is reprojected and no input range validation occurs."
+  },
+  "wire_Wire3D_SetCamera_purpose": {
+    "ja": "後続の投影に使うカメラ位置と姿勢を保存します。",
+    "en": "Store the camera position and orientation for subsequent projection."
+  },
+  "wire_Wire3D_SetCamera_arg_x": {
+    "ja": "世界座標でのカメラのX成分。",
+    "en": "World-space X component of the camera."
+  },
+  "wire_Wire3D_SetCamera_arg_y": {
+    "ja": "世界座標でのカメラのY成分。",
+    "en": "World-space Y component of the camera."
+  },
+  "wire_Wire3D_SetCamera_arg_z": {
+    "ja": "世界座標でのカメラのZ成分。",
+    "en": "World-space Z component of the camera."
+  },
+  "wire_Wire3D_SetCamera_arg_pitch": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_SetCamera_arg_yaw": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_SetCamera_arg_roll": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_Wire3D_SetCamera_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_Wire3D_SetPalette_notes": {
+    "ja": "2ビットずつのハードウェア形式をそのまま渡します。VBlank待ちは行いません。CGBのRGBパレットは別途設定します。サンプルは0xFCで白地に黒線を表示します。",
+    "en": "WIRE3D_DMG_HEIGHT = 96.\nWrite the raw DMG BGP palette encoding immediately; no frame synchronization occurs."
+  },
+  "wire_Wire3D_SetPalette_purpose": {
+    "ja": "モノクロ背景パレットBGPの4階調の割り当てを直接変更します。",
+    "en": "Write the four-shade mapping of the monochrome background palette register BGP."
+  },
+  "wire_Wire3D_SetPalette_arg_bgp": {
+    "ja": "4色の階調を2ビットずつ並べたBGPレジスタ値。",
+    "en": "BGP register value containing four two-bit shade assignments."
+  },
+  "wire_Wire3D_SetPalette_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_BeginFrame_notes": {
+    "ja": "96行設定ではステージとマスクを消去します。120行設定ではピクセルを消去せず、転送時にステージを消費します。未転送の描画や背景キューを破棄する操作ではありません。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nDisable occlusion filtering only. Stage clearing normally happens during\ntransfer, and Init supplies the first clean stage. This does not discard an\nunsubmitted frame, clear the mask, or reset pending BG writes/dirty flags."
+  },
+  "wire_DMG3D_BeginFrame_purpose": {
+    "ja": "次のフレームの描画を開始し、隠線判定の適用を解除します。",
+    "en": "Begin drawing a frame and disable occlusion testing."
+  },
+  "wire_wire_dmg3d_raster_expected": {
+    "ja": "基本の線・点・消去・座標変換を1画面で確認するサンプルです。 左上の枠の上辺の中央が消え、斜線が中央に投影されます。出力拒否時の座標が91・92のままになることも調べます。",
+    "en": "This sample demonstrates basic lines, points, erasure and projection in one frame. The middle of the upper-left frame’s top edge is erased and a diagonal is projected near the center. Rejected projection preserves outputs 91 and 92."
+  },
+  "wire_DMG3D_BeginFrame_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_DrawIndexedEdges_notes": {
+    "ja": "120行設定用です。頂点24個まで、辺は128組以下にしてください。倍率0は1として扱い、物体回転や面による辺選択は行いません。NULL配列、不正な頂点番号、投影できない端点は無視します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nDraw byte-pair edge indices after integer scaling and translation; scale\nzero means one, and there is no object rotation or face filtering. Project at\nmost 24 vertices. Supply at most 128 edge pairs because byte offsets wrap\nafter 255. Invalid vertex IDs/depth-rejected endpoints are skipped; null arrays\nare ignored. Keep coordinate products/sums representable as s16."
+  },
+  "wire_DMG3D_DrawIndexedEdges_purpose": {
+    "ja": "頂点配列と2バイトずつの辺インデックスから、整数倍率の線モデルを描きます。",
+    "en": "Draw an integer-scaled line model from vertices and two-byte edge-index pairs."
+  },
+  "wire_DMG3D_DrawIndexedEdges_arg_vertices": {
+    "ja": "3D頂点の配列。",
+    "en": "Array of 3D vertices."
+  },
+  "wire_DMG3D_DrawIndexedEdges_arg_vertex_count": {
+    "ja": "頂点配列の要素数。",
+    "en": "Number of vertex-array entries."
+  },
+  "wire_DMG3D_DrawIndexedEdges_arg_edges": {
+    "ja": "辺の両端の頂点番号。構造体またはバイト対という宣言の形式に従います。",
+    "en": "Vertex indices for each edge, in the declared struct or byte-pair format."
+  },
+  "wire_DMG3D_DrawIndexedEdges_arg_edge_count": {
+    "ja": "辺の本数。",
+    "en": "Number of edges."
+  },
+  "wire_DMG3D_DrawIndexedEdges_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_DMG3D_DrawIndexedEdges_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_DMG3D_DrawIndexedEdges_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_DMG3D_DrawIndexedEdges_arg_scale": {
+    "ja": "整数の拡大率。0は1として扱います。",
+    "en": "Integer scale; zero is treated as one."
+  },
+  "wire_wire_dmg3d_direct_expected": {
+    "ja": "投影した横線と補助転送の8×8ブロックを表示し、ステージの元バイトが255から0へ消費されることを確認します。",
+    "en": "A projected horizontal line and an auxiliary 8x8 block demonstrate direct transfers; a source byte changes from 255 to 0 as it is consumed."
+  },
+  "wire_DMG3D_DrawIndexedEdges_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_DrawLine2D_notes": {
+    "ja": "端点は表示領域内に指定します。斜線には接続用のピクセルを補います。120行設定でdirty転送を有効にすると外接するタイル範囲を記録します。VRAMへの反映は転送関数で行います。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nMark the bounding tile rectangle when dirty transfer is enabled, then draw\na connected staged line. Scene drawing may reject it using five mask samples.\nSupply 128x120 viewport endpoints; low-level pixel bounds checks do not clip\nthe segment geometrically."
+  },
+  "wire_DMG3D_DrawLine2D_purpose": {
+    "ja": "画面座標の両端を含む、ピクセルが上下左右につながる線をステージへ描きます。",
+    "en": "Draw an inclusive, four-connected screen-space line into the stage."
+  },
+  "wire_DMG3D_DrawLine2D_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_DMG3D_DrawLine2D_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_DMG3D_DrawLine2D_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_DMG3D_DrawLine2D_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_DMG3D_DrawLine2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_DrawLine3D_notes": {
+    "ja": "両端が奥行き範囲内の場合だけ描きます。近面・遠面との交点を計算する処理はありません。投影後の端点は個別に画面端へ制限されます。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nProject both world endpoints and draw only when both pass the depth range.\nDo not intersect a crossing segment with near/far planes; projected endpoints\nare independently clamped to the screen edges."
+  },
+  "wire_DMG3D_DrawLine3D_purpose": {
+    "ja": "世界座標の両端を投影して、1本の線を描きます。",
+    "en": "Project two world-space endpoints and draw a line between them."
+  },
+  "wire_DMG3D_DrawLine3D_arg_ax": {
+    "ja": "世界座標の始点のX成分。",
+    "en": "Start point’s world-space X component."
+  },
+  "wire_DMG3D_DrawLine3D_arg_ay": {
+    "ja": "世界座標の始点のY成分。",
+    "en": "Start point’s world-space Y component."
+  },
+  "wire_DMG3D_DrawLine3D_arg_az": {
+    "ja": "世界座標の始点のZ成分。",
+    "en": "Start point’s world-space Z component."
+  },
+  "wire_DMG3D_DrawLine3D_arg_bx": {
+    "ja": "世界座標の終点のX成分。",
+    "en": "End point’s world-space X component."
+  },
+  "wire_DMG3D_DrawLine3D_arg_by": {
+    "ja": "世界座標の終点のY成分。",
+    "en": "End point’s world-space Y component."
+  },
+  "wire_DMG3D_DrawLine3D_arg_bz": {
+    "ja": "世界座標の終点のZ成分。",
+    "en": "End point’s world-space Z component."
+  },
+  "wire_DMG3D_DrawLine3D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_DrawModel_notes": {
+    "ja": "倍率256でDrawModelScaledを呼びます。面や隣接情報があるモデルの辺選択にも、その関数の条件が適用されます。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nDraw an unscaled model by delegating to DrawModelScaled with scale 256."
+  },
+  "wire_DMG3D_DrawModel_purpose": {
+    "ja": "頂点・辺のモデルを、指定位置・回転で等倍描画します。",
+    "en": "Draw a vertex-and-edge model at the requested position and rotation at unity scale."
+  },
+  "wire_DMG3D_DrawModel_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_DMG3D_DrawModel_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_DMG3D_DrawModel_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_DMG3D_DrawModel_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_DMG3D_DrawModel_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_DrawModel_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_DrawModel_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_wire_dmg3d_models_expected": {
+    "ja": "上段に等倍と半分のモデル、下段に同じ倍率の物体配列を描き、投影と倍率の関係を比較します。",
+    "en": "Unity and half-scale models appear above an object-array scene at the same scales, demonstrating projection and scaling."
+  },
+  "wire_DMG3D_DrawModel_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_DrawModelScaled_notes": {
+    "ja": "倍率256が等倍、0以下も等倍です。頂点は最大24、面は最大16。96行設定は辺も最大16、120行設定はedge_count個を参照します。NULLのモデル・頂点・辺配列は無視します。奥行き範囲をまたぐ辺は切り詰めず省略します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nScale up to 24 vertices, rotate Y/X/Z, translate and project, then traverse\nall edge_count entries (a byte count) with optional adjacent-face filtering.\nFace scratch is capped at 16; edge tables must contain all declared entries.\nNonpositive scale means 256. Null model/vertex/edge pointers are ignored.\nKeep products/translations in signed 16-bit range; depth-crossing edges are dropped."
+  },
+  "wire_DMG3D_DrawModelScaled_purpose": {
+    "ja": "モデルを拡大縮小し、Y・X・Zの順に回転、平行移動、投影して辺を描きます。",
+    "en": "Scale a model, rotate it in Y/X/Z order, translate and project its vertices, then draw edges."
+  },
+  "wire_DMG3D_DrawModelScaled_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_DMG3D_DrawModelScaled_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_DMG3D_DrawModelScaled_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_DMG3D_DrawModelScaled_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_DMG3D_DrawModelScaled_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_DrawModelScaled_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_DrawModelScaled_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_DrawModelScaled_arg_scale_q8": {
+    "ja": "256を等倍とする拡大率。0以下も等倍として扱います。",
+    "en": "Scale with 256 as unity; nonpositive values also mean unity."
+  },
+  "wire_DMG3D_DrawModelScaled_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_DrawScene_notes": {
+    "ja": "物体中心の奥行きで順序を決め、面の外接矩形と線上の5点で隠れ方を近似します。ピクセル単位の深度バッファではありません。visibleが有効なモデルを描き、配列自体は並べ替えません。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nSort at most eight object origins by camera depth, near to far. Draw visible\nvalid models and mark front-face bounding rectangles for later objects. The\nfirst sorted slot bypasses mask tests and the last needs no new occluder.\nThis is coarse line rejection, not a depth buffer. Null/empty input is ignored;\ncaller data and the current projection cache must remain valid during traversal."
+  },
+  "wire_DMG3D_DrawScene_purpose": {
+    "ja": "最大8個の物体をカメラに近い順に描き、手前の面で後方の辺を隠します。",
+    "en": "Draw up to eight objects near to far, using nearer faces to hide later edges."
+  },
+  "wire_DMG3D_DrawScene_arg_objects": {
+    "ja": "位置・回転・倍率・visibleを持つ物体配列。",
+    "en": "Object array containing positions, rotations, scales and visibility flags."
+  },
+  "wire_DMG3D_DrawScene_arg_count": {
+    "ja": "渡した配列の要素数。関数固有の処理上限は注意事項を参照してください。",
+    "en": "Number of supplied array entries; see the operation-specific processing limit."
+  },
+  "wire_DMG3D_DrawScene_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_EndFrame_notes": {
+    "ja": "次のVBlankを待って背景予約を反映します。120行設定では有効な補助転送を先に行い、続いてメインを全体またはdirty転送します。ステージは転送で消費します。STAT待ちにより複数の表示期間にまたがる場合があります。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nWait for the next VBlank and flush BG writes, then optionally consume the\nauxiliary strips before uploading either dirty tiles or the entire main stage.\nAuxiliary/main source overlap makes that ordering significant. STAT polling\ncontinues across access windows; the update need not fit one VBlank."
+  },
+  "wire_DMG3D_EndFrame_purpose": {
+    "ja": "背景予約とステージの描画をVRAMへ反映します。",
+    "en": "Submit pending background writes and staged drawing to VRAM."
+  },
+  "wire_DMG3D_EndFrame_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_EraseModelFaces_notes": {
+    "ja": "隠線フラグと面データが必要です。頂点24・面16まで処理し、投影できない面は省略します。倍率0以下は256です。投影用の共有作業領域を書き換えますが、画面転送は行いません。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nProject up to 24 vertices and erase front-facing triangle interiors from\nthe stage for a model with hidden-line flags and face data. Nonpositive scale\nmeans 256 (unity). Up to 16 faces are considered; depth-crossing faces are\nskipped. This also replaces shared projection caches, but does not update VRAM."
+  },
+  "wire_DMG3D_EraseModelFaces_purpose": {
+    "ja": "モデルの手前向きの三角形面を投影し、ステージ上の線を面の内側から消します。",
+    "en": "Project front-facing model triangles and erase staged pixels inside them."
+  },
+  "wire_DMG3D_EraseModelFaces_arg_model": {
+    "ja": "頂点・辺・面の配列と個数を持つモデル。表は呼び出し中に読み取れる領域に置きます。",
+    "en": "Model holding vertex, edge and face arrays and counts; its tables must remain readable during the call."
+  },
+  "wire_DMG3D_EraseModelFaces_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_DMG3D_EraseModelFaces_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_DMG3D_EraseModelFaces_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_DMG3D_EraseModelFaces_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_EraseModelFaces_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_EraseModelFaces_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_EraseModelFaces_arg_scale_q8": {
+    "ja": "256を等倍とする拡大率。0以下も等倍として扱います。",
+    "en": "Scale with 256 as unity; nonpositive values also mean unity."
+  },
+  "wire_wire_dmg3d_faces_expected": {
+    "ja": "塗った領域から投影した面を消し、線が残る場所と消える場所を確認します。",
+    "en": "Projected faces erase a filled region, making the retained and cleared areas visible."
+  },
+  "wire_DMG3D_EraseModelFaces_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_EraseSpan2D_notes": {
+    "ja": "Xの左右は自動で並べ替えますが、両端を0～127に収めてください。範囲外のYは無視します。Xのクリッピングは行いません。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nOrder the X endpoints and erase the inclusive staged span. Both endpoints\nmust be in 0..127; invalid Y is ignored. The routine does not clip X for you."
+  },
+  "wire_DMG3D_EraseSpan2D_purpose": {
+    "ja": "指定した1行の両端を含む横区間を消去します。",
+    "en": "Erase an inclusive horizontal span on one staged row."
+  },
+  "wire_DMG3D_EraseSpan2D_arg_y": {
+    "ja": "消去する行のY座標（ピクセル）。",
+    "en": "Pixel Y coordinate of the row to erase."
+  },
+  "wire_DMG3D_EraseSpan2D_arg_x0": {
+    "ja": "最小側のX端点（表示領域内のピクセル）。",
+    "en": "Lower X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_DMG3D_EraseSpan2D_arg_x1": {
+    "ja": "最大側のX端点（表示領域内のピクセル）。",
+    "en": "Upper X endpoint in viewport pixels; ordering and clipping follow this operation’s notes."
+  },
+  "wire_DMG3D_EraseSpan2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_EraseTriangle2D_notes": {
+    "ja": "表示領域内の頂点を指定します。面積0の三角形は無視します。マスクや表示済みVRAMは変更しません。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nErase a triangle from staged pixels using integer scanline intersections.\nSupply viewport coordinates. Degenerate triangles are ignored; the occlusion\nmask and VRAM are unchanged."
+  },
+  "wire_DMG3D_EraseTriangle2D_purpose": {
+    "ja": "画面座標で指定した三角形の内部を、行ごとの塗りつぶしで消去します。",
+    "en": "Erase a screen-space triangle from the stage using horizontal scanline spans."
+  },
+  "wire_DMG3D_EraseTriangle2D_arg_ax": {
+    "ja": "頂点AのX座標（表示領域内のピクセル）。",
+    "en": "Vertex A X coordinate in viewport pixels."
+  },
+  "wire_DMG3D_EraseTriangle2D_arg_ay": {
+    "ja": "頂点AのY座標（表示領域内のピクセル）。",
+    "en": "Vertex A Y coordinate in viewport pixels."
+  },
+  "wire_DMG3D_EraseTriangle2D_arg_bx": {
+    "ja": "頂点BのX座標（表示領域内のピクセル）。",
+    "en": "Vertex B X coordinate in viewport pixels."
+  },
+  "wire_DMG3D_EraseTriangle2D_arg_by": {
+    "ja": "頂点BのY座標（表示領域内のピクセル）。",
+    "en": "Vertex B Y coordinate in viewport pixels."
+  },
+  "wire_DMG3D_EraseTriangle2D_arg_cx": {
+    "ja": "頂点CのX座標（表示領域内のピクセル）。",
+    "en": "Vertex C X coordinate in viewport pixels."
+  },
+  "wire_DMG3D_EraseTriangle2D_arg_cy": {
+    "ja": "頂点CのY座標（表示領域内のピクセル）。",
+    "en": "Vertex C Y coordinate in viewport pixels."
+  },
+  "wire_DMG3D_EraseTriangle2D_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_Init_notes": {
+    "ja": "カメラ、背景書き込みキュー、ステージをリセットし、BGPを0xB4に設定します。描画前にBeginFrameを呼びます。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nTake over LCD state, clear tile VRAM and the BG map, and install a 16x15\nviewport beginning at map tile (3,1). Set scroll (8,0), BGP=0xB4 and BG display.\nReset camera, queues, transfer modes, both dirty tables and stage. Reserve\n0xD000..0xDFFF and retain its WRAM mapping; auxiliary storage aliases it.\nCall BeginFrame before drawing to establish occlusion state."
+  },
+  "wire_DMG3D_Init_purpose": {
+    "ja": "LCD・タイル・背景マップを初期化し、モノクロのワイヤーフレーム表示領域を用意します。",
+    "en": "Initialize the LCD, tiles and background map for a monochrome wireframe viewport."
+  },
+  "wire_DMG3D_Init_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_ProjectPoint_notes": {
+    "ja": "奥行き8～255だけを受理します。範囲外なら0を返し、出力値は保持します。成功時は画面端に制限した座標を書き込みます。座標制限は線の幾何学的クリッピングではありません。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nProject a world point with the current camera. Return zero for invalid\ndepth without changing outputs; success writes clamped 128x120 coordinates.\nBoth output pointers must be valid. Coordinate differences must fit s16."
+  },
+  "wire_DMG3D_ProjectPoint_purpose": {
+    "ja": "世界座標の点をカメラから見た画面座標へ変換します。",
+    "en": "Project a world-space point through the camera to viewport coordinates."
+  },
+  "wire_DMG3D_ProjectPoint_arg_x": {
+    "ja": "世界座標での点または物体中心のX成分。",
+    "en": "World-space X component of the point or object origin."
+  },
+  "wire_DMG3D_ProjectPoint_arg_y": {
+    "ja": "世界座標での点または物体中心のY成分。",
+    "en": "World-space Y component of the point or object origin."
+  },
+  "wire_DMG3D_ProjectPoint_arg_z": {
+    "ja": "世界座標での点または物体中心のZ成分。",
+    "en": "World-space Z component of the point or object origin."
+  },
+  "wire_DMG3D_ProjectPoint_arg_sx": {
+    "ja": "投影結果のX座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected X coordinate."
+  },
+  "wire_DMG3D_ProjectPoint_arg_sy": {
+    "ja": "投影結果のY座標を書き込む、有効なu8領域へのポインタ。",
+    "en": "Valid writable u8 pointer receiving the projected Y coordinate."
+  },
+  "wire_DMG3D_ProjectPoint_return": {
+    "ja": "投影成功時は1、深度で拒否した場合は0です。",
+    "en": "Returns 1 on successful projection or 0 on depth rejection."
+  },
+  "wire_DMG3D_PutBgTile_notes": {
+    "ja": "座標は32×32マップのタイル単位です。48件まで予約でき、範囲外と超過分は無視します。EndFrameで反映する専用キューであり、一般のvramライブラリのキューとは別です。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nQueue a tile write to the 32x32 map at 0x9800 for EndFrame. Invalid map\ncoordinates and submissions beyond 48 pending writes are silently ignored.\nThis queue is separate from the general vram library queue."
+  },
+  "wire_DMG3D_PutBgTile_purpose": {
+    "ja": "背景マップの1セルへのタイル番号書き込みを予約します。",
+    "en": "Queue one tile-number write to a background-map cell."
+  },
+  "wire_DMG3D_PutBgTile_arg_x": {
+    "ja": "32×32背景マップ内のタイル単位のX座標。",
+    "en": "X tile coordinate in the 32x32 background map."
+  },
+  "wire_DMG3D_PutBgTile_arg_y": {
+    "ja": "32×32背景マップ内のタイル単位のY座標。",
+    "en": "Y tile coordinate in the 32x32 background map."
+  },
+  "wire_DMG3D_PutBgTile_arg_tile": {
+    "ja": "背景セルに置く8ビットのタイル番号。",
+    "en": "Eight-bit tile number for the background cell."
+  },
+  "wire_DMG3D_PutBgTile_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_RotatePoint_notes": {
+    "ja": "120行設定で使います。16段階の角度でY・X・Zの順に回転し、各軸の回転前に成分を±220へ制限します。いずれかのポインタがNULLなら何もせず、各成分には別々の領域を指定します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nRotate in place in Y/X/Z order using 16 steps per full turn. A null\ncomponent pointer makes the whole call a no-op; use distinct pointers.\nEach axis rotation clamps its inputs to +/-220."
+  },
+  "wire_DMG3D_RotatePoint_purpose": {
+    "ja": "1点のX・Y・Zを、指定した回転で直接書き換えます。",
+    "en": "Rotate one point in place by the supplied angles."
+  },
+  "wire_DMG3D_RotatePoint_arg_x": {
+    "ja": "X成分を読み書きする独立したs16領域へのポインタ。",
+    "en": "Distinct writable s16 pointer for the X component."
+  },
+  "wire_DMG3D_RotatePoint_arg_y": {
+    "ja": "Y成分を読み書きする独立したs16領域へのポインタ。",
+    "en": "Distinct writable s16 pointer for the Y component."
+  },
+  "wire_DMG3D_RotatePoint_arg_z": {
+    "ja": "Z成分を読み書きする独立したs16領域へのポインタ。",
+    "en": "Distinct writable s16 pointer for the Z component."
+  },
+  "wire_DMG3D_RotatePoint_arg_rx": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_RotatePoint_arg_ry": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_RotatePoint_arg_rz": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_RotatePoint_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_SetAuxTransfer_notes": {
+    "ja": "120行設定用です。0で無効、それ以外で有効です。この呼び出しだけでは転送・消去を行いません。補助転送の元データはメインステージと重なります。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nStore the EndFrame auxiliary-transfer gate; any nonzero value enables it.\nNo data is copied or cleared here. Auxiliary source bytes alias the main stage."
+  },
+  "wire_DMG3D_SetAuxTransfer_purpose": {
+    "ja": "EndFrameで補助領域も転送するかどうかを設定します。",
+    "en": "Choose whether EndFrame also transfers the auxiliary strips."
+  },
+  "wire_DMG3D_SetAuxTransfer_arg_flag": {
+    "ja": "0で転送機能を無効、それ以外で有効にします。",
+    "en": "Zero disables the transfer feature; any other value enables it."
+  },
+  "wire_wire_dmg3d_aux_gate_expected": {
+    "ja": "メインステージの一部を補助転送へ渡し、画面座標(80,24)に8×8の黒いブロックを表示します。",
+    "en": "Part of the main stage is consumed by auxiliary transfer, producing a black 8x8 block at screen coordinate (80,24)."
+  },
+  "wire_DMG3D_SetAuxTransfer_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_SetCamera_notes": {
+    "ja": "角度は16段階で1周します。既に描いた線は移動しません。座標差をs16の範囲に収めてください。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nStore camera position and angles for later draws; a full turn is 16 angle\nsteps. No existing drawing is reprojected and no input range validation occurs."
+  },
+  "wire_DMG3D_SetCamera_purpose": {
+    "ja": "後続の投影に使うカメラ位置と姿勢を保存します。",
+    "en": "Store the camera position and orientation for subsequent projection."
+  },
+  "wire_DMG3D_SetCamera_arg_x": {
+    "ja": "世界座標でのカメラのX成分。",
+    "en": "World-space X component of the camera."
+  },
+  "wire_DMG3D_SetCamera_arg_y": {
+    "ja": "世界座標でのカメラのY成分。",
+    "en": "World-space Y component of the camera."
+  },
+  "wire_DMG3D_SetCamera_arg_z": {
+    "ja": "世界座標でのカメラのZ成分。",
+    "en": "World-space Z component of the camera."
+  },
+  "wire_DMG3D_SetCamera_arg_pitch": {
+    "ja": "X軸の回転。16段階で1周します。",
+    "en": "Rotation about X; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_SetCamera_arg_yaw": {
+    "ja": "Y軸の回転。16段階で1周します。",
+    "en": "Rotation about Y; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_SetCamera_arg_roll": {
+    "ja": "Z軸の回転。16段階で1周します。",
+    "en": "Rotation about Z; sixteen steps make a full turn."
+  },
+  "wire_DMG3D_SetCamera_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_SetDirtyTransfer_notes": {
+    "ja": "値が同じでも現在・過去のdirty記録とステージを消去します。表示中のVRAMは保持します。古い画像が残る状態で有効化すると未登録のタイルが残り得るため、初期化直後など白紙の画面で設定します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nStore the dirty-transfer gate and clear both dirty histories and the main\nstage, even if the value is unchanged. VRAM is retained; enabling this over an\nold image can leave unmarked old tiles, so arrange a clean displayed baseline."
+  },
+  "wire_DMG3D_SetDirtyTransfer_purpose": {
+    "ja": "120行表示のメイン転送を、変更タイル中心の転送へ切り替えます。",
+    "en": "Select dirty-tile transfer for the 120-row main viewport."
+  },
+  "wire_DMG3D_SetDirtyTransfer_arg_flag": {
+    "ja": "0で転送機能を無効、それ以外で有効にします。",
+    "en": "Zero disables the transfer feature; any other value enables it."
+  },
+  "wire_wire_dmg3d_dirty_expected": {
+    "ja": "左上の古い枠を消し、画面座標(96,88)～(120,112)に新しい枠だけを表示します。",
+    "en": "The old upper-left frame disappears, leaving only a new frame at screen coordinates (96,88)..(120,112)."
+  },
+  "wire_DMG3D_SetDirtyTransfer_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_SetPalette_notes": {
+    "ja": "2ビットずつのハードウェア形式をそのまま渡します。VBlank待ちは行いません。CGBのRGBパレットは別途設定します。サンプルは0xFCで白地に黒線を表示します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nWrite the raw DMG BGP palette encoding immediately; no frame synchronization occurs."
+  },
+  "wire_DMG3D_SetPalette_purpose": {
+    "ja": "モノクロ背景パレットBGPの4階調の割り当てを直接変更します。",
+    "en": "Write the four-shade mapping of the monochrome background palette register BGP."
+  },
+  "wire_DMG3D_SetPalette_arg_bgp": {
+    "ja": "4色の階調を2ビットずつ並べたBGPレジスタ値。",
+    "en": "BGP register value containing four two-bit shade assignments."
+  },
+  "wire_DMG3D_SetPalette_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_TransferAuxNow_notes": {
+    "ja": "120行設定用です。補助転送の有効設定にかかわらず実行し、VBlank開始・dirty記録・背景予約を扱いません。元領域D518＋256×列から56バイトずつを読みます。メインステージと重なるため転送順に注意します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nUpload and consume auxiliary source strips immediately, independent of the\nauxiliary gate. No VBlank-start wait or dirty-history/BG-queue update occurs.\nThe source overlaps the main stage and must be coordinated with its upload."
+  },
+  "wire_DMG3D_TransferAuxNow_purpose": {
+    "ja": "補助用の6本のストリップを直ちに転送し、元データを消去します。",
+    "en": "Immediately upload six auxiliary strips and clear their source bytes."
+  },
+  "wire_DMG3D_TransferAuxNow_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_DMG3D_TransferMainNow_notes": {
+    "ja": "120行設定用です。STATでVRAMアクセスを待ちますが、次のVBlank開始は待ちません。転送設定に従わず、dirty記録や背景予約を変更しません。呼び出し側で表示周期を管理します。",
+    "en": "WIRE3D_DMG_HEIGHT = 120.\nUpload and consume the full main stage immediately, polling STAT but not\nwaiting for the next VBlank. Ignore transfer gates and leave dirty histories\nand BG tile queue unchanged; the caller coordinates the frame lifecycle."
+  },
+  "wire_DMG3D_TransferMainNow_purpose": {
+    "ja": "メインステージ全体を直ちに転送し、読み出したステージを消去します。",
+    "en": "Immediately upload the whole main stage and clear the consumed source pixels."
+  },
+  "wire_DMG3D_TransferMainNow_return": {
+    "ja": "戻り値はありません。作用する状態と画面への反映時期は上記の通りです。",
+    "en": "No return value; the state affected and display timing are described above."
+  },
+  "wire_module_wire3d_dmg": {
+    "ja": "モノクロの3D線描画です。モデルの頂点・辺・面と物体の位置・回転・倍率を指定し、初期化→フレーム開始→描画→転送の順で使います。物理計算は別途行います。角度は16段階、モデル倍率は256が等倍です。",
+    "en": "Monochrome 3D line drawing. Supply model vertices, edges and faces and object position, rotation and scale. Use initialization, frame start, drawing and upload in that order. Physics is separate. Angles have sixteen steps per turn; model scale 256 is unity."
+  },
+  "wire_model_fields": {
+    "ja": "Vec3はx/y/z、Edgeは頂点番号a/b、Faceは三角形の頂点番号a/b/cを持ちます。Modelのvertices・edges・facesはそれらの配列、各countは要素数です。edge_facesは辺に隣接する面番号f0/f1で、FACE_NONEは面なしを表します。flagsのMODEL_HIDDEN_LINESは面を用いた辺選択を要求します。面の向きは投影後の符号付き面積で判定するため、頂点の並べ方が重要です。",
+    "en": "Vec3 holds x/y/z, Edge vertex indices a/b, and Face triangle indices a/b/c. Model vertices, edges and faces point to these arrays; each count gives its length. edge_faces contains adjacent face indices f0/f1, with FACE_NONE for a missing face. MODEL_HIDDEN_LINES in flags requests face-based edge selection. Projected signed area determines face orientation, so vertex order matters."
+  },
+  "wire_object_fields": {
+    "ja": "Objectはmodelへの参照と、位置x/y/z・角度rx/ry/rz・倍率scale_q8・表示可否visibleを保持します。モデルの共有は可能ですが、表をコピーしたりROMバンクを自動で切り替えたりはしません。参照先を描画中に読み取れるように配置します。CGBのObjectには色番号colorもあります。",
+    "en": "Object stores a model reference, position x/y/z, angles rx/ry/rz, scale_q8 and visible. Objects may share a model, but drawing neither copies tables nor automatically switches their ROM banks. Keep referenced data readable throughout drawing. CGB Object also has a color index."
+  },
+  "wire_yaw_table": {
+    "ja": "96行設定のModelにはedge_masksとedge_mask_countもあります。物体のY回転に対応する16ビットの辺マスクをRAMへ用意します。使わない場合は両方を0にします。",
+    "en": "The 96-row Model also contains edge_masks and edge_mask_count. Supply a RAM table of 16-bit edge masks selected by object yaw, or set both fields to zero when unused."
+  },
+  "wire_module_wire3d": {
+    "ja": "モノクロの3D線描画です。モデルの頂点・辺・面と物体の位置・回転・倍率を指定し、初期化→フレーム開始→描画→転送の順で使います。物理計算は別途行います。角度は16段階、モデル倍率は256が等倍です。",
+    "en": "Monochrome 3D line drawing. Supply model vertices, edges and faces and object position, rotation and scale. Use initialization, frame start, drawing and upload in that order. Physics is separate. Angles have sixteen steps per turn; model scale 256 is unity."
+  },
+  "wire_module_dmg3d": {
+    "ja": "モノクロの3D線描画です。モデルの頂点・辺・面と物体の位置・回転・倍率を指定し、初期化→フレーム開始→描画→転送の順で使います。物理計算は別途行います。角度は16段階、モデル倍率は256が等倍です。",
+    "en": "Monochrome 3D line drawing. Supply model vertices, edges and faces and object position, rotation and scale. Use initialization, frame start, drawing and upload in that order. Physics is separate. Angles have sixteen steps per turn; model scale 256 is unity."
+  },
+  "wire_module_wire3d_cgb": {
+    "ja": "CGB専用の色付きワイヤーフレームです。128×96のピクセル描画、160×144のタイル割り当て描画、輪郭タイルを並べるFastMapは別の初期化と転送手順を使います。モデルは頂点・辺・三角形面を呼び出し側が保持します。物理計算は行いません。",
+    "en": "Color wireframes for CGB. The 128x96 pixel renderer, 160x144 tile allocator and outline-tile FastMap use distinct initialization and transfer sequences. The caller owns model vertices, edges and triangular faces. This module does not simulate physics."
+  },
+  "wire_fast_cube_fields": {
+    "ja": "FastCubeのx/yは画面中心からの変位、zは大きさや描画順の選択に使います。FastCubesは角度を使わず、FastCubeFrameはrx/ry/rzから4種類のスタンプを選びます。これらの簡易表示を、カメラ投影を行うDrawModelと区別して使ってください。",
+    "en": "FastCube x/y are offsets from the screen center; z selects size or drawing order. FastCubes ignores angles, whereas FastCubeFrame uses rx/ry/rz to choose four stamp variants. These simplified displays serve different purposes from camera-projected DrawModel."
+  }
+}

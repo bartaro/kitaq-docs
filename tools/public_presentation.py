@@ -42,6 +42,8 @@ def public_file(relative):
         return False
     if path.parts[:3] in [('verification','api-flags','state'),('verification','api-rle','state'),('verification','api-text-layout','state'),('verification','api-dialogue','state'),('verification','api-batch100','state'),('verification','api-batch200','state')]:
         return False
+    if path.parts[:3] in [('verification','api-physics','state'),('verification','api-physics','multiply')]:
+        return False
     return path.parts[0] != 'verification' or path.suffix in PUBLIC_EVIDENCE_SUFFIXES
 
 

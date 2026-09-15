@@ -1,0 +1,32 @@
+{
+  "ja": {
+    "title": "physics2d.h — 1/8ピクセル単位の移動データ",
+    "paragraphs": [
+      "KITAQFCのphysics2d.hは、移動データに使う型と定数を定義するヘッダーです。積分・衝突・重力を実行する関数は含みません。下のgame_stepは、これらの定義を使ってゲーム側で実装した処理です。",
+      "KQ2DPositionは整数ピクセル位置（0～255）、KQ2DFractionは端数（0～7）、KQ2DSpeedは1刻み当たりの移動量の大きさ（1/8ピクセル単位、0～255）、KQ2DDirectionは方向を保持します。各型の実体はu8です。速度の符号を同じ変数に格納しません。",
+      "KQ2D_SUBPIXEL_BITS=3、ONE=8、MASK=7を使い、位置×8＋端数を16ビットへ広げて計算します。方向のNONE=0は停止、NEGATIVE=1は減算、POSITIVE=2は加算を表します。計算後の位置が0～255に収まり、減算が0未満にならないようにゲーム側で境界を処理してください。",
+      "KQ2D_DRAG_BRAKE=1、STUN=2、COAST=3、THRUST=4は、ゲーム側の制動・停止効果・慣性・推進などを区別する識別値です。これらを代入するだけで減速や加速は起こりません。効果と継続時間をゲームの更新処理で定義します。"
+    ],
+    "example_title": "使用例：半ピクセルずつ進む物体",
+    "expected": "上の赤い16×16ピクセルの箱はX=24、下の箱は16刻み後のX=32を示します。速度4は1刻み当たり4/8＝0.5ピクセルなので、16刻みで8ピクセル進みます。Y座標の違いは比較のための配置です。その後、逆方向へ8刻み進める数値確認ではX=28、端数0になります。",
+    "caption": "KUROSAKIで確認した表示：開始位置と、半ピクセル移動を16回積算した位置。",
+    "download": "完全なサンプルプログラム",
+    "build_title": "ビルド"
+  },
+  "en": {
+    "title": "physics2d.h — Eighth-pixel motion data",
+    "paragraphs": [
+      "KITAQFC's physics2d.h defines types and constants for motion data. It contains no integration, collision or gravity functions. The game_step routine below belongs to the example and shows how a game can use those definitions.",
+      "KQ2DPosition stores an integer pixel position (0..255), KQ2DFraction a remainder (0..7), KQ2DSpeed a displacement magnitude per tick in eighths of a pixel (0..255), and KQ2DDirection the direction. All four types are u8. Direction is stored separately from speed rather than encoded as a sign.",
+      "Use KQ2D_SUBPIXEL_BITS=3, ONE=8 and MASK=7 to combine position*8+fraction in a 16-bit intermediate. Direction NONE=0 means no movement, NEGATIVE=1 means subtraction and POSITIVE=2 means addition. The game must handle boundaries so subtraction stays nonnegative and the resulting integer position remains within 0..255.",
+      "KQ2D_DRAG_BRAKE=1, STUN=2, COAST=3 and THRUST=4 are identifiers for game-defined braking, stun, coasting and thrust behavior. Assigning one does not apply acceleration or drag. Define each effect and its duration in your update routine."
+    ],
+    "example_title": "Example: accumulating half-pixel movement",
+    "expected": "The upper red 16x16-pixel box starts at X=24; the lower box shows X=32 after 16 ticks. Speed 4 means 4/8=0.5 pixels per tick, giving eight pixels over 16 ticks. The different Y positions separate the two views for comparison. A subsequent numerical check moves back for eight ticks and obtains X=28 with fraction 0.",
+    "caption": "Verified in KUROSAKI: the initial position and the position after accumulating 16 half-pixel steps.",
+    "download": "Complete sample program",
+    "build_title": "Build"
+  },
+  "code": "void game_step() {\n    u16 total;\n    total=(u16)position*KQ2D_SUBPIXEL_ONE+fraction;\n    if(direction==KQ2D_DIR_POSITIVE) total=total+speed;\n    else if(direction==KQ2D_DIR_NEGATIVE) total=total-speed;\n    position=(KQ2DPosition)(total>>KQ2D_SUBPIXEL_BITS);\n    fraction=(KQ2DFraction)(total&KQ2D_SUBPIXEL_MASK);\n}\n// Initial state: position=24; fraction=0; speed=4;\n// direction=KQ2D_DIR_POSITIVE; call game_step() 16 times.",
+  "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\physics_subpixel.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\physics_subpixel.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+}
