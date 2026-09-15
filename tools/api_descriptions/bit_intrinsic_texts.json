@@ -1,0 +1,74 @@
+{
+ "bi_test": {
+  "en":"Read one flag from a packed array of bits without modifying the array. This lets eight independent on/off flags share each byte of RAM. The result tells you whether the selected bit is clear or set; its numeric representation depends on the target.",
+  "ja":"複数のフラグを各ビットに詰めた配列から、1つのフラグを読み取ります。配列の内容は変更しません。RAMの1バイトで8個のオン・オフ状態を保持できます。結果は対象ビットが0か1かを示しますが、返される数値の形式はGB版とFC版で異なります。"
+ },
+ "bi_set": {
+  "en":"Set the selected flag to 1 while preserving the other seven bits in the same byte. For example, mark a quest as completed or an item as collected. Setting a bit that is already 1 leaves it unchanged; this is not a toggle.",
+  "ja":"指定したフラグを1にし、同じバイト内の他の7ビットは維持します。例えば、クエストの完了状態やアイテムの取得状態を記録できます。すでに1のビットを再び指定しても状態は変わりません。オン・オフを反転する操作ではありません。"
+ },
+ "bi_clear": {
+  "en":"Clear the selected flag to 0 without clearing the rest of its byte. Use this to remove one stored condition, such as a temporary status flag. Clearing the same bit again still leaves it at 0.",
+  "ja":"指定したフラグだけを0にします。そのフラグを含むバイト全体を消去するわけではありません。一時的な状態フラグなど、記録した条件を1つだけ解除する際に使います。同じビットを再び解除しても0のままです。"
+ },
+ "bi_toggle": {
+  "en":"Invert the selected flag: 0 becomes 1 and 1 becomes 0. The remaining bits are preserved. Two calls on the same bit restore its original state, provided nothing else writes that bit between the calls.",
+  "ja":"指定したフラグを反転し、0なら1、1なら0にします。他のビットは維持します。途中で他の処理が書き換えなければ、同じビットを2回反転すると元の状態に戻ります。"
+ },
+ "bi_base": {
+  "en":"Pointer to the first byte of the flag array in CPU-accessible memory. The array is not allocated or initialized by this call. Use writable RAM for set, clear and toggle operations; the test operation only reads it.",
+  "ja":"CPUからアクセスできるフラグ配列の先頭バイトへのポインターです。この呼び出しで配列の確保や初期化は行いません。設定・解除・反転には書き込み可能なRAMを使ってください。判定処理は読み取りだけを行います。"
+ },
+ "bi_index": {
+  "en":"Zero-based bit index as `u16` (0–65535), not a byte offset or a bit mask. Index 0 selects mask `0x01` in byte 0; index 7 selects `0x80` in byte 0; index 8 selects `0x01` in byte 1. In general, the byte offset is `index / 8` and the mask is `1 << (index % 8)`. For an N-byte array, require `index < 8*N` and a valid CPU address range.",
+  "ja":"0から始まる`u16`のビット番号（0〜65535）です。バイト単位のオフセットやビットマスクではありません。番号0は0番目のバイトの`0x01`、番号7は同じバイトの`0x80`、番号8は1番目のバイトの`0x01`を選びます。一般に、バイト位置は`index / 8`、マスクは`1 << (index % 8)`です。Nバイトの配列なら`index < 8*N`を満たし、計算後のCPUアドレスも有効な範囲に収まる必要があります。"
+ },
+ "bi_return_gb": {
+  "en":"`u8`: exactly 0 when the bit is clear, or 1 when it is set. The GB implementation normalizes the masked byte to these two values.",
+  "ja":"`u8`で、ビットが0なら0、1なら1を返します。GB版はビットマスクを適用した結果を0または1にそろえて返します。"
+ },
+ "bi_return_fc": {
+  "en":"`u8`: 0 when the bit is clear, otherwise its mask: 1, 2, 4, 8, 16, 32, 64 or 128. The result is `base[bit >> 3] & (1 << (bit & 7))`. For example, testing a set bit 7 returns 128. Use `result != 0` to test whether the flag is set; comparing only with 1 would miss flags in other bit positions.",
+  "ja":"`u8`で、ビットが0なら0、1ならそのビットのマスク値である1・2・4・8・16・32・64・128のいずれかを返します。計算は`base[bit >> 3] & (1 << (bit & 7))`です。例えば、1になっているビット7を調べると128を返します。有効かどうかは`result != 0`で判定してください。1とだけ比較すると、他の位置のビットが1でも見落とします。"
+ },
+ "bi_limits": {
+  "en":"The caller must provide enough storage. There is no array-length argument, bounds clipping, bank switching or automatic graphics upload. A large bit number can select a byte well beyond the allocated array. Keep the memory mapping stable; do not use these RAM-flag helpers as a shortcut for hardware registers whose reads or writes have side effects.",
+  "ja":"必要な記憶領域は呼び出し側で用意します。配列長を渡す引数、範囲外の切り詰め、バンク切り替え、画面への自動転送はありません。大きなビット番号を渡すと、確保した配列の外を読み書きすることがあります。処理中はメモリーマップを維持してください。読み書きに副作用があるハードウェアレジスターを、RAM上のフラグと同じつもりで操作しないでください。"
+ },
+ "bi_concurrent": {
+  "en":"Set, clear and toggle read a byte, modify the selected bit, then write the byte back. This sequence is not an atomic update. Coordinate writers in the main loop and interrupt handlers so that an intervening update to another bit in the same byte is not lost.",
+  "ja":"設定・解除・反転は、1バイトを読み取り、対象ビットを変更してから同じバイトへ書き戻します。この一連の処理は不可分ではありません。メインループと割り込み処理の書き込みを調整し、途中で同じバイトの別のビットに加えた変更が失われないようにしてください。"
+ },
+ "bi_fc_helper": {
+  "en":"FC code may inline a constant index or call a generated helper. Both forms use the same bit numbering and test-result mask. The generated helpers share argument and scratch storage, so do not re-enter them from NMI/IRQ during another helper call.",
+  "ja":"FC版は、ビット番号が定数なら処理を呼び出し位置へ展開する場合があり、それ以外は生成した補助処理を呼びます。どちらもビット番号の扱いと判定時のマスク値は同じです。補助処理は引数・作業領域を共有するため、別の補助処理の実行中にNMI・IRQから再び呼び出さないでください。"
+ },
+ "bi_demo_test": {
+  "en":"Start with byte 0 equal to `0xA4` (binary `10100100`). Testing bit 1 returns 0. Testing bit 7 returns 1 on GB or 128 on FC; the sample also converts that nonzero result to a shared on/off flag and checks that the original byte is unchanged. Look at TEST OFF and TEST ON in the screen below.",
+  "ja":"0番目のバイトを`0xA4`（2進数`10100100`）にして始めます。ビット1を調べると0を返します。ビット7ではGB版が1、FC版が128を返します。サンプルはその結果が0でないことから共通のオン・オフ値も求め、元のバイトが変わっていないことを照合します。下の画像のTEST OFF・TEST ONを確認してください。"
+ },
+ "bi_demo_set": {
+  "en":"Set bit 1 of `0xA4`: `10100100 | 00000010` becomes `10100110`, or `0xA6` (decimal 166). The SET BIT1 row must show 166. The sample sets the bit a second time and verifies that the byte remains `0xA6`, demonstrating that repeated setting does not invert a flag.",
+  "ja":"`0xA4`のビット1を設定します。`10100100 | 00000010`は`10100110`、つまり`0xA6`（10進数166）になります。SET BIT1の行が166なら正常です。サンプルでは同じビットをもう一度設定し、`0xA6`のままであることも確認します。繰り返し設定してもフラグが反転しないことを示す例です。"
+ },
+ "bi_demo_clear": {
+  "en":"The complete program reaches this step with byte 0 equal to `0xA6`. Clearing bit 2 changes it to `0xA2` (binary `10100010`, decimal 162); the CLEAR BIT2 row must show 162. Clearing bit 2 again leaves the result unchanged. The other stored flags survive both calls.",
+  "ja":"全体プログラムでは、この処理の直前に0番目のバイトが`0xA6`になっています。ビット2を解除すると`0xA2`（2進数`10100010`、10進数162）になり、CLEAR BIT2の行に162を表示します。再びビット2を解除しても値は変わらず、他のフラグは両方の呼び出しで維持されます。"
+ },
+ "bi_demo_toggle": {
+  "en":"The complete program enters this step with `0xA2`. Toggling bit 7 produces `0x22` (decimal 34), so TOGGLE BIT7 shows 034. Toggling it again restores `0xA2`, and RESTORE shows 162. These two observations demonstrate both directions of the inversion while preserving the other bits.",
+  "ja":"全体プログラムでは、この処理を`0xA2`から始めます。ビット7を反転すると`0x22`（10進数34）になり、TOGGLE BIT7は034になります。もう一度反転すると`0xA2`へ戻り、RESTOREは162になります。2つの表示から、他のビットを保ったまま両方向に反転できることを確認できます。"
+ },
+ "bi_screen_gb": {
+  "en":"Expected GB rows, in decimal: TEST OFF 000, TEST ON 001, SET BIT1 166, CLEAR BIT2 162, TOGGLE BIT7 034, RESTORE 162, NEXT BYTE 130, FAILED 000. NEXT BYTE comes from setting index 9 in the second byte, changing `0x80` to `0x82` without modifying byte 0. DMG uses black text on white; CGB uses blue text on white.",
+  "ja":"GB版の正常時の表示は、10進数でTEST OFF 000、TEST ON 001、SET BIT1 166、CLEAR BIT2 162、TOGGLE BIT7 034、RESTORE 162、NEXT BYTE 130、FAILED 000です。NEXT BYTEはビット番号9を設定した結果で、0番目のバイトを変えずに1番目のバイトを`0x80`から`0x82`へ変更しています。DMGは白地に黒字、CGBは白地に青字で表示します。"
+ },
+ "bi_screen_fc": {
+  "en":"Expected FC rows, in decimal: TEST OFF 000, TEST ON 128, SET BIT1 166, CLEAR BIT2 162, TOGGLE BIT7 034, RESTORE 162, NEXT BYTE 130, FAILED 000. NEXT BYTE comes from setting index 9 in the second byte, changing `0x80` to `0x82` without modifying byte 0. The captured FC screen uses blue text on black.",
+  "ja":"FC版の正常時の表示は、10進数でTEST OFF 000、TEST ON 128、SET BIT1 166、CLEAR BIT2 162、TOGGLE BIT7 034、RESTORE 162、NEXT BYTE 130、FAILED 000です。NEXT BYTEはビット番号9を設定した結果で、0番目のバイトを変えずに1番目のバイトを`0x80`から`0x82`へ変更しています。掲載したFC版の画面は黒地に青字です。"
+ },
+ "bi_proof": {
+  "en":"The program checks every displayed transition and shows the number of failures. Set, clear and toggle themselves return no value; their rows display the resulting RAM byte. Separate emulator checks compare all 520 bytes of guarded buffers in 136 cases per platform, including constant and runtime indices across byte and 256-byte boundaries and all eight possible nonzero bit-test masks. These are RAM-state checks, not a drawing demonstration. Physical hardware and concurrent interrupt writers have not been tested.",
+  "ja":"プログラムは表示する各状態変化を照合し、不一致の数を表示します。設定・解除・反転の関数そのものには戻り値がなく、対応する行は操作後のRAMの値です。別途、両機種それぞれ136ケースで保護領域を含む520バイト全体をエミュレーター上で比較し、定数・実行時のビット番号、バイト境界・256バイト境界、判定結果の非ゼロのマスク8種類を確認しています。RAMの状態を検証する例であり、図形描画の例ではありません。実機と、割り込み処理による同時書き込みは未検証です。"
+ }
+}

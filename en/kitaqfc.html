@@ -648,21 +648,422 @@ __bankswitch(2);</code></pre></div><p>This is a calling fragment. Follow the sta
                         return true;
                     }
                     _mapperWritingFunctions.Add(_currentFunctionName);
-                    Load1(args[0]); EmitAsm(&quot;JSR&quot;, Abs(&quot;__kq_prg_set_bank_a&quot;)); return true;</code></pre></div></details></details><details class="api searchable" id="api-__bit_clear"><summary><code>__bit_clear</code><span class="badge">Compiler intrinsic</span></summary><p>Clear contents or state. Module: Compiler intrinsics. The declaration, original notes and implementation below define exact units, terminators and return conditions.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __bit_clear(u8* base, u16 bit);</code></pre></div><p><b>Arguments, left to right: </b>u8* base, u16 bit. For arrays and pointers, allocate sufficient storage and keep it valid until processing finishes.</p><div class="original"><b>Original declaration notes (verbatim)</b><pre>Clear the indexed bit in caller storage; no bounds check or interrupt exclusion is inserted.</pre></div><h4>Argument-passing example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void example_bit_clear(u8* base, u16 bit) {
-    __bit_clear(base, bit);
-}</code></pre></div><p>Prepare object initialization, buffer sizes, ROM banks and device state in the calling code. This function fragment has not been executed in isolation.</p><p><a href="../samples/api-fragments/fc/__bit_clear.c" download>Download this fragment</a></p><p class="source">Declaration or identifier source: kitaqfc/lib/intrinsics.h:45</p></details><details class="api searchable" id="api-__bit_set"><summary><code>__bit_set</code><span class="badge">Compiler intrinsic</span></summary><p>Set a value or operating condition. Module: Compiler intrinsics. The declaration, original notes and implementation below define exact units, terminators and return conditions.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __bit_set(u8* base, u16 bit);</code></pre></div><p><b>Arguments, left to right: </b>u8* base, u16 bit. For arrays and pointers, allocate sufficient storage and keep it valid until processing finishes.</p><div class="original"><b>Original declaration notes (verbatim)</b><pre>Set the indexed bit in caller storage without changing the other seven bits in that byte.</pre></div><h4>Calling example (surrounding-code fragment)</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>m_text(2,3,&quot;BITS MEMORY&quot;);
-    u8 data[4]; u8 copy[4];
-    __memset(data,0,4); __bit_set(data,3); __bit_toggle(data,1);
-    __memcpy(copy,data,4); m_number(copy[0]);
-    while (1) { m_wait();  }
-}</code></pre></div><p class="source">Source: kitaq-docs/samples/fc_bits_memory.c:11</p><p><a href="../samples/fc_bits_memory.c">Complete program for this example</a></p><p class="source">Declaration or identifier source: kitaqfc/lib/intrinsics.h:43</p></details><details class="api searchable" id="api-__bit_test"><summary><code>__bit_test</code><span class="badge">Compiler intrinsic</span></summary><p>Perform the operation specified by the arguments. Module: Compiler intrinsics. The declaration, original notes and implementation below define exact units, terminators and return conditions.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 __bit_test(u8* base, u16 bit);</code></pre></div><p><b>Arguments, left to right: </b>u8* base, u16 bit. For arrays and pointers, allocate sufficient storage and keep it valid until processing finishes.</p><p><b>Return type: </b><code>u8</code>. The original notes and return conditions in the implementation define the meaning and success or failure values.</p><div class="original"><b>Original declaration notes (verbatim)</b><pre>Return 0 or 1 for bit at base[bit&gt;&gt;3], using mask 1&lt;&lt;(bit&amp;7); the caller supplies enough storage.</pre></div><h4>Argument-passing example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 example_bit_test(u8* base, u16 bit) {
-    return __bit_test(base, bit);
-}</code></pre></div><p>Prepare object initialization, buffer sizes, ROM banks and device state in the calling code. This function fragment has not been executed in isolation.</p><p><a href="../samples/api-fragments/fc/__bit_test.c" download>Download this fragment</a></p><p class="source">Declaration or identifier source: kitaqfc/lib/intrinsics.h:41</p></details><details class="api searchable" id="api-__bit_toggle"><summary><code>__bit_toggle</code><span class="badge">Compiler intrinsic</span></summary><p>Perform the operation specified by the arguments. Module: Compiler intrinsics. The declaration, original notes and implementation below define exact units, terminators and return conditions.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __bit_toggle(u8* base, u16 bit);</code></pre></div><p><b>Arguments, left to right: </b>u8* base, u16 bit. For arrays and pointers, allocate sufficient storage and keep it valid until processing finishes.</p><div class="original"><b>Original declaration notes (verbatim)</b><pre>XOR the indexed bit in caller storage; coordinate concurrent writers to avoid lost updates.</pre></div><h4>Calling example (surrounding-code fragment)</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>m_text(2,3,&quot;BITS MEMORY&quot;);
-    u8 data[4]; u8 copy[4];
-    __memset(data,0,4); __bit_set(data,3); __bit_toggle(data,1);
-    __memcpy(copy,data,4); m_number(copy[0]);
-    while (1) { m_wait();  }
-}</code></pre></div><p class="source">Source: kitaq-docs/samples/fc_bits_memory.c:11</p><p><a href="../samples/fc_bits_memory.c">Complete program for this example</a></p><p class="source">Declaration or identifier source: kitaqfc/lib/intrinsics.h:47</p></details><details class="api searchable" id="api-__chr_bank_set"><summary><code>__chr_bank_set</code><span class="badge">Compiler intrinsic</span></summary><p>Set a value or operating condition. Module: Compiler intrinsics. The declaration, original notes and implementation below define exact units, terminators and return conditions.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __chr_bank_set(u8 bank);</code></pre></div><p><b>Arguments, left to right: </b>u8 bank. For arrays and pointers, allocate sufficient storage and keep it valid until processing finishes.</p><div class="original"><b>Original declaration notes (verbatim)</b><pre>Select a CNROM bank or MMC3 register 0 bank; unsupported mapper profiles produce a compile error.</pre></div><h4>Argument-passing example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void example_chr_bank_set(u8 bank) {
+                    Load1(args[0]); EmitAsm(&quot;JSR&quot;, Abs(&quot;__kq_prg_set_bank_a&quot;)); return true;</code></pre></div></details></details><details class="api searchable" id="api-__bit_clear" data-api-contract="bit-intrinsics-source-20260915"><summary><code>__bit_clear</code></summary><p>Clear the selected flag to 0 without clearing the rest of its byte. Use this to remove one stored condition, such as a temporary status flag. Clearing the same bit again still leaves it at 0.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __bit_clear(u8* base, u16 bit);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p>Pointer to the first byte of the flag array in CPU-accessible memory. The array is not allocated or initialized by this call. Use writable RAM for set, clear and toggle operations; the test operation only reads it.</p></dd><dt><code>bit</code></dt><dd><p>Zero-based bit index as <code>u16</code> (0–65535), not a byte offset or a bit mask. Index 0 selects mask <code>0x01</code> in byte 0; index 7 selects <code>0x80</code> in byte 0; index 8 selects <code>0x01</code> in byte 1. In general, the byte offset is <code>index / 8</code> and the mask is <code>1 &lt;&lt; (index % 8)</code>. For an N-byte array, require <code>index &lt; 8*N</code> and a valid CPU address range.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>The caller must provide enough storage. There is no array-length argument, bounds clipping, bank switching or automatic graphics upload. A large bit number can select a byte well beyond the allocated array. Keep the memory mapping stable; do not use these RAM-flag helpers as a shortcut for hardware registers whose reads or writes have side effects.</p><p>Set, clear and toggle read a byte, modify the selected bit, then write the byte back. This sequence is not an atomic update. Coordinate writers in the main loop and interrupt handlers so that an intervening update to another bit in the same byte is not lost.</p><p>FC code may inline a constant index or call a generated helper. Both forms use the same bit numbering and test-result mask. The generated helpers share argument and scratch storage, so do not re-enter them from NMI/IRQ during another helper call.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>__bit_clear(bit_flags,2);
+bit_clear_value=bit_flags[0]; // A6 &amp; FB = A2, decimal 162.
+__bit_clear(bit_flags,2);     // Clearing it twice leaves it clear.</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The complete program reaches this step with byte 0 equal to <code>0xA6</code>. Clearing bit 2 changes it to <code>0xA2</code> (binary <code>10100010</code>, decimal 162); the CLEAR BIT2 row must show 162. Clearing bit 2 again leaves the result unchanged. The other stored flags survive both calls.</p><p>Expected FC rows, in decimal: TEST OFF 000, TEST ON 128, SET BIT1 166, CLEAR BIT2 162, TOGGLE BIT7 034, RESTORE 162, NEXT BYTE 130, FAILED 000. NEXT BYTE comes from setting index 9 in the second byte, changing <code>0x80</code> to <code>0x82</code> without modifying byte 0. The captured FC screen uses blue text on black.</p><p>The program checks every displayed transition and shows the number of failures. Set, clear and toggle themselves return no value; their rows display the resulting RAM byte. Separate emulator checks compare all 520 bytes of guarded buffers in 136 cases per platform, including constant and runtime indices across byte and 256-byte boundaries and all eight possible nonzero bit-test masks. These are RAM-state checks, not a drawing demonstration. Physical hardware and concurrent interrupt writers have not been tested.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-bit-intrinsics/fc-nrom/screen.png" alt="__bit_clear: NROM"><figcaption>NROM</figcaption></figure><p><a href="../samples/api-examples/fc/bit_intrinsics.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\bit_intrinsics.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\bit_intrinsics.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/intrinsics.h:45</p><div class="original"><b>Declaration notes (original source)</b><pre>Clear the indexed bit in caller storage; no bounds check or interrupt exclusion is inserted.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:4418</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copy</button><pre><code>case &quot;__bit_clear&quot;:
+                    if (TryEmitBitIntrinsicInline(funcName, args, ctx)) return true;
+                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2,2}, &quot;__bit_clear&quot;);
+
+bool TryEmitBitIntrinsicInline(string funcName, Expr[] args, FunctionContext ctx)
+        {
+            args = args ?? Array.Empty&lt;Expr&gt;();
+            if (args.Length != 2) return false;
+            if (!TryEvaluateConstant(args[1], out int bit) || bit &lt; 0) return false;
+            // Split the bit number into a byte displacement and an in-byte mask.
+            int byteOffset = bit &gt;&gt; 3;
+            if (byteOffset &gt; 255) return false;
+            int mask = 1 &lt;&lt; (bit &amp; 7);
+            int[] ptr = AcquireTemps(2);
+            try
+            {
+                EmitLoadValue(args[0], ctx, 2);
+                EmitAsm(&quot;STA&quot;, Mem(ptr[0]));
+                EmitAsm(&quot;STX&quot;, Mem(ptr[1]));
+                EmitAsm(&quot;LDY&quot;, Imm(byteOffset));
+                EmitAsm(&quot;LDA&quot;, IndY(ptr[0]));
+                switch (funcName)
+                {
+                    case &quot;__bit_test&quot;:
+                        EmitAsm(&quot;AND&quot;, Imm(mask));
+                        break;
+                    case &quot;__bit_set&quot;:
+                        EmitAsm(&quot;ORA&quot;, Imm(mask));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    case &quot;__bit_clear&quot;:
+                        EmitAsm(&quot;AND&quot;, Imm((~mask) &amp; 0xFF));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    case &quot;__bit_toggle&quot;:
+                        EmitAsm(&quot;EOR&quot;, Imm(mask));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    default:
+                        return false;
+                }
+            }
+            finally { ReleaseTemps(ptr); }
+            return true;
+        }
+
+void EmitBitHelper(string name, string op)
+        {
+            EmitHelperStart(name);
+            EmitAsm(&quot;LDA&quot;, Imm(1));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;AND&quot;, Imm(7));
+            EmitAsm(&quot;TAX&quot;);
+            string maskDone = NewGeneratedLabel(&quot;bit_mask_done&quot;);
+            string maskLoop = NewGeneratedLabel(&quot;bit_mask_loop&quot;);
+            EmitAsm(&quot;BEQ&quot;, Rel(maskDone));
+            _assembly.Add(Expr.Make(Tag.Label, maskLoop));
+            EmitAsm(&quot;ASL&quot;, Mem(_runtimeIntrinsicTmp0Address));
+            EmitAsm(&quot;DEX&quot;);
+            EmitAsm(&quot;BNE&quot;, Rel(maskLoop));
+            _assembly.Add(Expr.Make(Tag.Label, maskDone));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp1Address));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 3));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp2Address));
+            for (int i = 0; i &lt; 3; i++) { EmitAsm(&quot;LSR&quot;, Mem(_runtimeIntrinsicTmp2Address)); EmitAsm(&quot;ROR&quot;, Mem(_runtimeIntrinsicTmp1Address)); }
+            // Fold the high displacement into the pointer; indirect-Y adds the low byte and its carry.
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;CLC&quot;);
+            EmitAsm(&quot;ADC&quot;, Mem(_runtimeIntrinsicTmp2Address));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;LDY&quot;, Mem(_runtimeIntrinsicTmp1Address));
+            EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+            switch (op)
+            {
+                case &quot;test&quot;:
+                    EmitAsm(&quot;AND&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;set&quot;:
+                    EmitAsm(&quot;ORA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;clear&quot;:
+                    EmitAsm(&quot;LDA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;EOR&quot;, Imm(0xFF));
+                    EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp2Address));
+                    EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;AND&quot;, Mem(_runtimeIntrinsicTmp2Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;toggle&quot;:
+                    EmitAsm(&quot;EOR&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+            }
+        }</code></pre></div></details></details><details class="api searchable" id="api-__bit_set" data-api-contract="bit-intrinsics-source-20260915"><summary><code>__bit_set</code></summary><p>Set the selected flag to 1 while preserving the other seven bits in the same byte. For example, mark a quest as completed or an item as collected. Setting a bit that is already 1 leaves it unchanged; this is not a toggle.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __bit_set(u8* base, u16 bit);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p>Pointer to the first byte of the flag array in CPU-accessible memory. The array is not allocated or initialized by this call. Use writable RAM for set, clear and toggle operations; the test operation only reads it.</p></dd><dt><code>bit</code></dt><dd><p>Zero-based bit index as <code>u16</code> (0–65535), not a byte offset or a bit mask. Index 0 selects mask <code>0x01</code> in byte 0; index 7 selects <code>0x80</code> in byte 0; index 8 selects <code>0x01</code> in byte 1. In general, the byte offset is <code>index / 8</code> and the mask is <code>1 &lt;&lt; (index % 8)</code>. For an N-byte array, require <code>index &lt; 8*N</code> and a valid CPU address range.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>The caller must provide enough storage. There is no array-length argument, bounds clipping, bank switching or automatic graphics upload. A large bit number can select a byte well beyond the allocated array. Keep the memory mapping stable; do not use these RAM-flag helpers as a shortcut for hardware registers whose reads or writes have side effects.</p><p>Set, clear and toggle read a byte, modify the selected bit, then write the byte back. This sequence is not an atomic update. Coordinate writers in the main loop and interrupt handlers so that an intervening update to another bit in the same byte is not lost.</p><p>FC code may inline a constant index or call a generated helper. Both forms use the same bit numbering and test-result mask. The generated helpers share argument and scratch storage, so do not re-enter them from NMI/IRQ during another helper call.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>__bit_set(bit_flags,1);
+bit_set_value=bit_flags[0]; // A4 | 02 = A6, decimal 166.
+__bit_set(bit_flags,1);     // Setting it twice leaves it set.</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Set bit 1 of <code>0xA4</code>: <code>10100100 | 00000010</code> becomes <code>10100110</code>, or <code>0xA6</code> (decimal 166). The SET BIT1 row must show 166. The sample sets the bit a second time and verifies that the byte remains <code>0xA6</code>, demonstrating that repeated setting does not invert a flag.</p><p>Expected FC rows, in decimal: TEST OFF 000, TEST ON 128, SET BIT1 166, CLEAR BIT2 162, TOGGLE BIT7 034, RESTORE 162, NEXT BYTE 130, FAILED 000. NEXT BYTE comes from setting index 9 in the second byte, changing <code>0x80</code> to <code>0x82</code> without modifying byte 0. The captured FC screen uses blue text on black.</p><p>The program checks every displayed transition and shows the number of failures. Set, clear and toggle themselves return no value; their rows display the resulting RAM byte. Separate emulator checks compare all 520 bytes of guarded buffers in 136 cases per platform, including constant and runtime indices across byte and 256-byte boundaries and all eight possible nonzero bit-test masks. These are RAM-state checks, not a drawing demonstration. Physical hardware and concurrent interrupt writers have not been tested.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-bit-intrinsics/fc-nrom/screen.png" alt="__bit_set: NROM"><figcaption>NROM</figcaption></figure><p><a href="../samples/api-examples/fc/bit_intrinsics.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\bit_intrinsics.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\bit_intrinsics.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/intrinsics.h:43</p><div class="original"><b>Declaration notes (original source)</b><pre>Set the indexed bit in caller storage without changing the other seven bits in that byte.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:4415</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copy</button><pre><code>case &quot;__bit_set&quot;:
+                    if (TryEmitBitIntrinsicInline(funcName, args, ctx)) return true;
+                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2,2}, &quot;__bit_set&quot;);
+
+bool TryEmitBitIntrinsicInline(string funcName, Expr[] args, FunctionContext ctx)
+        {
+            args = args ?? Array.Empty&lt;Expr&gt;();
+            if (args.Length != 2) return false;
+            if (!TryEvaluateConstant(args[1], out int bit) || bit &lt; 0) return false;
+            // Split the bit number into a byte displacement and an in-byte mask.
+            int byteOffset = bit &gt;&gt; 3;
+            if (byteOffset &gt; 255) return false;
+            int mask = 1 &lt;&lt; (bit &amp; 7);
+            int[] ptr = AcquireTemps(2);
+            try
+            {
+                EmitLoadValue(args[0], ctx, 2);
+                EmitAsm(&quot;STA&quot;, Mem(ptr[0]));
+                EmitAsm(&quot;STX&quot;, Mem(ptr[1]));
+                EmitAsm(&quot;LDY&quot;, Imm(byteOffset));
+                EmitAsm(&quot;LDA&quot;, IndY(ptr[0]));
+                switch (funcName)
+                {
+                    case &quot;__bit_test&quot;:
+                        EmitAsm(&quot;AND&quot;, Imm(mask));
+                        break;
+                    case &quot;__bit_set&quot;:
+                        EmitAsm(&quot;ORA&quot;, Imm(mask));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    case &quot;__bit_clear&quot;:
+                        EmitAsm(&quot;AND&quot;, Imm((~mask) &amp; 0xFF));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    case &quot;__bit_toggle&quot;:
+                        EmitAsm(&quot;EOR&quot;, Imm(mask));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    default:
+                        return false;
+                }
+            }
+            finally { ReleaseTemps(ptr); }
+            return true;
+        }
+
+void EmitBitHelper(string name, string op)
+        {
+            EmitHelperStart(name);
+            EmitAsm(&quot;LDA&quot;, Imm(1));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;AND&quot;, Imm(7));
+            EmitAsm(&quot;TAX&quot;);
+            string maskDone = NewGeneratedLabel(&quot;bit_mask_done&quot;);
+            string maskLoop = NewGeneratedLabel(&quot;bit_mask_loop&quot;);
+            EmitAsm(&quot;BEQ&quot;, Rel(maskDone));
+            _assembly.Add(Expr.Make(Tag.Label, maskLoop));
+            EmitAsm(&quot;ASL&quot;, Mem(_runtimeIntrinsicTmp0Address));
+            EmitAsm(&quot;DEX&quot;);
+            EmitAsm(&quot;BNE&quot;, Rel(maskLoop));
+            _assembly.Add(Expr.Make(Tag.Label, maskDone));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp1Address));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 3));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp2Address));
+            for (int i = 0; i &lt; 3; i++) { EmitAsm(&quot;LSR&quot;, Mem(_runtimeIntrinsicTmp2Address)); EmitAsm(&quot;ROR&quot;, Mem(_runtimeIntrinsicTmp1Address)); }
+            // Fold the high displacement into the pointer; indirect-Y adds the low byte and its carry.
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;CLC&quot;);
+            EmitAsm(&quot;ADC&quot;, Mem(_runtimeIntrinsicTmp2Address));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;LDY&quot;, Mem(_runtimeIntrinsicTmp1Address));
+            EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+            switch (op)
+            {
+                case &quot;test&quot;:
+                    EmitAsm(&quot;AND&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;set&quot;:
+                    EmitAsm(&quot;ORA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;clear&quot;:
+                    EmitAsm(&quot;LDA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;EOR&quot;, Imm(0xFF));
+                    EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp2Address));
+                    EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;AND&quot;, Mem(_runtimeIntrinsicTmp2Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;toggle&quot;:
+                    EmitAsm(&quot;EOR&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+            }
+        }</code></pre></div></details></details><details class="api searchable" id="api-__bit_test" data-api-contract="bit-intrinsics-source-20260915"><summary><code>__bit_test</code></summary><p>Read one flag from a packed array of bits without modifying the array. This lets eight independent on/off flags share each byte of RAM. The result tells you whether the selected bit is clear or set; its numeric representation depends on the target.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 __bit_test(u8* base, u16 bit);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p>Pointer to the first byte of the flag array in CPU-accessible memory. The array is not allocated or initialized by this call. Use writable RAM for set, clear and toggle operations; the test operation only reads it.</p></dd><dt><code>bit</code></dt><dd><p>Zero-based bit index as <code>u16</code> (0–65535), not a byte offset or a bit mask. Index 0 selects mask <code>0x01</code> in byte 0; index 7 selects <code>0x80</code> in byte 0; index 8 selects <code>0x01</code> in byte 1. In general, the byte offset is <code>index / 8</code> and the mask is <code>1 &lt;&lt; (index % 8)</code>. For an N-byte array, require <code>index &lt; 8*N</code> and a valid CPU address range.</p></dd></dl><h4>Return value</h4><p><code>u8</code>: 0 when the bit is clear, otherwise its mask: 1, 2, 4, 8, 16, 32, 64 or 128. The result is <code>base[bit &gt;&gt; 3] &amp; (1 &lt;&lt; (bit &amp; 7))</code>. For example, testing a set bit 7 returns 128. Use <code>result != 0</code> to test whether the flag is set; comparing only with 1 would miss flags in other bit positions.</p><h4>Conditions and limits</h4><p>The caller must provide enough storage. There is no array-length argument, bounds clipping, bank switching or automatic graphics upload. A large bit number can select a byte well beyond the allocated array. Keep the memory mapping stable; do not use these RAM-flag helpers as a shortcut for hardware registers whose reads or writes have side effects.</p><p>FC code may inline a constant index or call a generated helper. Both forms use the same bit numbering and test-result mask. The generated helpers share argument and scratch storage, so do not re-enter them from NMI/IRQ during another helper call.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>bit_off=__bit_test(bit_flags,1); // Bit 1 of A4 is clear: zero.
+bit_on=__bit_test(bit_flags,7);  // Bit 7 is set: GB returns 1; FC returns 128.
+bit_is_on=0;
+if(bit_on!=0)bit_is_on=1; // The same nonzero test works on both targets.</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Start with byte 0 equal to <code>0xA4</code> (binary <code>10100100</code>). Testing bit 1 returns 0. Testing bit 7 returns 1 on GB or 128 on FC; the sample also converts that nonzero result to a shared on/off flag and checks that the original byte is unchanged. Look at TEST OFF and TEST ON in the screen below.</p><p>Expected FC rows, in decimal: TEST OFF 000, TEST ON 128, SET BIT1 166, CLEAR BIT2 162, TOGGLE BIT7 034, RESTORE 162, NEXT BYTE 130, FAILED 000. NEXT BYTE comes from setting index 9 in the second byte, changing <code>0x80</code> to <code>0x82</code> without modifying byte 0. The captured FC screen uses blue text on black.</p><p>The program checks every displayed transition and shows the number of failures. Set, clear and toggle themselves return no value; their rows display the resulting RAM byte. Separate emulator checks compare all 520 bytes of guarded buffers in 136 cases per platform, including constant and runtime indices across byte and 256-byte boundaries and all eight possible nonzero bit-test masks. These are RAM-state checks, not a drawing demonstration. Physical hardware and concurrent interrupt writers have not been tested.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-bit-intrinsics/fc-nrom/screen.png" alt="__bit_test: NROM"><figcaption>NROM</figcaption></figure><p><a href="../samples/api-examples/fc/bit_intrinsics.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\bit_intrinsics.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\bit_intrinsics.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/intrinsics.h:41</p><div class="original"><b>Declaration notes (original source)</b><pre>Return base[bit&gt;&gt;3] &amp; (1&lt;&lt;(bit&amp;7)): zero or the bit mask, not a normalized Boolean.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:4412</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copy</button><pre><code>case &quot;__bit_test&quot;:
+                    if (TryEmitBitIntrinsicInline(funcName, args, ctx)) return true;
+                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2,2}, &quot;__bit_test&quot;);
+
+bool TryEmitBitIntrinsicInline(string funcName, Expr[] args, FunctionContext ctx)
+        {
+            args = args ?? Array.Empty&lt;Expr&gt;();
+            if (args.Length != 2) return false;
+            if (!TryEvaluateConstant(args[1], out int bit) || bit &lt; 0) return false;
+            // Split the bit number into a byte displacement and an in-byte mask.
+            int byteOffset = bit &gt;&gt; 3;
+            if (byteOffset &gt; 255) return false;
+            int mask = 1 &lt;&lt; (bit &amp; 7);
+            int[] ptr = AcquireTemps(2);
+            try
+            {
+                EmitLoadValue(args[0], ctx, 2);
+                EmitAsm(&quot;STA&quot;, Mem(ptr[0]));
+                EmitAsm(&quot;STX&quot;, Mem(ptr[1]));
+                EmitAsm(&quot;LDY&quot;, Imm(byteOffset));
+                EmitAsm(&quot;LDA&quot;, IndY(ptr[0]));
+                switch (funcName)
+                {
+                    case &quot;__bit_test&quot;:
+                        EmitAsm(&quot;AND&quot;, Imm(mask));
+                        break;
+                    case &quot;__bit_set&quot;:
+                        EmitAsm(&quot;ORA&quot;, Imm(mask));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    case &quot;__bit_clear&quot;:
+                        EmitAsm(&quot;AND&quot;, Imm((~mask) &amp; 0xFF));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    case &quot;__bit_toggle&quot;:
+                        EmitAsm(&quot;EOR&quot;, Imm(mask));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    default:
+                        return false;
+                }
+            }
+            finally { ReleaseTemps(ptr); }
+            return true;
+        }
+
+void EmitBitHelper(string name, string op)
+        {
+            EmitHelperStart(name);
+            EmitAsm(&quot;LDA&quot;, Imm(1));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;AND&quot;, Imm(7));
+            EmitAsm(&quot;TAX&quot;);
+            string maskDone = NewGeneratedLabel(&quot;bit_mask_done&quot;);
+            string maskLoop = NewGeneratedLabel(&quot;bit_mask_loop&quot;);
+            EmitAsm(&quot;BEQ&quot;, Rel(maskDone));
+            _assembly.Add(Expr.Make(Tag.Label, maskLoop));
+            EmitAsm(&quot;ASL&quot;, Mem(_runtimeIntrinsicTmp0Address));
+            EmitAsm(&quot;DEX&quot;);
+            EmitAsm(&quot;BNE&quot;, Rel(maskLoop));
+            _assembly.Add(Expr.Make(Tag.Label, maskDone));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp1Address));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 3));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp2Address));
+            for (int i = 0; i &lt; 3; i++) { EmitAsm(&quot;LSR&quot;, Mem(_runtimeIntrinsicTmp2Address)); EmitAsm(&quot;ROR&quot;, Mem(_runtimeIntrinsicTmp1Address)); }
+            // Fold the high displacement into the pointer; indirect-Y adds the low byte and its carry.
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;CLC&quot;);
+            EmitAsm(&quot;ADC&quot;, Mem(_runtimeIntrinsicTmp2Address));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;LDY&quot;, Mem(_runtimeIntrinsicTmp1Address));
+            EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+            switch (op)
+            {
+                case &quot;test&quot;:
+                    EmitAsm(&quot;AND&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;set&quot;:
+                    EmitAsm(&quot;ORA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;clear&quot;:
+                    EmitAsm(&quot;LDA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;EOR&quot;, Imm(0xFF));
+                    EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp2Address));
+                    EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;AND&quot;, Mem(_runtimeIntrinsicTmp2Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;toggle&quot;:
+                    EmitAsm(&quot;EOR&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+            }
+        }</code></pre></div></details></details><details class="api searchable" id="api-__bit_toggle" data-api-contract="bit-intrinsics-source-20260915"><summary><code>__bit_toggle</code></summary><p>Invert the selected flag: 0 becomes 1 and 1 becomes 0. The remaining bits are preserved. Two calls on the same bit restore its original state, provided nothing else writes that bit between the calls.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __bit_toggle(u8* base, u16 bit);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>base</code></dt><dd><p>Pointer to the first byte of the flag array in CPU-accessible memory. The array is not allocated or initialized by this call. Use writable RAM for set, clear and toggle operations; the test operation only reads it.</p></dd><dt><code>bit</code></dt><dd><p>Zero-based bit index as <code>u16</code> (0–65535), not a byte offset or a bit mask. Index 0 selects mask <code>0x01</code> in byte 0; index 7 selects <code>0x80</code> in byte 0; index 8 selects <code>0x01</code> in byte 1. In general, the byte offset is <code>index / 8</code> and the mask is <code>1 &lt;&lt; (index % 8)</code>. For an N-byte array, require <code>index &lt; 8*N</code> and a valid CPU address range.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>The caller must provide enough storage. There is no array-length argument, bounds clipping, bank switching or automatic graphics upload. A large bit number can select a byte well beyond the allocated array. Keep the memory mapping stable; do not use these RAM-flag helpers as a shortcut for hardware registers whose reads or writes have side effects.</p><p>Set, clear and toggle read a byte, modify the selected bit, then write the byte back. This sequence is not an atomic update. Coordinate writers in the main loop and interrupt handlers so that an intervening update to another bit in the same byte is not lost.</p><p>FC code may inline a constant index or call a generated helper. Both forms use the same bit numbering and test-result mask. The generated helpers share argument and scratch storage, so do not re-enter them from NMI/IRQ during another helper call.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>__bit_toggle(bit_flags,7);
+bit_toggle_value=bit_flags[0]; // A2 ^ 80 = 22, decimal 34.
+__bit_toggle(bit_flags,7);
+bit_restore_value=bit_flags[0]; // Two toggles restore A2.</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The complete program enters this step with <code>0xA2</code>. Toggling bit 7 produces <code>0x22</code> (decimal 34), so TOGGLE BIT7 shows 034. Toggling it again restores <code>0xA2</code>, and RESTORE shows 162. These two observations demonstrate both directions of the inversion while preserving the other bits.</p><p>Expected FC rows, in decimal: TEST OFF 000, TEST ON 128, SET BIT1 166, CLEAR BIT2 162, TOGGLE BIT7 034, RESTORE 162, NEXT BYTE 130, FAILED 000. NEXT BYTE comes from setting index 9 in the second byte, changing <code>0x80</code> to <code>0x82</code> without modifying byte 0. The captured FC screen uses blue text on black.</p><p>The program checks every displayed transition and shows the number of failures. Set, clear and toggle themselves return no value; their rows display the resulting RAM byte. Separate emulator checks compare all 520 bytes of guarded buffers in 136 cases per platform, including constant and runtime indices across byte and 256-byte boundaries and all eight possible nonzero bit-test masks. These are RAM-state checks, not a drawing demonstration. Physical hardware and concurrent interrupt writers have not been tested.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-bit-intrinsics/fc-nrom/screen.png" alt="__bit_toggle: NROM"><figcaption>NROM</figcaption></figure><p><a href="../samples/api-examples/fc/bit_intrinsics.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\bit_intrinsics.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\bit_intrinsics.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/intrinsics.h:47</p><div class="original"><b>Declaration notes (original source)</b><pre>XOR the indexed bit in caller storage; coordinate concurrent writers to avoid lost updates.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:4421</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copy</button><pre><code>case &quot;__bit_toggle&quot;:
+                    if (TryEmitBitIntrinsicInline(funcName, args, ctx)) return true;
+                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2,2}, &quot;__bit_toggle&quot;);
+                // Arithmetic variants share argument packing here; signed/fixed-point arithmetic is implemented by their named helpers.
+
+bool TryEmitBitIntrinsicInline(string funcName, Expr[] args, FunctionContext ctx)
+        {
+            args = args ?? Array.Empty&lt;Expr&gt;();
+            if (args.Length != 2) return false;
+            if (!TryEvaluateConstant(args[1], out int bit) || bit &lt; 0) return false;
+            // Split the bit number into a byte displacement and an in-byte mask.
+            int byteOffset = bit &gt;&gt; 3;
+            if (byteOffset &gt; 255) return false;
+            int mask = 1 &lt;&lt; (bit &amp; 7);
+            int[] ptr = AcquireTemps(2);
+            try
+            {
+                EmitLoadValue(args[0], ctx, 2);
+                EmitAsm(&quot;STA&quot;, Mem(ptr[0]));
+                EmitAsm(&quot;STX&quot;, Mem(ptr[1]));
+                EmitAsm(&quot;LDY&quot;, Imm(byteOffset));
+                EmitAsm(&quot;LDA&quot;, IndY(ptr[0]));
+                switch (funcName)
+                {
+                    case &quot;__bit_test&quot;:
+                        EmitAsm(&quot;AND&quot;, Imm(mask));
+                        break;
+                    case &quot;__bit_set&quot;:
+                        EmitAsm(&quot;ORA&quot;, Imm(mask));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    case &quot;__bit_clear&quot;:
+                        EmitAsm(&quot;AND&quot;, Imm((~mask) &amp; 0xFF));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    case &quot;__bit_toggle&quot;:
+                        EmitAsm(&quot;EOR&quot;, Imm(mask));
+                        EmitAsm(&quot;STA&quot;, IndY(ptr[0]));
+                        break;
+                    default:
+                        return false;
+                }
+            }
+            finally { ReleaseTemps(ptr); }
+            return true;
+        }
+
+void EmitBitHelper(string name, string op)
+        {
+            EmitHelperStart(name);
+            EmitAsm(&quot;LDA&quot;, Imm(1));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;AND&quot;, Imm(7));
+            EmitAsm(&quot;TAX&quot;);
+            string maskDone = NewGeneratedLabel(&quot;bit_mask_done&quot;);
+            string maskLoop = NewGeneratedLabel(&quot;bit_mask_loop&quot;);
+            EmitAsm(&quot;BEQ&quot;, Rel(maskDone));
+            _assembly.Add(Expr.Make(Tag.Label, maskLoop));
+            EmitAsm(&quot;ASL&quot;, Mem(_runtimeIntrinsicTmp0Address));
+            EmitAsm(&quot;DEX&quot;);
+            EmitAsm(&quot;BNE&quot;, Rel(maskLoop));
+            _assembly.Add(Expr.Make(Tag.Label, maskDone));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp1Address));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 3));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp2Address));
+            for (int i = 0; i &lt; 3; i++) { EmitAsm(&quot;LSR&quot;, Mem(_runtimeIntrinsicTmp2Address)); EmitAsm(&quot;ROR&quot;, Mem(_runtimeIntrinsicTmp1Address)); }
+            // Fold the high displacement into the pointer; indirect-Y adds the low byte and its carry.
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;CLC&quot;);
+            EmitAsm(&quot;ADC&quot;, Mem(_runtimeIntrinsicTmp2Address));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;LDY&quot;, Mem(_runtimeIntrinsicTmp1Address));
+            EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+            switch (op)
+            {
+                case &quot;test&quot;:
+                    EmitAsm(&quot;AND&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;set&quot;:
+                    EmitAsm(&quot;ORA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;clear&quot;:
+                    EmitAsm(&quot;LDA&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;EOR&quot;, Imm(0xFF));
+                    EmitAsm(&quot;STA&quot;, Mem(_runtimeIntrinsicTmp2Address));
+                    EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;AND&quot;, Mem(_runtimeIntrinsicTmp2Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+                case &quot;toggle&quot;:
+                    EmitAsm(&quot;EOR&quot;, Mem(_runtimeIntrinsicTmp0Address));
+                    EmitAsm(&quot;STA&quot;, IndY(CallArgBase));
+                    EmitAsm(&quot;RTS&quot;);
+                    break;
+            }
+        }</code></pre></div></details></details><details class="api searchable" id="api-__chr_bank_set"><summary><code>__chr_bank_set</code><span class="badge">Compiler intrinsic</span></summary><p>Set a value or operating condition. Module: Compiler intrinsics. The declaration, original notes and implementation below define exact units, terminators and return conditions.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __chr_bank_set(u8 bank);</code></pre></div><p><b>Arguments, left to right: </b>u8 bank. For arrays and pointers, allocate sufficient storage and keep it valid until processing finishes.</p><div class="original"><b>Original declaration notes (verbatim)</b><pre>Select a CNROM bank or MMC3 register 0 bank; unsupported mapper profiles produce a compile error.</pre></div><h4>Argument-passing example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void example_chr_bank_set(u8 bank) {
     __chr_bank_set(bank);
 }</code></pre></div><p>Prepare object initialization, buffer sizes, ROM banks and device state in the calling code. This function fragment has not been executed in isolation.</p><p><a href="../samples/api-fragments/fc/__chr_bank_set.c" download>Download this fragment</a></p><p class="source">Declaration or identifier source: kitaqfc/lib/intrinsics.h:311</p></details><details class="api searchable" id="api-__chr_bank_set0"><summary><code>__chr_bank_set0</code><span class="badge">Compiler intrinsic</span></summary><p>Set a value or operating condition. Module: Compiler intrinsics. The declaration, original notes and implementation below define exact units, terminators and return conditions.</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __chr_bank_set0(u8 bank);</code></pre></div><p><b>Arguments, left to right: </b>u8 bank. For arrays and pointers, allocate sufficient storage and keep it valid until processing finishes.</p><div class="original"><b>Original declaration notes (verbatim)</b><pre>Use the same CNROM/MMC3 register 0 selection as __chr_bank_set.</pre></div><h4>Argument-passing example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void example_chr_bank_set0(u8 bank) {
     __chr_bank_set0(bank);

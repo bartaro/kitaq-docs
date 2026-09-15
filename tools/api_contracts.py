@@ -161,6 +161,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_ppu_intrinsic_examples(contracts))
     proofs.update(verified_interrupt_intrinsic_examples(contracts))
     proofs.update(verified_memory_intrinsic_examples(contracts))
+    proofs.update(verified_bit_intrinsic_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -683,12 +684,20 @@ def verified_interrupt_intrinsic_examples(contracts):
 
 
 def verified_memory_intrinsic_examples(contracts):
+    return verified_buffer_intrinsic_examples(contracts, 'memory', 88)
+
+
+def verified_bit_intrinsic_examples(contracts):
+    return verified_buffer_intrinsic_examples(contracts, 'bit', 136)
+
+
+def verified_buffer_intrinsic_examples(contracts, family, state_count):
     """Require full RAM comparisons and matching source, tool and screen hashes."""
-    folder=SITE/'verification/api-memory-intrinsics'
+    folder=SITE/('verification/api-'+family+'-intrinsics')
     if not (folder/'results.json').exists():return {}
     repos=SITE.parents[1]/'publish/github_20260912'
     if not repos.exists():repos=SITE.parent
-    review=json.loads((SOURCE/'memory_intrinsic_review_sources.json').read_text(encoding='utf-8'))
+    review=json.loads((SOURCE/(family+'_intrinsic_review_sources.json')).read_text(encoding='utf-8'))
     for name,expected in review['source_sha256'].items():
         if hashlib.sha256((repos/name).read_bytes()).hexdigest()!=expected:
             raise ValueError('Memory intrinsic source changed: '+name)
@@ -698,9 +707,9 @@ def verified_memory_intrinsic_examples(contracts):
     result={}
     for platform in ['gb','fc']:
         state=json.loads((folder/platform/'state_checks.json').read_text(encoding='utf-8'))
-        if len(state['cases'])!=88 or not all(r['passed'] and r['actual']==r['expected'] for r in state['cases']):
+        if len(state['cases'])!=state_count or not all(r['passed'] and r['actual']==r['expected'] for r in state['cases']):
             raise ValueError('Memory range/state checks failed')
-        if hashlib.sha256((SITE/'tools/check_memory_intrinsic_state.py').read_bytes()).hexdigest()!=state['script_sha256']:
+        if hashlib.sha256((SITE/('tools/check_'+family+'_intrinsic_state.py')).read_bytes()).hexdigest()!=state['script_sha256']:
             raise ValueError('Memory state checker changed')
         for row in state['cases']:
             case=folder/platform/row['name']
@@ -721,9 +730,9 @@ def verified_memory_intrinsic_examples(contracts):
             for name,expected in {run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}.items():
                 if hashlib.sha256((SITE/name).read_bytes()).hexdigest()!=expected:raise ValueError('Memory sample changed: '+name)
         for key,contract in contracts.items():
-            if not key.startswith(platform+':') or contract['review']!='memory-intrinsics-source-20260915':continue
+            if not key.startswith(platform+':') or contract['review']!=family+'-intrinsics-source-20260915':continue
             if any(contract['example']['program']!=run['source'] for run in selected):raise ValueError('Memory sample mismatch')
-            result[key]={'api':key.split(':')[1],'kind':'memory-intrinsics','runs':selected}
+            result[key]={'api':key.split(':')[1],'kind':family+'-intrinsics','runs':selected}
     return result
 
 
