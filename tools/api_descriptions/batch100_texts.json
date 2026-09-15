@@ -1,0 +1,1258 @@
+{
+  "b100_fix_from_int_purpose": {
+    "ja": "整数の座標や速度を、小数部分を扱えるQ8.8形式に変換します。",
+    "en": "Convert an integer coordinate or speed to Q8.8 so subsequent calculations can retain fractional parts."
+  },
+  "b100_fix_from_int_return": {
+    "ja": "`n × 256` の生の値を返します。",
+    "en": "Returns the raw value `n × 256`."
+  },
+  "b100_fix_from_int_note": {
+    "ja": "`fix8` は符号付きQ8.8です。生の値256が1.0を表します。中間値と結果が16ビットに収まる範囲で使用してください。",
+    "en": "`fix8` is signed Q8.8: a raw value of 256 represents 1.0. Keep intermediate values and results within the 16-bit range."
+  },
+  "b100_fix_from_int_example": {
+    "ja": "例では整数−3を変換します。画面の−00768は、Q8.8の生の値−768を表します。",
+    "en": "The example converts −3. The displayed −00768 is the raw Q8.8 result −768."
+  },
+  "b100_fix_from_int_arg_n": {
+    "ja": "変換する整数。表現可能な範囲は−128～127です。",
+    "en": "Integer to convert, from −128 through 127."
+  },
+  "b100_fix_to_int_purpose": {
+    "ja": "Q8.8の小数部分を捨てて整数座標を取り出します。負数は負の無限大方向へ丸めます。",
+    "en": "Extract an integer coordinate from Q8.8 by discarding its fractional bits. Negative values round toward negative infinity."
+  },
+  "b100_fix_to_int_return": {
+    "ja": "符号付き整数を返します。",
+    "en": "Returns a signed integer."
+  },
+  "b100_fix_to_int_note": {
+    "ja": "`fix8` は符号付きQ8.8です。生の値256が1.0を表します。中間値と結果が16ビットに収まる範囲で使用してください。",
+    "en": "`fix8` is signed Q8.8: a raw value of 256 represents 1.0. Keep intermediate values and results within the 16-bit range."
+  },
+  "b100_fix_to_int_example": {
+    "ja": "−1.5の生の値−384を渡し、−2を得ます。画面では−00002と表示します。−1の生の値からは−1を得る境界例も実行します。",
+    "en": "Passing raw −384 (−1.5) produces −2, displayed as −00002. A boundary check also confirms that raw −1 becomes −1."
+  },
+  "b100_fix_to_int_arg_x": {
+    "ja": "整数に変換するQ8.8の値。",
+    "en": "Q8.8 value to convert to an integer."
+  },
+  "b100_fix_mul_purpose": {
+    "ja": "二つのQ8.8値を、低コストの近似演算で乗算します。",
+    "en": "Multiply two Q8.8 values using a low-cost approximation."
+  },
+  "b100_fix_mul_return": {
+    "ja": "Q8.8形式の積を返します。",
+    "en": "Returns the product in Q8.8."
+  },
+  "b100_fix_mul_note": {
+    "ja": "各入力を先に4ビット右シフトしてから乗算します。両方の下位4ビットが失われるため、完全な16×16ビット乗算とは精度が異なります。`fix8` は符号付きQ8.8です。生の値256が1.0を表します。中間値と結果が16ビットに収まる範囲で使用してください。",
+    "en": "Each operand is shifted right by four bits before multiplication, discarding four low bits from each. This is less precise than a full 16-by-16-bit product. `fix8` is signed Q8.8: a raw value of 256 represents 1.0. Keep intermediate values and results within the 16-bit range."
+  },
+  "b100_fix_mul_example": {
+    "ja": "1.5と2.0から3.0（生の値768）を得ます。生の値271同士の積は256になることも確認します。",
+    "en": "Multiplying 1.5 by 2.0 yields 3.0 (raw 768). The program also checks the quantization case where raw 271 multiplied by raw 271 yields 256."
+  },
+  "b100_fix_mul_arg_a": {
+    "ja": "演算の左辺となるQ8.8の値。",
+    "en": "Left operand in Q8.8."
+  },
+  "b100_fix_mul_arg_b": {
+    "ja": "演算の右辺となるQ8.8の値。",
+    "en": "Right operand in Q8.8."
+  },
+  "b100_fix_div_purpose": {
+    "ja": "Q8.8値を、入力を縮小してから除算します。",
+    "en": "Divide Q8.8 values after reducing the operands."
+  },
+  "b100_fix_div_return": {
+    "ja": "Q8.8の商を返します。`b == 0` の場合は0です。",
+    "en": "Returns a Q8.8 quotient, or zero when `b == 0`."
+  },
+  "b100_fix_div_note": {
+    "ja": "式は `((a >> 4) * 256) / (b >> 4)` です。`b` が0以外でも `b >> 4` が0になる値（正の生の値1～15）は渡さないでください。積も16ビットに収めてください。",
+    "en": "The expression is `((a >> 4) * 256) / (b >> 4)`. A nonzero divisor must remain nonzero after the shift: do not pass positive raw values 1–15. The scaled numerator must also fit in 16 bits."
+  },
+  "b100_fix_div_example": {
+    "ja": "3.0を2.0で割り、1.5（生の値384）を得ます。明示的なゼロ除算入力では0を返すことも確認します。",
+    "en": "Dividing 3.0 by 2.0 yields 1.5 (raw 384). A separate check verifies the explicit zero-divisor return."
+  },
+  "b100_fix_div_arg_a": {
+    "ja": "演算の左辺となるQ8.8の値。",
+    "en": "Left operand in Q8.8."
+  },
+  "b100_fix_div_arg_b": {
+    "ja": "演算の右辺となるQ8.8の値。",
+    "en": "Right operand in Q8.8."
+  },
+  "b100_fix_lerp_purpose": {
+    "ja": "Q8.8の始点から終点へ、8ビットの割合で補間します。",
+    "en": "Interpolate from one Q8.8 value toward another using an eight-bit weight."
+  },
+  "b100_fix_lerp_return": {
+    "ja": "近似補間したQ8.8値を返します。",
+    "en": "Returns the approximated interpolated Q8.8 value."
+  },
+  "b100_fix_lerp_note": {
+    "ja": "差分と割合をそれぞれ4ビット右シフトします。割合は16段階になり、255でも終点に一致するとは限りません。`b - a` と最終値が16ビットに収まるようにしてください。",
+    "en": "The difference and weight are each shifted right by four bits. This gives 16 weight levels, so even 255 need not reach the endpoint. Keep `b - a` and the final result within 16 bits."
+  },
+  "b100_fix_lerp_example": {
+    "ja": "0から4.0への割合128で2.0（512）を得ます。割合255では3.75（960）となり、4.0には達しないことも確認します。",
+    "en": "A weight of 128 between 0 and 4.0 yields 2.0 (raw 512). Weight 255 produces 3.75 (raw 960), demonstrating that the endpoint is not reached."
+  },
+  "b100_fix_lerp_arg_a": {
+    "ja": "演算の左辺となるQ8.8の値。",
+    "en": "Left operand in Q8.8."
+  },
+  "b100_fix_lerp_arg_b": {
+    "ja": "演算の右辺となるQ8.8の値。",
+    "en": "Right operand in Q8.8."
+  },
+  "b100_fix_lerp_arg_t_q8": {
+    "ja": "補間割合。0～255で指定します。",
+    "en": "Interpolation weight from 0 through 255."
+  },
+  "b100_kq_abs_s16_purpose": {
+    "ja": "符号付き16ビット値の絶対値を求めます。",
+    "en": "Find the magnitude of a signed 16-bit value."
+  },
+  "b100_kq_abs_s16_return": {
+    "ja": "非負の絶対値を返します（入力−32768を除く）。",
+    "en": "Returns a nonnegative magnitude, except for the unrepresentable magnitude of −32768."
+  },
+  "b100_kq_abs_s16_note": {
+    "ja": "−32768の正の絶対値32768は `s16` に収まりません。非負の結果が必要な場合はこの入力を除外してください。",
+    "en": "The positive magnitude 32768 does not fit in `s16`. Exclude −32768 when a nonnegative result is required."
+  },
+  "b100_kq_abs_s16_example": {
+    "ja": "−123を渡して123を得る例です。座標差の大きさを求める場合などに使えます。",
+    "en": "The sample turns −123 into 123, as when measuring the magnitude of a coordinate difference."
+  },
+  "b100_kq_abs_s16_arg_v": {
+    "ja": "絶対値を求める符号付き16ビット値。",
+    "en": "Signed 16-bit value whose magnitude is needed."
+  },
+  "b100_kq_min_s16_purpose": {
+    "ja": "二つの符号付き16ビット値から小さい方を選びます。",
+    "en": "Select the smaller of two signed 16-bit values."
+  },
+  "b100_kq_min_s16_return": {
+    "ja": "選択した入力値を返します。",
+    "en": "Returns the selected operand."
+  },
+  "b100_kq_min_s16_note": {
+    "ja": "符号付きで比較します。同値の場合もその値を返し、入力を書き換えません。",
+    "en": "Comparison is signed. Equal operands produce that same value; neither input is modified."
+  },
+  "b100_kq_min_s16_example": {
+    "ja": "−7と4を比較し、-7を得ます。負の結果にはマイナス記号を付けて表示します。",
+    "en": "Comparing −7 and 4 yields -7. Negative results are displayed with a minus sign."
+  },
+  "b100_kq_min_s16_arg_a": {
+    "ja": "比較する一つ目の符号付き値。",
+    "en": "First signed value to compare."
+  },
+  "b100_kq_min_s16_arg_b": {
+    "ja": "比較する二つ目の符号付き値。",
+    "en": "Second signed value to compare."
+  },
+  "b100_kq_max_s16_purpose": {
+    "ja": "二つの符号付き16ビット値から大きい方を選びます。",
+    "en": "Select the larger of two signed 16-bit values."
+  },
+  "b100_kq_max_s16_return": {
+    "ja": "選択した入力値を返します。",
+    "en": "Returns the selected operand."
+  },
+  "b100_kq_max_s16_note": {
+    "ja": "符号付きで比較します。同値の場合もその値を返し、入力を書き換えません。",
+    "en": "Comparison is signed. Equal operands produce that same value; neither input is modified."
+  },
+  "b100_kq_max_s16_example": {
+    "ja": "−7と4を比較し、4を得ます。負の結果にはマイナス記号を付けて表示します。",
+    "en": "Comparing −7 and 4 yields 4. Negative results are displayed with a minus sign."
+  },
+  "b100_kq_max_s16_arg_a": {
+    "ja": "比較する一つ目の符号付き値。",
+    "en": "First signed value to compare."
+  },
+  "b100_kq_max_s16_arg_b": {
+    "ja": "比較する二つ目の符号付き値。",
+    "en": "Second signed value to compare."
+  },
+  "b100_kq_clamp_s16_purpose": {
+    "ja": "座標や速度を、指定した上下限の範囲に収めます。",
+    "en": "Restrict a coordinate or speed to an inclusive interval."
+  },
+  "b100_kq_clamp_s16_return": {
+    "ja": "下限未満なら `lo`、上限超過なら `hi`、範囲内なら `v` を返します。",
+    "en": "Returns `lo` below the interval, `hi` above it, or `v` within it."
+  },
+  "b100_kq_clamp_s16_note": {
+    "ja": "`lo <= hi` を満たす範囲を指定してください。",
+    "en": "Supply a valid interval with `lo <= hi`."
+  },
+  "b100_kq_clamp_s16_example": {
+    "ja": "25を−10～10に制限して10を得ます。下限側−11→−10と、範囲内3→3も確認します。",
+    "en": "Clamping 25 to −10…10 yields 10. Checks also cover −11→−10 at the lower edge and 3→3 inside the interval."
+  },
+  "b100_kq_clamp_s16_arg_v": {
+    "ja": "制限する符号付き値。",
+    "en": "Signed value to limit."
+  },
+  "b100_kq_clamp_s16_arg_lo": {
+    "ja": "含まれる下限値。",
+    "en": "Inclusive lower limit."
+  },
+  "b100_kq_clamp_s16_arg_hi": {
+    "ja": "含まれる上限値。",
+    "en": "Inclusive upper limit."
+  },
+  "b100_kq_rect_intersect_purpose": {
+    "ja": "二つの軸に平行な矩形が面積を持って重なるかを判定します。",
+    "en": "Test whether two axis-aligned rectangles overlap with positive area."
+  },
+  "b100_kq_rect_intersect_return": {
+    "ja": "重なれば1、離れているか辺が接するだけなら0です。",
+    "en": "Returns 1 for overlap and 0 for separation or mere edge contact."
+  },
+  "b100_kq_rect_intersect_note": {
+    "ja": "幅・高さは正数にし、座標と大きさの和を `s16` に収めてください。右端・下端は領域に含みません。ゼロ面積を自動的に拒否する処理はありません。",
+    "en": "Use positive dimensions and keep coordinate-plus-size sums representable as `s16`. Right and bottom edges are excluded. Zero-area rectangles are not explicitly rejected."
+  },
+  "b100_kq_rect_intersect_example": {
+    "ja": "矩形AとBの重なりを1、Aの右辺に接する矩形との判定を0として確認します。",
+    "en": "The sample verifies 1 for overlapping A and B, and 0 for a rectangle touching A’s right edge."
+  },
+  "b100_kq_rect_intersect_arg_a": {
+    "ja": "一つ目の矩形。`x, y` は左上、`w, h` は幅・高さです。構造体を値で渡します。",
+    "en": "First rectangle, passed by value: `x, y` locate its top-left corner; `w, h` are its width and height."
+  },
+  "b100_kq_rect_intersect_arg_b": {
+    "ja": "二つ目の矩形。Aと同じ座標系で指定します。",
+    "en": "Second rectangle in the same coordinate system as A."
+  },
+  "b100_kq_point_in_rect_purpose": {
+    "ja": "点が矩形の内部にあるかを判定します。左端と上端上の点も内部です。",
+    "en": "Test whether a point lies in a rectangle, including its left and top edges."
+  },
+  "b100_kq_point_in_rect_return": {
+    "ja": "内部なら1、外部なら0です。",
+    "en": "Returns 1 inside and 0 outside."
+  },
+  "b100_kq_point_in_rect_note": {
+    "ja": "幅・高さは正数にし、座標と大きさの和を `s16` に収めてください。右端・下端は領域に含みません。ゼロ面積を自動的に拒否する処理はありません。",
+    "en": "Use positive dimensions and keep coordinate-plus-size sums representable as `s16`. Right and bottom edges are excluded. Zero-area rectangles are not explicitly rejected."
+  },
+  "b100_kq_point_in_rect_example": {
+    "ja": "左上(8,8)は内部、右辺(16,8)と下辺(8,16)は外部になる例です。",
+    "en": "The sample includes the top-left point (8,8) but excludes (16,8) on the right edge and (8,16) on the bottom edge."
+  },
+  "b100_kq_point_in_rect_arg_x": {
+    "ja": "点のX座標。矩形と同じ座標系を使います。",
+    "en": "Point X coordinate in the rectangle’s coordinate system."
+  },
+  "b100_kq_point_in_rect_arg_y": {
+    "ja": "点のY座標。",
+    "en": "Point Y coordinate."
+  },
+  "b100_kq_point_in_rect_arg_r": {
+    "ja": "調べる矩形。構造体を値で渡します。",
+    "en": "Rectangle to test, passed by value."
+  },
+  "b100_chain_init_purpose": {
+    "ja": "座標履歴用のリングバッファに保存領域を割り当て、履歴を空にします。",
+    "en": "Attach storage to a circular position history and start with no recorded points."
+  },
+  "b100_chain_init_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_chain_init_note": {
+    "ja": "`Chain` と座標配列は呼び出し側が用意し、使用中は保持します。要素番号の8ビット加算があふれないよう、容量は128以下にしてください。",
+    "en": "The caller owns both `Chain` and its point array and must keep them alive. Use a capacity no greater than 128 to avoid overflow in the reader’s eight-bit index addition."
+  },
+  "b100_chain_init_example": {
+    "ja": "4点分の保存領域を登録し、点数が0から始まることを確認します。",
+    "en": "The example attaches four point slots and checks that the initial count is zero."
+  },
+  "b100_chain_init_arg_chain": {
+    "ja": "初期化する書き込み可能な `Chain`。",
+    "en": "Writable `Chain` to initialize."
+  },
+  "b100_chain_init_arg_storage": {
+    "ja": "`capacity` 個の `ChainPoint` を格納できる配列。",
+    "en": "Array with room for `capacity` `ChainPoint` entries."
+  },
+  "b100_chain_init_arg_capacity": {
+    "ja": "保存できる点数。1～128を推奨します。0では記録しません。",
+    "en": "Number of point slots. Use 1–128 for a usable history; zero disables recording."
+  },
+  "b100_chain_clear_purpose": {
+    "ja": "保存している座標履歴を論理的に空にし、同じ配列を再利用できるようにします。",
+    "en": "Forget the recorded history so the same backing array can be reused."
+  },
+  "b100_chain_clear_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_chain_clear_note": {
+    "ja": "点数と先頭位置を0に戻します。保存配列のバイト列は消去せず、メモリも解放しません。`Chain` と座標配列は呼び出し側が用意し、使用中は保持します。要素番号の8ビット加算があふれないよう、容量は128以下にしてください。",
+    "en": "Resets the count and head to zero without erasing or freeing the backing array. The caller owns both `Chain` and its point array and must keep them alive. Use a capacity no greater than 128 to avoid overflow in the reader’s eight-bit index addition."
+  },
+  "b100_chain_clear_example": {
+    "ja": "4点を保持している履歴を消去し、点数が0になることを確認します。",
+    "en": "The sample clears a four-point history and verifies that its count becomes zero."
+  },
+  "b100_chain_clear_arg_chain": {
+    "ja": "対象の初期化済み `Chain` へのポインター。",
+    "en": "Pointer to the initialized `Chain`."
+  },
+  "b100_chain_push_head_purpose": {
+    "ja": "最新の座標を履歴の先頭に追加します。容量に達すると最も古い点を置き換えます。",
+    "en": "Add the newest position at the head of the history, replacing the oldest point when full."
+  },
+  "b100_chain_push_head_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_chain_push_head_note": {
+    "ja": "ヌルの履歴または容量0なら何もしません。`Chain` と座標配列は呼び出し側が用意し、使用中は保持します。要素番号の8ビット加算があふれないよう、容量は128以下にしてください。",
+    "en": "A null chain or zero capacity is a no-op. The caller owns both `Chain` and its point array and must keep them alive. Use a capacity no greater than 128 to avoid overflow in the reader’s eight-bit index addition."
+  },
+  "b100_chain_push_head_example": {
+    "ja": "容量4に5点を記録します。最新点は(40,24)、残っている最古の点は(16,8)になり、最初の(8,8)は押し出されます。",
+    "en": "Five pushes into four slots leave (40,24) as the newest point and (16,8) as the oldest retained point; the original (8,8) is replaced."
+  },
+  "b100_chain_push_head_arg_chain": {
+    "ja": "対象の初期化済み `Chain` へのポインター。",
+    "en": "Pointer to the initialized `Chain`."
+  },
+  "b100_chain_push_head_arg_x": {
+    "ja": "追加する点の符号付きX座標。",
+    "en": "Signed X coordinate of the new point."
+  },
+  "b100_chain_push_head_arg_y": {
+    "ja": "追加する点の符号付きY座標。",
+    "en": "Signed Y coordinate of the new point."
+  },
+  "b100_chain_get_segment_purpose": {
+    "ja": "座標履歴から、何個前の点かを指定して座標を取り出します。",
+    "en": "Read a stored position by its age in the history."
+  },
+  "b100_chain_get_segment_return": {
+    "ja": "読み出せれば1、不正な要求なら0です。ヌルでない `out` は検査前に(0,0)へ初期化されます。",
+    "en": "Returns 1 on success or 0 for an invalid request. A non-null `out` is cleared to (0,0) before validation."
+  },
+  "b100_chain_get_segment_note": {
+    "ja": "`out` を履歴配列や `Chain` 自体と重ねないでください。先に出力を消去するため、元データが壊れます。`Chain` と座標配列は呼び出し側が用意し、使用中は保持します。要素番号の8ビット加算があふれないよう、容量は128以下にしてください。",
+    "en": "Do not alias `out` with the backing array or `Chain`: clearing the output would destroy source data. The caller owns both `Chain` and its point array and must keep them alive. Use a capacity no greater than 128 to avoid overflow in the reader’s eight-bit index addition."
+  },
+  "b100_chain_get_segment_example": {
+    "ja": "番号0から最新点(40,24)を読み、番号3から最古点(16,8)を読みます。範囲外の番号4では失敗し、出力は(0,0)になります。",
+    "en": "Index 0 reads newest (40,24), index 3 reads oldest (16,8), and invalid index 4 returns failure with output (0,0)."
+  },
+  "b100_chain_get_segment_arg_chain": {
+    "ja": "対象の初期化済み `Chain` へのポインター。",
+    "en": "Pointer to the initialized `Chain`."
+  },
+  "b100_chain_get_segment_arg_index": {
+    "ja": "点の古さ。0が最新、`count - 1` が保存中の最古です。",
+    "en": "Point age: 0 is newest and `count - 1` is oldest retained."
+  },
+  "b100_chain_get_segment_arg_out": {
+    "ja": "結果を書き込む独立した `ChainPoint`。ヌルなら失敗します。",
+    "en": "Separate writable `ChainPoint` for the result; null causes failure."
+  },
+  "b100_chain_get_count_purpose": {
+    "ja": "現在取り出せる座標の点数を調べます。",
+    "en": "Read the number of positions currently available in the history."
+  },
+  "b100_chain_get_count_return": {
+    "ja": "0～容量の点数。ヌルの履歴なら0です。",
+    "en": "Returns a count from zero through capacity, or zero for a null chain."
+  },
+  "b100_chain_get_count_note": {
+    "ja": "`Chain` と座標配列は呼び出し側が用意し、使用中は保持します。要素番号の8ビット加算があふれないよう、容量は128以下にしてください。",
+    "en": "The caller owns both `Chain` and its point array and must keep them alive. Use a capacity no greater than 128 to avoid overflow in the reader’s eight-bit index addition."
+  },
+  "b100_chain_get_count_example": {
+    "ja": "容量4へ5回追加しても点数は4です。消去後と容量0の履歴では0になることも確認します。",
+    "en": "After five pushes into four slots the count remains four. It becomes zero after clearing and stays zero for a zero-capacity history."
+  },
+  "b100_chain_get_count_arg_chain": {
+    "ja": "対象の初期化済み `Chain` へのポインター。",
+    "en": "Pointer to the initialized `Chain`."
+  },
+  "b100_debug_init_purpose": {
+    "ja": "デバッグログの有効件数・フレームタグ・最後のアサートコードを初期化します。",
+    "en": "Initialize the valid log length, frame tag and last assertion code."
+  },
+  "b100_debug_init_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_debug_init_note": {
+    "ja": "既存エントリーのバイト列は消去しません。初回の記録前に呼び出してください。ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "Existing entry bytes are not erased. Call this before recording the first entry. The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_debug_init_example": {
+    "ja": "初期件数0を確認し、記録後に再初期化して件数とアサートコードだけが0に戻り、配列の古い値は残ることを確認します。",
+    "en": "The sample checks an initial count of zero, then resets a populated log and verifies that count and assertion code clear while old array values remain."
+  },
+  "b100_debug_set_frame_purpose": {
+    "ja": "これ以降に追加するログに付けるフレーム番号を指定します。",
+    "en": "Set the frame tag copied into subsequent log entries."
+  },
+  "b100_debug_set_frame_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_debug_set_frame_note": {
+    "ja": "フレームを待つ処理や自動加算はありません。ゲームのフレームカウンターを明示的に渡します。ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "This neither waits for a frame nor increments the tag automatically. Pass the game’s frame counter explicitly. The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_debug_set_frame_example": {
+    "ja": "513を設定して10件を記録し、すべてのフレーム欄が513になることを読み出して確認します。",
+    "en": "The sample sets 513, records ten entries and reads back all ten frame fields to verify the tag."
+  },
+  "b100_debug_set_frame_arg_frame": {
+    "ja": "以後の記録に付ける16ビットのフレーム番号。",
+    "en": "16-bit frame number for subsequent entries."
+  },
+  "b100_debug_mark_frame_purpose": {
+    "ja": "処理の区切りを、名前付きのフレームマーカーとして記録します。",
+    "en": "Record a named frame marker to identify a point in the workflow."
+  },
+  "b100_debug_mark_frame_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_debug_mark_frame_note": {
+    "ja": "ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_debug_mark_frame_example": {
+    "ja": "BEGINというマーカーを追加します。値は65535（0xFFFF）、フレームは513として記録されます。",
+    "en": "Adding the BEGIN marker records value 65535 (0xFFFF) with frame tag 513."
+  },
+  "b100_debug_mark_frame_arg_label": {
+    "ja": "記録を識別する終端0の文字列。検査まで読み出せる領域に置きます。",
+    "en": "Zero-terminated label stored in memory that remains readable until inspection."
+  },
+  "b100_debug_trace_u8_purpose": {
+    "ja": "8ビットの状態値を名前と現在のフレーム番号とともに記録します。",
+    "en": "Log an eight-bit state value with its name and current frame tag."
+  },
+  "b100_debug_trace_u8_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_debug_trace_u8_note": {
+    "ja": "ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_debug_trace_u8_example": {
+    "ja": "BYTEに255を記録し、ログの16ビット値欄にも255として保存されることを確認します。",
+    "en": "The BYTE entry records 255 and verifies that the log’s 16-bit value field contains 255."
+  },
+  "b100_debug_trace_u8_arg_name": {
+    "ja": "記録を識別する終端0の文字列。検査まで読み出せる領域に置きます。",
+    "en": "Zero-terminated label stored in memory that remains readable until inspection."
+  },
+  "b100_debug_trace_u8_arg_value": {
+    "ja": "保存する0～255の値。ログ内では16ビットにゼロ拡張されます。",
+    "en": "Value from 0 through 255, zero-extended into the log’s 16-bit field."
+  },
+  "b100_debug_trace_u16_purpose": {
+    "ja": "16ビットのスコアやカウンターを名前付きで記録します。",
+    "en": "Log a named 16-bit score or counter."
+  },
+  "b100_debug_trace_u16_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_debug_trace_u16_note": {
+    "ja": "ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_debug_trace_u16_example": {
+    "ja": "WORDに4660（0x1234）を記録し、上位バイトを含む値を読み戻します。",
+    "en": "The WORD entry stores 4660 (0x1234), and the sample reads it back to check both bytes."
+  },
+  "b100_debug_trace_u16_arg_name": {
+    "ja": "記録を識別する終端0の文字列。検査まで読み出せる領域に置きます。",
+    "en": "Zero-terminated label stored in memory that remains readable until inspection."
+  },
+  "b100_debug_trace_u16_arg_value": {
+    "ja": "保存する0～65535の値。",
+    "en": "Value from 0 through 65535 to record."
+  },
+  "b100_debug_assert_fail_purpose": {
+    "ja": "アサート失敗のコードを保持し、ASSERTというログの追加を試みます。",
+    "en": "Retain an assertion failure code and attempt to append an ASSERT entry."
+  },
+  "b100_debug_assert_fail_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_debug_assert_fail_note": {
+    "ja": "実行を停止しません。ログが満杯でも最後のアサートコードは更新されます。ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "Execution continues. The last assertion code updates even when the log is full. The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_debug_assert_fail_example": {
+    "ja": "コード42を記録します。その後ログを満杯にしてコード999を記録し、件数は32のままでも最後のコードは999になることを確認します。",
+    "en": "The sample records code 42, fills the log, then records code 999. The count stays 32 while the last code becomes 999."
+  },
+  "b100_debug_assert_fail_arg_code": {
+    "ja": "保持する16ビットのエラー識別コード。",
+    "en": "16-bit error identifier to retain."
+  },
+  "b100_debug_get_trace_count_purpose": {
+    "ja": "ログ配列に入っている有効エントリー数を調べます。",
+    "en": "Read the number of valid entries in the trace array."
+  },
+  "b100_debug_get_trace_count_return": {
+    "ja": "0～`DEBUG_TRACE_MAX` の件数です。",
+    "en": "Returns a count from zero through `DEBUG_TRACE_MAX`."
+  },
+  "b100_debug_get_trace_count_note": {
+    "ja": "ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_debug_get_trace_count_example": {
+    "ja": "通常の10件と、追加し続けた後の上限32件を確認します。満杯になっても件数は折り返しません。",
+    "en": "The sample verifies ten initial entries and the limit of 32 after further writes; the count does not wrap when full."
+  },
+  "b100_debug_get_trace_log_purpose": {
+    "ja": "記録済みの名前・値・フレームを読み出すため、内部配列への参照を取得します。",
+    "en": "Obtain a reference to the internal array to inspect recorded names, values and frame tags."
+  },
+  "b100_debug_get_trace_log_return": {
+    "ja": "内部 `DebugTraceEntry` 配列への読み取り用ポインターです。",
+    "en": "Returns a read-only pointer to the internal `DebugTraceEntry` array."
+  },
+  "b100_debug_get_trace_log_note": {
+    "ja": "配列の複製ではありません。有効範囲は `debug_get_trace_count()` までです。初期化後に残る古いバイト列を有効な記録として扱わないでください。ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "This is not a copy. Read only the number of entries reported by `debug_get_trace_count()`. Stale bytes left after initialization are not valid records. The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_debug_get_trace_log_example": {
+    "ja": "10件の値とフレーム欄を順に読み出し、名前BEGINの先頭文字Bも確認します。",
+    "en": "The sample reads all ten value and frame fields and checks the leading B in the BEGIN label."
+  },
+  "b100_debug_get_last_assert_purpose": {
+    "ja": "最後に記録されたアサートコードを、ログの空きに関係なく取得します。",
+    "en": "Read the latest assertion code independently of available log space."
+  },
+  "b100_debug_get_last_assert_return": {
+    "ja": "最後の16ビットコード。初期化直後は0です。",
+    "en": "Returns the latest 16-bit code, initially zero after initialization."
+  },
+  "b100_debug_get_last_assert_note": {
+    "ja": "0は初期値であり、コード0の失敗と区別できません。読み出しても値を消去しません。",
+    "en": "Zero is also the initial value and cannot distinguish a failure recorded with code zero. Reading does not clear the code."
+  },
+  "b100_debug_get_last_assert_example": {
+    "ja": "マクロで記録した77、満杯後の999、再初期化後の0を確認します。",
+    "en": "The sample checks 77 from the assertion macro, 999 after the log fills, and zero after reinitialization."
+  },
+  "b100_KITAQGB_TRACE_U8_purpose": {
+    "ja": "名前付きの値を8ビットへ明示変換してデバッグログへ渡すマクロです。",
+    "en": "Log a named value after explicitly converting it to 8 bits."
+  },
+  "b100_KITAQGB_TRACE_U8_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_KITAQGB_TRACE_U8_note": {
+    "ja": "常に有効なマクロで、ビルド設定による自動無効化はありません。ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "The macro is always active; build settings do not automatically disable it. The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_KITAQGB_TRACE_U8_example": {
+    "ja": "例の記録値は52です。0x1234の下位8ビット0x34だけを記録します。",
+    "en": "The example records 52. Only the low byte 0x34 of 0x1234 is retained."
+  },
+  "b100_KITAQGB_TRACE_U8_arg_name": {
+    "ja": "記録を識別する終端0の文字列。検査まで読み出せる領域に置きます。",
+    "en": "Zero-terminated label stored in memory that remains readable until inspection."
+  },
+  "b100_KITAQGB_TRACE_U8_arg_value": {
+    "ja": "8ビットへ変換して保存する式。",
+    "en": "Expression converted to 8 bits before recording."
+  },
+  "b100_KITAQGB_TRACE_U16_purpose": {
+    "ja": "名前付きの値を16ビットへ明示変換してデバッグログへ渡すマクロです。",
+    "en": "Log a named value after explicitly converting it to 16 bits."
+  },
+  "b100_KITAQGB_TRACE_U16_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_KITAQGB_TRACE_U16_note": {
+    "ja": "常に有効なマクロで、ビルド設定による自動無効化はありません。ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "The macro is always active; build settings do not automatically disable it. The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_KITAQGB_TRACE_U16_example": {
+    "ja": "例の記録値は500です。値をログ配列から読み戻して確認します。",
+    "en": "The example records 500. The value is read back from the log for verification."
+  },
+  "b100_KITAQGB_TRACE_U16_arg_name": {
+    "ja": "記録を識別する終端0の文字列。検査まで読み出せる領域に置きます。",
+    "en": "Zero-terminated label stored in memory that remains readable until inspection."
+  },
+  "b100_KITAQGB_TRACE_U16_arg_value": {
+    "ja": "16ビットへ変換して保存する式。",
+    "en": "Expression converted to 16 bits before recording."
+  },
+  "b100_KITAQGB_TRACE_purpose": {
+    "ja": "名前付きの値を16ビットへ明示変換してデバッグログへ渡すマクロです。",
+    "en": "Log a named value after explicitly converting it to 16 bits."
+  },
+  "b100_KITAQGB_TRACE_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_KITAQGB_TRACE_note": {
+    "ja": "常に有効なマクロで、ビルド設定による自動無効化はありません。`KITAQGB_TRACE_U16` と同じ16ビット記録です。ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "The macro is always active; build settings do not automatically disable it. It has the same 16-bit logging behavior as `KITAQGB_TRACE_U16`. The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_KITAQGB_TRACE_example": {
+    "ja": "例の記録値は600です。値をログ配列から読み戻して確認します。",
+    "en": "The example records 600. The value is read back from the log for verification."
+  },
+  "b100_KITAQGB_TRACE_arg_name": {
+    "ja": "記録を識別する終端0の文字列。検査まで読み出せる領域に置きます。",
+    "en": "Zero-terminated label stored in memory that remains readable until inspection."
+  },
+  "b100_KITAQGB_TRACE_arg_value": {
+    "ja": "16ビットへ変換して保存する式。",
+    "en": "Expression converted to 16 bits before recording."
+  },
+  "b100_KITAQGB_MARK_FRAME_purpose": {
+    "ja": "ラベルを文字列ポインターへ変換し、値0xFFFFのフレームマーカーを追加するマクロです。",
+    "en": "Cast a label to a string pointer and append a frame marker with value 0xFFFF."
+  },
+  "b100_KITAQGB_MARK_FRAME_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_KITAQGB_MARK_FRAME_note": {
+    "ja": "ログ容量は既定32件です。満杯では追加を捨てます。`DEBUG_TRACE_MAX` を変更するなら1～255で全翻訳単位を統一してください。名前の文字列はコピーせずポインターを保存するため、検査が終わるまで有効に保ちます。割り込みとメイン処理の同時書き込みは呼び出し側で防いでください。",
+    "en": "The log holds 32 entries by default and drops new entries when full. If overriding `DEBUG_TRACE_MAX`, use 1–255 consistently in every translation unit. Names are retained as pointers rather than copied; keep their storage readable until inspection finishes. Serialize interrupt and main-thread writers yourself."
+  },
+  "b100_KITAQGB_MARK_FRAME_example": {
+    "ja": "ENDというラベルを記録し、値65535とフレーム513を確認します。",
+    "en": "The END marker is verified with value 65535 and frame tag 513."
+  },
+  "b100_KITAQGB_MARK_FRAME_arg_label": {
+    "ja": "記録を識別する終端0の文字列。検査まで読み出せる領域に置きます。",
+    "en": "Zero-terminated label stored in memory that remains readable until inspection."
+  },
+  "b100_KITAQGB_ASSERT_purpose": {
+    "ja": "条件が偽ならコード1のアサート失敗を記録する、文として使えるマクロです。",
+    "en": "A statement-like macro that records assertion code 1 when its condition is false."
+  },
+  "b100_KITAQGB_ASSERT_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_KITAQGB_ASSERT_note": {
+    "ja": "条件は一度評価します。真なら記録しません。失敗しても実行を続けます。`do…while (0)` 形式なので `if…else` の中でも一つの文として使えます。",
+    "en": "The condition is evaluated once. True records nothing; false records a failure without stopping execution. Its `do…while (0)` form makes it usable as one statement in an `if…else`."
+  },
+  "b100_KITAQGB_ASSERT_example": {
+    "ja": "真と偽を一回ずつ渡し、追加されるログはコード1の一件だけであることを確認します。",
+    "en": "One true and one false assertion produce exactly one entry with code 1."
+  },
+  "b100_KITAQGB_ASSERT_arg_cond": {
+    "ja": "成立していることを確認する条件式。0なら失敗です。",
+    "en": "Condition expected to hold; zero means failure."
+  },
+  "b100_KITAQGB_ASSERT_CODE_purpose": {
+    "ja": "条件が偽のときだけ、指定したコードのアサート失敗を記録します。",
+    "en": "Record a chosen assertion code only when the condition is false."
+  },
+  "b100_KITAQGB_ASSERT_CODE_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_KITAQGB_ASSERT_CODE_note": {
+    "ja": "条件は一度評価し、コードの式は失敗した場合だけ評価します。記録後も実行を続けます。",
+    "en": "The condition is evaluated once; the code expression is evaluated only on failure. Execution continues after recording."
+  },
+  "b100_KITAQGB_ASSERT_CODE_example": {
+    "ja": "真の条件で `++side_effect` を指定しても変数は0のままです。偽の条件ではコード77が記録されます。",
+    "en": "With a true condition, the code expression `++side_effect` is not evaluated and the variable stays zero. A false condition records code 77."
+  },
+  "b100_KITAQGB_ASSERT_CODE_arg_cond": {
+    "ja": "成立を確認する条件式。",
+    "en": "Condition expected to hold."
+  },
+  "b100_KITAQGB_ASSERT_CODE_arg_code": {
+    "ja": "失敗した場合に評価し、16ビットへ変換するコードの式。",
+    "en": "Code expression evaluated on failure and converted to 16 bits."
+  },
+  "b100_system_init_purpose": {
+    "ja": "フレーム管理を初期化し、カウンターと登録コールバックを消去します。",
+    "en": "Initialize frame management by clearing the counter and registered callback."
+  },
+  "b100_system_init_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_system_init_note": {
+    "ja": "カウンターはこのラッパーを通った待機回数であり、経過したハードウェアフレームを自動計測するものではありません。16ビットで折り返します。",
+    "en": "The counter counts waits through this wrapper; it does not automatically measure elapsed hardware frames. It wraps at 16 bits."
+  },
+  "b100_system_init_example": {
+    "ja": "初期化直後のフレーム番号が0であることを確認してからコールバックを登録します。",
+    "en": "The sample confirms an initial frame number of zero before registering its callback."
+  },
+  "b100_system_wait_vblank_purpose": {
+    "ja": "次のフレーム待機を行い、カウンターを加算してから登録コールバックを呼びます。",
+    "en": "Wait for the next frame, increment the counter, then invoke the registered callback."
+  },
+  "b100_system_wait_vblank_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_system_wait_vblank_note": {
+    "ja": "コールバックはこの関数内から同期的に呼ばれます。割り込みハンドラーとして登録されるわけではありません。カウンターはこのラッパーを通った待機回数であり、経過したハードウェアフレームを自動計測するものではありません。16ビットで折り返します。",
+    "en": "The callback runs synchronously inside this function; registration does not install an interrupt handler. The counter counts waits through this wrapper; it does not automatically measure elapsed hardware frames. It wraps at 16 bits."
+  },
+  "b100_system_wait_vblank_example": {
+    "ja": "3回呼び出すとコールバックも3回実行され、コールバックが読むカウンターは3になります。",
+    "en": "Three waits invoke the callback three times, and the last counter value observed inside it is three."
+  },
+  "b100_system_set_vblank_callback_purpose": {
+    "ja": "フレーム待機後に呼ぶ処理を登録、置換、または解除します。",
+    "en": "Register, replace or remove the function called after a frame wait."
+  },
+  "b100_system_set_vblank_callback_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_system_set_vblank_callback_note": {
+    "ja": "引数なし・戻り値なしの通常の関数ポインターです。バンク番号は保持しません。呼び出される間は対象コードが読み出せる状態にしてください。",
+    "en": "This is an ordinary pointer to a function with no arguments and no return value. It carries no bank number; keep the target code mapped while it can be called."
+  },
+  "b100_system_set_vblank_callback_example": {
+    "ja": "登録した関数が3回呼ばれた後、0を設定して解除します。次の待機でフレームは4へ進みますが、呼び出し回数は3のままです。",
+    "en": "After three callback invocations, registering 0 disables dispatch. The next wait advances the frame to four while the callback count stays three."
+  },
+  "b100_system_set_vblank_callback_arg_callback": {
+    "ja": "呼び出す関数。0なら登録を解除します。",
+    "en": "Function to invoke; 0 removes the callback."
+  },
+  "b100_system_get_frame_purpose": {
+    "ja": "フレーム待機ラッパーの16ビットカウンターを読み出します。",
+    "en": "Read the frame-wait wrapper’s 16-bit counter."
+  },
+  "b100_system_get_frame_return": {
+    "ja": "現在の0～65535のカウンター値です。",
+    "en": "Returns the current counter from 0 through 65535."
+  },
+  "b100_system_get_frame_note": {
+    "ja": "カウンターはこのラッパーを通った待機回数であり、経過したハードウェアフレームを自動計測するものではありません。16ビットで折り返します。",
+    "en": "The counter counts waits through this wrapper; it does not automatically measure elapsed hardware frames. It wraps at 16 bits."
+  },
+  "b100_system_get_frame_example": {
+    "ja": "3回待機した後に3を読みます。サンプルでは折り返し確認のためカウンターを65535へ設定し、次の待機後に0になることも確認します。",
+    "en": "The sample reads three after three waits. For a wraparound check it explicitly sets the counter to 65535 and verifies zero after the next wait."
+  },
+  "b100_system_get_frame8_purpose": {
+    "ja": "フレームカウンターの下位8ビットを取り出します。短い周期の処理に利用できます。",
+    "en": "Read the low eight bits of the frame counter for short repeating intervals."
+  },
+  "b100_system_get_frame8_return": {
+    "ja": "0～255の下位バイトです。",
+    "en": "Returns the low byte, from 0 through 255."
+  },
+  "b100_system_get_frame8_note": {
+    "ja": "カウンターはこのラッパーを通った待機回数であり、経過したハードウェアフレームを自動計測するものではありません。16ビットで折り返します。",
+    "en": "The counter counts waits through this wrapper; it does not automatically measure elapsed hardware frames. It wraps at 16 bits."
+  },
+  "b100_system_get_frame8_example": {
+    "ja": "3回待機した時点では3、16ビットカウンターが折り返した時点では0を得ます。",
+    "en": "The sample reads three after three waits and zero when the 16-bit counter wraps."
+  },
+  "b100_system_disable_interrupts_purpose": {
+    "ja": "CPUのマスク可能な割り込みを禁止します。",
+    "en": "Disable maskable CPU interrupts."
+  },
+  "b100_system_disable_interrupts_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_system_disable_interrupts_note": {
+    "ja": "必要な共有データの更新を短く保ち、更新後は適切に割り込みを再開してください。フレームの待機条件とは区別して使用します。",
+    "en": "Keep protected updates short and restore interrupts appropriately afterward. Interrupt masking is separate from the conditions needed by a frame-wait routine."
+  },
+  "b100_system_disable_interrupts_example": {
+    "ja": "サンプルでは禁止と再開を対にして呼びます。CPUの割り込み状態は専用の検証プログラムでも確認します。",
+    "en": "The example pairs disabling with enabling. Dedicated verification programs also inspect the CPU interrupt state."
+  },
+  "b100_system_enable_interrupts_purpose": {
+    "ja": "CPUのマスク可能な割り込みを許可します。",
+    "en": "Enable maskable CPU interrupts."
+  },
+  "b100_system_enable_interrupts_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_system_enable_interrupts_note": {
+    "ja": "許可する前に割り込み元とハンドラーを適切に準備してください。FCではNMIの許可・禁止とは独立しています。",
+    "en": "Prepare interrupt sources and handlers before enabling them. On FC this is independent of enabling or disabling NMI."
+  },
+  "b100_system_enable_interrupts_example": {
+    "ja": "禁止した割り込みを再開します。FCのサンプルはAPUのフレームIRQとDMC IRQを止めてから許可し、未処理IRQの連続発生を避けます。",
+    "en": "The example restores interrupts. The FC program first disables APU frame and DMC IRQ sources to avoid repeatedly servicing an unacknowledged IRQ."
+  },
+  "b100_scene_init_purpose": {
+    "ja": "シーン表を登録し、まだどのシーンも開始していない状態にします。",
+    "en": "Attach a scene table with no scene active yet."
+  },
+  "b100_scene_init_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_scene_init_note": {
+    "ja": "現在IDと変更フラグを0にします。enterは呼ばないため、開始するには `scene_change()` が必要です。シーン表は呼び出し側の所有です。使用中は表と通常の関数ポインターの参照先を有効に保ってください。各コールバックは0なら呼びません。enter/exitの中から再帰的にシーン変更や表の置換をしないでください。",
+    "en": "Resets the stored ID and change flag to zero. It does not call enter; use `scene_change()` to activate a scene. The caller owns the scene table. Keep it and the targets of its ordinary function pointers valid while in use. Null callbacks are skipped. Do not recursively change scenes or replace the table from enter/exit callbacks."
+  },
+  "b100_scene_init_example": {
+    "ja": "二つのシーンを登録し、開始前にupdate/drawを呼んでもイベントが発生しないことを確認します。",
+    "en": "The sample registers two scenes and verifies that update/draw before activation produce no events."
+  },
+  "b100_scene_init_arg_scenes": {
+    "ja": "enter・update・draw・exitを持つ `SceneDef` 配列。",
+    "en": "Array of `SceneDef` entries with enter, update, draw and exit callbacks."
+  },
+  "b100_scene_init_arg_count": {
+    "ja": "配列内のシーン数。0なら有効なシーンはありません。",
+    "en": "Number of entries; zero provides no valid scene IDs."
+  },
+  "b100_scene_set_table_purpose": {
+    "ja": "使用するシーン表を置き換え、アクティブなシーンを解除します。",
+    "en": "Replace the scene table and leave no scene active."
+  },
+  "b100_scene_set_table_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_scene_set_table_note": {
+    "ja": "`scene_init()` と同様に状態を初期化します。置き換え前のexitも、新しい表のenterも呼びません。シーン表は呼び出し側の所有です。使用中は表と通常の関数ポインターの参照先を有効に保ってください。各コールバックは0なら呼びません。enter/exitの中から再帰的にシーン変更や表の置換をしないでください。",
+    "en": "Resets state like `scene_init()`, calling neither the old exit callback nor a new enter callback. The caller owns the scene table. Keep it and the targets of its ordinary function pointers valid while in use. Null callbacks are skipped. Do not recursively change scenes or replace the table from enter/exit callbacks."
+  },
+  "b100_scene_set_table_example": {
+    "ja": "9件のイベントがある時点で表を置き換えます。件数は9のままで、変更フラグは0となり、続くdrawも何もしません。",
+    "en": "Replacing the table after nine events leaves the count at nine, resets the change flag to zero, and makes the following draw a no-op."
+  },
+  "b100_scene_set_table_arg_scenes": {
+    "ja": "enter・update・draw・exitを持つ `SceneDef` 配列。",
+    "en": "Array of `SceneDef` entries with enter, update, draw and exit callbacks."
+  },
+  "b100_scene_set_table_arg_count": {
+    "ja": "配列内のシーン数。0なら有効なシーンはありません。",
+    "en": "Number of entries; zero provides no valid scene IDs."
+  },
+  "b100_scene_change_purpose": {
+    "ja": "現在のシーンを終了させ、指定したシーンを開始します。",
+    "en": "Exit the current scene, if any, and enter the requested scene."
+  },
+  "b100_scene_change_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_scene_change_note": {
+    "ja": "範囲外IDは無視します。有効な変更ではexit→ID更新・変更フラグ設定→enterの順です。同じIDの指定でもexitとenterを実行します。シーン表は呼び出し側の所有です。使用中は表と通常の関数ポインターの参照先を有効に保ってください。各コールバックは0なら呼びません。enter/exitの中から再帰的にシーン変更や表の置換をしないでください。",
+    "en": "Out-of-range IDs are ignored. A valid change runs exit, stores the new ID and change flag, then runs enter. Selecting the same ID still runs exit and enter. The caller owns the scene table. Keep it and the targets of its ordinary function pointers valid while in use. Null callbacks are skipped. Do not recursively change scenes or replace the table from enter/exit callbacks."
+  },
+  "b100_scene_change_example": {
+    "ja": "0の開始、無効ID9の無視、0→1の遷移、1→1の再入場を実行し、イベント順を確認します。",
+    "en": "The program activates 0, ignores invalid ID 9, transitions 0→1 and re-enters 1→1, checking callback order."
+  },
+  "b100_scene_change_arg_scene_id": {
+    "ja": "開始するシーンの添字。0～count−1です。",
+    "en": "Index of the scene to enter, from 0 through count−1."
+  },
+  "b100_scene_update_purpose": {
+    "ja": "アクティブなシーンのupdate処理を一回呼びます。",
+    "en": "Invoke the active scene’s update callback once."
+  },
+  "b100_scene_update_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_scene_update_note": {
+    "ja": "アクティブなシーンがなければ何もしません。ある場合は呼び出し前に変更フラグを消すため、update内で起きたシーン変更は呼び出し後にも残ります。シーン表は呼び出し側の所有です。使用中は表と通常の関数ポインターの参照先を有効に保ってください。各コールバックは0なら呼びません。enter/exitの中から再帰的にシーン変更や表の置換をしないでください。",
+    "en": "Without an active scene this is a no-op. Otherwise it clears the change flag before dispatch, so a transition made inside update remains visible afterward. The caller owns the scene table. Keep it and the targets of its ordinary function pointers valid while in use. Null callbacks are skipped. Do not recursively change scenes or replace the table from enter/exit callbacks."
+  },
+  "b100_scene_update_example": {
+    "ja": "シーン0のupdateでイベント11を記録します。直前に1だった変更フラグは通常のupdate後に0になります。",
+    "en": "Scene 0’s update records event 11. The change flag, previously one, becomes zero after this ordinary update."
+  },
+  "b100_scene_draw_purpose": {
+    "ja": "アクティブなシーンのdraw処理を一回呼びます。",
+    "en": "Invoke the active scene’s draw callback once."
+  },
+  "b100_scene_draw_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_scene_draw_note": {
+    "ja": "アクティブなシーンがない場合とdrawが0の場合は何もしません。変更フラグは消去しません。画面の転送やフレーム待機はコールバック側で設計します。シーン表は呼び出し側の所有です。使用中は表と通常の関数ポインターの参照先を有効に保ってください。各コールバックは0なら呼びません。enter/exitの中から再帰的にシーン変更や表の置換をしないでください。",
+    "en": "No active scene or a null draw callback is a no-op. The change flag is not cleared. Plan display transfers and frame timing in the callback or surrounding game loop. The caller owns the scene table. Keep it and the targets of its ordinary function pointers valid while in use. Null callbacks are skipped. Do not recursively change scenes or replace the table from enter/exit callbacks."
+  },
+  "b100_scene_draw_example": {
+    "ja": "シーン0のdrawで12、シーン1のdrawで22がイベント列に入ることを確認します。",
+    "en": "The event sequence contains 12 from scene 0’s draw and 22 from scene 1’s draw."
+  },
+  "b100_scene_get_current_purpose": {
+    "ja": "保存されている現在シーンのIDを読み出します。",
+    "en": "Read the stored current scene ID."
+  },
+  "b100_scene_get_current_return": {
+    "ja": "保存されている8ビットIDです。初期化直後も0を返します。",
+    "en": "Returns the stored eight-bit ID; initialization also leaves it at zero."
+  },
+  "b100_scene_get_current_note": {
+    "ja": "0という戻り値だけではシーン0が開始済みか判別できません。初期化後に最初の `scene_change()` を行ったかを呼び出し側で管理してください。",
+    "en": "A return value of zero alone does not prove that scene 0 is active. Track whether the first `scene_change()` has occurred after initialization."
+  },
+  "b100_scene_get_current_example": {
+    "ja": "シーン0の開始後は0、シーン1への変更後は1を取得します。",
+    "en": "The sample reads zero after activating scene 0 and one after changing to scene 1."
+  },
+  "b100_scene_was_changed_purpose": {
+    "ja": "シーン変更が記録されているかを調べます。",
+    "en": "Read whether a scene transition is currently recorded."
+  },
+  "b100_scene_was_changed_return": {
+    "ja": "変更フラグが立っていれば1、消えていれば0です。",
+    "en": "Returns 1 when the transition flag is set, otherwise 0."
+  },
+  "b100_scene_was_changed_note": {
+    "ja": "読み出しでは消しません。初期化・表の置換と、アクティブなシーンのupdate開始時に消えます。無効IDの指定は変更しません。",
+    "en": "Reading does not clear the flag. Initialization, table replacement and the start of an active update clear it. An invalid scene ID leaves it unchanged."
+  },
+  "b100_scene_was_changed_example": {
+    "ja": "変更直後の1、通常のupdate後の0、表を置き換えた後の0を確認します。",
+    "en": "Checks cover one immediately after a transition, zero after an ordinary update, and zero after replacing the table."
+  },
+  "b100_nes_box16_intersects_purpose": {
+    "ja": "FC用の二つの矩形をポインターで渡し、面積のある重なりを調べます。",
+    "en": "Test positive-area overlap between two FC rectangles passed by pointer."
+  },
+  "b100_nes_box16_intersects_return": {
+    "ja": "重なれば1、離れているか辺が接するだけなら0です。",
+    "en": "Returns 1 for overlap and 0 for separation or edge contact."
+  },
+  "b100_nes_box16_intersects_note": {
+    "ja": "`x, y` は符号なし16ビット、幅・高さは8ビットです。正の大きさを指定し、座標と大きさの和を65535以下に保ってください。座標の折り返しをまたぐ矩形には使いません。",
+    "en": "`x, y` are unsigned 16-bit coordinates; width and height are bytes. Use positive dimensions and keep edge sums no greater than 65535. This does not handle rectangles crossing coordinate wraparound."
+  },
+  "b100_nes_box16_intersects_example": {
+    "ja": "(8,8)から8×8のAと、(12,12)から8×8のBの重なりを確認します。",
+    "en": "The sample checks overlap between an 8×8 box A at (8,8) and an 8×8 box B at (12,12)."
+  },
+  "b100_nes_box16_intersects_arg_a": {
+    "ja": "一つ目の読み取り可能な `NesBox16`。ヌルは渡しません。",
+    "en": "Readable first `NesBox16`; do not pass null."
+  },
+  "b100_nes_box16_intersects_arg_b": {
+    "ja": "二つ目の読み取り可能な `NesBox16`。",
+    "en": "Readable second `NesBox16`."
+  },
+  "b100_nes_box16_contains_point_purpose": {
+    "ja": "FC用の矩形に点が含まれるかを調べます。左・上辺を含み、右・下辺を除きます。",
+    "en": "Test whether a point is inside an FC rectangle, including left/top edges and excluding right/bottom edges."
+  },
+  "b100_nes_box16_contains_point_return": {
+    "ja": "内部なら1、外部なら0です。",
+    "en": "Returns 1 inside, 0 outside."
+  },
+  "b100_nes_box16_contains_point_note": {
+    "ja": "`x, y` は符号なし16ビット、幅・高さは8ビットです。正の大きさを指定し、座標と大きさの和を65535以下に保ってください。座標の折り返しをまたぐ矩形には使いません。",
+    "en": "`x, y` are unsigned 16-bit coordinates; width and height are bytes. Use positive dimensions and keep edge sums no greater than 65535. This does not handle rectangles crossing coordinate wraparound."
+  },
+  "b100_nes_box16_contains_point_example": {
+    "ja": "(8,8)から8×8の矩形に対し、右辺上の(16,8)は外部と判定されます。",
+    "en": "For an 8×8 rectangle at (8,8), the point (16,8) on its right edge is outside."
+  },
+  "b100_nes_box16_contains_point_arg_box": {
+    "ja": "読み取り可能な `NesBox16`。ヌルは渡しません。",
+    "en": "Readable `NesBox16`; do not pass null."
+  },
+  "b100_nes_box16_contains_point_arg_x": {
+    "ja": "点の符号なし16ビットX座標。",
+    "en": "Unsigned 16-bit point X coordinate."
+  },
+  "b100_nes_box16_contains_point_arg_y": {
+    "ja": "点の符号なし16ビットY座標。",
+    "en": "Unsigned 16-bit point Y coordinate."
+  },
+  "b100_menu_run_purpose": {
+    "ja": "項目一覧を表示し、決定または取消が押されるまで待機する選択メニューを実行します。",
+    "en": "Run a selection menu that displays its items and waits for confirmation or cancellation."
+  },
+  "b100_menu_run_return": {
+    "ja": "選択した0始まりの添字。Bまたは件数0なら255です。",
+    "en": "Returns the zero-based selection, or 255 for B/cancellation or an empty list."
+  },
+  "b100_menu_run_note": {
+    "ja": "UP/DOWNの押し始めで移動し、端から反対端へ循環します。押しっぱなしでは繰り返しません。AとBが同時ならAを優先します。入力時点で押されているキーは新規入力です。`menu->cursor` は開始位置として読み、結果を書き戻しません。終了後も枠は残ります。フレーム・カーソル・英数字のタイルをあらかじめ読み込みます。項目の文字列や配列は呼び出し側が保持します。文字の自動折り返しやクリッピングはないため、枠内に収まる位置・件数・文字数を指定してください。",
+    "en": "New UP/DOWN presses wrap at the ends, with no held-key repeat. A wins over B when both are pressed. Keys already held on entry count as new presses. `menu->cursor` supplies the starting position and is not updated with the result. The window remains after return. Load frame, cursor and text tiles beforehand. The caller retains the item array and strings. Text is neither automatically wrapped nor clipped; choose positions, counts and label lengths that fit the window."
+  },
+  "b100_menu_run_example": {
+    "ja": "SWORD・SHIELD・POTIONの一覧でDOWN→Aを入力し、SHIELDの添字1を得ます。開始カーソルの値0は変更されません。",
+    "en": "DOWN then A selects SHIELD, index 1, from SWORD/SHIELD/POTION. The stored starting cursor remains zero."
+  },
+  "b100_menu_run_arg_menu": {
+    "ja": "位置・大きさ・項目配列・件数・開始カーソルを設定した `menu_t`。ヌルは渡しません。開始カーソルが件数外なら0から始めます。",
+    "en": "Non-null `menu_t` specifying position, size, items, count and starting cursor. An out-of-range starting cursor falls back to zero."
+  },
+  "b100_menu_yesno_purpose": {
+    "ja": "YESとNOの二択メニューを固定位置に表示し、入力を待ちます。",
+    "en": "Display a YES/NO menu at a fixed location and wait for input."
+  },
+  "b100_menu_yesno_return": {
+    "ja": "YESなら0、NOなら1、Bで取消なら255です。",
+    "en": "Returns 0 for YES, 1 for NO, or 255 for cancellation with B."
+  },
+  "b100_menu_yesno_note": {
+    "ja": "枠はタイル座標(6,10)、幅8・高さ4です。選択には `text_choice()` を使います。表示後のゲーム処理は呼び出し側が行います。フレーム・カーソル・英数字のタイルをあらかじめ読み込みます。項目の文字列や配列は呼び出し側が保持します。文字の自動折り返しやクリッピングはないため、枠内に収まる位置・件数・文字数を指定してください。",
+    "en": "The window starts at tile (6,10) and is 8×4 tiles. Selection uses `text_choice()`. The caller performs the chosen game action after return. Load frame, cursor and text tiles beforehand. The caller retains the item array and strings. Text is neither automatically wrapped nor clipped; choose positions, counts and label lengths that fit the window."
+  },
+  "b100_menu_yesno_example": {
+    "ja": "DOWN→AでNOを選びます。NOの左にカーソルがあり、SELECTED欄は00001です。",
+    "en": "DOWN then A selects NO. The cursor appears to the left of NO and SELECTED reads 00001."
+  },
+  "b100_menu_inventory_purpose": {
+    "ja": "所持品の名前と2桁の数量を表示し、使用候補の項目を選びます。",
+    "en": "Display inventory names and two-digit quantities and let the player choose an item."
+  },
+  "b100_menu_inventory_return": {
+    "ja": "選択した配列の添字。Bまたは件数0なら255です。品物IDではありません。",
+    "en": "Returns the selected array index, not the item ID, or 255 for cancellation/empty input."
+  },
+  "b100_menu_inventory_note": {
+    "ja": "品物や数量は変更しません。数量は0～99、表示は最大15項目にしてください。枠は(1,1)、幅18、高さcount+2です。名前は列3から、数量は列15・16に表示し、長い名前は数量を上書きします。入力はUP/DOWNで循環し、AとBの同時押しはAを優先します。フレーム・カーソル・英数字のタイルをあらかじめ読み込みます。項目の文字列や配列は呼び出し側が保持します。文字の自動折り返しやクリッピングはないため、枠内に収まる位置・件数・文字数を指定してください。",
+    "en": "Items and quantities are not modified. Use quantities 0–99 and at most 15 visible items. The window is at (1,1), width 18 and height count+2. Names start in column 3 and quantities occupy columns 15–16; long names can overwrite them. UP/DOWN wraps, and A wins over simultaneous B. Load frame, cursor and text tiles beforehand. The caller retains the item array and strings. Text is neither automatically wrapped nor clipped; choose positions, counts and label lengths that fit the window."
+  },
+  "b100_menu_inventory_example": {
+    "ja": "SWORD 07、SHIELD 42、POTION 99を表示します。SHIELDを選ぶと添字1が返り、数量42は減りません。",
+    "en": "The window shows SWORD 07, SHIELD 42 and POTION 99. Selecting SHIELD returns index 1 and leaves its quantity at 42."
+  },
+  "b100_menu_inventory_arg_items": {
+    "ja": "ID・数量・名前を持つ `item_t` の読み取り可能な配列。",
+    "en": "Readable `item_t` array containing IDs, quantities and names."
+  },
+  "b100_menu_inventory_arg_count": {
+    "ja": "配列の項目数。画面に表示する場合は1～15、空なら0です。",
+    "en": "Item count: 1–15 for a visible list, or zero for an empty list."
+  },
+  "b100_menu_init_state_purpose": {
+    "ja": "ゲームループから少しずつ操作するメニュー状態を初期化します。",
+    "en": "Initialize a menu that will be driven incrementally by the game loop."
+  },
+  "b100_menu_init_state_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_menu_init_state_note": {
+    "ja": "カーソルと直前キーを0、選択結果を255、取消フラグを0にします。画面表示や入力待ちは行いません。フレーム・カーソル・英数字のタイルをあらかじめ読み込みます。項目の文字列や配列は呼び出し側が保持します。文字の自動折り返しやクリッピングはないため、枠内に収まる位置・件数・文字数を指定してください。",
+    "en": "Sets cursor and previous keys to zero, selection to 255, and cancellation to zero. It neither draws nor waits for input. Load frame, cursor and text tiles beforehand. The caller retains the item array and strings. Text is neither automatically wrapped nor clipped; choose positions, counts and label lengths that fit the window."
+  },
+  "b100_menu_init_state_example": {
+    "ja": "(1,2)に18×5タイルの3項目メニューを準備し、未選択の値255から操作を始めます。",
+    "en": "The example prepares a three-item menu at (1,2), sized 18×5 tiles, with initial selection 255."
+  },
+  "b100_menu_init_state_arg_state": {
+    "ja": "初期化する書き込み可能な `menu_state_t`。ヌルは渡しません。",
+    "en": "Writable, non-null `menu_state_t` to initialize."
+  },
+  "b100_menu_init_state_arg_x": {
+    "ja": "枠の左端のタイル列。",
+    "en": "Window’s leftmost tile column."
+  },
+  "b100_menu_init_state_arg_y": {
+    "ja": "枠の上端のタイル行。",
+    "en": "Window’s top tile row."
+  },
+  "b100_menu_init_state_arg_w": {
+    "ja": "枠を含む幅（タイル数）。",
+    "en": "Width in tiles, including the border."
+  },
+  "b100_menu_init_state_arg_h": {
+    "ja": "枠を含む高さ（タイル数）。",
+    "en": "Height in tiles, including the border."
+  },
+  "b100_menu_init_state_arg_items": {
+    "ja": "終端0の項目文字列へのポインター配列。",
+    "en": "Array of pointers to zero-terminated item labels."
+  },
+  "b100_menu_init_state_arg_count": {
+    "ja": "項目数。内側の表示行数以下にします。",
+    "en": "Item count, no greater than the available interior rows."
+  },
+  "b100_menu_draw_purpose": {
+    "ja": "メニュー状態に基づいて枠・項目・現在カーソルを描画します。",
+    "en": "Draw the border, item labels and current cursor from a menu state."
+  },
+  "b100_menu_draw_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_menu_draw_note": {
+    "ja": "ヌルなら何もしません。毎回 `text_open()` で枠を開き直すため、共有テキストウィンドウの状態も更新します。入力は読みません。フレーム・カーソル・英数字のタイルをあらかじめ読み込みます。項目の文字列や配列は呼び出し側が保持します。文字の自動折り返しやクリッピングはないため、枠内に収まる位置・件数・文字数を指定してください。",
+    "en": "Null is a no-op. Each call reopens the window with `text_open()`, also updating shared text-window state. It does not read input. Load frame, cursor and text tiles beforehand. The caller retains the item array and strings. Text is neither automatically wrapped nor clipped; choose positions, counts and label lengths that fit the window."
+  },
+  "b100_menu_draw_example": {
+    "ja": "初期表示と、入力によるカーソル変更後の再描画に使います。DOWN入力後はSHIELDの左にカーソルが移ります。",
+    "en": "The example draws initially and redraws after input. After DOWN, the cursor is next to SHIELD."
+  },
+  "b100_menu_draw_arg_state": {
+    "ja": "初期化済みのメニュー状態へのポインター。",
+    "en": "Pointer to an initialized menu state."
+  },
+  "b100_menu_update_purpose": {
+    "ja": "コントローラーの押し始めを一度読み、メニューのカーソル・決定・取消を更新します。",
+    "en": "Read one controller transition and update the cursor, selection and cancellation state."
+  },
+  "b100_menu_update_return": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b100_menu_update_note": {
+    "ja": "ヌルまたは件数0なら何もしません。フレームを待たず、描画もしません。呼び出し側が一フレームに一回程度呼びます。UP/DOWNは循環し、保持キーは連続移動しません。Aの後にBを処理するため、同時押しでは取消になります。",
+    "en": "Null or an empty list is a no-op. It neither waits for a frame nor draws; call it about once per game-loop frame. UP/DOWN wraps without held-key repeat. B is processed after A, so simultaneous A/B cancels."
+  },
+  "b100_menu_update_example": {
+    "ja": "VBlank待機→更新→描画を繰り返し、決定または取消でループを抜けます。DOWN→Aで選択結果1、取消フラグ0を得ます。",
+    "en": "The loop waits for VBlank, updates, then draws until selected or cancelled. DOWN then A yields selection 1 and cancellation flag 0."
+  },
+  "b100_menu_update_arg_state": {
+    "ja": "入力履歴と結果を書き込む、初期化済みのメニュー状態。",
+    "en": "Initialized menu state whose input history and results will be updated."
+  },
+  "b100_menu_get_selected_purpose": {
+    "ja": "非待機型メニューに保持されている選択結果を読み出します。",
+    "en": "Read the selection retained by an incremental menu."
+  },
+  "b100_menu_get_selected_return": {
+    "ja": "選択した0始まりの添字。未決定・取消・ヌルなら255です。",
+    "en": "Returns the zero-based selection, or 255 when pending, cancelled or passed null."
+  },
+  "b100_menu_get_selected_note": {
+    "ja": "読み出しても消去しません。操作終了後は更新ループを抜け、再使用する場合は `menu_init_state()` で結果を初期化してください。",
+    "en": "Reading does not clear the result. Stop updating after completion and call `menu_init_state()` before starting a new interaction."
+  },
+  "b100_menu_get_selected_example": {
+    "ja": "SHIELDを選択した結果1を読みます。ヌルに対しては255が返ることも確認します。",
+    "en": "The example reads selection 1 for SHIELD and verifies that null returns 255."
+  },
+  "b100_menu_get_selected_arg_state": {
+    "ja": "初期化済みのメニュー状態へのポインター。",
+    "en": "Pointer to an initialized menu state."
+  },
+  "b100_menu_was_cancelled_purpose": {
+    "ja": "非待機型メニューがBボタンで取り消されたかを調べます。",
+    "en": "Check whether an incremental menu was cancelled with B."
+  },
+  "b100_menu_was_cancelled_return": {
+    "ja": "取消済みなら1、それ以外またはヌルなら0です。",
+    "en": "Returns 1 when cancelled, otherwise 0, including for null."
+  },
+  "b100_menu_was_cancelled_note": {
+    "ja": "取消フラグは読み出しても消えません。再使用する前に `menu_init_state()` を呼んでください。選択値255だけでは未決定と取消を区別できないため、この関数を併用します。",
+    "en": "The flag is not cleared by reading. Reinitialize before reuse. Use this alongside selection because 255 alone cannot distinguish pending input from cancellation."
+  },
+  "b100_menu_was_cancelled_example": {
+    "ja": "Aで決定した例では0です。別の入力検証ではBで取り消して1になることを確認します。",
+    "en": "Confirmation with A leaves the flag at zero. A separate input check cancels with B and verifies one."
+  },
+  "b100_menu_was_cancelled_arg_state": {
+    "ja": "初期化済みのメニュー状態へのポインター。",
+    "en": "Pointer to an initialized menu state."
+  },
+  "b100_gb_chain_init_null": {
+    "ja": "GB版は有効な `chain` ポインターが必要です。",
+    "en": "The GB version requires a valid `chain` pointer."
+  },
+  "b100_module_chain": {
+    "ja": "移動物体の過去の座標をリングバッファに保存するライブラリです。最新点から古い点へ取り出し、追従する物体や軌跡の計算に使えます。",
+    "en": "A circular buffer for an object’s past positions. Read from newest to oldest to implement followers or movement trails."
+  },
+  "b100_gb_chain_clear_null": {
+    "ja": "GB版は有効な `chain` ポインターが必要です。",
+    "en": "The GB version requires a valid `chain` pointer."
+  },
+  "b100_module_debug": {
+    "ja": "名前・値・フレーム番号を固定容量のRAMログに記録します。アサートは情報を残して実行を続ける方式です。",
+    "en": "Record names, values and frame tags in a fixed-capacity RAM log. Assertions retain diagnostic information and allow execution to continue."
+  },
+  "b100_module_fixed": {
+    "ja": "整数だけで座標や速度の小数部分を扱うQ8.8演算と、矩形・点の当たり判定です。各演算の精度と範囲の制限を確認してください。",
+    "en": "Q8.8 arithmetic represents fractional coordinates and speeds using integers, alongside rectangle/point collision tests. Check each operation’s precision and range limits."
+  },
+  "b100_gb_kq_rect_intersect_geometry": {
+    "ja": "座標1単位を1タイルとして、A=(1,1)、B=(5,4)、両方8×6の矩形を表示します。Aだけの領域はA、BだけはB、重なり4×3=12マスはOです。Aの右辺x=9は内部に含みません。CGBではAが赤、Bが青、Oが緑です。",
+    "en": "Each coordinate unit occupies one tile. Rectangles A at (1,1) and B at (5,4) are both 8×6. A-only cells show A, B-only cells show B, and the 4×3 overlap shows 12 O cells. A’s right edge x=9 is excluded. On CGB, A is red, B blue and O green."
+  },
+  "b100_gb_kq_point_in_rect_geometry": {
+    "ja": "座標1単位を1タイルとして、A=(1,1)、B=(5,4)、両方8×6の矩形を表示します。Aだけの領域はA、BだけはB、重なり4×3=12マスはOです。Aの右辺x=9は内部に含みません。CGBではAが赤、Bが青、Oが緑です。",
+    "en": "Each coordinate unit occupies one tile. Rectangles A at (1,1) and B at (5,4) are both 8×6. A-only cells show A, B-only cells show B, and the 4×3 overlap shows 12 O cells. A’s right edge x=9 is excluded. On CGB, A is red, B blue and O green."
+  },
+  "b100_module_rpg": {
+    "ja": "選択メニューは、決定まで待つ関数と、ゲームループから入力・描画を個別に呼ぶ関数を用意しています。所持品メニューは名前と数量を表示します。",
+    "en": "Menus support both blocking selection and separate input/draw calls driven by the game loop. The inventory menu displays item names and quantities."
+  },
+  "b100_module_scene": {
+    "ja": "シーン表のenter・update・draw・exitを使い、タイトル画面やプレイ画面の処理を切り替えます。",
+    "en": "Dispatch a scene table’s enter, update, draw and exit handlers to switch between screens such as a title and gameplay."
+  },
+  "b100_gb_system_hardware": {
+    "ja": "GB版の待機はLCDが停止していると直ちに戻ります。その場合もラッパーのカウンター加算とコールバックは行います。初期化だけではLCDや割り込み元は設定しません。",
+    "en": "On GB, waiting returns immediately with the LCD off, but the wrapper still increments its counter and calls its callback. Initialization alone does not configure the LCD or interrupt sources."
+  },
+  "b100_module_system": {
+    "ja": "フレーム待機回数の管理、待機後のコールバック、CPU割り込みの許可・禁止を扱います。",
+    "en": "Manage frame-wait counts, callbacks after waits, and maskable CPU interrupt control."
+  },
+  "b100_fc_chain_init_null": {
+    "ja": "FC版は `chain == 0` なら何もしません。",
+    "en": "The FC version does nothing when `chain == 0`."
+  },
+  "b100_fc_chain_clear_null": {
+    "ja": "FC版は `chain == 0` なら何もしません。",
+    "en": "The FC version does nothing when `chain == 0`."
+  },
+  "b100_fc_nes_box16_intersects_geometry": {
+    "ja": "座標1単位を1タイルとして、A=(1,1)、B=(5,4)、両方8×6の矩形を表示します。Aだけの領域はA、BだけはB、重なり4×3=12マスはOです。Aの右辺x=9は内部に含みません。CGBではAが赤、Bが青、Oが緑です。",
+    "en": "Each coordinate unit occupies one tile. Rectangles A at (1,1) and B at (5,4) are both 8×6. A-only cells show A, B-only cells show B, and the 4×3 overlap shows 12 O cells. A’s right edge x=9 is excluded. On CGB, A is red, B blue and O green."
+  },
+  "b100_module_collision": {
+    "ja": "FCのワールド座標用に、符号なし16ビット座標の矩形同士・矩形と点の重なりを調べます。",
+    "en": "Test box/box and box/point overlap in FC world coordinates using unsigned 16-bit positions."
+  },
+  "b100_fc_nes_box16_contains_point_geometry": {
+    "ja": "座標1単位を1タイルとして、A=(1,1)、B=(5,4)、両方8×6の矩形を表示します。Aだけの領域はA、BだけはB、重なり4×3=12マスはOです。Aの右辺x=9は内部に含みません。CGBではAが赤、Bが青、Oが緑です。",
+    "en": "Each coordinate unit occupies one tile. Rectangles A at (1,1) and B at (5,4) are both 8×6. A-only cells show A, B-only cells show B, and the 4×3 overlap shows 12 O cells. A’s right edge x=9 is excluded. On CGB, A is red, B blue and O green."
+  },
+  "b100_fc_kq_rect_intersect_geometry": {
+    "ja": "座標1単位を1タイルとして、A=(1,1)、B=(5,4)、両方8×6の矩形を表示します。Aだけの領域はA、BだけはB、重なり4×3=12マスはOです。Aの右辺x=9は内部に含みません。CGBではAが赤、Bが青、Oが緑です。",
+    "en": "Each coordinate unit occupies one tile. Rectangles A at (1,1) and B at (5,4) are both 8×6. A-only cells show A, B-only cells show B, and the 4×3 overlap shows 12 O cells. A’s right edge x=9 is excluded. On CGB, A is red, B blue and O green."
+  },
+  "b100_fc_kq_point_in_rect_geometry": {
+    "ja": "座標1単位を1タイルとして、A=(1,1)、B=(5,4)、両方8×6の矩形を表示します。Aだけの領域はA、BだけはB、重なり4×3=12マスはOです。Aの右辺x=9は内部に含みません。CGBではAが赤、Bが青、Oが緑です。",
+    "en": "Each coordinate unit occupies one tile. Rectangles A at (1,1) and B at (5,4) are both 8×6. A-only cells show A, B-only cells show B, and the 4×3 overlap shows 12 O cells. A’s right edge x=9 is excluded. On CGB, A is red, B blue and O green."
+  },
+  "b100_fc_system_hardware": {
+    "ja": "FC版の初期化はNMIを許可します。待機にはNMIが実際に動作する必要があります。CPUのIRQ禁止だけではNMIは止まりません。",
+    "en": "FC initialization enables NMI. Waiting requires functioning NMI delivery. Masking CPU IRQs does not stop NMI."
+  }
+}

@@ -167,6 +167,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_rle_examples(contracts))
     proofs.update(verified_text_layout_examples(contracts))
     proofs.update(verified_dialogue_examples(contracts))
+    proofs.update(verified_batch100_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -175,6 +176,10 @@ def publish(language, require_complete=False):
     proofs.update(verified_oam_examples(contracts))
     proofs.update(verified_fc_oam_examples(contracts))
     proofs.update(verified_oam_library_examples(contracts))
+    # A reviewed card must never silently lose its evidence after a rebuild.
+    missing_proofs = sorted(set(contracts) - set(proofs))
+    if missing_proofs:
+        raise ValueError('Reviewed APIs lack matching execution evidence: ' + ', '.join(missing_proofs))
     attach_verified_images(contracts, proofs)
     coverage = []
     for platform, volumes in [('gb', ('kitaqgb', 'gb-library')), ('fc', ('kitaqfc', 'fc-library'))]:
@@ -200,11 +205,26 @@ def publish(language, require_complete=False):
             for start, end, replacement in reversed(edits):
                 text = text[:start] + replacement + text[end:]
             text = render_modules(text, platform, language, messages)
+            text = refresh_complete_headers(text, platform)
             path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
     publish_verification(language, contracts, proofs, messages, ui)
     from public_presentation import normalize
     normalize(language)
     return {'active_languages': ACTIVE_LANGUAGES, 'reviewed': len(contracts), 'remaining': len(coverage), 'missing': coverage}
+
+
+def refresh_complete_headers(text, platform):
+    """Keep the full-header appendix consistent with the same published source as the API cards."""
+    if '<h2 id="headers">' not in text:return text
+    repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    data=json.loads((SITE/'reference'/(platform+'-api.json')).read_text(encoding='utf-8'))
+    for name in data['headers']:
+        pattern=r'(<details class="searchable"><summary><code>'+re.escape(html.escape(Path(name).name))+r'</code>.*?</summary><div class="codebox">.*?<pre><code>)(.*?)(</code></pre>.*?<p class="source">'+re.escape(html.escape(name))+r'</p></details>)'
+        source=html.escape((repos/name).read_text(encoding='utf-8').strip())
+        text,count=re.subn(pattern,lambda m:m[1]+source+m[3],text,count=1,flags=re.S)
+        if count!=1:raise ValueError('Complete-header appendix entry missing: '+name)
+    return text
 
 
 def render_modules(text, platform, language, messages):
@@ -694,6 +714,55 @@ def verified_memory_intrinsic_examples(contracts):
 
 def verified_bit_intrinsic_examples(contracts):
     return verified_buffer_intrinsic_examples(contracts, 'bit', 136)
+
+
+def verified_batch100_examples(contracts):
+    """Require state, boundary, input and image evidence for all 100 new contracts."""
+    selected={k:c for k,c in contracts.items() if c['review']=='batch100-source-20260915'}
+    if not selected:return {}
+    if len(selected)!=100:raise ValueError('The 100-API batch is incomplete')
+    repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    folder=SITE/'verification/api-batch100';sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    review=json.loads((SOURCE/'batch100_review_sources.json').read_text(encoding='utf-8'))
+    for name,expected in review['source_sha256'].items():
+        if sha(repos/name)!=expected:raise ValueError('Batch library changed: '+name)
+    evidence=json.loads((folder/'results.json').read_text(encoding='utf-8'))
+    if evidence['checker_sha256']!=sha(SITE/'tools/check_batch100.py'):raise ValueError('Batch image checker changed')
+    runs=evidence['records']
+    if len(runs)!=26 or not all(r['passed'] and r['actual']==r['expected'] and r['pixel_mismatches']==0 for r in runs):raise ValueError('Batch sample proof is incomplete')
+    for name,count,script in [('edge_checks.json',37,'check_batch100_edges.py'),('menu_input_checks.json',56,'check_batch100_menu_inputs.py')]:
+        proof=json.loads((folder/name).read_text(encoding='utf-8'))
+        if proof['script_sha256']!=sha(SITE/'tools'/script):raise ValueError('Batch state checker changed: '+script)
+        if len(proof['records'])!=count or not all(r['passed'] and r['actual']==r['expected'] for r in proof['records']):raise ValueError('Batch state/input proof is incomplete: '+name)
+        for row in proof['records']:
+            for file,key in [('source','source_sha256'),('rom','rom_sha256')]:
+                if sha(SITE/row[file])!=row[key]:raise ValueError('Batch fixture changed: '+row[file])
+            platform=row.get('platform','gb')
+            if row.get('compiler_sha256',sha(repos/('kitaq'+platform)/('kitaq'+platform+'.exe')))!=sha(repos/('kitaq'+platform)/('kitaq'+platform+'.exe')):raise ValueError('Batch state compiler changed')
+            if row['emulator_sha256']!=sha(repos/('kokura/kokura-cli.exe' if platform=='gb' else 'kurosaki/kurosaki.exe')):raise ValueError('Batch state emulator changed')
+    for row in runs:
+        for file,key in [('source','source_sha256'),('rom','rom_sha256'),('image','image_sha256')]:
+            if sha(SITE/row[file])!=row[key]:raise ValueError('Batch teaching artifact changed: '+row[file])
+        platform=row['platform']
+        if row['compiler_sha256']!=sha(repos/('kitaq'+platform)/('kitaq'+platform+'.exe')):raise ValueError('Batch sample compiler changed')
+        if row['emulator_sha256']!=sha(repos/('kokura/kokura-cli.exe' if platform=='gb' else 'kurosaki/kurosaki.exe')):raise ValueError('Batch sample emulator changed')
+        if row['group'].startswith('menu_') and any(row[k] for k in ['tilemap_mismatches','geometry_pixel_mismatches','color_mismatches']):raise ValueError('Batch menu image mismatch')
+    timing=json.loads((folder/'timing_checks.json').read_text(encoding='utf-8'))
+    if timing['script_sha256']!=sha(SITE/'tools/check_batch100_timing.py') or len(timing['records'])!=3:raise ValueError('Batch frame timing proof is incomplete')
+    for row in timing['records']:
+        first=row['first_callback_frames']
+        if not row['passed'] or first[1]-first[0]!=1 or first[2]-first[1]!=1:raise ValueError('Batch callbacks did not advance on successive frames')
+        for file,key in [('source','source_sha256'),('rom','rom_sha256')]:
+            if sha(SITE/row[file])!=row[key]:raise ValueError('Batch timing fixture changed')
+        platform=row['platform']
+        if row['compiler_sha256']!=sha(repos/('kitaq'+platform)/('kitaq'+platform+'.exe')):raise ValueError('Batch timing compiler changed')
+    result={}
+    for key,contract in selected.items():
+        matched=[r for r in runs if r['source']==contract['example']['program']]
+        if len(matched)!=(2 if key.startswith('gb:') else 1):raise ValueError('Batch API sample missing: '+key)
+        result[key]={'api':key.split(':')[1],'kind':'batch100','runs':matched}
+    return result
 
 
 def verified_dialogue_examples(contracts):

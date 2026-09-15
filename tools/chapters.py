@@ -336,7 +336,7 @@ CGB版の線には色番号1・2・3を使います。通常の128×96描画で�
 ## 1　KITAQFCとGB版の違い
 KITAQFCはKITAQGBのフロントエンドを利用し、NES/Famicomの6502系CPUへコードを出すコンパイラです。GB用ROMをNESへ変換するツールではありません。画面、音、メモリ、マッパーに合わせてプログラムを作ります。
 
-今回のビルド確認では、構造体のコピーと通常の関数呼び出しを含む教材が動きました。一方、**do-whileとswitchはNESコード生成で未対応エラー** になりました。構文解析コードに名前があるだけで「使用可能」としないでください。
+構造体のコピー、通常の関数呼び出し、for、while、do-whileを使用できます。do-whileは本体を少なくとも1回実行してから条件を判定します。continueは末尾の条件判定へ進み、breakはループを抜けます。switchは未対応なので、状態による分岐にはif/elseを使います。
 
 ## 2　準備とビルド
 ```powershell
@@ -376,21 +376,21 @@ u8 clamp_score(u8 n) {
 
 整数は8ビットまたは16ビットの範囲で扱います。配列の添字は0からです。関数・ポインタ・構造体を使う実例は `fc_aggregate.c`、算術は `fc_arithmetic.c`、繰り返しは `fc_control.c` にあります。GB用のCGBレジスターやGB専用組み込み命令を混ぜないでください。
 
-## 5　未対応構文の書き換え
+## 5　ループと状態による分岐
 ```c
-// do { update(); } while (condition);
-// の代わりに、必ず1回実行してから条件を見る。
-while (1) {
+do {
     update();
-    if (!condition) break;
-}
-// switchの単純な振り分けはif/elseで表せる。
+} while (condition);
+
+// Dispatch a state with if/else.
 if (state == 0) { title_update(); }
 else if (state == 1) { game_update(); }
 else { pause_update(); }
 ```
 
-このコードは説明用断片で、`update` 等は自分の関数名です。完全なROM例では `fc_control.c` を使います。再帰、間接関数呼び出し、可変長引数などもPC用Cと同じ保証を前提にしません。ライブラリのscene/entityコールバックは現在、保存だけして間接呼び出ししない箇所があります。
+この断片は、更新を少なくとも1回実行するループと、状態に応じた処理の振り分けを示しています。update、condition、state、各状態の関数は、自分のプログラムで定義してください。完全なループのROM例はfc_control.c、シーン管理のROM例はライブラリのフレーム・シーンサンプルを参照してください。
+
+scene、entity、systemのコールバックには、宣言された引数と戻り値の型に合う関数を登録してください。各ライブラリは対応する更新・描画・フレーム待ちの処理から登録関数を呼び出します。関数のあるROMバンクと呼び出し時の配置条件は、各APIの説明に従ってください。再帰や可変長引数をPC用Cと同じように使えるとは限りません。
 
 ## 6　メモリとPPU
 NESのCPU内部RAMは0x0000～0x07FFです。0x0800以降のミラーを別RAMのように配置しません。スタックは6502のページ1、OAMシャドウやキューにも予約領域があります。`--nes-local-ram=START:LENGTH` / `--nes-temp-ram=START:LENGTH` はマップを調べて使う上級設定です。

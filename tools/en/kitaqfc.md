@@ -1,7 +1,7 @@
 ## 1. KITAQFC and the GB compiler
 KITAQFC uses the KITAQGB front end to generate code for the NES/Famicom's 6502-family CPU. It does not convert a GB ROM into an NES ROM. Write software for the target's display, sound, memory and mapper.
 
-The recorded checks ran examples using structure copies and ordinary function calls. However, **do-while and switch produced unsupported-code-generation errors on NES**. A construct appearing in the parser is not sufficient evidence that it can be used on this target.
+KITAQFC supports structure copies, ordinary function calls, for, while and do-while. A do-while loop runs its body at least once before testing the condition. continue proceeds to that final test; break leaves the loop. switch is unsupported, so use if/else for state dispatch.
 
 ## 2. Requirements and build
 {{CODE:0}}
@@ -22,12 +22,12 @@ The GB volume's statements and expressions provide a common starting point. FC a
 
 Use integers within their 8-bit or 16-bit ranges. Array indexes start at zero. `fc_aggregate.c` demonstrates functions, pointers and structures; `fc_arithmetic.c` demonstrates arithmetic; `fc_control.c` demonstrates loops. Do not include CGB registers or GB-only intrinsics in an FC program.
 
-## 5. Rewrite unsupported constructs
+## 5. Loops and state dispatch
 {{CODE:4}}
 
-Execute the loop body once before testing its exit condition to replace do-while. A simple switch dispatch can become an if/else chain. These are explanatory fragments: supply your own `update` and state functions. Use `fc_control.c` for a complete ROM example.
+These fragments show a loop that updates at least once and a branch that selects a handler for the current state. Define update, condition, state and the state handlers in your program. See fc_control.c for a complete loop example and the library's frame and scene sample for a complete scene-management ROM.
 
-Do not assume desktop-style support for recursion, indirect function calls or variadic functions. Some scene/entity callback APIs currently store function pointers without invoking them indirectly.
+Register scene, entity and system callbacks with the argument and return types required by their declarations. The libraries invoke registered handlers from the corresponding update, drawing or frame-wait operations. Follow each API's ROM-bank and mapping requirements. Do not assume desktop-style support for recursion or variadic functions.
 
 ## 6. Memory and the PPU
 NES internal CPU RAM occupies 0x0000-0x07FF. Its mirrors above 0x0800 are not additional RAM. The 6502 stack occupies page 1, while OAM shadows and queues reserve other regions. `--nes-local-ram=START:LENGTH` and `--nes-temp-ram=START:LENGTH` are advanced settings that require map inspection.
