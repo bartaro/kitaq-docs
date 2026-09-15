@@ -76,6 +76,11 @@ def render(record, contract, language, messages, ui):
         out.append('<p><a href="' + prefix + example['program'] + '">' + label('download') + '</a></p>')
     if example.get('build'):
         out += ['<h4>' + label('build') + '</h4>', code(example['build'], 'powershell')]
+    for additional in example.get('additional', []):
+        out += ['<h4>' + label('example') + '</h4>', code(additional['code']), paragraphs(['fragment'])]
+        out += ['<h4>' + label('expected') + '</h4>', paragraphs(additional['expected'])]
+        out.append('<p><a href="' + prefix + additional['program'] + '">' + label('download') + '</a></p>')
+        out += ['<h4>' + label('build') + '</h4>', code(additional['build'], 'powershell')]
     if example.get('verification'):
         out.append('<p><a href="verification.html#' + example['verification'] + '">' + label('verification') + '</a></p>')
     out.append('<details class="api-source"><summary>' + label('implementation') + '</summary>')
@@ -145,6 +150,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_sprite_examples(contracts))
     proofs.update(verified_oam_examples(contracts))
     proofs.update(verified_fc_oam_examples(contracts))
+    proofs.update(verified_oam_library_examples(contracts))
     for key in proofs:
         contracts[key]['example']['verification'] = 'api-' + key.replace(':','-')
     coverage = []
@@ -270,6 +276,44 @@ def verified_vram_examples(contracts, family='vram', modes=None):
                     raise ValueError('VRAM example evidence changed: '+file)
         verified[key]={'api':key.split(':')[1],'kind':family,'runs':selected}
     return verified
+
+
+def verified_oam_library_examples(contracts):
+    """Require a matching source/image for every separately compiled API form."""
+    path=SITE/'verification/api-oam-library/results.json'
+    if not path.exists():return {}
+    runs=json.loads(path.read_text(encoding='utf-8'))['records']
+    if len(runs)!=3 or {r['mode'] for r in runs}!={'aliases','c-runtime','fair-pool'}:return {}
+    if not all(r['passed'] and r['frames']==240 and r['label_pixel_mismatches']==0 and r['sprite_pixel_mismatches']==0 and r['sprite_pixels_checked']==8704 and r['oam_matches_source'] and len(r['oam'])==256 and r['oam']==r['source_bytes'] for r in runs):return {}
+    result={};repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    state_path=SITE/'verification/api-oam-library/state_checks.json'
+    if not state_path.exists():return {}
+    state=json.loads(state_path.read_text(encoding='utf-8'))
+    if len(state['cases'])!=17 or not all(r['passed'] for r in state['cases']):return {}
+    if {r['compiler_sha256'] for r in state['cases']}!={r['compiler_sha256'] for r in runs}:return {}
+    for name,expected in state['library_sha256'].items():
+        source=repos/'kitaqfc/lib'/name
+        if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('OAM state-test source changed: '+name)
+    script=repos/'kitaqfc/scripts/test-oam-library.py'
+    if script.exists() and hashlib.sha256(script.read_bytes()).hexdigest()!=state['script_sha256']:raise ValueError('OAM state-test script changed')
+    for key,contract in contracts.items():
+        if contract['review']!='oam-library-source-20260915':continue
+        examples=[contract['example']]+contract['example'].get('additional',[])
+        selected=[]
+        for example in examples:
+            matching=[r for r in runs if r['source']==example['program']]
+            if len(matching)!=1:raise ValueError('OAM library example mismatch: '+key)
+            run=matching[0];selected.append(run)
+            runtime=(Path(run['image']).parent/'runtime.json').as_posix()
+            files={run['source']:run['source_sha256'],run['image']:run['image_sha256'],runtime:run['runtime_sha256'],**run['support_sha256']}
+            for name,expected in files.items():
+                if hashlib.sha256((SITE/name).read_bytes()).hexdigest()!=expected:raise ValueError('OAM library evidence changed: '+name)
+            for name,expected in run['library_sha256'].items():
+                source=repos/'kitaqfc/lib'/name
+                if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('OAM library source changed: '+name)
+        result[key]={'api':key.split(':')[1],'kind':'oam-library','runs':selected,'state_path':state_path.relative_to(SITE).as_posix()}
+    return result
 
 
 def verified_fc_oam_examples(contracts):
@@ -511,9 +555,14 @@ def publish_verification(language, contracts, proofs, messages, ui):
             example = contracts[key]['example']
             block.append('<section id="api-' + key.replace(':','-') + '"><h3><code>' + html.escape(name) + '</code></h3>')
             block += ['<p>' + inline(messages[item][index]) + '</p>' for item in contracts[key]['purpose'][:2]]
-            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam']:
-                block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
+            if result.get('kind') in ['entity','input','pad-repeat','expansion-input','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library']:
+                if not example.get('additional'):
+                    block += ['<p>' + inline(messages[item][index]) + '</p>' for item in example['expected']]
                 for run in result['runs']:
+                    if example.get('additional'):
+                        matching=next(e for e in [example]+example['additional'] if e['program']==run['source'])
+                        block += ['<p>' + inline(messages[item][index]) + '</p>' for item in matching['expected']]
+                        block.append('<p><a href="'+prefix+matching['program']+'">'+html.escape(ui['download'][index])+'</a></p>')
                     caption = ('--cgb='+run['target']+' / ' if result.get('kind') in ['cgb-palette','cgb-dma-wram'] else '')+run['mode'].upper()
                     block.append('<figure><img class="screen" loading="lazy" src="'+prefix+run['image']+'" alt="'+html.escape(name+': '+caption,quote=True)+'"><figcaption>'+html.escape(caption)+'</figcaption></figure>')
                     log = str(Path(run['image']).parent/'build.txt').replace('\\','/')
@@ -521,6 +570,8 @@ def publish_verification(language, contracts, proofs, messages, ui):
                 records_path = 'verification/api-'+result['kind']+'/results.json'
                 if result.get('diagnostics_path'):
                     block.append('<p><a href="'+prefix+result['diagnostics_path']+'">KQ2102 / KQ2103</a></p>')
+                if result.get('state_path'):
+                    block.append('<p><a href="'+prefix+result['state_path']+'">'+html.escape(messages['verification_records'][index])+' (17)</a></p>')
                 block.append('<p><a href="'+prefix+example['program']+'">'+html.escape(ui['download'][index])+'</a> · <a href="'+prefix+records_path+'">'+html.escape(messages['verification_records'][index])+'</a></p></section>')
                 continue
             diagram = example['image']

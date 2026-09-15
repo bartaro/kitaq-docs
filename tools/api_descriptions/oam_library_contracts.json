@@ -1,0 +1,325 @@
+{
+  "fc:nes_oam_clear": {
+    "review": "oam-library-source-20260915",
+    "purpose": [
+      "ol_macro",
+      "fo_clear"
+    ],
+    "args": [],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "fo_shadow"
+    ],
+    "record_sha256": "4907641fe727cb3abc9ae6178bdc253d3d2f97a7d22a377889ff72b36fe51a25",
+    "example": {
+      "program": "samples/api-examples/fc/oam_aliases.c",
+      "code": "nes_sprite_set(63,144,111,128,0); // Seed the CLEAR row with a visible entry.\nnes_oam_clear(); // Set every Y byte to 240; tile, attributes and X are retained.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_aliases.nes --no-cache --no-disasm",
+      "expected": [
+        "fo_scene",
+        "ol_alias_example"
+      ]
+    }
+  },
+  "fc:nes_oam_dma": {
+    "review": "oam-library-source-20260915",
+    "purpose": [
+      "ol_dma_dual"
+    ],
+    "args": [
+      [
+        "page (C)",
+        [
+          "fo_page_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "ol_headers",
+      "ol_c_setup",
+      "ol_dma_timing"
+    ],
+    "record_sha256": "9ed7e35e4da051f2bd33a888bce2503c6120cf9fec5368b199adf1cd30d46208",
+    "example": {
+      "program": "samples/api-examples/fc/oam_aliases.c",
+      "code": "m_wait();nes_oam_dma(); // Expand to the page-02 compiler intrinsic.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_aliases.nes --no-cache --no-disasm",
+      "expected": [
+        "fo_scene",
+        "ol_alias_example"
+      ],
+      "additional": [
+        {
+          "program": "samples/api-examples/fc/oam_c_helpers.c",
+          "code": "m_wait();nes_oam_dma(4); // C function: source address high byte, 0x0400 -> 4.",
+          "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_c_helpers.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_c_helpers.nes --no-cache --no-disasm",
+          "expected": [
+            "ol_c_example",
+            "ol_color_proof"
+          ]
+        }
+      ]
+    },
+    "syntax": "#define nes_oam_dma()                      __oam_dma()\n\n// C function declared in runtime.h:\nvoid nes_oam_dma(unsigned char page);"
+  },
+  "fc:nes_sprite_set": {
+    "review": "oam-library-source-20260915",
+    "purpose": [
+      "ol_macro",
+      "fo_set"
+    ],
+    "args": [
+      [
+        "i",
+        [
+          "fo_index"
+        ]
+      ],
+      [
+        "x",
+        [
+          "sp_x"
+        ]
+      ],
+      [
+        "y",
+        [
+          "sp_y_fc"
+        ]
+      ],
+      [
+        "t",
+        [
+          "sp_tile_arg"
+        ]
+      ],
+      [
+        "a",
+        [
+          "fo_attr_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "fo_shadow"
+    ],
+    "record_sha256": "0d5fefa51aa4e86c688884906d9ffc6d4c35909a03f0a031c9f2a73fb86ea830",
+    "example": {
+      "program": "samples/api-examples/fc/oam_aliases.c",
+      "code": "nes_sprite_set(0,144,15,128,0); // An 8x8 arrow at visible position (144,16).",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_aliases.nes --no-cache --no-disasm",
+      "expected": [
+        "fo_scene",
+        "ol_alias_example"
+      ]
+    }
+  },
+  "fc:nes_sprite_move": {
+    "review": "oam-library-source-20260915",
+    "purpose": [
+      "ol_macro",
+      "fo_move"
+    ],
+    "args": [
+      [
+        "i",
+        [
+          "fo_index"
+        ]
+      ],
+      [
+        "x",
+        [
+          "sp_x"
+        ]
+      ],
+      [
+        "y",
+        [
+          "sp_y_fc"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "fo_shadow"
+    ],
+    "record_sha256": "37ec67aa763318e8ea85e88f8e4ea954ac8f7ac0a27dc63752870fa05d2ed071",
+    "example": {
+      "program": "samples/api-examples/fc/oam_aliases.c",
+      "code": "nes_sprite_move(1,144,31); // Move to (144,32), retaining tile 128 and attributes 0.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_aliases.nes --no-cache --no-disasm",
+      "expected": [
+        "fo_scene",
+        "ol_alias_example"
+      ]
+    }
+  },
+  "fc:nes_sprite_hide": {
+    "review": "oam-library-source-20260915",
+    "purpose": [
+      "ol_macro",
+      "fo_hide"
+    ],
+    "args": [
+      [
+        "i",
+        [
+          "fo_index"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "fo_shadow"
+    ],
+    "record_sha256": "5be39d43c20ed030ccd74fa7b0c27023ff1c08bf1566701c21c6e46a95996626",
+    "example": {
+      "program": "samples/api-examples/fc/oam_aliases.c",
+      "code": "nes_sprite_hide(4); // The HIDE row remains empty after DMA.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_aliases.nes --no-cache --no-disasm",
+      "expected": [
+        "fo_scene",
+        "ol_alias_example"
+      ]
+    }
+  },
+  "fc:nes_metasprite_draw": {
+    "review": "oam-library-source-20260915",
+    "purpose": [
+      "ol_meta_dual",
+      "fo_meta"
+    ],
+    "args": [
+      [
+        "oam_index / i",
+        [
+          "fo_index"
+        ]
+      ],
+      [
+        "base_x / x",
+        [
+          "sp_x"
+        ]
+      ],
+      [
+        "base_y / y",
+        [
+          "sp_y_fc"
+        ]
+      ],
+      [
+        "metasprite / data",
+        [
+          "fo_stream_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "fo_meta_return"
+    ],
+    "notes": [
+      "ol_headers",
+      "ol_c_setup",
+      "fo_shadow",
+      "fo_meta_limit"
+    ],
+    "record_sha256": "31b5504bbb3c0026a1e20ca5209c71f2eadef86a97d209e653ff55d6c8b1b4ce",
+    "example": {
+      "program": "samples/api-examples/fc/oam_c_helpers.c",
+      "code": "demo_next=nes_metasprite_draw(4,144,31,demo_parts); // C function: returns 6.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_c_helpers.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_c_helpers.nes --no-cache --no-disasm",
+      "expected": [
+        "ol_c_example",
+        "ol_color_proof"
+      ],
+      "additional": [
+        {
+          "program": "samples/api-examples/fc/oam_aliases.c",
+          "code": "fc_oam_next=nes_metasprite_draw(5,136,95,fc_oam_pair); // Returns 7 after two entries.",
+          "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_aliases.nes --no-cache --no-disasm",
+          "expected": [
+            "fo_scene",
+            "ol_alias_example"
+          ]
+        }
+      ]
+    },
+    "syntax": "unsigned char nes_metasprite_draw(unsigned char oam_index, unsigned char base_x, unsigned char base_y, unsigned char* metasprite);\n\n// Macro from nes_game.h:\n#define nes_metasprite_draw(i,x,y,data)    __metasprite_draw((i),(x),(y),(data))"
+  },
+  "fc:nes_metasprite_hide_from": {
+    "review": "oam-library-source-20260915",
+    "purpose": [
+      "ol_hide_range"
+    ],
+    "args": [
+      [
+        "oam_index",
+        [
+          "fo_index"
+        ]
+      ],
+      [
+        "sprite_count",
+        [
+          "ol_count"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "ol_c_setup",
+      "fo_shadow"
+    ],
+    "record_sha256": "252da498d2c52111ea0af018327c68c85624f70c8f7d05fe270d79d89df7b486",
+    "example": {
+      "program": "samples/api-examples/fc/oam_c_helpers.c",
+      "code": "nes_metasprite_hide_from(6,2); // Hide slots 6 and 7; the pair at slots 4 and 5 remains.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_c_helpers.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_c_helpers.nes --no-cache --no-disasm",
+      "expected": [
+        "ol_c_example",
+        "ol_color_proof"
+      ]
+    }
+  },
+  "fc:OAM_FairDraw": {
+    "review": "oam-library-source-20260915",
+    "purpose": [
+      "ol_fair"
+    ],
+    "args": [],
+    "returns": [
+      "ol_fair_returns"
+    ],
+    "notes": [
+      "ol_fair_inputs",
+      "ol_fair_cursor",
+      "ol_fair_setup"
+    ],
+    "record_sha256": "f5555348cae1368ccfb767074c04f3c992089435b4f780371898f402a311ebd2",
+    "example": {
+      "program": "samples/api-examples/fc/oam_fair.c",
+      "code": "oam_fair_used=4; // Byte cursor: reserve the already prepared slot 0.\nOAM_FairDraw(); // Phase becomes 13; append pool entries 13, 14 and 15.",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\oam_fair.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --nes-chr=.\\kitaq-docs\\samples\\sprite_example.chr -o .\\out\\oam_fair.nes --no-cache --no-disasm",
+      "expected": [
+        "ol_fair_example",
+        "ol_color_proof"
+      ]
+    }
+  }
+}

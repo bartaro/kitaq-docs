@@ -5124,7 +5124,8 @@
         "path": "kitaqfc/lib/actor.c",
         "line": 43,
         "code": "unsigned char nes_actor_draw_metasprite(struct NesActor* actor, unsigned char oam_index, unsigned char* metasprite)\n{\n    return nes_metasprite_draw(oam_index, actor->screen_x, actor->screen_y, metasprite);\n}\n\n// Test overlap in world coordinates with exclusive right/bottom edges. Keep\n// position-plus-size sums within u16; touching edges are not collisions."
-      }
+      },
+      "implementation_excerpt": "unsigned char nes_metasprite_draw(unsigned char oam_index, unsigned char base_x, unsigned char base_y, unsigned char* metasprite)\n{\n    unsigned char dst;\n    unsigned char dx;\n\n    dst = oam_index + oam_index;\n    dst = dst + dst;\n\n    while (1)\n    {\n        dx = metasprite[0];\n        if (dx == 0xFF)\n        {\n            break;\n        }\n\n        // These are raw OAM Y bytes, not a corrected screen-top coordinate; no allocation bookkeeping is updated.\n        nes_oam_shadow[dst] = (unsigned char)(base_y + metasprite[1]);\n        nes_oam_shadow[(unsigned char)(dst + 1)] = metasprite[2];\n        nes_oam_shadow[(unsigned char)(dst + 2)] = metasprite[3];\n        nes_oam_shadow[(unsigned char)(dst + 3)] = (unsigned char)(base_x + dx);\n\n        dst = (unsigned char)(dst + 4);\n        metasprite = metasprite + 4;\n    }\n\n    return (unsigned char)(dst >> 2);\n}\n#define nes_metasprite_draw(i,x,y,data)    __metasprite_draw((i),(x),(y),(data))"
     },
     {
       "name": "nes_metasprite_hide_from",
@@ -5150,7 +5151,8 @@
       },
       "availability": "implementation",
       "example": null,
-      "new_example": "void example_nes_metasprite_hide_from(unsigned char oam_index, unsigned char sprite_count) {\n    nes_metasprite_hide_from(oam_index, sprite_count);\n}"
+      "new_example": "void example_nes_metasprite_hide_from(unsigned char oam_index, unsigned char sprite_count) {\n    nes_metasprite_hide_from(oam_index, sprite_count);\n}",
+      "implementation_excerpt": "void nes_metasprite_hide_from(unsigned char oam_index, unsigned char sprite_count)\n{\n    unsigned char dst;\n\n    dst = oam_index + oam_index;\n    dst = dst + dst;\n\n    while (sprite_count != 0)\n    {\n        nes_oam_shadow[dst] = 0xF8;\n        dst = (unsigned char)(dst + 4);\n        sprite_count = sprite_count - 1;\n    }\n}"
     },
     {
       "name": "nes_nt_base_from_index",
@@ -5590,7 +5592,8 @@
       "definition": null,
       "availability": "macro",
       "example": null,
-      "new_example": "nes_oam_clear();"
+      "new_example": "nes_oam_clear();",
+      "implementation_excerpt": "#define nes_oam_clear()                    __oam_clear()"
     },
     {
       "name": "nes_oam_dma",
@@ -5603,10 +5606,21 @@
       "body": "",
       "kind": "macro",
       "module": "nes_game",
-      "definition": null,
+      "definition": {
+        "name": "nes_oam_dma",
+        "ret": "void",
+        "args": "unsigned char page",
+        "signature": "void nes_oam_dma(unsigned char page);",
+        "path": "kitaqfc/lib/runtime.c",
+        "line": 238,
+        "comment": "Reset the OAM destination and DMA one 256-byte CPU page. The hardware stalls\nthe CPU during transfer; page is the source address high byte.",
+        "body": "void nes_oam_dma(unsigned char page)\n{\n    OAMADDR = 0;\n    OAMDMA = page;\n}",
+        "kind": "function"
+      },
       "availability": "macro",
       "example": null,
-      "new_example": "nes_oam_dma();"
+      "new_example": "nes_oam_dma();",
+      "implementation_excerpt": "void nes_oam_dma(unsigned char page)\n{\n    OAMADDR = 0;\n    OAMDMA = page;\n}"
     },
     {
       "name": "nes_sprite_set",
@@ -5622,7 +5636,8 @@
       "definition": null,
       "availability": "macro",
       "example": null,
-      "new_example": "nes_sprite_set(i, x, y, t, a);"
+      "new_example": "nes_sprite_set(i, x, y, t, a);",
+      "implementation_excerpt": "#define nes_sprite_set(i,x,y,t,a)          __sprite_set((i),(x),(y),(t),(a))"
     },
     {
       "name": "nes_sprite_move",
@@ -5638,7 +5653,8 @@
       "definition": null,
       "availability": "macro",
       "example": null,
-      "new_example": "nes_sprite_move(i, x, y);"
+      "new_example": "nes_sprite_move(i, x, y);",
+      "implementation_excerpt": "#define nes_sprite_move(i,x,y)             __sprite_move((i),(x),(y))"
     },
     {
       "name": "nes_sprite_hide",
@@ -5654,7 +5670,8 @@
       "definition": null,
       "availability": "macro",
       "example": null,
-      "new_example": "nes_sprite_hide(i);"
+      "new_example": "nes_sprite_hide(i);",
+      "implementation_excerpt": "#define nes_sprite_hide(i)                 __sprite_hide((i))"
     },
     {
       "name": "nes_pad1",
@@ -5823,7 +5840,7 @@
       "signature": "void OAM_FairDraw(void);",
       "path": "kitaqfc/lib/oam_fair.h",
       "line": 24,
-      "comment": "Append visible pool entries using the configured common tile/attributes. The emitter stops at byte cursor 252,\nleaving slot 63 unused to avoid cursor wrap. Hide unused trailing OAM entries separately before DMA.",
+      "comment": "Append active pool entries using the configured common tile/attributes. The emitter stops at byte cursor 252,\nleaving slot 63 unused to avoid cursor wrap. Hide unused trailing OAM entries separately before DMA.",
       "body": "",
       "kind": "function",
       "module": "oam_fair",
@@ -5834,13 +5851,14 @@
         "signature": "void OAM_FairDraw(void);",
         "path": "kitaqfc/lib/oam_fair_impl.h",
         "line": 12,
-        "comment": "Rotate the starting pool entry by 13 modulo 64, then append active sprites\nuntil the caller's draw limit or OAM byte cursor limit is reached. Coordinates\nare centers converted by subtracting four. Include this implementation once\nand invoke it from the main loop with a four-byte-aligned used cursor.",
-        "body": "void OAM_FairDraw(void) {\n    __asm {\n        LDA oam_fair_phase\n        CLC\n        ADC #13\n        AND #63\n        STA oam_fair_phase\n        TAX\n        LDY oam_fair_used\n        LDA #0\n        STA oam_fair_drawn\n        STA oam_fair_scanned\n    // Visit each pool entry at most once, preserving already-written OAM entries\n    // and sharing the configured tile/attribute values across emitted sprites.\n    kq_fair_loop:\n        LDA oam_fair_active,X\n        BEQ kq_fair_next\n        LDA oam_fair_drawn\n        CMP oam_fair_limit\n        BCS kq_fair_done\n        // Reserve the final four-byte slot so advancing this byte cursor cannot wrap to zero.\n        CPY #252\n        BCS kq_fair_done\n        // Convert center to raw OAM position by subtraction modulo 256; no viewport clipping occurs here.\n        LDA oam_fair_y,X\n        SEC\n        SBC #4\n        STA oam_fair_shadow,Y\n        LDA oam_fair_tile\n        STA oam_fair_shadow+1,Y\n        LDA oam_fair_attr\n        STA oam_fair_shadow+2,Y\n        LDA oam_fair_x,X\n        SEC\n        SBC #4\n        STA oam_fair_shadow+3,Y\n        INY\n        INY\n        INY\n        INY\n        INC oam_fair_drawn\n    // Advance cyclically and stop after returning to this frame's starting entry.\n    kq_fair_next:\n        TXA\n        CLC\n        ADC #1\n        AND #63\n        TAX\n        CPX oam_fair_phase\n        BNE kq_fair_loop\n    // Publish the updated byte cursor for later OAM writers and the VBlank DMA path.\n    kq_fair_done:\n        STY oam_fair_used\n    }\n}",
+        "comment": "Rotate the starting pool entry by 13 modulo 64, then append active sprites\nuntil the caller's draw limit or OAM byte cursor limit is reached. Coordinates\ndescribe 8x8 centers: subtract four for X and five for raw OAM Y. Include once\nand invoke it from the main loop with a four-byte-aligned used cursor.",
+        "body": "void OAM_FairDraw(void) {\n    __asm {\n        LDA oam_fair_phase\n        CLC\n        ADC #13\n        AND #63\n        STA oam_fair_phase\n        TAX\n        LDY oam_fair_used\n        LDA #0\n        STA oam_fair_drawn\n        STA oam_fair_scanned\n    // Visit each pool entry at most once, preserving already-written OAM entries\n    // and sharing the configured tile/attribute values across emitted sprites.\n    kq_fair_loop:\n        LDA oam_fair_active,X\n        BEQ kq_fair_next\n        LDA oam_fair_drawn\n        CMP oam_fair_limit\n        BCS kq_fair_done\n        // Reserve the final four-byte slot so advancing this byte cursor cannot wrap to zero.\n        CPY #252\n        BCS kq_fair_done\n        // Convert the 8x8 center to raw OAM coordinates; Y also needs the hardware minus-one bias.\n        LDA oam_fair_y,X\n        SEC\n        SBC #5\n        STA oam_fair_shadow,Y\n        LDA oam_fair_tile\n        STA oam_fair_shadow+1,Y\n        LDA oam_fair_attr\n        STA oam_fair_shadow+2,Y\n        LDA oam_fair_x,X\n        SEC\n        SBC #4\n        STA oam_fair_shadow+3,Y\n        INY\n        INY\n        INY\n        INY\n        INC oam_fair_drawn\n    // Advance cyclically and stop after returning to this frame's starting entry.\n    kq_fair_next:\n        TXA\n        CLC\n        ADC #1\n        AND #63\n        TAX\n        CPX oam_fair_phase\n        BNE kq_fair_loop\n    // Publish the updated byte cursor for later OAM writers and the VBlank DMA path.\n    kq_fair_done:\n        STY oam_fair_used\n    }\n}",
         "kind": "function"
       },
       "availability": "implementation",
       "example": null,
-      "new_example": "OAM_FairDraw();"
+      "new_example": "OAM_FairDraw();",
+      "implementation_excerpt": "void OAM_FairDraw(void) {\n    __asm {\n        LDA oam_fair_phase\n        CLC\n        ADC #13\n        AND #63\n        STA oam_fair_phase\n        TAX\n        LDY oam_fair_used\n        LDA #0\n        STA oam_fair_drawn\n        STA oam_fair_scanned\n    // Visit each pool entry at most once, preserving already-written OAM entries\n    // and sharing the configured tile/attribute values across emitted sprites.\n    kq_fair_loop:\n        LDA oam_fair_active,X\n        BEQ kq_fair_next\n        LDA oam_fair_drawn\n        CMP oam_fair_limit\n        BCS kq_fair_done\n        // Reserve the final four-byte slot so advancing this byte cursor cannot wrap to zero.\n        CPY #252\n        BCS kq_fair_done\n        // Convert the 8x8 center to raw OAM coordinates; Y also needs the hardware minus-one bias.\n        LDA oam_fair_y,X\n        SEC\n        SBC #5\n        STA oam_fair_shadow,Y\n        LDA oam_fair_tile\n        STA oam_fair_shadow+1,Y\n        LDA oam_fair_attr\n        STA oam_fair_shadow+2,Y\n        LDA oam_fair_x,X\n        SEC\n        SBC #4\n        STA oam_fair_shadow+3,Y\n        INY\n        INY\n        INY\n        INY\n        INC oam_fair_drawn\n    // Advance cyclically and stop after returning to this frame's starting entry.\n    kq_fair_next:\n        TXA\n        CLC\n        ADC #1\n        AND #63\n        TAX\n        CPX oam_fair_phase\n        BNE kq_fair_loop\n    // Publish the updated byte cursor for later OAM writers and the VBlank DMA path.\n    kq_fair_done:\n        STY oam_fair_used\n    }\n}"
     },
     {
       "name": "nes_pad_poll",
