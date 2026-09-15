@@ -163,6 +163,7 @@ def publish(language, require_complete=False):
     proofs.update(verified_memory_intrinsic_examples(contracts))
     proofs.update(verified_bit_intrinsic_examples(contracts))
     proofs.update(verified_rng_examples(contracts))
+    proofs.update(verified_flags_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -690,6 +691,37 @@ def verified_memory_intrinsic_examples(contracts):
 
 def verified_bit_intrinsic_examples(contracts):
     return verified_buffer_intrinsic_examples(contracts, 'bit', 136)
+
+
+def verified_flags_examples(contracts):
+    """Require exhaustive valid-ID checks and exact flag/quest teaching screens."""
+    selected_contracts={k:c for k,c in contracts.items() if c['review']=='flags-source-20260915'}
+    if not selected_contracts:return {}
+    folder=SITE/'verification/api-flags';repos=SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists():repos=SITE.parent
+    sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+    review=json.loads((SOURCE/'flags_review_sources.json').read_text(encoding='utf-8'))
+    state=json.loads((folder/'state/results.json').read_text(encoding='utf-8'))
+    if not(state['passed'] and state['build_exit']==0 and state['runtime_exit']==0 and state['flag_ids']==2048 and state['quest_ids']==64 and state['quest_values_per_id']==256 and state['frames']==1200 and len(state['actual'])==336 and state['actual']==state['expected']):raise ValueError('Flag/quest exhaustive check failed')
+    if state['source_files']!=review['source_sha256']:raise ValueError('Flag/quest source binding mismatch')
+    for name,expected in review['source_sha256'].items():
+        if sha(repos/name)!=expected:raise ValueError('Flag/quest library changed: '+name)
+    for path,key in [(repos/'kitaqgb/kitaqgb.exe','compiler_sha256'),(repos/'kokura/kokura-cli.exe','emulator_sha256'),(folder/'state/case.c','source_sha256'),(folder/'state/case.gb','rom_sha256'),(SITE/'tools/check_flags_state.py','script_sha256')]:
+        if sha(path)!=state[key]:raise ValueError('Flag/quest state proof changed: '+str(path))
+    runs=json.loads((folder/'results.json').read_text(encoding='utf-8'))['records']
+    if len(runs)!=2 or {(r['platform'],r['mode']) for r in runs}!={('gb','dmg'),('gb','cgb')}:raise ValueError('Flag/quest screen variants missing')
+    for run in runs:
+        if not(run['passed'] and run['build_exit']==0 and run['runtime_exit']==0 and run['frames']==240 and run['label_pixel_mismatches']==0 and run['color_mismatches']==0 and run['colored_pixels']>0):raise ValueError('Flag/quest teaching screen failed')
+        if any(run[k]!=state[k] for k in ['compiler_sha256','emulator_sha256']):raise ValueError('Flag/quest screen tools changed')
+        if run['header_sha256']!=review['source_sha256']['kitaqgb/lib/rpg.h'] or run['library_sha256']!=review['source_sha256']['kitaqgb/lib/flags.c']:raise ValueError('Flag/quest screen library changed')
+        for name,expected in {run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}.items():
+            if sha(SITE/name)!=expected:raise ValueError('Flag/quest screen proof changed: '+name)
+        if sha((SITE/run['image']).with_name('example.gb'))!=run['rom_sha256']:raise ValueError('Flag/quest teaching ROM changed')
+    result={}
+    for key,contract in selected_contracts.items():
+        if any(r['source']!=contract['example']['program'] for r in runs):raise ValueError('Flag/quest program mismatch')
+        result[key]={'api':key.split(':')[1],'kind':'flags','runs':runs}
+    return result
 
 
 def verified_rng_examples(contracts):
