@@ -178,6 +178,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_dialogue_examples(contracts))
     proofs.update(verified_batch100_examples(contracts))
     proofs.update(verified_batch200_examples(contracts))
+    from api_batch300_proofs import verified_examples as verified_batch300_examples
+    proofs.update(verified_batch300_examples(contracts))
     from api_physics_proofs import verified_examples as verified_physics_examples
     proofs.update(verified_physics_examples(contracts))
     from api_wireframe_proofs import verified_examples as verified_wireframe_examples
@@ -265,7 +267,7 @@ def render_modules(text, platform, language, messages):
             owner, module = key.split(':')
             if owner != platform: continue
             pattern = r'(<h3\b[^>]*id="module-' + re.escape(module) + r'"[^>]*>.*?</h3>)'
-            review_date = '20260916' if path.stem == 'sound_modules' else '20260915'
+            review_date = '20260916' if path.stem in ['sound_modules','batch300_modules'] else '20260915'
             block = '<!-- api-module:start --><div data-module-contract="' + html.escape(path.stem.removesuffix('_modules'), quote=True) + '-source-' + review_date + '">'
             block += ''.join('<p>'+inline(messages[item][index])+'</p>' for item in paragraphs)
             block += '</div><!-- api-module:end -->'

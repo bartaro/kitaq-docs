@@ -1,0 +1,2190 @@
+{
+  "b300_cell": {
+    "ja": "座標はピクセルではなく現在のマップのセルです。通常マップは8×8ピクセル、メタタイルマップは16×16ピクセルで1セルです。",
+    "en": "Coordinates address cells in the current map: 8×8 pixels for ordinary tiles, 16×16 pixels for metatiles."
+  },
+  "b300_maplife": {
+    "ja": "有効なマップは全体で1つです。記述子はコピーしますが、配列は必要な間ずっと読み取り可能にします。画像のタイルデータは別途VRAMへ読み込んでください。",
+    "en": "There is one shared active map. The descriptor is copied, but its arrays must remain readable for as long as needed. Load tile graphics into VRAM separately."
+  },
+  "b300_pathlimits": {
+    "ja": "探索は共有の約4KiB作業領域を使い、再入できません。マップは1024セル以下、探索する距離は254以下にします。0xFFは未到達を表すため、255歩の経路は扱えません。出力配列は現在のマップの幅×高さバイトを用意します。",
+    "en": "Search uses about 4 KiB of shared, non-reentrant workspace. Limit maps to 1024 cells and explored distances to 254. Distance 0xFF means unreached, so a 255-step route is not representable. Cost/mask outputs need width*height writable bytes."
+  },
+  "b300_map_small": {
+    "ja": "小さいマップの外側は消去しません。bank_tiles=0は通常マップではバンク0を表し、記述子のバンクの継承指定ではありません。",
+    "en": "Cells outside a small map are not cleared. For ordinary maps, bank_tiles=0 means bank zero; it does not inherit the descriptor bank."
+  },
+  "b300_gb:map_load_purpose": {
+    "ja": "通常マップの記述子を読み込み、左上の最大20×18タイルを現在の背景マップへ描きます。",
+    "en": "Load an ordinary-map descriptor and draw up to 20×18 tiles from its upper-left corner into the selected background map."
+  },
+  "b300_gb:map_load_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:map_load_bank": {
+    "ja": "記述子・衝突ビット・イベント配列を置くROMバンク。",
+    "en": "ROM bank for the descriptor, collision bits and events."
+  },
+  "b300_gb:map_load_map": {
+    "ja": "9バイトのpacked map_t。tilesは幅×高さのタイル番号、collision_bitsは下位ビットからのビット列、eventsはセルごとの1バイトです。タイル配列はbank_tilesを使います。",
+    "en": "Packed nine-byte map_t. tiles contains width*height tile IDs; collision_bits packs cells least-significant bit first; events stores one byte per cell. Tile reads use bank_tiles."
+  },
+  "b300_gb:map_is_blocked_purpose": {
+    "ja": "移動先セルの衝突情報を調べます。メタタイルモードでは定義のcollisionを使います。",
+    "en": "Test whether a destination cell blocks movement; metatile mode uses the definition’s collision field."
+  },
+  "b300_gb:map_is_blocked_returns": {
+    "ja": "障害物・範囲外・マップ未設定は1、通行可能なら0。通常マップの衝突配列がNULLなら範囲内は0です。",
+    "en": "Returns 1 for a wall, outside coordinate or missing map; 0 for passable cells. A NULL ordinary collision array makes all in-bounds cells passable."
+  },
+  "b300_gb:map_is_blocked_x": {
+    "ja": "セルのX座標。",
+    "en": "Cell X coordinate."
+  },
+  "b300_gb:map_is_blocked_y": {
+    "ja": "セルのY座標。",
+    "en": "Cell Y coordinate."
+  },
+  "b300_gb:map_trigger_at_purpose": {
+    "ja": "セルにイベントが設定されているかを調べます。イベントの実行は行いません。",
+    "en": "Check whether a cell has an event, without executing it."
+  },
+  "b300_gb:map_trigger_at_returns": {
+    "ja": "設定ありで1、それ以外は0。通常マップのイベント値やメタタイルのイベントIDそのものは返しません。",
+    "en": "Returns 1 if an event is present, otherwise 0; does not return the stored event byte or metatile event ID."
+  },
+  "b300_gb:map_trigger_at_x": {
+    "ja": "セルのX座標。",
+    "en": "Cell X coordinate."
+  },
+  "b300_gb:map_trigger_at_y": {
+    "ja": "セルのY座標。",
+    "en": "Cell Y coordinate."
+  },
+  "b300_center": {
+    "ja": "原点はmax(x−10,0), max(y−9,0)をマップ端で制限し、8倍した下位8ビットをSCX/SCYへ書きます。メタタイルモードでは反映しません。新しい行や列をVRAMへ転送する機能はありません。",
+    "en": "The origin starts at max(x−10,0), max(y−9,0), clamps to map edges, then writes the low bytes of origin*8 to SCX/SCY. Metatile mode does not apply it. It does not stream new rows or columns into VRAM."
+  },
+  "b300_gb:camera_center_purpose": {
+    "ja": "通常マップの対象セルを20×18タイルの画面中央へ寄せ、マップ端でスクロールを止めます。",
+    "en": "Center an ordinary-map cell in a 20×18-tile viewport, clamping at map edges."
+  },
+  "b300_gb:camera_center_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:camera_center_x": {
+    "ja": "セルのX座標。",
+    "en": "Cell X coordinate."
+  },
+  "b300_gb:camera_center_y": {
+    "ja": "セルのY座標。",
+    "en": "Cell Y coordinate."
+  },
+  "b300_gb:map_current_width_purpose": {
+    "ja": "現在のマップの幅を取得します。",
+    "en": "Read the active map’s width."
+  },
+  "b300_gb:map_current_width_returns": {
+    "ja": "セル単位の幅。未設定なら0です。",
+    "en": "Returns width in cells, or zero if no map is loaded."
+  },
+  "b300_gb:map_current_height_purpose": {
+    "ja": "現在のマップの高さを取得します。",
+    "en": "Read the active map’s height."
+  },
+  "b300_gb:map_current_height_returns": {
+    "ja": "セル単位の高さ。未設定なら0です。",
+    "en": "Returns height in cells, or zero if no map is loaded."
+  },
+  "b300_meta_bank": {
+    "ja": "bank_tilesが0なら記述子のバンクを使い、0以外ならID配列・定義表の両方にそのバンクを使います。定義は左上・右上・左下・右下のタイル、collision、palette、eventの順です。paletteは描画時に自動適用しません。",
+    "en": "bank_tiles=0 inherits the descriptor bank; a nonzero value selects the bank for both IDs and definitions. A definition stores top-left, top-right, bottom-left, bottom-right tiles, collision, palette and event. Drawing does not automatically apply palette metadata."
+  },
+  "b300_gb:map_load_metatile_purpose": {
+    "ja": "メタタイルマップを選択し、カメラ(0,0)から10×9セルを20×18タイルへ展開します。",
+    "en": "Select a metatile map and expand a 10×9-cell viewport at camera (0,0) into 20×18 tiles."
+  },
+  "b300_gb:map_load_metatile_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:map_load_metatile_bank": {
+    "ja": "記述子を置くROMバンク。",
+    "en": "ROM bank containing the descriptor."
+  },
+  "b300_gb:map_load_metatile_map": {
+    "ja": "metatile_map_tへのポインタ。幅・高さは16×16セル数。ID配列と7バイトのmetatile_t定義表を参照します。",
+    "en": "Pointer to metatile_map_t. Dimensions count 16×16 cells. It references an ID array and a table of seven-byte metatile_t definitions."
+  },
+  "b300_meta_zero": {
+    "ja": "範囲外セルはメタタイルID 0で描きます。定義0を必ず用意してください。背景の20×18タイル以外とCGB属性は変更しません。",
+    "en": "Outside cells draw metatile ID zero, so always supply definition zero. The call leaves cells outside the 20×18 tile viewport and CGB attributes unchanged."
+  },
+  "b300_gb:map_draw_visible_purpose": {
+    "ja": "指定したメタタイル原点から10×9セルを背景へ描き、再描画用のカメラ位置を記憶します。",
+    "en": "Draw 10×9 metatiles from the requested origin and remember that camera position for dirty redraws."
+  },
+  "b300_gb:map_draw_visible_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:map_draw_visible_camera_tx": {
+    "ja": "左上セルのX。加算が8ビットで周回しないよう246以下にします。",
+    "en": "Leftmost cell X; keep at most 246 to avoid byte wrap during traversal."
+  },
+  "b300_gb:map_draw_visible_camera_ty": {
+    "ja": "上端セルのY。247以下にします。",
+    "en": "Topmost cell Y; keep at most 247."
+  },
+  "b300_gb:map_get_metatile_purpose": {
+    "ja": "セルのメタタイルIDを読みます。",
+    "en": "Read a cell’s metatile ID."
+  },
+  "b300_gb:map_get_metatile_returns": {
+    "ja": "IDを返します。範囲外・未設定は0です。",
+    "en": "Returns the ID, or zero outside the map or without metatile mode."
+  },
+  "b300_gb:map_get_metatile_tx": {
+    "ja": "メタタイルのX座標。",
+    "en": "Metatile X coordinate."
+  },
+  "b300_gb:map_get_metatile_ty": {
+    "ja": "メタタイルのY座標。",
+    "en": "Metatile Y coordinate."
+  },
+  "b300_gb:map_get_attr_purpose": {
+    "ja": "セルの定義にあるpaletteメタデータを読みます。",
+    "en": "Read palette metadata from the cell’s metatile definition."
+  },
+  "b300_gb:map_get_attr_returns": {
+    "ja": "paletteの1バイト。範囲外は定義0の値、メタタイル未設定は0です。",
+    "en": "Returns the palette byte. Outside cells use definition zero; without metatile mode returns zero."
+  },
+  "b300_gb:map_get_attr_tx": {
+    "ja": "メタタイルのX座標。",
+    "en": "Metatile X coordinate."
+  },
+  "b300_gb:map_get_attr_ty": {
+    "ja": "メタタイルのY座標。",
+    "en": "Metatile Y coordinate."
+  },
+  "b300_gb:map_is_solid_purpose": {
+    "ja": "セルが壁かを調べ、通常マップでは衝突ビットへ処理を委ねます。",
+    "en": "Test solidity, delegating to collision bits in ordinary-map mode."
+  },
+  "b300_gb:map_is_solid_returns": {
+    "ja": "collisionが非0または範囲外なら1、通行可能なら0です。",
+    "en": "Returns 1 for nonzero collision or an outside cell, otherwise 0."
+  },
+  "b300_gb:map_is_solid_tx": {
+    "ja": "メタタイルのX座標。",
+    "en": "Metatile X coordinate."
+  },
+  "b300_gb:map_is_solid_ty": {
+    "ja": "メタタイルのY座標。",
+    "en": "Metatile Y coordinate."
+  },
+  "b300_gb:map_get_event_purpose": {
+    "ja": "メタタイルのイベントIDを読みます。通常マップではイベントの有無を調べます。",
+    "en": "Read a metatile event ID; ordinary maps report event presence."
+  },
+  "b300_gb:map_get_event_returns": {
+    "ja": "メタタイルはeventの値、通常マップは0/1。未設定・範囲外は0です。",
+    "en": "Returns the metatile event byte or ordinary-map Boolean; missing/outside cells return zero."
+  },
+  "b300_gb:map_get_event_tx": {
+    "ja": "メタタイルのX座標。",
+    "en": "Metatile X coordinate."
+  },
+  "b300_gb:map_get_event_ty": {
+    "ja": "メタタイルのY座標。",
+    "en": "Metatile Y coordinate."
+  },
+  "b300_dirty": {
+    "ja": "1セルだけの更新キューではなく、共有のdirtyフラグを立てます。範囲外は無視します。IDや定義そのものは変更せず、呼び出し側が先に書き換えます。",
+    "en": "Sets one shared dirty flag rather than queuing a per-cell update. Outside coordinates are ignored. The caller changes IDs or definitions separately before marking dirty."
+  },
+  "b300_gb:map_mark_dirty_purpose": {
+    "ja": "有効なメタタイル座標を指定して、画面全体の再描画を予約します。",
+    "en": "Mark the viewport for redraw when given a valid metatile coordinate."
+  },
+  "b300_gb:map_mark_dirty_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:map_mark_dirty_tx": {
+    "ja": "メタタイルのX座標。",
+    "en": "Metatile X coordinate."
+  },
+  "b300_gb:map_mark_dirty_ty": {
+    "ja": "メタタイルのY座標。",
+    "en": "Metatile Y coordinate."
+  },
+  "b300_flush": {
+    "ja": "dirtyでなければ何もしません。描画対象は10×9メタタイル全体で、変更セルだけではありません。",
+    "en": "Does nothing when clean. A dirty redraw covers all 10×9 metatiles, not just the changed cell."
+  },
+  "b300_gb:map_flush_dirty_purpose": {
+    "ja": "再描画が予約されていれば、保存済みカメラ位置から表示範囲を描き直して予約を解除します。",
+    "en": "If dirty, redraw the viewport at its saved camera origin and clear the dirty flag."
+  },
+  "b300_gb:map_flush_dirty_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:unit_can_act_purpose": {
+    "ja": "HPが残り、まだ行動していないユニットかを調べます。",
+    "en": "Check that a unit has HP and has not acted."
+  },
+  "b300_gb:unit_can_act_returns": {
+    "ja": "hp≠0かつacted=0なら1、それ以外は0。状態は変更しません。",
+    "en": "Returns 1 when hp is nonzero and acted is zero; otherwise 0. Does not modify the unit."
+  },
+  "b300_gb:unit_can_act_u": {
+    "ja": "有効なunit_t。位置はセル単位、moveは歩数、atk_min/atk_maxは射程、hpとactedは行動可否に使います。",
+    "en": "Valid unit_t: cell position, move in steps, inclusive atk_min/atk_max range, hp and acted for action eligibility."
+  },
+  "b300_origin": {
+    "ja": "探索開始セルは壁でも到達済みになります。HP・acted・他のユニットは移動範囲に影響しません。",
+    "en": "The origin is seeded as reachable even when blocked. HP, acted and other units do not affect the movement mask."
+  },
+  "b300_gb:unit_move_range_purpose": {
+    "ja": "ユニットの位置からmove歩以内に到達できるセルを移動マスクへ変換します。",
+    "en": "Build a movement mask of cells reachable within the unit’s move allowance."
+  },
+  "b300_gb:unit_move_range_returns": {
+    "ja": "マップがあれば1、幅または高さが0なら0。ユニットの原点は必ず範囲内にしてください。",
+    "en": "Returns 1 for an available map, 0 for zero dimensions. The unit’s origin must be in bounds."
+  },
+  "b300_gb:unit_move_range_u": {
+    "ja": "有効なunit_t。位置はセル単位、moveは歩数、atk_min/atk_maxは射程、hpとactedは行動可否に使います。",
+    "en": "Valid unit_t: cell position, move in steps, inclusive atk_min/atk_max range, hp and acted for action eligibility."
+  },
+  "b300_gb:unit_move_range_out_mask": {
+    "ja": "幅×高さバイトの書き込み先。セルごとに0または1を書きます。",
+    "en": "Writable width*height bytes; receives zero or one for each cell."
+  },
+  "b300_attack": {
+    "ja": "障害物・射線・味方の位置は考慮しません。距離の計算結果が255以下になる範囲で使います。最小射程が最大射程より大きければ全セル0です。",
+    "en": "Ignores obstacles, line of sight and friendly units. Keep evaluated distances at most 255. If minimum range exceeds maximum range, every cell is zero."
+  },
+  "b300_gb:unit_attack_range_purpose": {
+    "ja": "各セルとのマンハッタン距離がatk_min以上atk_max以下になる攻撃範囲を作ります。",
+    "en": "Mark cells whose Manhattan distance lies between atk_min and atk_max, inclusive."
+  },
+  "b300_gb:unit_attack_range_returns": {
+    "ja": "マップがあれば1、幅または高さが0なら0。",
+    "en": "Returns 1 for an available map, 0 for zero dimensions."
+  },
+  "b300_gb:unit_attack_range_u": {
+    "ja": "有効なunit_t。位置はセル単位、moveは歩数、atk_min/atk_maxは射程、hpとactedは行動可否に使います。",
+    "en": "Valid unit_t: cell position, move in steps, inclusive atk_min/atk_max range, hp and acted for action eligibility."
+  },
+  "b300_gb:unit_attack_range_out_mask": {
+    "ja": "幅×高さバイトの書き込み先。セルごとに0または1を書きます。",
+    "en": "Writable width*height bytes; receives zero or one for each cell."
+  },
+  "b300_range_invalid": {
+    "ja": "マップ未設定や範囲外の開始セルでは出力を変更しません。開始セル以外の壁には入りません。",
+    "en": "Missing maps or invalid origins leave output unchanged. Blocked destination cells are not entered."
+  },
+  "b300_gb:range_fill_move_purpose": {
+    "ja": "上下左右へ1歩ずつ広げる幅優先探索で、開始セルからの移動コストを作ります。",
+    "en": "Flood cardinal neighbors at unit cost with breadth-first search to build movement costs."
+  },
+  "b300_gb:range_fill_move_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:range_fill_move_sx": {
+    "ja": "開始セルX。範囲内を指定します。",
+    "en": "In-bounds start cell X."
+  },
+  "b300_gb:range_fill_move_sy": {
+    "ja": "開始セルY。",
+    "en": "Start cell Y."
+  },
+  "b300_gb:range_fill_move_move": {
+    "ja": "移動上限0～254。0なら開始セルだけです。",
+    "en": "Movement limit 0..254; zero reaches only the origin."
+  },
+  "b300_gb:range_fill_move_out_costmap": {
+    "ja": "幅×高さバイトの出力。未到達は255、開始セルは0です。",
+    "en": "Writable width*height cost array: 255 unreached, zero at the origin."
+  },
+  "b300_pathlimit": {
+    "ja": "max_lenは探索距離の上限ではありません。失敗時に出力を新しい経路として使わないでください。",
+    "en": "max_len limits output, not the search radius. Do not use output as a new route after failure."
+  },
+  "b300_gb:path_find_bfs_purpose": {
+    "ja": "上下左右の最短経路を求め、開始点からの移動方向列へ変換します。",
+    "en": "Find a shortest cardinal route and write its directions in start-to-goal order."
+  },
+  "b300_gb:path_find_bfs_returns": {
+    "ja": "経路長を返します。未到達・不正座標・max_len超過・開始点と目標が同じ場合は0です。",
+    "en": "Returns route length; zero means unreachable, invalid coordinates, insufficient max_len, or an already reached goal."
+  },
+  "b300_gb:path_find_bfs_sx": {
+    "ja": "開始セルX。範囲内を指定します。",
+    "en": "In-bounds start cell X."
+  },
+  "b300_gb:path_find_bfs_sy": {
+    "ja": "開始セルY。",
+    "en": "Start cell Y."
+  },
+  "b300_gb:path_find_bfs_gx": {
+    "ja": "目標セルX。開始セルと異なる壁は目標にできません。",
+    "en": "Goal cell X; a blocked goal distinct from the origin is rejected."
+  },
+  "b300_gb:path_find_bfs_gy": {
+    "ja": "目標セルY。",
+    "en": "Goal cell Y."
+  },
+  "b300_gb:path_find_bfs_out_path": {
+    "ja": "max_lenバイト以上の配列。0=上、1=右、2=下、3=左。",
+    "en": "Writable array of at least max_len bytes; 0=up, 1=right, 2=down, 3=left."
+  },
+  "b300_gb:path_find_bfs_max_len": {
+    "ja": "許容する出力長。短すぎる場合は切り詰めずに失敗します。",
+    "en": "Output capacity; an excessive route fails rather than being truncated."
+  },
+  "b300_savefmt": {
+    "ja": "既定は4スロット×512バイトです。各スロットは6バイトのヘッダーと最大506バイトのデータを持ちます。MBC5と8KiB SRAMのビルド例を示します。処理後はRAMを無効にし、以前のRAMバンクや有効状態は復元しません。",
+    "en": "Defaults to four 512-byte slots, each with a six-byte header and up to 506 payload bytes. The sample uses MBC5 with 8 KiB SRAM. Calls finish with RAM disabled and do not restore its previous bank or enable state."
+  },
+  "b300_save_atomic": {
+    "ja": "8ビット加算チェックサムはすべての破損を検出するものではありません。書き込みは電源断に対して原子的ではなく、成功値は実機への保存保証ではありません。",
+    "en": "The additive eight-bit checksum cannot detect every corruption. Writes are not atomic across power loss; a success result alone is not a guarantee of physical persistence."
+  },
+  "b300_gb:save_write_purpose": {
+    "ja": "指定スロットへデータと長さ・チェックサムを書き込みます。",
+    "en": "Write data, length and checksum into a slot."
+  },
+  "b300_gb:save_write_returns": {
+    "ja": "引数が有効なら1、不正なスロット・長さなら0。書き戻し検査はしません。",
+    "en": "Returns 1 for valid arguments, 0 for invalid slot/length; does not perform readback verification."
+  },
+  "b300_gb:save_write_slot": {
+    "ja": "スロット番号0～3。",
+    "en": "Slot number 0..3."
+  },
+  "b300_gb:save_write_data": {
+    "ja": "保存する読み取り元。lenバイトが必要です。",
+    "en": "Readable source of len bytes."
+  },
+  "b300_gb:save_write_len": {
+    "ja": "データ長0～506バイト。読み込み時は保存された長さと完全一致させます。",
+    "en": "Payload length 0..506 bytes. Reads require an exact match with the saved length."
+  },
+  "b300_gb:save_read_purpose": {
+    "ja": "ヘッダー・長さ・チェックサムを検査し、成功時だけデータをコピーします。",
+    "en": "Validate header, exact length and checksum, copying data only after successful validation."
+  },
+  "b300_gb:save_read_returns": {
+    "ja": "成功で1、検査失敗で0。失敗時は出力配列を変更しません。",
+    "en": "Returns 1 on success, 0 on failed validation; failure leaves the destination unchanged."
+  },
+  "b300_gb:save_read_slot": {
+    "ja": "スロット番号0～3。",
+    "en": "Slot number 0..3."
+  },
+  "b300_gb:save_read_data": {
+    "ja": "読み込み先。lenバイトを書き込める必要があります。",
+    "en": "Writable destination of len bytes."
+  },
+  "b300_gb:save_read_len": {
+    "ja": "データ長0～506バイト。読み込み時は保存された長さと完全一致させます。",
+    "en": "Payload length 0..506 bytes. Reads require an exact match with the saved length."
+  },
+  "b300_gb:save_load_purpose": {
+    "ja": "save_readと同じ検査を通して保存データを読み込みます。",
+    "en": "Load saved data through the same validation performed by save_read."
+  },
+  "b300_gb:save_load_returns": {
+    "ja": "読み込み成功で1、失敗で0。要求した長さが保存時と一致する必要があります。",
+    "en": "Returns 1 on a successful load, otherwise 0; requested length must match the saved length."
+  },
+  "b300_gb:save_load_slot": {
+    "ja": "スロット番号0～3。",
+    "en": "Slot number 0..3."
+  },
+  "b300_gb:save_load_data": {
+    "ja": "読み込み先。lenバイトを書き込める必要があります。",
+    "en": "Writable destination of len bytes."
+  },
+  "b300_gb:save_load_len": {
+    "ja": "データ長0～506バイト。読み込み時は保存された長さと完全一致させます。",
+    "en": "Payload length 0..506 bytes. Reads require an exact match with the saved length."
+  },
+  "b300_gb:save_exists_purpose": {
+    "ja": "スロットのヘッダー・長さ・チェックサムを調べ、有効な保存があるか確認します。",
+    "en": "Validate a slot’s header, length and checksum to check for a usable save."
+  },
+  "b300_gb:save_exists_returns": {
+    "ja": "有効なら1、それ以外は0。長さ0の保存も有効です。",
+    "en": "Returns 1 if valid, otherwise 0. A zero-length save can be valid."
+  },
+  "b300_gb:save_exists_slot": {
+    "ja": "スロット番号0～3。",
+    "en": "Slot number 0..3."
+  },
+  "b300_gb:save_check_purpose": {
+    "ja": "データを取り出さず、save_existsと同じ完全性検査を行います。",
+    "en": "Perform the same integrity check as save_exists without extracting the payload."
+  },
+  "b300_gb:save_check_returns": {
+    "ja": "有効なら1、それ以外は0。長さ0の保存も有効です。",
+    "en": "Returns 1 if valid, otherwise 0. A zero-length save can be valid."
+  },
+  "b300_gb:save_check_slot": {
+    "ja": "スロット番号0～3。",
+    "en": "Slot number 0..3."
+  },
+  "b300_save_init_preserve": {
+    "ja": "保存データは消去せず、カートリッジの検出やフォーマットも行いません。",
+    "en": "Does not erase saved data, detect cartridge hardware or format slots."
+  },
+  "b300_gb:save_init_purpose": {
+    "ja": "RAMバンク0を選んで一度有効化し、無効化して初期化を終えます。",
+    "en": "Select RAM bank zero, enable it briefly, then disable it."
+  },
+  "b300_gb:save_init_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_save_clear_invalid": {
+    "ja": "0～3以外のスロットは無視します。ほかのスロットは変更しません。",
+    "en": "Ignores slots outside 0..3 and leaves other slots unchanged."
+  },
+  "b300_gb:save_clear_purpose": {
+    "ja": "指定スロットの512バイトを0で埋め、保存を無効にします。",
+    "en": "Zero all 512 bytes of a slot to invalidate its save."
+  },
+  "b300_gb:save_clear_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:save_clear_slot": {
+    "ja": "スロット番号0～3。",
+    "en": "Slot number 0..3."
+  },
+  "b300_sram_raw": {
+    "ja": "アクセス前に$0000へ0x0Aを書いてRAMを有効にし、終了時は0を書いて無効にします。バンク選択・範囲検査は行いません。呼び出し側でRAMバンクを設定してください。チェックサムや保存ヘッダーも扱いません。",
+    "en": "Writes 0x0A to $0000 to enable RAM before access, then writes zero to disable it afterward. Does not select the bank or validate the address; the caller configures the RAM bank. No save header or checksum is managed."
+  },
+  "b300_gb:__sram_read8_purpose": {
+    "ja": "CPUアドレスからSRAMの1バイトを読みます。",
+    "en": "Read one SRAM byte at a CPU address."
+  },
+  "b300_gb:__sram_read8_returns": {
+    "ja": "読み取ったu8。RAMの存在や値の有効性は検査しません。",
+    "en": "Returns the byte without checking RAM presence or data validity."
+  },
+  "b300_gb:__sram_read8_arg0": {
+    "ja": "$A000～$BFFFのCPUアドレス。",
+    "en": "CPU address in $A000..$BFFF."
+  },
+  "b300_gb:__sram_write8_purpose": {
+    "ja": "CPUアドレスへSRAMの1バイトを書きます。",
+    "en": "Write one SRAM byte at a CPU address."
+  },
+  "b300_gb:__sram_write8_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:__sram_write8_arg0": {
+    "ja": "$A000～$BFFFのCPUアドレス。",
+    "en": "CPU address in $A000..$BFFF."
+  },
+  "b300_gb:__sram_write8_arg1": {
+    "ja": "書き込む0～255の値。",
+    "en": "Byte value 0..255."
+  },
+  "b300_scriptfmt": {
+    "ja": "命令は00 END、01 TEXT(bank,ptr16)、02 SET_FLAG(id16)、03 CLEAR_FLAG(id16)、04 JUMP(bank,ptr16)、05 IF_FLAG(id16,bank,ptr16)、06 CHOICE(count,table16)、07 WAIT(n)、08 CALL_EVENT(bank,ptr16)です。16ビット値は下位バイトが先です。文字列・ポインタ表と命令列は読み取り中に消さず、バンク境界をまたがせないでください。",
+    "en": "Opcodes: 00 END; 01 TEXT(bank,ptr16); 02 SET_FLAG(id16); 03 CLEAR_FLAG(id16); 04 JUMP(bank,ptr16); 05 IF_FLAG(id16,bank,ptr16); 06 CHOICE(count,table16); 07 WAIT(n); 08 CALL_EVENT(bank,ptr16). Words are little-endian. Keep strings, pointer tables and instructions readable and within their mapped banks."
+  },
+  "b300_gb:script_run_purpose": {
+    "ja": "実行するスクリプトを選び、待ち回数・選択結果・復帰先を初期化します。",
+    "en": "Select a script and reset its wait count, choice result and saved return location."
+  },
+  "b300_gb:script_run_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:script_run_bank": {
+    "ja": "命令列のROMバンク。",
+    "en": "ROM bank of the instruction stream."
+  },
+  "b300_gb:script_run_script": {
+    "ja": "有効な終端付き命令列の先頭。呼び出しだけでは実行しません。",
+    "en": "Start of a valid terminated stream; this call arms it without executing commands."
+  },
+  "b300_script_time": {
+    "ja": "1フレームに1回script_stepを呼ぶとフレーム数になります。関数自体はハードウェアのVBlankを待ちません。",
+    "en": "This becomes a frame count only when script_step is called once per frame; the function does not itself wait for VBlank."
+  },
+  "b300_gb:script_wait_frames_purpose": {
+    "ja": "次のscript_step呼び出しを指定回数だけ待ち状態にします。",
+    "en": "Make the next specified number of script_step calls wait."
+  },
+  "b300_gb:script_wait_frames_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:script_wait_frames_n": {
+    "ja": "待つ呼び出し回数0～255。0なら待ちを解除します。",
+    "en": "Number of waiting calls, 0..255; zero clears the wait."
+  },
+  "b300_script_control": {
+    "ja": "WAIT nは読み取った回で1を返し、その後さらにn回待ちます。CALL_EVENTの復帰先は1段だけです。CHOICEは0でない件数が必要で、選択まで内部で待ち続けます。待ちのない無限ジャンプはゲームループを止めるため、必ず終了かyieldする命令へ到達させます。",
+    "en": "WAIT n returns 1 on decoding, then waits for n more calls. CALL_EVENT has only one saved return slot. CHOICE needs a nonzero count and blocks internally until selection. A non-yielding jump loop blocks the game loop, so ensure execution reaches a terminator or yielding command."
+  },
+  "b300_gb:script_step_purpose": {
+    "ja": "命令を進め、表示・選択・待ち・終端で呼び出し元へ戻ります。",
+    "en": "Advance commands until output, choice, waiting or completion yields control."
+  },
+  "b300_gb:script_step_returns": {
+    "ja": "0=TEXT/CHOICEで中断、1=待ち、2=終了または未実行。未知の命令も2で終了します。",
+    "en": "0=TEXT/CHOICE yield; 1=waiting; 2=finished or inactive. Unknown opcodes also terminate with 2."
+  },
+  "b300_far_macro": {
+    "ja": "マクロはpのbankとptrを別々に参照します。副作用のある式をpへ渡さないでください。ROM読み取り中のバンク切り替えは組み込み関数が行って復元します。割り込みから同じバンク操作を重ねないでください。",
+    "en": "The macro reads p.bank and p.ptr separately; do not pass a side-effecting expression. The intrinsic temporarily selects the ROM bank and restores it. Avoid concurrent bank changes from interrupts."
+  },
+  "b300_gb:far_read8_purpose": {
+    "ja": "バンク付きポインタから1バイトを読みます。",
+    "en": "Read one byte through a bank-qualified pointer."
+  },
+  "b300_gb:far_read8_returns": {
+    "ja": "u8の値。",
+    "en": "The byte as u8."
+  },
+  "b300_gb:far_read8_p": {
+    "ja": "bankとptrを持つfar_ptr_t。ptrはCPUから見えるアドレスです。",
+    "en": "far_ptr_t containing bank and ptr, where ptr is a CPU-visible address."
+  },
+  "b300_gb:far_read16_purpose": {
+    "ja": "バンク付きポインタから下位バイト先行の16ビット値を読みます。",
+    "en": "Read a little-endian word through a bank-qualified pointer."
+  },
+  "b300_gb:far_read16_returns": {
+    "ja": "u16の値。",
+    "en": "The word as u16."
+  },
+  "b300_gb:far_read16_p": {
+    "ja": "bankとptrを持つfar_ptr_t。ptrはCPUから見えるアドレスです。",
+    "en": "far_ptr_t containing bank and ptr, where ptr is a CPU-visible address."
+  },
+  "b300_far_copy": {
+    "ja": "__farmemcpyへのマクロです。ROMバンク境界を自動でまたぐ機能はなく、重なる領域の移動にも使いません。",
+    "en": "Macro forwarding to __farmemcpy. It does not cross ROM bank boundaries automatically and is not an overlapping-memory move."
+  },
+  "b300_gb:far_read_block_purpose": {
+    "ja": "バンク付きポインタから連続したバイト列をRAMへコピーします。",
+    "en": "Copy consecutive bytes from a bank-qualified pointer into RAM."
+  },
+  "b300_gb:far_read_block_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:far_read_block_dst": {
+    "ja": "lenバイトを書き込めるRAM先頭。",
+    "en": "Start of len writable RAM bytes."
+  },
+  "b300_gb:far_read_block_p": {
+    "ja": "bankとptrを持つfar_ptr_t。ptrはCPUから見えるアドレスです。",
+    "en": "far_ptr_t containing bank and ptr, where ptr is a CPU-visible address."
+  },
+  "b300_gb:far_read_block_len": {
+    "ja": "コピーするバイト数。元のバンク内に収めます。",
+    "en": "Byte count; keep the source extent within its bank."
+  },
+  "b300_dmreset": {
+    "ja": "プレイヤー座標・無敵フラグ・背景RAMマップは変更しません。ゲーム開始時に呼び、これらは別途設定します。",
+    "en": "Leaves player coordinates, invulnerability and the RAM tile map unchanged; set those separately at game start."
+  },
+  "b300_gb:danmaku_reset_purpose": {
+    "ja": "96発の弾プールを空にし、最大同時数・生成総数・満杯による拒否総数を0へ戻します。",
+    "en": "Empty the 96-bullet pool and reset peak, lifetime spawn and full-pool rejection counters."
+  },
+  "b300_gb:danmaku_reset_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_dmclear": {
+    "ja": "ピーク・生成総数・拒否総数は保持します。画面から弾を消すにはRAMマップを消去して転送してください。",
+    "en": "Preserves peak and lifetime counters. Clear and upload the RAM map to remove bullets from the display."
+  },
+  "b300_gb:danmaku_clear_purpose": {
+    "ja": "有効な弾をすべて消し、現在数・今回のヒット/かすり・次の探索位置を初期化します。",
+    "en": "Deactivate all bullets and clear live count, current hit/graze events and the allocation cursor."
+  },
+  "b300_gb:danmaku_clear_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_dmcounters": {
+    "ja": "位置は内部で1/16ピクセル単位です。生成/拒否のu16総数は65535の次に0へ周回します。メモリの動的確保は行いません。",
+    "en": "Positions are stored in sixteenths of a pixel. The u16 spawn/rejection totals wrap after 65535. No dynamic allocation is used."
+  },
+  "b300_gb:danmaku_spawn_purpose": {
+    "ja": "空きスロットを巡回検索し、指定した位置と速度の弾を1発作ります。",
+    "en": "Search free slots cyclically and create one bullet with the requested position and velocity."
+  },
+  "b300_gb:danmaku_spawn_returns": {
+    "ja": "生成できれば1、範囲外または満杯なら0。範囲外の要求はdm_rejectedへ加算しません。",
+    "en": "Returns 1 on allocation, 0 for outside coordinates or a full pool. Outside requests do not increment dm_rejected."
+  },
+  "b300_gb:danmaku_spawn_x": {
+    "ja": "初期Xピクセル0～159。",
+    "en": "Initial pixel X, 0..159."
+  },
+  "b300_gb:danmaku_spawn_y": {
+    "ja": "初期Yピクセル0～127。",
+    "en": "Initial pixel Y, 0..127."
+  },
+  "b300_gb:danmaku_spawn_vx": {
+    "ja": "符号付きQ4.4速度−128～127。16が1更新あたり右へ1ピクセルです。",
+    "en": "Signed Q4.4 velocity −128..127; 16 moves one pixel right per update."
+  },
+  "b300_gb:danmaku_spawn_vy": {
+    "ja": "符号付きQ4.4速度。正は下方向です。",
+    "en": "Signed Q4.4 velocity; positive moves down."
+  },
+  "b300_dmfan": {
+    "ja": "満杯でも残りの生成を試行します。sin/cos表は整数近似で、斜め方向の距離は丸めの影響を受けます。",
+    "en": "Continues attempting remaining spawns when full. Integer sin/cos table values introduce rounding in diagonal motion."
+  },
+  "b300_gb:danmaku_fan_purpose": {
+    "ja": "32方向のテーブルから速度を作り、角度をずらしながら弾を連続生成します。",
+    "en": "Generate a fan using a 32-direction velocity table and a fixed angular step."
+  },
+  "b300_gb:danmaku_fan_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:danmaku_fan_x": {
+    "ja": "初期Xピクセル0～159。",
+    "en": "Initial pixel X, 0..159."
+  },
+  "b300_gb:danmaku_fan_y": {
+    "ja": "初期Yピクセル0～127。",
+    "en": "Initial pixel Y, 0..127."
+  },
+  "b300_gb:danmaku_fan_direction": {
+    "ja": "開始角。下位5ビットを使い、0=右、8=下、16=左、24=上。",
+    "en": "Starting angle, masked to five bits: 0=right, 8=down, 16=left, 24=up."
+  },
+  "b300_gb:danmaku_fan_step": {
+    "ja": "弾ごとの角度増分。32方向で周回します。",
+    "en": "Angle increment per bullet, wrapping over 32 directions."
+  },
+  "b300_gb:danmaku_fan_count": {
+    "ja": "生成試行数。96に制限します。",
+    "en": "Attempt count, capped at 96."
+  },
+  "b300_gb:danmaku_fan_speed": {
+    "ja": "1/16ピクセル単位の速さ。64（4ピクセル/更新）に制限します。",
+    "en": "Speed in sixteenths of a pixel, capped at 64 (four pixels/update)."
+  },
+  "b300_dmmap": {
+    "ja": "弾の状態とVRAMは変更しません。毎フレーム clear_map → 装飾の書き込み → step → 転送の順で使います。",
+    "en": "Leaves bullet state and VRAM unchanged. Each frame use clear_map, write decorations, step, then upload."
+  },
+  "b300_gb:danmaku_clear_map_purpose": {
+    "ja": "32×18タイル分のdm_map 576バイトを0で埋めます。",
+    "en": "Clear all 576 bytes of the 32×18 RAM tile map."
+  },
+  "b300_gb:danmaku_clear_map_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_dmcollision": {
+    "ja": "描画中心は座標を4ピクセル区画へ丸めた中心です。プレイヤーとの各軸差が8以下で初回かすり、3以下でヒットします。無敵はヒットだけを抑えます。dm_hit/dm_grazeは呼び出しごとに初期化され、かすりは各弾1回です。タイル0～15を4つの区画ビットとして合成し、占有セルの装飾ID16以上は置き換えます。",
+    "en": "Rendered centers are snapped to four-pixel cells. Axis differences at most eight produce a first graze; at most three produce a hit. Invulnerability suppresses hits only. dm_hit/dm_graze reset each call; each bullet grazes once. Tile IDs 0..15 encode four quadrant bits; occupied decoration IDs 16 or above are replaced."
+  },
+  "b300_gb:danmaku_step_purpose": {
+    "ja": "全弾を1回移動し、範囲外の弾を削除して、弾のタイル合成とヒット/かすり判定を行います。",
+    "en": "Advance every bullet once, remove outside bullets, compose bullet tiles and detect hits/grazes."
+  },
+  "b300_gb:danmaku_step_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_dmgdma": {
+    "ja": "CGB専用です。DMGでは呼ばないでください。LCD停止中またはVBlank開始直後に使い、VRAMバンクは0になります。以前のVBKは復元しません。弾用タイル0～15はアプリ側で用意します。",
+    "en": "CGB only; do not call on DMG. Use with LCD off or at the start of VBlank. Selects VRAM bank zero without restoring prior VBK. The application supplies bullet graphics in tiles 0..15."
+  },
+  "b300_gb:danmaku_present_now_purpose": {
+    "ja": "CGBのGDMAでdm_map全576バイトを背景マップ$9800へ同期転送します。",
+    "en": "Synchronously upload all 576 dm_map bytes to background map $9800 using CGB GDMA."
+  },
+  "b300_gb:danmaku_present_now_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:__getbgmapbase_purpose": {
+    "ja": "LCDCのbit3から背景のタイルマップ先頭を求めます。",
+    "en": "Read LCDC bit 3 to select the background tile-map base."
+  },
+  "b300_gb:__getbgmapbase_returns": {
+    "ja": "$9800または$9C00。タイル画像の格納先アドレスではありません。",
+    "en": "Returns $9800 or $9C00, the tile-map base rather than the tile graphics address."
+  },
+  "b300_gb:__getwinmapbase_purpose": {
+    "ja": "LCDCのbit6からウィンドウのタイルマップ先頭を求めます。",
+    "en": "Read LCDC bit 6 to select the window tile-map base."
+  },
+  "b300_gb:__getwinmapbase_returns": {
+    "ja": "$9800または$9C00。タイル画像の格納先アドレスではありません。",
+    "en": "Returns $9800 or $9C00, the tile-map base rather than the tile graphics address."
+  },
+  "b300_gb:__tile_addr_purpose": {
+    "ja": "32タイル幅のマップで、1セルのCPUアドレスを計算します。",
+    "en": "Compute one cell’s CPU address in a 32-tile-wide map."
+  },
+  "b300_gb:__tile_addr_returns": {
+    "ja": "base + y*32 + xの下位16ビット。メモリの読み書きはしません。",
+    "en": "Returns (base + y*32 + x) modulo 65536 without accessing memory."
+  },
+  "b300_gb:__tile_addr_base": {
+    "ja": "背景/ウィンドウのマップ先頭。通常$9800/$9C00。",
+    "en": "Tile-map base, normally $9800/$9C00."
+  },
+  "b300_gb:__tile_addr_x": {
+    "ja": "列0～31を指定します。",
+    "en": "Column, normally 0..31."
+  },
+  "b300_gb:__tile_addr_y": {
+    "ja": "行0～31を指定します。",
+    "en": "Row, normally 0..31."
+  },
+  "b300_scrollnow": {
+    "ja": "保留中の背景更新フラグを消します。画面途中の書き込みはその後の走査へ影響するので、通常はVBlankで呼びます。",
+    "en": "Clears the pending background-update flag. Mid-frame writes affect subsequent scanning; normally call during VBlank."
+  },
+  "b300_gb:__scroll_bg_set_purpose": {
+    "ja": "背景のX/YスクロールをSCX/SCYへ即時設定し、内部の現在値・保留値も同期します。",
+    "en": "Write background SCX/SCY immediately and synchronize current/pending software values."
+  },
+  "b300_gb:__scroll_bg_set_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:__scroll_bg_set_scx": {
+    "ja": "Xスクロール0～255ピクセル。",
+    "en": "Horizontal scroll, 0..255 pixels."
+  },
+  "b300_gb:__scroll_bg_set_scy": {
+    "ja": "Yスクロール0～255ピクセル。",
+    "en": "Vertical scroll, 0..255 pixels."
+  },
+  "b300_waitvb": {
+    "ja": "LCD停止中は即座に戻ります。割り込みの有効化やフレームカウンターの更新は行わず、LYをポーリングします。",
+    "en": "Returns immediately with LCD off. Polls LY without enabling interrupts or advancing a library frame counter."
+  },
+  "b300_gb:__wait_vblank_purpose": {
+    "ja": "LCDが動作していれば、現在のVBlankを抜けて次のLY≧144まで待ちます。",
+    "en": "With LCD running, wait out any current VBlank and then wait for the next LY≥144."
+  },
+  "b300_gb:__wait_vblank_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_waitly": {
+    "ja": "すでにその走査線なら即座に戻り、過ぎていれば次フレームまで待ちます。LCD停止中も即座に戻ります。",
+    "en": "Returns immediately on the target line; if that line has passed, waits until the next frame. Also returns immediately with LCD off."
+  },
+  "b300_gb:__wait_ly_purpose": {
+    "ja": "LCD動作中にLYが指定値と一致するまで待ちます。",
+    "en": "With LCD running, wait until LY equals the target line."
+  },
+  "b300_gb:__wait_ly_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:__wait_ly_ly": {
+    "ja": "走査線0～153。LCD動作中に154以上を指定すると戻りません。",
+    "en": "Scanline 0..153; values above 153 do not complete while the LCD runs."
+  },
+  "b300_critical": {
+    "ja": "トークンは逆順にleaveへ渡し、256段の周回を起こさないでください。以前のハードウェアIMEは保存しません。もともとDI状態を保つ必要がある場面には使わないでください。",
+    "en": "Pass tokens to leave in reverse order and avoid depth wrapping at 256. Previous hardware IME is not saved; do not use this pair where a pre-existing DI state must be preserved."
+  },
+  "b300_gb:__critical_enter_purpose": {
+    "ja": "ソフトウェアのネスト深さを1増やしてDIを実行します。",
+    "en": "Increment software nesting depth and execute DI."
+  },
+  "b300_gb:__critical_enter_returns": {
+    "ja": "増加前の深さをu8トークンとして返します。外側は0、次の内側は1です。",
+    "en": "Returns the previous depth as a u8 token: zero for the outer scope, one for its first nested scope."
+  },
+  "b300_leave": {
+    "ja": "非0トークンではEIしません。任意の0を渡すと、ほかの区間が残っていても有効化するため、必ず正しく対応させます。",
+    "en": "Nonzero tokens do not execute EI. Passing an arbitrary zero can enable interrupts despite other active scopes; pair calls correctly."
+  },
+  "b300_gb:__critical_leave_purpose": {
+    "ja": "ネスト深さを減らし、外側のトークン0ならEIで割り込みを再開します。",
+    "en": "Decrease nesting depth and execute EI for outer token zero."
+  },
+  "b300_gb:__critical_leave_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_gb:__critical_leave_token": {
+    "ja": "対応する__critical_enterの返したトークン。",
+    "en": "Token returned by the matching __critical_enter."
+  },
+  "b300_rect_wrap": {
+    "ja": "差分で比較するのでrx+rwが255を超えても左端へ周回しません。",
+    "en": "Uses coordinate differences: a right bound above 255 does not wrap to the left."
+  },
+  "b300_gb:__xy_in_rect_purpose": {
+    "ja": "点が左上を含み右端・下端を含まない矩形内にあるか調べます。",
+    "en": "Test membership in a rectangle including its top/left and excluding its bottom/right."
+  },
+  "b300_gb:__xy_in_rect_returns": {
+    "ja": "内部なら1、それ以外は0。幅または高さ0は空です。",
+    "en": "Returns 1 inside, otherwise 0. Zero width or height is empty."
+  },
+  "b300_gb:__xy_in_rect_x": {
+    "ja": "点のX座標0～255。",
+    "en": "Point X, 0..255."
+  },
+  "b300_gb:__xy_in_rect_y": {
+    "ja": "点のY座標0～255。",
+    "en": "Point Y, 0..255."
+  },
+  "b300_gb:__xy_in_rect_rx": {
+    "ja": "矩形左端0～255。",
+    "en": "Rectangle left, 0..255."
+  },
+  "b300_gb:__xy_in_rect_ry": {
+    "ja": "矩形上端0～255。",
+    "en": "Rectangle top, 0..255."
+  },
+  "b300_gb:__xy_in_rect_rw": {
+    "ja": "幅0～255。",
+    "en": "Width, 0..255."
+  },
+  "b300_gb:__xy_in_rect_rh": {
+    "ja": "高さ0～255。",
+    "en": "Height, 0..255."
+  },
+  "b300_gb:__manhattan_purpose": {
+    "ja": "2点のX差の絶対値とY差の絶対値を足します。",
+    "en": "Add the absolute X and Y differences between two points."
+  },
+  "b300_gb:__manhattan_returns": {
+    "ja": "|x1−x2|+|y1−y2|の下位8ビット。255を超える距離は周回します。",
+    "en": "Returns the low byte of |x1−x2|+|y1−y2|; distances above 255 wrap."
+  },
+  "b300_gb:__manhattan_x1": {
+    "ja": "点1のX座標0～255。",
+    "en": "Point 1 X coordinate, 0..255."
+  },
+  "b300_gb:__manhattan_y1": {
+    "ja": "点1のY座標0～255。",
+    "en": "Point 1 Y coordinate, 0..255."
+  },
+  "b300_gb:__manhattan_x2": {
+    "ja": "点2のX座標0～255。",
+    "en": "Point 2 X coordinate, 0..255."
+  },
+  "b300_gb:__manhattan_y2": {
+    "ja": "点2のY座標0～255。",
+    "en": "Point 2 Y coordinate, 0..255."
+  },
+  "b300_gb:__map_index_purpose": {
+    "ja": "行優先配列のセル位置を1次元インデックスへ変換します。",
+    "en": "Convert a cell coordinate to a row-major array index."
+  },
+  "b300_gb:__map_index_returns": {
+    "ja": "y*width+xをu16で返します。座標の範囲検査はありません。",
+    "en": "Returns y*width+x as u16; does not validate coordinates."
+  },
+  "b300_gb:__map_index_x": {
+    "ja": "列0～255。通常はwidth未満です。",
+    "en": "Column 0..255, normally less than width."
+  },
+  "b300_gb:__map_index_y": {
+    "ja": "行0～255。",
+    "en": "Row 0..255."
+  },
+  "b300_gb:__map_index_width": {
+    "ja": "1行のセル数0～255。",
+    "en": "Cells per row, 0..255."
+  },
+  "b300_fc:__xy_in_rect_purpose": {
+    "ja": "点が左上を含み右端・下端を含まない矩形内にあるか調べます。",
+    "en": "Test membership in a rectangle including its top/left and excluding its bottom/right."
+  },
+  "b300_fc:__xy_in_rect_returns": {
+    "ja": "内部なら1、それ以外は0。幅または高さ0は空です。",
+    "en": "Returns 1 inside, otherwise 0. Zero width or height is empty."
+  },
+  "b300_fc:__xy_in_rect_x": {
+    "ja": "点のX座標0～255。",
+    "en": "Point X, 0..255."
+  },
+  "b300_fc:__xy_in_rect_y": {
+    "ja": "点のY座標0～255。",
+    "en": "Point Y, 0..255."
+  },
+  "b300_fc:__xy_in_rect_rx": {
+    "ja": "矩形左端0～255。",
+    "en": "Rectangle left, 0..255."
+  },
+  "b300_fc:__xy_in_rect_ry": {
+    "ja": "矩形上端0～255。",
+    "en": "Rectangle top, 0..255."
+  },
+  "b300_fc:__xy_in_rect_rw": {
+    "ja": "幅0～255。",
+    "en": "Width, 0..255."
+  },
+  "b300_fc:__xy_in_rect_rh": {
+    "ja": "高さ0～255。",
+    "en": "Height, 0..255."
+  },
+  "b300_fc:__manhattan_purpose": {
+    "ja": "2点のX差の絶対値とY差の絶対値を足します。",
+    "en": "Add the absolute X and Y differences between two points."
+  },
+  "b300_fc:__manhattan_returns": {
+    "ja": "|x1−x2|+|y1−y2|の下位8ビット。255を超える距離は周回します。",
+    "en": "Returns the low byte of |x1−x2|+|y1−y2|; distances above 255 wrap."
+  },
+  "b300_fc:__manhattan_x1": {
+    "ja": "点1のX座標0～255。",
+    "en": "Point 1 X coordinate, 0..255."
+  },
+  "b300_fc:__manhattan_y1": {
+    "ja": "点1のY座標0～255。",
+    "en": "Point 1 Y coordinate, 0..255."
+  },
+  "b300_fc:__manhattan_x2": {
+    "ja": "点2のX座標0～255。",
+    "en": "Point 2 X coordinate, 0..255."
+  },
+  "b300_fc:__manhattan_y2": {
+    "ja": "点2のY座標0～255。",
+    "en": "Point 2 Y coordinate, 0..255."
+  },
+  "b300_fc:__map_index_purpose": {
+    "ja": "行優先配列のセル位置を1次元インデックスへ変換します。",
+    "en": "Convert a cell coordinate to a row-major array index."
+  },
+  "b300_fc:__map_index_returns": {
+    "ja": "y*width+xをu16で返します。座標の範囲検査はありません。",
+    "en": "Returns y*width+x as u16; does not validate coordinates."
+  },
+  "b300_fc:__map_index_x": {
+    "ja": "列0～255。通常はwidth未満です。",
+    "en": "Column 0..255, normally less than width."
+  },
+  "b300_fc:__map_index_y": {
+    "ja": "行0～255。",
+    "en": "Row 0..255."
+  },
+  "b300_fc:__map_index_width": {
+    "ja": "1行のセル数0～255。",
+    "en": "Cells per row, 0..255."
+  },
+  "b300_gbmath": {
+    "ja": "GBのこれらの乗算は積を256で割り、符号付きでは0方向に切り捨てます。Q1.7版はその結果を2倍するため、厳密な128除算と最大1だけ異なります。各項を別々に丸め、最後の加算は16ビットで周回します。",
+    "en": "GB products are divided by 256; signed results truncate toward zero. Q1.7 variants double that truncated result and can differ by one from exact division by 128. Terms are rounded separately; final addition wraps at 16 bits."
+  },
+  "b300_gb:__smac16_q1_7_purpose": {
+    "ja": "符号付き積和を計算します。",
+    "en": "Compute a signed multiply-accumulate."
+  },
+  "b300_gb:__smac16_q1_7_returns": {
+    "ja": "各積を2*trunc(a*b/256)で求め、accへ加えます。戻り値は下位16ビットです。",
+    "en": "Each term is 2*trunc(a*b/256), added to acc; returns the low 16 bits."
+  },
+  "b300_gb:__smac16_q1_7_arg0": {
+    "ja": "加算する16ビットの累積値。",
+    "en": "16-bit accumulator to add."
+  },
+  "b300_gb:__smac16_q1_7_arg1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__smac16_q1_7_arg2": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__mul8x8_hi_purpose": {
+    "ja": "8ビット同士を掛け、積の上位8ビットを取り出します。",
+    "en": "Multiply two unsigned bytes and return the high byte."
+  },
+  "b300_gb:__mul8x8_hi_returns": {
+    "ja": "floor(a*b/256)、0～254。",
+    "en": "floor(a*b/256), in 0..254."
+  },
+  "b300_gb:__mul8x8_hi_arg0": {
+    "ja": "符号なし8ビット値0～255。",
+    "en": "Unsigned byte, 0..255."
+  },
+  "b300_gb:__mul8x8_hi_arg1": {
+    "ja": "符号なし8ビット値0～255。",
+    "en": "Unsigned byte, 0..255."
+  },
+  "b300_gb:__dot3_q8_8_purpose": {
+    "ja": "符号なし3項の内積を計算します。",
+    "en": "Compute a unsigned three-term dot product."
+  },
+  "b300_gb:__dot3_q8_8_returns": {
+    "ja": "各積をfloor(a*b/256)で求めて合計します。戻り値は下位16ビットです。",
+    "en": "Each term is floor(a*b/256). Sum the terms; returns the low 16 bits."
+  },
+  "b300_gb:__dot3_q8_8_arg0": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_gb:__dot3_q8_8_arg1": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_gb:__dot3_q8_8_arg2": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_gb:__dot3_q8_8_arg3": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_gb:__dot3_q8_8_arg4": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_gb:__dot3_q8_8_arg5": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_gb:__sdot3_q8_8_purpose": {
+    "ja": "符号付き3項の内積を計算します。",
+    "en": "Compute a signed three-term dot product."
+  },
+  "b300_gb:__sdot3_q8_8_returns": {
+    "ja": "各積をtrunc(a*b/256)で求めて合計します。戻り値は下位16ビットです。",
+    "en": "Each term is trunc(a*b/256). Sum the terms; returns the low 16 bits."
+  },
+  "b300_gb:__sdot3_q8_8_arg0": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot3_q8_8_arg1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot3_q8_8_arg2": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot3_q8_8_arg3": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__sdot3_q8_8_arg4": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__sdot3_q8_8_arg5": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__smul16x8_q1_7_purpose": {
+    "ja": "符号付き乗算を計算します。",
+    "en": "Compute a signed multiplication."
+  },
+  "b300_gb:__smul16x8_q1_7_returns": {
+    "ja": "各積を2*trunc(a*b/256)で求めます。戻り値は下位16ビットです。",
+    "en": "Each term is 2*trunc(a*b/256); returns the low 16 bits."
+  },
+  "b300_gb:__smul16x8_q1_7_arg0": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__smul16x8_q1_7_arg1": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__sdot3_q1_7_purpose": {
+    "ja": "符号付き3項の内積を計算します。",
+    "en": "Compute a signed three-term dot product."
+  },
+  "b300_gb:__sdot3_q1_7_returns": {
+    "ja": "各積を2*trunc(a*b/256)で求めて合計します。戻り値は下位16ビットです。",
+    "en": "Each term is 2*trunc(a*b/256). Sum the terms; returns the low 16 bits."
+  },
+  "b300_gb:__sdot3_q1_7_arg0": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot3_q1_7_arg1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot3_q1_7_arg2": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot3_q1_7_arg3": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__sdot3_q1_7_arg4": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__sdot3_q1_7_arg5": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__sdot2_q1_7_purpose": {
+    "ja": "符号付き2項の内積を計算します。",
+    "en": "Compute a signed two-term dot product."
+  },
+  "b300_gb:__sdot2_q1_7_returns": {
+    "ja": "各積を2*trunc(a*b/256)で求めて合計します。戻り値は下位16ビットです。",
+    "en": "Each term is 2*trunc(a*b/256). Sum the terms; returns the low 16 bits."
+  },
+  "b300_gb:__sdot2_q1_7_arg0": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot2_q1_7_arg1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot2_q1_7_arg2": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__sdot2_q1_7_arg3": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__mul16x8_purpose": {
+    "ja": "符号なし乗算を計算します。",
+    "en": "Compute a unsigned multiplication."
+  },
+  "b300_gb:__mul16x8_returns": {
+    "ja": "各積をfloor(a*b/256)で求めます。戻り値は下位16ビットです。",
+    "en": "Each term is floor(a*b/256); returns the low 16 bits."
+  },
+  "b300_gb:__mul16x8_a": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_gb:__mul16x8_b": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_gb:__smac16_purpose": {
+    "ja": "符号付き積和を計算します。",
+    "en": "Compute a signed multiply-accumulate."
+  },
+  "b300_gb:__smac16_returns": {
+    "ja": "各積をtrunc(a*b/256)で求め、accへ加えます。戻り値は下位16ビットです。",
+    "en": "Each term is trunc(a*b/256), added to acc; returns the low 16 bits."
+  },
+  "b300_gb:__smac16_arg0": {
+    "ja": "加算する16ビットの累積値。",
+    "en": "16-bit accumulator to add."
+  },
+  "b300_gb:__smac16_arg1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__smac16_arg2": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__sdot2_q8_8_purpose": {
+    "ja": "符号付き2項の内積を計算します。",
+    "en": "Compute a signed two-term dot product."
+  },
+  "b300_gb:__sdot2_q8_8_returns": {
+    "ja": "各積をtrunc(a*b/256)で求めて合計します。戻り値は下位16ビットです。",
+    "en": "Each term is trunc(a*b/256). Sum the terms; returns the low 16 bits."
+  },
+  "b300_gb:__sdot2_q8_8_arg0": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot2_q8_8_arg1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_gb:__sdot2_q8_8_arg2": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__sdot2_q8_8_arg3": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_gb:__mac16_purpose": {
+    "ja": "符号なし積和を計算します。",
+    "en": "Compute a unsigned multiply-accumulate."
+  },
+  "b300_gb:__mac16_returns": {
+    "ja": "各積をfloor(a*b/256)で求め、accへ加えます。戻り値は下位16ビットです。",
+    "en": "Each term is floor(a*b/256), added to acc; returns the low 16 bits."
+  },
+  "b300_gb:__mac16_arg0": {
+    "ja": "加算する16ビットの累積値。",
+    "en": "16-bit accumulator to add."
+  },
+  "b300_gb:__mac16_arg1": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_gb:__mac16_arg2": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_gb:__dot2_q8_8_purpose": {
+    "ja": "符号なし2項の内積を計算します。",
+    "en": "Compute a unsigned two-term dot product."
+  },
+  "b300_gb:__dot2_q8_8_returns": {
+    "ja": "各積をfloor(a*b/256)で求めて合計します。戻り値は下位16ビットです。",
+    "en": "Each term is floor(a*b/256). Sum the terms; returns the low 16 bits."
+  },
+  "b300_gb:__dot2_q8_8_arg0": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_gb:__dot2_q8_8_arg1": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_gb:__dot2_q8_8_arg2": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_gb:__dot2_q8_8_arg3": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_fc:__mul8x8_hi_purpose": {
+    "ja": "8ビット同士を掛け、積の上位8ビットを取り出します。",
+    "en": "Multiply two unsigned bytes and return the high byte."
+  },
+  "b300_fc:__mul8x8_hi_returns": {
+    "ja": "floor(a*b/256)、0～254。",
+    "en": "floor(a*b/256), in 0..254."
+  },
+  "b300_fc:__mul8x8_hi_a": {
+    "ja": "符号なし8ビット値0～255。",
+    "en": "Unsigned byte, 0..255."
+  },
+  "b300_fc:__mul8x8_hi_b": {
+    "ja": "符号なし8ビット値0～255。",
+    "en": "Unsigned byte, 0..255."
+  },
+  "b300_fcmath": {
+    "ja": "FCでは名前にq8_8/q1_7があっても生の整数積を使い、固定小数点の縮小シフトは行いません。Q1.7の3関数は対応する符号付き関数への別名です。単位変換は呼び出し側で行います。符号付き結果もu16のビット列として返します。",
+    "en": "On FC, q8_8/q1_7 names still use raw integer products without a fixed-point downshift. The Q1.7 functions alias their corresponding signed operations. The caller handles units; signed results are returned as u16 bit patterns."
+  },
+  "b300_fc:__mul16x8_purpose": {
+    "ja": "符号なし乗算を計算します。",
+    "en": "Compute a unsigned multiplication."
+  },
+  "b300_fc:__mul16x8_returns": {
+    "ja": "a*bの下位16ビットです。",
+    "en": "Returns the low 16 bits of a*b."
+  },
+  "b300_fc:__mul16x8_a": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_fc:__mul16x8_b": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_fc:__smul16x8_purpose": {
+    "ja": "符号付き乗算を計算します。",
+    "en": "Compute a signed multiplication."
+  },
+  "b300_fc:__smul16x8_returns": {
+    "ja": "a*bの下位16ビットです。",
+    "en": "Returns the low 16 bits of a*b."
+  },
+  "b300_fc:__smul16x8_a": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__smul16x8_b": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__mac16_purpose": {
+    "ja": "符号なし積和を計算します。",
+    "en": "Compute a unsigned multiply-accumulate."
+  },
+  "b300_fc:__mac16_returns": {
+    "ja": "acc+a*bの下位16ビットです。",
+    "en": "Returns the low 16 bits of acc+a*b."
+  },
+  "b300_fc:__mac16_acc": {
+    "ja": "加算する16ビットの累積値。",
+    "en": "16-bit accumulator to add."
+  },
+  "b300_fc:__mac16_a": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_fc:__mac16_b": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_fc:__smac16_purpose": {
+    "ja": "符号付き積和を計算します。",
+    "en": "Compute a signed multiply-accumulate."
+  },
+  "b300_fc:__smac16_returns": {
+    "ja": "acc+a*bの下位16ビットです。",
+    "en": "Returns the low 16 bits of acc+a*b."
+  },
+  "b300_fc:__smac16_acc": {
+    "ja": "加算する16ビットの累積値。",
+    "en": "16-bit accumulator to add."
+  },
+  "b300_fc:__smac16_a": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__smac16_b": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__smul16x8_q1_7_purpose": {
+    "ja": "符号付き乗算を計算します。",
+    "en": "Compute a signed multiplication."
+  },
+  "b300_fc:__smul16x8_q1_7_returns": {
+    "ja": "a*bの下位16ビットです。",
+    "en": "Returns the low 16 bits of a*b."
+  },
+  "b300_fc:__smul16x8_q1_7_a": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__smul16x8_q1_7_b": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__smac16_q1_7_purpose": {
+    "ja": "符号付き積和を計算します。",
+    "en": "Compute a signed multiply-accumulate."
+  },
+  "b300_fc:__smac16_q1_7_returns": {
+    "ja": "acc+a*bの下位16ビットです。",
+    "en": "Returns the low 16 bits of acc+a*b."
+  },
+  "b300_fc:__smac16_q1_7_acc": {
+    "ja": "加算する16ビットの累積値。",
+    "en": "16-bit accumulator to add."
+  },
+  "b300_fc:__smac16_q1_7_a": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__smac16_q1_7_b": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__dot2_q8_8_purpose": {
+    "ja": "符号なし2項の内積を計算します。",
+    "en": "Compute a unsigned two-term dot product."
+  },
+  "b300_fc:__dot2_q8_8_returns": {
+    "ja": "a0*b0+a1*b1の下位16ビットです。",
+    "en": "Returns the low 16 bits of a0*b0+a1*b1."
+  },
+  "b300_fc:__dot2_q8_8_a0": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_fc:__dot2_q8_8_a1": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_fc:__dot2_q8_8_b0": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_fc:__dot2_q8_8_b1": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_fc:__dot3_q8_8_purpose": {
+    "ja": "符号なし3項の内積を計算します。",
+    "en": "Compute a unsigned three-term dot product."
+  },
+  "b300_fc:__dot3_q8_8_returns": {
+    "ja": "a0*b0+a1*b1+a2*b2の下位16ビットです。",
+    "en": "Returns the low 16 bits of a0*b0+a1*b1+a2*b2."
+  },
+  "b300_fc:__dot3_q8_8_a0": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_fc:__dot3_q8_8_a1": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_fc:__dot3_q8_8_a2": {
+    "ja": "符号なし16ビット値0～65535。",
+    "en": "Unsigned word, 0..65535."
+  },
+  "b300_fc:__dot3_q8_8_b0": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_fc:__dot3_q8_8_b1": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_fc:__dot3_q8_8_b2": {
+    "ja": "符号なし8ビット係数0～255。",
+    "en": "Unsigned coefficient, 0..255."
+  },
+  "b300_fc:__sdot2_q8_8_purpose": {
+    "ja": "符号付き2項の内積を計算します。",
+    "en": "Compute a signed two-term dot product."
+  },
+  "b300_fc:__sdot2_q8_8_returns": {
+    "ja": "a0*b0+a1*b1の下位16ビットです。",
+    "en": "Returns the low 16 bits of a0*b0+a1*b1."
+  },
+  "b300_fc:__sdot2_q8_8_a0": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot2_q8_8_a1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot2_q8_8_b0": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__sdot2_q8_8_b1": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__sdot3_q8_8_purpose": {
+    "ja": "符号付き3項の内積を計算します。",
+    "en": "Compute a signed three-term dot product."
+  },
+  "b300_fc:__sdot3_q8_8_returns": {
+    "ja": "a0*b0+a1*b1+a2*b2の下位16ビットです。",
+    "en": "Returns the low 16 bits of a0*b0+a1*b1+a2*b2."
+  },
+  "b300_fc:__sdot3_q8_8_a0": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot3_q8_8_a1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot3_q8_8_a2": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot3_q8_8_b0": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__sdot3_q8_8_b1": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__sdot3_q8_8_b2": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__sdot2_q1_7_purpose": {
+    "ja": "符号付き2項の内積を計算します。",
+    "en": "Compute a signed two-term dot product."
+  },
+  "b300_fc:__sdot2_q1_7_returns": {
+    "ja": "a0*b0+a1*b1の下位16ビットです。",
+    "en": "Returns the low 16 bits of a0*b0+a1*b1."
+  },
+  "b300_fc:__sdot2_q1_7_a0": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot2_q1_7_a1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot2_q1_7_b0": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__sdot2_q1_7_b1": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__sdot3_q1_7_purpose": {
+    "ja": "符号付き3項の内積を計算します。",
+    "en": "Compute a signed three-term dot product."
+  },
+  "b300_fc:__sdot3_q1_7_returns": {
+    "ja": "a0*b0+a1*b1+a2*b2の下位16ビットです。",
+    "en": "Returns the low 16 bits of a0*b0+a1*b1+a2*b2."
+  },
+  "b300_fc:__sdot3_q1_7_a0": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot3_q1_7_a1": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot3_q1_7_a2": {
+    "ja": "符号付き16ビットのビット列。数値は−32768～32767。",
+    "en": "Signed 16-bit bit pattern, representing −32768..32767."
+  },
+  "b300_fc:__sdot3_q1_7_b0": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__sdot3_q1_7_b1": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_fc:__sdot3_q1_7_b2": {
+    "ja": "符号付き8ビットのビット列。係数は−128～127。",
+    "en": "Signed byte bit pattern, coefficient −128..127."
+  },
+  "b300_pputime": {
+    "ja": "直接転送はPPUCTRLのアドレス増分を1にし、描画停止中か転送量が収まるVBlankで行います。これらのヘルパーは描画停止も待機もしません。",
+    "en": "For direct transfers, set PPUCTRL increment to one and use rendering-off setup or a VBlank long enough for the upload. These helpers neither disable rendering nor wait."
+  },
+  "b300_shadow": {
+    "ja": "共有属性シャドー64バイトはCPU RAM $03E0～$041Fです。ほかのデータと重ねないでください。属性1バイトは4×4タイル、各2ビットは2×2タイルのパレットを表します。",
+    "en": "The shared 64-byte attribute shadow occupies CPU RAM $03E0..$041F. Reserve that range. One attribute byte covers 4×4 tiles; each two-bit field selects a palette for a 2×2-tile quadrant."
+  },
+  "b300_queue": {
+    "ja": "runtime.cをリンクします。キューはデータをコピーし、後のNMIまたは安全な描画停止中のflushで反映します。キューへの登録と消費を競合させないでください。複数行の途中で容量不足になった場合、それまでの行は残ります。",
+    "en": "Link runtime.c. The queue copies payloads for a later NMI or safe rendering-off flush. Serialize production against consumption. If a multirow operation runs out of capacity, earlier admitted rows remain queued."
+  },
+  "b300_fc:nes_attr_shadow_build_from_palette_map_purpose": {
+    "ja": "完成済みの属性64バイトを共有シャドーへコピーします。",
+    "en": "Copy 64 already-packed attribute bytes into the shared shadow."
+  },
+  "b300_fc:nes_attr_shadow_build_from_palette_map_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_attr_shadow_build_from_palette_map_src64": {
+    "ja": "読み取り可能な64バイトのpacked属性表。1タイルごとのパレット番号配列ではありません。",
+    "en": "Readable 64-byte packed attribute table, not an array of per-tile palette IDs."
+  },
+  "b300_fc:nes_attr_shadow_copy_purpose": {
+    "ja": "属性テーブル全体をRAMへコピーし、編集の初期値にします。",
+    "en": "Copy a complete attribute table into RAM as the starting point for edits."
+  },
+  "b300_fc:nes_attr_shadow_copy_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_attr_shadow_copy_src64": {
+    "ja": "読み取り可能な64バイトのpacked属性表。1タイルごとのパレット番号配列ではありません。",
+    "en": "Readable 64-byte packed attribute table, not an array of per-tile palette IDs."
+  },
+  "b300_attrrect": {
+    "ja": "矩形全体を32×30タイル内に収めます。空または範囲外の矩形では何も変更しません。奇数の境界は区画へ広がるので、矩形の外側の隣接タイルも同じパレットになります。",
+    "en": "Keep the entire rectangle within 32×30 tiles. Empty or invalid rectangles change nothing. Odd boundaries expand to quadrant boundaries, so neighboring tiles outside the rectangle can share the new palette."
+  },
+  "b300_fc:nes_attr_shadow_fill_rect_purpose": {
+    "ja": "矩形が触れる2×2タイル区画すべてのパレット番号を変更します。",
+    "en": "Replace the palette fields of every 2×2-tile quadrant touched by a rectangle."
+  },
+  "b300_fc:nes_attr_shadow_fill_rect_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_attr_shadow_fill_rect_tile_x": {
+    "ja": "左端のタイル列。可視範囲は0～31。",
+    "en": "Left tile column, visible range 0..31."
+  },
+  "b300_fc:nes_attr_shadow_fill_rect_tile_y": {
+    "ja": "上端のタイル行。可視範囲は0～29。",
+    "en": "Top tile row, visible range 0..29."
+  },
+  "b300_fc:nes_attr_shadow_fill_rect_width": {
+    "ja": "幅（タイル数）。",
+    "en": "Width in tiles."
+  },
+  "b300_fc:nes_attr_shadow_fill_rect_height": {
+    "ja": "高さ（タイル数）。",
+    "en": "Height in tiles."
+  },
+  "b300_fc:nes_attr_shadow_fill_rect_pal_index": {
+    "ja": "パレット番号。下位2ビットを使います。",
+    "en": "Palette index; only the low two bits are used."
+  },
+  "b300_attrbyte": {
+    "ja": "1属性バイトは4×4タイルです。関数は矩形に触れるバイト全体を転送するため、隣接区画の値もシャドーへ正しく保持しておきます。",
+    "en": "An attribute byte covers 4×4 tiles. Whole intersecting bytes are transferred, so preserve correct neighboring quadrant values in the shadow."
+  },
+  "b300_fc:nes_attr_queue_rect_purpose": {
+    "ja": "タイル矩形が触れる属性バイトを行単位でキューへコピーします。",
+    "en": "Copy rows of attribute bytes covering a tile rectangle into the queue."
+  },
+  "b300_fc:nes_attr_queue_rect_returns": {
+    "ja": "全行登録または空矩形なら1、範囲外または容量不足なら0。範囲外では登録を始めません。",
+    "en": "Returns 1 for complete admission or an empty rectangle, 0 for invalid bounds or insufficient capacity. Invalid bounds enqueue nothing."
+  },
+  "b300_fc:nes_attr_queue_rect_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_attr_queue_rect_tile_x": {
+    "ja": "左端のタイル列。可視範囲は0～31。",
+    "en": "Left tile column, visible range 0..31."
+  },
+  "b300_fc:nes_attr_queue_rect_tile_y": {
+    "ja": "上端のタイル行。可視範囲は0～29。",
+    "en": "Top tile row, visible range 0..29."
+  },
+  "b300_fc:nes_attr_queue_rect_width": {
+    "ja": "幅（タイル数）。",
+    "en": "Width in tiles."
+  },
+  "b300_fc:nes_attr_queue_rect_height": {
+    "ja": "高さ（タイル数）。",
+    "en": "Height in tiles."
+  },
+  "b300_fc:nes_nt_base_from_index_purpose": {
+    "ja": "番号の下位2ビットから論理ネームテーブルの先頭を求めます。",
+    "en": "Compute a logical nametable base from the low two index bits."
+  },
+  "b300_fc:nes_nt_base_from_index_returns": {
+    "ja": "$2000 + (index & 3)*$400。",
+    "en": "Returns $2000 + (index & 3)*$400."
+  },
+  "b300_fc:nes_nt_base_from_index_index": {
+    "ja": "番号。0～3を使い、4以上は下位2ビットへ周回します。",
+    "en": "Index; 0..3 select tables, larger values wrap to the low two bits."
+  },
+  "b300_fc:nes_attr_base_from_nt_purpose": {
+    "ja": "ネームテーブル先頭に$3C0を足し、属性表の先頭を求めます。",
+    "en": "Add $3C0 to a nametable base to locate its attribute table."
+  },
+  "b300_fc:nes_attr_base_from_nt_returns": {
+    "ja": "nt_base+$3C0。入力の妥当性は検査しません。",
+    "en": "Returns nt_base+$3C0 without validating the input."
+  },
+  "b300_fc:nes_attr_base_from_nt_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_attr_shadow_clear_purpose": {
+    "ja": "属性シャドー64バイトを同じpacked値で埋めます。",
+    "en": "Fill all 64 shadow bytes with the same packed value."
+  },
+  "b300_fc:nes_attr_shadow_clear_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_attr_shadow_clear_value": {
+    "ja": "packed属性値。例0x55は全区画パレット1、0xAAは2です。",
+    "en": "Packed attribute byte; e.g. 0x55 selects palette 1 in all quadrants, 0xAA selects 2."
+  },
+  "b300_quadbounds": {
+    "ja": "座標を32未満に保ちます。奇数座標もそのセルを含む2×2区画を選びます。可視行は0～29です。",
+    "en": "Keep coordinates below 32. Odd coordinates select their containing 2×2 quadrant. Visible rows are 0..29."
+  },
+  "b300_fc:nes_attr_shadow_set_quad_purpose": {
+    "ja": "1つの2×2タイル区画だけのパレットを変更し、同じバイト内の他の区画を保ちます。",
+    "en": "Replace one 2×2-tile quadrant’s palette while preserving the other fields in its byte."
+  },
+  "b300_fc:nes_attr_shadow_set_quad_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_attr_shadow_set_quad_tile_x": {
+    "ja": "左端のタイル列。可視範囲は0～31。",
+    "en": "Left tile column, visible range 0..31."
+  },
+  "b300_fc:nes_attr_shadow_set_quad_tile_y": {
+    "ja": "上端のタイル行。可視範囲は0～29。",
+    "en": "Top tile row, visible range 0..29."
+  },
+  "b300_fc:nes_attr_shadow_set_quad_pal_index": {
+    "ja": "パレット番号の下位2ビット。",
+    "en": "Low two bits of the palette index."
+  },
+  "b300_fc:nes_attr_apply_now_purpose": {
+    "ja": "共有シャドー64バイトを指定ネームテーブルの属性表へ即座に転送します。",
+    "en": "Immediately upload all 64 shadow bytes to a nametable’s attribute table."
+  },
+  "b300_fc:nes_attr_apply_now_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_attr_apply_now_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_attr_queue_all_purpose": {
+    "ja": "属性シャドー全体をキューにコピーします。",
+    "en": "Copy the entire attribute shadow into the queue."
+  },
+  "b300_fc:nes_attr_queue_all_returns": {
+    "ja": "登録成功で1、容量不足で0。1件67バイトを使います。",
+    "en": "Returns 1 on admission, 0 if full; one record uses 67 queue bytes."
+  },
+  "b300_fc:nes_attr_queue_all_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_nt_stream_row_purpose": {
+    "ja": "1行32タイルをPPUへ直接書き込みます。",
+    "en": "Copy one complete 32-tile row directly to the PPU."
+  },
+  "b300_fc:nes_nt_stream_row_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_nt_stream_row_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_nt_stream_row_row": {
+    "ja": "行番号0～29。範囲検査はありません。",
+    "en": "Row 0..29; not bounds-checked."
+  },
+  "b300_fc:nes_nt_stream_row_src32": {
+    "ja": "読み取り可能な32バイトのタイル番号。",
+    "en": "Thirty-two readable tile IDs."
+  },
+  "b300_fc:nes_nt_queue_row_purpose": {
+    "ja": "1行32タイルをキューへコピーします。",
+    "en": "Copy one complete 32-tile row into the queue."
+  },
+  "b300_fc:nes_nt_queue_row_returns": {
+    "ja": "成功1、容量不足0。キューを35バイト使います。",
+    "en": "Returns 1 on admission, 0 if full; uses 35 queue bytes."
+  },
+  "b300_fc:nes_nt_queue_row_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_nt_queue_row_row": {
+    "ja": "行番号0～29。範囲検査はありません。",
+    "en": "Row 0..29; not bounds-checked."
+  },
+  "b300_fc:nes_nt_queue_row_src32": {
+    "ja": "読み取り可能な32バイトのタイル番号。",
+    "en": "Thirty-two readable tile IDs."
+  },
+  "b300_ntrectbounds": {
+    "ja": "座標と幅・高さは可視ネームテーブル内に収め、pitchは通常width以上にします。クリッピングはありません。キュー版の1行幅は127以下、矩形の通常の最大幅は32です。",
+    "en": "Keep coordinates and extents within the visible nametable; normally pitch≥width. No clipping is performed. Queued row lengths must be at most 127; a normal nametable rectangle is at most 32 tiles wide."
+  },
+  "b300_fc:nes_nt_stream_rect_purpose": {
+    "ja": "矩形の各行を元配列のpitch間隔で読み、PPUへ直接転送します。",
+    "en": "For each rectangle row, read at the source pitch and upload directly to the PPU."
+  },
+  "b300_fc:nes_nt_stream_rect_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_nt_stream_rect_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_nt_stream_rect_tile_x": {
+    "ja": "左端のタイル列。可視範囲は0～31。",
+    "en": "Left tile column, visible range 0..31."
+  },
+  "b300_fc:nes_nt_stream_rect_tile_y": {
+    "ja": "上端のタイル行。可視範囲は0～29。",
+    "en": "Top tile row, visible range 0..29."
+  },
+  "b300_fc:nes_nt_stream_rect_width": {
+    "ja": "幅（タイル数）。",
+    "en": "Width in tiles."
+  },
+  "b300_fc:nes_nt_stream_rect_height": {
+    "ja": "高さ（タイル数）。",
+    "en": "Height in tiles."
+  },
+  "b300_fc:nes_nt_stream_rect_pitch": {
+    "ja": "元配列で次の行まで進むバイト数。行の末尾の余白を飛ばせます。",
+    "en": "Source byte stride between row starts; can skip trailing padding."
+  },
+  "b300_fc:nes_nt_stream_rect_src": {
+    "ja": "(height−1)*pitch+widthバイト以上の読み取り元。",
+    "en": "Readable source spanning at least (height−1)*pitch+width bytes."
+  },
+  "b300_fc:nes_nt_queue_rect_purpose": {
+    "ja": "矩形の各行をキューへコピーします。",
+    "en": "For each rectangle row, copy the source into the queue."
+  },
+  "b300_fc:nes_nt_queue_rect_returns": {
+    "ja": "全行成功または高さ0で1、途中の容量不足で0。",
+    "en": "Returns 1 after all rows or for zero height, 0 on admission failure."
+  },
+  "b300_fc:nes_nt_queue_rect_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_nt_queue_rect_tile_x": {
+    "ja": "左端のタイル列。可視範囲は0～31。",
+    "en": "Left tile column, visible range 0..31."
+  },
+  "b300_fc:nes_nt_queue_rect_tile_y": {
+    "ja": "上端のタイル行。可視範囲は0～29。",
+    "en": "Top tile row, visible range 0..29."
+  },
+  "b300_fc:nes_nt_queue_rect_width": {
+    "ja": "幅（タイル数）。",
+    "en": "Width in tiles."
+  },
+  "b300_fc:nes_nt_queue_rect_height": {
+    "ja": "高さ（タイル数）。",
+    "en": "Height in tiles."
+  },
+  "b300_fc:nes_nt_queue_rect_pitch": {
+    "ja": "元配列で次の行まで進むバイト数。行の末尾の余白を飛ばせます。",
+    "en": "Source byte stride between row starts; can skip trailing padding."
+  },
+  "b300_fc:nes_nt_queue_rect_src": {
+    "ja": "(height−1)*pitch+widthバイト以上の読み取り元。",
+    "en": "Readable source spanning at least (height−1)*pitch+width bytes."
+  },
+  "b300_fc:nes_nt_queue_fill_rect_purpose": {
+    "ja": "矩形の各行を同じタイルで埋めるキューへ登録します。",
+    "en": "For each rectangle row, queue a fill with one tile ID."
+  },
+  "b300_fc:nes_nt_queue_fill_rect_returns": {
+    "ja": "全行成功または高さ0で1、途中の容量不足で0。",
+    "en": "Returns 1 after all rows or for zero height, 0 on admission failure."
+  },
+  "b300_fc:nes_nt_queue_fill_rect_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_nt_queue_fill_rect_tile_x": {
+    "ja": "左端のタイル列。可視範囲は0～31。",
+    "en": "Left tile column, visible range 0..31."
+  },
+  "b300_fc:nes_nt_queue_fill_rect_tile_y": {
+    "ja": "上端のタイル行。可視範囲は0～29。",
+    "en": "Top tile row, visible range 0..29."
+  },
+  "b300_fc:nes_nt_queue_fill_rect_width": {
+    "ja": "幅（タイル数）。",
+    "en": "Width in tiles."
+  },
+  "b300_fc:nes_nt_queue_fill_rect_height": {
+    "ja": "高さ（タイル数）。",
+    "en": "Height in tiles."
+  },
+  "b300_fc:nes_nt_queue_fill_rect_value": {
+    "ja": "塗りつぶすタイル番号0～255。",
+    "en": "Fill tile ID, 0..255."
+  },
+  "b300_ntbulk": {
+    "ja": "1024バイトを同期転送するため、通常は起動時など描画を止めた場面で使います。フレームを分けた転送は行いません。",
+    "en": "A synchronous 1024-byte upload normally belongs in rendering-off setup. The helper does not spread it across frames."
+  },
+  "b300_fc:nes_nametable_apply_now_purpose": {
+    "ja": "960バイトのタイル番号に続けて64バイトの属性表を一括転送します。",
+    "en": "Upload 960 tile IDs followed by a 64-byte attribute table."
+  },
+  "b300_fc:nes_nametable_apply_now_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_nametable_apply_now_nt_base": {
+    "ja": "論理ネームテーブル先頭$2000/$2400/$2800/$2C00。物理的な独立性はミラーリング設定によります。",
+    "en": "Logical nametable base $2000/$2400/$2800/$2C00; mirroring determines physical independence."
+  },
+  "b300_fc:nes_nametable_apply_now_nam960": {
+    "ja": "32×30タイルの行優先配列。",
+    "en": "Row-major 32×30 tile array."
+  },
+  "b300_fc:nes_nametable_apply_now_attr64": {
+    "ja": "64バイトのpacked属性表。シャドーとは別の入力でも構いません。",
+    "en": "Sixty-four packed attribute bytes; need not be the shared shadow."
+  },
+  "b300_actorcache": {
+    "ja": "screen_x/screen_yは更新しません。カメラを反映するにはupdate_screenを呼びます。",
+    "en": "Does not update screen_x/screen_y. Call update_screen to project through the camera."
+  },
+  "b300_fc:nes_actor_set_world_purpose": {
+    "ja": "アクターのワールドX/Yを更新します。",
+    "en": "Set an actor’s world X/Y."
+  },
+  "b300_fc:nes_actor_set_world_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_actor_set_world_actor": {
+    "ja": "書き込み可能なNesActorへのポインタ。",
+    "en": "Pointer to a writable NesActor."
+  },
+  "b300_fc:nes_actor_set_world_x": {
+    "ja": "ワールドX、0～65535ピクセル。",
+    "en": "World X, 0..65535 pixels."
+  },
+  "b300_fc:nes_actor_set_world_y": {
+    "ja": "ワールドY、0～65535ピクセル。",
+    "en": "World Y, 0..65535 pixels."
+  },
+  "b300_actorclip": {
+    "ja": "負や256以上の結果は周回します。画面外のアクターを自動で隠さないので、描画前にゲーム側で判定します。",
+    "en": "Negative or ≥256 results wrap. It does not hide offscreen actors; the game must cull before drawing."
+  },
+  "b300_fc:nes_actor_update_screen_purpose": {
+    "ja": "ワールド座標からカメラ座標を引き、下位8ビットを画面座標へ保存します。",
+    "en": "Subtract camera coordinates from world coordinates and cache the low bytes as screen coordinates."
+  },
+  "b300_fc:nes_actor_update_screen_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "b300_fc:nes_actor_update_screen_actor": {
+    "ja": "書き込み可能なNesActorへのポインタ。",
+    "en": "Pointer to a writable NesActor."
+  },
+  "b300_fc:nes_actor_update_screen_camera_x": {
+    "ja": "カメラのワールドX。",
+    "en": "Camera world X."
+  },
+  "b300_fc:nes_actor_update_screen_camera_y": {
+    "ja": "カメラのワールドY。",
+    "en": "Camera world Y."
+  },
+  "b300_actordraw": {
+    "ja": "attr/flagsフィールドは適用しません。Yは生のOAM値なので表示上端は1ピクセル下です。実際の表示にはOAM DMAが別途必要です。",
+    "en": "Does not apply the actor’s attr/flags fields. Y is a raw OAM byte, so the visible top is one pixel lower. An OAM DMA is required to display the shadow."
+  },
+  "b300_fc:nes_actor_draw_metasprite_purpose": {
+    "ja": "保存済み画面座標を基点に、メタスプライトをシャドーOAMへ書きます。",
+    "en": "Write a metasprite into shadow OAM using the actor’s cached screen coordinates."
+  },
+  "b300_fc:nes_actor_draw_metasprite_returns": {
+    "ja": "次のOAMスロット番号。64スロット末尾を越えると周回します。",
+    "en": "Returns the next OAM slot index, wrapping at the end of 64 slots."
+  },
+  "b300_fc:nes_actor_draw_metasprite_actor": {
+    "ja": "書き込み可能なNesActorへのポインタ。",
+    "en": "Pointer to a writable NesActor."
+  },
+  "b300_fc:nes_actor_draw_metasprite_oam_index": {
+    "ja": "開始スロット0～63。全パーツ分の空きを確保します。",
+    "en": "First slot, 0..63; reserve room for every part."
+  },
+  "b300_fc:nes_actor_draw_metasprite_metasprite": {
+    "ja": "dx,dy,tile,attrの4バイト列。dx=255が終端です。",
+    "en": "Four-byte records dx,dy,tile,attr; dx=255 terminates."
+  },
+  "b300_actorbounds": {
+    "ja": "幅と高さは1以上、座標＋サイズは65535以下にします。画面座標・attr・flagsは判定に使いません。",
+    "en": "Use positive widths/heights and keep position+size≤65535. Screen coordinates, attr and flags are ignored."
+  },
+  "b300_fc:nes_actor_collide_purpose": {
+    "ja": "ワールド座標の軸に平行な矩形同士が重なるか調べます。",
+    "en": "Test overlap of axis-aligned actor rectangles in world coordinates."
+  },
+  "b300_fc:nes_actor_collide_returns": {
+    "ja": "重なれば1、離れているか辺が接するだけなら0。",
+    "en": "Returns 1 for overlap; 0 for separation or edges that merely touch."
+  },
+  "b300_fc:nes_actor_collide_a": {
+    "ja": "1つ目のアクター。",
+    "en": "First actor."
+  },
+  "b300_fc:nes_actor_collide_b": {
+    "ja": "2つ目のアクター。",
+    "en": "Second actor."
+  },
+  "b300_module_rpg_maps": {
+    "ja": "RPGのマップ表示・メタタイル・スクリプト・SRAM保存・経路探索を提供します。通常マップは8×8、メタタイルは16×16ピクセルのセルです。マップ読み込みと描画、移動マスク、攻撃マスクは別の処理で、画像の読み込みやイベント実行はゲーム側が組み合わせます。",
+    "en": "Provides map/metatile drawing, scripts, SRAM saves and pathfinding. Ordinary cells are 8×8 pixels; metatiles are 16×16. Loading/drawing, movement masks and attack masks are separate operations; the game coordinates graphics loading and event execution."
+  },
+  "b300_module_danmaku": {
+    "ja": "160×128ピクセル内の最大96発を固定配列で処理する弾幕ライブラリです。1/16ピクセルの位置更新、32方向の扇形生成、ヒット・かすり、4区画のタイル合成を行います。シミュレーションはGBでも動きますが、present_nowはCGB専用の転送です。",
+    "en": "An allocation-free bullet field for up to 96 shots in 160×128 pixels. Provides sixteenth-pixel motion, 32-direction fans, hit/graze events and four-quadrant tile composition. Simulation runs on GB; present_now is a CGB-only upload."
+  },
+  "b300_module_attr": {
+    "ja": "パレット区画の矩形編集と、必要な属性バイトだけのキュー転送を扱います。32×30タイルの範囲検査を行います。palette_map入力は完成済みの属性64バイトで、1タイル1色の配列ではありません。",
+    "en": "Edits palette quadrants by rectangle and queues only the intersecting attribute bytes, checking 32×30 tile bounds. The palette_map input is a completed 64-byte attribute table rather than one color per tile."
+  },
+  "b300_module_nt": {
+    "ja": "32タイルの行、pitch付き矩形、塗りつぶし、960+64バイトの画面全体を転送します。属性シャドーの編集と転送もここにあります。即時転送と後で消費するキューを用途に応じて選びます。",
+    "en": "Uploads 32-tile rows, pitched rectangles, fills and complete 960+64-byte screens; also edits and uploads attribute shadow data. Choose immediate transfers or deferred queue consumption for the situation."
+  },
+  "b300_module_actor": {
+    "ja": "ワールド座標・画面座標・矩形サイズをNesActorにまとめます。カメラからの相対座標、メタスプライトOAM生成、ワールド矩形の衝突を扱い、移動速度・画面外の非表示・OAM DMAはゲーム側で管理します。",
+    "en": "NesActor groups world position, screen position and rectangle size. Helpers project through a camera, write metasprite OAM and test world-space overlap. The game owns velocity, offscreen culling and OAM DMA."
+  },
+  "b300_expected_map_path": {
+    "ja": "左に移動3歩以内のコスト、右にSからGまでの最短経路を表示します。赤い3セルの壁を避け、緑の*が9歩の経路を示します。青い数字は到達コストです。DMGは同じ配置を黒で表示します。射程マスクは壁を無視する点もRAMで検査します。",
+    "en": "The left grid shows movement costs within three steps; the right shows a shortest route from S to G. Green asterisks trace nine steps around a red three-cell wall; blue digits show costs. DMG uses the same layout in black. RAM checks also demonstrate that the attack mask ignores walls."
+  },
+  "b300_expected_metatile": {
+    "ja": "メタタイルIDをRAMで変え、dirtyを付けてflushする例です。カメラ(1,0)で左上に16×16の緑の正方形が現れます。パレットのメタデータはサンプル側がCGB属性へ反映しています。DMGでは黒い正方形です。",
+    "en": "Edit a metatile ID in RAM, mark it dirty and flush. Camera (1,0) shows a green 16×16 square at the upper-left. The sample explicitly applies palette metadata to CGB attributes. DMG shows a black square."
+  },
+  "b300_expected_save": {
+    "ja": "7・42・255の3バイトを保存し、長さ不一致・無効スロット・破損チェックサムを試します。読み込み成功時の中央値は42、破損時には出力先77を保持し、消去後の検査は0です。",
+    "en": "Save three bytes, 7/42/255, then test length mismatch, an invalid slot and a damaged checksum. A successful load yields middle byte 42; a failed read preserves destination 77; validation after clearing returns 0."
+  },
+  "b300_expected_script": {
+    "ja": "バンク1からバンク2へジャンプし、フラグ19を立てて待つ例です。最初の待ち2回は1、ジャンプ先のフラグは1、WAIT後に終了2となります。別バンクへ制御が届いたことをフラグで確認します。",
+    "en": "Jump from bank 1 to bank 2, set flag 19 and wait. Initial two waiting calls return 1; destination flag becomes 1; completion after WAIT returns 2. The flag proves control reached the other bank."
+  },
+  "b300_expected_far": {
+    "ja": "別ROMバンクの34 12 AB（16進）を読みます。1バイトは52、下位バイト先行のワードは4660、コピーした末尾は171と表示します。",
+    "en": "Read hexadecimal 34 12 AB from another ROM bank: first byte 52, little-endian word 4660 and copied final byte 171."
+  },
+  "b300_expected_danmaku": {
+    "ja": "CGB専用の描画例です。中央(80,64)から8方向へ弾を放ち、8回更新して赤い3×3の点8個を放射状に表示します。縦横は32ピクセル進み、斜め方向は整数近似で進みます。プールの消去と生涯生成数の保持も検査します。",
+    "en": "CGB-only drawing lesson. Spawn eight directions at (80,64), update eight times and show eight red 3×3 dots in a radial arrangement. Cardinal bullets travel 32 pixels; diagonals use integer approximation. Also check pool clearing and retained lifetime spawn counts."
+  },
+  "b300_expected_display": {
+    "ja": "背景とウィンドウのマップ切り替え、スクロール、ネスト、走査線待ちを学びます。先頭アドレスは38912/39936、トークンは0/1、待ったLYは80/144です。LCD停止中の待ちが戻ることも確認します。",
+    "en": "Learn map selection, scrolling, nesting and scanline waits. Bases are 38912/39936; nested tokens are 0/1; observed target LY values are 80/144. Also verify waits return with the LCD off."
+  },
+  "b300_expected_coordinates": {
+    "ja": "矩形の内部・端・外側・幅0を試します。INSIDE=1、RIGHT EDGE=0、LEFT EDGE=0、HIGH X=1です。距離15、距離の周回254、配列位置64と65280を確認します。",
+    "en": "Exercise the interior, boundaries, outside point and zero width: INSIDE=1, RIGHT EDGE=0, LEFT EDGE=0, HIGH X=1. Verify distance 15, wrapped distance 254 and array indices 64/65280."
+  },
+  "b300_expected_math": {
+    "ja": "固定値とRAM変数で同じ計算を行う例です。画面には代表値を符号なし16ビットで表示し、負数は2の補数の値になります。GBは固定小数点の縮小を行い、FCは整数積を返すため、同じ入力でも両機種の結果は異なります。",
+    "en": "Compare literal inputs with values stored in RAM. Representative results appear as unsigned 16-bit values; negatives use two’s-complement bit patterns. GB rescales fixed-point products, while FC returns integer products, so identical inputs need not give identical results."
+  },
+  "b300_values_gb___smac16_q1_7": {
+    "ja": "この抜粋で保存する16ビット値は result[0]=220, result[1]=220, result[2]=65244, result[3]=65244 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[0]=220, result[1]=220, result[2]=65244, result[3]=65244. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___mul8x8_hi": {
+    "ja": "この抜粋で保存する16ビット値は result[4]=254, result[5]=254 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[4]=254, result[5]=254. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___dot3_q8_8": {
+    "ja": "この抜粋で保存する16ビット値は result[6]=521, result[7]=521 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[6]=521, result[7]=521. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___sdot3_q8_8": {
+    "ja": "この抜粋で保存する16ビット値は result[8]=521, result[9]=521, result[10]=65015, result[11]=65015 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[8]=521, result[9]=521, result[10]=65015, result[11]=65015. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___smul16x8_q1_7": {
+    "ja": "この抜粋で保存する16ビット値は result[12]=256, result[13]=256, result[14]=65280, result[15]=65280 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[12]=256, result[13]=256, result[14]=65280, result[15]=65280. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___sdot3_q1_7": {
+    "ja": "この抜粋で保存する16ビット値は result[16]=1042, result[17]=1042, result[18]=64494, result[19]=64494 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[16]=1042, result[17]=1042, result[18]=64494, result[19]=64494. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___sdot2_q1_7": {
+    "ja": "この抜粋で保存する16ビット値は result[20]=1018, result[21]=1018, result[22]=64518, result[23]=64518 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[20]=1018, result[21]=1018, result[22]=64518, result[23]=64518. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___mul16x8": {
+    "ja": "この抜粋で保存する16ビット値は result[24]=254, result[25]=254 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[24]=254, result[25]=254. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___smac16": {
+    "ja": "この抜粋で保存する16ビット値は result[26]=92, result[27]=92, result[28]=65372, result[29]=65372 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[26]=92, result[27]=92, result[28]=65372, result[29]=65372. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___sdot2_q8_8": {
+    "ja": "この抜粋で保存する16ビット値は result[30]=509, result[31]=509, result[32]=65027, result[33]=65027 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[30]=509, result[31]=509, result[32]=65027, result[33]=65027. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___mac16": {
+    "ja": "この抜粋で保存する16ビット値は result[34]=218, result[35]=218 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[34]=218, result[35]=218. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_gb___dot2_q8_8": {
+    "ja": "この抜粋で保存する16ビット値は result[36]=509, result[37]=509 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[36]=509, result[37]=509. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___mul8x8_hi": {
+    "ja": "この抜粋で保存する16ビット値は result[0]=254, result[1]=254 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[0]=254, result[1]=254. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___mul16x8": {
+    "ja": "この抜粋で保存する16ビット値は result[2]=65151, result[3]=65151 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[2]=65151, result[3]=65151. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___smul16x8": {
+    "ja": "この抜粋で保存する16ビット値は result[4]=32832, result[5]=32832, result[6]=32704, result[7]=32704 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[4]=32832, result[5]=32832, result[6]=32704, result[7]=32704. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___mac16": {
+    "ja": "この抜粋で保存する16ビット値は result[8]=65115, result[9]=65115 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[8]=65115, result[9]=65115. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___smac16": {
+    "ja": "この抜粋で保存する16ビット値は result[10]=32796, result[11]=32796, result[12]=32668, result[13]=32668 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[10]=32796, result[11]=32796, result[12]=32668, result[13]=32668. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___smul16x8_q1_7": {
+    "ja": "この抜粋で保存する16ビット値は result[14]=32832, result[15]=32832, result[16]=32704, result[17]=32704 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[14]=32832, result[15]=32832, result[16]=32704, result[17]=32704. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___smac16_q1_7": {
+    "ja": "この抜粋で保存する16ビット値は result[18]=32796, result[19]=32796, result[20]=32668, result[21]=32668 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[18]=32796, result[19]=32796, result[20]=32668, result[21]=32668. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___dot2_q8_8": {
+    "ja": "この抜粋で保存する16ビット値は result[22]=64959, result[23]=64959 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[22]=64959, result[23]=64959. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___dot3_q8_8": {
+    "ja": "この抜粋で保存する16ビット値は result[24]=2498, result[25]=2498 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[24]=2498, result[25]=2498. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___sdot2_q8_8": {
+    "ja": "この抜粋で保存する16ビット値は result[26]=64959, result[27]=64959, result[28]=577, result[29]=577 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[26]=64959, result[27]=64959, result[28]=577, result[29]=577. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___sdot3_q8_8": {
+    "ja": "この抜粋で保存する16ビット値は result[30]=2498, result[31]=2498, result[32]=63038, result[33]=63038 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[30]=2498, result[31]=2498, result[32]=63038, result[33]=63038. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___sdot2_q1_7": {
+    "ja": "この抜粋で保存する16ビット値は result[34]=64959, result[35]=64959, result[36]=577, result[37]=577 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[34]=64959, result[35]=64959, result[36]=577, result[37]=577. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_values_fc___sdot3_q1_7": {
+    "ja": "この抜粋で保存する16ビット値は result[38]=2498, result[39]=2498, result[40]=63038, result[41]=63038 です。固定値とRAM変数を使った計算は、それぞれ同じ値になります。画面は代表値を表示し、全結果はresult配列に保存します。",
+    "en": "The excerpt stores these 16-bit values: result[38]=2498, result[39]=2498, result[40]=63038, result[41]=63038. Each literal-input calculation matches its RAM-input counterpart. The screen shows representative values; the result array holds every result."
+  },
+  "b300_expected_attributes": {
+    "ja": "属性の矩形転送を学びます。(16,32)に赤の32×32、(80,32)に青の32×32、画面右下(240,224)に緑の16×16を表示します。隣の区画を壊さず、右下の属性バイトまで正しく転送する例です。",
+    "en": "Learn rectangular attribute uploads: red 32×32 at (16,32), blue 32×32 at (80,32), green 16×16 at bottom-right (240,224). The example preserves adjacent quadrants and reaches the final attribute byte correctly."
+  },
+  "b300_expected_nametable": {
+    "ja": "行・pitch付き矩形・塗りつぶし・一括転送を組み合わせます。上に赤い32×8の横棒2本、下に青い16×16、赤い16×24と32×24の矩形が並びます。直接転送とキュー転送で異なる位置へ描きます。",
+    "en": "Combine row, pitched rectangle, fill and full-table uploads. Two red 32×8 bars appear above a blue 16×16 square and red 16×24/32×24 rectangles. Direct and queued transfers draw at distinct positions."
+  },
+  "b300_expected_actor": {
+    "ja": "ワールド(300,95)のアクターへカメラ(268,32)を適用し、画面(32,64)と(40,64)へ赤と青の8×8パーツを並べます。生のOAM Y=63が表示では64になること、辺が接するだけでは衝突せず1ピクセル重なると衝突することを確認します。",
+    "en": "Project world (300,95) through camera (268,32): red and blue 8×8 parts appear at (32,64) and (40,64). This demonstrates raw OAM Y=63 appearing at 64, and collision changing from zero for touching edges to one for a one-pixel overlap."
+  }
+}

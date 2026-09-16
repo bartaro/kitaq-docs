@@ -16,9 +16,9 @@ class Text(HTMLParser):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--browser',action='store_true')
-    parser.add_argument('--suite',choices=['all','sound','physics','wireframe','batch200','batch100','dialogue','text-layout','rle','flags','rng','bit-intrinsics','memory-intrinsics','interrupt-intrinsics','input','padrepeat','expansion','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue','runtime-ppu','ppu-declarations','ppu-intrinsics'],default='input');args=parser.parse_args()
+    parser.add_argument('--suite',choices=['all','batch300','sound','physics','wireframe','batch200','batch100','dialogue','text-layout','rle','flags','rng','bit-intrinsics','memory-intrinsics','interrupt-intrinsics','input','padrepeat','expansion','vram','vram-memory','vramq','cgb-palette','cgb-dma-wram','asset','bank','sprite','oam','fc-oam','oam-library','vram-macros','runtime-queue','runtime-ppu','ppu-declarations','ppu-intrinsics'],default='input');args=parser.parse_args()
     messages,ui,contracts=api_contracts.load()
-    inputs={key:value for key,value in contracts.items() if args.suite=='all' or value['review']==args.suite+'-source-'+('20260916' if args.suite=='sound' else '20260915')}
+    inputs={key:value for key,value in contracts.items() if args.suite=='all' or value['review']==args.suite+'-source-'+('20260916' if args.suite in ['sound','batch300'] else '20260915')}
     results=[]
     for language in api_contracts.ACTIVE_LANGUAGES:
         index=api_contracts.ORDER.index(language)
@@ -52,8 +52,8 @@ def main():
                         assert card.count('<audio controls preload="none"')==count,(language,key,'audio count')
                         assert 'autoplay' not in card
                     results.append({'language':language,'api':key,'card':'passed'})
-    assert len(results)==len(inputs)*len(api_contracts.ACTIVE_LANGUAGES) and len(inputs)=={'all':len(contracts),'sound':82,'physics':27,'wireframe':124,'batch200':100,'batch100':100,'dialogue':6,'text-layout':6,'rle':3,'flags':5,'rng':13,'bit-intrinsics':8,'memory-intrinsics':12,'interrupt-intrinsics':8,'input':35,'padrepeat':6,'expansion':6,'vram':30,'vram-memory':9,'vramq':10,'cgb-palette':28,'cgb-dma-wram':8,'asset':17,'bank':32,'sprite':28,'oam':1,'fc-oam':9,'oam-library':8,'vram-macros':5,'runtime-queue':4,'runtime-ppu':7,'ppu-declarations':4,'ppu-intrinsics':21}[args.suite], len(results)
-    modules=json.loads((api_contracts.SOURCE/(args.suite+'_modules.json')).read_text(encoding='utf-8')) if args.suite in ['sound','physics','wireframe','batch200','batch100','dialogue','text-layout','rle','flags','rng','input','vram','cgb-palette','asset','bank','sprite','oam-library','runtime-queue','runtime-ppu'] else {}
+    assert len(results)==len(inputs)*len(api_contracts.ACTIVE_LANGUAGES) and len(inputs)=={'all':len(contracts),'sound':82,'batch300':100,'physics':27,'wireframe':124,'batch200':100,'batch100':100,'dialogue':6,'text-layout':6,'rle':3,'flags':5,'rng':13,'bit-intrinsics':8,'memory-intrinsics':12,'interrupt-intrinsics':8,'input':35,'padrepeat':6,'expansion':6,'vram':30,'vram-memory':9,'vramq':10,'cgb-palette':28,'cgb-dma-wram':8,'asset':17,'bank':32,'sprite':28,'oam':1,'fc-oam':9,'oam-library':8,'vram-macros':5,'runtime-queue':4,'runtime-ppu':7,'ppu-declarations':4,'ppu-intrinsics':21}[args.suite], len(results)
+    modules=json.loads((api_contracts.SOURCE/(args.suite+'_modules.json')).read_text(encoding='utf-8')) if args.suite in ['batch300','sound','physics','wireframe','batch200','batch100','dialogue','text-layout','rle','flags','rng','input','vram','cgb-palette','asset','bank','sprite','oam-library','runtime-queue','runtime-ppu'] else {}
     module_count=0
     for language in api_contracts.ACTIVE_LANGUAGES:
         index=api_contracts.ORDER.index(language)
@@ -61,7 +61,7 @@ def main():
         for key,keys in modules.items():
             platform,name=key.split(':')
             text=(folder/(platform+'-library.html')).read_text(encoding='utf-8')
-            block=re.search(r'<h3[^>]*id="module-'+name+r'".*?'+(r'data-module-contract="'+args.suite+r'-source-'+('20260916' if args.suite=='sound' else '20260915')+r'".*?' if args.suite in ['sound','physics','wireframe','batch200','batch100','dialogue','text-layout','flags','rng','rle'] else '')+r'<!-- api-module:end -->',text,re.S)
+            block=re.search(r'<h3[^>]*id="module-'+name+r'".*?'+(r'data-module-contract="'+args.suite+r'-source-'+('20260916' if args.suite in ['sound','batch300'] else '20260915')+r'".*?' if args.suite in ['batch300','sound','physics','wireframe','batch200','batch100','dialogue','text-layout','flags','rng','rle'] else '')+r'<!-- api-module:end -->',text,re.S)
             assert block,(language,key)
             for message in keys:assert api_contracts.inline(messages[message][index]) in block[0],(language,key,message)
             module_count+=1
@@ -84,7 +84,7 @@ def main():
                 if args.suite=='bank':cases=[('gb','gb-library','far_call'),('gb','kitaqgb','__farcall_ptr'),('fc','fc-library','farptr_read16'),('fc','kitaqfc','__prg_bank_set')]
                 if args.suite=='sprite':cases=[('gb','gb-library','sprite_set_flags'),('gb','gb-library','metasprite_draw'),('fc','fc-library','sprite_set_pos'),('fc','fc-library','sprite_max_scanline_count')]
                 if args.suite=='oam':cases=[('gb','kitaqgb','__oam_dma')]
-                if args.suite in ['sound','physics','wireframe','batch200','batch100','dialogue','text-layout','rng','flags','rle']:cases=[(k.split(':')[0],('kitaq'+k.split(':')[0]) if k.split(':')[1].startswith('__') else k.split(':')[0]+'-library',k.split(':')[1]) for k in inputs]
+                if args.suite in ['batch300','sound','physics','wireframe','batch200','batch100','dialogue','text-layout','rng','flags','rle']:cases=[(k.split(':')[0],('kitaq'+k.split(':')[0]) if k.split(':')[1].startswith('__') else k.split(':')[0]+'-library',k.split(':')[1]) for k in inputs]
                 if args.suite=='bit-intrinsics':cases=[(p,'kitaq'+p,n) for p in ['gb','fc'] for n in ['__bit_test','__bit_set','__bit_clear','__bit_toggle']]
                 if args.suite=='memory-intrinsics':cases=[(p,'kitaq'+p,n) for p in ['gb','fc'] for n in ['__memcpy','__memset_small','__copy32']]
                 if args.suite=='interrupt-intrinsics':cases=[('fc','kitaqfc',name) for name in ['__nmi_ready','__nmi_wait','__irq_save','__irq_restore']]
@@ -118,7 +118,7 @@ def main():
             browser.close()
     report={'languages':api_contracts.ACTIVE_LANGUAGES,'cards':results,'module_introductions':module_count,'browser':browser_results,'status':'passed'}
     report_name='document_checks.json' if args.browser else 'static_document_checks.json'
-    evidence_folder={'all':'.','sound':'api-sound','physics':'api-physics','wireframe':'api-wireframe','batch200':'api-batch200','batch100':'api-batch100','dialogue':'api-dialogue','text-layout':'api-text-layout','rle':'api-rle','flags':'api-flags','rng':'api-rng','bit-intrinsics':'api-bit-intrinsics','memory-intrinsics':'api-memory-intrinsics','interrupt-intrinsics':'api-interrupt-intrinsics','input':'api-input','padrepeat':'api-pad-repeat','expansion':'api-expansion-input','vram':'api-vram','vram-memory':'api-vram-memory','vramq':'api-vramq','cgb-palette':'api-cgb-palette','cgb-dma-wram':'api-cgb-dma-wram','asset':'api-asset','bank':'api-bank','sprite':'api-sprite','oam':'api-oam','fc-oam':'api-fc-oam','oam-library':'api-oam-library','vram-macros':'api-vram-macros','runtime-queue':'api-runtime-queue','runtime-ppu':'api-runtime-ppu','ppu-declarations':'api-ppu-declarations','ppu-intrinsics':'api-ppu-intrinsics'}[args.suite]
+    evidence_folder={'all':'.','batch300':'api-batch300','sound':'api-sound','physics':'api-physics','wireframe':'api-wireframe','batch200':'api-batch200','batch100':'api-batch100','dialogue':'api-dialogue','text-layout':'api-text-layout','rle':'api-rle','flags':'api-flags','rng':'api-rng','bit-intrinsics':'api-bit-intrinsics','memory-intrinsics':'api-memory-intrinsics','interrupt-intrinsics':'api-interrupt-intrinsics','input':'api-input','padrepeat':'api-pad-repeat','expansion':'api-expansion-input','vram':'api-vram','vram-memory':'api-vram-memory','vramq':'api-vramq','cgb-palette':'api-cgb-palette','cgb-dma-wram':'api-cgb-dma-wram','asset':'api-asset','bank':'api-bank','sprite':'api-sprite','oam':'api-oam','fc-oam':'api-fc-oam','oam-library':'api-oam-library','vram-macros':'api-vram-macros','runtime-queue':'api-runtime-queue','runtime-ppu':'api-runtime-ppu','ppu-declarations':'api-ppu-declarations','ppu-intrinsics':'api-ppu-intrinsics'}[args.suite]
     (SITE/'verification'/evidence_folder/report_name).write_text(json.dumps(report,indent=2),encoding='utf-8')
     print(str(len(results))+' localized cards; '+str(len(browser_results))+' browser inline-image checks passed.')
 
