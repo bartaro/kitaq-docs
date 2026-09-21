@@ -1,0 +1,598 @@
+{
+  "link_note_shared": {
+    "ja": "ライブラリは1台につき1つの通信状態を共有します。バイト送受信は全二重で、片側が内部クロック、もう片側が外部クロックを使います。通常速度は1ビット512クロック、CGB高速は16クロックです。",
+    "en": "Each machine has one shared link state. Byte exchanges are full duplex: one side supplies the internal clock and the other uses external clocks. Normal speed takes 512 clocks per bit; CGB fast speed takes 16."
+  },
+  "link_note_codes": {
+    "ja": "エラーコードは0=正常、1=使用中、2=時間切れ、3=受信容量不足、4=設定またはプロトコル不正、5=ACK待ちで切断を示す応答です。開始・設定関数の成功は0、受信取得関数の成功は1なので区別してください。成功しても過去のエラーは消えません。",
+    "en": "Error codes are 0=none, 1=busy, 2=timeout, 3=receive overflow, 4=invalid configuration/protocol and 5=an ACK timeout with a disconnect-like response. Start/configuration calls succeed with 0; receive/pop calls succeed with 1. Successful calls do not clear a latched error."
+  },
+  "link_note_reset": {
+    "ja": "初期化は受信キュー、パケット、接続先、エラーを破棄し、転送とシリアル割り込みを停止します。送受信中のデータを保存する操作ではありません。",
+    "en": "Initialization discards byte queues, packets, peer selection and errors, and disables the transfer and serial IRQ source. It does not preserve an in-flight exchange."
+  },
+  "link_note_critical": {
+    "ja": "内部のクリティカルセクションはソフトウェアの入れ子深さを使います。外側のセクションを抜けるとCPU割り込みが有効になるため、直前のIME状態の保存は前提にしないでください。",
+    "en": "Internal critical sections track software nesting depth. Leaving the outer section enables CPU interrupts, so do not assume that a previously disabled IME state is preserved."
+  },
+  "link_note_ring": {
+    "ja": "受信リングは8要素中7バイトを保持できます。満杯では新しいバイトを捨て、エラー3を記録します。受信値0も有効なデータです。",
+    "en": "An eight-entry receive ring holds seven bytes. A full ring drops the new byte and latches error 3. A received zero byte is valid data."
+  },
+  "link_note_logical": {
+    "ja": "Link4はホスト0と、1～3の相手を論理的に管理します。SelectPeerは電気的な配線を切り替えるコマンドを送りません。KOKURAのlink4接続ではコンパイラのメタデータを使って接続先を追従させます。DMG-07実機のプロトコルにはLinkDmg07を使います。",
+    "en": "Link4 manages logical host slot 0 and peer slots 1–3. SelectPeer does not send a command that switches physical wiring. KOKURA’s link4 topology follows the selected peer through compiler metadata. Use LinkDmg07 for the physical DMG-07 protocol."
+  },
+  "link_note_duplicate": {
+    "ja": "Link4では同じ受信バイトを通常リングと相手別リングの両方へ入れます。片方を読んでも他方は減りません。パケットのポーリングは通常リングを消費するので、不要な相手別の生バイトも定期的に読み捨て、満杯を防ぎます。",
+    "en": "Link4 copies each received byte to both the ordinary ring and a per-peer ring. Reading one does not drain the other. Packet polling consumes the ordinary ring; regularly discard unused per-peer raw bytes as well to prevent overflow."
+  },
+  "link_note_packet": {
+    "ja": "パケットは0xA5、コマンド、長さ、0～24バイトの内容、XORチェックサムの順で送り、受信確認0x79（ACK）または受信拒否0x1F（NAK）を返します。チェックサムはコマンド・長さ・内容のXORです。各機の通常メールボックスは1パケット、Link4は相手ごとにも1パケットを保持します。",
+    "en": "A packet contains 0xA5, command, length, 0–24 payload bytes and an XOR checksum. The response is 0x79 (ACK, accepted) or 0x1F (NAK, rejected). The checksum XORs the command, length and payload. Each machine has one shared packet mailbox; Link4 additionally has one mailbox per peer."
+  },
+  "link_note_polling": {
+    "ja": "送受信の両側で継続してポーリングします。タイマーはハードウェアのフレーム数ではなく、進展のない呼び出し90回で満了します。ACKを待つための0xFF送信だけでは期限を延長せず、送信は最大3回試みます。再送で同じ内容が届く場合があるため、厳密に1回だけ実行したいコマンドにはアプリ側の識別番号を付けます。",
+    "en": "Keep polling on both endpoints. A timeout counts 90 calls without progress, not hardware frames. Sending 0xFF solely to clock an ACK does not extend that deadline; transmission allows at most three attempts. Retries can deliver duplicates, so add application-level identifiers when a command must run exactly once."
+  },
+  "link_note_buffer": {
+    "ja": "受信先の容量を渡す引数はありません。dstを使う場合は最大長24バイトの書き込み可能な領域を用意します。cmd・len・dstは個別に0を渡して省略できます。空き通知と読み取りを別スレッドや割り込みで競合させないでください。",
+    "en": "There is no destination-capacity parameter. Provide 24 writable bytes when using dst. cmd, len and dst may independently be null. Serialize mailbox inspection and consumption against other code and interrupts."
+  },
+  "link_note_scope": {
+    "ja": "掲載画像はKOKURA上の結果です。複数台を使う通信例では、リンクしたエミュレータで送受信値を照合し、その終了状態から画面を取得しています。実機ケーブルや実物の4人用アダプターを使った検証ではありません。",
+    "en": "The screens come from KOKURA. Multi-endpoint examples check values on linked emulator instances, and screens are captured from their final saved states. These checks do not establish physical cable or four-player adapter behavior."
+  },
+  "link_Link_InitCommon_purpose": {
+    "ja": "通信状態を初期値へ戻し、外部クロック待ちの役割にします。",
+    "en": "Reset the shared link state to its external-clock default."
+  },
+  "link_Link_InitCommon_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_example_control": {
+    "ja": "初期化、使用中エラー、外部クロック待ち、受信リングの満杯を確かめます。BUSY ERROR=1、TIMEOUT=2、OPEN RX=255、OVERFLOW=3、QUEUE BYTES=7になります。IRQ REQUEST=1を確認してから、割り込み禁止のままハンドラー本体を明示呼び出しします。",
+    "en": "Check initialization, busy rejection, an external-clock timeout and ring capacity. Expect BUSY ERROR=1, TIMEOUT=2, OPEN RX=255, OVERFLOW=3 and QUEUE BYTES=7. After observing IRQ REQUEST=1, the lesson explicitly dispatches the handler body while the serial IRQ source remains masked."
+  },
+  "link_Link_InitMaster_purpose": {
+    "ja": "状態を初期化し、自機がクロックを供給する役割を選びます。",
+    "en": "Reset state and make this machine the clock source."
+  },
+  "link_Link_InitMaster_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_example_raw_master": {
+    "ja": "同梱のBYTE SLAVEと接続します。42を送り99を受け取り、次に双方で0を交換します。RECEIVED=1、PEER BYTE=99、ZERO READY=1、ZERO BYTE=0が、受信した0と未受信の違いを示します。CGB同士では2回目を高速クロックで行います。",
+    "en": "Connect to BYTE SLAVE. Send 42 and receive 99, then exchange zero in both directions. RECEIVED=1, PEER BYTE=99, ZERO READY=1 and ZERO BYTE=0 distinguish valid zero data from no data. Two CGB instances use fast clocks for the second exchange."
+  },
+  "link_Link_InitSlave_purpose": {
+    "ja": "状態を初期化し、相手から来るクロックで通信する役割を選びます。",
+    "en": "Reset state and select externally clocked communication."
+  },
+  "link_Link_InitSlave_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_example_raw_slave": {
+    "ja": "同梱のBYTE MASTERがクロックを供給します。PEER BYTE=42、ZERO READY=1、ZERO BYTE=0になります。その後のEMPTY READも0になるため、空かどうかは準備フラグかTryReadの戻り値で判断します。",
+    "en": "BYTE MASTER supplies the clocks. Expect PEER BYTE=42, ZERO READY=1 and ZERO BYTE=0. EMPTY READ is also zero afterwards, which is why readiness or TryRead’s return value is needed to distinguish an empty queue."
+  },
+  "link_note_irq": {
+    "ja": "割り込みベクター0058hのハンドラーは別途必要です。ライブラリは自動登録しません。サンプルは転送開始前に許可を戻し、実際のCPU割り込み入口は検証していません。",
+    "en": "Install a handler at vector 0058h separately; this library does not register one. The sample masks the source again before transferring and does not test a CPU interrupt entry stub."
+  },
+  "link_Link_SetUseInterrupt_purpose": {
+    "ja": "シリアル割り込みの許可ビットを設定し、保留中の要求を消します。",
+    "en": "Set the serial interrupt-enable bit and clear a pending serial request."
+  },
+  "link_Link_SetUseInterrupt_on": {
+    "ja": "0で無効、0以外で有効にします。",
+    "en": "Zero disables; any nonzero value enables."
+  },
+  "link_Link_SetUseInterrupt_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_note_fast": {
+    "ja": "転送中の速度は変更しません。外部クロック側ではこの設定を使いません。CGB対応を調べる機能はなく、サンプルは両側を同じ機種で動かします。",
+    "en": "Does not change an in-flight transfer. External-clock transfers ignore this setting. Hardware support is not checked; run both sample endpoints on matching hardware modes."
+  },
+  "link_Link_SetFastClock_purpose": {
+    "ja": "以後の内部クロック転送でCGB高速ビットを使うか選びます。",
+    "en": "Choose whether future internally clocked transfers use the CGB fast-clock bit."
+  },
+  "link_Link_SetFastClock_on": {
+    "ja": "0で通常、0以外で高速を要求します。",
+    "en": "Zero requests normal speed; nonzero requests fast speed."
+  },
+  "link_Link_SetFastClock_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_note_busyside": {
+    "ja": "単なる状態読み取りではありません。完了していればSBをキューへ入れ、受信準備フラグやエラーも変わり得ます。",
+    "en": "This is not a passive query: a completed SB byte is enqueued, which can change readiness and error state."
+  },
+  "link_Link_IsBusy_purpose": {
+    "ja": "完了済みの転送を一度取り込んでから、送受信中か返します。",
+    "en": "Poll once for completion, then report whether an exchange remains active."
+  },
+  "link_Link_IsBusy_returns": {
+    "ja": "1なら使用中、0ならアイドルです。",
+    "en": "Returns 1 while busy, otherwise 0."
+  },
+  "link_note_nopoll": {
+    "ja": "ハードウェアをポーリングしません。Link_Pollまたはシリアルハンドラーで転送完了を先に取り込みます。",
+    "en": "Does not poll hardware. Collect completion through Link_Poll or the serial handler first."
+  },
+  "link_Link_HasByte_purpose": {
+    "ja": "通常受信リングに未読バイトがあるか調べます。",
+    "en": "Inspect whether the ordinary receive ring contains unread data."
+  },
+  "link_Link_HasByte_returns": {
+    "ja": "未読があれば1、空なら0です。",
+    "en": "Returns 1 when data is queued, otherwise 0."
+  },
+  "link_Link_LastError_purpose": {
+    "ja": "最後に記録された通信エラーを消さずに取得します。",
+    "en": "Read the most recently latched link error without clearing it."
+  },
+  "link_Link_LastError_returns": {
+    "ja": "現在のエラーコード0～5です。",
+    "en": "Returns the current error code, 0..5."
+  },
+  "link_example_packet_master": {
+    "ja": "コマンド49と3バイト7/42/255を送り、送信直後に元の配列を変更します。QUEUED=0、重複開始はSECOND SEND=1です。この使用中エラーは送信成功後も残り、ClearErrorで0にします。受信側のPAYLOAD 2=42が、内容をコピーしていることの確認になります。",
+    "en": "Send command 49 with payload 7/42/255, then change the source array. QUEUED=0 accepts the send; SECOND SEND=1 rejects a second start. That busy error remains latched until ClearError. PAYLOAD 2=42 on the receiving endpoint proves that the queued payload is an owned copy."
+  },
+  "link_note_clear": {
+    "ja": "転送、キュー、パケットの状態はそのままです。停止が必要ならLink_Cancel、全体を破棄するなら初期化を使います。",
+    "en": "Transfers, queues and packet state remain unchanged. Use Link_Cancel to stop the byte transfer, or initialize again to discard all state."
+  },
+  "link_Link_ClearError_purpose": {
+    "ja": "エラー表示だけを0に戻します。",
+    "en": "Clear only the error latch."
+  },
+  "link_Link_ClearError_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_note_start": {
+    "ja": "外部クロックの役割では相手がクロックを送るまで完了しません。使用中の再呼び出しは、送信中のバイトを置き換えません。",
+    "en": "An external-clock endpoint waits for the other side to supply clocks. A busy rejection does not replace the byte already in flight."
+  },
+  "link_Link_BeginTransfer_purpose": {
+    "ja": "1バイトをSBへ置き、1回の全二重交換を開始または待ち受けます。",
+    "en": "Load SB and start or arm one full-duplex byte exchange."
+  },
+  "link_Link_BeginTransfer_out": {
+    "ja": "相手へ送る8ビット値。受信だけが目的でも値を1つ送ります。",
+    "en": "Eight-bit outgoing value; every exchange sends a byte even if only reception matters."
+  },
+  "link_Link_BeginTransfer_returns": {
+    "ja": "開始できれば0、すでに使用中なら1です。",
+    "en": "Returns 0 when started/armed, or 1 if already busy."
+  },
+  "link_note_poll": {
+    "ja": "1回の呼び出しで待ち続けることはありません。ソフトウェア上でアイドルなら何もしません。タイムアウトも設定しません。",
+    "en": "A call does not block. It does nothing when software state is idle and does not implement a timeout."
+  },
+  "link_Link_Poll_purpose": {
+    "ja": "SCの開始ビットが消えた転送だけを取り込み、受信キューへ追加します。",
+    "en": "Collect a busy transfer only after SC clears its start bit, and enqueue the received byte."
+  },
+  "link_Link_Poll_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_note_cancel": {
+    "ja": "SCを0にし、使用中とシリアル要求を消します。受信済みバイト、パケット状態、エラーは消しません。プロトコルを最初からやり直す場合は初期化も行います。",
+    "en": "Writes SC=0 and clears busy and serial-request state. Received bytes, packet state and errors remain. Reinitialize as well when restarting the protocol from scratch."
+  },
+  "link_Link_Cancel_purpose": {
+    "ja": "実行中または外部クロック待ちのバイト転送を停止します。",
+    "en": "Stop the active or externally clocked byte transfer."
+  },
+  "link_Link_Cancel_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_note_dispatch": {
+    "ja": "この関数自身はSCの完了ビットを調べません。転送がまだ進行中のタイマー割り込み等から呼ばないでください。例は実際のIF.serial要求をCPU割り込み禁止中に確認して明示呼び出しし、関数本体を検証します。ベクターの設置例ではありません。",
+    "en": "The function does not check SC for completion. Do not call it from an unrelated timer interrupt while serial transfer is active. This example explicitly dispatches after a real IF.serial request with the serial CPU IRQ source masked; it tests the body, not vector installation."
+  },
+  "link_Link_OnSerialIRQ_purpose": {
+    "ja": "シリアル要求を確認済みのハンドラーから、完了したバイトを取り込みます。",
+    "en": "Collect a completed byte from a handler that has identified a serial request."
+  },
+  "link_Link_OnSerialIRQ_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_Link_TryReadByte_purpose": {
+    "ja": "通常受信リングの先頭を、待たずに1バイト取り出します。",
+    "en": "Pop one byte from the ordinary receive ring without waiting."
+  },
+  "link_Link_TryReadByte_out": {
+    "ja": "受信値を書き込む1バイトの領域。0なら読み捨てます。",
+    "en": "Writable byte destination; null discards the byte."
+  },
+  "link_Link_TryReadByte_returns": {
+    "ja": "取り出せれば1、空なら0。空の場合outは変更しません。",
+    "en": "Returns 1 when popped, 0 when empty; an empty read leaves out unchanged."
+  },
+  "link_note_zero": {
+    "ja": "0を受信したのか空なのか、この戻り値だけでは判断できません。TryReadByteの成功値、または読み取り前のHasByteを使います。",
+    "en": "The return value alone cannot distinguish a received zero from an empty queue. Use TryReadByte’s success flag, or HasByte before reading."
+  },
+  "link_Link_ReadByte_purpose": {
+    "ja": "通常受信リングから1バイトを値として取り出します。",
+    "en": "Return one byte popped from the ordinary receive ring."
+  },
+  "link_Link_ReadByte_returns": {
+    "ja": "受信値を返します。空の場合も0です。",
+    "en": "Returns the received byte; an empty queue also returns zero."
+  },
+  "link_note_wait": {
+    "ja": "LCDを動作させて使います。時間切れはエラー2を記録し、outを変更しません。転送そのものは停止しないため、終了する場合はCancelします。",
+    "en": "Use with the LCD running. Timeout latches error 2 and leaves out unchanged. The transfer itself is not cancelled; call Cancel if abandoning it."
+  },
+  "link_Link_WaitByte_purpose": {
+    "ja": "直ちにポーリングし、必要ならVBlank単位で期限付き受信待ちをします。",
+    "en": "Poll immediately, then wait for a byte with a VBlank-based limit."
+  },
+  "link_Link_WaitByte_timeout_frames": {
+    "ja": "最大のVBlank待ち回数。0でも最初のポーリングと取得を行います。",
+    "en": "Maximum number of VBlank waits. Zero still performs the initial poll and read."
+  },
+  "link_Link_WaitByte_out": {
+    "ja": "必須の1バイト書き込み先。0なら待たず、エラーも変更せず0を返します。",
+    "en": "Required writable byte. Null returns zero immediately without changing the error latch."
+  },
+  "link_Link_WaitByte_returns": {
+    "ja": "取得できれば1。時間切れ、またはout=0なら0です。",
+    "en": "Returns 1 on receipt, 0 on timeout or a null output."
+  },
+  "link_note_accepted": {
+    "ja": "0は送信の受付です。相手による受信やACKの完了を意味しません。送信元配列は受付後に再利用できます。",
+    "en": "Zero means queued, not received or acknowledged by the peer. The source array may be reused after acceptance."
+  },
+  "link_Link_SendPacket_purpose": {
+    "ja": "送信内容を内部バッファへコピーし、パケット送信を予約します。",
+    "en": "Copy the payload into owned storage and schedule packet transmission."
+  },
+  "link_Link_SendPacket_data": {
+    "ja": "lenバイトを読み取る元。len=0のときだけ0を渡せます。",
+    "en": "Readable source of len bytes; may be null only when len is zero."
+  },
+  "link_Link_SendPacket_len": {
+    "ja": "内容の長さ0～24バイト。",
+    "en": "Payload length in bytes, 0..24."
+  },
+  "link_Link_SendPacket_cmd": {
+    "ja": "受信側アプリが意味を定める8ビットのコマンド。",
+    "en": "Application-defined eight-bit command."
+  },
+  "link_Link_SendPacket_returns": {
+    "ja": "受付なら0、送信状態が空いていなければ1、不正な長さやポインターなら4です。",
+    "en": "Returns 0 when accepted, 1 for busy packet state, or 4 for invalid length/pointer."
+  },
+  "link_note_nomix": {
+    "ja": "同じ受信リングを直接のReadByte等でも読むと、パケットの途中を消費してしまいます。通常の生バイト読出しとパケット受信を同時に混ぜないでください。",
+    "en": "Raw ReadByte-style calls consume the same ordinary ring and can steal part of a packet. Do not mix raw reads with packet reception."
+  },
+  "link_Link_PollPacket_purpose": {
+    "ja": "受信バイトを解析し、次の送信またはACKを開始して、期限と再試行を進めます。",
+    "en": "Parse received bytes, start the next outgoing byte or ACK, and advance timeout/retry state."
+  },
+  "link_Link_PollPacket_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_example_packet_slave": {
+    "ja": "同梱のPACKET MASTERと接続し、COMMAND=49、LENGTH=3、PAYLOAD=7/42/255を確認します。ReadPacket後のCONSUMED=0は、メールボックスが空になったことを示します。",
+    "en": "Connect to PACKET MASTER and check COMMAND=49, LENGTH=3 and payload 7/42/255. CONSUMED=0 after ReadPacket means that the mailbox is now empty."
+  },
+  "link_note_packetflag": {
+    "ja": "プロトコルを進めず、フラグだけを読みます。送信相手がACKを受け取ったかどうかを示すフラグではありません。",
+    "en": "Reads a flag without progressing the protocol. It does not indicate whether the sender has received its ACK."
+  },
+  "link_Link_HasPacket_purpose": {
+    "ja": "通常の完成済みパケットメールボックスを調べます。",
+    "en": "Inspect the shared completed-packet mailbox."
+  },
+  "link_Link_HasPacket_returns": {
+    "ja": "未読パケットがあれば1、空なら0です。",
+    "en": "Returns 1 for an unread packet, otherwise 0."
+  },
+  "link_note_sharedmail": {
+    "ja": "Link4の場合は、この共有パケットと同じ相手のメールボックスも空になります。他の相手のメールボックスは残ります。",
+    "en": "In Link4 mode, also clears the peer mailbox corresponding to this shared packet. Other peer mailboxes remain available."
+  },
+  "link_Link_ReadPacket_purpose": {
+    "ja": "完成済みパケットをコピーし、通常メールボックスを空にします。",
+    "en": "Copy a completed packet and consume the shared mailbox."
+  },
+  "link_Link_ReadPacket_cmd": {
+    "ja": "受信コマンドを書き込む1バイト。0なら省略します。",
+    "en": "Writable command byte; null omits it."
+  },
+  "link_Link_ReadPacket_len": {
+    "ja": "受信長0～24を書き込む1バイト。0なら省略します。",
+    "en": "Writable length byte, 0..24; null omits it."
+  },
+  "link_Link_ReadPacket_dst": {
+    "ja": "最大24バイトの書き込み先。0なら内容を読み捨てます。",
+    "en": "Writable payload buffer with room for 24 bytes; null discards the payload."
+  },
+  "link_Link_ReadPacket_returns": {
+    "ja": "取り出せれば1、空なら0。空では出力を書き換えません。",
+    "en": "Returns 1 when consumed, 0 when empty; empty reads leave outputs unchanged."
+  },
+  "link_note_invalidinit": {
+    "ja": "設定の妥当性を調べる前に初期化します。失敗しても前の接続設定や未読データは残りません。",
+    "en": "Initialization occurs before validation. A failed call still discards the previous topology and unread data."
+  },
+  "link_Link4_InitHost_purpose": {
+    "ja": "2～4スロットの論理ホストとして初期化し、最初の相手を1にします。",
+    "en": "Initialize a logical host with two to four slots and select peer 1."
+  },
+  "link_Link4_InitHost_slot_count": {
+    "ja": "ホスト自身を含むスロット数2～4。",
+    "en": "Number of slots including the host, 2..4."
+  },
+  "link_Link4_InitHost_returns": {
+    "ja": "設定できれば0、slot_countが範囲外なら4です。",
+    "en": "Returns 0 for valid configuration, 4 for an invalid slot count."
+  },
+  "link_example_four_host": {
+    "ja": "4つのROMをKOKURAのlink4で接続します。ホストは相手1/2/3から161/162/163を受け取り、LAST PEER=3になります。続いて各相手へコマンド65/66/67と7/42/255を送ります。各相手の画面でも内容を確認します。",
+    "en": "Connect all four ROMs with KOKURA’s link4 topology. The host receives 161/162/163 from peers 1/2/3 and shows LAST PEER=3. It then sends commands 65/66/67 with payload 7/42/255; verify those values on each peer’s screen too."
+  },
+  "link_Link4_InitPeer_purpose": {
+    "ja": "指定スロットの外部クロック側として初期化し、相手をホスト0にします。",
+    "en": "Initialize an externally clocked peer and select host slot 0."
+  },
+  "link_Link4_InitPeer_local_slot": {
+    "ja": "自分の番号1～slot_count−1。",
+    "en": "Local slot, 1..slot_count−1."
+  },
+  "link_Link4_InitPeer_slot_count": {
+    "ja": "ホストを含む総数2～4。",
+    "en": "Total slots including the host, 2..4."
+  },
+  "link_Link4_InitPeer_returns": {
+    "ja": "設定できれば0。スロット数や自分の番号が不正なら4です。",
+    "en": "Returns 0 for valid configuration, 4 for an invalid slot count/local slot."
+  },
+  "link_example_four_peer1": {
+    "ja": "4スロットの相手1として、HOST BYTE=17、COMMAND=65、LENGTH=3、PAYLOAD 2=42を確認します。CONSUMED=0は相手0のメールボックスを消費した後の値です。",
+    "en": "As peer 1 of four slots, expect HOST BYTE=17, COMMAND=65, LENGTH=3 and PAYLOAD 2=42. CONSUMED=0 is the host mailbox flag after consumption."
+  },
+  "link_note_notdetect": {
+    "ja": "これらは設定や転送履歴の読み取りです。実物の接続検出、全相手への問い合わせ、転送完了待ちは行いません。",
+    "en": "These are configuration/history getters. They do not detect physical connections, query every peer or wait for transfer completion."
+  },
+  "link_Link4_GetMode_purpose": {
+    "ja": "論理的な接続の役割を取得します。",
+    "en": "Read the configured logical role."
+  },
+  "link_Link4_GetMode_returns": {
+    "ja": "0=未設定、1=ホスト、2=相手です。",
+    "en": "0=unconfigured, 1=host, 2=peer."
+  },
+  "link_Link4_GetLocalSlot_purpose": {
+    "ja": "自機に設定されたスロット番号を取得します。",
+    "en": "Read this machine’s configured slot."
+  },
+  "link_Link4_GetLocalSlot_returns": {
+    "ja": "ホストは0、相手は1～3です。未設定時も0です。",
+    "en": "Host is 0; peers are 1..3. Unconfigured state also returns 0."
+  },
+  "link_Link4_GetSlotCount_purpose": {
+    "ja": "設定された総スロット数を取得します。",
+    "en": "Read the configured total slot count."
+  },
+  "link_Link4_GetSlotCount_returns": {
+    "ja": "有効な設定は2～4、未設定は0です。",
+    "en": "Valid configurations return 2..4; unconfigured returns 0."
+  },
+  "link_Link4_GetSelectedPeer_purpose": {
+    "ja": "次の交換で使う論理的な宛先を取得します。",
+    "en": "Read the currently selected logical destination."
+  },
+  "link_Link4_GetSelectedPeer_returns": {
+    "ja": "ホストでは選択中の相手、相手では0、未設定では255です。",
+    "en": "Host returns its selected peer; a peer returns 0; unconfigured returns 255."
+  },
+  "link_Link4_GetLastRxPeer_purpose": {
+    "ja": "最後に完了したバイトを割り当てた相手番号を取得します。",
+    "en": "Read the peer attributed to the last completed byte."
+  },
+  "link_Link4_GetLastRxPeer_returns": {
+    "ja": "ホストは選択相手、相手は0。まだ受信していなければ255です。",
+    "en": "Host returns the selected peer and a peer returns 0; before reception returns 255."
+  },
+  "link_Link4_GetLastTxPeer_purpose": {
+    "ja": "最後のバイト転送を開始した時点の宛先を取得します。",
+    "en": "Read the destination recorded when the last byte transfer started."
+  },
+  "link_Link4_GetLastTxPeer_returns": {
+    "ja": "記録済みの宛先番号。開始前は255です。",
+    "en": "Returns the recorded destination, or 255 before any start."
+  },
+  "link_Link4_SelectPeer_purpose": {
+    "ja": "未完了の交換がないことを確かめ、次の論理的な宛先を変更します。",
+    "en": "Poll completion and change the logical destination only while idle."
+  },
+  "link_Link4_SelectPeer_peer_slot": {
+    "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
+    "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer."
+  },
+  "link_Link4_SelectPeer_returns": {
+    "ja": "選択できれば0、バイト/パケット/ACKが使用中なら1、未設定や不正な相手なら4です。",
+    "en": "Returns 0 on selection, 1 for busy byte/packet/ACK state, or 4 for an unconfigured/invalid peer."
+  },
+  "link_Link4_BeginTransferTo_purpose": {
+    "ja": "宛先を選んでから1バイトの交換を開始します。",
+    "en": "Select a destination, then start one byte exchange."
+  },
+  "link_Link4_BeginTransferTo_peer_slot": {
+    "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
+    "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer."
+  },
+  "link_Link4_BeginTransferTo_out": {
+    "ja": "送る8ビット値。",
+    "en": "Outgoing eight-bit value."
+  },
+  "link_Link4_BeginTransferTo_returns": {
+    "ja": "選択または開始時の最初のエラー。成功は0です。",
+    "en": "Returns the first selection/start error, or 0 on success."
+  },
+  "link_note_peernopoll": {
+    "ja": "この問い合わせはハードウェアをポーリングせず、不正な相手でもエラーラッチを変更しません。",
+    "en": "This query does not poll hardware; an invalid peer does not change the error latch."
+  },
+  "link_Link4_HasByteFrom_purpose": {
+    "ja": "指定相手の受信リングに未読バイトがあるか調べます。",
+    "en": "Inspect unread data in one peer’s receive ring."
+  },
+  "link_Link4_HasByteFrom_peer_slot": {
+    "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
+    "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer."
+  },
+  "link_Link4_HasByteFrom_returns": {
+    "ja": "データがあれば1、空または不正な相手なら0です。",
+    "en": "Returns 1 for queued data, 0 for empty/invalid peer."
+  },
+  "link_Link4_TryReadByteFrom_purpose": {
+    "ja": "指定相手の受信リングから1バイトを取り出します。",
+    "en": "Pop one byte from a specific peer’s receive ring."
+  },
+  "link_Link4_TryReadByteFrom_peer_slot": {
+    "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
+    "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer."
+  },
+  "link_Link4_TryReadByteFrom_out": {
+    "ja": "受信値を書き込む1バイトの領域。0なら読み捨てます。",
+    "en": "Writable byte destination; null discards the byte."
+  },
+  "link_Link4_TryReadByteFrom_returns": {
+    "ja": "取り出せれば1。空または不正な相手なら0で、outはそのままです。",
+    "en": "Returns 1 on a pop; empty/invalid peer returns 0 and preserves out."
+  },
+  "link_note_priority": {
+    "ja": "自分のスロットは飛ばします。番号の小さい相手に未読が続くと大きい相手より先に返るため、公平な巡回が必要なら相手別の取得を使います。",
+    "en": "Skips the local slot. Continuously queued lower slots take priority; use per-peer reads when round-robin fairness is required."
+  },
+  "link_Link4_TryReadByteAny_purpose": {
+    "ja": "番号の小さい相手から順に調べ、最初に見つかった1バイトを取り出します。",
+    "en": "Scan remote slots in ascending order and pop the first available byte."
+  },
+  "link_Link4_TryReadByteAny_peer_slot": {
+    "ja": "受信元を書き込む1バイト。0なら番号の出力を省略します。",
+    "en": "Writable origin-slot byte; null omits the origin output."
+  },
+  "link_Link4_TryReadByteAny_out": {
+    "ja": "受信値を書き込む1バイトの領域。0なら読み捨てます。",
+    "en": "Writable byte destination; null discards the byte."
+  },
+  "link_Link4_TryReadByteAny_returns": {
+    "ja": "取得できれば1、どこにもなければ0です。",
+    "en": "Returns 1 on receipt, otherwise 0."
+  },
+  "link_note_sendselect": {
+    "ja": "選択に成功してから長さ等を調べるため、内容が不正で予約に失敗しても、宛先だけは変更される場合があります。",
+    "en": "Selection happens before payload validation; a rejected payload can still leave the new destination selected."
+  },
+  "link_Link4_SendPacketTo_purpose": {
+    "ja": "宛先を選択し、その相手へのパケットをコピーして予約します。",
+    "en": "Select a logical peer, copy the packet and schedule its transmission."
+  },
+  "link_Link4_SendPacketTo_peer_slot": {
+    "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
+    "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer."
+  },
+  "link_Link4_SendPacketTo_data": {
+    "ja": "lenバイトを読み取る元。len=0のときだけ0を渡せます。",
+    "en": "Readable source of len bytes; may be null only when len is zero."
+  },
+  "link_Link4_SendPacketTo_len": {
+    "ja": "内容の長さ0～24バイト。",
+    "en": "Payload length in bytes, 0..24."
+  },
+  "link_Link4_SendPacketTo_cmd": {
+    "ja": "受信側アプリが意味を定める8ビットのコマンド。",
+    "en": "Application-defined eight-bit command."
+  },
+  "link_Link4_SendPacketTo_returns": {
+    "ja": "選択または予約時の最初のエラー。受付は0です。",
+    "en": "Returns the first selection/queueing error; 0 means accepted."
+  },
+  "link_note_oneroute": {
+    "ja": "全スロットを順番に選ぶ処理は含まれません。相手を切り替えるのは、送受信が完了して選択可能になってからです。",
+    "en": "Does not rotate across all slots. Change peers only after the exchange has finished and selection is permitted."
+  },
+  "link_Link4_PollPacket_purpose": {
+    "ja": "共通のパケット処理を、現在の接続先に対して1回進めます。",
+    "en": "Advance the shared packet engine once for the currently selected peer."
+  },
+  "link_Link4_PollPacket_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "link_Link4_HasPacketFrom_purpose": {
+    "ja": "指定相手の完成済みパケットメールボックスを調べます。",
+    "en": "Inspect the completed-packet mailbox for one remote slot."
+  },
+  "link_Link4_HasPacketFrom_peer_slot": {
+    "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
+    "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer."
+  },
+  "link_Link4_HasPacketFrom_returns": {
+    "ja": "未読があれば1、空または不正な相手なら0です。",
+    "en": "Returns 1 for an unread packet, 0 for empty/invalid peer."
+  },
+  "link_note_peermail": {
+    "ja": "通常メールボックスがこの相手のパケットを指している場合だけ、通常側も消します。他の相手の未読パケットは保持します。",
+    "en": "Clears the shared mailbox only when it refers to this same peer’s packet. Unread packets from other peers remain available."
+  },
+  "link_Link4_ReadPacketFrom_purpose": {
+    "ja": "指定相手のパケットをコピーし、そのメールボックスを消費します。",
+    "en": "Copy a packet from a specific peer and consume its mailbox."
+  },
+  "link_Link4_ReadPacketFrom_peer_slot": {
+    "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
+    "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer."
+  },
+  "link_Link4_ReadPacketFrom_cmd": {
+    "ja": "受信コマンドを書き込む1バイト。0なら省略します。",
+    "en": "Writable command byte; null omits it."
+  },
+  "link_Link4_ReadPacketFrom_len": {
+    "ja": "受信長0～24を書き込む1バイト。0なら省略します。",
+    "en": "Writable length byte, 0..24; null omits it."
+  },
+  "link_Link4_ReadPacketFrom_dst": {
+    "ja": "最大24バイトの書き込み先。0なら内容を読み捨てます。",
+    "en": "Writable payload buffer with room for 24 bytes; null discards the payload."
+  },
+  "link_Link4_ReadPacketFrom_returns": {
+    "ja": "取得できれば1、空または不正な相手なら0です。",
+    "en": "Returns 1 when consumed, 0 for empty/invalid peer."
+  },
+  "link_example_deadline": {
+    "ja": "相手を接続せずにパケットを送ります。内部クロックのバイト転送自体は完了してもACKが来ないため、再試行後にNO ACK ERROR=5になります。Cancel後はCANCEL BUSY=0です。",
+    "en": "Send with no peer attached. Byte transfers complete under internal clocks, but no ACK arrives; after retries, NO ACK ERROR=5. Cancel leaves CANCEL BUSY=0."
+  },
+  "link_note_launch": {
+    "ja": "コマンドはkitaqgb・kokura・kitaq-docsを同じ親フォルダーに置き、その親でPowerShellを開いて実行します。接続する全ROMをビルドしてからまとめて起動します。Link4では出力されたシンボル等のメタデータをROMの隣に残してください。初代GBで確認する場合は全コマンドの--cgb=cgbを--cgb=dmg、--hardware cgbを--hardware dmgへ変更します。",
+    "en": "Run these PowerShell commands from the parent containing kitaqgb, kokura and kitaq-docs. Build every participating ROM before launching the linked session. For Link4, retain the generated symbol metadata beside the ROMs. For DMG runs, change --cgb=cgb to --cgb=dmg and --hardware cgb to --hardware dmg throughout."
+  },
+  "link_module": {
+    "ja": "このライブラリは、バイト交換、最大24バイトのパケット、接続先別キューの3層で通信を扱います。まずBYTE MASTER/SLAVEを動かし、次にPACKET、最後にLINK4へ進むと、クロックと受信待ちの関係を確認できます。ハードウェアレジスタ定義、link.c、link_packet.cは同じプログラムに1回ずつ組み込みます。サンプルのgb_link_example.hがこの順序をまとめています。",
+    "en": "The library provides three layers: byte exchanges, packets of up to 24 bytes, and peer-specific queues. Start with BYTE MASTER/SLAVE, then PACKET, then LINK4 to learn clock ownership and receive readiness. Include the hardware-register unit, link.c and link_packet.c exactly once in a program; gb_link_example.h supplies that order."
+  }
+}

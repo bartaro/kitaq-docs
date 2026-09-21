@@ -4867,7 +4867,7 @@
       "signature": "void __stackcall Link_SetUseInterrupt(u8 on);",
       "path": "kitaqgb/lib/link.h",
       "line": 50,
-      "comment": "Enable or disable serial IRQ delivery and clear its pending flag. Enabling\ndoes not install the handler or globally enable interrupts.",
+      "comment": "Enable or disable serial IRQ delivery and clear its pending flag. Enabling\ndoes not install the handler. Leaving its outer critical section enables CPU interrupts.",
       "body": "",
       "kind": "function",
       "module": "link",
@@ -4878,7 +4878,7 @@
         "signature": "void __stackcall Link_SetUseInterrupt(u8 on);",
         "path": "kitaqgb/lib/link.c",
         "line": 322,
-        "comment": "Enable or disable serial IRQ delivery and clear its pending flag. Enabling\ndoes not install the handler or globally enable interrupts.",
+        "comment": "Enable or disable serial IRQ delivery and clear its pending flag. Enabling\ndoes not install the handler. Leaving its outer critical section enables CPU interrupts.",
         "body": "void __stackcall Link_SetUseInterrupt(u8 on) {\n    if (on != 0) {\n        Link_UseInterrupt = 1;\n        Link_SetSerialInterruptEnabled(1);\n    } else {\n        Link_UseInterrupt = 0;\n        Link_SetSerialInterruptEnabled(0);\n    }\n}",
         "kind": "function"
       },
@@ -5264,7 +5264,7 @@
         "path": "kitaqgb/lib/link_packet.c",
         "line": 400,
         "comment": "Drain received bytes, advance one outgoing exchange and update the retry\ntimer. Timeout ticks count calls without progress, not hardware frames; call\nwith a controlled cadence and avoid mixing raw reads with packet consumption.",
-        "body": "void Link_PollPacket() {\n    u8 progress = 0;\n    u8 value = 0;\n\n    Link_Poll();\n\n    if (Link_PacketState == LINK_PKT_STATE_ERROR) {\n        Link_PacketGoIdle();\n        return;\n    }\n\n    while (Link_TryReadByte(&value) != 0) {\n        if (Link_PacketConsumeByte(value) != 0) progress = 1;\n    }\n\n    if (Link_PacketState == LINK_PKT_STATE_SEND_ACK) {\n        if (Link_PacketStartAckTransfer() != 0) progress = 1;\n    } else if (Link_PacketIsSendState() != 0) {\n        if (Link_PacketStartNextTransfer() != 0) progress = 1;\n    } else {\n        if (Link_PacketStartReceiveTransfer() != 0) progress = 1;\n    }\n\n    if (Link_PacketState == LINK_PKT_STATE_IDLE) {\n        Link_PacketTimer = 0;\n        return;\n    }\n\n    if (progress != 0) {\n        Link_PacketTimer = LINK_PKT_TIMEOUT_TICKS;\n        return;\n    }\n\n    if (Link_PacketTimer != 0) Link_PacketTimer--;\n    if (Link_PacketTimer == 0) Link_PacketHandleTimeout();\n}",
+        "body": "void Link_PollPacket() {\n    u8 progress = 0;\n    u8 previous_state;\n    u8 value = 0;\n\n    Link_Poll();\n\n    if (Link_PacketState == LINK_PKT_STATE_ERROR) {\n        Link_PacketGoIdle();\n        return;\n    }\n\n    while (Link_TryReadByte(&value) != 0) {\n        if (Link_PacketConsumeByte(value) != 0) progress = 1;\n    }\n\n    if (Link_PacketState == LINK_PKT_STATE_SEND_ACK) {\n        if (Link_PacketStartAckTransfer() != 0) progress = 1;\n    } else if (Link_PacketIsSendState() != 0) {\n        // Clocking an ACK is not protocol progress: a missing peer must time out.\n        previous_state = Link_PacketState;\n        if (Link_PacketStartNextTransfer() != 0 && previous_state != LINK_PKT_STATE_WAIT_ACK) progress = 1;\n    } else {\n        if (Link_PacketStartReceiveTransfer() != 0) progress = 1;\n    }\n\n    if (Link_PacketState == LINK_PKT_STATE_IDLE) {\n        Link_PacketTimer = 0;\n        return;\n    }\n\n    if (progress != 0) {\n        Link_PacketTimer = LINK_PKT_TIMEOUT_TICKS;\n        return;\n    }\n\n    if (Link_PacketTimer != 0) Link_PacketTimer--;\n    if (Link_PacketTimer == 0) Link_PacketHandleTimeout();\n}",
         "kind": "function"
       },
       "availability": "implementation",
@@ -5291,7 +5291,7 @@
         "args": "",
         "signature": "u8 Link_HasPacket();",
         "path": "kitaqgb/lib/link_packet.c",
-        "line": 438,
+        "line": 441,
         "comment": "Inspect the shared completed-packet flag without advancing the protocol.",
         "body": "u8 Link_HasPacket() {\n    return Link_ReceivedPacketReady;\n}",
         "kind": "function"
@@ -5317,7 +5317,7 @@
         "args": "u8 *cmd, u8 *len, u8 *dst",
         "signature": "u8 __stackcall Link_ReadPacket(u8 *cmd, u8 *len, u8 *dst);",
         "path": "kitaqgb/lib/link_packet.c",
-        "line": 445,
+        "line": 448,
         "comment": "Consume the shared packet mailbox and its matching peer flag. Any output\nmay be null; a nonnull destination needs room for the received payload because\nthere is no destination-capacity argument.",
         "body": "u8 __stackcall Link_ReadPacket(u8 *cmd, u8 *len, u8 *dst) {\n    u8 i;\n    u8 peer_slot = Link4_LastPacketPeer;\n\n    if (Link_ReceivedPacketReady == 0) return 0;\n\n    if (cmd != 0) *cmd = Link_ReceivedPacketCmd;\n    if (len != 0) *len = Link_ReceivedPacketLen;\n\n    if (dst != 0) {\n        for (i = 0; i < Link_ReceivedPacketLen; ++i) {\n            dst[(__safe_index u8)i] = Link_ReceivedPacketBuf[(__safe_index u8)i];\n        }\n    }\n\n    Link_ReceivedPacketReady = 0;\n    if (Link4_IsValidRemoteSlotInternal(peer_slot) != 0) {\n        Link4_ReceivedPacketReady[(__safe_index u8)peer_slot] = 0;\n    }\n    Link4_LastPacketPeer = LINK4_INVALID_SLOT;\n    return 1;\n}",
         "kind": "function"
@@ -5684,7 +5684,7 @@
         "args": "u8 peer_slot, const u8 *data, u8 len, u8 cmd",
         "signature": "u8 __stackcall Link4_SendPacketTo(u8 peer_slot, const u8 *data, u8 len, u8 cmd);",
         "path": "kitaqgb/lib/link_packet.c",
-        "line": 469,
+        "line": 472,
         "comment": "Select a logical peer, then copy and schedule a packet; return the first error.",
         "body": "u8 __stackcall Link4_SendPacketTo(u8 peer_slot, const u8 *data, u8 len, u8 cmd) {\n    u8 err = Link4_SelectPeer(peer_slot);\n    if (err != LINK_ERR_NONE) return err;\n    return Link_SendPacket(data, len, cmd);\n}",
         "kind": "function"
@@ -5710,7 +5710,7 @@
         "args": "",
         "signature": "void Link4_PollPacket();",
         "path": "kitaqgb/lib/link_packet.c",
-        "line": 476,
+        "line": 479,
         "comment": "Advance the shared packet engine; this does not poll every logical peer in turn.",
         "body": "void Link4_PollPacket() {\n    Link_PollPacket();\n}",
         "kind": "function"
@@ -5736,7 +5736,7 @@
         "args": "u8 peer_slot",
         "signature": "u8 __stackcall Link4_HasPacketFrom(u8 peer_slot);",
         "path": "kitaqgb/lib/link_packet.c",
-        "line": 481,
+        "line": 484,
         "comment": "Inspect the one-packet mailbox for a valid remote slot without consuming it.",
         "body": "u8 __stackcall Link4_HasPacketFrom(u8 peer_slot) {\n    return Link4_PacketPeerReady(peer_slot);\n}",
         "kind": "function"
@@ -5762,7 +5762,7 @@
         "args": "u8 peer_slot, u8 *cmd, u8 *len, u8 *dst",
         "signature": "u8 __stackcall Link4_ReadPacketFrom(u8 peer_slot, u8 *cmd, u8 *len, u8 *dst);",
         "path": "kitaqgb/lib/link_packet.c",
-        "line": 488,
+        "line": 491,
         "comment": "Consume a peer mailbox, copying to optional outputs. A nonnull destination\nneeds room for the entire payload. Clear the shared mailbox only when it\nrefers to this same peer.",
         "body": "u8 __stackcall Link4_ReadPacketFrom(u8 peer_slot, u8 *cmd, u8 *len, u8 *dst) {\n    u8 i;\n    u8 offset;\n\n    if (Link4_PacketPeerReady(peer_slot) == 0) return 0;\n\n    if (cmd != 0) *cmd = Link4_ReceivedPacketCmd[(__safe_index u8)peer_slot];\n    if (len != 0) *len = Link4_ReceivedPacketLen[(__safe_index u8)peer_slot];\n\n    if (dst != 0) {\n        for (i = 0; i < Link4_ReceivedPacketLen[(__safe_index u8)peer_slot]; ++i) {\n            offset = Link4_PacketOffset(peer_slot, i);\n            dst[(__safe_index u8)i] = Link4_ReceivedPacketBuf[(__safe_index u8)offset];\n        }\n    }\n\n    Link4_ReceivedPacketReady[(__safe_index u8)peer_slot] = 0;\n    if (Link4_LastPacketPeer == peer_slot) {\n        Link_ReceivedPacketReady = 0;\n        Link4_LastPacketPeer = LINK4_INVALID_SLOT;\n    }\n    return 1;\n}",
         "kind": "function"

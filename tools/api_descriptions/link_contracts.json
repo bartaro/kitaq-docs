@@ -1,0 +1,1173 @@
+{
+  "gb:Link_InitCommon": {
+    "review": "link-source-20260917",
+    "record_sha256": "56d5bcffcbaa60252cfe738555df6af6287355a298dd7863871fb71e9a926feb",
+    "purpose": [
+      "link_Link_InitCommon_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_InitCommon_returns"
+    ],
+    "notes": [
+      "link_note_shared",
+      "link_note_reset",
+      "link_note_critical",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_control.c",
+      "code": "Link_InitCommon();result[0]=Link_IsBusy();result[1]=Link_HasByte();result[2]=Link_LastError();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_control.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_control.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe .\\out\\link_control.gb --hardware cgb --run-frames 330 --png .\\out\\control.png",
+      "expected": [
+        "link_example_control"
+      ]
+    }
+  },
+  "gb:Link_InitMaster": {
+    "review": "link-source-20260917",
+    "record_sha256": "eedc5377c664fccf0e644b17e6338dec9e30676e620992b749de3758d4e57e48",
+    "purpose": [
+      "link_Link_InitMaster_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_InitMaster_returns"
+    ],
+    "notes": [
+      "link_note_shared",
+      "link_note_reset",
+      "link_note_critical",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_raw_master.c",
+      "code": "Link_InitMaster();Link_SetUseInterrupt(0);Link_SetFastClock(0);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=raw_master|slot=0|rom=.\\out\\link_raw_master.gb|save_state=.\\out\\raw_master.kqs\" --link-session \"name=raw_slave|slot=1|rom=.\\out\\link_raw_slave.gb|save_state=.\\out\\raw_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_master.gb --hardware cgb --load-state .\\out\\raw_master.kqs --run-frames 2 --png .\\out\\raw_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_slave.gb --hardware cgb --load-state .\\out\\raw_slave.kqs --run-frames 2 --png .\\out\\raw_slave.png",
+      "expected": [
+        "link_example_raw_master"
+      ]
+    }
+  },
+  "gb:Link_InitSlave": {
+    "review": "link-source-20260917",
+    "record_sha256": "53e3952ed6112b9df725c929a8f9f180a5da0239c2b564eb7236f54e11dd267e",
+    "purpose": [
+      "link_Link_InitSlave_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_InitSlave_returns"
+    ],
+    "notes": [
+      "link_note_shared",
+      "link_note_reset",
+      "link_note_critical",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_raw_slave.c",
+      "code": "Link_InitSlave();result[0]=Link_BeginTransfer(99);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=raw_master|slot=0|rom=.\\out\\link_raw_master.gb|save_state=.\\out\\raw_master.kqs\" --link-session \"name=raw_slave|slot=1|rom=.\\out\\link_raw_slave.gb|save_state=.\\out\\raw_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_master.gb --hardware cgb --load-state .\\out\\raw_master.kqs --run-frames 2 --png .\\out\\raw_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_slave.gb --hardware cgb --load-state .\\out\\raw_slave.kqs --run-frames 2 --png .\\out\\raw_slave.png",
+      "expected": [
+        "link_example_raw_slave"
+      ]
+    }
+  },
+  "gb:Link_SetUseInterrupt": {
+    "review": "link-source-20260917",
+    "record_sha256": "e06c54b7db3ef0655a883d00a0e75287a7b65a0e597039d2d4c7701b680e6404",
+    "purpose": [
+      "link_Link_SetUseInterrupt_purpose"
+    ],
+    "args": [
+      [
+        "on",
+        [
+          "link_Link_SetUseInterrupt_on"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link_SetUseInterrupt_returns"
+    ],
+    "notes": [
+      "link_note_critical",
+      "link_note_irq",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_control.c",
+      "code": "Link_SetUseInterrupt(1);result[3]=(IE_REG&8)!=0;Link_SetUseInterrupt(0);result[4]=(IE_REG&8)!=0;",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_control.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_control.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe .\\out\\link_control.gb --hardware cgb --run-frames 330 --png .\\out\\control.png",
+      "expected": [
+        "link_example_control"
+      ]
+    }
+  },
+  "gb:Link_SetFastClock": {
+    "review": "link-source-20260917",
+    "record_sha256": "613249b08a47615775dc8a6c0af88159ab63ad3dc53a1b5a7a4063923a03790e",
+    "purpose": [
+      "link_Link_SetFastClock_purpose"
+    ],
+    "args": [
+      [
+        "on",
+        [
+          "link_Link_SetFastClock_on"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link_SetFastClock_returns"
+    ],
+    "notes": [
+      "link_note_shared",
+      "link_note_fast",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_raw_master.c",
+      "code": "lesson_delay(12);Link_SetFastClock(__cgb_is_cgb());result[5]=Link_BeginTransfer(0);value=77;",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=raw_master|slot=0|rom=.\\out\\link_raw_master.gb|save_state=.\\out\\raw_master.kqs\" --link-session \"name=raw_slave|slot=1|rom=.\\out\\link_raw_slave.gb|save_state=.\\out\\raw_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_master.gb --hardware cgb --load-state .\\out\\raw_master.kqs --run-frames 2 --png .\\out\\raw_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_slave.gb --hardware cgb --load-state .\\out\\raw_slave.kqs --run-frames 2 --png .\\out\\raw_slave.png",
+      "expected": [
+        "link_example_raw_master"
+      ]
+    }
+  },
+  "gb:Link_IsBusy": {
+    "review": "link-source-20260917",
+    "record_sha256": "25be5868464b69de1c90c1a43af95f4772353213285933a655b97b9fb9f328ea",
+    "purpose": [
+      "link_Link_IsBusy_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_IsBusy_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_busyside",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_raw_master.c",
+      "code": "result[3]=Link_IsBusy();result[4]=Link_HasByte();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=raw_master|slot=0|rom=.\\out\\link_raw_master.gb|save_state=.\\out\\raw_master.kqs\" --link-session \"name=raw_slave|slot=1|rom=.\\out\\link_raw_slave.gb|save_state=.\\out\\raw_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_master.gb --hardware cgb --load-state .\\out\\raw_master.kqs --run-frames 2 --png .\\out\\raw_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_slave.gb --hardware cgb --load-state .\\out\\raw_slave.kqs --run-frames 2 --png .\\out\\raw_slave.png",
+      "expected": [
+        "link_example_raw_master"
+      ]
+    }
+  },
+  "gb:Link_HasByte": {
+    "review": "link-source-20260917",
+    "record_sha256": "5ddf23b398aa60c8e4148be90852dffca810c9f2dfcf464e0d364b0ac9b13725",
+    "purpose": [
+      "link_Link_HasByte_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_HasByte_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_nopoll",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_raw_slave.c",
+      "code": "result[1]=Link_HasByte();value=77;result[2]=Link_TryReadByte(&value);result[3]=value;",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=raw_master|slot=0|rom=.\\out\\link_raw_master.gb|save_state=.\\out\\raw_master.kqs\" --link-session \"name=raw_slave|slot=1|rom=.\\out\\link_raw_slave.gb|save_state=.\\out\\raw_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_master.gb --hardware cgb --load-state .\\out\\raw_master.kqs --run-frames 2 --png .\\out\\raw_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_slave.gb --hardware cgb --load-state .\\out\\raw_slave.kqs --run-frames 2 --png .\\out\\raw_slave.png",
+      "expected": [
+        "link_example_raw_slave"
+      ]
+    }
+  },
+  "gb:Link_LastError": {
+    "review": "link-source-20260917",
+    "record_sha256": "68b6e0221b0ff019d0b4d61500aca9ce43c7a7d7af5f4e47a012f6c7ecc35136",
+    "purpose": [
+      "link_Link_LastError_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_LastError_returns"
+    ],
+    "notes": [
+      "link_note_codes",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_packet_master.c",
+      "code": "result[2]=Link_LastError();Link_ClearError();result[3]=Link_LastError();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=packet_master|slot=0|rom=.\\out\\link_packet_master.gb|save_state=.\\out\\packet_master.kqs\" --link-session \"name=packet_slave|slot=1|rom=.\\out\\link_packet_slave.gb|save_state=.\\out\\packet_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_master.gb --hardware cgb --load-state .\\out\\packet_master.kqs --run-frames 2 --png .\\out\\packet_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_slave.gb --hardware cgb --load-state .\\out\\packet_slave.kqs --run-frames 2 --png .\\out\\packet_slave.png",
+      "expected": [
+        "link_example_packet_master"
+      ]
+    }
+  },
+  "gb:Link_ClearError": {
+    "review": "link-source-20260917",
+    "record_sha256": "07e91108f8b7fa445fd21bfdfa87aeafd2d73ca787369f5a608423fd79592606",
+    "purpose": [
+      "link_Link_ClearError_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_ClearError_returns"
+    ],
+    "notes": [
+      "link_note_codes",
+      "link_note_clear",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_control.c",
+      "code": "Link_ClearError();result[8]=Link_LastError();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_control.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_control.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe .\\out\\link_control.gb --hardware cgb --run-frames 330 --png .\\out\\control.png",
+      "expected": [
+        "link_example_control"
+      ]
+    }
+  },
+  "gb:Link_BeginTransfer": {
+    "review": "link-source-20260917",
+    "record_sha256": "77940f399a208ae352dc01a260da93322d1628a6f5a0aa64340bb6b8cb1144a5",
+    "purpose": [
+      "link_Link_BeginTransfer_purpose"
+    ],
+    "args": [
+      [
+        "out",
+        [
+          "link_Link_BeginTransfer_out"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link_BeginTransfer_returns"
+    ],
+    "notes": [
+      "link_note_shared",
+      "link_note_codes",
+      "link_note_start",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_raw_master.c",
+      "code": "lesson_delay(12);result[0]=Link_BeginTransfer(42);value=0;result[1]=Link_WaitByte(8,&value);result[2]=value;",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=raw_master|slot=0|rom=.\\out\\link_raw_master.gb|save_state=.\\out\\raw_master.kqs\" --link-session \"name=raw_slave|slot=1|rom=.\\out\\link_raw_slave.gb|save_state=.\\out\\raw_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_master.gb --hardware cgb --load-state .\\out\\raw_master.kqs --run-frames 2 --png .\\out\\raw_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_slave.gb --hardware cgb --load-state .\\out\\raw_slave.kqs --run-frames 2 --png .\\out\\raw_slave.png",
+      "expected": [
+        "link_example_raw_master"
+      ]
+    }
+  },
+  "gb:Link_Poll": {
+    "review": "link-source-20260917",
+    "record_sha256": "0cd747a8b7edab76455737a027b27af3daa090678e4bfdc0f98271e520696ea9",
+    "purpose": [
+      "link_Link_Poll_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_Poll_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_poll",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_raw_slave.c",
+      "code": "for(i=0;i<24;i++){Link_Poll();if(Link_HasByte())break;m_wait();}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=raw_master|slot=0|rom=.\\out\\link_raw_master.gb|save_state=.\\out\\raw_master.kqs\" --link-session \"name=raw_slave|slot=1|rom=.\\out\\link_raw_slave.gb|save_state=.\\out\\raw_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_master.gb --hardware cgb --load-state .\\out\\raw_master.kqs --run-frames 2 --png .\\out\\raw_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_slave.gb --hardware cgb --load-state .\\out\\raw_slave.kqs --run-frames 2 --png .\\out\\raw_slave.png",
+      "expected": [
+        "link_example_raw_slave"
+      ]
+    }
+  },
+  "gb:Link_Cancel": {
+    "review": "link-source-20260917",
+    "record_sha256": "e545b3a67125a99e1048b17f974b7ec4e436f080746489e2d7e20b229d6ac6a8",
+    "purpose": [
+      "link_Link_Cancel_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_Cancel_returns"
+    ],
+    "notes": [
+      "link_note_critical",
+      "link_note_cancel",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_control.c",
+      "code": "Link_Cancel();result[12]=Link_IsBusy();result[13]=(SC&128)!=0;Link_ClearError();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_control.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_control.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe .\\out\\link_control.gb --hardware cgb --run-frames 330 --png .\\out\\control.png",
+      "expected": [
+        "link_example_control"
+      ]
+    }
+  },
+  "gb:Link_OnSerialIRQ": {
+    "review": "link-source-20260917",
+    "record_sha256": "fd6726395952ee1a25d85390c70c96b71588dc626ce3e107c95ac36443ce0f6d",
+    "purpose": [
+      "link_Link_OnSerialIRQ_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_OnSerialIRQ_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_critical",
+      "link_note_dispatch",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_control.c",
+      "code": "lesson_delay(2);result[14]=(IF_REG&8)!=0;Link_OnSerialIRQ();result[15]=Link_HasByte();result[16]=Link_ReadByte();result[17]=(IF_REG&8)!=0;",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_control.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_control.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe .\\out\\link_control.gb --hardware cgb --run-frames 330 --png .\\out\\control.png",
+      "expected": [
+        "link_example_control"
+      ]
+    }
+  },
+  "gb:Link_TryReadByte": {
+    "review": "link-source-20260917",
+    "record_sha256": "b8a272c227a69d4abc0efb17b23c8d19a288153a099af723396f7d19f5bb6d63",
+    "purpose": [
+      "link_Link_TryReadByte_purpose"
+    ],
+    "args": [
+      [
+        "out",
+        [
+          "link_Link_TryReadByte_out"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link_TryReadByte_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_critical",
+      "link_note_duplicate",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_raw_slave.c",
+      "code": "result[1]=Link_HasByte();value=77;result[2]=Link_TryReadByte(&value);result[3]=value;",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=raw_master|slot=0|rom=.\\out\\link_raw_master.gb|save_state=.\\out\\raw_master.kqs\" --link-session \"name=raw_slave|slot=1|rom=.\\out\\link_raw_slave.gb|save_state=.\\out\\raw_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_master.gb --hardware cgb --load-state .\\out\\raw_master.kqs --run-frames 2 --png .\\out\\raw_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_slave.gb --hardware cgb --load-state .\\out\\raw_slave.kqs --run-frames 2 --png .\\out\\raw_slave.png",
+      "expected": [
+        "link_example_raw_slave"
+      ]
+    }
+  },
+  "gb:Link_ReadByte": {
+    "review": "link-source-20260917",
+    "record_sha256": "02147f46e04ae61bd687a7e3f36e49b5ccf3ee60999ca8b32a4ff7b2efa87f73",
+    "purpose": [
+      "link_Link_ReadByte_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_ReadByte_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_critical",
+      "link_note_zero",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_raw_slave.c",
+      "code": "result[6]=Link_HasByte();result[7]=Link_ReadByte();result[8]=Link_ReadByte();result[9]=Link_LastError();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_raw_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_raw_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=raw_master|slot=0|rom=.\\out\\link_raw_master.gb|save_state=.\\out\\raw_master.kqs\" --link-session \"name=raw_slave|slot=1|rom=.\\out\\link_raw_slave.gb|save_state=.\\out\\raw_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_master.gb --hardware cgb --load-state .\\out\\raw_master.kqs --run-frames 2 --png .\\out\\raw_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_raw_slave.gb --hardware cgb --load-state .\\out\\raw_slave.kqs --run-frames 2 --png .\\out\\raw_slave.png",
+      "expected": [
+        "link_example_raw_slave"
+      ]
+    }
+  },
+  "gb:Link_WaitByte": {
+    "review": "link-source-20260917",
+    "record_sha256": "1b7da3ddc54bedaa4aa20e4b669eb0f3dccec8fce5630414b82ecc4fdb652072",
+    "purpose": [
+      "link_Link_WaitByte_purpose"
+    ],
+    "args": [
+      [
+        "timeout_frames",
+        [
+          "link_Link_WaitByte_timeout_frames"
+        ]
+      ],
+      [
+        "out",
+        [
+          "link_Link_WaitByte_out"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link_WaitByte_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_wait",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_control.c",
+      "code": "value=77;result[9]=Link_WaitByte(2,&value);result[10]=value;result[11]=Link_LastError();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_control.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_control.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe .\\out\\link_control.gb --hardware cgb --run-frames 330 --png .\\out\\control.png",
+      "expected": [
+        "link_example_control"
+      ]
+    }
+  },
+  "gb:Link_SendPacket": {
+    "review": "link-source-20260917",
+    "record_sha256": "bda6e1bf0e00614f13a793acc8fc7a09eb46106246ff1511c39e64ab20e48743",
+    "purpose": [
+      "link_Link_SendPacket_purpose"
+    ],
+    "args": [
+      [
+        "data",
+        [
+          "link_Link_SendPacket_data"
+        ]
+      ],
+      [
+        "len",
+        [
+          "link_Link_SendPacket_len"
+        ]
+      ],
+      [
+        "cmd",
+        [
+          "link_Link_SendPacket_cmd"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link_SendPacket_returns"
+    ],
+    "notes": [
+      "link_note_codes",
+      "link_note_packet",
+      "link_note_polling",
+      "link_note_accepted",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_packet_master.c",
+      "code": "result[0]=Link_SendPacket(data,3,0x31);data[1]=0;result[1]=Link_SendPacket(data,3,0x32);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=packet_master|slot=0|rom=.\\out\\link_packet_master.gb|save_state=.\\out\\packet_master.kqs\" --link-session \"name=packet_slave|slot=1|rom=.\\out\\link_packet_slave.gb|save_state=.\\out\\packet_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_master.gb --hardware cgb --load-state .\\out\\packet_master.kqs --run-frames 2 --png .\\out\\packet_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_slave.gb --hardware cgb --load-state .\\out\\packet_slave.kqs --run-frames 2 --png .\\out\\packet_slave.png",
+      "expected": [
+        "link_example_packet_master"
+      ]
+    }
+  },
+  "gb:Link_PollPacket": {
+    "review": "link-source-20260917",
+    "record_sha256": "85cb03aafacad03f44364d5609a710c4fe513674842ee7a01bb256ef2605141a",
+    "purpose": [
+      "link_Link_PollPacket_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_PollPacket_returns"
+    ],
+    "notes": [
+      "link_note_packet",
+      "link_note_polling",
+      "link_note_nomix",
+      "link_note_duplicate",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_packet_slave.c",
+      "code": "Link_InitSlave();for(i=0;i<120;i++){Link_PollPacket();m_wait();}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=packet_master|slot=0|rom=.\\out\\link_packet_master.gb|save_state=.\\out\\packet_master.kqs\" --link-session \"name=packet_slave|slot=1|rom=.\\out\\link_packet_slave.gb|save_state=.\\out\\packet_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_master.gb --hardware cgb --load-state .\\out\\packet_master.kqs --run-frames 2 --png .\\out\\packet_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_slave.gb --hardware cgb --load-state .\\out\\packet_slave.kqs --run-frames 2 --png .\\out\\packet_slave.png",
+      "expected": [
+        "link_example_packet_slave"
+      ],
+      "additional": [
+        {
+          "program": "samples/api-examples/gb/link_deadline.c",
+          "code": "Link_InitMaster();result[0]=Link_SendPacket(0,0,7);\n// An absent peer cannot acknowledge the packet, despite completed FF exchanges.\nfor(ticks=0;ticks<300;ticks++){Link_PollPacket();m_wait();}\nresult[1]=Link_LastError();Link_Cancel();result[2]=Link_IsBusy();Link_ClearError();result[3]=Link_LastError();",
+          "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_deadline.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_deadline.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe .\\out\\link_deadline.gb --hardware cgb --run-frames 330 --png .\\out\\deadline.png",
+          "expected": [
+            "link_example_deadline"
+          ]
+        }
+      ]
+    }
+  },
+  "gb:Link_HasPacket": {
+    "review": "link-source-20260917",
+    "record_sha256": "73db6db8c39828d93435ab8ae4d1ac59e676319bd826c8c46781dc529423a4ea",
+    "purpose": [
+      "link_Link_HasPacket_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link_HasPacket_returns"
+    ],
+    "notes": [
+      "link_note_packet",
+      "link_note_packetflag",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_packet_slave.c",
+      "code": "result[0]=Link_HasPacket();cmd=0;len=0;result[1]=Link_ReadPacket(&cmd,&len,data);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=packet_master|slot=0|rom=.\\out\\link_packet_master.gb|save_state=.\\out\\packet_master.kqs\" --link-session \"name=packet_slave|slot=1|rom=.\\out\\link_packet_slave.gb|save_state=.\\out\\packet_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_master.gb --hardware cgb --load-state .\\out\\packet_master.kqs --run-frames 2 --png .\\out\\packet_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_slave.gb --hardware cgb --load-state .\\out\\packet_slave.kqs --run-frames 2 --png .\\out\\packet_slave.png",
+      "expected": [
+        "link_example_packet_slave"
+      ]
+    }
+  },
+  "gb:Link_ReadPacket": {
+    "review": "link-source-20260917",
+    "record_sha256": "9b6964f23234337b1982b292d0d563b5301743f57eed85251135d54b5067d124",
+    "purpose": [
+      "link_Link_ReadPacket_purpose"
+    ],
+    "args": [
+      [
+        "cmd",
+        [
+          "link_Link_ReadPacket_cmd"
+        ]
+      ],
+      [
+        "len",
+        [
+          "link_Link_ReadPacket_len"
+        ]
+      ],
+      [
+        "dst",
+        [
+          "link_Link_ReadPacket_dst"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link_ReadPacket_returns"
+    ],
+    "notes": [
+      "link_note_buffer",
+      "link_note_sharedmail",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_packet_slave.c",
+      "code": "result[0]=Link_HasPacket();cmd=0;len=0;result[1]=Link_ReadPacket(&cmd,&len,data);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_master.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_master.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_packet_slave.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_packet_slave.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology pair --run-frames 360 --link-session \"name=packet_master|slot=0|rom=.\\out\\link_packet_master.gb|save_state=.\\out\\packet_master.kqs\" --link-session \"name=packet_slave|slot=1|rom=.\\out\\link_packet_slave.gb|save_state=.\\out\\packet_slave.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_master.gb --hardware cgb --load-state .\\out\\packet_master.kqs --run-frames 2 --png .\\out\\packet_master.png\n.\\kokura\\kokura-cli.exe .\\out\\link_packet_slave.gb --hardware cgb --load-state .\\out\\packet_slave.kqs --run-frames 2 --png .\\out\\packet_slave.png",
+      "expected": [
+        "link_example_packet_slave"
+      ]
+    }
+  },
+  "gb:Link4_InitHost": {
+    "review": "link-source-20260917",
+    "record_sha256": "b71b830d1456995ec18d41ff525f73de7981e1a82eb48a9fd147c0eb3a8874a1",
+    "purpose": [
+      "link_Link4_InitHost_purpose"
+    ],
+    "args": [
+      [
+        "slot_count",
+        [
+          "link_Link4_InitHost_slot_count"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_InitHost_returns"
+    ],
+    "notes": [
+      "link_note_reset",
+      "link_note_logical",
+      "link_note_critical",
+      "link_note_invalidinit",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[0]=Link4_InitHost(4);result[1]=Link4_GetMode();result[2]=Link4_GetLocalSlot();result[3]=Link4_GetSlotCount();result[4]=Link4_GetSelectedPeer();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_InitPeer": {
+    "review": "link-source-20260917",
+    "record_sha256": "631a9b7ca392f243c4c2a9c3c2f421f5280c011431232930b67c6c7ad83b16ca",
+    "purpose": [
+      "link_Link4_InitPeer_purpose"
+    ],
+    "args": [
+      [
+        "local_slot",
+        [
+          "link_Link4_InitPeer_local_slot"
+        ]
+      ],
+      [
+        "slot_count",
+        [
+          "link_Link4_InitPeer_slot_count"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_InitPeer_returns"
+    ],
+    "notes": [
+      "link_note_reset",
+      "link_note_logical",
+      "link_note_critical",
+      "link_note_invalidinit",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_peer1.c",
+      "code": "result[0]=Link4_InitPeer(1,4);result[1]=Link4_GetMode();result[2]=Link4_GetLocalSlot();result[3]=Link4_GetSlotCount();result[4]=Link4_GetSelectedPeer();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_peer1"
+      ]
+    }
+  },
+  "gb:Link4_GetMode": {
+    "review": "link-source-20260917",
+    "record_sha256": "3b4d3953aed9ed098ebc87e6a1bf85d8021d4d44fa94df92ff81cfb1706168ff",
+    "purpose": [
+      "link_Link4_GetMode_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link4_GetMode_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_notdetect",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[1]=Link4_GetMode();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_GetLocalSlot": {
+    "review": "link-source-20260917",
+    "record_sha256": "c2748800a1dd774806a9c9e3736f9feecad2471cd96c54d7a4223f07206c1637",
+    "purpose": [
+      "link_Link4_GetLocalSlot_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link4_GetLocalSlot_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_notdetect",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[2]=Link4_GetLocalSlot();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_GetSlotCount": {
+    "review": "link-source-20260917",
+    "record_sha256": "81c55ef99acc2023a9293149ea8df572c9260e9e6d80c1cf7156fa1b5099eb3c",
+    "purpose": [
+      "link_Link4_GetSlotCount_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link4_GetSlotCount_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_notdetect",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[3]=Link4_GetSlotCount();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_GetSelectedPeer": {
+    "review": "link-source-20260917",
+    "record_sha256": "afb9944e3dc06adcfbffb568968705e4dd23711fe5c672cbd790f857e5f8f736",
+    "purpose": [
+      "link_Link4_GetSelectedPeer_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link4_GetSelectedPeer_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_notdetect",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[4]=Link4_GetSelectedPeer();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_GetLastRxPeer": {
+    "review": "link-source-20260917",
+    "record_sha256": "aed727f86c403b8b41810d61b487e3675dd926f27cb7891a512647deddf003f0",
+    "purpose": [
+      "link_Link4_GetLastRxPeer_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link4_GetLastRxPeer_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_notdetect",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[19]=Link4_GetLastRxPeer();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_GetLastTxPeer": {
+    "review": "link-source-20260917",
+    "record_sha256": "76caa596c8357e9415300938102db6c4a52b509bba9179205f27b296d4028b08",
+    "purpose": [
+      "link_Link4_GetLastTxPeer_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link4_GetLastTxPeer_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_notdetect",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[20]=Link4_GetLastTxPeer();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_SelectPeer": {
+    "review": "link-source-20260917",
+    "record_sha256": "49de3cb53d80fae28b7798094f55e46a45450f2b6a8caa8fa8c9501a5567f6b7",
+    "purpose": [
+      "link_Link4_SelectPeer_purpose"
+    ],
+    "args": [
+      [
+        "peer_slot",
+        [
+          "link_Link4_SelectPeer_peer_slot"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_SelectPeer_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_codes",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[25]=Link4_SelectPeer(1);result[26]=Link_LastError();",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_BeginTransferTo": {
+    "review": "link-source-20260917",
+    "record_sha256": "dcd2ded47e1e7756827bb0f5c4cdcf67b502867597ebf09cbf5aee672b6920a8",
+    "purpose": [
+      "link_Link4_BeginTransferTo_purpose"
+    ],
+    "args": [
+      [
+        "peer_slot",
+        [
+          "link_Link4_BeginTransferTo_peer_slot"
+        ]
+      ],
+      [
+        "out",
+        [
+          "link_Link4_BeginTransferTo_out"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_BeginTransferTo_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_codes",
+      "link_note_duplicate",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[6+slot]=Link4_BeginTransferTo(slot,16+slot);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_HasByteFrom": {
+    "review": "link-source-20260917",
+    "record_sha256": "6ee2caf5d88ea3ce8a508a2782f8839512051c11dbe912c6b86a72373fc8ab0e",
+    "purpose": [
+      "link_Link4_HasByteFrom_purpose"
+    ],
+    "args": [
+      [
+        "peer_slot",
+        [
+          "link_Link4_HasByteFrom_peer_slot"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_HasByteFrom_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_duplicate",
+      "link_note_peernopoll",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[9+slot]=Link4_HasByteFrom(slot);value=0;",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_TryReadByteFrom": {
+    "review": "link-source-20260917",
+    "record_sha256": "240a7afc818e2e033e739033045ffc4dd698b65021358002443153bebfc15744",
+    "purpose": [
+      "link_Link4_TryReadByteFrom_purpose"
+    ],
+    "args": [
+      [
+        "peer_slot",
+        [
+          "link_Link4_TryReadByteFrom_peer_slot"
+        ]
+      ],
+      [
+        "out",
+        [
+          "link_Link4_TryReadByteFrom_out"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_TryReadByteFrom_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_duplicate",
+      "link_note_critical",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "if(slot==1)result[13]=Link4_TryReadByteFrom(slot,&value);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_TryReadByteAny": {
+    "review": "link-source-20260917",
+    "record_sha256": "7f88d1e94b2c65a6e16c8f2f3e823977562cfaafc399f81b815dfd6a881a9b6e",
+    "purpose": [
+      "link_Link4_TryReadByteAny_purpose"
+    ],
+    "args": [
+      [
+        "peer_slot",
+        [
+          "link_Link4_TryReadByteAny_peer_slot"
+        ]
+      ],
+      [
+        "out",
+        [
+          "link_Link4_TryReadByteAny_out"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_TryReadByteAny_returns"
+    ],
+    "notes": [
+      "link_note_ring",
+      "link_note_duplicate",
+      "link_note_critical",
+      "link_note_priority",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "else {other=255;Link4_TryReadByteAny(&other,&value);result[12+slot]=other;}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_SendPacketTo": {
+    "review": "link-source-20260917",
+    "record_sha256": "f80bcae6c4175871dd2c6f510012f4435cd71e1166f4a5b4a5605c955ba57ef3",
+    "purpose": [
+      "link_Link4_SendPacketTo_purpose"
+    ],
+    "args": [
+      [
+        "peer_slot",
+        [
+          "link_Link4_SendPacketTo_peer_slot"
+        ]
+      ],
+      [
+        "data",
+        [
+          "link_Link4_SendPacketTo_data"
+        ]
+      ],
+      [
+        "len",
+        [
+          "link_Link4_SendPacketTo_len"
+        ]
+      ],
+      [
+        "cmd",
+        [
+          "link_Link4_SendPacketTo_cmd"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_SendPacketTo_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_codes",
+      "link_note_packet",
+      "link_note_polling",
+      "link_note_duplicate",
+      "link_note_sendselect",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "result[21+slot]=Link4_SendPacketTo(slot,data,3,64+slot);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_PollPacket": {
+    "review": "link-source-20260917",
+    "record_sha256": "e8e41aa7939bd563d96fd53b93c2a25b124d7f42594c23a40b7bc77a59afb872",
+    "purpose": [
+      "link_Link4_PollPacket_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "link_Link4_PollPacket_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_packet",
+      "link_note_polling",
+      "link_note_duplicate",
+      "link_note_oneroute",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_host.c",
+      "code": "for(i=0;i<50;i++){Link4_PollPacket();while(Link4_TryReadByteFrom(slot,0)){}m_wait();}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_host"
+      ]
+    }
+  },
+  "gb:Link4_HasPacketFrom": {
+    "review": "link-source-20260917",
+    "record_sha256": "e842488e150acf79db32728fc6fd78898ca8340ac78ce9948c1cfe0d8ebb58cc",
+    "purpose": [
+      "link_Link4_HasPacketFrom_purpose"
+    ],
+    "args": [
+      [
+        "peer_slot",
+        [
+          "link_Link4_HasPacketFrom_peer_slot"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_HasPacketFrom_returns"
+    ],
+    "notes": [
+      "link_note_logical",
+      "link_note_packet",
+      "link_note_peernopoll",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_peer1.c",
+      "code": "result[9]=Link4_HasPacketFrom(0);result[10]=Link4_ReadPacketFrom(0,&cmd,&len,data);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_peer1"
+      ]
+    }
+  },
+  "gb:Link4_ReadPacketFrom": {
+    "review": "link-source-20260917",
+    "record_sha256": "5573c2167758ec9f91ab3926577ea6d619ded327eb08e607f3df9ecc67ff02d5",
+    "purpose": [
+      "link_Link4_ReadPacketFrom_purpose"
+    ],
+    "args": [
+      [
+        "peer_slot",
+        [
+          "link_Link4_ReadPacketFrom_peer_slot"
+        ]
+      ],
+      [
+        "cmd",
+        [
+          "link_Link4_ReadPacketFrom_cmd"
+        ]
+      ],
+      [
+        "len",
+        [
+          "link_Link4_ReadPacketFrom_len"
+        ]
+      ],
+      [
+        "dst",
+        [
+          "link_Link4_ReadPacketFrom_dst"
+        ]
+      ]
+    ],
+    "returns": [
+      "link_Link4_ReadPacketFrom_returns"
+    ],
+    "notes": [
+      "link_note_buffer",
+      "link_note_peermail",
+      "link_note_scope",
+      "link_note_launch"
+    ],
+    "example": {
+      "program": "samples/api-examples/gb/link_four_peer1.c",
+      "code": "result[9]=Link4_HasPacketFrom(0);result[10]=Link4_ReadPacketFrom(0,&cmd,&len,data);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_host.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_host.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer1.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer1.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer2.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer2.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\link_four_peer3.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\link_four_peer3.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=128k --no-cache --no-disasm\n.\\kokura\\kokura-cli.exe --link-topology link4 --run-frames 360 --link-session \"name=four_host|slot=0|rom=.\\out\\link_four_host.gb|save_state=.\\out\\four_host.kqs\" --link-session \"name=four_peer1|slot=1|rom=.\\out\\link_four_peer1.gb|save_state=.\\out\\four_peer1.kqs\" --link-session \"name=four_peer2|slot=2|rom=.\\out\\link_four_peer2.gb|save_state=.\\out\\four_peer2.kqs\" --link-session \"name=four_peer3|slot=3|rom=.\\out\\link_four_peer3.gb|save_state=.\\out\\four_peer3.kqs\"\n.\\kokura\\kokura-cli.exe .\\out\\link_four_host.gb --hardware cgb --load-state .\\out\\four_host.kqs --run-frames 2 --png .\\out\\four_host.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer1.gb --hardware cgb --load-state .\\out\\four_peer1.kqs --run-frames 2 --png .\\out\\four_peer1.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer2.gb --hardware cgb --load-state .\\out\\four_peer2.kqs --run-frames 2 --png .\\out\\four_peer2.png\n.\\kokura\\kokura-cli.exe .\\out\\link_four_peer3.gb --hardware cgb --load-state .\\out\\four_peer3.kqs --run-frames 2 --png .\\out\\four_peer3.png",
+      "expected": [
+        "link_example_four_peer1"
+      ]
+    }
+  }
+}
