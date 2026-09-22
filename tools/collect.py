@@ -4,7 +4,8 @@ import hashlib, json, re, subprocess
 from datetime import date
 
 SITE = Path(__file__).resolve().parents[1]
-ROOT = SITE.parent
+ROOT = SITE.parents[1] / 'publish/github_20260912'
+if not ROOT.is_dir(): ROOT = SITE.parent
 WORK = SITE.parent / '_manual_work'
 WORK.mkdir(exist_ok=True)
 TOOLS = {

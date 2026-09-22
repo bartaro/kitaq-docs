@@ -1,0 +1,170 @@
+{
+  "fc_audio_vblank_void": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "fc_audio_vblank_setup": {
+    "ja": "`audio_vblank.h`を読み込み、`audio_vblank.c`を1回だけビルドへ加えます。コンパイラは、このライブラリのフックを既定または独自のNMIハンドラーから1回ずつ呼びます。PPUのNMIを有効にしてください。音楽の更新を前景ループから呼ぶ必要はありません。",
+    "en": "Include `audio_vblank.h` and add `audio_vblank.c` to the build exactly once. The compiler calls its hook once from either the default or a custom NMI handler. Enable PPU NMI. The foreground loop does not call a music update routine."
+  },
+  "fc_audio_vblank_scope": {
+    "ja": "NTSC向けの4音源ドライバーです。CH1=パルス1、CH2=パルス2、CH3=三角波、CH4=ノイズで、チャンネル添字は0～3です。DMCと拡張音源は再生しません。`audio.c`の効果音関数など、同じAPUを直接書き換える処理とは同時に使わないでください。PAL用の音程表やテンポ補正はありません。",
+    "en": "This four-channel driver is tuned for NTSC: CH1=pulse 1, CH2=pulse 2, CH3=triangle, CH4=noise, indexed 0..3. It does not play DMC or expansion audio. Do not run it alongside direct APU writers such as the effects in `audio.c`. There is no PAL pitch table or tempo correction."
+  },
+  "fc_audio_vblank_format": {
+    "ja": "1レコードは5バイトで、`待機時間, CH1, CH2, CH3, CH4`の順です。待機時間1～255は、その音を維持するNMI回数です。0は終端で、残り4バイトは無視します。CH1～CH3の音階0～71はC2～B7（24=C4）。CH4の0～15は通常ノイズの周期番号、16～31は短周期モードです。各音源の255=`NES_AUDIO_HOLD`は変更せず、254=`NES_AUDIO_STOP`は停止します。",
+    "en": "A record contains five bytes: `delay, CH1, CH2, CH3, CH4`. Delay 1..255 is the number of NMI ticks for which the new state lasts. Zero terminates playback and ignores the other four bytes. Tonal notes 0..71 are C2..B7 (24=C4). Noise values 0..15 select a long-mode period, and 16..31 select short mode. For any channel, 255=`NES_AUDIO_HOLD` leaves it unchanged; 254=`NES_AUDIO_STOP` silences it."
+  },
+  "fc_audio_vblank_queue": {
+    "ja": "RAMの40バイトに8スロットを用意し、満杯と空を区別するため1スロットを空けて使います。実際に予約できるのは7レコードです。生産側は前景処理1か所とし、NMIからenqueue/refillや初期化を呼ばないでください。コピー完了後に1バイトの書き込み位置を公開するため、途中のレコードをNMIが読むことはありません。",
+    "en": "The 40-byte RAM ring has eight physical slots, with one left empty to distinguish full from empty. Usable capacity is seven records. Use one foreground producer; do not enqueue, refill or initialize from NMI. The producer publishes a one-byte write position only after copying the complete record, so NMI cannot read a partial record."
+  },
+  "fc_audio_vblank_starvation": {
+    "ja": "待機時間が尽きて次のレコードがなければ4音源を消音し、再開可能な待機状態になります。補充後の次のNMIで再開します。空になってから補充されるまでを1回の補充不足として数えます。消音後にHOLDだけを送っても、前の音は復元しません。通常は各フレームにrefillを呼び、重い処理に入る前に十分な待機時間をキューへ入れます。",
+    "en": "If a delay expires with no next record, silence all four channels and wait for more data. Playback resumes at the next NMI after enqueueing. Each starvation episode is counted once, until a record arrives. HOLD alone does not restore notes silenced by starvation. Normally refill each frame and queue enough timed records before expensive work."
+  },
+  "fc_audio_vblank_expected": {
+    "ja": "サンプルは独自の4音源フレーズを1回再生します。前景処理が90フレーム補充を止めて整数計算をしている間も音楽が進みます。画面の「PHRASE COMPLETE / SILENT」「UNDERRUNS 0 / MATH OK」は、終了・補充不足0・計算結果一致を表します。添付の音声でパルスの旋律と伴奏、三角波の低音、ノイズを確認できます。終了後は無音です。画像は制御結果の表示であり、音の確認には音声を使ってください。",
+    "en": "The sample plays an original four-channel phrase once. Music continues while the foreground performs integer arithmetic without refilling for 90 frames. “PHRASE COMPLETE / SILENT” and “UNDERRUNS 0 / MATH OK” mean playback finished, no queue starvation occurred and arithmetic results matched. Listen to the captured audio for the pulse melody and accompaniment, triangle bass and noise. The end is silent. The image reports control results; use the audio to assess sound."
+  },
+  "fc_audio_vblank_count": {
+    "ja": "読み取れる5バイトレコードの個数、1～13107です。バイト数ではありません。count×5バイトが有効なCPUアドレス範囲に連続して存在する必要があります。",
+    "en": "Number of readable five-byte records, 1..13107; not a byte count. All count×5 bytes must occupy a contiguous valid CPU address range."
+  },
+  "fc_audio_vblank_pointer": {
+    "ja": "音楽データの先頭。読み取り可能なROMまたはRAMを渡し、補充が終わるまで保持します。バンク切り替えは行わないので、refillを呼ぶ間は該当ROMバンクを読めるようにしてください。NMIはコピー済みのRAMだけを読みます。",
+    "en": "Start of the stream in readable ROM or RAM. Keep it alive until feeding finishes. No bank switching is performed: map the appropriate ROM bank while calling refill. NMI reads only the copied RAM records."
+  },
+  "fc_audio_vblank_loop": {
+    "ja": "0は1回再生、0以外は先頭から反復します。反復するデータに待機時間0の終端レコードを入れないでください。",
+    "en": "Zero selects one-shot playback; any nonzero value repeats from the start. Do not include a delay-zero terminator inside a looping stream."
+  },
+  "fc_audio_vblank_init_settings": {
+    "ja": "APUフレームIRQとDMCを無効にし、パルスのスイープも無効にします。既定音色はCH1=50%デューティ・音量12、CH2=25%・音量10、三角波=発音、ノイズ=音量8です。初期化だけでは音楽もNMIも開始しません。",
+    "en": "Disable APU frame IRQs, DMC and pulse sweep. Defaults are pulse 1 at 50% duty/volume 12, pulse 2 at 25%/volume 10, triangle enabled for notes, and noise volume 8. Initialization starts neither music nor NMI."
+  },
+  "fc_audio_vblank_record": {
+    "ja": "コピーする5バイトの先頭。コピーが返るまで読める領域を指定します。返った後は元の配列を再利用できます。0は拒否します。",
+    "en": "Address of five readable bytes, valid until the call returns. The source array may then be reused. Null is rejected."
+  },
+  "fc_audio_vblank_enqueue_return": {
+    "ja": "受け入れたら1。満杯、null、不正な音階・ノイズ値なら0で、キューは変更しません。終端レコードは音源の4バイトを検査しません。",
+    "en": "Return 1 when accepted. Full, null or invalid tonal/noise values return 0 without changing the queue. The four channel bytes of a terminator are not validated."
+  },
+  "fc_audio_vblank_queued_return": {
+    "ja": "0～7レコードです。現在鳴っている音の待機時間は数えません。NMIが消費を進めるので、読み取った時点の値です。",
+    "en": "Return 0..7 records, excluding the currently sounding record’s remaining delay. NMI can advance consumption, so this is a momentary value."
+  },
+  "fc_audio_vblank_free_return": {
+    "ja": "0～7スロットで、`7−queued()`です。バイト数ではありません。1スロットに5バイトのレコードを1つ格納します。",
+    "en": "Return 0..7 slots, equal to `7−queued()`. This is not a byte count; one slot holds one five-byte record."
+  },
+  "fc_audio_vblank_start_note": {
+    "ja": "初期化と補充を先に行ってください。NMI自体は有効にしません。有効な待機時間が残っている再生中に呼んでも、待機時間や読み取り位置は変更しません。",
+    "en": "Initialize and enqueue first. This does not enable NMI itself. Calling during playback leaves the current delay and read position unchanged."
+  },
+  "fc_audio_vblank_stop_note": {
+    "ja": "一時停止位置は保存しません。再開にはset_musicまたはplay_musicを使います。音色と補充不足カウンターは保持し、NMIも無効にしません。",
+    "en": "No pause position is saved. Start another stream with set_music or play_music. Timbres and the starvation counter are retained; NMI stays enabled."
+  },
+  "fc_audio_vblank_set_return": {
+    "ja": "ポインターと個数が有効なら1、null・0個・13107超なら0です。失敗時もそれまでの再生とキューは停止・破棄します。各レコードの内容は補充時に検査します。",
+    "en": "Return 1 for a valid pointer/count, or 0 for null, zero count or a count above 13107. Even on failure, existing playback and queued data are stopped/discarded. Record contents are checked during refill."
+  },
+  "fc_audio_vblank_refill_return": {
+    "ja": "受け入れた0～7レコードの個数です。1回再生では最後に自動追加する終端も1個に数えます。補充元がない場合や満杯なら0です。不正なレコードに到達した場合は再生とキューを停止・破棄して0を返します。",
+    "en": "Return 0..7 accepted records, counting the automatically appended terminator for one-shot playback. No source or a full queue returns 0. Encountering an invalid record stops playback, discards the queue/feeder and returns 0."
+  },
+  "fc_audio_vblank_refill_direct": {
+    "ja": "ROM補充と直接enqueueは同じキューを使います。意図しない順番で混ぜないでください。refillは音源レジスターを書かず、再生開始もしません。ただし不正データを検出して停止するときは消音します。",
+    "en": "The ROM feeder and direct enqueue share one queue; combine them only with an intentional ordering. Refilling does not play records or start the consumer. Its invalid-data stop does silence the APU."
+  },
+  "fc_audio_vblank_play_return": {
+    "ja": "設定と最初の補充が成功したら1、設定不正または初回補充で不正データを見つけたら0です。曲全体の妥当性を事前保証する値ではありません。後続の不正レコードは後のrefillで検出します。",
+    "en": "Return 1 when setup and initial prefill succeed; return 0 for invalid setup or invalid data found during that prefill. Success does not validate the entire song: later malformed records are found by later refill calls."
+  },
+  "fc_audio_vblank_play_init": {
+    "ja": "最初にinitを1回呼びます。play_musicは音色と補充不足カウンターを保持します。長い曲や反復する曲では、その後も定期的にrefillしてください。",
+    "en": "Call init once first. play_music retains timbres and the starvation counter. Continue calling refill periodically for long or looping streams."
+  },
+  "fc_audio_vblank_playing_return": {
+    "ja": "有効なら1、停止または終端到達後は0です。補充不足で一時的に消音している間も1なので、この値だけでは実際に音が鳴っているとは判断できません。",
+    "en": "Return 1 when enabled, or 0 after stop/termination. Starvation remains enabled and returns 1 even while silent, so this is not an audible-sound indicator."
+  },
+  "fc_audio_vblank_underrun_return": {
+    "ja": "0～255で、255に達すると増えません。空のまま待ったフレーム数ではなく、補充不足の発生回数です。initで0に戻り、stopや曲変更では保持します。正常な終端は数えません。",
+    "en": "Return 0..255, saturating at 255. Count starvation episodes, not every frame spent waiting. init clears it; stop and song changes retain it. A normal terminator is not starvation."
+  },
+  "fc_audio_vblank_channel": {
+    "ja": "0=CH1パルス1、1=CH2パルス2、2=CH3三角波、3=CH4ノイズです。4以上は拒否します。",
+    "en": "0=CH1 pulse 1, 1=CH2 pulse 2, 2=CH3 triangle, 3=CH4 noise. Values of 4 or more are rejected."
+  },
+  "fc_audio_vblank_control": {
+    "ja": "パルスは上位2ビットがデューティ（0=12.5%、1=25%、2=50%、3=75%）、下位4ビットが音量0～15です。ノイズは下位4ビットの音量だけを使います。三角波は0が消音設定、0以外が発音設定です。長さカウンター停止と固定音量をライブラリが設定します。",
+    "en": "For pulse channels, bits 7..6 select duty (0=12.5%, 1=25%, 2=50%, 3=75%); bits 3..0 select volume 0..15. Noise uses only volume bits 3..0. Triangle uses zero for a silent next note and nonzero for an audible one. The library supplies length-counter halt and constant-volume settings."
+  },
+  "fc_audio_vblank_timbre_return": {
+    "ja": "有効なチャンネルなら1、4以上なら変更せず0です。",
+    "en": "Return 1 for a valid channel; values of 4 or more return 0 without changes."
+  },
+  "fc_audio_vblank_hook": {
+    "ja": "アプリケーションから直接呼ばないでください。音楽ライブラリをリンクするとコンパイラがNMIへ接続します。処理はA/X/Yを保存し、共通の式計算用ワーク領域を使いません。フックと音程表は固定ROMへ配置され、NMI中にROMバンクを切り替えません。これは音楽フック自身の保存処理であり、独自NMIハンドラーの他の処理に必要な保存を肩代わりするものではありません。",
+    "en": "Do not call this directly from application code. Linking the music library connects it to NMI through the compiler. The hook saves A/X/Y and does not use shared expression scratch. The hook and pitch tables reside in fixed ROM; it never switches ROM banks in NMI. Its preservation applies to the music hook itself; a custom NMI handler remains responsible for preserving state used by its other work."
+  },
+  "fc_audio_vblank_init": {
+    "ja": "APUとキューを初期化し、音楽・補充状態と補充不足カウンターをリセットします。",
+    "en": "Initialize the APU and queue, resetting playback, feeder state and the starvation counter."
+  },
+  "fc_audio_vblank_enqueue": {
+    "ja": "1レコードを検査してRAMキューへコピーします。ROM補充関数を使わず、ゲーム側で音楽を組み立てる場合にも使えます。",
+    "en": "Validate and copy one record into the RAM queue. Use this to generate music in game code without the ROM feeder."
+  },
+  "fc_audio_vblank_queued": {
+    "ja": "まだNMIに取り出されていないレコード数を返します。",
+    "en": "Return the number of records that NMI has not yet consumed."
+  },
+  "fc_audio_vblank_free": {
+    "ja": "キューへ追加できるレコードの空きスロット数を返します。",
+    "en": "Return the number of free record slots in the queue."
+  },
+  "fc_audio_vblank_start": {
+    "ja": "RAMキューの消費を有効にします。最初のレコードは次のNMIで取り出します。",
+    "en": "Enable RAM-queue consumption. The first record is taken at the next NMI."
+  },
+  "fc_audio_vblank_stop": {
+    "ja": "再生を無効にして4音源を消音し、キューとROM補充状態を破棄します。",
+    "en": "Disable playback, silence the four channels and discard the queue and ROM feeder."
+  },
+  "fc_audio_vblank_set_music": {
+    "ja": "再生を停止して音楽ストリームを補充元に設定します。キューへのコピーと再生開始は別操作です。",
+    "en": "Stop playback and attach a stream as the feeder source. Copying into the queue and starting playback are separate operations."
+  },
+  "fc_audio_vblank_refill": {
+    "ja": "設定したストリームから、空きスロットへ最大7レコードを補充します。長い曲を小さなRAMキューで再生するための前景処理です。",
+    "en": "Feed up to seven records from the attached stream into free slots. This foreground operation lets a small RAM queue play a long song."
+  },
+  "fc_audio_vblank_play_music": {
+    "ja": "音楽の設定、最初の補充、再生有効化をまとめて行います。短い曲を始める基本の入口です。",
+    "en": "Attach a song, prefill the queue and enable playback in one call. This is the usual entry point for starting a phrase."
+  },
+  "fc_audio_vblank_is_playing": {
+    "ja": "NMIによるキュー消費が有効かを返します。",
+    "en": "Report whether NMI queue consumption is enabled."
+  },
+  "fc_audio_vblank_underruns": {
+    "ja": "音楽の次のレコードが間に合わなかった回数を返します。補充の余裕を確認するために使います。",
+    "en": "Return the number of queue-starvation episodes, helping assess refill headroom."
+  },
+  "fc_audio_vblank_set_timbre": {
+    "ja": "指定した音源で、次に発音する音のデューティや音量を設定します。再生中の音は再トリガーしません。",
+    "en": "Configure duty or level for the next note on a channel, without retriggering its current note."
+  },
+  "fc_audio_vblank___hook": {
+    "ja": "NMIで待機時間を進め、必要ならキューから1レコードを取り出してAPUへ適用するコンパイラ用フックです。",
+    "en": "Compiler hook that advances the delay in NMI and applies one queued record to the APU when needed."
+  },
+  "fc_audio_vblank_module": {
+    "ja": "NMIで進む4音源の音楽ライブラリです。初期化→曲の設定と初回補充→NMIを有効にして再生→前景でrefillの順で使います。NMIはRAMキューを読むだけなので、補充を続ければ長い曲も小さなRAM使用量で再生できます。各音源は独立したHOLD/STOPを持ちます。",
+    "en": "Four-channel music advances in NMI. Initialize, attach and prefill a song, enable NMI for playback, then refill from the foreground. NMI reads a RAM queue, letting a small amount of RAM serve a long stream as long as it is refilled. Each channel has independent HOLD/STOP commands."
+  }
+}

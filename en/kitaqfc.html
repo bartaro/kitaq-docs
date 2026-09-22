@@ -806,7 +806,175 @@ EmitHelperStart(&quot;__fds_wave_load&quot;);
             EmitAsm(&quot;STA&quot;, new AsmOperand(0x4040, AddressMode.AbsoluteY));
             EmitAsm(&quot;INY&quot;); EmitAsm(&quot;CPY&quot;, Imm(64)); EmitAsm(&quot;BNE&quot;, Rel(waveLoop));
             EmitAsm(&quot;LDA&quot;, Imm(0x00)); EmitAsm(&quot;STA&quot;, Mem(0x4089));
-            EmitAsm(&quot;RTS&quot;);</code></pre></div></details></details><h3 id="module-intrinsics">intrinsics.h — Compiler intrinsics</h3><details class="api searchable" id="api-__ppu_mask_get" data-api-contract="ppu-shadow-source-20260922"><summary><code>__ppu_mask_get</code></summary><p>Return the software shadow of PPUMASK. Use it to preserve rendering, left-edge visibility, grayscale and color-emphasis settings.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 __ppu_mask_get(void);</code></pre></div><h4>Return value</h4><p>Return the last control value maintained by the library or intrinsic setters as u8. This does not read PPUSTATUS.</p><h4>Conditions and limits</h4><p>PPUCTRL and PPUMASK are write-only. This getter does not read hardware. Direct writes to $2000/$2001 or custom assembly bypass the shadows. Use the corresponding __ppu_*_set operations consistently. Reading the shadow does not change the latch or interrupt state.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>__ppu_mask_set(0xE7);
+            EmitAsm(&quot;RTS&quot;);</code></pre></div></details></details><h3 id="module-intrinsics">intrinsics.h — Compiler intrinsics</h3><details class="api searchable" id="api-__nes_audio_vblank_tick" data-api-contract="fc-audio-vblank-source-20260922"><summary><code>__nes_audio_vblank_tick</code></summary><p>Compiler hook that advances the delay in NMI and applies one queued record to the APU when needed.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __nes_audio_vblank_tick(void);</code></pre></div><h4>Return value</h4><p>No return value.</p><h4>Conditions and limits</h4><p>Include <code>audio_vblank.h</code> and add <code>audio_vblank.c</code> to the build exactly once. The compiler calls its hook once from either the default or a custom NMI handler. Enable PPU NMI. The foreground loop does not call a music update routine.</p><p>This four-channel driver is tuned for NTSC: CH1=pulse 1, CH2=pulse 2, CH3=triangle, CH4=noise, indexed 0..3. It does not play DMC or expansion audio. Do not run it alongside direct APU writers such as the effects in <code>audio.c</code>. There is no PAL pitch table or tempo correction.</p><p>Do not call this directly from application code. Linking the music library connects it to NMI through the compiler. The hook saves A/X/Y and does not use shared expression scratch. The hook and pitch tables reside in fixed ROM; it never switches ROM banks in NMI. Its preservation applies to the music hook itself; a custom NMI handler remains responsible for preserving state used by its other work.</p><p>A record contains five bytes: <code>delay, CH1, CH2, CH3, CH4</code>. Delay 1..255 is the number of NMI ticks for which the new state lasts. Zero terminates playback and ignores the other four bytes. Tonal notes 0..71 are C2..B7 (24=C4). Noise values 0..15 select a long-mode period, and 16..31 select short mode. For any channel, 255=<code>NES_AUDIO_HOLD</code> leaves it unchanged; 254=<code>NES_AUDIO_STOP</code> silences it.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// The linked audio_vblank.c supplies __nes_audio_vblank_tick().
+    // The compiler calls that hook once per NMI. Do not call it in this loop.
+    __nmi_wait();</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The sample plays an original four-channel phrase once. Music continues while the foreground performs integer arithmetic without refilling for 90 frames. “PHRASE COMPLETE / SILENT” and “UNDERRUNS 0 / MATH OK” mean playback finished, no queue starvation occurred and arithmetic results matched. Listen to the captured audio for the pulse melody and accompaniment, triangle bass and noise. The end is silent. The image reports control results; use the audio to assess sound.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-fc-audio-vblank/example/nrom/screen.png" alt="__nes_audio_vblank_tick: NROM"><figcaption>NROM</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="__nes_audio_vblank_tick: NROM — Captured audio" src="../verification/api-fc-audio-vblank/example/nrom/music.wav"></audio><figcaption>NROM — Captured audio</figcaption></figure><p><a href="../samples/api-examples/fc/audio_vblank.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaqfc\lib\audio_vblank.c .\kitaq-docs\samples\api-examples\fc\audio_vblank.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr -o .\out\audio_vblank.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/audio_vblank.h:49</p><div class="original"><b>Declaration notes (original source)</b><pre>Compiler NMI hook: linked automatically once per NMI. Do not call manually.
+Saves A/X/Y, uses no compiler scratch bytes and reads only RAM/fixed ROM.</pre></div><p class="source">kitaqfc/lib/audio_vblank.c:112</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void __nes_audio_vblank_tick(void){
+    __asm {
+        PHA
+        TXA
+        PHA
+        TYA
+        PHA
+        LDA nav_active
+        BNE nav_tick_active
+        JMP nav_tick_exit
+nav_tick_active:
+        LDA nav_delay
+        BEQ nav_tick_next
+        DEC nav_delay
+        BEQ nav_tick_next
+        JMP nav_tick_exit
+nav_tick_next:
+        LDX nav_tail
+        CPX nav_head
+        BNE nav_tick_record
+        LDA #0
+        STA $4015
+        STA nav_enabled
+        LDA nav_starved
+        BNE nav_tick_empty_done
+        INC nav_starved
+        LDA nav_underruns
+        CMP #255
+        BEQ nav_tick_empty_done
+        INC nav_underruns
+nav_tick_empty_done:
+        JMP nav_tick_exit
+nav_tick_record:
+        LDA #0
+        STA nav_starved
+        LDA nav_queue,X
+        BNE nav_tick_timed
+        STA nav_active
+        STA nav_enabled
+        STA $4015
+        JMP nav_tick_release
+nav_tick_timed:
+        STA nav_delay
+        INX
+        LDA nav_queue,X
+        CMP #255
+        BEQ nav_tick_ch1_done
+        CMP #254
+        BNE nav_tick_ch1_note
+        LDA nav_enabled
+        AND #254
+        STA nav_enabled
+        STA $4015
+        JMP nav_tick_ch1_done
+nav_tick_ch1_note:
+        TAY
+        LDA nav_enabled
+        ORA #1
+        STA nav_enabled
+        STA $4015
+        LDA nav_timbre+0
+        STA $4000
+        LDA nav_pulse_lo,Y
+        STA $4002
+        LDA nav_pulse_hi,Y
+        STA $4003
+nav_tick_ch1_done:
+        INX
+        LDA nav_queue,X
+        CMP #255
+        BEQ nav_tick_ch2_done
+        CMP #254
+        BNE nav_tick_ch2_note
+        LDA nav_enabled
+        AND #253
+        STA nav_enabled
+        STA $4015
+        JMP nav_tick_ch2_done
+nav_tick_ch2_note:
+        TAY
+        LDA nav_enabled
+        ORA #2
+        STA nav_enabled
+        STA $4015
+        LDA nav_timbre+1
+        STA $4004
+        LDA nav_pulse_lo,Y
+        STA $4006
+        LDA nav_pulse_hi,Y
+        STA $4007
+nav_tick_ch2_done:
+        INX
+        LDA nav_queue,X
+        CMP #255
+        BEQ nav_tick_ch3_done
+        CMP #254
+        BNE nav_tick_ch3_note
+        LDA nav_enabled
+        AND #251
+        STA nav_enabled
+        STA $4015
+        JMP nav_tick_ch3_done
+nav_tick_ch3_note:
+        TAY
+        LDA nav_enabled
+        ORA #4
+        STA nav_enabled
+        STA $4015
+        LDA nav_timbre+2
+        STA $4008
+        LDA nav_triangle_lo,Y
+        STA $400A
+        LDA nav_triangle_hi,Y
+        STA $400B
+nav_tick_ch3_done:
+        INX
+        LDA nav_queue,X
+        CMP #255
+        BEQ nav_tick_ch4_done
+        CMP #254
+        BNE nav_tick_ch4_note
+        LDA nav_enabled
+        AND #247
+        STA nav_enabled
+        STA $4015
+        JMP nav_tick_ch4_done
+nav_tick_ch4_note:
+        TAY
+        LDA nav_enabled
+        ORA #8
+        STA nav_enabled
+        STA $4015
+        LDA nav_timbre+3
+        STA $400C
+        TYA
+        AND #16
+        BEQ nav_tick_noise_long
+        TYA
+        AND #15
+        ORA #128
+        JMP nav_tick_noise_period
+nav_tick_noise_long:
+        TYA
+nav_tick_noise_period:
+        STA $400E
+        LDA #0
+        STA $400F
+nav_tick_ch4_done:
+nav_tick_release:
+        LDA nav_tail
+        CLC
+        ADC #5
+        CMP #40
+        BNE nav_tick_publish
+        LDA #0
+nav_tick_publish:
+        STA nav_tail
+nav_tick_exit:
+        PLA
+        TAY
+        PLA
+        TAX
+        PLA
+    }
+}</code></pre></div></details></details><details class="api searchable" id="api-__ppu_mask_get" data-api-contract="ppu-shadow-source-20260922"><summary><code>__ppu_mask_get</code></summary><p>Return the software shadow of PPUMASK. Use it to preserve rendering, left-edge visibility, grayscale and color-emphasis settings.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 __ppu_mask_get(void);</code></pre></div><h4>Return value</h4><p>Return the last control value maintained by the library or intrinsic setters as u8. This does not read PPUSTATUS.</p><h4>Conditions and limits</h4><p>PPUCTRL and PPUMASK are write-only. This getter does not read hardware. Direct writes to $2000/$2001 or custom assembly bypass the shadows. Use the corresponding __ppu_*_set operations consistently. Reading the shadow does not change the latch or interrupt state.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>__ppu_mask_set(0xE7);
     if(__ppu_mask_get()!=0xE7)failures=1;
     __ppu_mask_set(0);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The four library calls turn rendering off, load both palettes, clear a full nametable and turn rendering on. The sample reads the palette and cleared table back before drawing. Expect blue copied squares, bars and triangles at y=16, green filled tiles at y=96, and red square/bar/triangle markers at y=208. Each large block uses 255 tiles, leaving the last cell black. FAILED CHECKS is 0.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-ppu-declarations/alternatives/screen.png" alt="__ppu_mask_get: ALTERNATIVES"><figcaption>ALTERNATIVES</figcaption></figure><p><a href="../samples/api-examples/fc/ppu_implemented.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\ppu_implemented.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\ppu_implemented.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\vram_shapes.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/intrinsics.h:104</p><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:4517</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">Copy</button><pre><code>case &quot;__ppu_mask_get&quot;:

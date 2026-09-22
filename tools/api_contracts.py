@@ -210,6 +210,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_rob_examples(contracts))
     from api_chain_body_proofs import verified_examples as verified_chain_body_examples
     proofs.update(verified_chain_body_examples(contracts))
+    from api_fc_audio_vblank_proofs import verified_examples as verified_fc_audio_vblank_examples
+    proofs.update(verified_fc_audio_vblank_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -254,6 +256,8 @@ def publish(language, require_complete=False):
                 text = wire_speed_overview(text, language)
             if platform == 'fc':
                 if volume == 'kitaqfc':
+                    from api_fc_audio_vblank_proofs import hook_overview as fc_audio_hook_overview
+                    text = fc_audio_hook_overview(text, language)
                     from fc_chr_ram_presentation import overview as chr_ram_overview
                     text = chr_ram_overview(text, language)
                 from api_fc_wireframe_proofs import ensure_header
@@ -261,6 +265,8 @@ def publish(language, require_complete=False):
                 from api_physics_proofs import render_fc_module
                 text = render_fc_module(text, language)
                 if volume == 'fc-library':
+                    from api_fc_audio_vblank_proofs import overview as fc_audio_vblank_overview
+                    text = fc_audio_vblank_overview(text, language)
                     from fc_wireframe_presentation import overview as wireframe_overview
                     text = wireframe_overview(text, language)
                     from api_fc_danmaku_proofs import overview as danmaku_overview
