@@ -1,0 +1,206 @@
+{
+  "raster_bands_common": {
+    "ja": "`raster.h`を読み込み、`raster.c`と`scroll.c`をコンパイルします。最大8バンドの共有表を使います。`Raster_*`で構築している間は、直接`Scroll_Split*`や`__scroll_split_*`を呼ばないでください。別経路の操作はRaster側の個数・行番号と一致しなくなります。",
+    "en": "Include `raster.h` and compile `raster.c` plus `scroll.c`. A shared table holds up to eight bands. Do not interleave direct `Scroll_Split*` or `__scroll_split_*` calls while building with `Raster_*`; they bypass the wrapper count and last-line bookkeeping."
+  },
+  "raster_bands_schedule": {
+    "ja": "表を作り直すときはVBlankなど描画への影響を管理できる区間でClear→登録→Commitを行います。Clearは実行中の分割も停止し、独立した二重バッファへの編集ではありません。バンドのLYは割り込みの予約行で、実際のレジスター書き込みには処理時間がかかります。毎走査線の波形描画には別の`Raster_LineX*`系を使い、同時には動かしません。",
+    "en": "Rebuild in VBlank or another interval where you control the display impact: clear, add entries, then commit. Clear stops the active splits too; this is not editing an independent back buffer. LY schedules an interrupt, and register writes take additional time. Use the separate `Raster_LineX*` family for per-scanline wave rendering; do not run both drivers together."
+  },
+  "raster_bands_errors": {
+    "ja": "状態コードは0=OK、1=FULL、2=BAD_LY、3=UNSORTED、4=BAD_RANGEです。Push系はLY範囲、容量、行順序の順に検査します。失敗した登録は表を増やしません。次の成功した登録やClearでエラーは0になるため、各戻り値をその場で確認してください。",
+    "en": "Status codes are 0 OK, 1 FULL, 2 BAD_LY, 3 UNSORTED and 4 BAD_RANGE. Push operations check LY range, capacity and ordering in that order. A rejected entry does not grow the table. A later successful push or clear resets the error to zero, so check each return value when it occurs."
+  },
+  "raster_bands_status": {
+    "ja": "成功ならKQ_RASTER_OK（0）、失敗なら状態コード1～4を返します。詳細は各関数の制約と`Raster_GetLastError`を参照してください。",
+    "en": "Return KQ_RASTER_OK (0) on success or an error status 1..4. See the function constraints and `Raster_GetLastError`."
+  },
+  "raster_bands_void": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "raster_bands_ly": {
+    "ja": "予約する可視行0～143です。同じ表では前のLYより大きくしてください。先頭のLY=0はフレーム開始用としてVBlank処理で適用されます。",
+    "en": "Visible scheduled line, 0..143, strictly greater than the previous entry in the table. A first entry at LY=0 is applied by VBlank handling to establish the frame-start state."
+  },
+  "raster_bands_scroll": {
+    "ja": "背景のスクロール値0～255です。SCX/SCYは画面の位置ではなく背景マップを読み始める座標です。背景は256ピクセル単位で折り返します。",
+    "en": "Background scroll byte, 0..255. SCX/SCY specify where to read the background map, not a screen-space position. Coordinates wrap across the 256-pixel background."
+  },
+  "raster_bands_wx": {
+    "ja": "ハードウェアのWX値です。通常の画面Xに7を加えた値を渡します。画面左端はWX=7です。値の範囲検査や補正は行いません。",
+    "en": "Raw hardware WX value. Add seven to an ordinary screen X coordinate; WX=7 places the window at the left edge. This function does not clamp or validate WX."
+  },
+  "raster_bands_wy": {
+    "ja": "ウィンドウのWYです。画面上端からのピクセル数で、横方向と違い7の加算はありません。WYが144以上なら可視領域に開始行がありません。",
+    "en": "Window WY in pixels from the top edge. Unlike X, Y needs no addition of seven. WY values of 144 or more have no start line in the visible area."
+  },
+  "raster_bands_screenx": {
+    "ja": "ウィンドウ左端の画面X座標です。内部で7を足してWXへ変換します。通常は0～159を使います。249以上は8ビット加算が折り返すため、画面外へ隠す目的で指定しないでください。",
+    "en": "Screen X coordinate of the window left edge. The wrapper adds seven to form WX. Normally use 0..159. Values of 249 or more wrap during byte addition; do not use them as a way to hide the window."
+  },
+  "raster_bands_flags": {
+    "ja": "BG=1で背景、WIN=2でWX/WY、WIN_SHOW=4で表示、WIN_HIDE=8で非表示、BG_COLOR0=16でCGB背景色0を更新します。未知の上位ビットは捨てます。SHOWとHIDEを同時指定するとSHOWが最後に適用されます。色操作はSCX/SCY欄を色に使うため、通常のBGスクロールと混ぜないでください。",
+    "en": "Flags: BG=1 updates background scroll, WIN=2 updates WX/WY, WIN_SHOW=4 shows the window, WIN_HIDE=8 hides it, BG_COLOR0=16 updates CGB background color zero. Unknown upper bits are discarded. With both SHOW and HIDE, SHOW is applied last. Color updates reuse SCX/SCY payload fields; do not combine them with ordinary background scrolling."
+  },
+  "raster_bands_winflags": {
+    "ja": "通常はWIN_SHOWまたはWIN_HIDEを指定します。ラッパーがWINを追加するので、座標更新だけなら0でも使えます。その他の対応ビットも通過するため、意図しないBGや色操作は指定しないでください。",
+    "en": "Normally pass WIN_SHOW or WIN_HIDE. The wrapper adds WIN, so zero is sufficient to update coordinates without changing visibility. Other supported bits pass through; avoid unintended BG or color operations."
+  },
+  "raster_bands_builder": {
+    "ja": "範囲が正しければ既存の分割を停止して表を消し、新しいバンドを登録します。範囲が不正なら表と個数をそのままにしてBAD_RANGEを保存します。成功後も`Raster_Commit`が必要です。",
+    "en": "Valid parameters stop existing splits, clear the table and add the new bands. Invalid parameters preserve the table and count while storing BAD_RANGE. A successful build still requires `Raster_Commit`."
+  },
+  "raster_bands_disable_note": {
+    "ja": "分割停止はSCX・SCY・WX・WYを0へ戻す操作ではありません。通常の背景・ウィンドウ設定には`Scroll_SetBg`などを使います。IEのVBlank/STATビットやIMEを元の状態に戻す関数でもありません。",
+    "en": "Stopping splits does not zero SCX, SCY, WX or WY. Use ordinary setters such as `Scroll_SetBg` for the desired base state. These functions also do not restore previous VBlank/STAT IE bits or IME."
+  },
+  "raster_bands_count_result": {
+    "ja": "登録済みの個数0～8です。空き数が必要なら8から引きます。読み取りで状態は変わりません。",
+    "en": "Return the entry count, 0..8. Subtract it from eight for remaining capacity. Reading does not alter state."
+  },
+  "raster_bands_error_result": {
+    "ja": "保存中の状態コード0～4です。Commitはこの値を返しますが、それまでの失敗を自動で取り消したり表を破棄したりしません。",
+    "en": "Return the stored status, 0..4. Commit returns this value but does not automatically undo a failure or discard the table."
+  },
+  "raster_bands_rgb": {
+    "ja": "RGB15です。赤はビット0～4、緑は5～9、青は10～14です。0x001Fが赤、0x03E0が緑、0x7C00が青です。入力値の範囲検査は行いません。",
+    "en": "RGB15: red in bits 0..4, green in 5..9, blue in 10..14. 0x001F is red, 0x03E0 green and 0x7C00 blue. The input is not range-checked."
+  },
+  "raster_bands_color_note": {
+    "ja": "色更新はBCPS/BCPDを使い、BCPSの元のインデックスは保持しません。前景処理からパレットを書く際もインデックスを明示してください。転送できるLCDモードを待つので、予約行と実際の色境界には遅れがあります。",
+    "en": "Color updates use BCPS/BCPD and do not preserve the previous BCPS index. Set the index explicitly when foreground code writes palettes too. The handler waits for an accessible LCD mode, so the visible color boundary can follow the scheduled LY."
+  },
+  "raster_bands_commit_result": {
+    "ja": "保存中の最終エラーコードを返します。0だからといって、それ以前のすべての登録が成功した証明にはなりません。",
+    "en": "Return the last stored error. Zero does not prove that every earlier registration succeeded."
+  },
+  "raster_bands_commit_irq": {
+    "ja": "空でない表ではIEのVBlank/STATビットを立て、EIで割り込みを有効にします。他のIEビットは保持します。空の表では分割を停止し、割り込み全体の設定は復元しません。",
+    "en": "A nonempty table sets the VBlank/STAT IE bits and executes EI, enabling interrupts; other IE bits are preserved. An empty table disables split scheduling without restoring the global interrupt configuration."
+  },
+  "raster_bands_hud_height": {
+    "ja": "分割する行1～143です。0や144以上はBAD_RANGEとなります。",
+    "en": "Split line, 1..143. Zero or 144 and above return BAD_RANGE."
+  },
+  "raster_bands_hud_y": {
+    "ja": "分割する行1～143です。0や144以上はBAD_RANGEとなります。",
+    "en": "Split line, 1..143. Zero or 144 and above return BAD_RANGE."
+  },
+  "raster_bands_split_y": {
+    "ja": "分割する行1～143です。0や144以上はBAD_RANGEとなります。",
+    "en": "Split line, 1..143. Zero or 144 and above return BAD_RANGE."
+  },
+  "raster_bands_y1": {
+    "ja": "分割行です。1 ≤ y1 < y2 ≤ 143を満たしてください。",
+    "en": "Split line; require 1 <= y1 < y2 <= 143."
+  },
+  "raster_bands_y2": {
+    "ja": "分割行です。1 ≤ y1 < y2 ≤ 143を満たしてください。",
+    "en": "Split line; require 1 <= y1 < y2 <= 143."
+  },
+  "raster_bands_expected_bands": {
+    "ja": "赤い矩形（DMGでは黒）が上から(32,16)、(24,80)、(16,112)へ並びます。幅24・高さ16で、下の段ほど左へずれます。表の個数3、エラー0、Commitの戻り値0を内部で記録しています。",
+    "en": "Red rectangles (black on DMG), each 24 by 16 pixels, appear at (32,16), (24,80) and (16,112). Lower bands shift farther left. Internal results record count 3, error 0 and commit result 0."
+  },
+  "raster_bands_Raster_Init": {
+    "ja": "共有バンド表を空にして分割を停止し、個数・最終LYの有効フラグ・エラーを初期化します。背景やウィンドウの座標を初期化する`Scroll_Init`とは役割が異なります。",
+    "en": "Empty the shared band table, stop splits, and initialize count, last-LY validity and error state. Unlike `Scroll_Init`, this does not initialize background/window coordinates."
+  },
+  "raster_bands_Raster_Clear": {
+    "ja": "実行中の分割をただちに停止し、登録個数・行順序・エラーをリセットします。同じ場面で新しい表を組み直す前に使います。表のデータ領域全体を0埋めする操作ではありません。",
+    "en": "Immediately stop split scheduling and reset count, ordering and error state before rebuilding a table in the same scene. It does not zero every byte of table storage."
+  },
+  "raster_bands_Raster_Disable": {
+    "ja": "Clearの後で空の表をCommitし、ラスターバンドを無効にします。スクロール分割のない場面へ移る際の明示的な停止操作です。",
+    "en": "Clear and commit an empty table to disable raster bands. Use this as an explicit stop when entering a scene without split scrolling."
+  },
+  "raster_bands_Raster_GetCount": {
+    "ja": "Rasterラッパーで登録した現在のバンド数を読みます。Clear/Disable後は0、Commitだけでは個数を消しません。",
+    "en": "Read the number of bands registered through the Raster wrapper. Clear/Disable reset it to zero; committing alone preserves it."
+  },
+  "raster_bands_Raster_GetLastError": {
+    "ja": "最後に保存されたRaster状態コードを読みます。読み取りでエラーは消えません。過去に発生したすべてのエラーを蓄積する機能ではありません。",
+    "en": "Read the last stored Raster status without clearing it. This is not a cumulative record of every previous failure."
+  },
+  "raster_bands_Raster_Push": {
+    "ja": "LYで背景SCX/SCYを切り替えるバンドを1個追加します。ウィンドウや色は変更しない、背景スクロール専用の登録関数です。",
+    "en": "Append one band that changes background SCX/SCY at the scheduled LY. This background-only operation does not change the window or colors."
+  },
+  "raster_bands_Raster_PushEx": {
+    "ja": "背景・ウィンドウ・表示状態・色のうち、flagsで指定した操作を行う拡張バンドを追加します。通常の背景だけならRaster_Pushを使うと引数が少なくなります。",
+    "en": "Append an extended band that performs the background, window, visibility or color operations selected by flags. Use Raster_Push for ordinary background-only changes with fewer arguments."
+  },
+  "raster_bands_expected_window_raw": {
+    "ja": "WX=31、WY=48により、ウィンドウ左上は画面(24,48)です。青い16×16矩形はその中の(8,8)、つまり画面(32,56)に見えます。上の赤い背景矩形は(32,16)です。DMGではどちらも黒になります。",
+    "en": "WX=31 and WY=48 place the window origin at screen (24,48). Its blue 16-by-16 rectangle at local (8,8) appears at screen (32,56). The upper red background rectangle stays at (32,16). Both are black on DMG."
+  },
+  "raster_bands_Raster_PushWindowRaw": {
+    "ja": "ハードウェアWX/WYをそのまま使うウィンドウバンドを追加します。WINビットを自動で追加し、背景用の2バイトには0を渡します。",
+    "en": "Append a window band using raw hardware WX/WY. It automatically adds WIN and supplies zero for the two background payload bytes."
+  },
+  "raster_bands_expected_window_screen": {
+    "ja": "画面座標(24,48)を直接指定しても、青いウィンドウ矩形はRaw版と同じ画面(32,56)に表示されます。Xへの7の加算はライブラリが行います。上の赤い背景矩形は(32,16)です。",
+    "en": "Passing screen (24,48) directly produces the same blue window rectangle at (32,56) as the raw example. The library adds seven to X. The upper red background rectangle is at (32,16)."
+  },
+  "raster_bands_Raster_PushWindowScreen": {
+    "ja": "画面座標でウィンドウバンドを追加します。Xに7を加えてからRaw版へ渡すため、画面XとWXを取り違えずに配置できます。",
+    "en": "Append a window band in screen coordinates. It adds seven to X before calling the raw variant, so callers can position the window without mixing up screen X and WX."
+  },
+  "raster_bands_expected_bg_window": {
+    "ja": "背景X=8により赤い背景矩形が(24,16)へ移ります。ウィンドウ左上は(24,48)で、青い矩形は(32,56)のままです。背景とウィンドウの座標系が独立していることが分かります。",
+    "en": "Background X=8 moves the red background rectangle to (24,16). The window origin remains (24,48), keeping its blue rectangle at (32,56). This shows the independent coordinate systems."
+  },
+  "raster_bands_Raster_PushBgWindowScreen": {
+    "ja": "1個のバンドで背景スクロールとウィンドウ座標を両方更新します。BGとWINを自動で追加し、ウィンドウXを画面座標からWXへ変換します。",
+    "en": "Update background scroll and window coordinates in a single band. The wrapper adds BG and WIN and converts window screen X to WX."
+  },
+  "raster_bands_expected_color": {
+    "ja": "CGB通常速度の検証画像では、上から行0～65が青、66～113が赤、114～143が緑です。予約LYは0・64・112で、割り込み処理とパレット待ちによる遅延が画面境界に含まれます。DMG版のカラー表示はありません。",
+    "en": "In the verified CGB normal-speed capture, rows 0..65 are blue, 66..113 red and 114..143 green. Scheduled LY values are 0, 64 and 112; interrupt and palette-access latency contribute to the visible boundaries. There is no DMG color version."
+  },
+  "raster_bands_Raster_PushBgColor0": {
+    "ja": "CGBの背景パレット0の色0を走査途中で切り替えるバンドを追加します。背景全体のパレット選択や他の3色を変更する操作ではありません。DMGでは登録できてもカラー効果はありません。",
+    "en": "Append a band that changes color zero of CGB background palette zero during the frame. It does not select a different palette or change its other three colors. Registration on DMG does not produce a color effect."
+  },
+  "raster_bands_Raster_Commit": {
+    "ja": "構築した共有表を有効にします。先にPushが失敗していても、それまでに登録できた表を適用します。呼び出し側で各登録の成否を確認してください。",
+    "en": "Activate the constructed shared table. Even if a previous push failed, entries successfully added before it are activated; caller code must check each registration."
+  },
+  "raster_bands_expected_hud_top": {
+    "ja": "上端32行を固定します。上の矩形は(32,16)のままで、下の2個はカメラ(8,8)により(24,72)と(24,104)へ移ります。上端のFIXED TOP HUDは動きません。",
+    "en": "The top 32 rows stay fixed. The upper rectangle remains at (32,16); camera (8,8) moves the other two to (24,72) and (24,104). FIXED TOP HUD remains at the top."
+  },
+  "raster_bands_Raster_BuildHudTop": {
+    "ja": "上側を固定したHUD用に、LY=0で背景(0,0)、hud_heightでカメラ座標となる2バンドを作ります。ウィンドウではなく背景スクロールの分割です。",
+    "en": "Build two background bands for a fixed top HUD: (0,0) at LY=0, then camera coordinates at hud_height. This splits background scrolling; it does not use the window."
+  },
+  "raster_bands_expected_hud_bottom": {
+    "ja": "96行目から下を固定します。上の2個の矩形はカメラ(8,8)により(24,8)と(24,72)、下の矩形は(32,112)です。下端のFIXED BOTTOM HUDも固定します。",
+    "en": "Rows from 96 downward stay fixed. Camera (8,8) places the upper rectangles at (24,8) and (24,72), while the bottom rectangle stays at (32,112). FIXED BOTTOM HUD stays at the bottom."
+  },
+  "raster_bands_Raster_BuildHudBottom": {
+    "ja": "上側をスクロールするプレイ領域、下側を固定HUDとする2バンドを作ります。LY=0はカメラ座標、hud_y以降は背景(0,0)です。",
+    "en": "Build a scrolling upper playfield and fixed bottom HUD. LY=0 uses camera coordinates; hud_y switches to background (0,0)."
+  },
+  "raster_bands_expected_parallax2": {
+    "ja": "64行目でXを0から16へ切り替えます。上の矩形は(32,16)、下の2個は(16,80)と(16,112)となり、下側だけ16ピクセル左へ動きます。",
+    "en": "X changes from 0 to 16 at the scheduled line 64. Rectangles appear at (32,16), (16,80) and (16,112); only the lower region shifts sixteen pixels left."
+  },
+  "raster_bands_Raster_BuildParallax2": {
+    "ja": "上下2段の背景を別々のXスクロール値で描く表を作ります。LY=0はfar_scx、split_y以降はnear_scxとなり、Yは共通です。",
+    "en": "Build two background bands with separate horizontal offsets: far_scx at LY=0 and near_scx from split_y, sharing the same Y scroll."
+  },
+  "raster_bands_expected_parallax3": {
+    "ja": "64行目と104行目でXを0→8→16へ切り替えます。矩形は(32,16)、(24,80)、(16,112)へ段階的に左へずれ、3段の差が見えます。",
+    "en": "Scheduled lines 64 and 104 select X offsets 0, 8 and 16. Rectangles at (32,16), (24,80) and (16,112) show the increasing displacement across three bands."
+  },
+  "raster_bands_Raster_BuildParallax3": {
+    "ja": "LY=0・y1・y2の3段に対して、それぞれscx0・scx1・scx2を登録します。遠景・中景・近景の横移動を分け、Yは共通にできます。",
+    "en": "Register scx0, scx1 and scx2 for bands beginning at LY=0, y1 and y2. Give far, middle and near layers different horizontal offsets while sharing Y scroll."
+  },
+  "raster_bands_module": {
+    "ja": "Rasterライブラリには、最大8個の境界を登録するバンド方式と、全144走査線のXを動かすLineX方式があります。バンド方式は固定HUD・多重スクロール・ウィンドウ切り替え・CGB色帯に向きます。LineX方式は波打つタイトルや画面演出に使います。両方式を同時には動かさず、必要な方式を選んでください。",
+    "en": "The Raster library provides an eight-entry band table and a LineX renderer that changes X on all 144 visible lines. Bands suit fixed HUDs, parallax, window changes and CGB color regions. LineX suits rippling titles and screen effects. Choose one driver; do not run both together."
+  }
+}

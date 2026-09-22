@@ -1,4 +1,4 @@
-"""Fail-closed runtime evidence and the function-free FC physics module."""
+"""Fail-closed runtime evidence and a separate FC subpixel-data lesson."""
 from pathlib import Path
 import hashlib,html,json,re
 SITE=Path(__file__).resolve().parents[1]
@@ -48,13 +48,13 @@ def verified_examples(contracts):
     return result
 
 def render_fc_module(text,language):
-    """Give a header containing only types/constants a discoverable module entry."""
+    """Describe the separate Q5.3 data convention beside the world/body APIs."""
     anchor='<h3 id="module-ppu">'
     if anchor not in text:return text
     text=re.sub(r'<!-- fc-physics:start -->.*?<!-- fc-physics:end -->','',text,flags=re.S)
     data=read(SOURCE/'physics_fc_module.json');prefix='' if language=='ja' else '../'
     section=data[language]
-    block='<!-- fc-physics:start --><section data-module-contract="physics-source-20260915"><h3 id="module-physics2d">'+html.escape(section['title'])+'</h3>'
+    block='<!-- fc-physics:start --><section data-module-contract="physics-source-20260915"><h3 id="physics-subpixel-data">'+html.escape(section['title'])+'</h3>'
     block+=''.join('<p>'+html.escape(p)+'</p>' for p in section['paragraphs'])
     block+='<h4>'+html.escape(section['example_title'])+'</h4><p>'+html.escape(section['expected'])+'</p>'
     block+='<div class="codebox"><span class="lang">c</span><pre><code>'+html.escape(data['code'])+'</code></pre></div>'

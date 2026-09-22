@@ -37,7 +37,7 @@ for mode,length in [('alternatives',255)]:
  command=[str(compiler),str(source),'-I',str(REPOS/'kitaqfc/lib'),'-I',str(SITE/'samples'),'-o',str(rom),'--mapper=nrom','--nes-chr='+str(SITE/'samples/api-examples/fc/vram_shapes.chr'),'--no-cache','--no-disasm']
  process=subprocess.run(command,capture_output=True,timeout=90,cwd=folder)
  (folder/'build.txt').write_bytes(process.stdout+process.stderr)
- row={'platform':'fc','mode':mode,'source':source.relative_to(SITE).as_posix(),'source_sha256':sha(source),'compiler_sha256':sha(compiler),'library_sha256':{name:sha(REPOS/'kitaqfc/lib'/name) for name in ['intrinsics.h','ppu.h']},'build_command':command,'build_exit':process.returncode,'passed':False,
+ row={'platform':'fc','mode':mode,'source':source.relative_to(SITE).as_posix(),'source_sha256':sha(source),'compiler_sha256':sha(compiler),'library_sha256':{name:sha(REPOS/'kitaqfc/lib'/name) for name in ['intrinsics.h','ppu.h','ppu.c','runtime.c','runtime.h']},'build_command':command,'build_exit':process.returncode,'passed':False,
   'support_sha256':{name:sha(SITE/name) for name in ['samples/fc_common.h','samples/api-examples/fc/vram_shapes.chr']}}
  if process.returncode==0:
   command=[str(emulator),'run',str(rom),'--frames','240','--png',str(image),'--json',str(report)]
@@ -48,7 +48,7 @@ for mode,length in [('alternatives',255)]:
    state=json.loads(report.read_text(encoding='utf-8'));frames=state['frames']
    labels=[(1,0,'PPU IMPLEMENTED CALLS'),(1,10,'BLUE COPY '+str(length)+' BYTES'),(1,20,'GREEN FILL '+str(length)+' BYTES'),(1,24,'FAILED CHECKS'),(24,24,'0'),(1,27,'SQUARE / BAR / TRIANGLE')]
    if mode=='runtime':labels += [(1,22,'NMI OBSERVED'),(24,22,'1'),(1,23,'VBLANK OBSERVED'),(24,23,'1')]
-   else:labels += [(1,22,'DECLARATIONS NEED BODIES')]
+   else:labels += [(1,22,'FOUR LIBRARY CALLS')]
    label_errors=check_pixels(image,labels,'fc');shapes,colors=geometry_errors(image,length)
    row.update(image=image.relative_to(SITE).as_posix(),image_sha256=sha(image),expected_labels=labels,label_pixel_mismatches=label_errors,geometry_pixel_mismatches=shapes,geometry_color_mismatches=colors,geometry_pixels_checked=34816,ppu_writes_while_rendering=state['ppu']['data_writes_while_rendering'],frames=frames,passed=label_errors==0 and shapes==0 and colors==0 and frames==240 and state['ppu']['data_writes_while_rendering']==0)
  if row['passed']:
@@ -56,5 +56,5 @@ for mode,length in [('alternatives',255)]:
   (folder/'integration_test/reports/COMMAND_HISTORY.log').unlink(missing_ok=True)
  records.append(row)
  print('fc',mode,'PASS' if row['passed'] else 'FAIL',flush=True)
-(OUTPUT/'results.json').write_text(json.dumps({'records':records,'scope':'Implemented alternatives for declaration-only screen, palette and nametable functions; the missing functions are not called by this ROM. NROM emulator only; real hardware not tested.'},indent=2),encoding='utf-8')
+(OUTPUT/'results.json').write_text(json.dumps({'records':records,'scope':'Executed screen, palette and nametable library calls with buffered nametable readback. NROM emulator only; real hardware not tested.','script_sha256':sha(Path(__file__))},indent=2),encoding='utf-8')
 if not all(r['passed'] for r in records):raise SystemExit(1)

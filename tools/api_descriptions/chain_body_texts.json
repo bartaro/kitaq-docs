@@ -1,0 +1,122 @@
+{
+  "chain_body_setup": {
+    "ja": "`chain.h`を読み込み、`chain.c`を1回だけコンパイルします。`ChainBody`は各節の現在位置と向きを保持します。座標履歴を蓄積する`Chain`とは別の状態型です。",
+    "en": "Include `chain.h` and compile `chain.c` exactly once. `ChainBody` holds each joint’s current position and heading. It is a separate state type from the `Chain` position-history ring."
+  },
+  "chain_body_storage": {
+    "ja": "`x`、`y`、`heading`はそれぞれ`capacity`バイトの書き込み可能な配列です。相互に重ねず、使用中は保持してください。添字0が頭で、`count`には頭も含みます。初期化後にポインター・容量・画面サイズを直接変更しないでください。",
+    "en": "Supply three separate writable arrays, `x`, `y` and `heading`, each containing `capacity` bytes. Keep them alive while the body is used. Index zero is the head, included in `count`. Do not alter storage pointers, capacity or field dimensions after initialization."
+  },
+  "chain_body_directions": {
+    "ja": "向きは時計回りの16方向で、0=右、4=下、8=左、12=上です。入力は下位4ビットを使います。画面座標は右・下が正で、幅・高さは1～256ピクセルです。",
+    "en": "Headings use 16 clockwise sectors: 0=right, 4=down, 8=left, 12=up. Only the low four input bits are used. Screen coordinates increase rightward and downward; each dimension is 1..256 pixels."
+  },
+  "chain_body_expected": {
+    "ja": "画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。",
+    "en": "The image shows a straight body at the top, one update after a downward turn in the middle, and four updates after the turn below. Coordinates are drawn at twice their logical size. The bend travels backward from the head at the right. CGB and FC use red for the head, blue for the body and green for the tail; DMG uses black. Four settling updates separate the duplicated tail after growth. These are three views of the same eight joints, not one 24-joint body."
+  },
+  "chain_body_physics": {
+    "ja": "頭の速度・加速度、当たり判定、描画、待機は呼び出し側で行います。通常は頭を動かした後、シミュレーション1回につき`chain_body_step`を1回呼びます。これは関節追従であり、剛体や厳密な長さ拘束を解く物理ソルバーではありません。",
+    "en": "The caller handles head velocity, acceleration, collisions, rendering and waiting. Normally update the head first, then call `chain_body_step` once per simulation tick. This is joint following, not a rigid-body or exact length-constraint solver."
+  },
+  "chain_body_void": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "chain_body_arg_body": {
+    "ja": "対象の`ChainBody`。`0`なら処理しません。初期化以外は初期化済みの状態を渡します。",
+    "en": "Target `ChainBody`; null is ignored. Except for initialization, pass an initialized state."
+  },
+  "chain_body_arg_x": {
+    "ja": "各節のX座標を保持する配列。",
+    "en": "Array of joint X coordinates."
+  },
+  "chain_body_arg_y": {
+    "ja": "各節のY座標を保持する配列。",
+    "en": "Array of joint Y coordinates."
+  },
+  "chain_body_arg_dirs": {
+    "ja": "各節の向きを保持する配列。",
+    "en": "Array of joint headings."
+  },
+  "chain_body_arg_cap": {
+    "ja": "確保済み配列の長さ、1～255。",
+    "en": "Allocated array length, 1..255."
+  },
+  "chain_body_arg_w": {
+    "ja": "折り返す画面の幅、1～256。",
+    "en": "Wrapped field width, 1..256."
+  },
+  "chain_body_arg_h": {
+    "ja": "折り返す画面の高さ、1～256。",
+    "en": "Wrapped field height, 1..256."
+  },
+  "chain_body_init_ret": {
+    "ja": "成功なら1、無効な引数なら0です。有効な`body`に対する失敗では`capacity`と`count`を0にし、以後の更新を無効にします。",
+    "en": "Return 1 on success or 0 for invalid arguments. Failure with a non-null body sets capacity and count to zero, disabling updates."
+  },
+  "chain_body_arg_count": {
+    "ja": "頭を含む節数。1～capacity。",
+    "en": "Joint count including the head, 1..capacity."
+  },
+  "chain_body_arg_hx": {
+    "ja": "頭のX座標。画面幅に合わせて折り返します。",
+    "en": "Head X coordinate, wrapped to the field width."
+  },
+  "chain_body_arg_hy": {
+    "ja": "頭のY座標。画面高さに合わせて折り返します。",
+    "en": "Head Y coordinate, wrapped to the field height."
+  },
+  "chain_body_arg_heading": {
+    "ja": "頭の16方向の向き。",
+    "en": "Head heading in the 16-sector system."
+  },
+  "chain_body_reset_ret": {
+    "ja": "成功なら1。節数が0、容量超過、またはbodyが0なら姿勢を変えず0です。",
+    "en": "Return 1 on success. A zero or excessive count, or a null body, returns 0 without changing the pose."
+  },
+  "chain_body_reset_gap": {
+    "ja": "上下左右は4ピクセル間隔です。斜めは整数ベクトル(4,1)、(3,3)、(1,4)などを使うため、実距離は厳密に4ピクセルではありません。画面端をまたぐ姿勢も生成できます。",
+    "en": "Cardinal spacing is four pixels. Intermediate headings use integer vectors such as (4,1), (3,3) and (1,4), so Euclidean distance is not exactly four pixels. The initial pose may cross a field edge."
+  },
+  "chain_body_step_algorithm": {
+    "ja": "前の節の更新済み座標から目標位置を求め、画面端をまたぐ最短差分を各軸で計算します。差分0なら移動せず、絶対値1～4なら1ピクセル、5以上なら2ピクセル動きます。ちょうど画面半分の距離では元の差分の符号を保ちます。",
+    "en": "Use the predecessor’s updated position to find the target socket, then compute the shortest wrapped displacement on each axis. A zero displacement does not move; magnitude 1..4 moves one pixel, and magnitude 5 or more moves two. At exactly half a field, retain the original displacement sign."
+  },
+  "chain_body_step_heading": {
+    "ja": "次の節へ渡すのは、上書きする前に保存した向きです。全身へ頭の新しい向きを一度に配る処理ではありません。空の状態では何もしません。",
+    "en": "Pass each joint’s saved, pre-update heading to the next joint, allowing a bend to travel through the body. An empty body is unchanged."
+  },
+  "chain_body_grow_ret": {
+    "ja": "追加できたら1。空、容量一杯、無効化された状態、またはbodyが0なら0です。",
+    "en": "Return 1 if a joint was appended; return 0 for an empty, full, disabled or null body."
+  },
+  "chain_body_grow_overlap": {
+    "ja": "追加直後の尾は前の尾と重なります。以後の`chain_body_step`で徐々に離れます。成長そのものでは頭や他の節を移動させません。",
+    "en": "The new tail initially overlaps the previous tail, then separates during subsequent `chain_body_step` calls. Growth itself does not move the head or other joints."
+  },
+  "chain_body_clear_data": {
+    "ja": "配列のバイト列は消去しません。再開には`chain_body_reset`を使います。クリア直後に`chain_body_grow`しても追加されません。",
+    "en": "Array bytes are not erased. Use `chain_body_reset` to start again; calling `chain_body_grow` immediately after clearing does not append a joint."
+  },
+  "chain_body_init": {
+    "ja": "呼び出し側の3配列を関節データに割り当て、節数を0にします。メモリは確保しません。",
+    "en": "Attach three caller-owned joint arrays and set the joint count to zero, without allocating memory."
+  },
+  "chain_body_reset": {
+    "ja": "指定した頭の位置から後方へ節を並べ、直線の初期姿勢を作ります。",
+    "en": "Build a straight initial pose by placing joints behind the specified head."
+  },
+  "chain_body_step": {
+    "ja": "頭を指定位置へ置き、前の節の後方へ各関節を少しずつ引き寄せます。曲がりが1更新につき1節ずつ後方へ伝わります。",
+    "en": "Set the head pose and pull each joint gradually toward a socket behind its predecessor. Heading changes propagate by one joint per update."
+  },
+  "chain_body_grow": {
+    "ja": "尾の現在位置と向きを次の空きスロットへ複製し、節数を1増やします。",
+    "en": "Copy the tail’s current position and heading into the next free slot and increase the count by one."
+  },
+  "chain_body_clear": {
+    "ja": "節数だけを0にして、同じ配列と画面設定を再利用できるようにします。",
+    "en": "Set the joint count to zero while retaining the arrays and field settings."
+  }
+}

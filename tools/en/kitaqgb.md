@@ -55,6 +55,23 @@ Start with these short type names. Do not assume desktop definitions of `int`, `
 
 Distinguish `=` from `==`. Use parentheses to make complex expressions clear, and avoid crowding calls and side effects into a single statement. Avoid division by zero and out-of-bounds array accesses. `sizeof` gives a size in bytes; `offsetof` gives a structure member's offset.
 
+<!-- common-language-kitaqgb:start -->
+### Expression results and evaluation
+The comparison operators `==`, `!=`, `<`, `<=`, `>`, `>=` and logical operators `!`, `&&`, `||` return 0 for false and 1 for true. You can store the result in a `u16`, pass or return it, or use it in arithmetic. For example, `score = 500 + (lives != 0);` produces 501 when a life remains and 500 otherwise.
+
+`&&` skips its right operand when the left operand is zero. `||` skips its right operand when the left operand is nonzero. In `pointer != 0 && pointer->active != 0`, a null pointer prevents the member access. Both bytes of a 16-bit value participate in the truth test, so 256 is true. Bitwise `&` and `|` do not short-circuit.
+
+`++value` returns the updated value; `value++` returns the original value. These operators also accept array elements, dereferenced pointers and structure members. `buffer[index()]++` calls `index()` once. For a `u16 *p`, `p++` advances two bytes to the next element, while `(*p)++` increments the pointed-to value.
+
+`sizeof(array)` gives the entire array's size in bytes; `sizeof(pointer)` is 2. For `u16 values[9];`, `sizeof(values)` is 18. This includes ROM arrays, local arrays and array members. `sizeof(function())` inspects the return type without calling the function.
+
+A function declaration and definition must agree on parameter types and order. Their parameter names may differ; the body uses the definition's names. For example, `u8 next(u8 input);` can be defined as `u8 next(u8 value) { return (u8)(value + 1); }`. Parameters and local variables hide globals with the same name.
+
+Selecting arrays or strings with `?:` produces a pointer to the selected element type. You can pass it directly, as in `show(ready ? "READY" : "WAIT");`. For `u16` arrays `a` and `b`, `(ready ? a : b) + 1` advances two bytes to the second element of the selected array. This does not copy the array.
+
+`condition ? yes : no` evaluates its condition and then only the selected arm. The condition and arms may contain shifts with variable counts. For example, `on = (pattern & (0x80 >> bit)) != 0 ? 4 : 2;` selects four or two for the chosen bit. Function calls in a right operand skipped by `&&` or `||` are also skipped. A `continue` in a `for` loop runs the update expression once before reevaluating the condition; in `while` and `do ... while`, it advances to the condition.
+
+<!-- common-language-kitaqgb:end -->
 ## 6. Branches and loops
 {{CODE:4}}
 

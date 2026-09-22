@@ -1,0 +1,66 @@
+{
+  "rob_setup": {
+    "ja": "`intrinsics.h`を読み込みます。既定のNMIハンドラーが動き、内部のNMIカウンターが更新される状態で使ってください。NMIが無効、または独自ハンドラーがカウンターを更新しない場合、待機は終わりません。タイムアウトはありません。",
+    "en": "Include `intrinsics.h`. The default NMI handler must be running and advancing its counter. Disabled NMI or a custom handler that does not maintain that counter leaves the wait blocked. There is no timeout."
+  },
+  "rob_mask": {
+    "ja": "点灯側はPPUMASKとその保持値を0x1E、消灯側は0にします。以前の描画マスクは復元しません。背景・スプライト・左端描画をまとめて切り替え、グレースケールや色強調の指定も上書きします。",
+    "en": "The on phase sets PPUMASK and its software shadow to 0x1E; the off phase sets both to zero. The previous mask is not restored. This changes background, sprite and left-edge rendering together and also replaces grayscale and color-emphasis settings."
+  },
+  "rob_light": {
+    "ja": "描画を有効にするだけでは白い画面になりません。明るいタイルとパレット、消灯中に見える暗い背景色を呼び出し側で用意します。サンプルは白い単色タイルと黒い背景色を使い、処理中に画面全体を点滅させます。",
+    "en": "Enabling rendering does not create a white screen by itself. Supply bright tiles and palette entries plus a dark backdrop for the off phase. The sample uses solid white tiles and a black backdrop, flashing the whole screen during the operation."
+  },
+  "rob_timing": {
+    "ja": "待機回数はNMIカウンターの変化数です。呼び出し時点から最初のNMIまでは1フレーム未満になる場合があります。前景処理から使い、割り込み内から呼ばないでください。別処理による描画マスクの変更は点滅を乱します。",
+    "en": "Wait counts measure NMI-counter changes. The interval from entry to the first NMI may be shorter than one frame. Call from foreground code, not an interrupt. Another routine changing the rendering mask can disturb the pattern."
+  },
+  "rob_scope": {
+    "ja": "画面の明暗と待機のための低水準部品です。ロボット用コマンドの前置きや機種別の命令列、受信確認は生成しません。検証はKUROSAKI上のPPUMASK書き込み順序・NMI回数・画像を対象とし、実機ロボットの受信は確認していません。",
+    "en": "These are low-level display-mask and wait primitives. They do not generate a robot command preamble, device-specific command sequence or reception acknowledgement. Verification covers PPUMASK writes, NMI counts and pixels in KUROSAKI; physical robot reception has not been tested."
+  },
+  "rob_void": {
+    "ja": "戻り値はありません。指定した待機が終わると呼び出し元へ戻ります。",
+    "en": "No return value. Return to the caller after the requested waits complete."
+  },
+  "rob_diagram": {
+    "ja": "実行後、FLASH WAITS 1、PULSE 3 ON / 2 OFF = 5、A5 BYTE WAITS 48と表示します。下の図は0xA5のビット列で、上段が1・0・1・0、下段が0・1・0・1です。1区画は1回の待機、白は描画有効、黒は無効を表します。ビット1は白4区画＋黒2区画、ビット0は白2区画＋黒4区画です。FINAL MASK 0とTIMING CHECKS OKが完了を示します。",
+    "en": "After execution, the screen shows FLASH WAITS 1, PULSE 3 ON / 2 OFF = 5 and A5 BYTE WAITS 48. The diagram represents 0xA5: 1,0,1,0 on the upper row and 0,1,0,1 below. Each cell is one wait; white means rendering enabled and black means disabled. A one has four white cells followed by two black cells; a zero has two white followed by four black. FINAL MASK 0 and TIMING CHECKS OK indicate completion."
+  },
+  "rob_bright": {
+    "ja": "0なら消灯、0以外なら点灯です。1だけでなく255なども点灯として扱います。輝度の段階指定ではありません。",
+    "en": "Zero selects off; any nonzero byte selects on, including 255. This is not a brightness level."
+  },
+  "rob_on": {
+    "ja": "点灯側の待機回数0～255。0なら点灯側を実行しません。",
+    "en": "On-phase wait count, 0..255. Zero skips the on phase."
+  },
+  "rob_off": {
+    "ja": "消灯側の待機回数0～255。0なら消灯側を実行しません。合計は最大510回です。",
+    "en": "Off-phase wait count, 0..255. Zero skips the off phase. The total can reach 510 waits."
+  },
+  "rob_zero": {
+    "ja": "両方0ならマスクも待機も変更しません。消灯回数が1以上なら終了時のマスクは0、点灯だけなら0x1Eです。",
+    "en": "With both counts zero, neither the mask nor timing changes. Any off waits leave mask zero; an on-only pulse leaves 0x1E."
+  },
+  "rob_pattern": {
+    "ja": "送る8ビットのパターン0～255です。0xA5なら1,0,1,0,0,1,0,1の順になります。チャンネル番号やロボットの操作番号ではありません。",
+    "en": "Eight-bit pattern, 0..255. For 0xA5 the order is 1,0,1,0,0,1,0,1. This is not a channel ID or a robot action number."
+  },
+  "rob_final": {
+    "ja": "最後のビットも必ず消灯待機で終わり、終了時のPPUMASKと保持値は0です。固定長の8ビットだけを送り、開始記号や終端記号は加えません。",
+    "en": "The last bit also ends with off waits, leaving PPUMASK and its shadow at zero. Send exactly eight bits; no start or end marker is added."
+  },
+  "rob___rob_flash": {
+    "ja": "描画を点灯側または消灯側へ設定し、NMIカウンターが1回変わるまで待ちます。設定したマスクは戻った後も維持します。",
+    "en": "Select the on or off rendering mask and wait for one NMI-counter change. The selected mask remains in effect after return."
+  },
+  "rob___rob_pulse": {
+    "ja": "指定回数の点灯待機を行い、続けて指定回数の消灯待機を行います。1組のパルスを作る関数です。",
+    "en": "Perform the requested on waits followed by the requested off waits, producing one pulse."
+  },
+  "rob___rob_send_byte": {
+    "ja": "1バイトを最上位ビットから8ビットの点滅パターンに変換します。1は点灯4回・消灯2回、0は点灯2回・消灯4回の待機で表し、合計48回のNMI待機を行います。",
+    "en": "Encode one byte as eight blink patterns, most-significant bit first. One uses four on waits and two off waits; zero uses two on waits and four off waits. The total is 48 NMI waits."
+  }
+}

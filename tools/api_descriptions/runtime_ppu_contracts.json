@@ -54,7 +54,31 @@
         [
           "vq_dst_fc"
         ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "rq_setup",
+      "rp_timing"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/runtime_ppu.c",
+      "code": "PPUADDR=0x21; // Deliberately leave the shared address latch half-written.\nnes_ppu_seek(0x2342); // This runtime function resets the latch itself.\nPPUDATA=1; // Red 8x8 marker at pixel (16,208).",
+      "expected": [
+        "rp_scene"
       ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\runtime_ppu.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\runtime_ppu.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+    },
+    "record_sha256": "e5c7c52e815944e5560f27b03a984ecd10e0b4157578a7d20a02d796924b2caa"
+  },
+  "fc:nes_ppu_seek_bytes": {
+    "review": "runtime-ppu-source-20260915",
+    "purpose": [
+      "rp_seek_bytes"
+    ],
+    "args": [
       [
         "hi / lo",
         [
@@ -66,30 +90,18 @@
       "none"
     ],
     "notes": [
-      "rq_setup",
       "rp_pair_setup",
       "rp_timing"
     ],
     "example": {
-      "program": "samples/api-examples/fc/runtime_ppu.c",
-      "code": "PPUADDR=0x21; // Deliberately leave the shared address latch half-written.\nnes_ppu_seek(0x2342); // This runtime function resets the latch itself.\nPPUDATA=1; // Red 8x8 marker at pixel (16,208).",
+      "program": "samples/api-examples/fc/ppu_address_pair.c",
+      "code": "nes_ppu_seek_bytes(0x23,0x42);\nPPUDATA=1; // Red 8x8 marker at pixel (16,208).",
       "expected": [
-        "rp_scene"
+        "rp_pair_scene"
       ],
-      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\runtime_ppu.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\runtime_ppu.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm",
-      "additional": [
-        {
-          "program": "samples/api-examples/fc/ppu_address_pair.c",
-          "code": "__ppu_read_status(); // Reset the shared latch before the high/low pair.\nnes_ppu_seek(0x23,0x42);\nPPUDATA=1; // Red 8x8 marker at pixel (16,208).",
-          "expected": [
-            "rp_pair_scene"
-          ],
-          "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\ppu_address_pair.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\ppu_address_pair.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
-        }
-      ]
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\ppu_address_pair.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\ppu_address_pair.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
     },
-    "syntax": "void nes_ppu_seek(unsigned short ppu_addr);\n\n// Separate implementation in ppu.c:\nvoid nes_ppu_seek(unsigned char hi, unsigned char lo);",
-    "record_sha256": "9b96915b11e5677ffdb8b7d512fac034270a5cf6d476310f9bf4e17d01915f85"
+    "record_sha256": "09333e21bd06e9b147009e0babf48254075edafd70f1ffa4a7973149ff35edd1"
   },
   "fc:nes_ppu_stream_write": {
     "review": "runtime-ppu-source-20260915",
@@ -215,7 +227,7 @@
       ],
       "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\ppu_address_pair.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\ppu_address_pair.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
     },
-    "record_sha256": "3714b6b1874131d97f1b436d783dbe013b37049f72db11ea07e6c5037edf95a5"
+    "record_sha256": "fd81019db55b912e54541bdbf90ca092dac004af2606138311a35386dfe9fefb"
   },
   "fc:nes_ppu_fill": {
     "review": "runtime-ppu-source-20260915",
@@ -257,6 +269,6 @@
       ],
       "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\ppu_address_pair.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\ppu_address_pair.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
     },
-    "record_sha256": "fda6400c3bdb7988471ce2c6585801ffc4531945c3d63c8144907207c9c153be"
+    "record_sha256": "caa92e39b75b4620bbed808f5a9f7f74e4474a3e90b428fc5a0decd7822e2f88"
   }
 }

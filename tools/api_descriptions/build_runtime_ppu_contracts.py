@@ -11,14 +11,15 @@ definitions={r['name']:r for r in catalog.definitions(implementation)}
 pair_source=REPOS/'kitaqfc/lib/ppu.c'
 pair_definitions={r['name']:r for r in catalog.definitions(pair_source)}
 inventory=SITE/'reference/fc-api.json';data=json.loads(inventory.read_text(encoding='utf-8'));records={r['name']:r for r in data['records']}
-for name in ['nes_ppu_write_bytes','nes_ppu_fill']:
+for name in ['nes_ppu_seek_bytes','nes_ppu_write_bytes','nes_ppu_fill']:
     if name not in records:
         record=dict(pair_definitions[name]);record.update(module='ppu',availability='implementation',definition=dict(pair_definitions[name]),example=None)
         data['records'].append(record);records[name]=record
 rows={
  'nes_wait_nmi':('rp_wait_nmi',[],'runtime_ppu.c',['rq_setup']),
  'nes_vblank_wait':('rp_wait_blank',[],'runtime_ppu.c',['rq_setup']),
- 'nes_ppu_seek':('rp_seek',[('ppu_addr','vq_dst_fc'),('hi / lo','rp_pair_address')],'runtime_ppu.c',['rq_setup','rp_pair_setup','rp_timing']),
+ 'nes_ppu_seek':('rp_seek',[('ppu_addr','vq_dst_fc')],'runtime_ppu.c',['rq_setup','rp_timing']),
+ 'nes_ppu_seek_bytes':('rp_seek_bytes',[('hi / lo','rp_pair_address')],'ppu_address_pair.c',['rp_pair_setup','rp_timing']),
  'nes_ppu_stream_write':('rp_write',[('ppu_addr','vq_dst_fc'),('src','rp_source'),('len','rp_length')],'runtime_ppu.c',['rq_setup','rp_timing']),
  'nes_ppu_stream_fill':('rp_fill',[('ppu_addr','vq_dst_fc'),('value','vq_fill_value'),('len','rp_length')],'runtime_ppu.c',['rq_setup','rp_timing']),
  'nes_ppu_write_bytes':('rp_pair_write',[('hi / lo','rp_pair_address'),('src','rp_source'),('count','rp_pair_length')],'ppu_address_pair.c',['rp_pair_setup','rp_timing']),
@@ -34,11 +35,8 @@ for name,(purpose,args,filename,notes) in rows.items():
     for field in ['ret','args','signature','path','line','comment','body']:record[field]=primary[field]
     record['definition']=definitions[name] if name in definitions else pair_definitions[name]
     contract=dict(review='runtime-ppu-source-20260915',purpose=[purpose],args=[[arg,[message]] for arg,message in args],returns=['none'],notes=notes,example=example(filename,name))
-    if name=='nes_ppu_seek':
-        contract['syntax']=primary['signature']+'\n\n// Separate implementation in ppu.c:\n'+pair_definitions[name]['signature']
-        contract['example']['additional']=[example('ppu_address_pair.c','pair_nes_ppu_seek')]
-        record['implementation_excerpt']=pair_definitions[name]['body']
-        record['alternative_definition']=pair_definitions[name]
+    record.pop('implementation_excerpt',None)
+    record.pop('alternative_definition',None)
     contract['record_sha256']=hashlib.sha256(json.dumps({k:record.get(k) for k in ['name','signature','comment','definition','implementation_excerpt']},sort_keys=True).encode()).hexdigest()
     contracts['fc:'+name]=contract
 (HERE/'runtime_ppu_contracts.json').write_text(json.dumps(contracts,ensure_ascii=False,indent=2),encoding='utf-8')
@@ -47,11 +45,11 @@ for name,(purpose,args,filename,notes) in rows.items():
 inventory.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
 # Add the two headerless public functions to the existing PPU section. Other
 # internal C helpers are separately audited, not presumed public by their name.
-for language in ['', 'en','ko','zh-CN','zh-TW','es','pt','fr','de']:
+for language in ['', 'en']:
     page=SITE/language/'fc-library.html';raw=page.read_bytes();text=raw.decode('utf-8')
-    for name in ['nes_ppu_write_bytes','nes_ppu_fill']:
+    for name in ['nes_ppu_seek_bytes','nes_ppu_write_bytes','nes_ppu_fill']:
         if 'id="api-'+name+'"' not in text:
             text=re.sub(r'(<h3[^>]*id="module-ppu"[^>]*>.*?</h3>)',lambda m:m[1]+'<details class="api searchable" id="api-'+name+'"><summary><code>'+name+'</code></summary></details>',text,count=1,flags=re.S)
     text=re.sub(r'(<h3[^>]*id="module-ppu"[^>]*>).*?(</h3>)',r'\1ppu.h / ppu.c\2',text,count=1,flags=re.S)
     page.write_bytes(text.encode('utf-8'))
-print('Seven direct PPU contracts; two headerless functions added to the inventory.')
+print('Eight direct PPU contracts, including distinct word and byte-pair seek calls.')

@@ -13,7 +13,7 @@ def msg(key,ja,en):
 group_for={'fixed.h':'math','chain.h':'chain','debug.h':'debug','system.h':'services','scene.h':'services','collision.h':'geometry','rpg.h':'menu_state'}
 module_text={
  'fixed':('整数だけで座標や速度の小数部分を扱うQ8.8演算と、矩形・点の当たり判定です。各演算の精度と範囲の制限を確認してください。','Q8.8 arithmetic represents fractional coordinates and speeds using integers, alongside rectangle/point collision tests. Check each operation’s precision and range limits.'),
- 'chain':('移動物体の過去の座標をリングバッファに保存するライブラリです。最新点から古い点へ取り出し、追従する物体や軌跡の計算に使えます。','A circular buffer for an object’s past positions. Read from newest to oldest to implement followers or movement trails.'),
+ 'chain':('関節でつながる蛇・ひもなどを動かす`ChainBody`と、移動座標を記録する`Chain`を提供します。`ChainBody`は各節の現在位置と16方向の向きを保持し、曲がりを1節ずつ後方へ伝えます。画面端の折り返し、尾を複製する成長、1軸あたり最大2ピクセルの追従に対応します。','Use `ChainBody` for articulated snakes or ropes, and `Chain` for recorded position history. Each body joint stores its current position and one of 16 headings; bends travel backward one joint per update. Body operations support wrapped fields, growth by tail duplication and corrections of up to two pixels per axis.'),
  'debug':('名前・値・フレーム番号を固定容量のRAMログに記録します。アサートは情報を残して実行を続ける方式です。','Record names, values and frame tags in a fixed-capacity RAM log. Assertions retain diagnostic information and allow execution to continue.'),
  'system':('フレーム待機回数の管理、待機後のコールバック、CPU割り込みの許可・禁止を扱います。','Manage frame-wait counts, callbacks after waits, and maskable CPU interrupt control.'),
  'scene':('シーン表のenter・update・draw・exitを使い、タイトル画面やプレイ画面の処理を切り替えます。','Dispatch a scene table’s enter, update, draw and exit handlers to switch between screens such as a title and gameplay.'),

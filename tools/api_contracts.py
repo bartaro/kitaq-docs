@@ -54,7 +54,7 @@ def render(record, contract, language, messages, ui):
         result = []
         for shot in example.get('verified_images', []):
             caption = shot['caption']
-            if contract['review'] in ['physics-source-20260915','wireframe-source-20260915']:
+            if contract['review'] in ['physics-source-20260915','fc-physics-source-20260922','wireframe-source-20260915','raster-wave-source-20260922','raster-bands-source-20260922','rob-source-20260922','chain-body-source-20260922','fc-wireframe-source-20260922','fc-danmaku-source-20260922','zx0-source-20260922']:
                 caption += ' — ' + ' '.join(messages[key][index].replace('`','') for key in example.get('expected', []))
             result.append('<figure class="example-result"><img class="screen" loading="lazy" src="' + prefix + html.escape(shot['image'], quote=True) + '" alt="' + html.escape(name + ': ' + caption, quote=True) + '"><figcaption>' + html.escape(caption) + '</figcaption></figure>')
         for clip in example.get('verified_audio', []):
@@ -182,12 +182,34 @@ def publish(language, require_complete=False):
     proofs.update(verified_batch300_examples(contracts))
     from api_link_proofs import verified_examples as verified_link_examples
     proofs.update(verified_link_examples(contracts))
+    from api_dmg07_proofs import verified_examples as verified_dmg07_examples
+    proofs.update(verified_dmg07_examples(contracts))
+    from api_raster_wave_proofs import verified_examples as verified_raster_wave_examples
+    proofs.update(verified_raster_wave_examples(contracts))
+    from api_raster_bands_proofs import verified_examples as verified_raster_bands_examples
+    proofs.update(verified_raster_bands_examples(contracts))
     from api_physics_proofs import verified_examples as verified_physics_examples
     proofs.update(verified_physics_examples(contracts))
+    from api_fc_physics_proofs import verified_examples as verified_fc_physics_examples
+    proofs.update(verified_fc_physics_examples(contracts))
+    from api_audio_queue_proofs import verified_examples as verified_audio_queue_examples
+    proofs.update(verified_audio_queue_examples(contracts))
+    from api_zx0_proofs import verified_examples as verified_zx0_examples
+    proofs.update(verified_zx0_examples(contracts))
+    from api_ppu_library_proofs import verified_shadow_examples
+    proofs.update(verified_shadow_examples(contracts))
     from api_wireframe_proofs import verified_examples as verified_wireframe_examples
     proofs.update(verified_wireframe_examples(contracts))
+    from api_fc_wireframe_proofs import verified_examples as verified_fc_wireframe_examples
+    proofs.update(verified_fc_wireframe_examples(contracts))
+    from api_fc_danmaku_proofs import verified_examples as verified_fc_danmaku_examples
+    proofs.update(verified_fc_danmaku_examples(contracts))
     from api_sound_proofs import verified_examples as verified_sound_examples
     proofs.update(verified_sound_examples(contracts))
+    from api_rob_proofs import verified_examples as verified_rob_examples
+    proofs.update(verified_rob_examples(contracts))
+    from api_chain_body_proofs import verified_examples as verified_chain_body_examples
+    proofs.update(verified_chain_body_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -225,9 +247,36 @@ def publish(language, require_complete=False):
             for start, end, replacement in reversed(edits):
                 text = text[:start] + replacement + text[end:]
             text = render_modules(text, platform, language, messages)
+            if platform == 'gb' and volume == 'gb-library':
+                from raster_wave_presentation import overview
+                text = overview(text, language)
+                from wireframe_speed_presentation import overview as wire_speed_overview
+                text = wire_speed_overview(text, language)
             if platform == 'fc':
+                if volume == 'kitaqfc':
+                    from fc_chr_ram_presentation import overview as chr_ram_overview
+                    text = chr_ram_overview(text, language)
+                from api_fc_wireframe_proofs import ensure_header
+                text = ensure_header(text)
                 from api_physics_proofs import render_fc_module
                 text = render_fc_module(text, language)
+                if volume == 'fc-library':
+                    from fc_wireframe_presentation import overview as wireframe_overview
+                    text = wireframe_overview(text, language)
+                    from api_fc_danmaku_proofs import overview as danmaku_overview
+                    text = danmaku_overview(text, language)
+                    from api_fc_physics_proofs import overview as fc_physics_overview
+                    text = fc_physics_overview(text, language)
+            from render_feature_cards import overview as feature_cards_overview
+            if volume in ['gb-library', 'fc-library']:
+                from api_chain_body_proofs import overview as chain_body_overview
+                text = chain_body_overview(text, platform, language)
+                from api_zx0_proofs import overview as zx0_overview
+                text = zx0_overview(text, platform, language)
+            if volume == 'gb-library':
+                from api_raster_bands_proofs import overview as raster_bands_overview
+                text = raster_bands_overview(text, language)
+            text = feature_cards_overview(text, platform, language)
             text = refresh_complete_headers(text, platform)
             path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
     publish_verification(language, contracts, proofs, messages, ui)
@@ -418,38 +467,8 @@ def verified_runtime_ppu_examples(contracts):
 
 
 def verified_ppu_declaration_examples(contracts):
-    """Separate expected unresolved symbols from successful alternative execution."""
-    folder=SITE/'verification/api-ppu-declarations'
-    if not (folder/'results.json').exists() or not (folder/'state_checks.json').exists():return {}
-    runs=json.loads((folder/'results.json').read_text(encoding='utf-8'))['records']
-    state=json.loads((folder/'state_checks.json').read_text(encoding='utf-8'))
-    if len(runs)!=1 or not runs[0]['passed']:return {}
-    if len(state['declarations'])!=4 or len(state['alternatives'])!=4:return {}
-    for row in state['declarations']:
-        if not row['passed'] or row['build_exit']==0 or not row['diagnostic_present'] or row['rom_created']:return {}
-        case=folder/'declarations'/row['name']
-        if row['expected_diagnostic'] not in (case/'build.txt').read_text(encoding='utf-8',errors='replace'):return {}
-        if hashlib.sha256((case/'case.c').read_bytes()).hexdigest()!=row['source_sha256']:raise ValueError('Declaration build source changed')
-    if not all(r['passed'] and r['actual']==r['expected'] for r in state['alternatives']):return {}
-    repos=SITE.parents[1]/'publish/github_20260912'
-    if not repos.exists():repos=SITE.parent
-    for name,expected in state['library_sha256'].items():
-        source=repos/'kitaqfc/lib'/name
-        if source.exists() and hashlib.sha256(source.read_bytes()).hexdigest()!=expected:raise ValueError('PPU declaration source changed: '+name)
-    script=repos/'kitaqfc/scripts/test-ppu-declarations.py'
-    if script.exists() and hashlib.sha256(script.read_bytes()).hexdigest()!=state['script_sha256']:raise ValueError('Declaration test script changed')
-    run=runs[0]
-    if run['frames']!=240 or run['geometry_pixels_checked']!=34816 or any(run[k]!=0 for k in ['label_pixel_mismatches','geometry_pixel_mismatches','geometry_color_mismatches','ppu_writes_while_rendering']):return {}
-    if run['compiler_sha256']!=state['compiler_sha256'] or run['emulator_sha256']!=state['emulator_sha256'] or run['library_sha256']!=state['library_sha256']:return {}
-    for name,expected in {run['source']:run['source_sha256'],run['image']:run['image_sha256'],**run['support_sha256']}.items():
-        if hashlib.sha256((SITE/name).read_bytes()).hexdigest()!=expected:raise ValueError('Alternative image/source changed: '+name)
-    result={}
-    for key,contract in contracts.items():
-        if contract['review']!='ppu-declarations-source-20260915':continue
-        if contract['example']['program']!=run['source']:raise ValueError('Alternative program mismatch')
-        name=key.split(':')[1]
-        result[key]=dict(api=name,kind='ppu-declarations',runs=runs,state_path='verification/api-ppu-declarations/state_checks.json',state_count=8,declaration_path='verification/api-ppu-declarations/declarations/'+name+'/build.txt')
-    return result
+    from api_ppu_library_proofs import verified_examples
+    return verified_examples(contracts)
 
 
 def verified_ppu_intrinsic_examples(contracts):
@@ -1150,6 +1169,10 @@ def attach_verified_images(contracts, proofs):
             if len(matching) != 1:
                 raise ValueError('Screen does not identify exactly one sample: ' + key)
             caption = ('--cgb=' + run['target'] + ' / ' if result.get('kind') in ['cgb-palette', 'cgb-dma-wram'] else '') + run['mode'].upper()
+            if result.get('kind') == 'raster-wave':
+                caption += ' / frame ' + str(run['frames'])
+            if result.get('kind') == 'dmg07':
+                caption += ' / player ' + str(run['slot'])
             matching[0]['verified_images'].append({'image': run['image'], 'caption': caption})
             if run.get('audio') and run.get('playback_clip',True):
                 matching[0]['verified_audio'].append({'audio': run['audio'], 'caption': caption})

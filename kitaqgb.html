@@ -51,6 +51,16 @@ score = (u16)200 + 100;</code></pre></div>
 <tr><td>ポインタ</td><td><code>&amp;変数</code> / <code>*p</code></td><td>アドレスを得る／指す先を読む</td></tr>
 </table></div>
 <p><code>=</code> と <code>==</code> を混同しないでください。複雑な式は括弧で意図を明確にし、呼び出しと副作用を1行へ詰め込みません。ゼロ除算や配列範囲外へのアクセスは避けます。<code>sizeof</code> はバイト数、<code>offsetof</code> は構造体メンバーの位置を得るために使います。</p>
+<!-- common-language-kitaqgb:start -->
+<h3 id="式の結果と評価回数">式の結果と評価回数</h3>
+<p>比較演算子 <code>==</code>、<code>!=</code>、<code>&lt;</code>、<code>&lt;=</code>、<code>&gt;</code>、<code>&gt;=</code> と論理演算子 <code>!</code>、<code>&amp;&amp;</code>、<code>||</code> は、偽なら0、真なら1を返します。結果を <code>u16</code> 変数へ保存したり、引数・戻り値・算術式に使えます。例えば <code>score = 500 + (lives != 0);</code> は、残機があれば501、なければ500になります。</p>
+<p><code>&amp;&amp;</code> は左辺が0なら右辺を評価せず、<code>||</code> は左辺が0以外なら右辺を評価しません。<code>pointer != 0 &amp;&amp; pointer-&gt;active != 0</code> では、ポインタが0のとき右辺へアクセスしません。16ビット値は上位バイトも含めて判定するため、256も真です。ビット演算子 <code>&amp;</code>、<code>|</code> には短絡評価がありません。</p>
+<p><code>++value</code> は更新後、<code>value++</code> は更新前の値を返します。配列要素、ポインタの参照先、構造体メンバーにも使えます。<code>buffer[index()]++</code> は <code>index()</code> を1回呼びます。<code>u16 *p</code> に対する <code>p++</code> は次の要素へ2バイト進み、<code>(*p)++</code> は指している値を増やします。</p>
+<p><code>sizeof(array)</code> は配列全体のバイト数、<code>sizeof(pointer)</code> は2です。例えば <code>u16 values[9];</code> なら <code>sizeof(values)</code> は18です。ROM配列・ローカル配列・構造体内の配列も対象になります。<code>sizeof(function())</code> は戻り値の型の大きさを調べるだけで、関数を呼びません。</p>
+<p>関数宣言と定義では、引数の型と順番を合わせます。引数名は一致しなくてもよく、関数本体では定義側の名前を使います。例えば <code>u8 next(u8 input);</code> に対して <code>u8 next(u8 value) { return (u8)(value + 1); }</code> と定義できます。引数やローカル変数は同名のグローバル変数を隠します。</p>
+<p><code>?:</code>で配列や文字列を選ぶと、結果は選んだ要素型へのポインタになります。<code>show(ready ? &quot;READY&quot; : &quot;WAIT&quot;);</code>のように直接引数へ渡せます。<code>u16</code>配列<code>a</code>と<code>b</code>を選ぶ<code>(ready ? a : b) + 1</code>は、選択先の2番目の要素へ2バイト進みます。配列そのものをコピーする操作ではありません。</p>
+<p><code>condition ? yes : no</code> は条件を評価してから、選ばれた側だけを評価します。条件や選択肢には変数を使ったシフト式も書けます。例えば <code>on = (pattern &amp; (0x80 &gt;&gt; bit)) != 0 ? 4 : 2;</code> は対象ビットに応じて4か2を選びます。<code>&amp;&amp;</code>、<code>||</code>で飛ばされる右辺の関数呼び出しも実行されません。ループ内の<code>continue</code>では、<code>for</code>の更新式を1回実行してから条件を再評価します。<code>while</code>・<code>do ... while</code>では条件へ進みます。</p>
+<!-- common-language-kitaqgb:end -->
 <h2 id="6-条件分岐と繰り返し">6　条件分岐と繰り返し</h2>
 <div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>if (lives == 0) { game_over = 1; }
 else { score = score + 10; }

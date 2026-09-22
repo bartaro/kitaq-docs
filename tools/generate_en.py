@@ -64,7 +64,7 @@ SPECIAL = dict(zip(g.SPECIAL, [
     'Start music from a bank number and song data in the driver stream format.',
     'Start a sound effect at the requested priority and record the currently visible ROM bank.',
     'Change the music/effect driver pause state. The game must separately pause its own logic.',
-    'On GB, the wait function calls this callback cooperatively. The current FC implementation only stores it; it does not invoke it automatically.',
+    'On GB and FC, the wait function calls a non-null callback synchronously after completing its frame wait.',
     'Allocate a free sprite slot. Check for the failure value before using the result.',
     'Initialize a free object and return its ID, or 0xFF when the pool is full.',
     'Return the object for a valid ID. Check for NULL for out-of-range or inactive IDs.',

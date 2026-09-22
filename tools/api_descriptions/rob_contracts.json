@@ -1,0 +1,109 @@
+{
+  "fc:__rob_flash": {
+    "review": "rob-source-20260922",
+    "record_sha256": "37fd12f52ccbc36e2567d07bce1af099973f19fbe830a2dbefdfdafd986f6119",
+    "purpose": [
+      "rob___rob_flash"
+    ],
+    "args": [
+      [
+        "bright",
+        [
+          "rob_bright"
+        ]
+      ]
+    ],
+    "returns": [
+      "rob_void"
+    ],
+    "notes": [
+      "rob_setup",
+      "rob_mask",
+      "rob_light",
+      "rob_timing",
+      "rob_scope"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/rob_timing.c",
+      "code": "    start=__nmi_ready();\n    __rob_flash(1); // Enable rendering and wait for one NMI-counter change.\n    rob_result[0]=(u8)(__nmi_ready()-start);\n    __rob_flash(0); // Disable rendering; the black backdrop remains visible.",
+      "expected": [
+        "rob_diagram"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\rob_timing.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr -o .\\out\\rob_timing.nes --no-cache --no-disasm"
+    }
+  },
+  "fc:__rob_pulse": {
+    "review": "rob-source-20260922",
+    "record_sha256": "a424a5177713d6f54b04a28140983943786ee316e79d72b80401eb5cce1d2248",
+    "purpose": [
+      "rob___rob_pulse"
+    ],
+    "args": [
+      [
+        "on_frames",
+        [
+          "rob_on"
+        ]
+      ],
+      [
+        "off_frames",
+        [
+          "rob_off"
+        ]
+      ]
+    ],
+    "returns": [
+      "rob_void"
+    ],
+    "notes": [
+      "rob_zero",
+      "rob_setup",
+      "rob_mask",
+      "rob_light",
+      "rob_timing",
+      "rob_scope"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/rob_timing.c",
+      "code": "    start=__nmi_ready();\n    __rob_pulse(3,2); // Three enabled waits, then two disabled waits.\n    rob_result[1]=(u8)(__nmi_ready()-start);",
+      "expected": [
+        "rob_diagram"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\rob_timing.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr -o .\\out\\rob_timing.nes --no-cache --no-disasm"
+    }
+  },
+  "fc:__rob_send_byte": {
+    "review": "rob-source-20260922",
+    "record_sha256": "cc703360df2275f8aefa6670027e43952f9157b13ea379305ac955cf4ce1f7df",
+    "purpose": [
+      "rob___rob_send_byte"
+    ],
+    "args": [
+      [
+        "pattern",
+        [
+          "rob_pattern"
+        ]
+      ]
+    ],
+    "returns": [
+      "rob_void"
+    ],
+    "notes": [
+      "rob_final",
+      "rob_setup",
+      "rob_mask",
+      "rob_light",
+      "rob_timing",
+      "rob_scope"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/rob_timing.c",
+      "code": "    start=__nmi_ready();\n    __rob_send_byte(0xA5); // 10100101, most-significant bit first; 48 waits.\n    rob_result[2]=(u8)(__nmi_ready()-start);\n    rob_result[3]=__ppu_mask_get(); // Zero: the sequence ends with rendering off.",
+      "expected": [
+        "rob_diagram"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\rob_timing.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr -o .\\out\\rob_timing.nes --no-cache --no-disasm"
+    }
+  }
+}

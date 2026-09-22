@@ -1,7 +1,7 @@
 {
   "rp_pair_write": [
-    "Write `count` consecutive source bytes directly to PPUDATA after setting the address with `hi` and `lo`. This `ppu.c` function accepts an eight-bit count and relies on the caller to reset the address latch. Transfer completes before return; no queue is used.",
-    "`hi`と`lo`でアドレスを設定し、転送元の連続した`count`バイトをPPUDATAへ直接書きます。`ppu.c`のこの関数は8ビットの個数を受け取り、アドレスラッチのリセットは呼び出し側が行います。キューは使わず、関数が戻るまでに転送が完了します。",
+    "Reset the address latch, set hi/lo and write count source bytes directly to PPUDATA. The eight-bit count limits a call to 255 bytes. Transfer finishes before return without a queue.",
+    "アドレスラッチをリセットしてhi/loを設定し、素材のcountバイトを直接PPUDATAへ書きます。個数は8ビットなので1回で255バイトまでです。キューを使わず、戻る前に転送を完了します。",
     "`hi`와 `lo`로 주소를 설정한 뒤 원본의 연속된 `count`바이트를 PPUDATA에 직접 씁니다. 이 `ppu.c` 함수는 8비트 개수를 받으며 주소 래치 초기화는 호출자가 담당합니다. 큐를 사용하지 않고 반환 전에 전송을 마칩니다.",
     "用 `hi` 和 `lo` 设置地址后，将源数据中连续的 `count` 字节直接写入 PPUDATA。此 `ppu.c` 函数接受八位计数，地址锁存器由调用方复位。不使用队列，返回前完成传输。",
     "用 `hi` 和 `lo` 設定位址後，將來源中連續的 `count` 位元組直接寫入 PPUDATA。此 `ppu.c` 函式接受八位元計數，位址鎖存器由呼叫端重設。不使用佇列，返回前完成傳輸。",
@@ -11,8 +11,8 @@
     "Schreibt nach dem Setzen der Adresse mit `hi` und `lo` direkt `count` aufeinanderfolgende Quellbytes nach PPUDATA. Diese Funktion aus `ppu.c` nimmt eine 8-Bit-Anzahl entgegen; der Aufrufer muss den Adress-Latch zurücksetzen. Die Übertragung endet vor der Rückkehr und verwendet keine Warteschlange."
   ],
   "rp_pair_fill": [
-    "Set the address with `hi` and `lo`, then write `value` to PPUDATA `count` times. This `ppu.c` function fills immediately with an eight-bit count; the caller resets the latch first. It does not clip to rows or rectangles.",
-    "`hi`と`lo`でアドレスを設定し、`value`をPPUDATAへ`count`回書きます。`ppu.c`のこの関数は8ビットの個数で直接埋め込みを行います。先に呼び出し側でラッチをリセットしてください。行や矩形の境界での切り詰めは行いません。",
+    "Reset the address latch, set hi/lo and write value to PPUDATA count times. This immediate fill uses an eight-bit count and does not clip to rows or rectangles.",
+    "アドレスラッチをリセットしてhi/loを設定し、PPUDATAへvalueをcount回書きます。8ビットの個数による即時の埋め込みで、行や矩形の境界では切りません。",
     "`hi`와 `lo`로 주소를 설정하고 `value`를 PPUDATA에 `count`번 씁니다. 이 `ppu.c` 함수는 8비트 개수로 즉시 채우며, 호출자가 먼저 래치를 초기화해야 합니다. 행이나 사각형 경계에서 잘라내지 않습니다.",
     "用 `hi` 和 `lo` 设置地址，再将 `value` 向 PPUDATA 写入 `count` 次。此 `ppu.c` 函数使用八位计数立即填充，调用方须先复位锁存器。不会按行或矩形边界裁剪。",
     "用 `hi` 和 `lo` 設定位址，再將 `value` 向 PPUDATA 寫入 `count` 次。此 `ppu.c` 函式使用八位元計數立即填滿，呼叫端須先重設鎖存器。不會依行或矩形邊界裁切。",
@@ -33,8 +33,8 @@
     "Das Laufzeitbeispiel zeigt direkte Übertragung und beide Wartemethoden. Bei `(0,16)` erscheint ein blaues Muster aus vollen Kacheln, linken Halbflächen und Dreiecken; bei `(0,96)` ein gefüllter grüner Block. Jeder Block ist `256×64` Pixel groß und entsteht aus 256 Kachelbytes. Die erste blaue Kachel bleibt nach Änderung der Quelle gefüllt. Bei y=208 markieren rote Formen an x=16, 224 und 240 Adresssetzung, Schreiben mit Länge null und Füllen mit Länge null: ein 8×8-Quadrat, ein linker 4×8-Balken und ein achtzeiliges Dreieck. Beide Warteanzeigen zeigen 1, FAILED CHECKS zeigt 0."
   ],
   "rp_pair_scene": [
-    "The separate high/low-address example teaches explicit latch preparation and eight-bit transfer counts. Its blue and green regions use 255 bytes each: the last 8×8 cell at `(248,72)` and `(248,152)` stays black. The red seek and zero-length markers have the same positions and shapes as the runtime example. FAILED CHECKS reads 0; this program does not test the runtime wait functions.",
-    "上位・下位アドレスを渡す別の例では、ラッチの明示的な準備と8ビットの転送個数を学びます。青と緑の領域はそれぞれ255バイトを使い、最後の8×8マスである`(248,72)`と`(248,152)`が黒いままになります。アドレス設定と長さ0の操作を示す赤いマーカーの位置・形はランタイムの例と同じです。FAILED CHECKSは0になります。このプログラムではランタイムの待機関数は検証しません。",
+    "The high/low-address example shows latch reset and eight-bit transfer counts. Its blue copied patterns and green filled regions each use 255 bytes, leaving the last cells at (248,72) and (248,152) black. Red markers at y=208 show seek and zero-length transfers. FAILED CHECKS is 0.",
+    "上位・下位バイト指定の例では、ラッチのリセットと8ビットの転送個数を確認します。青いコピーと緑の埋め込みは各255バイトで、最後のマス(248,72)と(248,152)は黒です。y=208の赤い印はアドレス設定と個数0の転送を示します。FAILED CHECKSは0です。",
     "별도의 상위·하위 주소 예제에서는 명시적인 래치 준비와 8비트 전송 개수를 배웁니다. 파란색과 녹색 영역은 각각 255바이트를 사용하므로 마지막 8×8 칸인 `(248,72)`와 `(248,152)`는 검은색으로 남습니다. 주소 설정과 길이 0 연산을 나타내는 빨간 표시의 위치·모양은 런타임 예제와 같습니다. FAILED CHECKS는 0이며, 이 프로그램은 런타임 대기 함수를 검증하지 않습니다.",
     "独立的高、低地址示例用于学习显式准备锁存器和八位传输计数。蓝色与绿色区域各使用 255 字节，因此最后一个 8×8 单元 `(248,72)` 和 `(248,152)` 保持黑色。红色地址设置及零长度标记的位置和形状与运行时示例相同。FAILED CHECKS 为 0；此程序不测试运行时等待函数。",
     "獨立的高、低位址範例用於學習明確準備鎖存器和八位元傳輸計數。藍色與綠色區域各使用 255 位元組，因此最後一個 8×8 格子 `(248,72)` 和 `(248,152)` 保持黑色。紅色位址設定及零長度標記的位置和形狀與執行階段範例相同。FAILED CHECKS 為 0；此程式不測試執行階段等待函式。",

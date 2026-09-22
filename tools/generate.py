@@ -22,6 +22,8 @@ def md(t):
    lang=s[3:] or 'text';block=[];i+=1
    while i<len(lines) and not lines[i].startswith('```'):block.append(lines[i]);i+=1
    out.append(code('\n'.join(block),lang));i+=1;continue
+  if s.startswith('### '):
+   title=s[4:];out.append('<h3 id="'+slug(title)+'">'+inline(title)+'</h3>');i+=1;continue
   if s.startswith('## '):
    title=s[3:];out.append('<h2 id="'+slug(title)+'">'+inline(title)+'</h2>');i+=1;continue
   if s.startswith('|'):
@@ -41,14 +43,14 @@ def md(t):
    while i<len(lines) and re.match(r'^\d+\. ',lines[i]):out.append('<li>'+inline(re.sub(r'^\d+\. ','',lines[i]))+'</li>');i+=1
    out.append('</ol>');continue
   para=[]
-  while i<len(lines) and lines[i].strip() and not lines[i].startswith(('## ','```','|')) and not re.match(r'^\d+\. ',lines[i]):para.append(lines[i]);i+=1
+  while i<len(lines) and lines[i].strip() and not lines[i].startswith(('## ','### ','```','|')) and not re.match(r'^\d+\. ',lines[i]):para.append(lines[i]);i+=1
   out.append('<p>'+inline(' '.join(para))+'</p>')
  return '\n'.join(out)
 
 MODULES={
 'system':'起動、フレーム数、待機と割り込み', 'input':'ボタンの現在値・押下・解放・リピート', 'sprite':'OBJの確保、配置、メタスプライト、アニメーション',
 'vram':'VRAM更新の予約と転送','fixed':'Q8.8固定小数点と矩形','scene':'シーンの登録、変更と更新','entity':'固定配列のオブジェクトプール',
-'chain':'座標履歴を保存するリングバッファ','audio':'音楽と効果音・音源制御','audio_vblank':'VBlank IRQによる音楽再生','rpg':'乱数、文字、マップ、セーブ、RPG/ADV/SLG',
+'chain':'関節追従と座標履歴','audio':'音楽と効果音・音源制御','audio_vblank':'VBlank IRQによる音楽再生','rpg':'乱数、文字、マップ、セーブ、RPG/ADV/SLG',
 'bank':'バンク番号付きのコード・データアクセス','asset':'素材IDとデータ記述表','debug':'RAMに値とアサートを記録','cgb_palette':'CGBのBG/OBJパレット',
 'cgb_tile':'CGBのタイル番号と属性','scroll':'背景・ウィンドウ・分割スクロール','raster':'帯・行単位のスクロール表','camera':'世界座標と表示範囲の変換',
 'link':'シリアル通信と論理パケット','link_dmg07':'DMG-07の外部クロック通信','slg':'盤面、手の一覧とundo','physics2d':'2Dの運動と衝突',

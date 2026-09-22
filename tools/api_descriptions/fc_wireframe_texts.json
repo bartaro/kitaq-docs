@@ -1,0 +1,218 @@
+{
+  "fc_wire_none": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "fc_wire_memory": {
+    "ja": "CHR RAM 8 KiBと、書き込み可能なカートリッジPRG RAM $6800～$70BF、ゼロページ$00～$0Aを使います。--nes-chr-ramでビルドしてください。共有作業領域を使うため再入できません。",
+    "en": "Requires 8 KiB of CHR RAM, writable cartridge PRG RAM at $6800–$70BF and zero-page scratch at $00–$0A. Build with --nes-chr-ram. Shared working storage makes the renderer non-reentrant."
+  },
+  "fc_wire_video": {
+    "ja": "Init→BeginFrame→描画→EndFrameの順に使います。背景パターンテーブル2面、ネームテーブル0、背景パレット、スクロールをライブラリが管理し、NMIを無効にします。他のPPU書き込み処理と同時に動かさないでください。",
+    "en": "Call Init, BeginFrame, drawing functions and EndFrame in that order. The library owns both background pattern tables, nametable zero, the background palette and scroll, and disables NMI. Do not run another PPU writer concurrently."
+  },
+  "fc_wire_size": {
+    "ja": "表示領域は64×48（既定）、96×64、128×96です。wire3d.cをインクルードする前にWIRE3D_FC_WIDTHとWIRE3D_FC_HEIGHTを組で指定します。画面中央へ配置され、小さいサイズほど描画・転送量を減らせますが、予約するRAM容量は同じです。",
+    "en": "Choose 64×48 (default), 96×64 or 128×96 by defining both WIRE3D_FC_WIDTH and WIRE3D_FC_HEIGHT before including wire3d.c. The viewport is centered on screen. Smaller views reduce rendering and transfer work but reserve the same RAM capacity."
+  },
+  "fc_wire_scene": {
+    "ja": "完成画像は黒地に水色の枠、中央の立方体、上側の十字、下側の横線です。枠は2D座標、十字は点の回転と投影、横線は3D線、立方体は頂点・辺の配列を使う例です。各関数の役割を同じ画面で見比べられます。",
+    "en": "The completed image has a cyan border, a central cube, an upper cross and a lower horizontal line on black. The border uses 2D coordinates; the cross uses point rotation and projection; the lower line uses camera-space endpoints; the cube uses vertex and edge arrays. These shapes let you compare the roles of the APIs on one screen."
+  },
+  "fc_wire_verification": {
+    "ja": "掲載画像はKUROSAKIで3サイズを実行し、全256×240画素の位置・色とRAMの計算結果を照合したものです。実機の速度を保証する測定ではありません。",
+    "en": "The images were captured in KUROSAKI at all three sizes. Checks compare every pixel of the 256×240 image, including color, and the numeric results in RAM. They are not hardware performance measurements."
+  },
+  "fc_wire_angles": {
+    "ja": "回転量は32段階で1周です。0は回転なし、8は90度、16は180度です。値の下位5ビットを使います。回転の順序はY→X→Zです。",
+    "en": "Angles use 32 steps per turn: 0 is no rotation, 8 is 90 degrees and 16 is 180 degrees. Only the low five bits are used. Rotations are applied in Y, X, Z order."
+  },
+  "fc_wire_Init_purpose": {
+    "ja": "CHR RAMと背景マップ、ステージ、変更タイルの履歴を初期化し、水色の線を描く背景表示を有効にします。現在の画面内容は消えます。",
+    "en": "Initialize CHR RAM, the background map, staging pixels and dirty-tile history, then enable background rendering with cyan lines. Existing screen contents are erased."
+  },
+  "fc_wire_begin_sequence": {
+    "ja": "描画のたびに最初に呼びます。EndFrameの前にもう一度呼ぶと、その時点までのステージ上の線を消します。",
+    "en": "Call once at the start of each drawing. Calling again before EndFrame erases the lines staged so far."
+  },
+  "fc_wire_BeginFrame_purpose": {
+    "ja": "前の描画で触れたタイルのステージデータを消し、新しい図を描ける状態にします。表示中のCHRテーブルと画面は書き換えません。",
+    "en": "Clear staged pixels in tiles touched by the previous drawing, preparing an empty frame. The displayed CHR table and visible image remain unchanged."
+  },
+  "fc_wire_arg_ax_10": {
+    "ja": "始点の横座標です。表示領域左上を(0,0)とするピクセル値で、−512～511を指定します。",
+    "en": "Start horizontal coordinate in viewport pixels, from −512 to 511. The viewport top left is (0,0)."
+  },
+  "fc_wire_arg_ay_11": {
+    "ja": "始点の縦座標です。表示領域左上を(0,0)とするピクセル値で、−512～511を指定します。",
+    "en": "Start vertical coordinate in viewport pixels, from −512 to 511. The viewport top left is (0,0)."
+  },
+  "fc_wire_arg_bx_12": {
+    "ja": "終点の横座標です。表示領域左上を(0,0)とするピクセル値で、−512～511を指定します。",
+    "en": "End horizontal coordinate in viewport pixels, from −512 to 511. The viewport top left is (0,0)."
+  },
+  "fc_wire_arg_by_13": {
+    "ja": "終点の縦座標です。表示領域左上を(0,0)とするピクセル値で、−512～511を指定します。",
+    "en": "End vertical coordinate in viewport pixels, from −512 to 511. The viewport top left is (0,0)."
+  },
+  "fc_wire_line_clip": {
+    "ja": "座標が−512～511の範囲を外れると線全体を描きません。有効な座標では表示領域外のピクセルを捨てます。描画済みの線とはORで合成し、画面への反映はEndFrameで行います。",
+    "en": "Reject the whole line if any endpoint coordinate is outside −512..511. Otherwise discard pixels outside the viewport. New pixels are ORed with staged lines and become visible through EndFrame."
+  },
+  "fc_wire_DrawLine2D_purpose": {
+    "ja": "両端を含む線をステージへ描き、触れたタイルを転送対象として記録します。カメラ投影は行いません。",
+    "en": "Rasterize an inclusive line into staging memory and mark touched tiles for upload. No camera projection is performed."
+  },
+  "fc_wire_arg_x_16": {
+    "ja": "x成分を読み書きするs16へのポインターです。3成分は別々の有効な領域を指し、入力値を各−63～63に保ちます。",
+    "en": "Pointer to the writable s16 x component. Use three distinct locations and keep each input component in −63..63."
+  },
+  "fc_wire_arg_y_17": {
+    "ja": "y成分を読み書きするs16へのポインターです。3成分は別々の有効な領域を指し、入力値を各−63～63に保ちます。",
+    "en": "Pointer to the writable s16 y component. Use three distinct locations and keep each input component in −63..63."
+  },
+  "fc_wire_arg_z_18": {
+    "ja": "z成分を読み書きするs16へのポインターです。3成分は別々の有効な領域を指し、入力値を各−63～63に保ちます。",
+    "en": "Pointer to the writable s16 z component. Use three distinct locations and keep each input component in −63..63."
+  },
+  "fc_wire_arg_rx_19": {
+    "ja": "X軸の回転角です。32段階で1周します。",
+    "en": "X-axis angle, in 32 steps per turn."
+  },
+  "fc_wire_arg_ry_20": {
+    "ja": "Y軸の回転角です。32段階で1周します。",
+    "en": "Y-axis angle, in 32 steps per turn."
+  },
+  "fc_wire_arg_rz_21": {
+    "ja": "Z軸の回転角です。32段階で1周します。",
+    "en": "Z-axis angle, in 32 steps per turn."
+  },
+  "fc_wire_rotate_limits": {
+    "ja": "いずれかのポインターが0なら何も変更せず戻ります。Q6整数演算の小数部は0方向へ丸めます。入力範囲を自動的に制限する処理はありません。",
+    "en": "If any pointer is null, return without modifying coordinates. Q6 integer products truncate toward zero. Input components are not automatically clamped."
+  },
+  "fc_wire_rotate_expected": {
+    "ja": "サンプルの(24,0,0)はZ軸の90度回転で(0,24,0)になり、投影後の十字が立方体より上に現れます。",
+    "en": "In the sample, a 90-degree Z rotation changes (24,0,0) to (0,24,0); its projected cross appears above the cube."
+  },
+  "fc_wire_RotatePoint_purpose": {
+    "ja": "モデル空間の1点をその場で回転します。位置の平行移動や透視投影は行いません。",
+    "en": "Rotate one model-space point in place, without translation or perspective projection."
+  },
+  "fc_wire_arg_x_25": {
+    "ja": "カメラから見たX座標です。−127～127を指定します。正のXは右、正のYは上です。",
+    "en": "Camera-space X coordinate. Use −127..127. Positive X is right and positive Y is up."
+  },
+  "fc_wire_arg_y_26": {
+    "ja": "カメラから見たY座標です。−127～127を指定します。正のXは右、正のYは上です。",
+    "en": "Camera-space Y coordinate. Use −127..127. Positive X is right and positive Y is up."
+  },
+  "fc_wire_arg_z_27": {
+    "ja": "カメラから見たZ座標です。奥行き32～255を指定します。値が大きいほど遠くなります。",
+    "en": "Camera-space Z coordinate. Depth must be 32..255; larger values are farther away."
+  },
+  "fc_wire_arg_sx_28": {
+    "ja": "投影した横座標を書き込むs16ポインターです。2出力は異なる有効な領域を指します。",
+    "en": "Writable s16 pointer for the projected horizontal pixel coordinate. Use distinct output locations."
+  },
+  "fc_wire_arg_sy_29": {
+    "ja": "投影した縦座標を書き込むs16ポインターです。2出力は異なる有効な領域を指します。",
+    "en": "Writable s16 pointer for the projected vertical pixel coordinate. Use distinct output locations."
+  },
+  "fc_wire_project_return": {
+    "ja": "成功は1、座標範囲外または出力ポインターが0なら0です。失敗時は出力先を変更しません。",
+    "en": "Return 1 on success, or 0 for out-of-range coordinates or null output pointers. Failed calls leave outputs untouched."
+  },
+  "fc_wire_project_outside": {
+    "ja": "有効な奥行きでも、投影結果は表示領域外になることがあります。画面端への制限は行いません。逆数表による整数近似を使うため、浮動小数点による理想的な投影とは数ピクセル異なる場合があります。",
+    "en": "Valid depth does not guarantee an on-screen result. Output coordinates are not clamped to the viewport. Integer reciprocal approximation may differ by a few pixels from ideal floating-point projection."
+  },
+  "fc_wire_project_expected": {
+    "ja": "十字の中心は、64×48で(32,16)、96×64で(48,20)、128×96で(64,33)です。座標は画面全体ではなく各表示領域の左上が原点です。",
+    "en": "The cross center is (32,16) at 64×48, (48,20) at 96×64 and (64,33) at 128×96, measured from the viewport top left."
+  },
+  "fc_wire_ProjectPoint_purpose": {
+    "ja": "カメラ空間の1点を表示領域のピクセル座標へ変換します。画面中央が投影の中心です。描画やマスクの変更は行いません。",
+    "en": "Project one camera-space point to viewport pixels, using the viewport center as the projection center. This does not draw or change a mask."
+  },
+  "fc_wire_arg_ax_34": {
+    "ja": "始点のカメラ空間X座標です。−127～127を指定します。",
+    "en": "Start camera-space X coordinate; use −127..127."
+  },
+  "fc_wire_arg_ay_35": {
+    "ja": "始点のカメラ空間Y座標です。−127～127を指定します。",
+    "en": "Start camera-space Y coordinate; use −127..127."
+  },
+  "fc_wire_arg_az_36": {
+    "ja": "始点のカメラ空間Z座標です。奥行き32～255を指定します。",
+    "en": "Start camera-space Z coordinate; use depth 32..255."
+  },
+  "fc_wire_arg_bx_37": {
+    "ja": "終点のカメラ空間X座標です。−127～127を指定します。",
+    "en": "End camera-space X coordinate; use −127..127."
+  },
+  "fc_wire_arg_by_38": {
+    "ja": "終点のカメラ空間Y座標です。−127～127を指定します。",
+    "en": "End camera-space Y coordinate; use −127..127."
+  },
+  "fc_wire_arg_bz_39": {
+    "ja": "終点のカメラ空間Z座標です。奥行き32～255を指定します。",
+    "en": "End camera-space Z coordinate; use depth 32..255."
+  },
+  "fc_wire_near_clip": {
+    "ja": "片方だけでも投影条件を満たさなければ線全体を捨てます。近接面との交点を求めるクリッピングは行いません。有効な線の画面外ピクセルはDrawLine2Dで除外します。",
+    "en": "If either endpoint fails projection, discard the whole segment. There is no intersection clipping at the near plane. DrawLine2D discards off-viewport pixels of accepted segments."
+  },
+  "fc_wire_DrawLine3D_purpose": {
+    "ja": "カメラ空間の両端点を投影し、両方が有効なら線を描きます。モデルの回転や平行移動は呼び出し側で済ませます。",
+    "en": "Project two camera-space endpoints and draw the line when both are valid. Perform any model rotation or translation before calling."
+  },
+  "fc_wire_arg_vertices_42": {
+    "ja": "s8のx/y/zを持つWire3DFC_Vec3の配列です。頂点成分は各−63～63に保ち、宣言した個数分を用意します。",
+    "en": "Array of Wire3DFC_Vec3 records with s8 x/y/z components. Keep components in −63..63 and supply the declared number of vertices."
+  },
+  "fc_wire_arg_vertex_count_43": {
+    "ja": "頂点数です。24を超える場合は先頭24頂点だけを扱います。",
+    "en": "Vertex count; values above 24 use only the first 24 vertices."
+  },
+  "fc_wire_arg_edges_44": {
+    "ja": "頂点番号a/bを持つWire3DFC_Edgeの配列です。edge_count個の要素を用意します。",
+    "en": "Array of Wire3DFC_Edge records containing vertex indices a/b. Supply edge_count elements."
+  },
+  "fc_wire_arg_edge_count_45": {
+    "ja": "処理する辺の数（0～255）です。使用頂点数以上の番号を含む辺は省略します。",
+    "en": "Number of edges to process (0..255). Edges referencing vertices beyond the effective vertex count are skipped."
+  },
+  "fc_wire_arg_x_46": {
+    "ja": "回転後の頂点へ加えるX方向の位置です。加算後の各点がProjectPointの入力範囲に収まるようにします。",
+    "en": "X translation added after rotation. Transformed points must satisfy ProjectPoint input ranges."
+  },
+  "fc_wire_arg_y_47": {
+    "ja": "回転後の頂点へ加えるY方向の位置です。加算後の各点がProjectPointの入力範囲に収まるようにします。",
+    "en": "Y translation added after rotation. Transformed points must satisfy ProjectPoint input ranges."
+  },
+  "fc_wire_arg_z_48": {
+    "ja": "回転後の頂点へ加えるZ方向の位置です。加算後の各点がProjectPointの入力範囲に収まるようにします。",
+    "en": "Z translation added after rotation. Transformed points must satisfy ProjectPoint input ranges."
+  },
+  "fc_wire_model_limits": {
+    "ja": "verticesまたはedgesが0なら描画しません。表は現在のPRGマッピングで読み取れる必要があります。面データや奥行きマスクは使わず、有効な辺をすべて描きます。立方体の奥側の辺も見えます。",
+    "en": "Null vertices or edges produce no drawing. Tables must remain readable in the current PRG mapping. This API uses no face data or depth mask and draws every valid edge, so rear cube edges remain visible."
+  },
+  "fc_wire_DrawModel_purpose": {
+    "ja": "頂点を回転・移動・投影して共有し、辺の配列に従って線を描きます。各辺で同じ頂点を計算し直すことを避けます。",
+    "en": "Rotate, translate and project vertices once, then reuse their screen coordinates while drawing indexed edges."
+  },
+  "fc_wire_end_batches": {
+    "ja": "1回のVBlankで最大16タイル（低位ビットプレーン128バイト）を転送します。必要な回数だけ待つ同期処理です。wire3d_uploaded_tilesは転送したタイル数、wire3d_transfer_framesは転送バッチ数＋表示切り替えの待機1回であり、ゲーム全体で経過したフレーム数ではありません。",
+    "en": "Each VBlank batch transfers at most 16 tiles, or 128 low-bitplane bytes. This synchronous call waits for as many batches as needed. wire3d_uploaded_tiles reports transferred tiles; wire3d_transfer_frames counts upload batches plus one swap wait, not total elapsed game frames."
+  },
+  "fc_wire_end_clear": {
+    "ja": "裏側の過去の描画も考慮するため、物体が移動した後に古い線を消せます。タイルの全内容を前後比較する差分検出ではなく、描画で触れたタイルの履歴を使います。",
+    "en": "History for the hidden table allows old lines to be erased after objects move. Tracking is based on tiles touched by drawing, rather than comparing every tile byte between frames."
+  },
+  "fc_wire_EndFrame_purpose": {
+    "ja": "触れたタイルと、裏側CHRテーブルの消去が必要なタイルを転送し、完了後のVBlankで表示面を切り替えます。",
+    "en": "Upload touched tiles and tiles that must be erased from the hidden CHR table, then switch the displayed table at a fresh VBlank after completion."
+  }
+}

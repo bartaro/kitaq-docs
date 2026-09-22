@@ -11,6 +11,21 @@ def verified_examples(contracts):
     selected={k:v for k,v in contracts.items() if v['review']=='sound-source-20260916'}
     if not selected:return {}
     if len(selected)!=82:raise ValueError('Sound requires 82 individually reviewed APIs')
+    routes=read(FOLDER/'channel-routes/results.json')
+    if routes['script_sha256']!=sha(SITE/'tools/check_sound_channel_routes.py') or not routes['passed']:
+        raise ValueError('Channel-routing checks are stale or failed')
+    expected_routes={(d,c,m) for d in ['direct','stream','vblank-direct','vblank-queue'] for c in [1,2,3,4] for m in ['dmg','cgb']}
+    if len(routes['records'])!=32 or {(r['driver'],r['channel'],r['mode']) for r in routes['records']}!=expected_routes:
+        raise ValueError('All four channels require both hardware models and all four playback paths')
+    for row in routes['records']:
+        if not row['passed'] or row['registers'][0]!=(1<<(row['channel']-1)) or row['registers'][1]!=0x5A or row['registers'][4]!=0 or row['done']!=[165]:
+            raise ValueError('Channel activation, routing or stop mismatch')
+        for key in ['source','rom','image','audio']:
+            if sha(SITE/row[key])!=row[key+'_sha256']:raise ValueError('Channel evidence changed: '+row[key])
+        for path,digest in row['input_sha256'].items():
+            if sha((REPOS if path.startswith('kitaqgb/') else SITE)/path)!=digest:raise ValueError('Channel input changed: '+path)
+        if row['compiler_sha256']!=sha(REPOS/'kitaqgb/kitaqgb.exe') or row['emulator_sha256']!=sha(REPOS/'kokura/kokura-cli.exe'):
+            raise ValueError('Channel execution tool changed')
     for path,digest in read(SOURCE/'sound_review_sources.json')['source_sha256'].items():
         if sha(REPOS/path)!=digest:raise ValueError('Sound reviewed source changed: '+path)
     for name,script,count in [('alignment/current-results.json','check_sound_alignment.py',4),('midi/results.json','check_sound_midi_matrix.py',2)]:

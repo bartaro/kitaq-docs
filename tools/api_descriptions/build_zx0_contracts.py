@@ -1,0 +1,51 @@
+"""Describe the actual independent ZX0 APIs and their executed teaching sample."""
+from pathlib import Path
+import hashlib,json,re,sys
+HERE=Path(__file__).resolve().parent;SITE=HERE.parents[1];REPOS=SITE.parents[1]/'publish/github_20260912'
+sys.path.insert(0,str(SITE/'tools'));import catalog
+catalog.ROOT=REPOS;texts={};contracts={};modules={}
+def msg(key,ja,en):
+ key='zx0_'+key;texts[key]={'ja':ja,'en':en};return key
+credit=msg('credit','ZX0形式と元の圧縮アルゴリズムの設計者はEinar Saukas氏です。ここで提供する圧縮器・展開器はDAISUKE OBAによるKITAQ独自実装で、MITライセンスを適用します。','Einar Saukas designed the ZX0 format and original compression algorithm. The compressor and decompressor provided here are independent KITAQ implementations, copyright DAISUKE OBA, released under the MIT License.')
+common=msg('common','`zx0.h`を読み込み、`lib/zx0.c`をコンパイルします。共有作業領域を使い、割り込みからの再入には対応しません。入力と出力を重ねず、CPUアドレスの折り返しや現在選択しているバンクの境界をまたがないようにしてください。ライブラリは素材のバンクを切り替えません。','Include `zx0.h` and compile `lib/zx0.c`. These routines use shared scratch and are not reentrant from interrupts. Input and output must not overlap, wrap the CPU address space or cross currently mapped bank windows. The library does not switch asset banks.')
+status=msg('status','`zx0_error`は各呼び出しで更新します。0=成功、1=不正な引数、2=入力不足、3=不正な形式、4=出力容量不足、5=表示が有効です。エラーでは途中まで出力を書き込む場合があるため、失敗した出力は使わないでください。エラー番号は検出順で決まります。','Each call updates `zx0_error`: 0 success, 1 invalid argument, 2 truncated input, 3 malformed stream, 4 insufficient output space, 5 display active. A failure can leave partial output; do not use it. When multiple conditions are invalid, the first detected condition determines the code.')
+result=msg('result','成功時は展開したバイト数、エラー時は0を返します。必ず`zx0_error`も確認してください。','Return the decoded byte count on success, or zero on error. Always check `zx0_error` as well.')
+expected=msg('expected','上段のRAM MAPには四角・ひし形・市松模様が順に並びます。中央のAUTO RLE MAPは16個の四角がつながった横棒です。下段のVRAM TILESは、VRAMへ展開した同じ3種類のタイルを並べます。CGBとFCでは四角が白、ひし形が赤、市松模様が青で、DMGでは濃淡になります。末尾のCHECKS OKは3回の展開が期待するサイズで成功したことを示します。','The RAM MAP row repeats a square, diamond and checker tile. AUTO RLE MAP forms a horizontal bar from sixteen square tiles. VRAM TILES repeats the same three tiles after decoding their pixels into VRAM. On CGB and FC the square is white, the diamond red and the checker blue; DMG uses gray shades. CHECKS OK confirms that all three calls returned the expected decoded sizes without an error.')
+src=msg('src','現在のバンクから読み出せる圧縮データの先頭です。NULLは使えません。','Start of compressed data readable through the current bank mapping. Must not be null.')
+size=msg('size','入力データ全体のバイト数です。ZX0では終端までを含み、余分な末尾データは付けません。KQA1では9バイトのヘッダーも数えます。最大65535バイトです。','Byte count of the complete input. A ZX0 stream includes its end marker and has no trailing bytes. A KQA1 container includes its nine-byte header. Maximum: 65535 bytes.')
+dst=msg('dst','展開先の書き込み可能なRAMの先頭です。NULLは使えません。容量は配列の要素数ではなくバイト数で指定します。','Start of writable destination RAM; must not be null. Express capacity in bytes, not array elements.')
+cap=msg('capacity','出力先に書き込めるバイト数です。ZX0の通常のデータは最低1バイト必要です。空のKQA1 rawデータだけは容量0で成功できます。','Number of writable destination bytes. An ordinary ZX0 stream needs at least one byte. An empty raw KQA1 asset can succeed with capacity zero.')
+format_note=msg('format','順方向のZX0 v2に対応します。ZX0 v1、逆方向ストリーム、外部辞書は対象外です。展開前にPC側で作った素材と展開後サイズを把握し、十分な容量を確保してください。','Accept forward ZX0 v2 streams. ZX0 v1, backward streams and external dictionaries are outside this interface. Know the decoded size of the host-generated asset and provide sufficient storage.')
+auto_note=msg('auto_note','KQA1はKITAQの素材コンテナーです。識別子4バイト、方式1バイト（0=raw、1=RLE、2=ZX0）、展開後サイズu16、ペイロードサイズu16、ペイロードの順です。u16は下位バイトが先です。RLEは個数1～255と値の組を繰り返し、個数0で終えます。空のrawは戻り値0・エラー0で成功します。','KQA1 is the KITAQ asset container: four-byte magic, one-byte codec (0 raw, 1 RLE, 2 ZX0), decoded size u16, payload size u16, then payload. The u16 fields are little-endian. RLE repeats count/value pairs, with counts 1..255 and a zero-count terminator. An empty raw asset succeeds with return value zero and error zero.')
+for platform in ['gb','fc']:
+ name='kitaq'+platform;header=REPOS/name/'lib/zx0.h';impl=REPOS/name/'lib/zx0.c'
+ decls={r['name']:r for r in catalog.definitions(header)};defs={r['name']:r for r in catalog.definitions(impl)}
+ program=f'samples/api-examples/{platform}/zx0_decode.c';source=(SITE/program).read_text(encoding='utf-8')
+ path=SITE/f'reference/{platform}-api.json';data=json.loads(path.read_text(encoding='utf-8'))
+ module=msg(platform+'_module','ZX0互換の圧縮素材をRAMやVRAMへ展開するライブラリです。PC側の`'+name+'-zx0.exe`で素材を作り、実行中は必要なデータだけ展開します。`--format=auto`はraw・RLE・ZX0のペイロードを比較して最小を選びます。同サイズならraw、RLE、ZX0の順です。9バイトのヘッダーを含め65535バイト以内に収め、実際のCPUバンクやRAM容量にも合わせて素材を分割してください。','Decode ZX0-compatible assets into RAM or VRAM. Prepare assets with `'+name+'-zx0.exe` on the PC, then decode only the data needed at runtime. `--format=auto` compares raw, RLE and ZX0 payloads and chooses the smallest; ties prefer raw, RLE, then ZX0. Keep the complete container within 65535 bytes including its nine-byte header, and split assets to fit actual CPU banks and RAM.')
+ modules[platform+':zx0']=[module,credit]
+ for api in ['zx0_decompress','asset_decompress','zx0_decompress_vram']:
+  args=[['dst',[dst]],['capacity',[cap]],['src',[src]],['packed_size',[size]]];notes=[common,status];returns=[result]
+  if api=='zx0_decompress':
+   purpose=msg(platform+'_ram','ZX0 v2の圧縮列を指定容量内のRAMへ展開します。既に展開したデータを参照して繰り返しを復元するため、出力先は読み書きできる必要があります。タイルマップやステージ表をCPUで加工してから使う場合に適しています。','Decode a ZX0 v2 stream into bounded RAM. Matches reference previously decoded bytes, so the destination must be readable and writable. Use this for tile maps or level tables that the CPU will process before use.');notes.append(format_note)
+  elif api=='asset_decompress':
+   purpose=msg(platform+'_auto','`--format=auto`で作ったKQA1ヘッダーから方式とサイズを読み、rawコピー・RLE展開・ZX0展開を選んでRAMへ復元します。呼び出し側で方式ごとに分岐する必要はありません。','Read the codec and sizes from a KQA1 header generated by `--format=auto`, then copy raw bytes or decode RLE/ZX0 into RAM. Caller code does not need a separate branch for each codec.');notes.append(auto_note)
+  elif platform=='gb':
+   purpose=msg('gb_vram','LCDを停止した状態で、ZX0のタイル画像やマップを選択中のVRAMバンクへ直接展開します。VRAM自身を既出データの参照先として使うため、RAMの中間バッファは不要です。','With the LCD stopped, decode ZX0 tile pixels or map data directly into the selected VRAM bank. VRAM itself provides match history, so no intermediate RAM buffer is needed.')
+   args=[['vram_addr',[msg('gb_addr','VRAMの開始アドレス0x8000～0x9FFFです。書き込み上限は0xA000直前となります。CGBでは呼び出し前にVBKを選択してください。','VRAM start address, 0x8000..0x9FFF. Output is bounded by the end of VRAM at 0xA000. On CGB, select VBK before calling.')]],['src',[src]],['packed_size',[size]]]
+   notes+=[format_note,msg('gb_display','LCDが有効ならエラー5です。VBlank中というだけでは使えません。表示・VBK・割り込みの設定は変更せず、呼び出し側がLCD停止と再開を担当します。','Return error 5 when the LCD is enabled; merely being in VBlank is insufficient. Display, VBK and interrupt settings are unchanged. Caller code stops and restarts the LCD.')]
+  else:
+   purpose=msg('fc_vram','ZX0素材全体を呼び出し側のRAM作業領域へ展開し、成功したら128バイト以下の単位でPPUへ転送します。CPUから直接読めないVRAMを履歴に使う代わりに、RAMを使って一致列を復元します。','Decode the entire ZX0 asset into caller-owned RAM, then upload it to the PPU in chunks of at most 128 bytes. Match history stays in RAM because PPU memory is not directly readable through ordinary CPU pointers.')
+   args=[['ppu_addr',[msg('fc_addr','転送開始PPUアドレス0x0000～0x2FFFです。展開後データ全体が0x3000未満に収まる必要があります。CHR領域ではCHR RAMを搭載したROM構成にしてください。','PPU destination, 0x0000..0x2FFF. The entire decoded extent must end before 0x3000. Pattern-table destinations require a cartridge configuration with CHR RAM.')]],['workspace',[dst]],['capacity',[msg('fc_workspace','RAM作業領域の容量です。素材の展開後サイズ全体が入る必要があります。PPUへの転送単位128バイトとは別の制限です。','RAM workspace capacity. It must hold the whole decoded asset; the 128-byte PPU transfer chunk size does not reduce this requirement.')]],['src',[src]],['packed_size',[size]]]
+   notes+=[format_note,msg('fc_display','`__ppu_mask_set(0)`などで描画を停止してから呼びます。PPUCTRLの増分を一時的に1へ設定し、終了時にPPUCTRLを復元します。PPUADDR・PPUDATAの操作でPPUアドレスとラッチが変わるため、描画再開前にスクロールを設定してください。割り込み側もPPUを操作しないようにします。CHR ROMやパレットへの転送には使いません。出力先範囲の検査はRAM展開後なので、範囲エラーでも作業領域は変更され得ます。','Disable rendering with `__ppu_mask_set(0)` before calling. The routine temporarily selects PPU increment 1 and restores PPUCTRL afterward. PPUADDR/PPUDATA operations change PPU address and latch state; set scrolling before resuming rendering. Interrupt handlers must also avoid PPU access during the call. Do not use this for CHR ROM or palette transfers. Destination extent is checked after RAM decoding, so a range error may still modify the workspace.')]
+  record=dict(decls[api]);record.update(module='zx0',availability='implementation',definition=defs[api],example={'source':program,'calls':[api]})
+  data['records']=[r for r in data['records'] if r['name']!=api]+[record]
+  snippet=re.search('// example:'+api+':start\s*\n(.*?)\s*// example:'+api+':end',source,re.S)[1]
+  fp=hashlib.sha256(json.dumps({k:record.get(k) for k in ['name','signature','comment','definition','implementation_excerpt']},sort_keys=True).encode()).hexdigest()
+  build='New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\'+name+'\\'+name+'.exe .\\kitaq-docs\\'+program.replace('/','\\')+' -I .\\'+name+'\\lib -I .\\kitaq-docs\\samples -o .\\out\\zx0_decode.'+('gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb' if platform=='gb' else 'nes --mapper=nrom --nes-chr-ram')+' --no-cache --no-disasm'
+  contracts[platform+':'+api]=dict(review='zx0-source-20260922',record_sha256=fp,purpose=[purpose],args=args,returns=returns,notes=notes,references=[dict(title='ZX0 format — Einar Saukas',url='https://github.com/einar-saukas/ZX0')],example=dict(program=program,code=snippet,expected=[expected],build=build))
+ if name+'/lib/zx0.h' not in data['headers']:data['headers'].append(name+'/lib/zx0.h');data['headers'].sort()
+ data['records'].sort(key=lambda r:(r['module'],r['name']));path.write_text(json.dumps(data,ensure_ascii=False,indent=2),encoding='utf-8')
+for name,obj in [('zx0_contracts.json',contracts),('zx0_texts.json',texts),('zx0_modules.json',modules)]:
+ (HERE/name).write_text(json.dumps(obj,ensure_ascii=False,indent=2),encoding='utf-8')
+print('Six individually authored ZX0 API contracts and two module descriptions.')

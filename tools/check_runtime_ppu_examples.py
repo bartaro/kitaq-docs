@@ -48,7 +48,7 @@ for mode,length in [('runtime',256),('pair',255)]:
    state=json.loads(report.read_text(encoding='utf-8'));frames=state['frames']
    labels=[(1,0,'RUNTIME PPU STREAM' if mode=='runtime' else 'PPU HIGH LOW PAIR'),(1,10,'BLUE COPY '+str(length)+' BYTES'),(1,20,'GREEN FILL '+str(length)+' BYTES'),(1,24,'FAILED CHECKS'),(24,24,'0'),(1,27,'SEEK / ZERO WRITE / FILL')]
    if mode=='runtime':labels += [(1,22,'NMI OBSERVED'),(24,22,'1'),(1,23,'VBLANK OBSERVED'),(24,23,'1')]
-   else:labels += [(1,22,'PREPARE LATCH BEFORE CALL')]
+   else:labels += [(1,22,'LATCH RESET BY LIBRARY')]
    label_errors=check_pixels(image,labels,'fc');shapes,colors=geometry_errors(image,length)
    row.update(image=image.relative_to(SITE).as_posix(),image_sha256=sha(image),expected_labels=labels,label_pixel_mismatches=label_errors,geometry_pixel_mismatches=shapes,geometry_color_mismatches=colors,geometry_pixels_checked=34816,ppu_writes_while_rendering=state['ppu']['data_writes_while_rendering'],frames=frames,passed=label_errors==0 and shapes==0 and colors==0 and frames==240 and state['ppu']['data_writes_while_rendering']==0)
  if row['passed']:

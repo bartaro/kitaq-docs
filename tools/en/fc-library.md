@@ -8,14 +8,14 @@ Do not point `-I` at the similarly named GB library. For example, NES `__oam_dma
 ## 2. Runtime and system
 `runtime.c` supplies C helpers for PPU registers, the OAM shadow and VRAM queues. Intrinsic paths such as `__vramq_*` also exist. Check which data the NMI handler consumes instead of mixing separate queues with similar names.
 
-`system_init` initializes frame state and enables NMI. `system_wait_vblank` waits for NMI and increments the software frame count. **FC `system_set_vblank_callback` stores the value, but the current wait function does not execute the callback.** Do not place all game updates in that callback assuming GB behavior.
+`system_init` initializes frame state and enables NMI. `system_wait_vblank` waits for NMI, increments the software frame count, then invokes the registered callback once, synchronously. Pass zero to `system_set_vblank_callback` to disable it. The callback runs in the caller of the wait function, not inside the NMI handler.
 
 ## 3. PPU, tiles, attributes and palettes
 `ppu_direct.h` provides direct PPU operations, `vram_queue.h` provides NMI updates, `tilemap` / `nametable_asset` handle tables and assets, `attribute` updates attributes, and `palette` handles palettes. Separate initial loading from per-frame work.
 
 Background and sprite palettes each occupy a 16-byte group. Palette values are NES color codes, not RGB components. Attributes select colors for groups of tiles, so changing a single tile's apparent palette can affect nearby tiles.
 
-Some declarations in `ppu.h` do not match implementation names in `ppu.c`. Entries marked **declaration only** have no implementation found in the collected scope and are not used as direct calls in beginner examples. The runnable lessons use verified intrinsics. A declaration alone is not evidence of a completed, linkable feature.
+`ppu.h` and `ppu.c` provide screen control, a 32-byte palette transfer and complete nametable initialization. `nes_ppu_seek_bytes(hi,lo)` resets the address latch and sets a two-byte address. It can be linked alongside the single-word `nes_ppu_seek(address)` in `runtime.c`. Disable rendering before transfers and initialization.
 
 ## 4. OAM, metasprites and fair display
 NES supports up to 64 sprites, normally eight per scanline. Nine or more enemies or bullets on one line cannot all appear simultaneously. Metasprites combine multiple OBJs into one image; check allocation boundaries and terminator formats.
@@ -35,12 +35,12 @@ DMC samples have address, length, alignment and rate constraints. Inspect map pl
 VRC6 provides extra pulse and saw channels, VRC7 exposes FM registers, and FDS provides wavetable sound. Use a matching mapper and record the result. These APIs are separate from the GB `Audio_*` driver.
 
 ## 7. Scenes, actors and entities
-`actor` and `entity` store game objects in fixed arrays; `scene` stores scene state. Detect capacity exhaustion and stop using destroyed IDs. Some FC APIs currently register callbacks without calling them. For beginner programs, explicitly dispatch state-specific update functions from the main loop.
+`actor` and `entity` hold game objects in fixed arrays; `scene` manages scene state. Detect capacity exhaustion and stop using destroyed IDs. Scene transitions, updates and drawing invoke their registered callbacks synchronously. Check each API’s call order and reentrancy restrictions.
 
-`chain` stores coordinate history; `collision` tests contact between shapes such as rectangles. A consistent move, collide, draw order avoids collision decisions that lag by a frame.
+`chain` provides articulated following with `ChainBody` and position history with `Chain`; `collision` tests contact between shapes such as rectangles. A consistent move, collide, draw order avoids collision decisions that lag by a frame.
 
 ## 8. Mathematics and physics
-`fixed.h` provides Q8.8 arithmetic, `math_fast` / `math_fixed` provide numeric operations, and `math_lut` provides table-based calculations. The current `physics2d.h` supplies **Q5.3 types and constants**, not an integration-function or update-macro implementation. It is not the GB world/body physics API.
+`fixed.h` provides Q8.8 arithmetic, `math_fast` / `math_fixed` provide numeric operations, and `math_lut` provides table-based calculations. `physics2d` handles box integration, gravity, AABB contacts and surface response. `physics3d` handles nonrotating 3D boxes, bounce and impact values. Allocate a world and body array, initialize them, set their parameters and call step. Positions and velocities use consistent caller-selected integer units.
 
 Q5.3 fractions represent eighths of a pixel. Keep integer coordinates, fractional parts, velocity and direction separately and perform addition and carry handling in game code. `fc_subpixel.c` adds 2/8 pixel eight times, moving from pixel 40 to pixel 42. Do not reuse the Q8.8 representation 256 unchanged as Q5.3.
 

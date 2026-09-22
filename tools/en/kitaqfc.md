@@ -1,7 +1,7 @@
 ## 1. KITAQFC and the GB compiler
 KITAQFC uses the KITAQGB front end to generate code for the NES/Famicom's 6502-family CPU. It does not convert a GB ROM into an NES ROM. Write software for the target's display, sound, memory and mapper.
 
-KITAQFC supports structure copies, ordinary function calls, for, while and do-while. A do-while loop runs its body at least once before testing the condition. continue proceeds to that final test; break leaves the loop. switch is unsupported, so use if/else for state dispatch.
+KITAQFC supports structure copies, ordinary function calls, for, while and do-while. A do-while loop runs its body at least once before testing the condition. continue proceeds to that final test; break leaves the loop. A switch selects a case constant in 0..255 or the default body when no case matches. Its selector is evaluated once. break exits the innermost loop or switch; continue inside a switch advances the enclosing loop.
 
 ## 2. Requirements and build
 {{CODE:0}}
@@ -22,6 +22,23 @@ The GB volume's statements and expressions provide a common starting point. FC a
 
 Use integers within their 8-bit or 16-bit ranges. Array indexes start at zero. `fc_aggregate.c` demonstrates functions, pointers and structures; `fc_arithmetic.c` demonstrates arithmetic; `fc_control.c` demonstrates loops. Do not include CGB registers or GB-only intrinsics in an FC program.
 
+<!-- common-language-kitaqfc:start -->
+### Expression results and evaluation
+The comparison operators `==`, `!=`, `<`, `<=`, `>`, `>=` and logical operators `!`, `&&`, `||` return 0 for false and 1 for true. You can store the result in a `u16`, pass or return it, or use it in arithmetic. For example, `score = 500 + (lives != 0);` produces 501 when a life remains and 500 otherwise.
+
+`&&` skips its right operand when the left operand is zero. `||` skips its right operand when the left operand is nonzero. In `pointer != 0 && pointer->active != 0`, a null pointer prevents the member access. Both bytes of a 16-bit value participate in the truth test, so 256 is true. Bitwise `&` and `|` do not short-circuit.
+
+`++value` returns the updated value; `value++` returns the original value. These operators also accept array elements, dereferenced pointers and structure members. `buffer[index()]++` calls `index()` once. For a `u16 *p`, `p++` advances two bytes to the next element, while `(*p)++` increments the pointed-to value.
+
+`sizeof(array)` gives the entire array's size in bytes; `sizeof(pointer)` is 2. For `u16 values[9];`, `sizeof(values)` is 18. This includes ROM arrays, local arrays and array members. `sizeof(function())` inspects the return type without calling the function.
+
+A function declaration and definition must agree on parameter types and order. Their parameter names may differ; the body uses the definition's names. For example, `u8 next(u8 input);` can be defined as `u8 next(u8 value) { return (u8)(value + 1); }`. Parameters and local variables hide globals with the same name.
+
+Selecting arrays or strings with `?:` produces a pointer to the selected element type. You can pass it directly, as in `show(ready ? "READY" : "WAIT");`. For `u16` arrays `a` and `b`, `(ready ? a : b) + 1` advances two bytes to the second element of the selected array. This does not copy the array.
+
+`condition ? yes : no` evaluates its condition and then only the selected arm. The condition and arms may contain shifts with variable counts. For example, `on = (pattern & (0x80 >> bit)) != 0 ? 4 : 2;` selects four or two for the chosen bit. Function calls in a right operand skipped by `&&` or `||` are also skipped. A `continue` in a `for` loop runs the update expression once before reevaluating the condition; in `while` and `do ... while`, it advances to the condition.
+
+<!-- common-language-kitaqfc:end -->
 ## 5. Loops and state dispatch
 {{CODE:4}}
 

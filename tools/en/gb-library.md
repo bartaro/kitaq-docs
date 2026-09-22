@@ -50,12 +50,12 @@ Compile `audio_hwregs_gb.c`, then `audio.c`, then the game source. Do not add du
 
 `Audio_PlayMusic(bank,song)` explicitly names the music bank. `Audio_PlaySFXBanked` plays an effect from another bank. Priorities arbitrate effects sharing physical channels. GB has four physical sound channels: CH1, CH2, CH3 and CH4.
 
-The music-stream commands `AUDIO_CMD_NOTE` and `AUDIO_CMD_SET_INST` use this channel encoding: **0=CH1, 1=CH2, 2=CH4, 3=CH3**. Do not confuse it with ordinary API channel constants. The header currently defines `AUDIO_NOTE_MAX=67`.
+Music-stream commands `AUDIO_CMD_NOTE`, `AUDIO_CMD_SET_INST` and `AUDIO_CMD_STOP_CHANNEL` share the ordinary API channel IDs: **0=CH1, 1=CH2, 2=CH3, 3=CH4**. CH1 is pulse with sweep, CH2 pulse, CH3 wave and CH4 noise. The header defines `AUDIO_NOTE_MAX=67`.
 
 The basic CH1 effect stream reads note/volume pairs per frame and ends on note 0. CH3 uses a different marker and format. See `gb_sound.c`. Fades advance during `Audio_Update`; stopping updates also stops a fade.
 
 ## 8. VBlank IRQ music
-`audio_vblank.c` uses a separate playback format. Timed records contain five bytes: `delay, ch2_note, ch1_note, ch3_note, ch4_noise_param`. The driver reads directly addressable songs or consumes a WRAM queue; the public library does not include a queue-refill routine. Your game must supply the producer and coordinate its writes with the ISR. `LOOP` is recognized only in direct streams, and `IMMEDIATE` only in queue mode. Ordinary `audio.c` streams cannot be passed unchanged.
+`audio_vblank.c` uses a separate playback format. Timed records contain five bytes: `delay, ch1_note, ch2_note, ch3_note, ch4_noise_param`. The driver reads directly addressable songs or consumes a WRAM queue; use AudioVBlank_QueueReset to initialize queue mode, AudioVBlank_QueueRefill to submit complete five-byte records, and AudioVBlank_QueuePlay to start. Refill from a single foreground producer. `LOOP` is recognized only in direct streams, and `IMMEDIATE` only in queue mode. Ordinary `audio.c` streams cannot be passed unchanged.
 
 {{CODE:2}}
 
@@ -75,7 +75,7 @@ For CGB lines, use colors 1, 2 and 3. Normal 128 × 96 lines combine color bits,
 The 160 × 144 mode allocates at most 127 tiles per frame. An allocation failure or an out-of-range coordinate in its fast line path sets `Wire3DCGB_GetFullScreenOverflow()` and suppresses further pixel writes until the next frame reset. Keep vertices within the selected viewport. Triangle-mask padding stops at X=127 in 128 × 96 mode and X=159 in full-screen mode. Follow the API notes for WRAM bank mapping, especially when using full-screen or FastMap functions.
 
 ## 10. Scenes, object pools and bullet patterns
-`scene` manages states such as title, play and pause; `entity` provides a fixed-capacity object pool; `chain` stores coordinate history for a snake, train or rope. Check allocation failure values such as 0xFF before using the pointer returned by `entity_get`.
+`scene` manages states such as title, play and pause; `entity` provides a fixed-capacity object pool; `chain` provides joint following and position history. Use `ChainBody` to move an articulated snake or rope. Check allocation failure values such as 0xFF before using the pointer returned by `entity_get`.
 
 `danmaku` provides fixed-point bullet pools, directional and fan spawning, hits and grazing. Its CGB background-compositing path avoids the ordinary OBJ count limit, but frame time and background-transfer bandwidth remain limited. Measure frame processing time rather than targeting bullet count alone.
 

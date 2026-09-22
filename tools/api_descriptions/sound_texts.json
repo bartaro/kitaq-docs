@@ -24,8 +24,8 @@
     "en": "audio_vblank.c implements __kq_vblank_vector; do not also install a competing VBlank vector. The sample defines Audio_NoiseEffectActive, excludes the ordinary music decoder, and uses Audio_Update only for effects and fades. Mask interrupts while changing song pointers or shared state."
   },
   "sound_vb_format": {
-    "ja": "直接参照する曲は固定ROMなどISRが常に読める場所に置きます。レコードはdelay,CH2,CH1,CH3,CH4の5バイトです。ノートの0xFFは保持、0xFDは停止です。delay位置の0xFFは終端、0xFEはループです。WRAMキューは別モードで、補充処理は呼び出し側が実装します。",
-    "en": "Keep direct song data in fixed ROM or another area always visible to the ISR. A record is five bytes: delay, CH2, CH1, CH3, CH4. In note fields, 0xFF holds the current voice and 0xFD stops it. In the delay field, 0xFF ends playback and 0xFE loops. WRAM queue playback is a separate mode; the caller implements refilling."
+    "ja": "直接参照する曲は固定ROMなどISRが常に読める場所に置きます。レコードはdelay,CH1,CH2,CH3,CH4の5バイトです。ノートの0xFFは保持、0xFDは停止です。delay位置の0xFFは終端、0xFEはループです。これはチャンネルIDではなく、レコード内の配置順です。WRAMキューは別モードで、AudioVBlank_QueueRefillで完全な5バイトレコードを補充します。",
+    "en": "Keep direct song data in fixed ROM or another area always visible to the ISR. A record is five bytes: delay, CH1, CH2, CH3, CH4. In note fields, 0xFF holds the current voice and 0xFD stops it. In the delay field, 0xFF ends playback and 0xFE loops. This is the record layout, not the channel-ID numbering. WRAM queue playback is a separate mode; submit complete five-byte records with AudioVBlank_QueueRefill."
   },
   "sound_fc_voices": {
     "ja": "このヘルパーはAPU_STATUSへ単一チャンネルのマスクを書き、ほかのチャンネルを無効化します。複数音を同時に鳴らすミキサーではありません。periodはパルス・三角波のタイマー値で、小さいほど高い音です。サンプルの周波数と時間はNTSC設定で確認しています。",
@@ -72,8 +72,8 @@
     "en": "0=center, 1=left, 2=right, 3=mute. Effect APIs treat values above 3, including 0xFF, as inherited base pan."
   },
   "sound_arg_ch": {
-    "ja": "物理チャンネル番号：0=CH1、1=CH2、2=CH3、3=CH4。曲ストリームの番号とは区別します。",
-    "en": "Physical channel: 0=CH1, 1=CH2, 2=CH3, 3=CH4. These differ from music-stream channel IDs."
+    "ja": "チャンネル番号：0=CH1、1=CH2、2=CH3、3=CH4。直接操作APIと音楽ストリームで同じ番号を使います。",
+    "en": "Channel ID: 0=CH1, 1=CH2, 2=CH3, 3=CH4. Direct APIs and music streams use the same IDs."
   },
   "sound_arg_left": {
     "ja": "左出力のマスター音量0～7。7より大きい値は7へ制限します。0も完全な無音ではありません。",
@@ -636,8 +636,8 @@
     "en": "Macro forwarding its array to __fds_wave_load to load a 64-byte wave."
   },
   "sound_module_audio": {
-    "ja": "4音源の直接発音、バンク付き音楽・効果音、左右定位、音量フェード、独自波形を扱います。音楽ストリームのチャンネル番号はCH1=0・CH2=1・CH4=2・CH3=3で、物理チャンネル番号とCH3/CH4が逆です。",
-    "en": "Provides direct access to four voices, banked music/effects, stereo routing, volume fades and custom waves. Music-stream channel IDs are CH1=0, CH2=1, CH4=2, CH3=3; CH3/CH4 are reversed relative to physical channel IDs."
+    "ja": "4音源の直接発音、バンク付き音楽・効果音、左右定位、音量フェード、独自波形を扱います。音楽ストリームのチャンネル番号はCH1=0・CH2=1・CH3=2・CH4=3で、直接操作APIと共通です。CH3は波形、CH4はノイズです。",
+    "en": "Provides direct access to four voices, banked music/effects, stereo routing, volume fades and custom waves. Music-stream and direct API channel IDs are CH1=0, CH2=1, CH3=2, CH4=3. CH3 plays waveforms; CH4 generates noise."
   },
   "sound_module_vblank": {
     "ja": "音楽をVBlank割り込みで更新し、効果音との所有権調整とフレームコールバックを提供します。通常の音楽デコーダーと同時に同じ曲を処理しないでください。",

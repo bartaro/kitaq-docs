@@ -2,7 +2,7 @@
 #define SOUND_VBLANK
 #include "gb_sound_example.h"
 __wram u8 hook_count;
-__prg_rom u8 irq_song[]={30,0xFF,33,0xFF,0xFF,30,0xFF,40,0xFF,0xFF,0xFE};
+__prg_rom u8 irq_song[]={30,33,0xFF,0xFF,0xFF,30,40,0xFF,0xFF,0xFF,0xFE};
 void frame_hook() { hook_count++; }
 void main() {
     u8 before;

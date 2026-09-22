@@ -1,0 +1,354 @@
+{
+  "dmg07_note_scope": {
+    "ja": "画像はKOKURAのDMG-07モデルで実行した結果です。接続するコンソールは個別に動作し、実際の送受信値を照合しています。実物のアダプターやケーブルの電気的特性・タイミングは未検証です。CGBの数値は青色で表示します。",
+    "en": "Screens are captured from KOKURA’s DMG-07 model. Each console executes independently, and transmitted and received values are compared. Physical adapter/cable electrical behavior and timing are unverified. CGB screens display numeric values in blue."
+  },
+  "dmg07_note_port": {
+    "ja": "このドライバーがシリアルポートを専有します。通常のLinkやLink4と同時に動かさず、link_hwregs_gb.cとlink_dmg07.cを1回ずつ組み込みます。外部クロックはアダプターが供給し、CGB専用の高速通信には切り替えません。",
+    "en": "This driver owns the serial port. Do not run ordinary Link or Link4 concurrently; include link_hwregs_gb.c and link_dmg07.c once each. The adapter supplies external clocks; the driver does not select CGB fast serial mode."
+  },
+  "dmg07_note_poll": {
+    "ja": "Pollはフレームの途中でも繰り返し呼び、TickFrameは1フレームにつき1回だけ呼びます。VBlankごとにPollを1回呼ぶだけではバイト間の再設定に間に合いません。共通ヘッダーのd_pollはLYが144以上になった境界を検出してTickFrameを呼びます。両者を割り込みとメイン処理から同時に操作しないでください。",
+    "en": "Call Poll repeatedly throughout the frame and TickFrame exactly once per frame. One Poll per VBlank cannot re-arm the port between adapter bytes. The shared header’s d_poll detects entry into LY >= 144 to call TickFrame once. Serialize both operations instead of racing an ISR against the main loop."
+  },
+  "dmg07_note_slots": {
+    "ja": "ライブラリのプレイヤー番号は1～4、未検出は0です。接続マスクのビット0～3がプレイヤー1～4に対応します。KOKURAの--link-sessionに渡すslotは0～3なので、ROM内の番号と区別します。",
+    "en": "Library player numbers are 1..4; zero means undiscovered. Connection-mask bits 0..3 correspond to players 1..4. KOKURA --link-session slot values are 0..3, a separate numbering convention from the ROM API."
+  },
+  "dmg07_note_errors": {
+    "ja": "エラーは0=なし、1=不正なフェーズ、2=プレイヤー1ではない、3=接続準備不足、4=時間切れ、5=プロトコル不正、6=未読パケットの上書きです。要求の成功は0、受信取得の成功は1です。成功した要求が以前のエラーを消すことはありません。",
+    "en": "Error codes are 0=none, 1=wrong phase, 2=not player 1, 3=not ready, 4=timeout, 5=protocol error and 6=unread packet overwritten. Requests succeed with zero; receive/pop operations succeed with one. A successful request does not clear an earlier error."
+  },
+  "dmg07_note_pipeline": {
+    "ja": "SIZE=1で各台が1バイトを提出し、4バイトの配信はプレイヤー1～4の順です。最初の配信は捨て、次の配信から受け取ります。受信内容は1パケット前の提出値です。4バイトすべてが0xFFの配信は再起動通知として予約されています。",
+    "en": "With SIZE=1 each console submits one byte; the four-byte broadcast is ordered by players 1..4. The initial broadcast is discarded. Subsequent broadcasts contain the previous packet’s submissions. An all-0xFF four-byte broadcast is reserved as the restart indication."
+  },
+  "dmg07_note_mailbox": {
+    "ja": "受信メールボックスは最新の1パケットだけを保持します。未読のまま次が完成すると新しい内容で上書きし、エラー6とErrorCountを記録します。取り出すまでアダプターが待ってくれるわけではありません。",
+    "en": "The receive mailbox holds only the latest packet. Completion of another packet overwrites unread data, latches error 6 and increments ErrorCount. The adapter does not wait for the application to consume the mailbox."
+  },
+  "dmg07_note_counters": {
+    "ja": "SilenceFramesと診断カウンターは255で止まります。Initはすべて初期化しますが、通常のプロトコル再起動では診断カウンターを保持します。ClearErrorはエラー番号だけを消します。",
+    "en": "SilenceFrames and diagnostic counters saturate at 255. Init resets them all; ordinary protocol restarts preserve diagnostic counters. ClearError clears only the error code."
+  },
+  "dmg07_note_seq": {
+    "ja": "番号は8ビットで255の次は0です。パケット公開時にPacketSequence=SentSequence−1となります。その後も送信が始まるとSentSequenceが進むため、後から読む2つの番号が常に差1になるとは限りません。",
+    "en": "Sequence numbers wrap from 255 to zero. At publication, PacketSequence equals SentSequence minus one. Later transmit starts advance SentSequence, so two getters sampled later need not differ by one."
+  },
+  "dmg07_note_launch": {
+    "ja": "kitaqgb・kokura・kitaq-docsを同じ親フォルダーへ配置し、親フォルダーでPowerShellを開きます。4台通信では同じROMを4セッションで起動します。初代GB用に試す場合は、全コマンドの--cgb=cgbを--cgb=dmg、--hardware cgbを--hardware dmgへ変更します。",
+    "en": "Place kitaqgb, kokura and kitaq-docs under one parent directory and open PowerShell there. Four-console examples launch the same ROM in four sessions. For DMG checks, replace --cgb=cgb with --cgb=dmg and --hardware cgb with --hardware dmg throughout."
+  },
+  "dmg07_note_init": {
+    "ja": "SCを0x80、SBを0x88に設定し、IEとIFのシリアルビットだけを消します。ほかの割り込み許可ビットやCPUのIME状態を変更する処理ではありません。",
+    "en": "Sets SC to 0x80 and SB to 0x88; clears only the serial bits in IE and IF. It does not alter the other interrupt-enable bits or CPU IME state."
+  },
+  "dmg07_example_exchange": {
+    "ja": "同じROMを4台で動かし、各台が32＋プレイヤー番号を送ります。全台でPLAYER 1～4が33/34/35/36になります。最初の有効な配信でSENT SEQ=2、PACKET SEQ=1を記録し、1パケットの遅延を示します。表示はその時点の観測値を固定したものです。ゲームでは受信後もポーリングを続けます。",
+    "en": "Run the same ROM on four consoles, each sending 32 plus its player number. Every console receives PLAYER 1..4 = 33/34/35/36. The first valid broadcast records SENT SEQ=2 and PACKET SEQ=1, showing the one-packet delay. The screen freezes that observation; a game continues polling afterwards."
+  },
+  "dmg07_LinkDmg07_Init_purpose": {
+    "ja": "探索状態、受信保存領域、診断値を初期化し、アダプターからのクロックを待ち受けます。",
+    "en": "Reset discovery, receive storage and diagnostics, then arm reception for adapter clocks."
+  },
+  "dmg07_LinkDmg07_Init_rate": {
+    "ja": "アダプターへ返す8ビットRATE。0なら既定の0x10を使います。",
+    "en": "Eight-bit RATE response to the adapter; zero selects the default 0x10."
+  },
+  "dmg07_LinkDmg07_Init_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "dmg07_note_pollbusy": {
+    "ja": "SCの開始ビットが立っている間は何もしません。完了を処理するとSilenceFramesと時間切れラッチをリセットします。初期化前には呼ばないでください。",
+    "en": "Does nothing while SC’s start bit is set. Processing completion resets SilenceFrames and the timeout latch. Initialize before polling."
+  },
+  "dmg07_LinkDmg07_Poll_purpose": {
+    "ja": "完了済みのシリアル1バイトを現在のフェーズで処理し、次の応答を設定して再び受信を開始します。",
+    "en": "Process one completed serial byte in the current phase and immediately arm the next response."
+  },
+  "dmg07_LinkDmg07_Poll_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "dmg07_note_watchdog": {
+    "ja": "既定の期限は12回で、組込み前にLINK_DMG07_TIMEOUT_FRAMESを1～255へ設定できます。同じ無通信状態では1回だけ時間切れを数え、次の受信バイトでラッチを解除します。転送中は位置を保持して境界で再起動し、探索・開始待ちでは探索へ戻ります。",
+    "en": "The default deadline is 12 calls; define LINK_DMG07_TIMEOUT_FRAMES as 1..255 before inclusion to choose another deadline. A silence episode is counted once until another byte clears its latch. Transfer recovery preserves byte alignment; discovery/start recovery returns to discovery."
+  },
+  "dmg07_example_absent": {
+    "ja": "アダプターを接続せずに実行します。PLAYER=0、START ERROR=2、SILENT FRAME=12、TIMEOUTS=1、ERROR=4になります。一度もアダプターを見ていないためDISCONNECTS=0です。空の取得ではEMPTY BUFFER=77を保持し、ClearError後はCLEARED=0になります。",
+    "en": "Run without an adapter. Expect PLAYER=0, START ERROR=2, SILENT FRAME=12, TIMEOUTS=1 and ERROR=4. DISCONNECTS stays zero because no adapter has ever been seen. An empty read preserves EMPTY BUFFER=77; ClearError produces CLEARED=0."
+  },
+  "dmg07_LinkDmg07_TickFrame_purpose": {
+    "ja": "無通信時間と開始・再起動ハンドシェイクの時間を1フレーム分進め、期限に達したら回復を要求します。",
+    "en": "Advance silence and start/restart watchdogs by one frame, requesting recovery at the deadline."
+  },
+  "dmg07_LinkDmg07_TickFrame_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "dmg07_note_phase": {
+    "ja": "状態を読むだけでポーリングや待機はしません。要求を受け付けただけではTRANSFERにならず、連続する4バイトの0xCCを受信して初めて転送へ移ります。",
+    "en": "Does not poll or wait. Acceptance of a start request is insufficient for TRANSFER: four consecutive 0xCC bytes are required."
+  },
+  "dmg07_LinkDmg07_GetPhase_purpose": {
+    "ja": "探索、開始要求、開始確認、データ転送のうち現在の段階を読みます。",
+    "en": "Read the current discovery, start-request, confirmation or transfer phase."
+  },
+  "dmg07_LinkDmg07_GetPhase_returns": {
+    "ja": "0=PING、1=REQUEST_AA、2=WAIT_CC、3=TRANSFERです。",
+    "en": "0=PING, 1=REQUEST_AA, 2=WAIT_CC, 3=TRANSFER."
+  },
+  "dmg07_LinkDmg07_GetLocalSlot_purpose": {
+    "ja": "アダプターの状態通知から分かった自機のプレイヤー番号を読みます。",
+    "en": "Read this console’s player number learned from adapter status."
+  },
+  "dmg07_LinkDmg07_GetLocalSlot_returns": {
+    "ja": "検出済みは1～4、未検出または探索へのリセット直後は0です。",
+    "en": "Returns 1..4 when discovered; zero before discovery or immediately after a discovery reset."
+  },
+  "dmg07_note_cached": {
+    "ja": "探索中に受け付けた値を保存しています。呼び出すたびに物理配線を調べるものではなく、転送中の表示は最後の通知に基づきます。",
+    "en": "Returns cached discovery status rather than probing physical wiring. During transfer it reflects the most recent accepted notification."
+  },
+  "dmg07_LinkDmg07_GetConnectedMask_purpose": {
+    "ja": "最後に受け付けた接続プレイヤーの集合を4ビットで読みます。",
+    "en": "Read the four-bit set of players in the last accepted status."
+  },
+  "dmg07_LinkDmg07_GetConnectedMask_returns": {
+    "ja": "ビット0～3に接続状態を返します。未検出は0、4台接続は15です。",
+    "en": "Bits 0..3 report connected players. Undiscovered is zero; four connected players is 15."
+  },
+  "dmg07_note_status": {
+    "ja": "ビット3が1、自機番号が0または5以上、検出後に自機番号が変わる通知は拒否し、エラー5を記録します。拒否された値はLastStatusへ保存しません。",
+    "en": "Rejects status with bit 3 set, player number zero or above four, or a changed local number after discovery. Rejection latches error 5 without storing that value as LastStatus."
+  },
+  "dmg07_LinkDmg07_GetLastStatus_purpose": {
+    "ja": "最後に検証を通ったアダプターの状態バイトを変換せずに読みます。",
+    "en": "Read the last validated raw adapter status byte."
+  },
+  "dmg07_LinkDmg07_GetLastStatus_returns": {
+    "ja": "上位4ビットは接続マスク、下位3ビットは自機番号です。未検出は0です。",
+    "en": "The high nibble is the connection mask; the low three bits contain the local player number. Initially zero."
+  },
+  "dmg07_note_pingflag": {
+    "ja": "フラグを読むだけです。探索中の不正な状態バイトでも交換自体は進むため、このフラグだけで全データの妥当性や転送開始完了を判断せず、番号・マスク・LastErrorも確認します。",
+    "en": "Reads only a flag. A discovery exchange can progress despite a rejected status byte; do not use this flag alone to infer fully valid data or completed startup. Check the slot, mask and LastError too."
+  },
+  "dmg07_LinkDmg07_HasPingStatus_purpose": {
+    "ja": "4バイトの探索交換を終えた通知が未消費かどうかを調べます。",
+    "en": "Inspect whether a completed four-byte discovery exchange is awaiting acknowledgment."
+  },
+  "dmg07_LinkDmg07_HasPingStatus_returns": {
+    "ja": "未消費の通知があれば1、なければ0です。",
+    "en": "Returns 1 for an unconsumed notification, otherwise 0."
+  },
+  "dmg07_note_consume": {
+    "ja": "通知だけを消し、番号・接続マスク・LastStatusの保存値は残します。繰り返し呼ぶと新しい通知が来るまで0になります。",
+    "en": "Clears only the notification, preserving slot, mask and LastStatus. Further calls return zero until a new notification arrives."
+  },
+  "dmg07_LinkDmg07_ConsumePingStatus_purpose": {
+    "ja": "探索完了通知を1回分取り出してフラグを消します。",
+    "en": "Consume and clear a completed-discovery notification."
+  },
+  "dmg07_LinkDmg07_ConsumePingStatus_returns": {
+    "ja": "通知があれば1、なければ0です。",
+    "en": "Returns 1 when consumed, otherwise 0."
+  },
+  "dmg07_note_start": {
+    "ja": "PINGでのみ予約できます。全4台がそろうまで待つ処理は含まず、サンプルはアプリ側でマスク15を待ちます。予約は即時転送ではなく、整列した0xAA列を送ってから0xCC列を待ちます。",
+    "en": "Can be scheduled only in PING. It does not itself wait for all four players; the example checks mask 15 in application code. Scheduling is asynchronous: aligned 0xAA traffic precedes the 0xCC confirmation."
+  },
+  "dmg07_LinkDmg07_RequestTransmission_purpose": {
+    "ja": "物理プレイヤー1から、次の探索パケット境界で開始要求を送るよう予約します。",
+    "en": "Schedule a start request from physical player 1 at the next discovery-packet boundary."
+  },
+  "dmg07_LinkDmg07_RequestTransmission_returns": {
+    "ja": "予約できれば0。フェーズ不正は1、プレイヤー1でなければ2、自機接続ビットがなければ3です。",
+    "en": "Returns 0 when scheduled, 1 for the wrong phase, 2 when not player 1, or 3 when the local connection bit is absent."
+  },
+  "dmg07_note_restart": {
+    "ja": "どのプレイヤーでも要求できます。途中のバイト位置を壊さず、境界から0xFFを送り続け、アダプターの全0xFF通知を受けて探索へ戻ります。要求しただけでは自機番号や受信パイプラインを消しません。",
+    "en": "Any player may request it. Preserves the current byte position, sends aligned 0xFF traffic, and returns to discovery after the adapter’s all-0xFF indication. Merely requesting it does not erase the local slot or receive pipeline."
+  },
+  "dmg07_example_restart": {
+    "ja": "4台のうちプレイヤー2が再起動を要求します。その台でPENDING=1とSENT FF=1を記録し、全台でDATA VALID=1、RESET PHASE=0、SLOT AFTER=0、RESET PRIME=0になります。要求直後に通信状態を捨てず、アダプターの通知後に探索へ戻ることを確認します。",
+    "en": "Player 2 requests restart. That console records PENDING=1 and SENT FF=1. All four show DATA VALID=1, RESET PHASE=0, SLOT AFTER=0 and RESET PRIME=0. The driver preserves the active exchange until the adapter’s indication returns it to discovery."
+  },
+  "dmg07_LinkDmg07_RequestRestart_purpose": {
+    "ja": "転送中のパケット境界から再起動制御を送るよう予約します。",
+    "en": "Schedule restart control traffic beginning at a transfer packet boundary."
+  },
+  "dmg07_LinkDmg07_RequestRestart_returns": {
+    "ja": "TRANSFERなら0、それ以外は1です。予約中・送信中の再要求も0です。",
+    "en": "Returns 0 in TRANSFER, otherwise 1. Repeated requests while pending/sending also return 0."
+  },
+  "dmg07_note_restartstate": {
+    "ja": "これは通信フェーズとは別の状態です。値0だけでは接続済みや転送可能とは判断できません。",
+    "en": "Separate from the communication phase. Zero alone does not imply an established or usable connection."
+  },
+  "dmg07_LinkDmg07_GetRestartState_purpose": {
+    "ja": "再起動要求の待機・送信状態を読みます。",
+    "en": "Read whether restart control is absent, pending or being sent."
+  },
+  "dmg07_LinkDmg07_GetRestartState_returns": {
+    "ja": "0=なし、1=境界待ち、2=制御送信中です。",
+    "en": "0=none, 1=pending boundary, 2=sending control traffic."
+  },
+  "dmg07_note_sampletime": {
+    "ja": "値はパケットのバイト0を設定するときに読み取ります。すでにSBへ設定したバイトは変更しません。最初の提出値は開始要求前に設定します。",
+    "en": "Sampled when packet byte zero is armed. Does not modify an already armed SB byte. Set the first submission before requesting startup."
+  },
+  "dmg07_LinkDmg07_SetLocalByte_purpose": {
+    "ja": "次に自機データを送るパケット用の1バイトを設定します。",
+    "en": "Set the one-byte application value for a future outgoing packet."
+  },
+  "dmg07_LinkDmg07_SetLocalByte_value": {
+    "ja": "提出する8ビット値。",
+    "en": "Eight-bit application value to submit."
+  },
+  "dmg07_LinkDmg07_SetLocalByte_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "dmg07_note_primed": {
+    "ja": "1でも完成済みパケットがあるとは限りません。取り出せるかどうかはHasPacketで調べます。",
+    "en": "A primed pipeline need not contain a completed packet. Use HasPacket to determine whether a read is available."
+  },
+  "dmg07_LinkDmg07_IsPipelinePrimed_purpose": {
+    "ja": "初回の未定義配信を捨てて受信準備を終えたか調べます。",
+    "en": "Inspect whether the initial undefined broadcast has been discarded."
+  },
+  "dmg07_LinkDmg07_IsPipelinePrimed_returns": {
+    "ja": "初回配信の処理後は1、初期化・探索へのリセット・開始確認時は0です。",
+    "en": "Returns 1 after the initial broadcast; initialization, discovery reset and startup confirmation clear it."
+  },
+  "dmg07_LinkDmg07_HasPacket_purpose": {
+    "ja": "通常データの完成済み4バイトパケットが未読か調べます。",
+    "en": "Inspect whether a completed four-byte data packet is unread."
+  },
+  "dmg07_LinkDmg07_HasPacket_returns": {
+    "ja": "未読があれば1、空なら0です。",
+    "en": "Returns 1 for unread data, otherwise 0."
+  },
+  "dmg07_note_retained": {
+    "ja": "読んだ後も保存領域にはデータが残るため、GetPacketSlotで参照できます。空のReadPacketはその保存値を再取得する操作ではありません。",
+    "en": "Cached bytes remain available through GetPacketSlot after consumption. An empty ReadPacket does not copy those cached bytes again."
+  },
+  "dmg07_LinkDmg07_ReadPacket_purpose": {
+    "ja": "最新の完成済みパケットを取り出し、未読フラグを消します。",
+    "en": "Copy the latest completed packet and clear its unread flag."
+  },
+  "dmg07_LinkDmg07_ReadPacket_dst": {
+    "ja": "4バイトの書き込み可能な領域。0なら内容を読み捨てます。",
+    "en": "Four writable bytes; null discards the packet."
+  },
+  "dmg07_LinkDmg07_ReadPacket_returns": {
+    "ja": "取得できれば1、空なら0です。空ではdstを書き換えません。",
+    "en": "Returns 1 when consumed, 0 when empty. Empty reads leave dst unchanged."
+  },
+  "dmg07_note_cachebyte": {
+    "ja": "未読フラグは調べず、消費もしません。初期化直後は0、消費後や探索へのリセット後は保存値を返すことがあるため、新着判定には使いません。",
+    "en": "Neither checks nor consumes readiness. Returns zero just after initialization and may return retained bytes after consumption or a discovery reset. Do not use it as a new-data test."
+  },
+  "dmg07_LinkDmg07_GetPacketSlot_purpose": {
+    "ja": "保存中のパケットから指定プレイヤーの1バイトを読みます。",
+    "en": "Read one player’s byte from cached packet storage."
+  },
+  "dmg07_LinkDmg07_GetPacketSlot_player_slot": {
+    "ja": "物理プレイヤー番号1～4。",
+    "en": "Physical player number, 1..4."
+  },
+  "dmg07_LinkDmg07_GetPacketSlot_returns": {
+    "ja": "1～4なら対応する保存値、不正な番号なら0です。",
+    "en": "Returns the cached byte for player 1..4, or zero for an invalid number."
+  },
+  "dmg07_LinkDmg07_GetSentSequence_purpose": {
+    "ja": "自機の提出バイトが実際にクロックで送り出された回数を読みます。",
+    "en": "Read the count of application submission bytes actually clocked out."
+  },
+  "dmg07_LinkDmg07_GetSentSequence_returns": {
+    "ja": "8ビットの送信番号です。初回の提出も数えますが、再起動制御の送信は数えません。",
+    "en": "Returns the eight-bit sent sequence. Counts the initial submission but excludes restart-control traffic."
+  },
+  "dmg07_LinkDmg07_GetPacketSequence_purpose": {
+    "ja": "最後にメールボックスへ公開したパケットの番号を読みます。",
+    "en": "Read the sequence assigned to the most recently published packet."
+  },
+  "dmg07_LinkDmg07_GetPacketSequence_returns": {
+    "ja": "8ビットの受信パケット番号です。読み取りで未読フラグは変わりません。",
+    "en": "Returns the eight-bit packet sequence without changing readiness."
+  },
+  "dmg07_LinkDmg07_GetSilenceFrames_purpose": {
+    "ja": "最後のシリアル完了処理から経過したフレーム数を読みます。",
+    "en": "Read frames counted since the last processed serial completion."
+  },
+  "dmg07_LinkDmg07_GetSilenceFrames_returns": {
+    "ja": "0～255。完了処理で0へ戻り、TickFrameごとに増えます。",
+    "en": "0..255; processed completion resets it, and each TickFrame increments it."
+  },
+  "dmg07_note_timeoutonce": {
+    "ja": "受信が再開するまで同じ無通信状態を毎フレーム加算しません。ClearErrorを呼んでもこの抑制ラッチと累積値は残ります。",
+    "en": "Does not count the same silence episode every frame before reception resumes. ClearError preserves both this suppression latch and the cumulative count."
+  },
+  "dmg07_LinkDmg07_GetTimeoutCount_purpose": {
+    "ja": "無通信またはハンドシェイクの期限超過を記録した回数を読みます。",
+    "en": "Read the count of silence or handshake deadline expirations."
+  },
+  "dmg07_LinkDmg07_GetTimeoutCount_returns": {
+    "ja": "0～255の累積値です。",
+    "en": "Returns a cumulative value in 0..255."
+  },
+  "dmg07_note_disconnect": {
+    "ja": "アダプター未検出のまま期限を超えても増えません。1回の状態変化で複数人が消えても1イベントです。",
+    "en": "A deadline before any adapter has been observed does not increment it. Multiple players removed by one status change count as one event."
+  },
+  "dmg07_LinkDmg07_GetDisconnectCount_purpose": {
+    "ja": "検出済みアダプターの無通信、または探索マスクからのプレイヤー減少を数えます。",
+    "en": "Read recorded loss events: silence after seeing an adapter, or players disappearing from discovery status."
+  },
+  "dmg07_LinkDmg07_GetDisconnectCount_returns": {
+    "ja": "0～255の累積イベント数です。失われた人数ではありません。",
+    "en": "Returns 0..255 events, not the number of lost players."
+  },
+  "dmg07_example_overflow": {
+    "ja": "最初の有効パケットを読まず、次が届くまで待ちます。SENT SEQ=3、PACKET SEQ=2、ERROR=6となり、取得内容は最新の33/34/35/36です。ClearErrorでCLEAR ERROR=0になりますが、ErrorCountは1のままです。",
+    "en": "Leave the first valid packet unread until another arrives. Expect SENT SEQ=3, PACKET SEQ=2 and ERROR=6; the read returns the latest 33/34/35/36. ClearError changes CLEAR ERROR to zero while ErrorCount remains one."
+  },
+  "dmg07_LinkDmg07_GetErrorCount_purpose": {
+    "ja": "受信プロトコル不正と未読パケットの上書きを記録した回数を読みます。",
+    "en": "Read the count of received-protocol errors and unread-packet overwrites."
+  },
+  "dmg07_LinkDmg07_GetErrorCount_returns": {
+    "ja": "0～255の累積値です。要求の引数・状態エラーや時間切れはこの数に含めません。",
+    "en": "Returns 0..255. Request validation/state errors and timeouts are not included."
+  },
+  "dmg07_note_last": {
+    "ja": "読み取りでは消えません。複数の問題が起きたときの全履歴ではなく、最後のコードだけです。",
+    "en": "Reading does not clear it. Stores only the latest code, not a history of every error."
+  },
+  "dmg07_LinkDmg07_LastError_purpose": {
+    "ja": "最後に記録したエラー番号を読みます。",
+    "en": "Read the most recently latched error code."
+  },
+  "dmg07_LinkDmg07_LastError_returns": {
+    "ja": "0～6のエラー番号です。",
+    "en": "Returns error code 0..6."
+  },
+  "dmg07_note_clear": {
+    "ja": "受信データ、フェーズ、接続情報、時間切れラッチは変えません。これだけで再接続や受信再開を行う関数ではありません。",
+    "en": "Preserves received data, phase, connection information and the timeout latch. This call alone does not reconnect or resume reception."
+  },
+  "dmg07_LinkDmg07_ClearError_purpose": {
+    "ja": "最後のエラー番号を0へ戻します。",
+    "en": "Reset the last-error code to zero."
+  },
+  "dmg07_LinkDmg07_ClearError_returns": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "dmg07_module": {
+    "ja": "DMG-07は各台からの1バイトを4台へ配信するアダプターです。このライブラリは、探索、プレイヤー1による開始要求、1パケット遅れの配信、整列した再起動制御を扱います。EXCHANGEで基本の4台通信、NO ADAPTERで時間切れ、OVERFLOWで読み忘れ、RESTARTで回復を学べます。",
+    "en": "The DMG-07 broadcasts one submitted byte from each console to all four players. This library handles discovery, player-1 startup, delayed packet broadcasts and aligned restart control. Learn four-console exchange with EXCHANGE, timeout behavior with NO ADAPTER, unread data with OVERFLOW and recovery with RESTART."
+  }
+}

@@ -1,8 +1,8 @@
 {
   "ja": {
-    "title": "physics2d.h — 1/8ピクセル単位の移動データ",
+    "title": "Q5.3の型を使う独自の移動処理",
     "paragraphs": [
-      "KITAQFCのphysics2d.hは、移動データに使う型と定数を定義するヘッダーです。積分・衝突・重力を実行する関数は含みません。下のgame_stepは、これらの定義を使ってゲーム側で実装した処理です。",
+      "physics2d.hには、world/bodyの関数に加えて、独自の小数移動に使える型と定数があります。ここではQ5.3のデータ表現を使い、ゲーム側でgame_stepを実装します。この例はworld/bodyの積分処理とは別の方式です。",
       "KQ2DPositionは整数ピクセル位置（0～255）、KQ2DFractionは端数（0～7）、KQ2DSpeedは1刻み当たりの移動量の大きさ（1/8ピクセル単位、0～255）、KQ2DDirectionは方向を保持します。各型の実体はu8です。速度の符号を同じ変数に格納しません。",
       "KQ2D_SUBPIXEL_BITS=3、ONE=8、MASK=7を使い、位置×8＋端数を16ビットへ広げて計算します。方向のNONE=0は停止、NEGATIVE=1は減算、POSITIVE=2は加算を表します。計算後の位置が0～255に収まり、減算が0未満にならないようにゲーム側で境界を処理してください。",
       "KQ2D_DRAG_BRAKE=1、STUN=2、COAST=3、THRUST=4は、ゲーム側の制動・停止効果・慣性・推進などを区別する識別値です。これらを代入するだけで減速や加速は起こりません。効果と継続時間をゲームの更新処理で定義します。"
@@ -14,9 +14,9 @@
     "build_title": "ビルド"
   },
   "en": {
-    "title": "physics2d.h — Eighth-pixel motion data",
+    "title": "Custom movement using Q5.3 data types",
     "paragraphs": [
-      "KITAQFC's physics2d.h defines types and constants for motion data. It contains no integration, collision or gravity functions. The game_step routine below belongs to the example and shows how a game can use those definitions.",
+      "Alongside the world/body functions, physics2d.h defines types and constants for custom fractional movement. This lesson implements game_step using the Q5.3 data convention. It is a separate approach from world/body integration.",
       "KQ2DPosition stores an integer pixel position (0..255), KQ2DFraction a remainder (0..7), KQ2DSpeed a displacement magnitude per tick in eighths of a pixel (0..255), and KQ2DDirection the direction. All four types are u8. Direction is stored separately from speed rather than encoded as a sign.",
       "Use KQ2D_SUBPIXEL_BITS=3, ONE=8 and MASK=7 to combine position*8+fraction in a 16-bit intermediate. Direction NONE=0 means no movement, NEGATIVE=1 means subtraction and POSITIVE=2 means addition. The game must handle boundaries so subtraction stays nonnegative and the resulting integer position remains within 0..255.",
       "KQ2D_DRAG_BRAKE=1, STUN=2, COAST=3 and THRUST=4 are identifiers for game-defined braking, stun, coasting and thrust behavior. Assigning one does not apply acceleration or drag. Define each effect and its duration in your update routine."

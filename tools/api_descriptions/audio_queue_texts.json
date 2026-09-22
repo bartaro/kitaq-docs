@@ -1,0 +1,50 @@
+{
+  "audio_queue_setup": {
+    "ja": "AudioVBlank_Initの後、QueueReset、QueueRefill、QueuePlayの順に呼びます。通常のaudio_vblank.cをコンパイルしてください。AUDIO_VBLANK_CORE_ONLYでは補充用C関数は含まれません。16レコード×5バイトのキューを使い、前景処理で補充し、VBlank ISRが消費します。",
+    "en": "After AudioVBlank_Init, call QueueReset, QueueRefill and QueuePlay in that order. Compile the ordinary audio_vblank.c; AUDIO_VBLANK_CORE_ONLY excludes the C producer functions. Foreground code fills a queue of sixteen five-byte records and the VBlank ISR consumes it."
+  },
+  "audio_queue_concurrency": {
+    "ja": "補充を呼ぶ側は前景処理の1か所に限定し、ISRやFrameHookから重ねて呼ばないでください。レコードを公開する短い区間だけIEを退避して割り込みを抑え、終了時にIEとSVBKを戻します。IMEは変更しません。素材のROM/RAMバンクは呼び出し側で選択して保持します。",
+    "en": "Use a single foreground producer; do not call it recursively or from an ISR or FrameHook. Each short publication step saves IE and masks interrupt sources, then restores IE and SVBK. IME is unchanged. Select and retain the source ROM/RAM bank in caller code."
+  },
+  "audio_queue_format": {
+    "ja": "時間付きレコードはdelay, ch1_note, ch2_note, ch3_note, ch4_noise_paramの5バイトです。ENDも5バイトで用意します。LOOPは補充側で展開し、必要なレコードを再投入してください。直接再生用の可変長コマンド列をそのまま渡す用途ではありません。",
+    "en": "Timed records contain delay, ch1_note, ch2_note, ch3_note and ch4_noise_param. Supply END as a complete five-byte record too. Expand LOOP in producer code by submitting the required records again. Do not pass a variable-length direct-play command stream unchanged."
+  },
+  "audio_queue_expected": {
+    "ja": "独自の8音のフレーズを6回鳴らし、最後に停止します。16枠のキューへ49レコード（48音＋END）を順に補充します。検証では全49レコードの受理、アンダーラン0、再生停止、空・満杯・NULL・個数0の処理、CGBのWRAMバンク復元、IME保持、再生中の音声と終了後の無音を確認しています。",
+    "en": "Play an original eight-note phrase six times, then stop. Feed 49 records—48 notes plus END—through the sixteen-slot queue. Checks cover all 49 accepted records, zero underruns, stopped playback, empty/full/null/zero-count cases, CGB WRAM-bank restoration, preserved IME, active audio and silence after completion."
+  },
+  "audio_queue_reset": {
+    "ja": "再生を止めて音を消し、キューモードを選択して読み書き位置・残数・アンダーラン数を0へ戻します。既存のレコードを破棄して新しい曲を準備する操作です。",
+    "en": "Stop and silence playback, select queue mode, and zero read/write positions, count and underruns. This discards pending records to prepare a new stream."
+  },
+  "audio_queue_void": {
+    "ja": "戻り値はありません。音楽の有効・一時停止の設定は保持します。",
+    "en": "No return value. Music-enable and pause settings are preserved."
+  },
+  "audio_queue_refill": {
+    "ja": "完全な5バイトレコードを空きキューへコピーし、コピーが終わったレコードだけISRへ公開します。1回の呼び出しで最大16レコードを受理します。",
+    "en": "Copy complete five-byte records into available queue slots and publish each only after its copy finishes. One call accepts at most sixteen records."
+  },
+  "audio_queue_records": {
+    "ja": "現在読み出せるバンクにあるレコード列。受理される個数×5バイトを読める状態にしてください。NULLでは0を返します。",
+    "en": "Record array in the currently readable bank. Provide five readable bytes per accepted record. A null pointer returns zero."
+  },
+  "audio_queue_count": {
+    "ja": "コピーを試みるレコード数です。バイト数ではありません。16を超える指定は16に制限し、0では何もしません。",
+    "en": "Number of records to attempt, not bytes. Values above sixteen are capped at sixteen; zero does nothing."
+  },
+  "audio_queue_accepted": {
+    "ja": "実際に受理したレコード数0～16です。満杯、NULL、個数0、キューモード以外では0です。次の素材位置は戻り値×5バイト進めます。呼び出し中にISRが空きを作る場合があるため、単なる呼び出し前の空き数とは限りません。",
+    "en": "Return the actual accepted record count, 0..16. Return zero for a full queue, null input, zero count or non-queue mode. Advance the source by five times the return value. The ISR may free slots during the call, so this is not necessarily the free count at entry."
+  },
+  "audio_queue_play": {
+    "ja": "キューモードで1レコード以上あれば再生フラグを有効にします。読み書き位置・待ち時間・音楽の有効設定・一時停止状態を変更しません。初期再生の前にQueueResetと補充を行います。",
+    "en": "Enable playback when queue mode is active and at least one record is available. Preserve cursors, delay, music-enable and pause state. Reset and prefill the queue before starting a new stream."
+  },
+  "audio_queue_started": {
+    "ja": "開始を受け付けると1、空またはキューモード以外なら0です。ISRが動作し、音楽が有効で一時停止されていなければ消費が進みます。",
+    "en": "Return one when accepted, or zero for an empty queue or non-queue mode. Consumption requires a running ISR, enabled music and an unpaused driver."
+  }
+}

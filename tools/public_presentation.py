@@ -32,6 +32,12 @@ def public_file(relative):
     path = Path(relative)
     if any(part.startswith('.') or part == '__pycache__' for part in path.parts):
         return False
+    if path.parts[0] == 'verification' and path.name == 'build.c':
+        return False
+    if path.parts[0] == 'verification' and any(part in ('state','oracle','multiply') for part in path.parts[2:]):
+        return False
+    if path.parts[:2] == ('verification','api-audio-queue'):
+        return path.suffix in PUBLIC_EVIDENCE_SUFFIXES | {'.wav'}
     if path.parts[:2] == ('verification','api-sound'):
         if 'state' in path.parts or 'integration_test' in path.parts:return False
         if 'fc-midi' in path.parts and path.suffix=='.wav':return False
@@ -44,7 +50,7 @@ def public_file(relative):
     # The three teaching ROMs/screens have distinct gb-dmg, gb-cgb and fc-nrom folders.
     if len(path.parts)>2 and path.parts[0]=='verification' and path.parts[1] in ('api-memory-intrinsics','api-bit-intrinsics','api-rng') and path.parts[2] in ('gb','fc'):
         return False
-    if path.parts[:3] in [('verification','api-link','state'),('verification','api-flags','state'),('verification','api-rle','state'),('verification','api-text-layout','state'),('verification','api-dialogue','state'),('verification','api-batch100','state'),('verification','api-batch200','state'),('verification','api-batch300','state')]:
+    if path.parts[:3] in [('verification','api-dmg07','state'),('verification','api-link','state'),('verification','api-flags','state'),('verification','api-rle','state'),('verification','api-text-layout','state'),('verification','api-dialogue','state'),('verification','api-batch100','state'),('verification','api-batch200','state'),('verification','api-batch300','state')]:
         return False
     if path.parts[:3] in [('verification','api-physics','state'),('verification','api-physics','multiply')]:
         return False

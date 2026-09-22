@@ -33,8 +33,8 @@
     "Direkter PPU-Zugriff erfordert ausgeschaltete Bildausgabe oder einen sicheren VBlank-Zeitraum, in den die gesamte Operation passt. Diese Funktionen warten nicht, legen keine Aufträge an, sperren NMI nicht und stellen den Bildlauf nicht wieder her. Verhindern Sie, dass Interrupts während des Aufrufs den gemeinsamen Latch oder die Adresse verändern. PPUCTRL-Bit 2 wählt eine Zieladressschrittweite von 1 oder 32 pro Byte. Spiegelung und Adressumlauf übernimmt die PPU; CHR-ROM ist nicht beschreibbar. Stellen Sie nach dem Zugriff vor der Bildausgabe den gewünschten Bildlauf ein."
   ],
   "rp_pair_setup": [
-    "Include or compile `ppu.c` once, without `runtime.c`. Call `__ppu_read_status()` before its address-pair helpers to reset the shared latch. `ppu.h` does not declare these functions: its four screen/palette/nametable declarations have no implementations in this distribution. Including `ppu.c` supplies the functions shown here; including `ppu.h` alone does not.",
-    "`runtime.c`を併用せず、`ppu.c`を一度だけインクルードまたはコンパイルしてください。上位・下位バイトでアドレスを渡すこれらの関数の前には、`__ppu_read_status()`で共有ラッチをリセットします。`ppu.h`はこれらの関数を宣言しておらず、画面・パレット・ネームテーブル用の4宣言にも配布物内の実装がありません。ここで示す関数は`ppu.c`を組み込んで使います。`ppu.h`だけでは使えません。",
+    "Include ppu.h and compile ppu.c once. The byte-pair helpers reset the shared address latch themselves. They can be linked with runtime.c; the word-address helper is nes_ppu_seek and the byte-pair helper is nes_ppu_seek_bytes.",
+    "ppu.hを読み込み、ppu.cを1回コンパイルします。2バイト指定のヘルパーは自身で共有アドレスラッチをリセットします。runtime.cも併用できます。16ビット指定はnes_ppu_seek、2バイト指定はnes_ppu_seek_bytesです。",
     "`runtime.c`와 함께 사용하지 말고 `ppu.c`를 한 번만 포함하거나 컴파일하세요. 상위·하위 주소 바이트를 받는 함수 앞에서 `__ppu_read_status()`를 호출해 공유 래치를 초기화하세요. `ppu.h`에는 이 함수들의 선언이 없으며, 그 안의 화면·팔레트·네임테이블용 선언 네 개는 배포본에 구현이 없습니다. 여기 나온 함수는 `ppu.c`를 포함해 사용하며 `ppu.h`만으로는 사용할 수 없습니다.",
     "仅引入或编译一次 `ppu.c`，不要同时使用 `runtime.c`。调用其高、低地址字节函数前，请用 `__ppu_read_status()` 复位共享锁存器。`ppu.h` 没有声明这些函数；其中四个屏幕、调色板及名称表函数的声明在此发行包中没有实现。这里展示的函数由 `ppu.c` 提供，仅包含 `ppu.h` 无法使用。",
     "僅引入或編譯一次 `ppu.c`，不要同時使用 `runtime.c`。呼叫其高、低位址位元組函式前，請用 `__ppu_read_status()` 重設共用鎖存器。`ppu.h` 沒有宣告這些函式；其中四個畫面、調色盤及名稱表函式的宣告在此散布套件中沒有實作。這裡展示的函式由 `ppu.c` 提供，僅包含 `ppu.h` 無法使用。",
@@ -44,8 +44,8 @@
     "Binden oder kompilieren Sie `ppu.c` genau einmal und ohne `runtime.c`. Rufen Sie vor dessen Funktionen mit zwei Adressbytes `__ppu_read_status()` auf, um den gemeinsamen Latch zurückzusetzen. `ppu.h` deklariert diese Funktionen nicht; seine vier Deklarationen für Bildausgabe, Palette und Nametable besitzen in dieser Distribution keine Implementierung. Die hier gezeigten Funktionen stammen aus `ppu.c`; `ppu.h` allein reicht nicht aus."
   ],
   "rp_pair_length": [
-    "Byte count `0..255` (unsigned eight-bit). Zero sets the address without writing data. The helper does not reset the shared latch, even for zero; prepare it before calling.",
-    "符号なし8ビットのバイト数`0..255`です。0ならアドレスだけを設定し、データを書きません。0の場合も含め、関数は共有ラッチをリセットしないため、呼び出す前に準備してください。",
+    "Byte count 0..255. Zero still resets the address latch and sets the address, without writing PPUDATA.",
+    "バイト数0～255です。0でもアドレスラッチをリセットしてアドレスを設定しますが、PPUDATAには書きません。",
     "부호 없는 8비트 바이트 수 `0..255`입니다. 0이면 주소만 설정하고 데이터는 쓰지 않습니다. 0인 경우에도 공유 래치를 초기화하지 않으므로 호출 전에 준비하세요.",
     "无符号八位字节数，范围为 `0..255`。0 只设置地址，不写入数据。即使为 0，函数也不会复位共享锁存器，请在调用前准备好锁存器。",
     "無號八位元的位元組數，範圍為 `0..255`。0 只設定位址，不寫入資料。即使為 0，函式也不會重設共用鎖存器，請在呼叫前準備好鎖存器。",
