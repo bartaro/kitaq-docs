@@ -2457,7 +2457,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fds_available();"
+      "new_example": "__fds_available();",
+      "implementation_excerpt": "if (funcName == \"__fds_available\")\n            {\n                if (!Need(0)) return true;\n                EmitAsm(\"LDA\", Imm(isFds ? 1 : 0));\n                return true;\n            }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 5053
+      }
     },
     {
       "name": "__fds_disk_ready",
@@ -2473,7 +2478,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fds_disk_ready();"
+      "new_example": "__fds_disk_ready();",
+      "implementation_excerpt": "case \"__fds_disk_ready\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(0x4032));\n                    EmitAsm(\"AND\", Imm(0x01));\n                    EmitAsm(\"EOR\", Imm(0x01));\n                    return true;\n                // Expose status bit 2 as the raw mask value 0 or 4, rather than a normalized Boolean.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 5067
+      }
     },
     {
       "name": "__fds_error",
@@ -2489,7 +2499,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fds_error();"
+      "new_example": "__fds_error();",
+      "implementation_excerpt": "case \"__fds_error\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(0x4030));\n                    return true;",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 5080
+      }
     },
     {
       "name": "__fds_side",
@@ -2505,7 +2520,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fds_side();"
+      "new_example": "__fds_side();",
+      "implementation_excerpt": "case \"__fds_side\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(0x4032));\n                    EmitAsm(\"AND\", Imm(0x04));\n                    return true;\n                // Read status register 4030 directly; the caller receives its complete byte value.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 5074
+      }
     },
     {
       "name": "__fds_wait_insert",
@@ -2521,7 +2541,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fds_wait_insert();"
+      "new_example": "__fds_wait_insert();",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_wait_ready\");\n            string loop = NewGeneratedLabel(\"fds_wait_ready_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", Mem(0x4032));\n            EmitAsm(\"AND\", Imm(0x01));\n            EmitAsm(\"BNE\", Rel(loop));\n            EmitAsm(\"RTS\");\n\n            // Build a one-file load list and supply inline wildcard-ID/list pointers to the BIOS LoadFiles entry.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9045
+      }
     },
     {
       "name": "__fds_wait_ready",
@@ -2537,7 +2562,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fds_wait_ready();"
+      "new_example": "__fds_wait_ready();",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_wait_ready\");\n            string loop = NewGeneratedLabel(\"fds_wait_ready_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", Mem(0x4032));\n            EmitAsm(\"AND\", Imm(0x01));\n            EmitAsm(\"BNE\", Rel(loop));\n            EmitAsm(\"RTS\");\n\n            // Build a one-file load list and supply inline wildcard-ID/list pointers to the BIOS LoadFiles entry.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9045
+      }
     },
     {
       "name": "__fds_file_exists",
@@ -2553,7 +2583,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fds_file_exists(u8 id) {\n    return __fds_file_exists(id);\n}"
+      "new_example": "u8 example_fds_file_exists(u8 id) {\n    return __fds_file_exists(id);\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_file_exists\");\n            EmitFdsMetadataSearch(foundReturnsSize: false);\n\n            // Return the compiled metadata size, using zero for an unmatched ID.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9178
+      }
     },
     {
       "name": "__fds_file_size",
@@ -2569,7 +2604,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u16 example_fds_file_size(u8 id) {\n    return __fds_file_size(id);\n}"
+      "new_example": "u16 example_fds_file_size(u8 id) {\n    return __fds_file_size(id);\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_file_size\");\n            EmitFdsMetadataSearch(foundReturnsSize: true);\n\n            // Construct a RAM-source WriteFile header and invoke the BIOS with inline descriptor pointers.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9182
+      }
     },
     {
       "name": "__fds_load_file",
@@ -2585,7 +2625,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fds_load_file(u8 id, u8* dst) {\n    return __fds_load_file(id, dst);\n}"
+      "new_example": "u8 example_fds_load_file(u8 id, u8* dst) {\n    return __fds_load_file(id, dst);\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_load_file\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress + 1));\n            EmitAsm(\"JSR\", Mem(0xE1F8)); // FDS BIOS LoadFiles; A=error, Y=count.\n            _assembly.Add(Expr.Make(Tag.Word, \"__kq_fds_disk_id_wildcard\"));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsLoadListAddress)));\n            // A raw file load can replace any part of the switchable window.\n            // Only the bank-aware wrapper may establish a known resident bank.\n            EmitAsm(\"TAX\");\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"STA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"TXA\");\n            EmitAsm(\"RTS\");\n\n            // Use the same BIOS loading convention for an overlay file identifier.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9054
+      }
     },
     {
       "name": "__fds_save_file",
@@ -2601,7 +2646,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fds_save_file(u8 id, const u8* src, u16 len) {\n    return __fds_save_file(id, src, len);\n}"
+      "new_example": "u8 example_fds_save_file(u8 id, const u8* src, u16 len) {\n    return __fds_save_file(id, src, len);\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_save_file\");\n            // Build a minimal BIOS WriteFile header in RAM.\n            // args: id, src, len. File number uses id; file name is \"KQFCFILE\"; load/source addr = src.\n            EmitAsm(\"LDA\", Mem(CallArgBase)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 0));\n            byte[] nameBytes = System.Text.Encoding.ASCII.GetBytes(\"KQFCFILE\");\n            for (int i = 0; i < 8; i++)\n            {\n                EmitAsm(\"LDA\", Imm(nameBytes[i]));\n                EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 1 + i));\n            }\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 9));  // load addr lo\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 10)); // load addr hi\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 11)); // size lo\n            EmitAsm(\"LDA\", Mem(CallArgBase + 4)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 12)); // size hi\n            EmitAsm(\"LDA\", Imm(0)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 13)); // file type PRG\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 14)); // source addr lo\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 15)); // source addr hi\n            EmitAsm(\"LDA\", Imm(0)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 16)); // source address type: RAM\n            EmitAsm(\"LDA\", Mem(CallArgBase)); // sequential file number; expected to match id in KITAQFC simple-save convention.\n            EmitAsm(\"JSR\", Mem(0xE239)); // FDS BIOS WriteFile\n            _assembly.Add(Expr.Make(Tag.Word, \"__kq_fds_disk_id_wildcard\"));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsFileHeaderAddress)));\n            EmitAsm(\"RTS\");\n\n            // Enable wave-RAM writes, copy 64 source bytes, then clear the wave-write control register.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9186
+      }
     },
     {
       "name": "__fds_current_bank",
@@ -2609,15 +2659,20 @@
       "args": "void",
       "signature": "u8 __fds_current_bank(void);",
       "path": "kitaqfc/lib/fds_overlay.h",
-      "line": 14,
-      "comment": "Return the software resident-bank byte; it is not a checksum of overlay memory.",
+      "line": 16,
+      "comment": "Return the software resident-bank byte, or FF after a failed bank transfer.\nThis is not a checksum of overlay memory.",
       "body": "",
       "kind": "function",
       "module": "fds_overlay",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fds_current_bank();"
+      "new_example": "__fds_current_bank();",
+      "implementation_excerpt": "case \"__fds_current_bank\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(_runtimeFdsResidentBankAddress));\n                    return true;",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 5129
+      }
     },
     {
       "name": "__fds_farcall",
@@ -2625,15 +2680,20 @@
       "args": "u8 bank, u16 func",
       "signature": "u8 __fds_farcall(u8 bank, u16 func);",
       "path": "kitaqfc/lib/fds_overlay.h",
-      "line": 22,
-      "comment": "Alternate direct-call spelling for FDS overlay calls; supply a function symbol, not a runtime pointer.",
+      "line": 25,
+      "comment": "Same named, zero-argument dispatch as __fds_overlay_farcall; evaluate bank once.",
       "body": "",
       "kind": "function",
       "module": "fds_overlay",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fds_farcall(u8 bank, u16 func) {\n    return __fds_farcall(bank, func);\n}"
+      "new_example": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\nu8 choose_overlay(void){fds_result[2]++;return 2;}\n#pragma fixed_bank 2\nu8 overlay_answer(void){fds_result[1]++;fds_result[3]=__fds_current_bank();return 42;}\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();fds_result[1]=0;fds_result[2]=0;\n    fds_result[0]=__fds_farcall(choose_overlay(),overlay_answer);\n    fds_result[4]=__fds_current_bank();fds_result[15]=165;\n    fds_call_screen();while(1){m_wait();}\n}",
+      "implementation_excerpt": "if (string.Equals(funcName, \"__fds_overlay_farcall\", StringComparison.Ordinal) ||\n                string.Equals(funcName, \"__fds_farcall\", StringComparison.Ordinal))\n            {\n                // FDS overlay dispatch requires the configured FDS RAM layout and a named function target.\n                Expr[] farArgs = args ?? Array.Empty<Expr>();\n                if (farArgs.Length != 2)\n                {\n                    Program.Error(\"error KQFC2512: {0}(bank, func) expects exactly 2 arguments.\", funcName);\n                    return;\n                }\n                string targetName;\n                if (!farArgs[1].Match(Tag.Name, out targetName))\n                {\n                    Program.Error(\"error KQFC2513: {0}(bank, func) requires the 2nd argument to be a function name.\", funcName);\n                    return;\n                }\n                if (!Program.NesMapperProfile.HasFds || !Program.FdsPrgRamLayoutEnabled)\n                {\n                    Program.Error(\"error KQFC2514: {0} requires --mapper=fds with --fds-layout=fds32.\", funcName);\n                    return;\n                }\n                // Like ordinary __farcall, this entry supplies no callback arguments.\n                // Validate before emitting code so a data symbol cannot become a JSR target.\n                if (!_functionParameters.TryGetValue(targetName, out FieldInfo[] fdsParameters))\n                {\n                    Program.Error(\"error KQFC2610: {0} requires a declared function name; use an ordinary typed call for a function pointer.\", funcName);\n                    return;\n                }\n                if (fdsParameters.Length != 0)\n                {\n                    Program.Error(\"error KQFC2610: {0} requires a callback with no parameters.\", funcName);\n                    return;\n                }\n                // Evaluate the bank expression exactly once, even for a safe direct call.\n                // The named target's linked placement determines the dispatched bank.\n                EmitLoadValue(farArgs[0], ctx, 1);\n                int callerBank = ctx == null ? 0 : ctx.Bank;\n                int calleeBank = GetFunctionBank(targetName);\n                if (ShouldUseFdsOverlayThunk(callerBank, calleeBank))\n                {\n                    string directFdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                    EmitAsm(\"JSR\", Abs(directFdsThunkName));\n                    RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                    return;\n                }\n                if (calleeBank == 0 || calleeBank == callerBank)\n                {\n                    EmitAsm(\"JSR\", Abs(targetName));\n                    RecordCallEdge(targetName, calleeBank, \"direct\", viaThunk: false, viaFarcall: true);\n                    return;\n                }\n                string fdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                EmitAsm(\"JSR\", Abs(fdsThunkName));\n                RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 3981
+      }
     },
     {
       "name": "__fds_is_bank_resident",
@@ -2641,15 +2701,20 @@
       "args": "u8 bank",
       "signature": "u8 __fds_is_bank_resident(u8 bank);",
       "path": "kitaqfc/lib/fds_overlay.h",
-      "line": 16,
-      "comment": "Compare bank with the software resident-bank byte and return 0 or 1.",
+      "line": 18,
+      "comment": "Compare a valid bank with the software resident-bank byte; FF (unknown) never matches.",
       "body": "",
       "kind": "function",
       "module": "fds_overlay",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fds_is_bank_resident(u8 bank) {\n    return __fds_is_bank_resident(bank);\n}"
+      "new_example": "u8 example_fds_is_bank_resident(u8 bank) {\n    return __fds_is_bank_resident(bank);\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_is_bank_resident\");\n            string fdsResidentYes = NewGeneratedLabel(\"fds_resident_yes\");\n            string fdsResidentNo = NewGeneratedLabel(\"fds_resident_no\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsResidentNo));\n            EmitAsm(\"CMP\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"BEQ\", Rel(fdsResidentYes));\n            _assembly.Add(Expr.Make(Tag.Label, fdsResidentNo));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsResidentYes));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"RTS\");\n\n            // Query file existence in the compiled metadata table.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9162
+      }
     },
     {
       "name": "__fds_load_bank",
@@ -2657,15 +2722,20 @@
       "args": "u8 bank",
       "signature": "u8 __fds_load_bank(u8 bank);",
       "path": "kitaqfc/lib/fds_overlay.h",
-      "line": 10,
-      "comment": "Map bank >=2 to overlay-start-id+(bank-2), load it and update residency on success.\nReturn FF for bank 0 or 1; an enabled residency guard may skip an already-resident load.",
+      "line": 11,
+      "comment": "Load logical bank 1 from its separate boot file, or bank 2+ from overlay-start-id+(bank-2).\nReturn zero on success, FF for invalid/unavailable mappings, or the BIOS error.\nA failed BIOS transfer marks residency FF (unknown); a matching valid guard can skip loading.",
       "body": "",
       "kind": "function",
       "module": "fds_overlay",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fds_load_bank(u8 bank) {\n    return __fds_load_bank(bank);\n}"
+      "new_example": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\n#pragma fixed_bank 2\n__prg_rom u8 bank_payload[4]={11,22,33,44};\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();\n    fds_result[0]=__fds_load_bank(2);\n    fds_result[1]=__fds_current_bank();\n    fds_result[2]=__fds_require_bank(2);\n    fds_result[3]=bank_payload[0];fds_result[4]=bank_payload[3];\n    fds_result[5]=nes_fds_load_bank(1);\n    fds_result[6]=__fds_current_bank();\n    fds_result[7]=__fds_require_bank(1);\n    fds_result[8]=__fds_load_bank(0);\n    fds_result[9]=__fds_load_bank(255);\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS DATA WINDOW\");m_wait();\n    m_text(2,5,\"LOAD BANK 2 STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"FIRST / LAST BYTE\");fds_number(21,7,fds_result[3]);fds_number(25,7,fds_result[4]);m_wait();\n    m_text(2,9,\"REQUIRE SAME BANK\");fds_number(25,9,fds_result[2]);m_wait();\n    m_text(2,11,\"RESTORE BANK 1\");fds_number(25,11,fds_result[5]);m_wait();\n    m_text(2,13,\"RESIDENT BANK\");fds_number(25,13,fds_result[6]);m_wait();\n    m_text(2,16,\"INVALID BANKS 0 / 255\");m_wait();\n    fds_number(2,18,fds_result[8]);fds_number(8,18,fds_result[9]);m_wait();\n    while(1){m_wait();}\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_load_bank\");\n            string fdsLoadBankLoad = NewGeneratedLabel(\"fds_load_bank_load\");\n            string fdsLoadBankOverlay = NewGeneratedLabel(\"fds_load_bank_overlay\");\n            string fdsLoadBankCall = NewGeneratedLabel(\"fds_load_bank_call\");\n            string fdsLoadBankDone = NewGeneratedLabel(\"fds_load_bank_done\");\n            string fdsLoadBankPopInvalid = NewGeneratedLabel(\"fds_load_bank_pop_invalid\");\n            string fdsLoadBankInvalid = NewGeneratedLabel(\"fds_load_bank_invalid\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"CMP\", Imm(1));\n            EmitAsm(\"BCC\", Rel(fdsLoadBankInvalid));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankInvalid));\n            if (Program.FdsOverlayResidencyGuardEnabled)\n            {\n                EmitAsm(\"CMP\", Mem(_runtimeFdsResidentBankAddress));\n                EmitAsm(\"BNE\", Rel(fdsLoadBankLoad));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"RTS\");\n                _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankLoad));\n            }\n            EmitAsm(\"PHA\");\n            EmitAsm(\"CMP\", Imm(1));\n            EmitAsm(\"BNE\", Rel(fdsLoadBankOverlay));\n            EmitAsm(\"LDA\", Abs(\"__kq_fds_boot_bank_file_id\"));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankPopInvalid));\n            EmitAsm(\"JMP\", Abs(fdsLoadBankCall));\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankOverlay));\n            EmitAsm(\"SEC\");\n            EmitAsm(\"SBC\", Imm(2));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Imm(Program.FdsOverlayStartId & 0xFF));\n            EmitAsm(\"BCS\", Rel(fdsLoadBankPopInvalid));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankPopInvalid));\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankCall));\n            EmitAsm(\"STA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__fds_load_overlay\"));\n            EmitAsm(\"TAX\");\n            EmitAsm(\"PLA\");\n            EmitAsm(\"CPX\", Imm(0));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankDone));\n            // A failed BIOS transfer may have overwritten part of the window.\n            // Mark it unknown so a subsequent restore cannot be skipped by the guard.\n            EmitAsm(\"LDA\", Imm(0xFF));\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankDone));\n            EmitAsm(\"STA\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"STA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"TXA\");\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankPopInvalid));\n            EmitAsm(\"PLA\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankInvalid));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"RTS\");\n\n            // Return success for the recorded resident bank, otherwise dispatch a bank load.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9091
+      }
     },
     {
       "name": "__fds_load_overlay",
@@ -2674,14 +2744,19 @@
       "signature": "u8 __fds_load_overlay(u8 id);",
       "path": "kitaqfc/lib/fds_overlay.h",
       "line": 7,
-      "comment": "Load the disk file id through BIOS and return its error byte; this alone does not update bank residency.",
+      "comment": "Load disk file id through BIOS, return its error byte and mark bank residency FF (unknown).",
       "body": "",
       "kind": "function",
       "module": "fds_overlay",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fds_load_overlay(u8 id) {\n    return __fds_load_overlay(id);\n}"
+      "new_example": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\n#pragma fixed_bank 2\n__prg_rom u8 raw_payload[4]={11,22,33,44};\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();\n    fds_result[0]=__fds_load_overlay(32);\n    fds_result[1]=__fds_current_bank();\n    fds_result[2]=__fds_is_bank_resident(1);\n    fds_result[3]=raw_payload[0];fds_result[4]=raw_payload[3];\n    fds_result[5]=__fds_require_bank(1);\n    fds_result[6]=__fds_current_bank();\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS RAW FILE-ID LOAD\");m_wait();\n    m_text(2,5,\"FILE 32 LOAD STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"FIRST / LAST BYTE\");fds_number(21,7,fds_result[3]);fds_number(25,7,fds_result[4]);m_wait();\n    m_text(2,9,\"UNKNOWN BANK RECORD\");fds_number(25,9,fds_result[1]);m_wait();\n    m_text(2,11,\"IS BANK 1 RESIDENT\");fds_number(25,11,fds_result[2]);m_wait();\n    m_text(2,13,\"REQUIRE BANK 1\");fds_number(25,13,fds_result[5]);m_wait();\n    m_text(2,15,\"RESIDENT AFTER RELOAD\");fds_number(25,15,fds_result[6]);m_wait();\n    while(1){m_wait();}\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_load_overlay\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress + 1));\n            EmitAsm(\"JSR\", Mem(0xE1F8));\n            _assembly.Add(Expr.Make(Tag.Word, \"__kq_fds_disk_id_wildcard\"));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsLoadListAddress)));\n            // A raw file load can replace any part of the switchable window.\n            // Only the bank-aware wrapper may establish a known resident bank.\n            EmitAsm(\"TAX\");\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"STA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"TXA\");\n            EmitAsm(\"RTS\");\n\n            // Restore bank 1 from its separate boot file; map banks 2+ to overlay\n            // IDs. Keep the requested bank on the CPU stack across the BIOS call.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9072
+      }
     },
     {
       "name": "__fds_overlay_farcall",
@@ -2689,15 +2764,20 @@
       "args": "u8 bank, u16 func",
       "signature": "u8 __fds_overlay_farcall(u8 bank, u16 func);",
       "path": "kitaqfc/lib/fds_overlay.h",
-      "line": 20,
-      "comment": "Use a direct call with a function name as the second argument; arbitrary numeric pointers are rejected.",
+      "line": 23,
+      "comment": "Evaluate bank once and call the named zero-argument function using its linked bank.\nRestore the caller window before returning; restoration failure stops in common code.",
       "body": "",
       "kind": "function",
       "module": "fds_overlay",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fds_overlay_farcall(u8 bank, u16 func) {\n    return __fds_overlay_farcall(bank, func);\n}"
+      "new_example": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\nu8 choose_overlay(void){fds_result[2]++;return 2;}\n#pragma fixed_bank 2\nu8 overlay_answer(void){fds_result[1]++;fds_result[3]=__fds_current_bank();return 42;}\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();fds_result[1]=0;fds_result[2]=0;\n    fds_result[0]=__fds_overlay_farcall(choose_overlay(),overlay_answer);\n    fds_result[4]=__fds_current_bank();fds_result[15]=165;\n    fds_call_screen();while(1){m_wait();}\n}",
+      "implementation_excerpt": "if (string.Equals(funcName, \"__fds_overlay_farcall\", StringComparison.Ordinal) ||\n                string.Equals(funcName, \"__fds_farcall\", StringComparison.Ordinal))\n            {\n                // FDS overlay dispatch requires the configured FDS RAM layout and a named function target.\n                Expr[] farArgs = args ?? Array.Empty<Expr>();\n                if (farArgs.Length != 2)\n                {\n                    Program.Error(\"error KQFC2512: {0}(bank, func) expects exactly 2 arguments.\", funcName);\n                    return;\n                }\n                string targetName;\n                if (!farArgs[1].Match(Tag.Name, out targetName))\n                {\n                    Program.Error(\"error KQFC2513: {0}(bank, func) requires the 2nd argument to be a function name.\", funcName);\n                    return;\n                }\n                if (!Program.NesMapperProfile.HasFds || !Program.FdsPrgRamLayoutEnabled)\n                {\n                    Program.Error(\"error KQFC2514: {0} requires --mapper=fds with --fds-layout=fds32.\", funcName);\n                    return;\n                }\n                // Like ordinary __farcall, this entry supplies no callback arguments.\n                // Validate before emitting code so a data symbol cannot become a JSR target.\n                if (!_functionParameters.TryGetValue(targetName, out FieldInfo[] fdsParameters))\n                {\n                    Program.Error(\"error KQFC2610: {0} requires a declared function name; use an ordinary typed call for a function pointer.\", funcName);\n                    return;\n                }\n                if (fdsParameters.Length != 0)\n                {\n                    Program.Error(\"error KQFC2610: {0} requires a callback with no parameters.\", funcName);\n                    return;\n                }\n                // Evaluate the bank expression exactly once, even for a safe direct call.\n                // The named target's linked placement determines the dispatched bank.\n                EmitLoadValue(farArgs[0], ctx, 1);\n                int callerBank = ctx == null ? 0 : ctx.Bank;\n                int calleeBank = GetFunctionBank(targetName);\n                if (ShouldUseFdsOverlayThunk(callerBank, calleeBank))\n                {\n                    string directFdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                    EmitAsm(\"JSR\", Abs(directFdsThunkName));\n                    RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                    return;\n                }\n                if (calleeBank == 0 || calleeBank == callerBank)\n                {\n                    EmitAsm(\"JSR\", Abs(targetName));\n                    RecordCallEdge(targetName, calleeBank, \"direct\", viaThunk: false, viaFarcall: true);\n                    return;\n                }\n                string fdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                EmitAsm(\"JSR\", Abs(fdsThunkName));\n                RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                return;\n            }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 3981
+      }
     },
     {
       "name": "__fds_overlay_function_count",
@@ -2705,15 +2785,20 @@
       "args": "void",
       "signature": "u8 __fds_overlay_function_count(void);",
       "path": "kitaqfc/lib/fds_overlay.h",
-      "line": 18,
-      "comment": "Read the emitted overlay-function table count; the current helper emits an initial zero entry.",
+      "line": 20,
+      "comment": "Return the linker-generated overlay-function count; zero if the table is disabled.",
       "body": "",
       "kind": "function",
       "module": "fds_overlay",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fds_overlay_function_count();"
+      "new_example": "__fds_overlay_function_count();",
+      "implementation_excerpt": "case \"__fds_overlay_function_count\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Abs(\"__kq_fds_overlay_function_table\"));\n                    return true;",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 5136
+      }
     },
     {
       "name": "__fds_require_bank",
@@ -2721,7 +2806,7 @@
       "args": "u8 bank",
       "signature": "u8 __fds_require_bank(u8 bank);",
       "path": "kitaqfc/lib/fds_overlay.h",
-      "line": 12,
+      "line": 13,
       "comment": "Return zero when the software residency record matches, otherwise call __fds_load_bank.",
       "body": "",
       "kind": "function",
@@ -2729,7 +2814,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fds_require_bank(u8 bank) {\n    return __fds_require_bank(bank);\n}"
+      "new_example": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\n#pragma fixed_bank 2\n__prg_rom u8 bank_payload[4]={11,22,33,44};\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();\n    fds_result[0]=__fds_load_bank(2);\n    fds_result[1]=__fds_current_bank();\n    fds_result[2]=__fds_require_bank(2);\n    fds_result[3]=bank_payload[0];fds_result[4]=bank_payload[3];\n    fds_result[5]=nes_fds_load_bank(1);\n    fds_result[6]=__fds_current_bank();\n    fds_result[7]=__fds_require_bank(1);\n    fds_result[8]=__fds_load_bank(0);\n    fds_result[9]=__fds_load_bank(255);\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS DATA WINDOW\");m_wait();\n    m_text(2,5,\"LOAD BANK 2 STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"FIRST / LAST BYTE\");fds_number(21,7,fds_result[3]);fds_number(25,7,fds_result[4]);m_wait();\n    m_text(2,9,\"REQUIRE SAME BANK\");fds_number(25,9,fds_result[2]);m_wait();\n    m_text(2,11,\"RESTORE BANK 1\");fds_number(25,11,fds_result[5]);m_wait();\n    m_text(2,13,\"RESIDENT BANK\");fds_number(25,13,fds_result[6]);m_wait();\n    m_text(2,16,\"INVALID BANKS 0 / 255\");m_wait();\n    fds_number(2,18,fds_result[8]);fds_number(8,18,fds_result[9]);m_wait();\n    while(1){m_wait();}\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fds_require_bank\");\n            string fdsRequireLoad = NewGeneratedLabel(\"fds_require_load\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsRequireLoad));\n            EmitAsm(\"CMP\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"BNE\", Rel(fdsRequireLoad));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsRequireLoad));\n            EmitAsm(\"JSR\", Abs(\"__fds_load_bank\"));\n            EmitAsm(\"RTS\");\n\n            // Compare the requested bank with the software residency record and return zero or one.",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 9148
+      }
     },
     {
       "name": "__fds_env_set",
@@ -6619,7 +6709,7 @@
       "definition": null,
       "availability": "macro",
       "example": null,
-      "new_example": "nes_fds_farcall(bank, func);"
+      "new_example": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\nu8 choose_overlay(void){fds_result[2]++;return 2;}\n#pragma fixed_bank 2\nu8 overlay_answer(void){fds_result[1]++;fds_result[3]=__fds_current_bank();return 42;}\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();fds_result[1]=0;fds_result[2]=0;\n    fds_result[0]=nes_fds_farcall(choose_overlay(),overlay_answer);\n    fds_result[4]=__fds_current_bank();fds_result[15]=165;\n    fds_call_screen();while(1){m_wait();}\n}"
     },
     {
       "name": "nes_fds_load_bank",
@@ -6635,7 +6725,7 @@
       "definition": null,
       "availability": "macro",
       "example": null,
-      "new_example": "nes_fds_load_bank(bank);"
+      "new_example": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\n#pragma fixed_bank 2\n__prg_rom u8 bank_payload[4]={11,22,33,44};\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();\n    fds_result[0]=__fds_load_bank(2);\n    fds_result[1]=__fds_current_bank();\n    fds_result[2]=__fds_require_bank(2);\n    fds_result[3]=bank_payload[0];fds_result[4]=bank_payload[3];\n    fds_result[5]=nes_fds_load_bank(1);\n    fds_result[6]=__fds_current_bank();\n    fds_result[7]=__fds_require_bank(1);\n    fds_result[8]=__fds_load_bank(0);\n    fds_result[9]=__fds_load_bank(255);\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS DATA WINDOW\");m_wait();\n    m_text(2,5,\"LOAD BANK 2 STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"FIRST / LAST BYTE\");fds_number(21,7,fds_result[3]);fds_number(25,7,fds_result[4]);m_wait();\n    m_text(2,9,\"REQUIRE SAME BANK\");fds_number(25,9,fds_result[2]);m_wait();\n    m_text(2,11,\"RESTORE BANK 1\");fds_number(25,11,fds_result[5]);m_wait();\n    m_text(2,13,\"RESIDENT BANK\");fds_number(25,13,fds_result[6]);m_wait();\n    m_text(2,16,\"INVALID BANKS 0 / 255\");m_wait();\n    fds_number(2,18,fds_result[8]);fds_number(8,18,fds_result[9]);m_wait();\n    while(1){m_wait();}\n}"
     },
     {
       "name": "nes_fds_wave_load",

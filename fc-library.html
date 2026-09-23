@@ -2295,7 +2295,48 @@ width. Caller-provided coordinates, storage and timing are not clipped or checke
     unsigned short ppu_addr;
     ppu_addr = (unsigned short)(nt_base + ((unsigned short)row &lt;&lt; 5));
     nes_ppu_stream_write(ppu_addr, src32, 32);
-}</code></pre></div></details></details><h3 id="module-nes_game">nes_game.h — ゲーム向け操作名のマクロ</h3><!-- api-module:start --><div data-module-contract="oam-library-source-20260915"><p><code>nes_game.h</code>は、VRAMキュー、OAM・メタスプライト、コントローラー読み取り、マッパー割り込み、分割スクロール、FDS操作に読みやすいマクロ名を提供します。各マクロはコンパイラの組み込み関数へ展開されるため、診断やKUROSAKIメタデータにも実際のハードウェア操作が記録されます。キュー操作には組み込みキューを使い、OAM DMAマクロは引数を取りません。</p><p>使うヘッダーを明確に選んでください。<code>nes_game.h</code>と総合ヘッダー<code>fc.h</code>はマクロを定義します。C関数を使う場合は<code>runtime.h</code>や<code>metasprite.h</code>と各実装ファイルを組み合わせ、同名マクロを含めないか、先に<code>#undef</code>で解除します。引数なしのDMAマクロにC関数の<code>page</code>引数を渡すことはできません。</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_fds_farcall"><summary><code>nes_fds_farcall</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。引数に対応する処理を実行します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_farcall(bank, func)        __fds_overlay_farcall((bank), (func))</code></pre></div><p><b>引数（左から順）：</b>bank, func。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_fds_farcall(bank, func);</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_fds_farcall.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:41</p></details><details class="api searchable" id="api-nes_fds_load_bank"><summary><code>nes_fds_load_bank</code><span class="badge">マクロ</span></summary><p>ゲーム向け操作名のマクロに関するAPIです。データを読み込みします。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_load_bank(bank)            __fds_load_bank((bank))</code></pre></div><p><b>引数（左から順）：</b>bank。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>nes_fds_load_bank(bank);</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/nes_fds_load_bank.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/nes_game.h:40</p></details><details class="api searchable" id="api-nes_fds_wave_load" data-api-contract="sound-source-20260916"><summary><code>nes_fds_wave_load</code></summary><p>__fds_wave_loadへ配列を渡すマクロです。64バイトの波形をロードします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_wave_load(wave64)          __fds_wave_load((wave64))</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>wave64</code></dt><dd><p>FDS波形の64バイト配列。各値は0～63の6ビット振幅です。NULLは検査しません。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>--mapper=fdsで.fdsを生成します。サンプルはディスク入出力を使わず音源を操作します。録音はKUROSAKIのRAM直接起動と音源モデルで確認しました。検証用の空のファームウェア領域はBIOS機能を提供せず、配布物にも含みません。通常のディスク起動や実機では別途適切な起動環境が必要です。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.
+}</code></pre></div></details></details><h3 id="module-nes_game">nes_game.h — ゲーム向け操作名のマクロ</h3><!-- api-module:start --><div data-module-contract="oam-library-source-20260915"><p><code>nes_game.h</code>は、VRAMキュー、OAM・メタスプライト、コントローラー読み取り、マッパー割り込み、分割スクロール、FDS操作に読みやすいマクロ名を提供します。各マクロはコンパイラの組み込み関数へ展開されるため、診断やKUROSAKIメタデータにも実際のハードウェア操作が記録されます。キュー操作には組み込みキューを使い、OAM DMAマクロは引数を取りません。</p><p>使うヘッダーを明確に選んでください。<code>nes_game.h</code>と総合ヘッダー<code>fc.h</code>はマクロを定義します。C関数を使う場合は<code>runtime.h</code>や<code>metasprite.h</code>と各実装ファイルを組み合わせ、同名マクロを含めないか、先に<code>#undef</code>で解除します。引数なしのDMAマクロにC関数の<code>page</code>引数を渡すことはできません。</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_fds_farcall" data-api-contract="fds-load-source-20260923"><summary><code>nes_fds_farcall</code></summary><p><code>nes_game.h</code>から使うFDS遠隔呼び出しマクロです。<code>__fds_overlay_farcall((bank), (func))</code>へ展開します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_farcall(bank, func)        __fds_overlay_farcall((bank), (func))</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>bank</code></dt><dd><p>バンクを表す式。式は呼び出し前に一度だけ評価しますが、実際にロードするバンクはfuncのリンク時の配置から決まります。任意の番号へ同じアドレスを振り向ける機能ではありません。<code>__bankof(func)</code>など、対象と一致する値を渡してください。</p></dd><dt><code>func</code></dt><dd><p>宣言済みで引数を取らない関数の名前。サンプルは<code>u8 overlay_answer(void)</code>を渡します。数値アドレス、実行時の関数ポインター、引数を必要とする関数は受け付けません。引数を渡す場合は通常の<code>target(a, b)</code>形式を使います。</p></dd></dl><h4>戻り値</h4><p>対象関数が返した8ビット値。ロードに失敗して元のバンクを復元できた場合は、対象を呼ばずロードエラーのバイトを返します。そのため、関数の結果とエラーを区別する設計が必要です。</p><h4>使用条件と制限</h4><p><code>--mapper=fds --fds-layout=fds32</code>向けです。バンク0は$A000～$DFFFの共通コード、バンク1は起動時の$6000～$9FFF、バンク2以降は同じ16 KiB窓へ読み込むオーバーレイです。バンク2以降は<code>#pragma fixed_bank 2</code>などで配置します。</p><p>バンク1は$6000・16384バイトの独立した起動PRGファイルから復元します。管理表を省略した標準構成ではID 0がバンク1、ID 1が共通コード、ID 2がCHRです。独自の管理表を使う場合は起動PRGを$6000と$A000の16384バイトずつに分けてください。バンク2以降のファイルIDは<code>--fds-overlay-start-id</code>（既定32）+ バンク番号 - 2です。</p><p>異なるバンクを呼ぶ場合は、呼び出し前のバンクを保存し、対象の実行後に復元してから戻ります。入れ子の呼び出しも同じ規則です。転送途中の失敗でも復元を試みます。復元そのものが失敗した場合は、上書きされたコードへ戻らず共通コード内で停止します。共通コード内の対象や同一バンクの対象には不要な転送を行いません。</p><p>BIOS呼び出しは同期処理です。読み込み中も毎フレームの処理が進むAPIではありません。割り込みハンドラーから呼ばず、共通コードに置いた通常の制御処理から使ってください。表示・音声の継続や実機でのBIOSとの共存は別途確認が必要です。</p><p>掲載画像は、独自に作成したLoadFilesの呼び出し規約テスト用処理で、コンパイルしたコード・メモリ転送・画面の全画素を確認したものです。実際のBIOS、ディスク転送タイミング、CRC、実機起動を検証した画像ではありません。KUROSAKIのFDSコントローラーは簡易モデルで、この検証用処理なしの通常実行だけでは同じ転送結果を再現できません。</p><p>下記コマンドの最初の行で配布サンプルをビルドします。Pythonの検証コマンドは5本のサンプルを最適化あり・なしでビルドし、KUROSAKIで確認します。検証用処理は<code>scripts/fds_abi_fixture.py</code>から一時生成して削除するため、外部BIOSを用意する必要はありません。通常のゲームでこの検証用処理を使うものではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#pragma fixed_bank 0
+#include &quot;fc_fds_scene.h&quot;
+u8 choose_overlay(void){fds_result[2]++;return 2;}
+#pragma fixed_bank 2
+u8 overlay_answer(void){fds_result[1]++;fds_result[3]=__fds_current_bank();return 42;}
+#pragma fixed_bank 0
+void main(void) {
+    __irq_disable();fds_result[1]=0;fds_result[2]=0;
+    fds_result[0]=nes_fds_farcall(choose_overlay(),overlay_answer);
+    fds_result[4]=__fds_current_bank();fds_result[15]=165;
+    fds_call_screen();while(1){m_wait();}
+}</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>独自のLoadFiles呼び出し規約テストでは、RETURN VALUEが042、CALLBACK COUNTとBANK EXPR COUNTが各001、BANK IN CALLBACKが002、BANK AFTER RETURNが001になります。対象とバンク式が一度ずつ実行され、バンク2で関数を呼んだ後にバンク1へ復元したことを表します。実際のディスク転送の検証画像ではありません。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-load/example/call_alias-default/screen.png" alt="nes_fds_farcall: CALL_ALIAS-DEFAULT — 独自のLoadFiles呼び出し規約テストでは、RETURN VALUEが042、CALLBACK COUNTとBANK EXPR COUNTが各001、BANK IN CALLBACKが002、BANK AFTER RETURNが001になります。対象とバンク式が一度ずつ実行され、バンク2で関数を呼んだ後にバンク1へ復元したことを表します。実際のディスク転送の検証画像ではありません。"><figcaption>CALL_ALIAS-DEFAULT — 独自のLoadFiles呼び出し規約テストでは、RETURN VALUEが042、CALLBACK COUNTとBANK EXPR COUNTが各001、BANK IN CALLBACKが002、BANK AFTER RETURNが001になります。対象とバンク式が一度ずつ実行され、バンク2で関数を呼んだ後にバンク1へ復元したことを表します。実際のディスク転送の検証画像ではありません。</figcaption></figure><p><a href="samples/api-examples/fc/fds_call_alias.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_call_alias.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_call_alias.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm
+python .\kitaq-docs\tools\check_fds_load_examples.py</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/nes_game.h:41</p></details></details><details class="api searchable" id="api-nes_fds_load_bank" data-api-contract="fds-load-source-20260923"><summary><code>nes_fds_load_bank</code></summary><p><code>nes_game.h</code>が提供する<code>__fds_load_bank()</code>のマクロ名です。ゲーム用ヘッダーの表記で論理バンクを明示的に読み込みます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_load_bank(bank)            __fds_load_bank((bank))</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>bank</code></dt><dd><p>ロードする論理バンク番号1～254。0は共通コードなのでロード対象ではなく、255は不明状態の予約値です。バンク2以降では、計算したファイルIDも0～254に収まる必要があります。</p></dd></dl><h4>戻り値</h4><p>成功時は0。番号0・255、ファイルIDの桁あふれ、復元用ファイルがないバンク1などは255。BIOS転送が失敗した場合はそのエラーバイトです。転送前の引数エラーでは常駐記録を変更せず、BIOS転送失敗時は255（不明）にします。</p><h4>使用条件と制限</h4><p><code>--mapper=fds --fds-layout=fds32</code>向けです。バンク0は$A000～$DFFFの共通コード、バンク1は起動時の$6000～$9FFF、バンク2以降は同じ16 KiB窓へ読み込むオーバーレイです。バンク2以降は<code>#pragma fixed_bank 2</code>などで配置します。</p><p><code>__fds_load_bank((bank))</code>へ展開します。bank式の重複評価はありません。引数範囲、常駐ガード、エラー処理は組み込み関数と同じです。</p><p>バンク1は$6000・16384バイトの独立した起動PRGファイルから復元します。管理表を省略した標準構成ではID 0がバンク1、ID 1が共通コード、ID 2がCHRです。独自の管理表を使う場合は起動PRGを$6000と$A000の16384バイトずつに分けてください。バンク2以降のファイルIDは<code>--fds-overlay-start-id</code>（既定32）+ バンク番号 - 2です。</p><p>既定の常駐ガードが有効で、指定バンクがすでに記録されていれば、ディスクを読まず0を返します。<code>--fds-no-overlay-guard</code>は<code>__fds_load_bank()</code>のこの省略処理を無効にします。ロード成功後はバンク番号を記録します。記録はメモリの検査結果ではありません。</p><p>ロード元と同じ$6000～$9FFF窓に置いた関数から直接バンクを切り替えると、自分のコードや復帰先を上書きします。このサンプルは呼び出し元と表示処理を<code>#pragma fixed_bank 0</code>へ置きます。別バンクの関数を呼んで戻る用途には<code>__fds_overlay_farcall()</code>または通常の型付き関数呼び出しを使います。</p><p>BIOS呼び出しは同期処理です。読み込み中も毎フレームの処理が進むAPIではありません。割り込みハンドラーから呼ばず、共通コードに置いた通常の制御処理から使ってください。表示・音声の継続や実機でのBIOSとの共存は別途確認が必要です。</p><p>掲載画像は、独自に作成したLoadFilesの呼び出し規約テスト用処理で、コンパイルしたコード・メモリ転送・画面の全画素を確認したものです。実際のBIOS、ディスク転送タイミング、CRC、実機起動を検証した画像ではありません。KUROSAKIのFDSコントローラーは簡易モデルで、この検証用処理なしの通常実行だけでは同じ転送結果を再現できません。</p><p>下記コマンドの最初の行で配布サンプルをビルドします。Pythonの検証コマンドは5本のサンプルを最適化あり・なしでビルドし、KUROSAKIで確認します。検証用処理は<code>scripts/fds_abi_fixture.py</code>から一時生成して削除するため、外部BIOSを用意する必要はありません。通常のゲームでこの検証用処理を使うものではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#pragma fixed_bank 0
+#include &quot;fc_fds_scene.h&quot;
+#pragma fixed_bank 2
+__prg_rom u8 bank_payload[4]={11,22,33,44};
+#pragma fixed_bank 0
+void main(void) {
+    __irq_disable();
+    fds_result[0]=__fds_load_bank(2);
+    fds_result[1]=__fds_current_bank();
+    fds_result[2]=__fds_require_bank(2);
+    fds_result[3]=bank_payload[0];fds_result[4]=bank_payload[3];
+    fds_result[5]=nes_fds_load_bank(1);
+    fds_result[6]=__fds_current_bank();
+    fds_result[7]=__fds_require_bank(1);
+    fds_result[8]=__fds_load_bank(0);
+    fds_result[9]=__fds_load_bank(255);
+    fds_result[15]=165;
+    m_init();m_text(2,2,&quot;FDS DATA WINDOW&quot;);m_wait();
+    m_text(2,5,&quot;LOAD BANK 2 STATUS&quot;);fds_number(25,5,fds_result[0]);m_wait();
+    m_text(2,7,&quot;FIRST / LAST BYTE&quot;);fds_number(21,7,fds_result[3]);fds_number(25,7,fds_result[4]);m_wait();
+    m_text(2,9,&quot;REQUIRE SAME BANK&quot;);fds_number(25,9,fds_result[2]);m_wait();
+    m_text(2,11,&quot;RESTORE BANK 1&quot;);fds_number(25,11,fds_result[5]);m_wait();
+    m_text(2,13,&quot;RESIDENT BANK&quot;);fds_number(25,13,fds_result[6]);m_wait();
+    m_text(2,16,&quot;INVALID BANKS 0 / 255&quot;);m_wait();
+    fds_number(2,18,fds_result[8]);fds_number(8,18,fds_result[9]);m_wait();
+    while(1){m_wait();}
+}</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>独自のLoadFiles呼び出し規約テストでは、LOAD BANK 2 STATUS・REQUIRE SAME BANK・RESTORE BANK 1が000です。FIRST / LAST BYTEの011と044は実際に転送した4バイトの両端、RESIDENT BANKの001は復元後の番号です。無効なバンク0と255はそれぞれ255を返します。同一バンクのrequireは追加のロードを起こさず、検証したファイル読み込み要求は32→0の2回です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-load/example/bank_load-default/screen.png" alt="nes_fds_load_bank: BANK_LOAD-DEFAULT — 独自のLoadFiles呼び出し規約テストでは、LOAD BANK 2 STATUS・REQUIRE SAME BANK・RESTORE BANK 1が000です。FIRST / LAST BYTEの011と044は実際に転送した4バイトの両端、RESIDENT BANKの001は復元後の番号です。無効なバンク0と255はそれぞれ255を返します。同一バンクのrequireは追加のロードを起こさず、検証したファイル読み込み要求は32→0の2回です。"><figcaption>BANK_LOAD-DEFAULT — 独自のLoadFiles呼び出し規約テストでは、LOAD BANK 2 STATUS・REQUIRE SAME BANK・RESTORE BANK 1が000です。FIRST / LAST BYTEの011と044は実際に転送した4バイトの両端、RESIDENT BANKの001は復元後の番号です。無効なバンク0と255はそれぞれ255を返します。同一バンクのrequireは追加のロードを起こさず、検証したファイル読み込み要求は32→0の2回です。</figcaption></figure><p><a href="samples/api-examples/fc/fds_bank_load.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_bank_load.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_bank_load.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm
+python .\kitaq-docs\tools\check_fds_load_examples.py</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/nes_game.h:40</p></details></details><details class="api searchable" id="api-nes_fds_wave_load" data-api-contract="sound-source-20260916"><summary><code>nes_fds_wave_load</code></summary><p>__fds_wave_loadへ配列を渡すマクロです。64バイトの波形をロードします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define nes_fds_wave_load(wave64)          __fds_wave_load((wave64))</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>wave64</code></dt><dd><p>FDS波形の64バイト配列。各値は0～63の6ビット振幅です。NULLは検査しません。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。音源レジスターまたはドライバーの状態を変更します。</p><h4>使用条件と制限</h4><p>--mapper=fdsで.fdsを生成します。サンプルはディスク入出力を使わず音源を操作します。録音はKUROSAKIのRAM直接起動と音源モデルで確認しました。検証用の空のファームウェア領域はBIOS機能を提供せず、配布物にも含みません。通常のディスク起動や実機では別途適切な起動環境が必要です。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// Mapper 20 sound lesson: original 64-step triangle and two sustained pitches.
 #include &quot;fc_sound_example.h&quot;
 #include &quot;fds_sound.h&quot;
 #include &quot;nes_game.h&quot;
@@ -5011,22 +5052,25 @@ u16 __fds_file_size(u8 id);
 
 #include &quot;intrinsics.h&quot;
 
-// Load the disk file id through BIOS and return its error byte; this alone does not update bank residency.
+// Load disk file id through BIOS, return its error byte and mark bank residency FF (unknown).
 u8 __fds_load_overlay(u8 id);
-// Map bank &gt;=2 to overlay-start-id+(bank-2), load it and update residency on success.
-// Return FF for bank 0 or 1; an enabled residency guard may skip an already-resident load.
+// Load logical bank 1 from its separate boot file, or bank 2+ from overlay-start-id+(bank-2).
+// Return zero on success, FF for invalid/unavailable mappings, or the BIOS error.
+// A failed BIOS transfer marks residency FF (unknown); a matching valid guard can skip loading.
 u8 __fds_load_bank(u8 bank);
 // Return zero when the software residency record matches, otherwise call __fds_load_bank.
 u8 __fds_require_bank(u8 bank);
-// Return the software resident-bank byte; it is not a checksum of overlay memory.
+// Return the software resident-bank byte, or FF after a failed bank transfer.
+// This is not a checksum of overlay memory.
 u8 __fds_current_bank(void);
-// Compare bank with the software resident-bank byte and return 0 or 1.
+// Compare a valid bank with the software resident-bank byte; FF (unknown) never matches.
 u8 __fds_is_bank_resident(u8 bank);
-// Read the emitted overlay-function table count; the current helper emits an initial zero entry.
+// Return the linker-generated overlay-function count; zero if the table is disabled.
 u8 __fds_overlay_function_count(void);
-// Use a direct call with a function name as the second argument; arbitrary numeric pointers are rejected.
+// Evaluate bank once and call the named zero-argument function using its linked bank.
+// Restore the caller window before returning; restoration failure stops in common code.
 u8 __fds_overlay_farcall(u8 bank, u16 func);
-// Alternate direct-call spelling for FDS overlay calls; supply a function symbol, not a runtime pointer.
+// Same named, zero-argument dispatch as __fds_overlay_farcall; evaluate bank once.
 u8 __fds_farcall(u8 bank, u16 func);
 
 #endif</code></pre></div><p class="source">kitaqfc/lib/fds_overlay.h</p></details><details class="searchable"><summary><code>fds_save.h</code> — FDS保存の宣言</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#ifndef FDS_SAVE_H
@@ -5554,22 +5598,25 @@ u8 __fds_load_file(u8 id, u8* dst);
 // Call BIOS WriteFile with a RAM source and byte length, returning its error byte.
 // The generated PRG descriptor uses id as file number and the fixed name KQFCFILE.
 u8 __fds_save_file(u8 id, const u8* src, u16 len);
-// Load the disk file id through BIOS and return its error byte; this alone does not update bank residency.
+// Load disk file id through BIOS, return its error byte and mark bank residency FF (unknown).
 u8 __fds_load_overlay(u8 id);
-// Map bank &gt;=2 to overlay-start-id+(bank-2), load it and update residency on success.
-// Return FF for bank 0 or 1; an enabled residency guard may skip an already-resident load.
+// Load logical bank 1 from its separate boot file, or bank 2+ from overlay-start-id+(bank-2).
+// Return zero on success, FF for invalid/unavailable mappings, or the BIOS error.
+// A failed BIOS transfer marks residency FF (unknown); a matching valid guard can skip loading.
 u8 __fds_load_bank(u8 bank);
 // Return zero when the software residency record matches, otherwise call __fds_load_bank.
 u8 __fds_require_bank(u8 bank);
-// Return the software resident-bank byte; it is not a checksum of overlay memory.
+// Return the software resident-bank byte, or FF after a failed bank transfer.
+// This is not a checksum of overlay memory.
 u8 __fds_current_bank(void);
-// Compare bank with the software resident-bank byte and return 0 or 1.
+// Compare a valid bank with the software resident-bank byte; FF (unknown) never matches.
 u8 __fds_is_bank_resident(u8 bank);
-// Read the emitted overlay-function table count; the current helper emits an initial zero entry.
+// Return the linker-generated overlay-function count; zero if the table is disabled.
 u8 __fds_overlay_function_count(void);
-// Use a direct call with a function name as the second argument; arbitrary numeric pointers are rejected.
+// Evaluate bank once and call the named zero-argument function using its linked bank.
+// Restore the caller window before returning; restoration failure stops in common code.
 u8 __fds_overlay_farcall(u8 bank, u16 func);
-// Alternate direct-call spelling for FDS overlay calls; supply a function symbol, not a runtime pointer.
+// Same named, zero-argument dispatch as __fds_overlay_farcall; evaluate bank once.
 u8 __fds_farcall(u8 bank, u16 func);
 // Query the compiled --fds-meta/--fds-manifest table, not the inserted disk; return 0 or 1.
 u8 __fds_file_exists(u8 id);

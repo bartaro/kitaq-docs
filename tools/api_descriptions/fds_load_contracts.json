@@ -1,0 +1,262 @@
+{
+  "fc:__fds_load_bank": {
+    "review": "fds-load-source-20260923",
+    "record_sha256": "193e57e41d6113f9170a52cba730674f1e3dc4cad1c547bcdeddfed191ffdb5e",
+    "purpose": [
+      "fds_load___fds_load_bank_purpose"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "fds_load_bankarg"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_load_status"
+    ],
+    "notes": [
+      "fds_load_native",
+      "fds_load_mapping",
+      "fds_load_guard",
+      "fds_load_window",
+      "fds_load_blocking",
+      "fds_load_boundary",
+      "fds_load_fixture"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_bank_load.c",
+      "code": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\n#pragma fixed_bank 2\n__prg_rom u8 bank_payload[4]={11,22,33,44};\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();\n    fds_result[0]=__fds_load_bank(2);\n    fds_result[1]=__fds_current_bank();\n    fds_result[2]=__fds_require_bank(2);\n    fds_result[3]=bank_payload[0];fds_result[4]=bank_payload[3];\n    fds_result[5]=nes_fds_load_bank(1);\n    fds_result[6]=__fds_current_bank();\n    fds_result[7]=__fds_require_bank(1);\n    fds_result[8]=__fds_load_bank(0);\n    fds_result[9]=__fds_load_bank(255);\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS DATA WINDOW\");m_wait();\n    m_text(2,5,\"LOAD BANK 2 STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"FIRST / LAST BYTE\");fds_number(21,7,fds_result[3]);fds_number(25,7,fds_result[4]);m_wait();\n    m_text(2,9,\"REQUIRE SAME BANK\");fds_number(25,9,fds_result[2]);m_wait();\n    m_text(2,11,\"RESTORE BANK 1\");fds_number(25,11,fds_result[5]);m_wait();\n    m_text(2,13,\"RESIDENT BANK\");fds_number(25,13,fds_result[6]);m_wait();\n    m_text(2,16,\"INVALID BANKS 0 / 255\");m_wait();\n    fds_number(2,18,fds_result[8]);fds_number(8,18,fds_result[9]);m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_bank_load.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_bank_load.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\npython .\\kitaq-docs\\tools\\check_fds_load_examples.py",
+      "expected": [
+        "fds_load_load_expected"
+      ]
+    }
+  },
+  "fc:__fds_require_bank": {
+    "review": "fds-load-source-20260923",
+    "record_sha256": "ffd47043753400f47a6bb1da63c8c495a4365dffa52fb922027f4fce093d933f",
+    "purpose": [
+      "fds_load___fds_require_bank_purpose"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "fds_load_bankarg"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_load_status"
+    ],
+    "notes": [
+      "fds_load_native",
+      "fds_load_require_guard",
+      "fds_load_mapping",
+      "fds_load_window",
+      "fds_load_blocking",
+      "fds_load_boundary",
+      "fds_load_fixture"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_bank_load.c",
+      "code": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\n#pragma fixed_bank 2\n__prg_rom u8 bank_payload[4]={11,22,33,44};\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();\n    fds_result[0]=__fds_load_bank(2);\n    fds_result[1]=__fds_current_bank();\n    fds_result[2]=__fds_require_bank(2);\n    fds_result[3]=bank_payload[0];fds_result[4]=bank_payload[3];\n    fds_result[5]=nes_fds_load_bank(1);\n    fds_result[6]=__fds_current_bank();\n    fds_result[7]=__fds_require_bank(1);\n    fds_result[8]=__fds_load_bank(0);\n    fds_result[9]=__fds_load_bank(255);\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS DATA WINDOW\");m_wait();\n    m_text(2,5,\"LOAD BANK 2 STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"FIRST / LAST BYTE\");fds_number(21,7,fds_result[3]);fds_number(25,7,fds_result[4]);m_wait();\n    m_text(2,9,\"REQUIRE SAME BANK\");fds_number(25,9,fds_result[2]);m_wait();\n    m_text(2,11,\"RESTORE BANK 1\");fds_number(25,11,fds_result[5]);m_wait();\n    m_text(2,13,\"RESIDENT BANK\");fds_number(25,13,fds_result[6]);m_wait();\n    m_text(2,16,\"INVALID BANKS 0 / 255\");m_wait();\n    fds_number(2,18,fds_result[8]);fds_number(8,18,fds_result[9]);m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_bank_load.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_bank_load.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\npython .\\kitaq-docs\\tools\\check_fds_load_examples.py",
+      "expected": [
+        "fds_load_load_expected"
+      ]
+    }
+  },
+  "fc:nes_fds_load_bank": {
+    "review": "fds-load-source-20260923",
+    "record_sha256": "8a9a484d77a6dd74e50eff51eb9975f08be88c6d4c3e7cb66b9af97c137a25bc",
+    "purpose": [
+      "fds_load_nes_fds_load_bank_purpose"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "fds_load_bankarg"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_load_status"
+    ],
+    "notes": [
+      "fds_load_native",
+      "fds_load_load_alias",
+      "fds_load_mapping",
+      "fds_load_guard",
+      "fds_load_window",
+      "fds_load_blocking",
+      "fds_load_boundary",
+      "fds_load_fixture"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_bank_load.c",
+      "code": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\n#pragma fixed_bank 2\n__prg_rom u8 bank_payload[4]={11,22,33,44};\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();\n    fds_result[0]=__fds_load_bank(2);\n    fds_result[1]=__fds_current_bank();\n    fds_result[2]=__fds_require_bank(2);\n    fds_result[3]=bank_payload[0];fds_result[4]=bank_payload[3];\n    fds_result[5]=nes_fds_load_bank(1);\n    fds_result[6]=__fds_current_bank();\n    fds_result[7]=__fds_require_bank(1);\n    fds_result[8]=__fds_load_bank(0);\n    fds_result[9]=__fds_load_bank(255);\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS DATA WINDOW\");m_wait();\n    m_text(2,5,\"LOAD BANK 2 STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"FIRST / LAST BYTE\");fds_number(21,7,fds_result[3]);fds_number(25,7,fds_result[4]);m_wait();\n    m_text(2,9,\"REQUIRE SAME BANK\");fds_number(25,9,fds_result[2]);m_wait();\n    m_text(2,11,\"RESTORE BANK 1\");fds_number(25,11,fds_result[5]);m_wait();\n    m_text(2,13,\"RESIDENT BANK\");fds_number(25,13,fds_result[6]);m_wait();\n    m_text(2,16,\"INVALID BANKS 0 / 255\");m_wait();\n    fds_number(2,18,fds_result[8]);fds_number(8,18,fds_result[9]);m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_bank_load.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_bank_load.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\npython .\\kitaq-docs\\tools\\check_fds_load_examples.py",
+      "expected": [
+        "fds_load_load_expected"
+      ]
+    }
+  },
+  "fc:__fds_overlay_farcall": {
+    "review": "fds-load-source-20260923",
+    "record_sha256": "0664760637723a2f44a0474d75cb479fe03dfcd1754df922fba348748329ecb2",
+    "purpose": [
+      "fds_load___fds_overlay_farcall_purpose"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "fds_load_callbank"
+        ]
+      ],
+      [
+        "func",
+        [
+          "fds_load_funcarg"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_load_callreturn"
+    ],
+    "notes": [
+      "fds_load_native",
+      "fds_load_mapping",
+      "fds_load_restore",
+      "fds_load_blocking",
+      "fds_load_boundary",
+      "fds_load_fixture"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_overlay_call.c",
+      "code": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\nu8 choose_overlay(void){fds_result[2]++;return 2;}\n#pragma fixed_bank 2\nu8 overlay_answer(void){fds_result[1]++;fds_result[3]=__fds_current_bank();return 42;}\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();fds_result[1]=0;fds_result[2]=0;\n    fds_result[0]=__fds_overlay_farcall(choose_overlay(),overlay_answer);\n    fds_result[4]=__fds_current_bank();fds_result[15]=165;\n    fds_call_screen();while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_overlay_call.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_overlay_call.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\npython .\\kitaq-docs\\tools\\check_fds_load_examples.py",
+      "expected": [
+        "fds_load_call_expected"
+      ]
+    }
+  },
+  "fc:__fds_farcall": {
+    "review": "fds-load-source-20260923",
+    "record_sha256": "243f0f2b19e9510067b93d683102ba7ee262017fe2d3d59b1afe6744fe62d630",
+    "purpose": [
+      "fds_load___fds_farcall_purpose"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "fds_load_callbank"
+        ]
+      ],
+      [
+        "func",
+        [
+          "fds_load_funcarg"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_load_callreturn"
+    ],
+    "notes": [
+      "fds_load_native",
+      "fds_load_mapping",
+      "fds_load_restore",
+      "fds_load_blocking",
+      "fds_load_boundary",
+      "fds_load_fixture"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_farcall.c",
+      "code": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\nu8 choose_overlay(void){fds_result[2]++;return 2;}\n#pragma fixed_bank 2\nu8 overlay_answer(void){fds_result[1]++;fds_result[3]=__fds_current_bank();return 42;}\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();fds_result[1]=0;fds_result[2]=0;\n    fds_result[0]=__fds_farcall(choose_overlay(),overlay_answer);\n    fds_result[4]=__fds_current_bank();fds_result[15]=165;\n    fds_call_screen();while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_farcall.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_farcall.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\npython .\\kitaq-docs\\tools\\check_fds_load_examples.py",
+      "expected": [
+        "fds_load_call_expected"
+      ]
+    }
+  },
+  "fc:nes_fds_farcall": {
+    "review": "fds-load-source-20260923",
+    "record_sha256": "39d6c4e40f30bec92251fec417ce6b89461eadd01bab79ffa959d3dff9a92bd9",
+    "purpose": [
+      "fds_load_nes_fds_farcall_purpose"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "fds_load_callbank"
+        ]
+      ],
+      [
+        "func",
+        [
+          "fds_load_funcarg"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_load_callreturn"
+    ],
+    "notes": [
+      "fds_load_native",
+      "fds_load_mapping",
+      "fds_load_restore",
+      "fds_load_blocking",
+      "fds_load_boundary",
+      "fds_load_fixture"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_call_alias.c",
+      "code": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\nu8 choose_overlay(void){fds_result[2]++;return 2;}\n#pragma fixed_bank 2\nu8 overlay_answer(void){fds_result[1]++;fds_result[3]=__fds_current_bank();return 42;}\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();fds_result[1]=0;fds_result[2]=0;\n    fds_result[0]=nes_fds_farcall(choose_overlay(),overlay_answer);\n    fds_result[4]=__fds_current_bank();fds_result[15]=165;\n    fds_call_screen();while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_call_alias.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_call_alias.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\npython .\\kitaq-docs\\tools\\check_fds_load_examples.py",
+      "expected": [
+        "fds_load_call_expected"
+      ]
+    }
+  },
+  "fc:__fds_load_overlay": {
+    "review": "fds-load-source-20260923",
+    "record_sha256": "95a862cf6813f0620576113dde348d49e4e4442d4f6166110c80cca16cbdd698",
+    "purpose": [
+      "fds_load___fds_load_overlay_purpose"
+    ],
+    "args": [
+      [
+        "id",
+        [
+          "fds_load_file_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_load_raw_return"
+    ],
+    "notes": [
+      "fds_load_native",
+      "fds_load_raw_note",
+      "fds_load_window",
+      "fds_load_blocking",
+      "fds_load_boundary",
+      "fds_load_fixture"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_raw_overlay.c",
+      "code": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\n#pragma fixed_bank 2\n__prg_rom u8 raw_payload[4]={11,22,33,44};\n#pragma fixed_bank 0\nvoid main(void) {\n    __irq_disable();\n    fds_result[0]=__fds_load_overlay(32);\n    fds_result[1]=__fds_current_bank();\n    fds_result[2]=__fds_is_bank_resident(1);\n    fds_result[3]=raw_payload[0];fds_result[4]=raw_payload[3];\n    fds_result[5]=__fds_require_bank(1);\n    fds_result[6]=__fds_current_bank();\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS RAW FILE-ID LOAD\");m_wait();\n    m_text(2,5,\"FILE 32 LOAD STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"FIRST / LAST BYTE\");fds_number(21,7,fds_result[3]);fds_number(25,7,fds_result[4]);m_wait();\n    m_text(2,9,\"UNKNOWN BANK RECORD\");fds_number(25,9,fds_result[1]);m_wait();\n    m_text(2,11,\"IS BANK 1 RESIDENT\");fds_number(25,11,fds_result[2]);m_wait();\n    m_text(2,13,\"REQUIRE BANK 1\");fds_number(25,13,fds_result[5]);m_wait();\n    m_text(2,15,\"RESIDENT AFTER RELOAD\");fds_number(25,15,fds_result[6]);m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_raw_overlay.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_raw_overlay.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\npython .\\kitaq-docs\\tools\\check_fds_load_examples.py",
+      "expected": [
+        "fds_load_raw_expected"
+      ]
+    }
+  }
+}

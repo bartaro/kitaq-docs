@@ -56,8 +56,8 @@
     "en": "The size is the metadata’s declared value. It need not equal the inferred length of a source file, a trimmed overlay’s payload length or the contents of a swapped disk. Declare accurate sizes when using these queries to bound data access."
   },
   "fds_query_resident": {
-    "ja": "FDSの標準起動処理は常駐記録を1で初期化します。`__fds_load_bank()`はロード成功時に記録を更新します。メモリ内容の照合は行わないため、直接メモリを書き換えたり`__fds_load_overlay()`だけを呼んだ場合、記録と実体が一致しなくなることがあります。独自のリセット処理を用意する場合は初期化も自分で管理します。",
-    "en": "The standard FDS startup initializes the residency record to 1. `__fds_load_bank()` updates it after a successful load. No memory contents are checked: direct writes or using `__fds_load_overlay()` alone can make the record disagree with RAM. A custom reset routine must manage initialization itself."
+    "ja": "FDSの標準起動処理は常駐記録を1で初期化します。`__fds_load_bank()`はロード成功時に記録を更新します。`__fds_load_file()`または`__fds_load_overlay()`による直接ロード、およびバンク転送の失敗では記録が255（不明）になります。メモリ内容の照合は行わないため、直接メモリを書き換える場合は記録に依存しないでください。独自のリセット処理を用意する場合は初期化も自分で管理します。",
+    "en": "The standard FDS startup initializes the residency record to 1. `__fds_load_bank()` updates it after a successful load. Raw loads through `__fds_load_file()` or `__fds_load_overlay()`, and failed bank transfers, set the record to 255 (unknown). No memory contents are checked; do not rely on the record after modifying the window directly. A custom reset routine must manage initialization itself."
   },
   "fds_query_bank": {
     "ja": "比較する論理バンク番号。標準起動時の記録は1、自動オーバーレイは2以降です。0は共通コードのバンクであり、この常駐記録の初期値ではありません。",
@@ -132,16 +132,16 @@
     "en": "Return the byte size declared for an ID in compiled metadata, for example when inspecting an asset’s planned load size."
   },
   "fds_query_current_return": {
-    "ja": "ソフトウェアが保持する8ビットの常駐バンク番号。標準起動直後は1です。",
-    "en": "The eight-bit software residency record; 1 immediately after standard startup."
+    "ja": "ソフトウェアが保持する8ビットの常駐バンク番号。標準起動直後は1、不明な状態では255です。",
+    "en": "The eight-bit software residency record; 1 immediately after standard startup, or 255 when unknown."
   },
   "fds_query___fds_current_bank_purpose": {
     "ja": "現在ロード済みとして記録されている論理バンク番号を返します。ディスクから読み直す操作は行いません。",
     "en": "Return the logical bank recorded as resident, without reading anything from disk."
   },
   "fds_query_is_return": {
-    "ja": "記録と一致すれば1、不一致なら0。",
-    "en": "1 if the bank matches the record, otherwise 0."
+    "ja": "有効な番号が記録と一致すれば1、それ以外は0。255（不明）は記録が255でも0です。",
+    "en": "1 if a valid bank matches the record, otherwise 0. Bank 255 (unknown) always returns zero, even when the record is 255."
   },
   "fds_query___fds_is_bank_resident_purpose": {
     "ja": "指定バンクが常駐記録と一致するかを調べます。ロードが必要か判断する前に使えますが、この関数自体はロードしません。",
