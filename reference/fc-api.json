@@ -3732,7 +3732,7 @@
       "args": "u8 x, u8 y, u8 attr",
       "signature": "void __attr_set(u8 x, u8 y, u8 attr);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 130,
+      "line": 134,
       "comment": "Write the entire packed attribute byte at 23C0+(y>>2)*8+(x>>2).\nUse tile coordinates below 32; this does not merge a single palette quadrant.",
       "body": "",
       "kind": "function",
@@ -3743,7 +3743,7 @@
       "new_example": "void example_attr_set(u8 x, u8 y, u8 attr) {\n    __attr_set(x, y, attr);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4638
+        "line": 4824
       },
       "implementation_excerpt": "case \"__attr_set\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1}, funcName);\n\nvoid EmitHelperAttrSet()\n        {\n            EmitHelperStart(\"__attr_set\");\n            // args: x,y,attr. Attribute address = $23C0 + (y>>2)*8 + (x>>2), nametable 0.\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"LSR\"); EmitAsm(\"LSR\"); EmitAsm(\"ASL\"); EmitAsm(\"ASL\"); EmitAsm(\"ASL\");\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Mem(CallArgBase)); EmitAsm(\"LSR\"); EmitAsm(\"LSR\"); EmitAsm(\"CLC\"); EmitAsm(\"ADC\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Mem(0x2002)); EmitAsm(\"LDA\", Imm(0x23)); EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"CLC\"); EmitAsm(\"ADC\", Imm(0xC0)); EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2)); EmitAsm(\"STA\", Mem(0x2007));\n            EmitAsm(\"RTS\");\n        }"
     },
@@ -3753,7 +3753,7 @@
       "args": "u8 nt, u8 x, u8 y, u8 attr",
       "signature": "void __attr_set_nt(u8 nt, u8 x, u8 y, u8 attr);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 132,
+      "line": 136,
       "comment": "Write a whole packed attribute byte in nametable nt&3; other quadrant fields are overwritten.",
       "body": "",
       "kind": "function",
@@ -3764,7 +3764,7 @@
       "new_example": "void example_attr_set_nt(u8 nt, u8 x, u8 y, u8 attr) {\n    __attr_set_nt(nt, x, y, attr);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4639
+        "line": 4825
       },
       "implementation_excerpt": "case \"__attr_set_nt\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1,1}, funcName);\n                // Palette loaders receive a word pointer; their fixed data layout is handled by the runtime helper.\n\nvoid EmitHelperAttrSetNt()\n        {\n            EmitHelperStart(\"__attr_set_nt\");\n            // args: nt,x,y,attr. Attribute address = $23C0 + nt*$400 + (y>>2)*8 + (x>>2).\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"AND\", Imm(3));\n            EmitAsm(\"ASL\");\n            EmitAsm(\"ASL\");\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Imm(0x23));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"LSR\"); EmitAsm(\"LSR\"); EmitAsm(\"ASL\"); EmitAsm(\"ASL\"); EmitAsm(\"ASL\");\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"LSR\"); EmitAsm(\"LSR\"); EmitAsm(\"CLC\"); EmitAsm(\"ADC\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Mem(0x2002)); EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp1Address)); EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"CLC\"); EmitAsm(\"ADC\", Imm(0xC0)); EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3)); EmitAsm(\"STA\", Mem(0x2007));\n            EmitAsm(\"RTS\");\n        }"
     },
@@ -4894,7 +4894,7 @@
       "args": "u8 x, u8 y, u8 tile",
       "signature": "void __nametable_put(u8 x, u8 y, u8 tile);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 120,
+      "line": 124,
       "comment": "Write one tile directly at 2000+y*32+x; use x<32, y<30 for visible nametable cells.",
       "body": "",
       "kind": "function",
@@ -4905,7 +4905,7 @@
       "new_example": "void example_nametable_put(u8 x, u8 y, u8 tile) {\n    __nametable_put(x, y, tile);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4634
+        "line": 4820
       },
       "implementation_excerpt": "case \"__nametable_put\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1}, funcName);\n\nvoid EmitHelperNametablePut()\n        {\n            EmitHelperStart(\"__nametable_put\");\n            // args: x, y, tile. PPU address = $2000 + y * 32 + x.\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            for (int i = 0; i < 5; i++) { EmitAsm(\"ASL\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"ROL\", Mem(_runtimeIntrinsicTmp1Address)); }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Mem(CallArgBase));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"ADC\", Imm(0x20));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"LDA\", Mem(0x2002));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"STA\", Mem(0x2007));\n            EmitAsm(\"RTS\");\n        }"
     },
@@ -4915,7 +4915,7 @@
       "args": "u8 nt, u8 x, u8 y, u8 tile",
       "signature": "void __nametable_put_nt(u8 nt, u8 x, u8 y, u8 tile);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 122,
+      "line": 126,
       "comment": "Write one tile in nametable nt&3. Mirroring can alias logical nametables; coordinates are unchecked.",
       "body": "",
       "kind": "function",
@@ -4926,7 +4926,7 @@
       "new_example": "void example_nametable_put_nt(u8 nt, u8 x, u8 y, u8 tile) {\n    __nametable_put_nt(nt, x, y, tile);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4635
+        "line": 4821
       },
       "implementation_excerpt": "case \"__nametable_put_nt\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1,1}, funcName);\n\nvoid EmitHelperNametablePutNt()\n        {\n            EmitHelperStart(\"__nametable_put_nt\");\n            // args: nt,x,y,tile. PPU address = $2000 + nt*$400 + y*32 + x.\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"AND\", Imm(3));\n            EmitAsm(\"ASL\");\n            EmitAsm(\"ASL\");\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Imm(0x20));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp2Address));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            for (int i = 0; i < 5; i++) { EmitAsm(\"ASL\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"ROL\", Mem(_runtimeIntrinsicTmp1Address)); }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"ADC\", Mem(_runtimeIntrinsicTmp2Address));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"LDA\", Mem(0x2002));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3));\n            EmitAsm(\"STA\", Mem(0x2007));\n            EmitAsm(\"RTS\");\n        }"
     },
@@ -4936,7 +4936,7 @@
       "args": "u8 x, u8 y, u8 w, u8 h, u8 tile",
       "signature": "void __nametable_rect(u8 x, u8 y, u8 w, u8 h, u8 tile);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 125,
+      "line": 129,
       "comment": "Fill rows of nametable zero directly, advancing each row start by 32 bytes.\nKeep the rectangle in bounds and use PPU increment one; this does not enqueue or clip.",
       "body": "",
       "kind": "function",
@@ -4947,7 +4947,7 @@
       "new_example": "void example_nametable_rect(u8 x, u8 y, u8 w, u8 h, u8 tile) {\n    __nametable_rect(x, y, w, h, tile);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4636
+        "line": 4822
       },
       "implementation_excerpt": "case \"__nametable_rect\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1,1,1}, funcName);\n\nvoid EmitHelperNametableRect()\n        {\n            EmitHelperStart(\"__nametable_rect\");\n            // args: x,y,w,h,tile; writes tile-filled rectangle to nametable 0.\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            for (int i = 0; i < 5; i++) { EmitAsm(\"ASL\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"ROL\", Mem(_runtimeIntrinsicTmp1Address)); }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"CLC\"); EmitAsm(\"ADC\", Mem(CallArgBase)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp1Address)); EmitAsm(\"ADC\", Imm(0x20)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp2Address));\n            string rowLoop = NewGeneratedLabel(\"nt_rect_row\");\n            string done = NewGeneratedLabel(\"nt_rect_done\");\n            _assembly.Add(Expr.Make(Tag.Label, rowLoop));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp2Address)); EmitAsm(\"BEQ\", Rel(done));\n            EmitAsm(\"LDA\", Mem(0x2002)); EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp1Address)); EmitAsm(\"STA\", Mem(0x2006)); EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDY\", Imm(0));\n            string colLoop = NewGeneratedLabel(\"nt_rect_col\");\n            string rowDone = NewGeneratedLabel(\"nt_rect_row_done\");\n            _assembly.Add(Expr.Make(Tag.Label, colLoop));\n            EmitAsm(\"CPY\", Mem(CallArgBase + 2)); EmitAsm(\"BEQ\", Rel(rowDone));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 4)); EmitAsm(\"STA\", Mem(0x2007)); EmitAsm(\"INY\"); EmitAsm(\"BNE\", Rel(colLoop));\n            _assembly.Add(Expr.Make(Tag.Label, rowDone));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"CLC\"); EmitAsm(\"ADC\", Imm(32)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"BCC\", Rel(rowLoop + \"_nohi\"));\n            EmitAsm(\"INC\", Mem(_runtimeIntrinsicTmp1Address));\n            _assembly.Add(Expr.Make(Tag.Label, rowLoop + \"_nohi\"));\n            EmitAsm(\"DEC\", Mem(_runtimeIntrinsicTmp2Address));\n            EmitAsm(\"JMP\", Abs(rowLoop));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }"
     },
@@ -4957,7 +4957,7 @@
       "args": "u8 nt, u8 x, u8 y, u8 w, u8 h, u8 tile",
       "signature": "void __nametable_rect_nt(u8 nt, u8 x, u8 y, u8 w, u8 h, u8 tile);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 127,
+      "line": 131,
       "comment": "Fill a rectangle in nametable nt&3 with the same unchecked, direct-write row loop.",
       "body": "",
       "kind": "function",
@@ -4968,7 +4968,7 @@
       "new_example": "void example_nametable_rect_nt(u8 nt, u8 x, u8 y, u8 w, u8 h, u8 tile) {\n    __nametable_rect_nt(nt, x, y, w, h, tile);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4637
+        "line": 4823
       },
       "implementation_excerpt": "case \"__nametable_rect_nt\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {1,1,1,1,1,1}, funcName);\n\nvoid EmitHelperNametableRectNt()\n        {\n            EmitHelperStart(\"__nametable_rect_nt\");\n            // args: nt,x,y,w,h,tile.\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"AND\", Imm(3));\n            EmitAsm(\"ASL\");\n            EmitAsm(\"ASL\");\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Imm(0x20));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp2Address));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            for (int i = 0; i < 5; i++) { EmitAsm(\"ASL\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"ROL\", Mem(_runtimeIntrinsicTmp1Address)); }\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"CLC\"); EmitAsm(\"ADC\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp1Address)); EmitAsm(\"ADC\", Mem(_runtimeIntrinsicTmp2Address)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 4)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp2Address));\n            string rowLoop = NewGeneratedLabel(\"nt_rect_nt_row\");\n            string done = NewGeneratedLabel(\"nt_rect_nt_done\");\n            _assembly.Add(Expr.Make(Tag.Label, rowLoop));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp2Address)); EmitAsm(\"BEQ\", Rel(done));\n            EmitAsm(\"LDA\", Mem(0x2002)); EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp1Address)); EmitAsm(\"STA\", Mem(0x2006)); EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDY\", Imm(0));\n            string colLoop = NewGeneratedLabel(\"nt_rect_nt_col\");\n            string rowDone = NewGeneratedLabel(\"nt_rect_nt_row_done\");\n            _assembly.Add(Expr.Make(Tag.Label, colLoop));\n            EmitAsm(\"CPY\", Mem(CallArgBase + 3)); EmitAsm(\"BEQ\", Rel(rowDone));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 5)); EmitAsm(\"STA\", Mem(0x2007)); EmitAsm(\"INY\"); EmitAsm(\"BNE\", Rel(colLoop));\n            _assembly.Add(Expr.Make(Tag.Label, rowDone));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address)); EmitAsm(\"CLC\"); EmitAsm(\"ADC\", Imm(32)); EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"BCC\", Rel(rowLoop + \"_nohi\"));\n            EmitAsm(\"INC\", Mem(_runtimeIntrinsicTmp1Address));\n            _assembly.Add(Expr.Make(Tag.Label, rowLoop + \"_nohi\"));\n            EmitAsm(\"DEC\", Mem(_runtimeIntrinsicTmp2Address));\n            EmitAsm(\"JMP\", Abs(rowLoop));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }"
     },
@@ -5257,7 +5257,7 @@
       "args": "const u8* pal16",
       "signature": "void __palette_bg_load(const u8* pal16);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 134,
+      "line": 138,
       "comment": "Stream exactly 16 source bytes to 3F00. Arrange PPU access timing and increment one.",
       "body": "",
       "kind": "function",
@@ -5268,7 +5268,7 @@
       "new_example": "void example_palette_bg_load(const u8* pal16) {\n    __palette_bg_load(pal16);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4641
+        "line": 4827
       },
       "implementation_excerpt": "case \"__palette_bg_load\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2}, funcName);\n\nvoid EmitHelperPalette(string name, int ppuAddress)\n        {\n            EmitHelperStart(name);\n            EmitAsm(\"LDA\", Mem(0x2002));\n            EmitAsm(\"LDA\", Imm((ppuAddress >> 8) & 0xFF));\n            EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Imm(ppuAddress & 0xFF));\n            EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDY\", Imm(0));\n            string loop = NewGeneratedLabel(\"pal_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", IndY(CallArgBase));\n            EmitAsm(\"STA\", Mem(0x2007));\n            EmitAsm(\"INY\");\n            EmitAsm(\"CPY\", Imm(16));\n            EmitAsm(\"BNE\", Rel(loop));\n            EmitAsm(\"RTS\");\n        }\n\nEmitHelperPalette(\"__palette_bg_load\", 0x3F00);"
     },
@@ -5278,7 +5278,7 @@
       "args": "const u8* pal16",
       "signature": "void __palette_sp_load(const u8* pal16);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 136,
+      "line": 140,
       "comment": "Stream exactly 16 source bytes to 3F10; hardware palette aliases also affect background entries.",
       "body": "",
       "kind": "function",
@@ -5292,7 +5292,7 @@
       },
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4642
+        "line": 4828
       },
       "implementation_excerpt": "case \"__palette_sp_load\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2}, funcName);\n                // Clear queued length and readiness; the overflow indicator has a separate reset intrinsic.\n\nvoid EmitHelperPalette(string name, int ppuAddress)\n        {\n            EmitHelperStart(name);\n            EmitAsm(\"LDA\", Mem(0x2002));\n            EmitAsm(\"LDA\", Imm((ppuAddress >> 8) & 0xFF));\n            EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDA\", Imm(ppuAddress & 0xFF));\n            EmitAsm(\"STA\", Mem(0x2006));\n            EmitAsm(\"LDY\", Imm(0));\n            string loop = NewGeneratedLabel(\"pal_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", IndY(CallArgBase));\n            EmitAsm(\"STA\", Mem(0x2007));\n            EmitAsm(\"INY\");\n            EmitAsm(\"CPY\", Imm(16));\n            EmitAsm(\"BNE\", Rel(loop));\n            EmitAsm(\"RTS\");\n        }\n\nEmitHelperPalette(\"__palette_sp_load\", 0x3F10);"
     },
@@ -5302,7 +5302,7 @@
       "args": "u16 ppu_addr",
       "signature": "void __ppu_addr(u16 ppu_addr);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 102,
+      "line": 106,
       "comment": "Set the PPU address through the compiler helper; address writes affect the shared scroll/address latch.",
       "body": "",
       "kind": "function",
@@ -5313,7 +5313,7 @@
       "new_example": "void example_ppu_addr(u16 ppu_addr) {\n    __ppu_addr(ppu_addr);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4512
+        "line": 4698
       },
       "implementation_excerpt": "case \"__ppu_addr\":\n                    if (!Need(1)) return true;\n                    PpuAddr(args[0]); return true;\n\nvoid PpuAddr(Expr e)\n            {\n                int[] t = AcquireTemps(2);\n                try\n                {\n                    EmitLoadValue(e, ctx, 2);\n                    EmitAsm(\"STA\", Mem(t[0]));\n                    EmitAsm(\"STX\", Mem(t[1]));\n                    EmitAsm(\"LDA\", Mem(0x2002));\n                    EmitAsm(\"LDA\", Mem(t[1]));\n                    EmitAsm(\"STA\", Mem(0x2006));\n                    EmitAsm(\"LDA\", Mem(t[0]));\n                    EmitAsm(\"STA\", Mem(0x2006));\n                }\n                finally { ReleaseTemps(t); }\n            }"
     },
@@ -5333,7 +5333,7 @@
       "implementation_excerpt": "case \"__ppu_ctrl_get\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(_runtimePpuCtrlShadowAddress)); return true;",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4514
+        "line": 4691
       }
     },
     {
@@ -5353,9 +5353,9 @@
       "new_example": "void example_ppu_ctrl_set(u8 value) {\n    __ppu_ctrl_set(value);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4508
+        "line": 4687
       },
-      "implementation_excerpt": "case \"__ppu_ctrl_set\":\n                    if (!Need(1)) return true;\n                    Store1(args[0], _runtimePpuCtrlShadowAddress); EmitAsm(\"STA\", Mem(0x2000)); return true;\n                // Direct PPU address/data access does not wait for a safe rendering interval here."
+      "implementation_excerpt": "case \"__ppu_ctrl_set\":\n                    if (!Need(1)) return true;\n                    Store1(args[0], _runtimePpuCtrlShadowAddress); EmitAsm(\"STA\", Mem(0x2000)); return true;\n                // Read software state: the corresponding hardware registers are write-only."
     },
     {
       "name": "__ppu_data",
@@ -5363,7 +5363,7 @@
       "args": "u8 value",
       "signature": "void __ppu_data(u8 value);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 104,
+      "line": 108,
       "comment": "Write one PPUDATA byte using the current PPU address and increment mode.",
       "body": "",
       "kind": "function",
@@ -5374,7 +5374,7 @@
       "new_example": "void example_ppu_data(u8 value) {\n    __ppu_data(value);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4515
+        "line": 4701
       },
       "implementation_excerpt": "case \"__ppu_data\":\n                    if (!Need(1)) return true;\n                    Load1(args[0]); EmitAsm(\"STA\", Mem(0x2007)); return true;\n                // Reading PPUSTATUS also has hardware side effects; this is not a side-effect-free status cache."
     },
@@ -5394,7 +5394,7 @@
       "implementation_excerpt": "case \"__ppu_mask_get\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(_runtimePpuMaskShadowAddress)); return true;\n                // Direct PPU address/data access does not wait for a safe rendering interval here.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4517
+        "line": 4694
       }
     },
     {
@@ -5417,7 +5417,7 @@
       },
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4504
+        "line": 4683
       },
       "implementation_excerpt": "case \"__ppu_mask_set\":\n                    if (!Need(1)) return true;\n                    Store1(args[0], _runtimePpuMaskShadowAddress); EmitAsm(\"STA\", Mem(0x2001)); return true;\n                // Update the PPUCTRL shadow before writing the hardware register."
     },
@@ -5438,7 +5438,7 @@
       "new_example": "__ppu_off();",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4500
+        "line": 4679
       },
       "implementation_excerpt": "case \"__ppu_off\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Imm(0)); EmitAsm(\"STA\", Mem(_runtimePpuMaskShadowAddress)); EmitAsm(\"STA\", Mem(0x2001)); return true;\n                // Keep the supplied mask available for later runtime code that restores PPU state."
     },
@@ -5459,7 +5459,7 @@
       "new_example": "__ppu_on();",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4497
+        "line": 4676
       },
       "implementation_excerpt": "case \"__ppu_on\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Imm(0x1E)); EmitAsm(\"STA\", Mem(_runtimePpuMaskShadowAddress)); EmitAsm(\"STA\", Mem(0x2001)); return true;"
     },
@@ -5469,7 +5469,7 @@
       "args": "void",
       "signature": "u8 __ppu_read_status(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 106,
+      "line": 110,
       "comment": "Read PPUSTATUS; the hardware clears VBlank status and resets the shared write latch.",
       "body": "",
       "kind": "function",
@@ -5480,7 +5480,7 @@
       "new_example": "__ppu_read_status();",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4519
+        "line": 4705
       },
       "implementation_excerpt": "case \"__ppu_read_status\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(0x2002)); return true;"
     },
@@ -5612,7 +5612,7 @@
       "args": "void",
       "signature": "void __scroll_latch_reset(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 108,
+      "line": 112,
       "comment": "Read PPUSTATUS to reset the scroll/address write latch; the read also clears VBlank status.",
       "body": "",
       "kind": "function",
@@ -5623,7 +5623,7 @@
       "new_example": "__scroll_latch_reset();",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4522
+        "line": 4708
       },
       "implementation_excerpt": "case \"__scroll_latch_reset\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(0x2002)); return true;\n                // Store both scroll components, reset the write latch, then emit the X/Y pair."
     },
@@ -5633,7 +5633,7 @@
       "args": "u8 x, u8 y",
       "signature": "void __scroll_set(u8 x, u8 y);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 110,
+      "line": 114,
       "comment": "Save X/Y in runtime shadows, reset the PPU latch and write both scroll bytes immediately.",
       "body": "",
       "kind": "function",
@@ -5647,7 +5647,7 @@
       },
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4526
+        "line": 4712
       },
       "implementation_excerpt": "case \"__scroll_set\":\n                    if (!Need(2)) return true;\n                    Store1(args[0], _runtimeScrollXAddress); Store1(args[1], _runtimeScrollYAddress);\n                    EmitAsm(\"LDA\", Mem(0x2002)); EmitAsm(\"LDA\", Mem(_runtimeScrollXAddress)); EmitAsm(\"STA\", Mem(0x2005)); EmitAsm(\"LDA\", Mem(_runtimeScrollYAddress)); EmitAsm(\"STA\", Mem(0x2005)); return true;\n                // Changing X rewrites both latch bytes, using the retained Y component."
     },
@@ -5657,7 +5657,7 @@
       "args": "u8 x",
       "signature": "void __scroll_x_set(u8 x);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 112,
+      "line": 116,
       "comment": "Replace saved X and write an X/Y pair using the retained Y shadow.",
       "body": "",
       "kind": "function",
@@ -5668,7 +5668,7 @@
       "new_example": "void example_scroll_x_set(u8 x) {\n    __scroll_x_set(x);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4531
+        "line": 4717
       },
       "implementation_excerpt": "case \"__scroll_x_set\":\n                    if (!Need(1)) return true;\n                    Store1(args[0], _runtimeScrollXAddress);\n                    EmitAsm(\"LDA\", Mem(0x2002)); EmitAsm(\"LDA\", Mem(_runtimeScrollXAddress)); EmitAsm(\"STA\", Mem(0x2005)); EmitAsm(\"LDA\", Mem(_runtimeScrollYAddress)); EmitAsm(\"STA\", Mem(0x2005)); return true;\n                // Changing Y rewrites both latch bytes, using the retained X component."
     },
@@ -5678,7 +5678,7 @@
       "args": "u8 y",
       "signature": "void __scroll_y_set(u8 y);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 114,
+      "line": 118,
       "comment": "Replace saved Y and write an X/Y pair using the retained X shadow.",
       "body": "",
       "kind": "function",
@@ -5689,7 +5689,7 @@
       "new_example": "void example_scroll_y_set(u8 y) {\n    __scroll_y_set(y);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4536
+        "line": 4722
       },
       "implementation_excerpt": "case \"__scroll_y_set\":\n                    if (!Need(1)) return true;\n                    Store1(args[0], _runtimeScrollYAddress);\n                    EmitAsm(\"LDA\", Mem(0x2002)); EmitAsm(\"LDA\", Mem(_runtimeScrollXAddress)); EmitAsm(\"STA\", Mem(0x2005)); EmitAsm(\"LDA\", Mem(_runtimeScrollYAddress)); EmitAsm(\"STA\", Mem(0x2005)); return true;\n                // Modify only the NMI-enable bit in the PPUCTRL shadow and publish the new register value."
     },
@@ -6041,7 +6041,7 @@
       "args": "u16 ppu_addr, u8 value, u8 len",
       "signature": "void __vram_fill(u16 ppu_addr, u8 value, u8 len);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 118,
+      "line": 122,
       "comment": "Write repeated bytes directly; this is not an enqueue operation.",
       "body": "",
       "kind": "function",
@@ -6052,7 +6052,7 @@
       "new_example": "void example_vram_fill(u16 ppu_addr, u8 value, u8 len) {\n    __vram_fill(ppu_addr, value, len);\n}",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4632
+        "line": 4818
       },
       "implementation_excerpt": "case \"__vram_fill\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2,1,1}, funcName);\n                // Nametable and attribute helpers receive byte coordinates, values and optional table selectors.\n\nvoid EmitHelperVramFill()\n        {\n            EmitHelperStart(\"__vram_fill\");\n            EmitPpuAddrFromCallArg();\n            EmitAsm(\"LDX\", Mem(CallArgBase + 3));\n            string loop = NewGeneratedLabel(\"vram_fill_loop\");\n            string done = NewGeneratedLabel(\"vram_fill_done\");\n            EmitAsm(\"BEQ\", Rel(done));\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"STA\", Mem(0x2007));\n            EmitAsm(\"DEX\");\n            EmitAsm(\"BNE\", Rel(loop));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }"
     },
@@ -6062,7 +6062,7 @@
       "args": "u16 ppu_addr, const u8* src, u8 len",
       "signature": "void __vram_write(u16 ppu_addr, const u8* src, u8 len);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 116,
+      "line": 120,
       "comment": "Write a byte-counted source range directly; arrange PPU access timing and source-bank visibility.",
       "body": "",
       "kind": "function",
@@ -6076,7 +6076,7 @@
       },
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4631
+        "line": 4817
       },
       "implementation_excerpt": "case \"__vram_write\": return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2,2,1}, funcName);\n\nvoid EmitHelperVramWrite()\n        {\n            EmitHelperStart(\"__vram_write\");\n            EmitPpuAddrFromCallArg();\n            EmitAsm(\"LDY\", Imm(0));\n            string loop = NewGeneratedLabel(\"vram_write_loop\");\n            string done = NewGeneratedLabel(\"vram_write_done\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"CPY\", Mem(CallArgBase + 4));\n            EmitAsm(\"BEQ\", Rel(done));\n            EmitAsm(\"LDA\", IndY(CallArgBase + 2));\n            EmitAsm(\"STA\", Mem(0x2007));\n            EmitAsm(\"INY\");\n            EmitAsm(\"BNE\", Rel(loop));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }"
     },
