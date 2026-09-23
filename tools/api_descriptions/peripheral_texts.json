@@ -1,0 +1,190 @@
+{
+  "peripheral_none": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "peripheral_ports": {
+    "ja": "これらは$4016/$4017を直接操作します。通常のパッド、キーボード、シリアル送信など、同じポートを使う処理を割り込みで混在させないでください。パッドのシリアル読み取り位置にも影響します。サンプルは入力の採取中だけNMIを止め、表示を初期化してから再開します。",
+    "en": "These APIs access $4016/$4017 directly. Do not interleave interrupt-driven gamepad, keyboard or serial operations on the same ports. Controller shift positions can also be affected. The sample disables NMI while capturing input, then enables it when initializing the display."
+  },
+  "peripheral_baseline": {
+    "ja": "掲載画像は配布サンプルを変更せずにKUROSAKIで実行した結果です。現在のKUROSAKIはパッドの入力モデルを持ちますが、キーボード・光線銃・シリアルアダプターの信号はモデル化していません。外部入力ビットが0になるため、画像は周辺機器の動作確認ではありません。実機のキー入力、受光、通信は未検証です。",
+    "en": "These images run the downloadable ROMs unchanged in KUROSAKI. Its current input bus models gamepads but not keyboard, light-gun or serial-adapter signals. The external input bits read as zero, so the captures do not verify those devices. Physical key input, optical sensing and communication remain untested."
+  },
+  "peripheral_rawkeys": {
+    "ja": "キー状態はビット1～4の生値で、押すと対応ビットが0になります。無押下は0x1Eです。ASCII文字列でも、押下したキーを1にしたビットマップでもありません。未接続でも0になる場合があるため、接続判定なしに0を「全部押された」と解釈しないでください。",
+    "en": "Key groups are raw bits 1..4: a pressed key clears its bit, and an idle group is 0x1E. They are neither ASCII text nor a bitmap with one meaning pressed. A disconnected device can also read zero; do not interpret that as every key being held without checking presence."
+  },
+  "peripheral_keytime": {
+    "ja": "$4016へ5を書いて行0にリセットし、列選択ビットを1→0に切り替えて行を進めます。リセット後は12 CPUサイクル分、列選択後は50サイクル分のNOP待機を入れます（周囲の命令時間は別）。最後は0を書いてキーボード行列を無効化します。",
+    "en": "Writes 5 to $4016 to reset row 0, then advances rows using high-to-low transitions of the column-select bit. The generated code includes 12 CPU cycles of NOPs after reset and 50 after column selection, in addition to surrounding instructions. It writes zero on exit to disable the matrix."
+  },
+  "peripheral_keyproof": {
+    "ja": "別の回帰検証で、行0～9・列0/1の選択、9行の一括走査、待ち時間、最後のポート値を、実行したCPUのバス記録から確認しています。キーの電気信号を入力した検証ではありません。",
+    "en": "A separate regression checks rows 0..9, both columns, the nine-row scan, settling delays and final port state from executed CPU bus traces. It does not inject physical key signals."
+  },
+  "peripheral_keyexpected": {
+    "ja": "このKUROSAKI実行ではDEVICE DETECT、ROW 6 COL 0、A KEY - GUARDEDがすべて000、9行のCOL0/COL1がすべて00です。Aは行6・列0のビット4ですが、未検出時は生値0を押下と扱わず、表示も000に保ちます。表は起動時の一度の採取結果です。",
+    "en": "In this KUROSAKI run, DEVICE DETECT, ROW 6 COL 0 and A KEY - GUARDED are all 000; all nine COL0/COL1 pairs are 00. A is row 6, column 0, bit 4, but failed detection prevents the raw zero from being reported as a key press. The table is a single startup capture."
+  },
+  "peripheral_zapinstant": {
+    "ja": "呼び出した瞬間の信号を読みます。ストローブ、フレーム待ち、前回との差分判定、照準座標や命中判定は行いません。rawとtrigger/lightを別々に呼ぶと、それぞれ別の時刻にレジスターを読むため、信号が変化中なら一致しない場合があります。",
+    "en": "Reads the instantaneous signal. It does not strobe, wait for a frame, detect an edge, locate an aim point or decide a hit. Separate raw and trigger/light calls each read the register at their own time, so their values can differ while the signal changes."
+  },
+  "peripheral_zaplight": {
+    "ja": "受光線はアクティブローです。ビット3が0なので戻り値1になる、という処理であり、装置の存在を検出した結果ではありません。通常のパッドや未接続の入力でも1になり得ます。画面に的を描くだけで命中を判定するAPIではありません。",
+    "en": "The light input is active-low: a clear bit 3 produces a return value of one. That conversion does not detect whether a gun is connected; a gamepad or unconnected input may also yield one. Drawing a target on screen does not turn this into a hit-testing API."
+  },
+  "peripheral_zaptrigger": {
+    "ja": "戻り値はトリガー線の論理状態です。「最後まで引き続けている」を保証する値ではなく、装置のスイッチ特性にも依存します。ゲームの発射イベントには、必要な方向の変化を前回値と比較して扱います。",
+    "en": "The result is the trigger line’s logical state. It does not guarantee that the trigger remains fully pulled, and switch behavior depends on the device. For a game firing event, compare with the previous reading to detect the desired transition."
+  },
+  "peripheral_maskproof": {
+    "ja": "ビット変換は、独自の検証ROMでレジスター読み取り先だけをRAMの模擬値へ置き換え、00/08/10/18の組み合わせと無関係な上位ビットを入力して確認しました。この単体検証は、配布サンプルの通常実行および周辺機器の実動作とは別です。",
+    "en": "Bit conversion is also unit-tested in an owned test ROM by redirecting register reads to RAM fixture values. The tests cover 00/08/10/18 combinations with unrelated bits set. This unit test is separate from the unmodified sample run and from real peripheral behavior."
+  },
+  "peripheral_zapexpected": {
+    "ja": "KUROSAKIでは両ポートともRAW=00、TRIGGER=000、LIGHT=001です。番号なし関数もポート2と同じ000/001になります。LIGHT=001は未モデル化の入力ビット3が0だからで、画面の光を検知した証拠ではありません。画面下にも「LIGHT 1 IS NOT A HIT TEST」と表示します。",
+    "en": "In KUROSAKI, both ports show RAW=00, TRIGGER=000 and LIGHT=001. The unsuffixed calls show the same 000/001 as port 2. LIGHT=001 comes from unmodeled input bit 3 reading zero, not from detecting screen brightness. The screen also states LIGHT 1 IS NOT A HIT TEST."
+  },
+  "peripheral_serialclock": {
+    "ja": "外部アダプターのOUT0→TX、$4017のD4→RXという配線規約を前提にした低水準処理です。ビットの待ち時間、ボーレート、開始・停止ビット、バイト化、受信待ちを自動では追加しません。`__midi_out()`などのバイト単位処理とは役割が異なります。",
+    "en": "These low-level primitives assume an external adapter mapping OUT0 to TX and $4017 D4 to RX. They add no bit interval, baud clock, start/stop bits, byte assembly or receive wait. Their role differs from byte-oriented helpers such as `__midi_out()`."
+  },
+  "peripheral_serialexpected": {
+    "ja": "VALUEの000/001/002/003/254/255に対し、EXPECTED OUT0は0/1/0/1/0/1です。これは下位1ビットの意味を示す説明欄で、端子を読み返した値ではありません。CPUトレースでもこの順の書き込みと最後の1を確認しました。RX SAMPLE=000はKUROSAKIで受信線をモデル化していないためです。",
+    "en": "For VALUE 000/001/002/003/254/255, EXPECTED OUT0 is 0/1/0/1/0/1. This column explains the low-bit mapping; it is not electrical readback. CPU traces confirm those writes followed by a final one. RX SAMPLE is 000 because KUROSAKI does not model the receive line."
+  },
+  "peripheral_detect_return": {
+    "ja": "行9・列0が0x1Eで、行列を無効にした後の値が0なら1。それ以外は0です。機器識別IDではなく、信号パターンによる推定です。",
+    "en": "Returns 1 if row 9, column 0 reads 0x1E and the disabled matrix reads zero; otherwise 0. This is a signal-pattern heuristic, not a device identification code."
+  },
+  "peripheral_detect_note": {
+    "ja": "行9にはキーがありません。途中で条件を満たさなければ0で戻ります。KUROSAKIでは最初の読み取りが0のため検出しません。",
+    "en": "Row 9 has no keys. A failed condition returns zero immediately. KUROSAKI returns zero on the first read, so detection fails there."
+  },
+  "peripheral___fkb_detect_purpose": {
+    "ja": "キーボードの検出用パターンを調べます。キーの押下を調べる前の接続判定に使います。",
+    "en": "Probe the keyboard detection pattern before interpreting key presses."
+  },
+  "peripheral_dst": {
+    "ja": "18バイト以上の書き込み可能な領域。添字`row*2+col`にその列群の生値を保存します。NULLや長さの検査はありません。",
+    "en": "Writable storage of at least 18 bytes. Element `row*2+col` receives that group’s raw value. No null or length check is performed."
+  },
+  "peripheral_scan_note": {
+    "ja": "各行の列0、列1の順に読みます。逐次走査なので、全キーを同一の瞬間に採取する機能ではありません。キーが0の列でも走査を途中で打ち切りません。",
+    "en": "Reads column 0 then column 1 for each row. This is sequential scanning, not a simultaneous snapshot of every key. A zero-valued group does not terminate the scan early."
+  },
+  "peripheral___fkb_scan_purpose": {
+    "ja": "9行×2列群のキーボード行列をまとめて読み、18バイトへ保存します。複数キーを一度の走査で扱うための入口です。",
+    "en": "Scan all nine rows and two column groups into 18 bytes, allowing multiple keys to be inspected from one matrix capture."
+  },
+  "peripheral_row": {
+    "ja": "キーは0～8、検出用のキーなし行は9です。範囲外を検査するコードは生成しません。",
+    "en": "Use 0..8 for key rows or 9 for the keyless detection row. No runtime range check is generated."
+  },
+  "peripheral_col": {
+    "ja": "0または1。実装では下位1ビットだけを使うため、偶数は列0、奇数は列1になります。",
+    "en": "0 or 1. Only the low bit is used: even values select group 0 and odd values group 1."
+  },
+  "peripheral_read_return": {
+    "ja": "$4017 & 0x1E。ビットを詰め直さず、そのまま返します。",
+    "en": "Returns $4017 & 0x1E without packing the bits down."
+  },
+  "peripheral_row_note": {
+    "ja": "毎回行0から指定行まで進め直します。前の呼び出しの行位置を再利用するAPIではありません。",
+    "en": "Resets to row 0 and advances afresh for every call; it does not reuse the previous call’s row position."
+  },
+  "peripheral___fkb_read_row_col_purpose": {
+    "ja": "指定した1行・1列群だけを読みます。必要なキー群が決まっている場合に、18バイトのバッファを使わず取得できます。",
+    "en": "Read one selected row and column group without an 18-byte buffer when only a particular group is needed."
+  },
+  "peripheral_raw1": {
+    "ja": "$4016 & 0x18。0x00・0x08・0x10・0x18のいずれかです。ビット4がトリガー、ビット3が非受光を表す生の信号です。",
+    "en": "Returns $4016 & 0x18: 0x00, 0x08, 0x10 or 0x18. Bit 4 is the trigger line; bit 3 is the raw no-light signal."
+  },
+  "peripheral___zapper_raw1_purpose": {
+    "ja": "ポート1（$4016）の光線銃用2ビットをまとめて取得します。同じ読み取り時点のトリガー線と受光線を自分で分けたい場合に使います。",
+    "en": "Read both light-gun bits from port 1 ($4016) together when trigger and light must be decoded from the same register read."
+  },
+  "peripheral_trigger1": {
+    "ja": "$4016のビット4が1なら1、0なら0です。",
+    "en": "1 when $4016 bit 4 is set, otherwise 0."
+  },
+  "peripheral___zapper_trigger1_purpose": {
+    "ja": "ポート1（$4016）のトリガー線を0/1へ正規化して読みます。",
+    "en": "Read and normalize the trigger line on port 1 ($4016)."
+  },
+  "peripheral_light1": {
+    "ja": "$4016のビット3が0なら1、1なら0です。",
+    "en": "1 when $4016 bit 3 is clear; 0 when it is set."
+  },
+  "peripheral___zapper_light1_purpose": {
+    "ja": "ポート1（$4016）の受光線を、受光なら1という表記へ変換して読みます。",
+    "en": "Read the light-sense line on port 1 ($4016), converting the active-low input to one for sensed light."
+  },
+  "peripheral_raw2": {
+    "ja": "$4017 & 0x18。0x00・0x08・0x10・0x18のいずれかです。ビット4がトリガー、ビット3が非受光を表す生の信号です。",
+    "en": "Returns $4017 & 0x18: 0x00, 0x08, 0x10 or 0x18. Bit 4 is the trigger line; bit 3 is the raw no-light signal."
+  },
+  "peripheral___zapper_raw2_purpose": {
+    "ja": "ポート2（$4017）の光線銃用2ビットをまとめて取得します。同じ読み取り時点のトリガー線と受光線を自分で分けたい場合に使います。",
+    "en": "Read both light-gun bits from port 2 ($4017) together when trigger and light must be decoded from the same register read."
+  },
+  "peripheral_trigger2": {
+    "ja": "$4017のビット4が1なら1、0なら0です。",
+    "en": "1 when $4017 bit 4 is set, otherwise 0."
+  },
+  "peripheral___zapper_trigger2_purpose": {
+    "ja": "ポート2（$4017）のトリガー線を0/1へ正規化して読みます。",
+    "en": "Read and normalize the trigger line on port 2 ($4017)."
+  },
+  "peripheral_light2": {
+    "ja": "$4017のビット3が0なら1、1なら0です。",
+    "en": "1 when $4017 bit 3 is clear; 0 when it is set."
+  },
+  "peripheral___zapper_light2_purpose": {
+    "ja": "ポート2（$4017）の受光線を、受光なら1という表記へ変換して読みます。",
+    "en": "Read the light-sense line on port 2 ($4017), converting the active-low input to one for sensed light."
+  },
+  "peripheral_default_trigger": {
+    "ja": "$4017のビット4を0/1にした値。ポート1への自動切り替えはありません。",
+    "en": "The normalized $4017 bit 4. It never automatically switches to port 1."
+  },
+  "peripheral___zapper_trigger_purpose": {
+    "ja": "ポート2を既定とするトリガー読み取り名です。`__zapper_trigger2()`と同じ処理を呼びます。",
+    "en": "The default port-2 trigger reader. Calls the same helper as `__zapper_trigger2()`."
+  },
+  "peripheral_default_light": {
+    "ja": "$4017のビット3が0なら1、それ以外は0。ポート1の値は読みません。",
+    "en": "1 when $4017 bit 3 is clear, otherwise 0. Port 1 is not read."
+  },
+  "peripheral___zapper_light_purpose": {
+    "ja": "ポート2を既定とする受光読み取り名です。`__zapper_light2()`と同じ処理を呼びます。",
+    "en": "The default port-2 light reader. Calls the same helper as `__zapper_light2()`."
+  },
+  "peripheral_tx_arg": {
+    "ja": "0/1として送りたい値。使用するのは`bit & 1`だけなので、2は0、255は1を送ります。",
+    "en": "Value to output. Only `bit & 1` is used: 2 outputs zero, while 255 outputs one."
+  },
+  "peripheral_tx_note": {
+    "ja": "$4016へ0または1を丸ごと書くため、OUT1/OUT2は0になります。送ったビットを保持するための待機処理はありません。通常のパッドではOUT0はラッチ制御なので、この操作はパッドの読み出し状態も変更します。",
+    "en": "Writes the entire $4016 value as zero or one, clearing OUT1/OUT2. No hold delay is inserted. OUT0 controls the normal gamepad latch, so this operation changes gamepad reading state too."
+  },
+  "peripheral___serial_tx_bit_purpose": {
+    "ja": "引数の下位1ビットを$4016のOUT0へ書きます。外部シリアルアダプター用の1ビット出力操作です。",
+    "en": "Write the argument’s low bit to OUT0 through $4016, providing a one-bit output operation for an external serial adapter."
+  },
+  "peripheral_rx_return": {
+    "ja": "ビット4が1なら1、それ以外は0。データ到着の有無や通信エラーを表す状態コードではありません。",
+    "en": "1 when bit 4 is set, otherwise 0. This is not a data-ready or communication-error status."
+  },
+  "peripheral_rx_note": {
+    "ja": "相手の送信タイミングに合わせて呼ぶ責任は呼び出し側にあります。受信待ちや複数ビットの復元を行わず、$4016への出力も変更しません。",
+    "en": "The caller must sample at the appropriate time. This neither waits for data nor assembles multiple bits, and it does not change the $4016 output."
+  },
+  "peripheral___serial_rx_bit_purpose": {
+    "ja": "外部アダプターの受信線として使う$4017のビット4を、その場で一度読み取ります。",
+    "en": "Sample $4017 bit 4 once as the receive line supplied by an external adapter."
+  }
+}

@@ -1,0 +1,434 @@
+{
+  "fc:__fkb_detect": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "ae8c4f81907f7149636debcba7a3c06283dbd5cf840b07d24b411efe3028eda2",
+    "purpose": [
+      "peripheral___fkb_detect_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_detect_return"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_keytime",
+      "peripheral_keyproof",
+      "peripheral_detect_note",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_keyboard.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    u8 row;\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__fkb_detect();\n    __fkb_scan(key_matrix);\n    port_result[1]=__fkb_read_row_col(6,0);\n    port_result[2]=0;\n    if(port_result[0] && !(port_result[1]&16))port_result[2]=1;\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"KEYBOARD STARTUP SNAPSHOT\");m_wait();\n    m_text(2,4,\"DEVICE DETECT\");port_number(25,4,port_result[0]);m_wait();\n    m_text(2,6,\"ROW 6 COL 0\");port_number(25,6,port_result[1]);m_wait();\n    m_text(2,8,\"A KEY - GUARDED\");port_number(25,8,port_result[2]);m_wait();\n    m_text(2,10,\"ROW   COL0  COL1  (HEX)\");m_wait();\n    for(row=0;row<9;row++){\n        m_put(3,12+row,'0'+row);port_hex(9,12+row,key_matrix[row*2]);port_hex(15,12+row,key_matrix[row*2+1]);m_wait();\n    }\n    m_text(2,23,\"RAW MATRIX - NOT ASCII\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_keyboard.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_keyboard.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_keyboard.nes --frames 120 --png .\\out\\peripheral_keyboard.png",
+      "expected": [
+        "peripheral_keyexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Family BASIC Keyboard",
+        "url": "https://www.nesdev.org/wiki/Family_basic_keyboard"
+      }
+    ]
+  },
+  "fc:__fkb_scan": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "baaa789c9089f570df1af5c959c7c6d65fe262da4c18d40160aed8e9e5cdf191",
+    "purpose": [
+      "peripheral___fkb_scan_purpose"
+    ],
+    "args": [
+      [
+        "dst18",
+        [
+          "peripheral_dst"
+        ]
+      ]
+    ],
+    "returns": [
+      "peripheral_none"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_rawkeys",
+      "peripheral_keytime",
+      "peripheral_keyproof",
+      "peripheral_scan_note",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_keyboard.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    u8 row;\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__fkb_detect();\n    __fkb_scan(key_matrix);\n    port_result[1]=__fkb_read_row_col(6,0);\n    port_result[2]=0;\n    if(port_result[0] && !(port_result[1]&16))port_result[2]=1;\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"KEYBOARD STARTUP SNAPSHOT\");m_wait();\n    m_text(2,4,\"DEVICE DETECT\");port_number(25,4,port_result[0]);m_wait();\n    m_text(2,6,\"ROW 6 COL 0\");port_number(25,6,port_result[1]);m_wait();\n    m_text(2,8,\"A KEY - GUARDED\");port_number(25,8,port_result[2]);m_wait();\n    m_text(2,10,\"ROW   COL0  COL1  (HEX)\");m_wait();\n    for(row=0;row<9;row++){\n        m_put(3,12+row,'0'+row);port_hex(9,12+row,key_matrix[row*2]);port_hex(15,12+row,key_matrix[row*2+1]);m_wait();\n    }\n    m_text(2,23,\"RAW MATRIX - NOT ASCII\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_keyboard.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_keyboard.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_keyboard.nes --frames 120 --png .\\out\\peripheral_keyboard.png",
+      "expected": [
+        "peripheral_keyexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Family BASIC Keyboard",
+        "url": "https://www.nesdev.org/wiki/Family_basic_keyboard"
+      }
+    ]
+  },
+  "fc:__fkb_read_row_col": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "c83e715347fbf41484b0ffdd13c4d1f9e6b307f40f91fed41961300c7c18e6f8",
+    "purpose": [
+      "peripheral___fkb_read_row_col_purpose"
+    ],
+    "args": [
+      [
+        "row",
+        [
+          "peripheral_row"
+        ]
+      ],
+      [
+        "col",
+        [
+          "peripheral_col"
+        ]
+      ]
+    ],
+    "returns": [
+      "peripheral_read_return"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_rawkeys",
+      "peripheral_keytime",
+      "peripheral_keyproof",
+      "peripheral_row_note",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_keyboard.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    u8 row;\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__fkb_detect();\n    __fkb_scan(key_matrix);\n    port_result[1]=__fkb_read_row_col(6,0);\n    port_result[2]=0;\n    if(port_result[0] && !(port_result[1]&16))port_result[2]=1;\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"KEYBOARD STARTUP SNAPSHOT\");m_wait();\n    m_text(2,4,\"DEVICE DETECT\");port_number(25,4,port_result[0]);m_wait();\n    m_text(2,6,\"ROW 6 COL 0\");port_number(25,6,port_result[1]);m_wait();\n    m_text(2,8,\"A KEY - GUARDED\");port_number(25,8,port_result[2]);m_wait();\n    m_text(2,10,\"ROW   COL0  COL1  (HEX)\");m_wait();\n    for(row=0;row<9;row++){\n        m_put(3,12+row,'0'+row);port_hex(9,12+row,key_matrix[row*2]);port_hex(15,12+row,key_matrix[row*2+1]);m_wait();\n    }\n    m_text(2,23,\"RAW MATRIX - NOT ASCII\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_keyboard.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_keyboard.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_keyboard.nes --frames 120 --png .\\out\\peripheral_keyboard.png",
+      "expected": [
+        "peripheral_keyexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Family BASIC Keyboard",
+        "url": "https://www.nesdev.org/wiki/Family_basic_keyboard"
+      }
+    ]
+  },
+  "fc:__zapper_raw1": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "db4b6707299c757e90c448babaaa02497df62a29ecc7898724c5c75e439e5a7b",
+    "purpose": [
+      "peripheral___zapper_raw1_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_raw1"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_zapinstant",
+      "peripheral_zaplight",
+      "peripheral_maskproof",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_zapper.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__zapper_raw1();port_result[1]=__zapper_trigger1();port_result[2]=__zapper_light1();\n    port_result[3]=__zapper_raw2();port_result[4]=__zapper_trigger2();port_result[5]=__zapper_light2();\n    port_result[6]=__zapper_trigger();port_result[7]=__zapper_light();\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"LIGHT-GUN INPUT SNAPSHOT\");m_wait();\n    m_text(2,5,\"PORT   RAW  TRIGGER  LIGHT\");m_wait();\n    m_put(3,8,'1');port_hex(9,8,port_result[0]);port_number(15,8,port_result[1]);port_number(24,8,port_result[2]);m_wait();\n    m_put(3,10,'2');port_hex(9,10,port_result[3]);port_number(15,10,port_result[4]);port_number(24,10,port_result[5]);m_wait();\n    m_text(2,13,\"DEFAULT = PORT 2\");m_wait();\n    m_text(2,15,\"TRIGGER\");port_number(15,15,port_result[6]);m_wait();\n    m_text(2,17,\"LIGHT\");port_number(15,17,port_result[7]);m_wait();\n    m_text(2,21,\"LIGHT 1 IS NOT A HIT TEST\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_zapper.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_zapper.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_zapper.nes --frames 120 --png .\\out\\peripheral_zapper.png",
+      "expected": [
+        "peripheral_zapexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Zapper",
+        "url": "https://www.nesdev.org/wiki/Zapper"
+      }
+    ]
+  },
+  "fc:__zapper_trigger1": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "7f21e4e176e87d7f167a86043998da7ac3ef6cb2778b8427fcafa2bffbffb48e",
+    "purpose": [
+      "peripheral___zapper_trigger1_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_trigger1"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_zapinstant",
+      "peripheral_zaptrigger",
+      "peripheral_maskproof",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_zapper.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__zapper_raw1();port_result[1]=__zapper_trigger1();port_result[2]=__zapper_light1();\n    port_result[3]=__zapper_raw2();port_result[4]=__zapper_trigger2();port_result[5]=__zapper_light2();\n    port_result[6]=__zapper_trigger();port_result[7]=__zapper_light();\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"LIGHT-GUN INPUT SNAPSHOT\");m_wait();\n    m_text(2,5,\"PORT   RAW  TRIGGER  LIGHT\");m_wait();\n    m_put(3,8,'1');port_hex(9,8,port_result[0]);port_number(15,8,port_result[1]);port_number(24,8,port_result[2]);m_wait();\n    m_put(3,10,'2');port_hex(9,10,port_result[3]);port_number(15,10,port_result[4]);port_number(24,10,port_result[5]);m_wait();\n    m_text(2,13,\"DEFAULT = PORT 2\");m_wait();\n    m_text(2,15,\"TRIGGER\");port_number(15,15,port_result[6]);m_wait();\n    m_text(2,17,\"LIGHT\");port_number(15,17,port_result[7]);m_wait();\n    m_text(2,21,\"LIGHT 1 IS NOT A HIT TEST\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_zapper.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_zapper.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_zapper.nes --frames 120 --png .\\out\\peripheral_zapper.png",
+      "expected": [
+        "peripheral_zapexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Zapper",
+        "url": "https://www.nesdev.org/wiki/Zapper"
+      }
+    ]
+  },
+  "fc:__zapper_light1": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "c0f7cf410ebe6d3c7aa96e242dd1a1debe74c22d2eb489f37710b103d77962eb",
+    "purpose": [
+      "peripheral___zapper_light1_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_light1"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_zapinstant",
+      "peripheral_zaplight",
+      "peripheral_maskproof",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_zapper.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__zapper_raw1();port_result[1]=__zapper_trigger1();port_result[2]=__zapper_light1();\n    port_result[3]=__zapper_raw2();port_result[4]=__zapper_trigger2();port_result[5]=__zapper_light2();\n    port_result[6]=__zapper_trigger();port_result[7]=__zapper_light();\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"LIGHT-GUN INPUT SNAPSHOT\");m_wait();\n    m_text(2,5,\"PORT   RAW  TRIGGER  LIGHT\");m_wait();\n    m_put(3,8,'1');port_hex(9,8,port_result[0]);port_number(15,8,port_result[1]);port_number(24,8,port_result[2]);m_wait();\n    m_put(3,10,'2');port_hex(9,10,port_result[3]);port_number(15,10,port_result[4]);port_number(24,10,port_result[5]);m_wait();\n    m_text(2,13,\"DEFAULT = PORT 2\");m_wait();\n    m_text(2,15,\"TRIGGER\");port_number(15,15,port_result[6]);m_wait();\n    m_text(2,17,\"LIGHT\");port_number(15,17,port_result[7]);m_wait();\n    m_text(2,21,\"LIGHT 1 IS NOT A HIT TEST\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_zapper.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_zapper.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_zapper.nes --frames 120 --png .\\out\\peripheral_zapper.png",
+      "expected": [
+        "peripheral_zapexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Zapper",
+        "url": "https://www.nesdev.org/wiki/Zapper"
+      }
+    ]
+  },
+  "fc:__zapper_raw2": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "7b7e19eb08375be9b8c2eba2fc16359b3b8b1e73d15e4c41af44381f9a66e592",
+    "purpose": [
+      "peripheral___zapper_raw2_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_raw2"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_zapinstant",
+      "peripheral_zaplight",
+      "peripheral_maskproof",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_zapper.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__zapper_raw1();port_result[1]=__zapper_trigger1();port_result[2]=__zapper_light1();\n    port_result[3]=__zapper_raw2();port_result[4]=__zapper_trigger2();port_result[5]=__zapper_light2();\n    port_result[6]=__zapper_trigger();port_result[7]=__zapper_light();\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"LIGHT-GUN INPUT SNAPSHOT\");m_wait();\n    m_text(2,5,\"PORT   RAW  TRIGGER  LIGHT\");m_wait();\n    m_put(3,8,'1');port_hex(9,8,port_result[0]);port_number(15,8,port_result[1]);port_number(24,8,port_result[2]);m_wait();\n    m_put(3,10,'2');port_hex(9,10,port_result[3]);port_number(15,10,port_result[4]);port_number(24,10,port_result[5]);m_wait();\n    m_text(2,13,\"DEFAULT = PORT 2\");m_wait();\n    m_text(2,15,\"TRIGGER\");port_number(15,15,port_result[6]);m_wait();\n    m_text(2,17,\"LIGHT\");port_number(15,17,port_result[7]);m_wait();\n    m_text(2,21,\"LIGHT 1 IS NOT A HIT TEST\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_zapper.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_zapper.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_zapper.nes --frames 120 --png .\\out\\peripheral_zapper.png",
+      "expected": [
+        "peripheral_zapexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Zapper",
+        "url": "https://www.nesdev.org/wiki/Zapper"
+      }
+    ]
+  },
+  "fc:__zapper_trigger2": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "902b39840128b56f4e77c992bf82af27071c0845574a770accd343737c459e9a",
+    "purpose": [
+      "peripheral___zapper_trigger2_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_trigger2"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_zapinstant",
+      "peripheral_zaptrigger",
+      "peripheral_maskproof",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_zapper.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__zapper_raw1();port_result[1]=__zapper_trigger1();port_result[2]=__zapper_light1();\n    port_result[3]=__zapper_raw2();port_result[4]=__zapper_trigger2();port_result[5]=__zapper_light2();\n    port_result[6]=__zapper_trigger();port_result[7]=__zapper_light();\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"LIGHT-GUN INPUT SNAPSHOT\");m_wait();\n    m_text(2,5,\"PORT   RAW  TRIGGER  LIGHT\");m_wait();\n    m_put(3,8,'1');port_hex(9,8,port_result[0]);port_number(15,8,port_result[1]);port_number(24,8,port_result[2]);m_wait();\n    m_put(3,10,'2');port_hex(9,10,port_result[3]);port_number(15,10,port_result[4]);port_number(24,10,port_result[5]);m_wait();\n    m_text(2,13,\"DEFAULT = PORT 2\");m_wait();\n    m_text(2,15,\"TRIGGER\");port_number(15,15,port_result[6]);m_wait();\n    m_text(2,17,\"LIGHT\");port_number(15,17,port_result[7]);m_wait();\n    m_text(2,21,\"LIGHT 1 IS NOT A HIT TEST\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_zapper.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_zapper.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_zapper.nes --frames 120 --png .\\out\\peripheral_zapper.png",
+      "expected": [
+        "peripheral_zapexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Zapper",
+        "url": "https://www.nesdev.org/wiki/Zapper"
+      }
+    ]
+  },
+  "fc:__zapper_light2": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "c2ccf78675aaf28f408a1e298075b8b2868ce6bb0c6bd48597fd341c74b74fdf",
+    "purpose": [
+      "peripheral___zapper_light2_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_light2"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_zapinstant",
+      "peripheral_zaplight",
+      "peripheral_maskproof",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_zapper.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__zapper_raw1();port_result[1]=__zapper_trigger1();port_result[2]=__zapper_light1();\n    port_result[3]=__zapper_raw2();port_result[4]=__zapper_trigger2();port_result[5]=__zapper_light2();\n    port_result[6]=__zapper_trigger();port_result[7]=__zapper_light();\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"LIGHT-GUN INPUT SNAPSHOT\");m_wait();\n    m_text(2,5,\"PORT   RAW  TRIGGER  LIGHT\");m_wait();\n    m_put(3,8,'1');port_hex(9,8,port_result[0]);port_number(15,8,port_result[1]);port_number(24,8,port_result[2]);m_wait();\n    m_put(3,10,'2');port_hex(9,10,port_result[3]);port_number(15,10,port_result[4]);port_number(24,10,port_result[5]);m_wait();\n    m_text(2,13,\"DEFAULT = PORT 2\");m_wait();\n    m_text(2,15,\"TRIGGER\");port_number(15,15,port_result[6]);m_wait();\n    m_text(2,17,\"LIGHT\");port_number(15,17,port_result[7]);m_wait();\n    m_text(2,21,\"LIGHT 1 IS NOT A HIT TEST\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_zapper.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_zapper.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_zapper.nes --frames 120 --png .\\out\\peripheral_zapper.png",
+      "expected": [
+        "peripheral_zapexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Zapper",
+        "url": "https://www.nesdev.org/wiki/Zapper"
+      }
+    ]
+  },
+  "fc:__zapper_trigger": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "5e09f77923341556304f46cf2d43daf9678480c511fbe919a6289f8b0067a51e",
+    "purpose": [
+      "peripheral___zapper_trigger_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_default_trigger"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_zapinstant",
+      "peripheral_zaptrigger",
+      "peripheral_maskproof",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_zapper.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__zapper_raw1();port_result[1]=__zapper_trigger1();port_result[2]=__zapper_light1();\n    port_result[3]=__zapper_raw2();port_result[4]=__zapper_trigger2();port_result[5]=__zapper_light2();\n    port_result[6]=__zapper_trigger();port_result[7]=__zapper_light();\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"LIGHT-GUN INPUT SNAPSHOT\");m_wait();\n    m_text(2,5,\"PORT   RAW  TRIGGER  LIGHT\");m_wait();\n    m_put(3,8,'1');port_hex(9,8,port_result[0]);port_number(15,8,port_result[1]);port_number(24,8,port_result[2]);m_wait();\n    m_put(3,10,'2');port_hex(9,10,port_result[3]);port_number(15,10,port_result[4]);port_number(24,10,port_result[5]);m_wait();\n    m_text(2,13,\"DEFAULT = PORT 2\");m_wait();\n    m_text(2,15,\"TRIGGER\");port_number(15,15,port_result[6]);m_wait();\n    m_text(2,17,\"LIGHT\");port_number(15,17,port_result[7]);m_wait();\n    m_text(2,21,\"LIGHT 1 IS NOT A HIT TEST\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_zapper.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_zapper.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_zapper.nes --frames 120 --png .\\out\\peripheral_zapper.png",
+      "expected": [
+        "peripheral_zapexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Zapper",
+        "url": "https://www.nesdev.org/wiki/Zapper"
+      }
+    ]
+  },
+  "fc:__zapper_light": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "2b2d2b6ed838579c7fdde8d8a7cafda728ab9690a7b4bfbf4a88ff305e2b865e",
+    "purpose": [
+      "peripheral___zapper_light_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_default_light"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_zapinstant",
+      "peripheral_zaplight",
+      "peripheral_maskproof",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_zapper.c",
+      "code": "#include \"fc_ports_scene.h\"\nvoid main(void){\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    port_result[0]=__zapper_raw1();port_result[1]=__zapper_trigger1();port_result[2]=__zapper_light1();\n    port_result[3]=__zapper_raw2();port_result[4]=__zapper_trigger2();port_result[5]=__zapper_light2();\n    port_result[6]=__zapper_trigger();port_result[7]=__zapper_light();\n    port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"LIGHT-GUN INPUT SNAPSHOT\");m_wait();\n    m_text(2,5,\"PORT   RAW  TRIGGER  LIGHT\");m_wait();\n    m_put(3,8,'1');port_hex(9,8,port_result[0]);port_number(15,8,port_result[1]);port_number(24,8,port_result[2]);m_wait();\n    m_put(3,10,'2');port_hex(9,10,port_result[3]);port_number(15,10,port_result[4]);port_number(24,10,port_result[5]);m_wait();\n    m_text(2,13,\"DEFAULT = PORT 2\");m_wait();\n    m_text(2,15,\"TRIGGER\");port_number(15,15,port_result[6]);m_wait();\n    m_text(2,17,\"LIGHT\");port_number(15,17,port_result[7]);m_wait();\n    m_text(2,21,\"LIGHT 1 IS NOT A HIT TEST\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_zapper.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_zapper.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_zapper.nes --frames 120 --png .\\out\\peripheral_zapper.png",
+      "expected": [
+        "peripheral_zapexpected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: Zapper",
+        "url": "https://www.nesdev.org/wiki/Zapper"
+      }
+    ]
+  },
+  "fc:__serial_tx_bit": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "2b410baac02362629a1bb8b979496f1a5f517e849d2602008d758802111f4d77",
+    "purpose": [
+      "peripheral___serial_tx_bit_purpose"
+    ],
+    "args": [
+      [
+        "bit",
+        [
+          "peripheral_tx_arg"
+        ]
+      ]
+    ],
+    "returns": [
+      "peripheral_none"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_serialclock",
+      "peripheral_tx_note",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_serial.c",
+      "code": "#include \"fc_ports_scene.h\"\n__prg_rom u8 tx_values[6]={0,1,2,3,254,255};\nvoid main(void){\n    u8 i;\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    for(i=0;i<6;i++)__serial_tx_bit(tx_values[i]);\n    __serial_tx_bit(1); // Leave OUT0 high; no byte framing or baud clock is added.\n    port_result[0]=__serial_rx_bit();port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"SERIAL BIT PRIMITIVES\");m_wait();\n    m_text(2,5,\"VALUE       EXPECTED OUT0\");m_wait();\n    for(i=0;i<6;i++){port_number(3,7+i*2,tx_values[i]);m_put(23,7+i*2,'0'+(tx_values[i]&1));m_wait();}\n    m_text(2,20,\"RX SAMPLE\");port_number(23,20,port_result[0]);m_wait();\n    m_text(2,23,\"NO BYTE FRAMING OR CLOCK\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_serial.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_serial.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_serial.nes --frames 120 --png .\\out\\peripheral_serial.png",
+      "expected": [
+        "peripheral_serialexpected"
+      ]
+    }
+  },
+  "fc:__serial_rx_bit": {
+    "review": "peripheral-source-20260923",
+    "record_sha256": "b4e9898fa7561778ff6d01b794de814390c3c64295f8703427fe36d36355ff34",
+    "purpose": [
+      "peripheral___serial_rx_bit_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "peripheral_rx_return"
+    ],
+    "notes": [
+      "peripheral_ports",
+      "peripheral_serialclock",
+      "peripheral_rx_note",
+      "peripheral_maskproof",
+      "peripheral_baseline"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/peripheral_serial.c",
+      "code": "#include \"fc_ports_scene.h\"\n__prg_rom u8 tx_values[6]={0,1,2,3,254,255};\nvoid main(void){\n    u8 i;\n    __irq_disable();__ppu_ctrl_set(0);port_phase=1;\n    for(i=0;i<6;i++)__serial_tx_bit(tx_values[i]);\n    __serial_tx_bit(1); // Leave OUT0 high; no byte framing or baud clock is added.\n    port_result[0]=__serial_rx_bit();port_phase=2;port_result[31]=165;\n    m_init();m_text(2,2,\"SERIAL BIT PRIMITIVES\");m_wait();\n    m_text(2,5,\"VALUE       EXPECTED OUT0\");m_wait();\n    for(i=0;i<6;i++){port_number(3,7+i*2,tx_values[i]);m_put(23,7+i*2,'0'+(tx_values[i]&1));m_wait();}\n    m_text(2,20,\"RX SAMPLE\");port_number(23,20,port_result[0]);m_wait();\n    m_text(2,23,\"NO BYTE FRAMING OR CLOCK\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\peripheral_serial.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\peripheral_serial.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n.\\kurosaki\\kurosaki.exe run .\\out\\peripheral_serial.nes --frames 120 --png .\\out\\peripheral_serial.png",
+      "expected": [
+        "peripheral_serialexpected"
+      ]
+    }
+  }
+}

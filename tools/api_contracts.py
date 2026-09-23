@@ -54,7 +54,7 @@ def render(record, contract, language, messages, ui):
         result = []
         for shot in example.get('verified_images', []):
             caption = shot['caption']
-            if contract['review'] in ['physics-source-20260915','fc-physics-source-20260922','wireframe-source-20260915','raster-wave-source-20260922','raster-bands-source-20260922','rob-source-20260922','chain-body-source-20260922','fc-wireframe-source-20260922','fc-danmaku-source-20260922','zx0-source-20260922','sprite0-source-20260923','fds-query-source-20260923','fds-load-source-20260923']:
+            if contract['review'] in ['physics-source-20260915','fc-physics-source-20260922','wireframe-source-20260915','raster-wave-source-20260922','raster-bands-source-20260922','rob-source-20260922','chain-body-source-20260922','fc-wireframe-source-20260922','fc-danmaku-source-20260922','zx0-source-20260922','sprite0-source-20260923','fds-query-source-20260923','fds-load-source-20260923','peripheral-source-20260923']:
                 caption += ' — ' + ' '.join(messages[key][index].replace('`','') for key in example.get('expected', []))
             result.append('<figure class="example-result"><img class="screen" loading="lazy" src="' + prefix + html.escape(shot['image'], quote=True) + '" alt="' + html.escape(name + ': ' + caption, quote=True) + '"><figcaption>' + html.escape(caption) + '</figcaption></figure>')
         for clip in example.get('verified_audio', []):
@@ -220,6 +220,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_fds_query_examples(contracts))
     from api_fds_load_proofs import verified_examples as verified_fds_load_examples
     proofs.update(verified_fds_load_examples(contracts))
+    from api_peripheral_proofs import verified_examples as verified_peripheral_examples
+    proofs.update(verified_peripheral_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -275,6 +277,9 @@ def publish(language, require_complete=False):
                 if volume == 'fc-library':
                     from api_fc_audio_vblank_proofs import overview as fc_audio_vblank_overview
                     text = fc_audio_vblank_overview(text, language)
+                    if any(c["review"] == "peripheral-source-20260923" for c in contracts.values()):
+                        from api_peripheral_proofs import overview as peripheral_overview
+                        text = peripheral_overview(text, language, library=True)
                     from fc_wireframe_presentation import overview as wireframe_overview
                     text = wireframe_overview(text, language)
                     from api_fc_danmaku_proofs import overview as danmaku_overview

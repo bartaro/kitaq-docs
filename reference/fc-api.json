@@ -2545,7 +2545,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_wait_ready\");\n            string loop = NewGeneratedLabel(\"fds_wait_ready_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", Mem(0x4032));\n            EmitAsm(\"AND\", Imm(0x01));\n            EmitAsm(\"BNE\", Rel(loop));\n            EmitAsm(\"RTS\");\n\n            // Build a one-file load list and supply inline wildcard-ID/list pointers to the BIOS LoadFiles entry.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9045
+        "line": 9053
       }
     },
     {
@@ -2566,7 +2566,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_wait_ready\");\n            string loop = NewGeneratedLabel(\"fds_wait_ready_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", Mem(0x4032));\n            EmitAsm(\"AND\", Imm(0x01));\n            EmitAsm(\"BNE\", Rel(loop));\n            EmitAsm(\"RTS\");\n\n            // Build a one-file load list and supply inline wildcard-ID/list pointers to the BIOS LoadFiles entry.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9045
+        "line": 9053
       }
     },
     {
@@ -2587,7 +2587,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_file_exists\");\n            EmitFdsMetadataSearch(foundReturnsSize: false);\n\n            // Return the compiled metadata size, using zero for an unmatched ID.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9178
+        "line": 9186
       }
     },
     {
@@ -2608,7 +2608,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_file_size\");\n            EmitFdsMetadataSearch(foundReturnsSize: true);\n\n            // Construct a RAM-source WriteFile header and invoke the BIOS with inline descriptor pointers.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9182
+        "line": 9190
       }
     },
     {
@@ -2629,7 +2629,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_load_file\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress + 1));\n            EmitAsm(\"JSR\", Mem(0xE1F8)); // FDS BIOS LoadFiles; A=error, Y=count.\n            _assembly.Add(Expr.Make(Tag.Word, \"__kq_fds_disk_id_wildcard\"));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsLoadListAddress)));\n            // A raw file load can replace any part of the switchable window.\n            // Only the bank-aware wrapper may establish a known resident bank.\n            EmitAsm(\"TAX\");\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"STA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"TXA\");\n            EmitAsm(\"RTS\");\n\n            // Use the same BIOS loading convention for an overlay file identifier.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9054
+        "line": 9062
       }
     },
     {
@@ -2650,7 +2650,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_save_file\");\n            // Build a minimal BIOS WriteFile header in RAM.\n            // args: id, src, len. File number uses id; file name is \"KQFCFILE\"; load/source addr = src.\n            EmitAsm(\"LDA\", Mem(CallArgBase)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 0));\n            byte[] nameBytes = System.Text.Encoding.ASCII.GetBytes(\"KQFCFILE\");\n            for (int i = 0; i < 8; i++)\n            {\n                EmitAsm(\"LDA\", Imm(nameBytes[i]));\n                EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 1 + i));\n            }\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 9));  // load addr lo\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 10)); // load addr hi\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 11)); // size lo\n            EmitAsm(\"LDA\", Mem(CallArgBase + 4)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 12)); // size hi\n            EmitAsm(\"LDA\", Imm(0)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 13)); // file type PRG\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 14)); // source addr lo\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 15)); // source addr hi\n            EmitAsm(\"LDA\", Imm(0)); EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 16)); // source address type: RAM\n            EmitAsm(\"LDA\", Mem(CallArgBase)); // sequential file number; expected to match id in KITAQFC simple-save convention.\n            EmitAsm(\"JSR\", Mem(0xE239)); // FDS BIOS WriteFile\n            _assembly.Add(Expr.Make(Tag.Word, \"__kq_fds_disk_id_wildcard\"));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsFileHeaderAddress)));\n            EmitAsm(\"RTS\");\n\n            // Enable wave-RAM writes, copy 64 source bytes, then clear the wave-write control register.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9186
+        "line": 9194
       }
     },
     {
@@ -2713,7 +2713,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_is_bank_resident\");\n            string fdsResidentYes = NewGeneratedLabel(\"fds_resident_yes\");\n            string fdsResidentNo = NewGeneratedLabel(\"fds_resident_no\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsResidentNo));\n            EmitAsm(\"CMP\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"BEQ\", Rel(fdsResidentYes));\n            _assembly.Add(Expr.Make(Tag.Label, fdsResidentNo));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsResidentYes));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"RTS\");\n\n            // Query file existence in the compiled metadata table.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9162
+        "line": 9170
       }
     },
     {
@@ -2734,7 +2734,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_load_bank\");\n            string fdsLoadBankLoad = NewGeneratedLabel(\"fds_load_bank_load\");\n            string fdsLoadBankOverlay = NewGeneratedLabel(\"fds_load_bank_overlay\");\n            string fdsLoadBankCall = NewGeneratedLabel(\"fds_load_bank_call\");\n            string fdsLoadBankDone = NewGeneratedLabel(\"fds_load_bank_done\");\n            string fdsLoadBankPopInvalid = NewGeneratedLabel(\"fds_load_bank_pop_invalid\");\n            string fdsLoadBankInvalid = NewGeneratedLabel(\"fds_load_bank_invalid\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"CMP\", Imm(1));\n            EmitAsm(\"BCC\", Rel(fdsLoadBankInvalid));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankInvalid));\n            if (Program.FdsOverlayResidencyGuardEnabled)\n            {\n                EmitAsm(\"CMP\", Mem(_runtimeFdsResidentBankAddress));\n                EmitAsm(\"BNE\", Rel(fdsLoadBankLoad));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"RTS\");\n                _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankLoad));\n            }\n            EmitAsm(\"PHA\");\n            EmitAsm(\"CMP\", Imm(1));\n            EmitAsm(\"BNE\", Rel(fdsLoadBankOverlay));\n            EmitAsm(\"LDA\", Abs(\"__kq_fds_boot_bank_file_id\"));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankPopInvalid));\n            EmitAsm(\"JMP\", Abs(fdsLoadBankCall));\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankOverlay));\n            EmitAsm(\"SEC\");\n            EmitAsm(\"SBC\", Imm(2));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Imm(Program.FdsOverlayStartId & 0xFF));\n            EmitAsm(\"BCS\", Rel(fdsLoadBankPopInvalid));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankPopInvalid));\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankCall));\n            EmitAsm(\"STA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__fds_load_overlay\"));\n            EmitAsm(\"TAX\");\n            EmitAsm(\"PLA\");\n            EmitAsm(\"CPX\", Imm(0));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankDone));\n            // A failed BIOS transfer may have overwritten part of the window.\n            // Mark it unknown so a subsequent restore cannot be skipped by the guard.\n            EmitAsm(\"LDA\", Imm(0xFF));\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankDone));\n            EmitAsm(\"STA\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"STA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"TXA\");\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankPopInvalid));\n            EmitAsm(\"PLA\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankInvalid));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"RTS\");\n\n            // Return success for the recorded resident bank, otherwise dispatch a bank load.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9091
+        "line": 9099
       }
     },
     {
@@ -2755,7 +2755,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_load_overlay\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress + 1));\n            EmitAsm(\"JSR\", Mem(0xE1F8));\n            _assembly.Add(Expr.Make(Tag.Word, \"__kq_fds_disk_id_wildcard\"));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsLoadListAddress)));\n            // A raw file load can replace any part of the switchable window.\n            // Only the bank-aware wrapper may establish a known resident bank.\n            EmitAsm(\"TAX\");\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"STA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"TXA\");\n            EmitAsm(\"RTS\");\n\n            // Restore bank 1 from its separate boot file; map banks 2+ to overlay\n            // IDs. Keep the requested bank on the CPU stack across the BIOS call.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9072
+        "line": 9080
       }
     },
     {
@@ -2818,7 +2818,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_require_bank\");\n            string fdsRequireLoad = NewGeneratedLabel(\"fds_require_load\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsRequireLoad));\n            EmitAsm(\"CMP\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"BNE\", Rel(fdsRequireLoad));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsRequireLoad));\n            EmitAsm(\"JSR\", Abs(\"__fds_load_bank\"));\n            EmitAsm(\"RTS\");\n\n            // Compare the requested bank with the software residency record and return zero or one.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9148
+        "line": 9156
       }
     },
     {
@@ -4067,7 +4067,7 @@
       "args": "void",
       "signature": "u8 __fkb_detect(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 255,
+      "line": 259,
       "comment": "Zapper / light gun. The no-suffix names default to the usual port-2/Famicom\nexpansion-port mapping. __zapper_light*() returns 1 when light is detected.\n/\nReturn raw 4016 & 18, retaining trigger and active-low light bits.\nu8 __zapper_raw1(void);\nReturn raw 4017 & 18 for the second port.\nu8 __zapper_raw2(void);\nReturn port-1 trigger bit 4 normalized to 0 or 1.\nu8 __zapper_trigger1(void);\nReturn port-2 trigger bit 4 normalized to 0 or 1.\nu8 __zapper_trigger2(void);\nInvert port-1 bit 3 and normalize: one means light detected.\nu8 __zapper_light1(void);\nInvert port-2 bit 3 and normalize: one means light detected.\nu8 __zapper_light2(void);\nDefault to the port-2 normalized trigger reader.\nu8 __zapper_trigger(void);\nDefault to the port-2 normalized light reader.\nu8 __zapper_light(void);\n\n Family BASIC Keyboard. __fkb_scan() writes 18 bytes: 9 rows x 2 columns,\neach byte containing raw $4017 & 0x1E for that row/column.\n/\nProbe selected-row and disabled-matrix bit patterns and return 0 or 1; this is a heuristic detection.",
       "body": "",
       "kind": "function",
@@ -4075,7 +4075,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__fkb_detect();"
+      "new_example": "__fkb_detect();",
+      "implementation_excerpt": "EmitHelperStart(\"__fkb_detect\");\n            EmitAsm(\"LDA\", Imm(0x09));\n            EmitAsm(\"STA\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(CallArgBase + 1));\n            EmitAsm(\"JSR\", Abs(\"__fkb_read_row_col\"));\n            EmitAsm(\"CMP\", Imm(0x1E));\n            string no = NewGeneratedLabel(\"fkb_no\");\n            EmitAsm(\"BNE\", Rel(no));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x1E));\n            EmitAsm(\"BNE\", Rel(no));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, no));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7749
+      }
     },
     {
       "name": "__fkb_read_row_col",
@@ -4083,7 +4088,7 @@
       "args": "u8 row, u8 col",
       "signature": "u8 __fkb_read_row_col(u8 row, u8 col);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 260,
+      "line": 264,
       "comment": "Select a matrix row and the low bit of col, then return raw 4017 & 1E.\nUse rows 0..8 for keys; row 9 is used by detection. No row-range validation is emitted.",
       "body": "",
       "kind": "function",
@@ -4091,7 +4096,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "u8 example_fkb_read_row_col(u8 row, u8 col) {\n    return __fkb_read_row_col(row, col);\n}"
+      "new_example": "u8 example_fkb_read_row_col(u8 row, u8 col) {\n    return __fkb_read_row_col(row, col);\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fkb_read_row_col\");\n            EmitAsm(\"LDA\", Imm(0x05));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitKeyboardDelayShort();\n            // Establish row zero, then generate one high-to-low column edge\n            // per requested advance. Repeated writes of 04 do not clock the counter.\n            EmitAsm(\"LDA\", Imm(0x04));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitKeyboardDelayLong();\n            EmitAsm(\"LDX\", Mem(CallArgBase));\n            string selectedRow = NewGeneratedLabel(\"fkb_selected_row\");\n            EmitAsm(\"BEQ\", Rel(selectedRow));\n            string adv = NewGeneratedLabel(\"fkb_adv_row\");\n            _assembly.Add(Expr.Make(Tag.Label, adv));\n            EmitAsm(\"LDA\", Imm(0x06));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitKeyboardDelayLong();\n            EmitAsm(\"LDA\", Imm(0x04));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitKeyboardDelayLong();\n            EmitAsm(\"DEX\");\n            EmitAsm(\"BNE\", Rel(adv));\n            _assembly.Add(Expr.Make(Tag.Label, selectedRow));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"AND\", Imm(1));\n            string readNow = NewGeneratedLabel(\"fkb_read_now\");\n            EmitAsm(\"BEQ\", Rel(readNow));\n            EmitAsm(\"LDA\", Imm(0x06));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitKeyboardDelayLong();\n            _assembly.Add(Expr.Make(Tag.Label, readNow));\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x1E));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7709
+      }
     },
     {
       "name": "__fkb_scan",
@@ -4099,7 +4109,7 @@
       "args": "u8* dst18",
       "signature": "void __fkb_scan(u8* dst18);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 257,
+      "line": 261,
       "comment": "Write 18 raw masked samples (4017 & 1E), two per row, to caller storage; reset 4016 afterward.",
       "body": "",
       "kind": "function",
@@ -4107,7 +4117,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_fkb_scan(u8* dst18) {\n    __fkb_scan(dst18);\n}"
+      "new_example": "void example_fkb_scan(u8* dst18) {\n    __fkb_scan(dst18);\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__fkb_scan\");\n            EmitAsm(\"LDA\", Imm(0x05));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitKeyboardDelayShort();\n            EmitAsm(\"LDY\", Imm(0));\n            EmitAsm(\"LDX\", Imm(9));\n            string rowLoop = NewGeneratedLabel(\"fkb_scan_row\");\n            _assembly.Add(Expr.Make(Tag.Label, rowLoop));\n            EmitAsm(\"LDA\", Imm(0x04));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitKeyboardDelayLong();\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x1E));\n            EmitAsm(\"STA\", IndY(CallArgBase));\n            EmitAsm(\"INY\");\n            EmitAsm(\"LDA\", Imm(0x06));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitKeyboardDelayLong();\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x1E));\n            EmitAsm(\"STA\", IndY(CallArgBase));\n            EmitAsm(\"INY\");\n            EmitAsm(\"DEX\");\n            EmitAsm(\"BNE\", Rel(rowLoop));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7680
+      }
     },
     {
       "name": "__irq_disable",
@@ -5668,7 +5683,7 @@
       "args": "void",
       "signature": "u8 __serial_rx_bit(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 284,
+      "line": 288,
       "comment": "Read 4017 bit 4 and normalize it to 0 or 1; an external serial adapter supplies the signal.",
       "body": "",
       "kind": "function",
@@ -5676,7 +5691,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__serial_rx_bit();"
+      "new_example": "__serial_rx_bit();",
+      "implementation_excerpt": "EmitHelperStart(\"__serial_rx_bit\");\n            EmitAsm(\"LDA\", Mem(0x4017));\n            EmitAsm(\"AND\", Imm(0x10));\n            string rx0 = NewGeneratedLabel(\"serial_rx0\");\n            string rxd = NewGeneratedLabel(\"serial_rxdone\");\n            EmitAsm(\"BEQ\", Rel(rx0));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"JMP\", Abs(rxd));\n            _assembly.Add(Expr.Make(Tag.Label, rx0));\n            EmitAsm(\"LDA\", Imm(0));\n            _assembly.Add(Expr.Make(Tag.Label, rxd));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7872
+      }
     },
     {
       "name": "__serial_tx_bit",
@@ -5684,15 +5704,20 @@
       "args": "u8 bit",
       "signature": "void __serial_tx_bit(u8 bit);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 282,
-      "comment": "R.O.B. / Famicom Robot optical flash primitives. These are timing primitives;\ngame-specific command sequences should be built on top of __rob_pulse() or\n__rob_send_byte().\n/\nSet PPUMASK and its shadow to 1E or 00, then wait for an NMI-counter change.\nThe caller supplies image/palette brightness; rendering enable alone does not create a white screen.\nvoid __rob_flash(u8 bright);\nRun on_frames enabled-mask waits followed by off_frames disabled-mask waits; NMI must advance.\nvoid __rob_pulse(u8 on_frames, u8 off_frames);\nThe intended sequence uses MSB-first 4/2 or 2/4 frame pulses.\nThe current backend reuses X in its nested pulse helper without preserving the outer bit count;\nthis entry point is not a verified eight-bit transmission routine.\nvoid __rob_send_byte(u8 pattern);\n\n Expansion-port TTL serial / MIDI adapter support.\nThe low-level serial layer assumes an external adapter that maps OUT0 to TX\nand D4 on $4017 to RX. MIDI helpers bit-bang 8N1 bytes at an approximate\n31250 bps timing suitable for adapter bring-up and simple music sync.\n/\nWrite bit & 1 to 4016, replacing the port output value; coordinate with other port users.",
+      "line": 286,
+      "comment": "R.O.B. / Famicom Robot optical flash primitives. These are timing primitives;\ngame-specific command sequences should be built on top of __rob_pulse() or\n__rob_send_byte().\n/\nSet PPUMASK and its shadow to 1E or 00, then wait for an NMI-counter change.\nThe caller supplies image/palette brightness; rendering enable alone does not create a white screen.\nvoid __rob_flash(u8 bright);\nRun on_frames enabled-mask waits followed by off_frames disabled-mask waits; NMI must advance.\nvoid __rob_pulse(u8 on_frames, u8 off_frames);\nSend eight bits MSB first: one uses 4 on/2 off waits; zero uses 2 on/4 off.\nRequires an advancing runtime NMI counter; 48 waits in total, final PPUMASK=0.\nThis raw pattern does not add a robot command preamble or validate reception.\nvoid __rob_send_byte(u8 pattern);\n\n Expansion-port TTL serial / MIDI adapter support.\nThe low-level serial layer assumes an external adapter that maps OUT0 to TX\nand D4 on $4017 to RX. MIDI helpers bit-bang 8N1 bytes at an approximate\n31250 bps timing suitable for adapter bring-up and simple music sync.\n/\nWrite bit & 1 to 4016, replacing the port output value; coordinate with other port users.",
       "body": "",
       "kind": "function",
       "module": "intrinsics",
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "void example_serial_tx_bit(u8 bit) {\n    __serial_tx_bit(bit);\n}"
+      "new_example": "void example_serial_tx_bit(u8 bit) {\n    __serial_tx_bit(bit);\n}",
+      "implementation_excerpt": "EmitHelperStart(\"__serial_tx_bit\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"AND\", Imm(1));\n            EmitAsm(\"STA\", Mem(0x4016));\n            EmitAsm(\"RTS\");",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7865
+      }
     },
     {
       "name": "__smac16",
@@ -6172,7 +6197,7 @@
       "args": "void",
       "signature": "u8 __zapper_light(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 249,
+      "line": 253,
       "comment": "Default to the port-2 normalized light reader.",
       "body": "",
       "kind": "function",
@@ -6180,7 +6205,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__zapper_light();"
+      "new_example": "__zapper_light();",
+      "implementation_excerpt": "EmitHelperStart(\"__zapper_light2\");\n            EmitNormalizeBoolFromMask(0x4017, 0x08, true);\n        void EmitNormalizeBoolFromMask(int port, int mask, bool invert)\n        {\n            string zero = NewGeneratedLabel(\"bool_zero\");\n            string done = NewGeneratedLabel(\"bool_done\");\n            EmitAsm(\"LDA\", Mem(port));\n            EmitAsm(\"AND\", Imm(mask));\n            if (invert) EmitAsm(\"BNE\", Rel(zero)); else EmitAsm(\"BEQ\", Rel(zero));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"JMP\", Abs(done));\n            _assembly.Add(Expr.Make(Tag.Label, zero));\n            EmitAsm(\"LDA\", Imm(0));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7660
+      }
     },
     {
       "name": "__zapper_light1",
@@ -6188,7 +6218,7 @@
       "args": "void",
       "signature": "u8 __zapper_light1(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 243,
+      "line": 247,
       "comment": "Invert port-1 bit 3 and normalize: one means light detected.",
       "body": "",
       "kind": "function",
@@ -6196,7 +6226,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__zapper_light1();"
+      "new_example": "__zapper_light1();",
+      "implementation_excerpt": "EmitHelperStart(\"__zapper_light1\");\n            EmitNormalizeBoolFromMask(0x4016, 0x08, true);\n        void EmitNormalizeBoolFromMask(int port, int mask, bool invert)\n        {\n            string zero = NewGeneratedLabel(\"bool_zero\");\n            string done = NewGeneratedLabel(\"bool_done\");\n            EmitAsm(\"LDA\", Mem(port));\n            EmitAsm(\"AND\", Imm(mask));\n            if (invert) EmitAsm(\"BNE\", Rel(zero)); else EmitAsm(\"BEQ\", Rel(zero));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"JMP\", Abs(done));\n            _assembly.Add(Expr.Make(Tag.Label, zero));\n            EmitAsm(\"LDA\", Imm(0));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7658
+      }
     },
     {
       "name": "__zapper_light2",
@@ -6204,7 +6239,7 @@
       "args": "void",
       "signature": "u8 __zapper_light2(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 245,
+      "line": 249,
       "comment": "Invert port-2 bit 3 and normalize: one means light detected.",
       "body": "",
       "kind": "function",
@@ -6212,7 +6247,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__zapper_light2();"
+      "new_example": "__zapper_light2();",
+      "implementation_excerpt": "EmitHelperStart(\"__zapper_light2\");\n            EmitNormalizeBoolFromMask(0x4017, 0x08, true);\n        void EmitNormalizeBoolFromMask(int port, int mask, bool invert)\n        {\n            string zero = NewGeneratedLabel(\"bool_zero\");\n            string done = NewGeneratedLabel(\"bool_done\");\n            EmitAsm(\"LDA\", Mem(port));\n            EmitAsm(\"AND\", Imm(mask));\n            if (invert) EmitAsm(\"BNE\", Rel(zero)); else EmitAsm(\"BEQ\", Rel(zero));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"JMP\", Abs(done));\n            _assembly.Add(Expr.Make(Tag.Label, zero));\n            EmitAsm(\"LDA\", Imm(0));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7660
+      }
     },
     {
       "name": "__zapper_raw1",
@@ -6220,7 +6260,7 @@
       "args": "void",
       "signature": "u8 __zapper_raw1(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 235,
+      "line": 239,
       "comment": "Famicom/NES expansion input devices.\nD1 readers are for expansion-port controllers/joysticks that expose a\nstandard 8-bit joypad stream on data line D1 instead of D0.\n__joypad2p_voice() / __mic_read2p() return the Famicom 2P microphone bit.\n/\nLatch and read an eight-button stream from port-1 data line D1 rather than D0.\nu8 __pad_read1_d1(void);\nLatch and read an eight-button stream from port-2 data line D1 rather than D0.\nu8 __pad_read2_d1(void);\nAlias the port-1 D1 controller reader; the attached device must use the expected serial protocol.\nu8 __exp_pad_read1(void);\nAlias the port-2 D1 controller reader; this is not an expansion-device discovery operation.\nu8 __exp_pad_read2(void);\nReturn controller-port 4016 bit 2 normalized to 0 or 1; this is a microphone level bit, not PCM audio.\nu8 __joypad2p_voice(void);\nAlias the same normalized microphone input bit as __joypad2p_voice.\nu8 __mic_read2p(void);\n\n Zapper / light gun. The no-suffix names default to the usual port-2/Famicom\nexpansion-port mapping. __zapper_light*() returns 1 when light is detected.\n/\nReturn raw 4016 & 18, retaining trigger and active-low light bits.",
       "body": "",
       "kind": "function",
@@ -6228,7 +6268,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__zapper_raw1();"
+      "new_example": "__zapper_raw1();",
+      "implementation_excerpt": "case \"__zapper_raw1\": if (!Need(0)) return true; EmitAsm(\"LDA\", Mem(0x4016)); EmitAsm(\"AND\", Imm(0x18)); return true;",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4682
+      }
     },
     {
       "name": "__zapper_raw2",
@@ -6236,7 +6281,7 @@
       "args": "void",
       "signature": "u8 __zapper_raw2(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 237,
+      "line": 241,
       "comment": "Return raw 4017 & 18 for the second port.",
       "body": "",
       "kind": "function",
@@ -6244,7 +6289,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__zapper_raw2();"
+      "new_example": "__zapper_raw2();",
+      "implementation_excerpt": "case \"__zapper_raw2\": if (!Need(0)) return true; EmitAsm(\"LDA\", Mem(0x4017)); EmitAsm(\"AND\", Imm(0x18)); return true;",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 4683
+      }
     },
     {
       "name": "__zapper_trigger",
@@ -6252,7 +6302,7 @@
       "args": "void",
       "signature": "u8 __zapper_trigger(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 247,
+      "line": 251,
       "comment": "Default to the port-2 normalized trigger reader.",
       "body": "",
       "kind": "function",
@@ -6260,7 +6310,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__zapper_trigger();"
+      "new_example": "__zapper_trigger();",
+      "implementation_excerpt": "EmitHelperStart(\"__zapper_trigger2\");\n            EmitNormalizeBoolFromMask(0x4017, 0x10, false);\n        void EmitNormalizeBoolFromMask(int port, int mask, bool invert)\n        {\n            string zero = NewGeneratedLabel(\"bool_zero\");\n            string done = NewGeneratedLabel(\"bool_done\");\n            EmitAsm(\"LDA\", Mem(port));\n            EmitAsm(\"AND\", Imm(mask));\n            if (invert) EmitAsm(\"BNE\", Rel(zero)); else EmitAsm(\"BEQ\", Rel(zero));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"JMP\", Abs(done));\n            _assembly.Add(Expr.Make(Tag.Label, zero));\n            EmitAsm(\"LDA\", Imm(0));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7656
+      }
     },
     {
       "name": "__zapper_trigger1",
@@ -6268,7 +6323,7 @@
       "args": "void",
       "signature": "u8 __zapper_trigger1(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 239,
+      "line": 243,
       "comment": "Return port-1 trigger bit 4 normalized to 0 or 1.",
       "body": "",
       "kind": "function",
@@ -6276,7 +6331,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__zapper_trigger1();"
+      "new_example": "__zapper_trigger1();",
+      "implementation_excerpt": "EmitHelperStart(\"__zapper_trigger1\");\n            EmitNormalizeBoolFromMask(0x4016, 0x10, false);\n        void EmitNormalizeBoolFromMask(int port, int mask, bool invert)\n        {\n            string zero = NewGeneratedLabel(\"bool_zero\");\n            string done = NewGeneratedLabel(\"bool_done\");\n            EmitAsm(\"LDA\", Mem(port));\n            EmitAsm(\"AND\", Imm(mask));\n            if (invert) EmitAsm(\"BNE\", Rel(zero)); else EmitAsm(\"BEQ\", Rel(zero));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"JMP\", Abs(done));\n            _assembly.Add(Expr.Make(Tag.Label, zero));\n            EmitAsm(\"LDA\", Imm(0));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7654
+      }
     },
     {
       "name": "__zapper_trigger2",
@@ -6284,7 +6344,7 @@
       "args": "void",
       "signature": "u8 __zapper_trigger2(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 241,
+      "line": 245,
       "comment": "Return port-2 trigger bit 4 normalized to 0 or 1.",
       "body": "",
       "kind": "function",
@@ -6292,7 +6352,12 @@
       "definition": null,
       "availability": "compiler",
       "example": null,
-      "new_example": "__zapper_trigger2();"
+      "new_example": "__zapper_trigger2();",
+      "implementation_excerpt": "EmitHelperStart(\"__zapper_trigger2\");\n            EmitNormalizeBoolFromMask(0x4017, 0x10, false);\n        void EmitNormalizeBoolFromMask(int port, int mask, bool invert)\n        {\n            string zero = NewGeneratedLabel(\"bool_zero\");\n            string done = NewGeneratedLabel(\"bool_done\");\n            EmitAsm(\"LDA\", Mem(port));\n            EmitAsm(\"AND\", Imm(mask));\n            if (invert) EmitAsm(\"BNE\", Rel(zero)); else EmitAsm(\"BEQ\", Rel(zero));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"JMP\", Abs(done));\n            _assembly.Add(Expr.Make(Tag.Label, zero));\n            EmitAsm(\"LDA\", Imm(0));\n            _assembly.Add(Expr.Make(Tag.Label, done));\n            EmitAsm(\"RTS\");\n        }",
+      "implementation_source": {
+        "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+        "line": 7656
+      }
     },
     {
       "name": "nes_metasprite_draw",
