@@ -54,7 +54,7 @@ def render(record, contract, language, messages, ui):
         result = []
         for shot in example.get('verified_images', []):
             caption = shot['caption']
-            if contract['review'] in ['physics-source-20260915','fc-physics-source-20260922','wireframe-source-20260915','raster-wave-source-20260922','raster-bands-source-20260922','rob-source-20260922','chain-body-source-20260922','fc-wireframe-source-20260922','fc-danmaku-source-20260922','zx0-source-20260922','sprite0-source-20260923']:
+            if contract['review'] in ['physics-source-20260915','fc-physics-source-20260922','wireframe-source-20260915','raster-wave-source-20260922','raster-bands-source-20260922','rob-source-20260922','chain-body-source-20260922','fc-wireframe-source-20260922','fc-danmaku-source-20260922','zx0-source-20260922','sprite0-source-20260923','fds-query-source-20260923']:
                 caption += ' — ' + ' '.join(messages[key][index].replace('`','') for key in example.get('expected', []))
             result.append('<figure class="example-result"><img class="screen" loading="lazy" src="' + prefix + html.escape(shot['image'], quote=True) + '" alt="' + html.escape(name + ': ' + caption, quote=True) + '"><figcaption>' + html.escape(caption) + '</figcaption></figure>')
         for clip in example.get('verified_audio', []):
@@ -216,6 +216,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_mapper_examples(contracts))
     from api_sprite0_proofs import verified_examples as verified_sprite0_examples
     proofs.update(verified_sprite0_examples(contracts))
+    from api_fds_query_proofs import verified_examples as verified_fds_query_examples
+    proofs.update(verified_fds_query_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))

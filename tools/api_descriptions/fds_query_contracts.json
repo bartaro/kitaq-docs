@@ -1,0 +1,336 @@
+{
+  "fc:__fds_available": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "921fa3a92fb8825368a6cf598452c5e70f0b663938eb6d208f9129e39ced02ab",
+    "purpose": [
+      "fds_query___fds_available_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "fds_query_available_return"
+    ],
+    "notes": [
+      "fds_query_available_note",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_available.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    fds_result[0] = __fds_available();\n    m_init();\n    m_text(2,2,\"FDS BUILD SELECTION\"); m_wait();\n    m_text(2,5,\"FDS=1 / CARTRIDGE=0\"); m_wait();\n    m_number(fds_result[0]); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_available.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_available.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\n# Cartridge comparison\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_available.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_available.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "fds_query_available_expected"
+      ]
+    }
+  },
+  "fc:__fds_disk_ready": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "e186d1c51b782fe7af4728fe764c6f217e2f60bc1766ce0175da9718081f728a",
+    "purpose": [
+      "fds_query___fds_disk_ready_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "fds_query_ready_return"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_notready",
+      "fds_query_statusmodel",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_status.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    fds_result[0] = __fds_disk_ready();\n    fds_result[1] = __fds_side();\n    fds_result[2] = __fds_error();\n    fds_result[3] = 0;\n    // Never enter an unbounded wait without first checking disk presence.\n    if (fds_result[0]) {\n        __fds_wait_ready(); fds_result[3]++;\n        __fds_wait_insert(); fds_result[3]++;\n    }\n    m_init();\n    m_text(2,2,\"FDS REGISTER STATUS\"); m_wait();\n    m_text(2,5,\"PRESENT / PROTECT / STATUS\"); m_wait();\n    m_put(2,7,'0'+fds_result[0]);\n    m_put(12,7,'0'+fds_result[1]);\n    m_put(22,7,'0'+fds_result[2]); m_wait();\n    m_text(2,10,\"COMPLETED PRESENCE WAITS\"); m_wait();\n    m_put(2,12,'0'+fds_result[3]); m_wait();\n    m_text(2,15,\"NO FILE TRANSFER TESTED\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_status.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_status.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "fds_query_status_expected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: FDS hardware registers",
+        "url": "https://www.nesdev.org/wiki/Famicom_Disk_System"
+      }
+    ]
+  },
+  "fc:__fds_side": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "0995ddf7c8225751c88a44a556ffb8b0d2ba6f2a77a5dd8ae3a2280f7a3f7ef6",
+    "purpose": [
+      "fds_query___fds_side_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "fds_query_side_return"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_statusmodel",
+      "fds_query_side_note",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_status.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    fds_result[0] = __fds_disk_ready();\n    fds_result[1] = __fds_side();\n    fds_result[2] = __fds_error();\n    fds_result[3] = 0;\n    // Never enter an unbounded wait without first checking disk presence.\n    if (fds_result[0]) {\n        __fds_wait_ready(); fds_result[3]++;\n        __fds_wait_insert(); fds_result[3]++;\n    }\n    m_init();\n    m_text(2,2,\"FDS REGISTER STATUS\"); m_wait();\n    m_text(2,5,\"PRESENT / PROTECT / STATUS\"); m_wait();\n    m_put(2,7,'0'+fds_result[0]);\n    m_put(12,7,'0'+fds_result[1]);\n    m_put(22,7,'0'+fds_result[2]); m_wait();\n    m_text(2,10,\"COMPLETED PRESENCE WAITS\"); m_wait();\n    m_put(2,12,'0'+fds_result[3]); m_wait();\n    m_text(2,15,\"NO FILE TRANSFER TESTED\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_status.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_status.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "fds_query_status_expected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: FDS hardware registers",
+        "url": "https://www.nesdev.org/wiki/Famicom_Disk_System"
+      }
+    ]
+  },
+  "fc:__fds_error": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "c013b6aec2192b01875d2ba4c2553a58c83e807d30f420837fa8820bec5e4da4",
+    "purpose": [
+      "fds_query___fds_error_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "fds_query_error_return"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_statusmodel",
+      "fds_query_error_note",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_status.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    fds_result[0] = __fds_disk_ready();\n    fds_result[1] = __fds_side();\n    fds_result[2] = __fds_error();\n    fds_result[3] = 0;\n    // Never enter an unbounded wait without first checking disk presence.\n    if (fds_result[0]) {\n        __fds_wait_ready(); fds_result[3]++;\n        __fds_wait_insert(); fds_result[3]++;\n    }\n    m_init();\n    m_text(2,2,\"FDS REGISTER STATUS\"); m_wait();\n    m_text(2,5,\"PRESENT / PROTECT / STATUS\"); m_wait();\n    m_put(2,7,'0'+fds_result[0]);\n    m_put(12,7,'0'+fds_result[1]);\n    m_put(22,7,'0'+fds_result[2]); m_wait();\n    m_text(2,10,\"COMPLETED PRESENCE WAITS\"); m_wait();\n    m_put(2,12,'0'+fds_result[3]); m_wait();\n    m_text(2,15,\"NO FILE TRANSFER TESTED\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_status.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_status.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "fds_query_status_expected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: FDS hardware registers",
+        "url": "https://www.nesdev.org/wiki/Famicom_Disk_System"
+      }
+    ]
+  },
+  "fc:__fds_wait_ready": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "a82e7fcbbf26d6e465f321c49c87689434d7454d7076ca459b802c943a050172",
+    "purpose": [
+      "fds_query___fds_wait_ready_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "fds_query_none"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_notready",
+      "fds_query_blocked",
+      "fds_query_statusmodel",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_status.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    fds_result[0] = __fds_disk_ready();\n    fds_result[1] = __fds_side();\n    fds_result[2] = __fds_error();\n    fds_result[3] = 0;\n    // Never enter an unbounded wait without first checking disk presence.\n    if (fds_result[0]) {\n        __fds_wait_ready(); fds_result[3]++;\n        __fds_wait_insert(); fds_result[3]++;\n    }\n    m_init();\n    m_text(2,2,\"FDS REGISTER STATUS\"); m_wait();\n    m_text(2,5,\"PRESENT / PROTECT / STATUS\"); m_wait();\n    m_put(2,7,'0'+fds_result[0]);\n    m_put(12,7,'0'+fds_result[1]);\n    m_put(22,7,'0'+fds_result[2]); m_wait();\n    m_text(2,10,\"COMPLETED PRESENCE WAITS\"); m_wait();\n    m_put(2,12,'0'+fds_result[3]); m_wait();\n    m_text(2,15,\"NO FILE TRANSFER TESTED\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_status.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_status.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "fds_query_status_expected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: FDS hardware registers",
+        "url": "https://www.nesdev.org/wiki/Famicom_Disk_System"
+      }
+    ]
+  },
+  "fc:__fds_wait_insert": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "1ec0fe6566849804471d8f3b581c9b14c63ca6233a26e2a733b719b4b78a9c0f",
+    "purpose": [
+      "fds_query___fds_wait_insert_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "fds_query_none"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_notready",
+      "fds_query_blocked",
+      "fds_query_statusmodel",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_status.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    fds_result[0] = __fds_disk_ready();\n    fds_result[1] = __fds_side();\n    fds_result[2] = __fds_error();\n    fds_result[3] = 0;\n    // Never enter an unbounded wait without first checking disk presence.\n    if (fds_result[0]) {\n        __fds_wait_ready(); fds_result[3]++;\n        __fds_wait_insert(); fds_result[3]++;\n    }\n    m_init();\n    m_text(2,2,\"FDS REGISTER STATUS\"); m_wait();\n    m_text(2,5,\"PRESENT / PROTECT / STATUS\"); m_wait();\n    m_put(2,7,'0'+fds_result[0]);\n    m_put(12,7,'0'+fds_result[1]);\n    m_put(22,7,'0'+fds_result[2]); m_wait();\n    m_text(2,10,\"COMPLETED PRESENCE WAITS\"); m_wait();\n    m_put(2,12,'0'+fds_result[3]); m_wait();\n    m_text(2,15,\"NO FILE TRANSFER TESTED\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_status.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_status.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "fds_query_status_expected"
+      ]
+    },
+    "references": [
+      {
+        "title": "NESdev: FDS hardware registers",
+        "url": "https://www.nesdev.org/wiki/Famicom_Disk_System"
+      }
+    ]
+  },
+  "fc:__fds_file_exists": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "d2c3b3c14c944a4e9b3ead79ee5cb786f79165cbd68c558985361a46f2f93fec",
+    "purpose": [
+      "fds_query___fds_file_exists_purpose"
+    ],
+    "args": [
+      [
+        "id",
+        [
+          "fds_query_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_query_exists_return"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_meta",
+      "fds_query_metasize",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_metadata.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    fds_result[0] = __fds_file_exists(16);\n    fds_sizes[0] = __fds_file_size(16);\n    fds_result[1] = __fds_file_exists(17);\n    fds_sizes[1] = __fds_file_size(17);\n    fds_result[2] = __fds_file_exists(18);\n    fds_sizes[2] = __fds_file_size(18);\n    m_init();\n    m_text(2,2,\"FDS COMPILED FILE TABLE\"); m_wait();\n    m_text(2,5,\"ID    EXISTS    BYTES\"); m_wait();\n    m_text(2,7,\"16      1        513\"); m_wait();\n    m_text(2,9,\"17      1          0\"); m_wait();\n    m_text(2,11,\"18      0          0\"); m_wait();\n    if (fds_result[0]==1 && fds_sizes[0]==513 &&\n        fds_result[1]==1 && fds_sizes[1]==0 &&\n        fds_result[2]==0 && fds_sizes[2]==0) { m_text(2,14,\"TABLE VALUES MATCH: PASS\"); }\n    else { m_text(2,14,\"TABLE VALUES MATCH: FAIL\"); }\n    m_wait();\n    m_text(2,17,\"NO DISK DIRECTORY SCAN\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_metadata.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_metadata.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm --fds-meta=.\\kitaq-docs\\samples\\api-examples\\fc\\fds_metadata.json",
+      "expected": [
+        "fds_query_metadata_expected"
+      ]
+    }
+  },
+  "fc:__fds_file_size": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "c44416c6bf5a114707c95609c6bfce4acd0a84c910d7188c6110ab71ddf8e92d",
+    "purpose": [
+      "fds_query___fds_file_size_purpose"
+    ],
+    "args": [
+      [
+        "id",
+        [
+          "fds_query_id"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_query_size_return"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_meta",
+      "fds_query_metasize",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_metadata.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    fds_result[0] = __fds_file_exists(16);\n    fds_sizes[0] = __fds_file_size(16);\n    fds_result[1] = __fds_file_exists(17);\n    fds_sizes[1] = __fds_file_size(17);\n    fds_result[2] = __fds_file_exists(18);\n    fds_sizes[2] = __fds_file_size(18);\n    m_init();\n    m_text(2,2,\"FDS COMPILED FILE TABLE\"); m_wait();\n    m_text(2,5,\"ID    EXISTS    BYTES\"); m_wait();\n    m_text(2,7,\"16      1        513\"); m_wait();\n    m_text(2,9,\"17      1          0\"); m_wait();\n    m_text(2,11,\"18      0          0\"); m_wait();\n    if (fds_result[0]==1 && fds_sizes[0]==513 &&\n        fds_result[1]==1 && fds_sizes[1]==0 &&\n        fds_result[2]==0 && fds_sizes[2]==0) { m_text(2,14,\"TABLE VALUES MATCH: PASS\"); }\n    else { m_text(2,14,\"TABLE VALUES MATCH: FAIL\"); }\n    m_wait();\n    m_text(2,17,\"NO DISK DIRECTORY SCAN\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_metadata.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_metadata.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm --fds-meta=.\\kitaq-docs\\samples\\api-examples\\fc\\fds_metadata.json",
+      "expected": [
+        "fds_query_metadata_expected"
+      ]
+    }
+  },
+  "fc:__fds_current_bank": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "93a84c32d651398aacde30e6444b01f2545b20a8bc86154c2ee26bb7a0808541",
+    "purpose": [
+      "fds_query___fds_current_bank_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "fds_query_current_return"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_resident",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_residency.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    request_overlay=0;\n    fds_result[0] = __fds_current_bank();\n    fds_result[1] = __fds_is_bank_resident(1);\n    fds_result[2] = __fds_is_bank_resident(2);\n    fds_result[3] = __fds_overlay_function_count();\n    if (request_overlay) {\n        fds_result[4]=lesson_overlay_a(); fds_result[5]=lesson_overlay_b();\n    }\n    m_init();\n    m_text(2,2,\"FDS OVERLAY RECORDS\"); m_wait();\n    m_text(2,5,\"CURRENT BANK\"); m_put(25,5,'0'+fds_result[0]); m_wait();\n    m_text(2,7,\"BANK 1 RESIDENT\"); m_put(25,7,'0'+fds_result[1]); m_wait();\n    m_text(2,9,\"BANK 2 RESIDENT\"); m_put(25,9,'0'+fds_result[2]); m_wait();\n    m_text(2,11,\"OVERLAY FUNCTIONS\"); m_put(25,11,'0'+fds_result[3]); m_wait();\n    m_text(2,14,\"NO OVERLAY LOAD TESTED\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_residency.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_residency.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "fds_query_resident_expected"
+      ]
+    }
+  },
+  "fc:__fds_is_bank_resident": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "d765263bc6abd9aef290d67034dc3b2ddbd99a8dafb38f6c3ea79812fe699128",
+    "purpose": [
+      "fds_query___fds_is_bank_resident_purpose"
+    ],
+    "args": [
+      [
+        "bank",
+        [
+          "fds_query_bank"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_query_is_return"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_resident",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_residency.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    request_overlay=0;\n    fds_result[0] = __fds_current_bank();\n    fds_result[1] = __fds_is_bank_resident(1);\n    fds_result[2] = __fds_is_bank_resident(2);\n    fds_result[3] = __fds_overlay_function_count();\n    if (request_overlay) {\n        fds_result[4]=lesson_overlay_a(); fds_result[5]=lesson_overlay_b();\n    }\n    m_init();\n    m_text(2,2,\"FDS OVERLAY RECORDS\"); m_wait();\n    m_text(2,5,\"CURRENT BANK\"); m_put(25,5,'0'+fds_result[0]); m_wait();\n    m_text(2,7,\"BANK 1 RESIDENT\"); m_put(25,7,'0'+fds_result[1]); m_wait();\n    m_text(2,9,\"BANK 2 RESIDENT\"); m_put(25,9,'0'+fds_result[2]); m_wait();\n    m_text(2,11,\"OVERLAY FUNCTIONS\"); m_put(25,11,'0'+fds_result[3]); m_wait();\n    m_text(2,14,\"NO OVERLAY LOAD TESTED\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_residency.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_residency.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "fds_query_resident_expected"
+      ]
+    }
+  },
+  "fc:__fds_overlay_function_count": {
+    "review": "fds-query-source-20260923",
+    "record_sha256": "becf3a5101bdaf62aeabbea792c185b0377399ef84768a270f15bc6ce2c5eff4",
+    "purpose": [
+      "fds_query___fds_overlay_function_count_purpose"
+    ],
+    "args": [],
+    "returns": [
+      "fds_query_count_return"
+    ],
+    "notes": [
+      "fds_query_mapper",
+      "fds_query_count_note",
+      "fds_query_boundary",
+      "fds_query_buildnote"
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_residency.c",
+      "code": "void main(void) {\n    // These BIOS-free queries need NMI for display, but no maskable IRQ.\n    __irq_disable();\n    request_overlay=0;\n    fds_result[0] = __fds_current_bank();\n    fds_result[1] = __fds_is_bank_resident(1);\n    fds_result[2] = __fds_is_bank_resident(2);\n    fds_result[3] = __fds_overlay_function_count();\n    if (request_overlay) {\n        fds_result[4]=lesson_overlay_a(); fds_result[5]=lesson_overlay_b();\n    }\n    m_init();\n    m_text(2,2,\"FDS OVERLAY RECORDS\"); m_wait();\n    m_text(2,5,\"CURRENT BANK\"); m_put(25,5,'0'+fds_result[0]); m_wait();\n    m_text(2,7,\"BANK 1 RESIDENT\"); m_put(25,7,'0'+fds_result[1]); m_wait();\n    m_text(2,9,\"BANK 2 RESIDENT\"); m_put(25,9,'0'+fds_result[2]); m_wait();\n    m_text(2,11,\"OVERLAY FUNCTIONS\"); m_put(25,11,'0'+fds_result[3]); m_wait();\n    m_text(2,14,\"NO OVERLAY LOAD TESTED\"); m_wait();\n    while (1) { m_wait(); }\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_residency.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_residency.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm",
+      "expected": [
+        "fds_query_resident_expected"
+      ]
+    }
+  }
+}

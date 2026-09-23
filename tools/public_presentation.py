@@ -40,6 +40,8 @@ def public_file(relative):
         return path.suffix in PUBLIC_EVIDENCE_SUFFIXES | {'.wav'}
     if path.parts[:2] == ('verification','api-fc-audio-vblank'):
         return path.suffix in PUBLIC_EVIDENCE_SUFFIXES | {'.wav'}
+    if path.parts[:3] == ('verification','api-fds-query','example'):
+        return path.name in ('example.fds','example.nes','screen.png')
     if path.parts[:2] == ('verification','api-sound'):
         if 'state' in path.parts or 'integration_test' in path.parts:return False
         if 'fc-midi' in path.parts and path.suffix=='.wav':return False
