@@ -82,7 +82,7 @@ Selecting arrays or strings with `?:` produces a pointer to the selected element
 
 Array indexes begin at zero: a four-element array has indexes 0 through 3. `player.x` selects a member; `pointer->x` accesses a member through a pointer. Structures, unions and enums are parsed, but layout depends on types and `__packed` / `__aligned` attributes. Check `sizeof` before sharing data with hardware or binary formats.
 
-The default Legacy ABI places arguments and local storage at fixed locations. Do not assume desktop-style recursion or interrupt reentrancy. `__stackcall` and `--abi=stack` are advanced calling-convention choices. When combining conventions, inspect ABI reports and verify execution.
+The default Legacy ABI places arguments and local storage at fixed locations. Do not assume desktop-style recursion or interrupt reentrancy. `__stackcall` and `--abi=stack` are advanced calling-convention choices. When combining conventions, inspect ABI reports and verify execution. Function-pointer callback calls are unsupported with `--abi=stack`. Build the complete system and scene callback examples with the default Legacy ABI, as shown in their build commands.
 
 ## 8. Multiple files and the preprocessor
 Put types, constants and declarations in headers and function bodies in `.c` files. Use `#pragma once` or include guards to prevent repeated inclusion. Conditional compilation supports `#define`, `#undef`, `#if`, `#ifdef`, `#ifndef`, `#elif`, `#else` and `#endif`.

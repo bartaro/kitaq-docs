@@ -74,7 +74,7 @@ typedef struct { u8 x; u8 y; } Point;
 Point player;
 u8 tiles[4];</code></pre></div>
 <p>配列は0から数えます。4要素なら有効な添字は0～3です。<code>player.x</code> はメンバー、<code>pointer-&gt;x</code> はポインタで指した構造体のメンバーです。構造体・union・enumの構文があり、レイアウトは型や <code>__packed</code> / <code>__aligned</code> の指定に依存します。バイナリファイルやハードウェアへ渡すときは <code>sizeof</code> を確認します。</p>
-<p>標準のLegacy ABIは引数やローカル領域を固定配置する設計です。再帰や割り込みによる再入をPC用Cと同様に扱わないでください。<code>__stackcall</code> や <code>--abi=stack</code> は呼び出し規約に関わる上級指定です。混在するときはビルドのABIレポートと実行を確認します。</p>
+<p>標準のLegacy ABIは引数やローカル領域を固定配置する設計です。再帰や割り込みによる再入をPC用Cと同様に扱わないでください。<code>__stackcall</code> や <code>--abi=stack</code> は呼び出し規約に関わる上級指定です。混在するときはビルドのABIレポートと実行を確認します。関数ポインター経由のコールバック呼び出しは<code>--abi=stack</code>では未対応です。システムやシーンのコールバックを使う完成サンプルは、掲載したビルド例どおり標準のLegacy ABIを使います。</p>
 <h2 id="8-ソースの分割とプリプロセッサ">8　ソースの分割とプリプロセッサ</h2>
 <p>ヘッダーには型・定数・関数宣言を書き、<code>.c</code> に関数本体を書きます。<code>#pragma once</code> またはinclude guardで二重取り込みを防ぎます。<code>#define</code>、<code>#undef</code>、<code>#if</code>、<code>#ifdef</code>、<code>#ifndef</code>、<code>#elif</code>、<code>#else</code>、<code>#endif</code> を使ってコンパイル時にコードを選べます。</p>
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>.\kitaqgb\kitaqgb.exe main.c game.c .\kitaqgb\lib\input.c -I .\kitaqgb\lib -o .\out\game.gb --profile=dev</code></pre></div>

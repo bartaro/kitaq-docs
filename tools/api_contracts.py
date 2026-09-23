@@ -106,6 +106,8 @@ def render(record, contract, language, messages, ui):
         out += ['<h4>' + label('build') + '</h4>', code(additional['build'], 'powershell')]
     out.append('<details class="api-source"><summary>' + label('implementation') + '</summary>')
     out.append('<p class="source">' + html.escape(record['path']) + ':' + str(record['line']) + '</p>')
+    if record.get('source_macro'):
+        out.append(code(record['source_macro']))
     if record.get('comment'):
         comment = '\n'.join(line.rstrip() for line in record['comment'].splitlines())
         out += ['<div class="original"><b>' + label('original') + '</b><pre>' + html.escape(comment) + '</pre></div>']
@@ -237,6 +239,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_asset_examples(contracts))
     from api_far_copy_alias_proofs import verified_examples as verified_far_copy_alias_examples
     proofs.update(verified_far_copy_alias_examples(contracts))
+    from api_header_alias_proofs import verified_examples as verified_header_alias_examples
+    proofs.update(verified_header_alias_examples(contracts))
     proofs.update(verified_bank_examples(contracts))
     proofs.update(verified_sprite_examples(contracts))
     from api_sprite_order_proofs import verified_examples as verified_sprite_order_examples
@@ -267,6 +271,9 @@ def publish(language, require_complete=False):
             if volume == 'kitaqfc':
                 from api_far_copy_alias_proofs import ensure_card
                 text = ensure_card(text)
+            if volume.endswith('-library'):
+                from api_header_alias_proofs import ensure_cards as ensure_header_alias_cards
+                text = ensure_header_alias_cards(text, platform)
             edits = []
             for name, start, end in CardRanges(text).ranges:
                 key = platform + ':' + name

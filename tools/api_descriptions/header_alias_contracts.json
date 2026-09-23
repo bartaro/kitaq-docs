@@ -1,0 +1,773 @@
+{
+  "gb:btn_down": {
+    "review": "header-alias-source-20260923",
+    "purpose": [
+      "ha_gb_btn_down",
+      "input_down"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "ha_macro",
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "4c21127ea86d9d406888295f38d472fed013e8f7c6a6d4ab277d0084d286b8bf",
+    "example": {
+      "code": "    if (btn_down(BTN_A)!=0) held_ticks++;",
+      "program": "samples/api-examples/gb/input_aliases.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_aliases.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-input_down",
+        "title": "input_down"
+      }
+    ]
+  },
+  "gb:btn_pressed": {
+    "review": "header-alias-source-20260923",
+    "purpose": [
+      "ha_gb_btn_pressed",
+      "input_pressed"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "ha_macro",
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "5999206d75ea39ccb057dc89f27adeb3dc68f5f8031bf6a5eeb81fbff9b78b77",
+    "example": {
+      "code": "    if (btn_pressed(BTN_A)!=0) {\n        press_count++; seen_press=1;\n        first_down=btn_down(BTN_A); first_press=btn_pressed(BTN_A);\n        first_repeat=btn_repeat(BTN_A);\n        first_current=input_current(); // Only A held: BTN_A, or decimal 16.\n        first_previous=input_previous(); // No buttons in the preceding sample: 0.\n        if (first_down!=1 || first_press!=1 || first_repeat!=1) failures++;\n        if (first_current!=BTN_A || first_previous!=0) failures++;\n        if (btn_down(BTN_A|BTN_B)!=1 || btn_down(0)!=0) failures++;\n    }",
+      "program": "samples/api-examples/gb/input_aliases.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_aliases.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-input_pressed",
+        "title": "input_pressed"
+      }
+    ]
+  },
+  "gb:btn_released": {
+    "review": "header-alias-source-20260923",
+    "purpose": [
+      "ha_gb_btn_released",
+      "input_released"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "ha_macro",
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "c7b2bf920e3ddeffcb6ee1c212696958b8cac283d9dbdbb410e41624fa61aff7",
+    "example": {
+      "code": "    if (btn_released(BTN_A)!=0) {\n        release_result=btn_released(BTN_A);\n        last_current=input_current(); last_previous=input_previous();\n        if (btn_down(BTN_A)!=0 || btn_pressed(BTN_A)!=0 || btn_repeat(BTN_A)!=0) failures++;\n        break;\n    }",
+      "program": "samples/api-examples/gb/input_aliases.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_aliases.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-input_released",
+        "title": "input_released"
+      }
+    ]
+  },
+  "gb:btn_repeat": {
+    "review": "header-alias-source-20260923",
+    "purpose": [
+      "ha_gb_btn_repeat",
+      "input_repeat"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "ha_macro",
+      "input_logical_layout",
+      "input_cached_state",
+      "input_repeat_timing"
+    ],
+    "record_sha256": "e4ab12ac6ce156f21a29bdef7e65fac3f22aee1eecde6981952edb0a454c23a1",
+    "example": {
+      "code": "    if (btn_repeat(BTN_A)!=0) {\n        // The initial press is pulse 1. Defaults then wait 19 updates, followed by 6.\n        if (repeat_count==1 && held_ticks-previous_pulse!=19) failures++;\n        if (repeat_count>1 && held_ticks-previous_pulse!=6) failures++;\n        previous_pulse=held_ticks; repeat_count++;\n        if (btn_repeat(BTN_A)!=1) failures++; // Reading again does not consume it.\n    }",
+      "program": "samples/api-examples/gb/input_aliases.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaqgb\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\gb\\input_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_aliases.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-input_repeat",
+        "title": "input_repeat"
+      }
+    ]
+  },
+  "gb:gb_init": {
+    "purpose": [
+      "ha_gb_gb_init",
+      "b100_system_init_purpose"
+    ],
+    "returns": [
+      "b100_system_init_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_init_note",
+      "b100_gb_system_hardware",
+      "ha_gb_callback_abi"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "bdac23583f7912d21623d41af06375fbbb5f1a50ff4457a0a1822303ffa13657",
+    "example": {
+      "program": "samples/api-examples/gb/system_aliases.c",
+      "code": "gb_init();result[0]=gb_frame_count();",
+      "expected": [
+        "b100_system_init_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\system_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.gb --no-cache --no-disasm --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k"
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-system_init",
+        "title": "system_init"
+      }
+    ]
+  },
+  "gb:gb_wait_vblank": {
+    "purpose": [
+      "ha_gb_gb_wait_vblank",
+      "b100_system_wait_vblank_purpose"
+    ],
+    "returns": [
+      "b100_system_wait_vblank_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_wait_vblank_note",
+      "b100_gb_system_hardware",
+      "ha_gb_callback_abi"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "e3df6b9fbf7a50fb006a7f540713c737ba6f1f3aba410de150c5598121e3f4b1",
+    "example": {
+      "program": "samples/api-examples/gb/system_aliases.c",
+      "code": "gb_wait_vblank();gb_wait_vblank();gb_wait_vblank();result[1]=frame_calls;result[2]=frame_seen;",
+      "expected": [
+        "b100_system_wait_vblank_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\system_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.gb --no-cache --no-disasm --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k"
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-system_wait_vblank",
+        "title": "system_wait_vblank"
+      }
+    ]
+  },
+  "gb:gb_set_vblank_callback": {
+    "purpose": [
+      "ha_gb_gb_set_vblank_callback",
+      "b100_system_set_vblank_callback_purpose"
+    ],
+    "returns": [
+      "b100_system_set_vblank_callback_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_set_vblank_callback_note",
+      "b100_gb_system_hardware",
+      "ha_gb_callback_abi"
+    ],
+    "args": [
+      [
+        "callback",
+        [
+          "b100_system_set_vblank_callback_arg_callback"
+        ]
+      ]
+    ],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "426ebf1e1c5b10b1f89a48131d75e275152ee5acd6085cded2ef1e4f54748401",
+    "example": {
+      "program": "samples/api-examples/gb/system_aliases.c",
+      "code": "gb_set_vblank_callback(on_frame);",
+      "expected": [
+        "b100_system_set_vblank_callback_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\system_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.gb --no-cache --no-disasm --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k"
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-system_set_vblank_callback",
+        "title": "system_set_vblank_callback"
+      }
+    ]
+  },
+  "gb:gb_frame_count": {
+    "purpose": [
+      "ha_gb_gb_frame_count",
+      "b100_system_get_frame_purpose"
+    ],
+    "returns": [
+      "b100_system_get_frame_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_get_frame_note",
+      "b100_gb_system_hardware",
+      "ha_gb_callback_abi"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "4af344c279d97edef65ffbda6e02e2988e4c15255eb592e425c18973fdc82dd9",
+    "example": {
+      "program": "samples/api-examples/gb/system_aliases.c",
+      "code": "result[3]=gb_frame_count();",
+      "expected": [
+        "b100_system_get_frame_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\system_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.gb --no-cache --no-disasm --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k"
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-system_get_frame",
+        "title": "system_get_frame"
+      }
+    ]
+  },
+  "gb:gb_enable_interrupts": {
+    "purpose": [
+      "ha_gb_gb_enable_interrupts",
+      "b100_system_enable_interrupts_purpose"
+    ],
+    "returns": [
+      "b100_system_enable_interrupts_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_enable_interrupts_note",
+      "b100_gb_system_hardware",
+      "ha_gb_callback_abi"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "0772ecdab1d68b58a18e47dbca9b52f9e1dc572b847c816f9948cbff2ef4bb46",
+    "example": {
+      "program": "samples/api-examples/gb/system_aliases.c",
+      "code": "gb_enable_interrupts();",
+      "expected": [
+        "b100_system_enable_interrupts_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\system_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.gb --no-cache --no-disasm --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k"
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-system_enable_interrupts",
+        "title": "system_enable_interrupts"
+      }
+    ]
+  },
+  "gb:gb_disable_interrupts": {
+    "purpose": [
+      "ha_gb_gb_disable_interrupts",
+      "b100_system_disable_interrupts_purpose"
+    ],
+    "returns": [
+      "b100_system_disable_interrupts_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_disable_interrupts_note",
+      "b100_gb_system_hardware",
+      "ha_gb_callback_abi"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "35cc059c6bf6041f40d0f957b3b0291e5080929110d580cb0ca4d083197d54f9",
+    "example": {
+      "program": "samples/api-examples/gb/system_aliases.c",
+      "code": "gb_disable_interrupts();",
+      "expected": [
+        "b100_system_disable_interrupts_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqgb\\kitaqgb.exe .\\kitaq-docs\\samples\\api-examples\\gb\\system_aliases.c -I .\\kitaqgb\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.gb --no-cache --no-disasm --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k"
+    },
+    "references": [
+      {
+        "url": "gb-library.html#api-system_disable_interrupts",
+        "title": "system_disable_interrupts"
+      }
+    ]
+  },
+  "fc:btn_down": {
+    "review": "header-alias-source-20260923",
+    "purpose": [
+      "ha_fc_btn_down",
+      "input_down"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "ha_macro",
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "e569ec6a8c6d002c4493561836ff708de1a374b5fa1b056e4a3ca205f14e1e58",
+    "example": {
+      "code": "    if (btn_down(BTN_A)!=0) held_ticks++;",
+      "program": "samples/api-examples/fc/input_aliases.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_aliases.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-input_down",
+        "title": "input_down"
+      }
+    ]
+  },
+  "fc:btn_pressed": {
+    "review": "header-alias-source-20260923",
+    "purpose": [
+      "ha_fc_btn_pressed",
+      "input_pressed"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "ha_macro",
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "a9d13a080f09b450527c0feecc23269e0698b67f44040576f690336d5f6f2c9b",
+    "example": {
+      "code": "    if (btn_pressed(BTN_A)!=0) {\n        press_count++; seen_press=1;\n        first_down=btn_down(BTN_A); first_press=btn_pressed(BTN_A);\n        first_repeat=btn_repeat(BTN_A);\n        first_current=input_current(); // Only A held: BTN_A, or decimal 16.\n        first_previous=input_previous(); // No buttons in the preceding sample: 0.\n        if (first_down!=1 || first_press!=1 || first_repeat!=1) failures++;\n        if (first_current!=BTN_A || first_previous!=0) failures++;\n        if (btn_down(BTN_A|BTN_B)!=1 || btn_down(0)!=0) failures++;\n    }",
+      "program": "samples/api-examples/fc/input_aliases.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_aliases.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-input_pressed",
+        "title": "input_pressed"
+      }
+    ]
+  },
+  "fc:btn_released": {
+    "review": "header-alias-source-20260923",
+    "purpose": [
+      "ha_fc_btn_released",
+      "input_released"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "ha_macro",
+      "input_logical_layout",
+      "input_cached_state"
+    ],
+    "record_sha256": "102bd96407c5a5537cb5577e0c0456bcae0bf6ccf92f3f7b82fb7d6d098c6475",
+    "example": {
+      "code": "    if (btn_released(BTN_A)!=0) {\n        release_result=btn_released(BTN_A);\n        last_current=input_current(); last_previous=input_previous();\n        if (btn_down(BTN_A)!=0 || btn_pressed(BTN_A)!=0 || btn_repeat(BTN_A)!=0) failures++;\n        break;\n    }",
+      "program": "samples/api-examples/fc/input_aliases.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_aliases.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-input_released",
+        "title": "input_released"
+      }
+    ]
+  },
+  "fc:btn_repeat": {
+    "review": "header-alias-source-20260923",
+    "purpose": [
+      "ha_fc_btn_repeat",
+      "input_repeat"
+    ],
+    "args": [
+      [
+        "mask",
+        [
+          "input_mask_argument"
+        ]
+      ]
+    ],
+    "returns": [
+      "input_boolean_result"
+    ],
+    "notes": [
+      "ha_macro",
+      "input_logical_layout",
+      "input_cached_state",
+      "input_repeat_timing"
+    ],
+    "record_sha256": "c6e8570948a0457f670bbb64cd02c1a2d3b190d3b5fd295f579741d188c62612",
+    "example": {
+      "code": "    if (btn_repeat(BTN_A)!=0) {\n        // The initial press is pulse 1. Defaults then wait 19 updates, followed by 6.\n        if (repeat_count==1 && held_ticks-previous_pulse!=19) failures++;\n        if (repeat_count>1 && held_ticks-previous_pulse!=6) failures++;\n        previous_pulse=held_ticks; repeat_count++;\n        if (btn_repeat(BTN_A)!=1) failures++; // Reading again does not consume it.\n    }",
+      "program": "samples/api-examples/fc/input_aliases.c",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\input.c .\\kitaq-docs\\samples\\api-examples\\fc\\input_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\input_aliases.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-disasm --no-cache",
+      "expected": [
+        "input_edges_example"
+      ]
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-input_repeat",
+        "title": "input_repeat"
+      }
+    ]
+  },
+  "fc:fc_init": {
+    "purpose": [
+      "ha_fc_fc_init",
+      "b100_system_init_purpose"
+    ],
+    "returns": [
+      "b100_system_init_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_init_note",
+      "b100_fc_system_hardware"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "80f7d16186ddc3eb0d0f9514e4289d7a756ab0ada71db321baa93024c0f32ee6",
+    "example": {
+      "program": "samples/api-examples/fc/system_aliases.c",
+      "code": "fc_init();result[0]=fc_frame_count();",
+      "expected": [
+        "b100_system_init_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\runtime.c .\\kitaq-docs\\samples\\api-examples\\fc\\system_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr"
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-system_init",
+        "title": "system_init"
+      }
+    ]
+  },
+  "fc:fc_wait_vblank": {
+    "purpose": [
+      "ha_fc_fc_wait_vblank",
+      "b100_system_wait_vblank_purpose"
+    ],
+    "returns": [
+      "b100_system_wait_vblank_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_wait_vblank_note",
+      "b100_fc_system_hardware"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "1c23d4daadf2d8f31e3c16a5d72ef14d75d409c10c5d25d831900db3e0c460de",
+    "example": {
+      "program": "samples/api-examples/fc/system_aliases.c",
+      "code": "fc_wait_vblank();fc_wait_vblank();fc_wait_vblank();result[1]=frame_calls;result[2]=frame_seen;",
+      "expected": [
+        "b100_system_wait_vblank_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\runtime.c .\\kitaq-docs\\samples\\api-examples\\fc\\system_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr"
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-system_wait_vblank",
+        "title": "system_wait_vblank"
+      }
+    ]
+  },
+  "fc:fc_set_vblank_callback": {
+    "purpose": [
+      "ha_fc_fc_set_vblank_callback",
+      "b100_system_set_vblank_callback_purpose"
+    ],
+    "returns": [
+      "b100_system_set_vblank_callback_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_set_vblank_callback_note",
+      "b100_fc_system_hardware"
+    ],
+    "args": [
+      [
+        "callback",
+        [
+          "b100_system_set_vblank_callback_arg_callback"
+        ]
+      ]
+    ],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "fff8ceb246b38c37ff11b70725bfc386cce2d0e4fba765bd55d9a402669f9dca",
+    "example": {
+      "program": "samples/api-examples/fc/system_aliases.c",
+      "code": "fc_set_vblank_callback(on_frame);",
+      "expected": [
+        "b100_system_set_vblank_callback_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\runtime.c .\\kitaq-docs\\samples\\api-examples\\fc\\system_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr"
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-system_set_vblank_callback",
+        "title": "system_set_vblank_callback"
+      }
+    ]
+  },
+  "fc:fc_frame_count": {
+    "purpose": [
+      "ha_fc_fc_frame_count",
+      "b100_system_get_frame_purpose"
+    ],
+    "returns": [
+      "b100_system_get_frame_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "b100_system_get_frame_note",
+      "b100_fc_system_hardware"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "74f4f04fda7998b04b33861e825500f9cb573bcad30716f863fe800a7a303f7b",
+    "example": {
+      "program": "samples/api-examples/fc/system_aliases.c",
+      "code": "result[3]=fc_frame_count();",
+      "expected": [
+        "b100_system_get_frame_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\runtime.c .\\kitaq-docs\\samples\\api-examples\\fc\\system_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_aliases.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr"
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-system_get_frame",
+        "title": "system_get_frame"
+      }
+    ]
+  },
+  "fc:gb_init": {
+    "purpose": [
+      "ha_fc_gb_init",
+      "b100_system_init_purpose"
+    ],
+    "returns": [
+      "b100_system_init_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "ha_fc_gb_prefix",
+      "b100_system_init_note",
+      "b100_fc_system_hardware"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "e64dff15ea9a03145d298d07ab33fd8aa726b6786b01ed8e07d1b5a6a01ab686",
+    "example": {
+      "program": "samples/api-examples/fc/system_gb_aliases.c",
+      "code": "gb_init();result[0]=gb_frame_count();",
+      "expected": [
+        "b100_system_init_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\runtime.c .\\kitaq-docs\\samples\\api-examples\\fc\\system_gb_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_gb_aliases.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr"
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-system_init",
+        "title": "system_init"
+      }
+    ]
+  },
+  "fc:gb_wait_vblank": {
+    "purpose": [
+      "ha_fc_gb_wait_vblank",
+      "b100_system_wait_vblank_purpose"
+    ],
+    "returns": [
+      "b100_system_wait_vblank_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "ha_fc_gb_prefix",
+      "b100_system_wait_vblank_note",
+      "b100_fc_system_hardware"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "48647d6a3395f3f14486712303124e4cde9d3f3b08b61932e1ec9fa5663bdcee",
+    "example": {
+      "program": "samples/api-examples/fc/system_gb_aliases.c",
+      "code": "gb_wait_vblank();gb_wait_vblank();gb_wait_vblank();result[1]=frame_calls;result[2]=frame_seen;",
+      "expected": [
+        "b100_system_wait_vblank_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\runtime.c .\\kitaq-docs\\samples\\api-examples\\fc\\system_gb_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_gb_aliases.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr"
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-system_wait_vblank",
+        "title": "system_wait_vblank"
+      }
+    ]
+  },
+  "fc:gb_set_vblank_callback": {
+    "purpose": [
+      "ha_fc_gb_set_vblank_callback",
+      "b100_system_set_vblank_callback_purpose"
+    ],
+    "returns": [
+      "b100_system_set_vblank_callback_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "ha_fc_gb_prefix",
+      "b100_system_set_vblank_callback_note",
+      "b100_fc_system_hardware"
+    ],
+    "args": [
+      [
+        "callback",
+        [
+          "b100_system_set_vblank_callback_arg_callback"
+        ]
+      ]
+    ],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "a72146df6af085a234ce6b4da11cbb4ba55d4f2b27a5a39ba93dc1676d93807e",
+    "example": {
+      "program": "samples/api-examples/fc/system_gb_aliases.c",
+      "code": "gb_set_vblank_callback(on_frame);",
+      "expected": [
+        "b100_system_set_vblank_callback_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\runtime.c .\\kitaq-docs\\samples\\api-examples\\fc\\system_gb_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_gb_aliases.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr"
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-system_set_vblank_callback",
+        "title": "system_set_vblank_callback"
+      }
+    ]
+  },
+  "fc:gb_frame_count": {
+    "purpose": [
+      "ha_fc_gb_frame_count",
+      "b100_system_get_frame_purpose"
+    ],
+    "returns": [
+      "b100_system_get_frame_return"
+    ],
+    "notes": [
+      "ha_macro",
+      "ha_fc_gb_prefix",
+      "b100_system_get_frame_note",
+      "b100_fc_system_hardware"
+    ],
+    "args": [],
+    "review": "header-alias-source-20260923",
+    "record_sha256": "e00cfb0f75034ff2c8add2b331346fb493cbf7081af40bf65ba8fd528ec3716f",
+    "example": {
+      "program": "samples/api-examples/fc/system_gb_aliases.c",
+      "code": "result[3]=gb_frame_count();",
+      "expected": [
+        "b100_system_get_frame_example"
+      ],
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\runtime.c .\\kitaq-docs\\samples\\api-examples\\fc\\system_gb_aliases.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\system_gb_aliases.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr"
+    },
+    "references": [
+      {
+        "url": "fc-library.html#api-system_get_frame",
+        "title": "system_get_frame"
+      }
+    ]
+  }
+}

@@ -92,6 +92,30 @@ def fc_far_copy_alias(source, compiler_path):
   availability='compiler',implementation_excerpt=excerpt,
   implementation_source=dict(path=compiler_path,line=source.count('\n',0,start)+1))
 
+def callable_aliases(records, headers):
+ """Resolve object-like macros that name known callable APIs, excluding constants."""
+ pending=[];added=[]
+ for path in headers:
+  text=read(path)
+  for match in re.finditer(r'(?m)^#define[ \t]+(\w+)[ \t]+(\w+)[ \t]*$',clean(text)):
+   name,target=match.groups()
+   if name not in records:
+    pending.append((name,target,path,text.count('\n',0,match.start())+1))
+ while pending:
+  unresolved=[];progress=False
+  for name,target,path,line in pending:
+   if name in records:continue
+   if target not in records:unresolved.append((name,target,path,line));continue
+   record=dict(records[target])
+   record.update(name=name,alias_of=target,module=path.stem,
+    path=path.relative_to(ROOT).as_posix(),line=line,kind='alias',availability='macro',
+    signature=re.sub(r'\b'+re.escape(target)+r'\b',name,record['signature'],count=1),
+    source_macro='#define '+name+' '+target,comment='',body='')
+   records[name]=record;added.append(record);progress=True
+  if not progress:break
+  pending=unresolved
+ return added
+
 def collect(platform):
  lib=ROOT/('kitaqgb/lib' if platform=='gb' else 'kitaqfc/lib')
  comp=ROOT/('kitaqgb/kitaqgb' if platform=='gb' else 'kitaqfc/kitaqfc')
@@ -150,6 +174,7 @@ def collect(platform):
              line=text.count('\n',0,match.start())+1,availability='implementation',definition=bodies[height].get(new),
              comment='Compatibility alias: '+new+'; WIRE3D_DMG_HEIGHT = '+str(height)+'.\n'+r['comment'])
     records[old]=r
+ callable_aliases(records,headers)
  source=read(comp/'CodeGenerator.cs')
  if platform=='fc':
   records['__farmemcpy']=fc_far_copy_alias(source,(comp/'CodeGenerator.cs').relative_to(ROOT).as_posix())
