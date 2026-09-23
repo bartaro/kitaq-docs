@@ -18,12 +18,20 @@ def verified_examples(contracts):
         assert report['script_sha256']==sha(REPOS/'kitaqfc/scripts'/script)
         assert report['compiler_sha256']==sha(REPOS/'kitaqfc/kitaqfc.exe') and report['emulator_sha256']==sha(REPOS/'kurosaki/kurosaki.exe')
         assert len(report['records'])==count and all(r['passed'] for r in report['records'])
+        names={'default','O0','zp','O0-zp'} if name=='keyboard' else {str(v)+'-'+o for v in [0,8,16,24] for o in ['default','O0']}
+        assert {r['name'] for r in report['records']}==names
         for r in report['records']:
             if name=='keyboard':
                 assert r['selected']=={'1':[[row,col,True] for row in range(9) for col in range(2)],'2':[[row,col,True] for row in range(10) for col in range(2)],'3':[[9,0,True]]}
                 assert r['final_outputs']==[0,0,0] and min(r['reset_delays'])>=16 and min(r['read_delays'])>=50
                 assert r['scan_bytes']==[0]*18 and r['ram']==[165,0,85,170]
-            else:assert r['actual']==r['expected'] and r['patches']
+            else:
+                a,b=r['inputs'];assert [a,b]==[int(r['name'].split('-')[0])|0xE7,(24^int(r['name'].split('-')[0]))|0xE7]
+                expected=[a&24,int(bool(a&16)),int(not a&8),b&24,int(bool(b&16)),int(not b&8),int(bool(b&16)),int(not b&8),int(bool(b&16)),165]
+                assert r['actual']==r['expected']==expected
+                assert len(r['patches'])>=8 and len({p['file_offset'] for p in r['patches']})==len(r['patches'])
+                assert all((p['read_address'],p['fixture_address']) in [(0x4016,0x700),(0x4017,0x701)] for p in r['patches'])
+                assert r['original_rom_sha256']!=r['substituted_rom_sha256']
     report=read(folder/'example/results.json');assert report['script_sha256']==sha(SITE/'tools/check_peripheral_examples.py')
     rows=report['records'];assert len(rows)==6
     values=dict(keyboard=[0]*21,zapper=[0,0,1,0,0,1,0,1],serial=[0])
@@ -31,6 +39,7 @@ def verified_examples(contracts):
     for r in rows:
         verify_row(r);assert r['actual']==values[r['mode'].rsplit('-',1)[0]]+[165]
         assert r['port_writes']==r['expected_writes'] and r['port_reads']==r['expected_reads']
+        assert r['pixel_mismatches']==0
     result={}
     for key,c in selected.items():
         ex=c['example'];source=(SITE/ex['program']).read_text(encoding='utf-8')
