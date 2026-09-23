@@ -1,0 +1,18 @@
+{
+  "cgb_tile_overview_role": {
+    "ja": "`cgb_tile.h`は、タイルマップ操作の組み込み命令の宣言と、CGBのタイル属性を組み立てるマクロをまとめたヘッダーです。タイル番号は表示する絵柄を選び、属性はパレット、絵柄のVRAMバンク、左右・上下反転、背景の優先度を指定します。属性はタイル画像そのものを書き換える機能ではありません。",
+    "en": "`cgb_tile.h` groups declarations for tile-map intrinsics and macros for constructing CGB tile attributes. A tile number selects a pattern; its attribute selects the palette, pattern VRAM bank, flips and background priority. Setting attributes does not alter the pattern’s pixels."
+  },
+  "cgb_tile_overview_names": {
+    "ja": "`__settile`系はマップ`0x9800`、`__settileat`系は指定したマップ先頭、`__settilebg`系はLCDCが選ぶ背景マップ、`__settilewin`系はLCDCが選ぶウィンドウマップを使います。`attr`は属性だけ、`cgb`はタイル番号と属性の両方を書きます。`bulk`は指定アドレスから連続したバイト列を転送します。用途に合わせて、書き込み先と書く内容の両方から命令を選んでください。",
+    "en": "The `__settile` family addresses map `0x9800`; `__settileat` uses an explicit map base; `__settilebg` uses the background map selected by LCDC; and `__settilewin` uses its window map. The `attr` forms write attributes only, while the `cgb` forms write both tile numbers and attributes. The `bulk` forms transfer consecutive bytes at the supplied address. Choose an entry point by both its destination and the data it writes."
+  },
+  "cgb_tile_overview_attributes": {
+    "ja": "`KQ_CGB_ATTR_PAL`などのマクロで各属性のビットを作り、`KQ_CGB_ATTR`でまとめて指定できます。`bank`は絵柄を読むVRAMバンクで、ROMバンク番号ではありません。通常のタイル番号書き込みは選択中のVRAMバンクを使うため、タイルと属性を一緒に設定する前にバンク0を選択してください。DMGでは属性だけの操作は何もせず、タイルと属性を組み合わせた操作はタイル番号だけを書きます。",
+    "en": "Use macros such as `KQ_CGB_ATTR_PAL` for individual attribute bits, or `KQ_CGB_ATTR` to combine the fields. The bank field selects the VRAM bank containing the pattern, not a ROM bank. Ordinary tile-number writes use the currently selected VRAM bank, so select bank zero before combined tile/attribute operations. On DMG, attribute-only operations do nothing; combined operations still write the tile numbers."
+  },
+  "cgb_tile_overview_timing": {
+    "ja": "`__`で始まる命令はコンパイラが実装を生成するため、これらのために`cgb_tile.c`をリンクする必要はありません。通常の書き込み経路はVRAMアクセスを待ちますが、割り込み許可状態を変更するものがあります。`_unsafe`と`_fast`はその待機を省くため、LCD停止中など、呼び出し側が書き込み可能な期間を保証できる場面で使います。各命令の割り込み・バンク・転送長の条件も確認してください。",
+    "en": "The compiler emits the implementation of the `__` intrinsics; they do not require linking `cgb_tile.c`. Ordinary write paths wait for VRAM access, but some also change the interrupt-enable state. The `_unsafe` and `_fast` forms omit those waits: use them only when the caller guarantees writable VRAM, such as while the LCD is off. Check each entry’s interrupt, bank and transfer-length conditions."
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "entity_overview_role": {
+    "ja": "`entity`は、敵、弾、アイテムなどの状態を固定配列で管理するオブジェクトプールです。空きスロットを確保してIDで参照し、不要になったスロットを再利用します。ヒープからの動的確保は行いません。座標や速度の単位、移動、当たり判定、タイマーの進行はゲーム側で決めます。",
+    "en": "`entity` is a fixed-array object pool for state such as enemies, projectiles and items. Allocate a free slot, refer to it by its ID, and reuse the slot when the object is no longer needed. There is no heap allocation. Your game defines coordinate and velocity units, movement, collision handling and timer updates."
+  },
+  "entity_overview_setup": {
+    "ja": "`entity.h`を読み込み、`entity.c`を1回だけコンパイルします。最初に`entity_init`を呼び、`entity_create`の戻り値が`0xFF`でないことを確認してください。`ENTITY_MAX`の既定値は16です。IDで表せる範囲は1～255件ですが、実際に配置できる数は利用可能なRAMに制約されます。定数を変更するときは全コンパイル単位で同じ値にします。",
+    "en": "Include `entity.h` and compile `entity.c` exactly once. Call `entity_init` first and check that `entity_create` does not return `0xFF`. `ENTITY_MAX` defaults to 16. IDs support a capacity of 1..255 slots, but the number you can actually allocate depends on available RAM. Use the same capacity definition in every compilation unit."
+  },
+  "entity_overview_lifetime": {
+    "ja": "`entity_get`が返すポインターはプール内のスロットを指します。解放後に同じIDが別の物体へ再利用されるため、長期間有効な物体識別子として保持しないでください。`entity_destroy`はスロットを非アクティブにするだけです。スプライトの非表示・解放、その他の素材の後始末は呼び出し側で行います。`sprite`フィールドも管理用の値であり、自動的にOAMへ反映されません。",
+    "en": "The pointer returned by `entity_get` refers to reusable pool storage. After release, the same ID can identify a different object, so neither the ID nor the pointer is a persistent identity. `entity_destroy` only deactivates the slot. The caller must hide or release sprites and clean up other resources. The `sprite` field is bookkeeping; it does not automatically update OAM."
+  },
+  "entity_overview_callbacks": {
+    "ja": "`entity_update_all`と`entity_draw_all`は、アクティブなスロットをIDの小さい順に巡回して`fn(id)`を呼びます。更新と描画の実処理はコールバックへ書きます。NULLのコールバックでは何もしません。コールバックから後のIDのスロットを作成・解放すると、同じ巡回に反映されます。更新用の巡回が終わってから描画用の巡回を行う構成にすると、役割を分けやすくなります。",
+    "en": "`entity_update_all` and `entity_draw_all` visit active slots in ascending ID order and call `fn(id)`. Put the actual update or drawing work in the callback. A null callback does nothing. Creating or releasing a later slot inside a callback affects the same traversal. Running the update traversal before the drawing traversal keeps these responsibilities separate."
+  }
+}

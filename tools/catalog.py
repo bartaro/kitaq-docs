@@ -12,6 +12,18 @@ DECL=re.compile(r'(?m)^[ \t]*((?:(?:[A-Za-z_]\w*)[ \t\r\n*]+)+)([A-Za-z_]\w*)[ \
 def declaration_name_offsets(cleaned):
  return {m.start(2) for m in DECL.finditer(cleaned)
          if not m[1].strip().startswith(('return','typedef','if','else','while','for'))}
+def comment_text(source):
+ # Remove each actual comment's delimiters before stripping decorative stars.
+ # A single substitution over the whole string can consume the '*' in a
+ # closing ' */' line and leave a stray '/', or erase literal /* text inside
+ # a line comment. Token-wise extraction preserves such explanatory text.
+ def extract(match):
+  token=match[0]
+  if token.startswith('//'):
+   return token[3:] if token.startswith('// ') else token[2:]
+  body=token[2:-2]
+  return re.sub(r'^[ \t]*\* ?', '', body, flags=re.M)
+ return re.sub(r'//[^\n]*|/\*(?:(?!\*/).)*\*/',extract,source,flags=re.S).strip()
 def renderer_profile(text, height):
  # Mask inactive profile branches without changing source line numbers. Other
  # preprocessor guards remain intact; this is not a general C preprocessor.
@@ -52,7 +64,7 @@ def definitions(p, height=None):
   # Otherwise earlier prototypes can be swallowed into the following API's notes.
   comment=re.search(r'((?:(?://[^\n]*\n)|(?:/\*(?:(?!\*/).)*\*/\s*))+)[ \t\n]*$',before,re.S)
   desc=comment[1] if comment else ''
-  desc=re.sub(r'^\s*// ?|/\*|\*/|^\s*\* ?','',desc,flags=re.M).strip()
+  desc=comment_text(desc)
   body=''
   if end=='{':
    depth=1;i=m.end()
