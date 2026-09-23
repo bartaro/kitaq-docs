@@ -1373,10 +1373,28 @@ bank_expect(pointer.bank==3 &amp;&amp; pointer.ptr==payload+1,23);</code></pre><
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\banked_data_calls.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/bank.h:28</p><div class="original"><b>宣言の注記（原文）</b><pre>Read one byte using both the bank and address of the supplied far pointer.</pre></div><p class="source">kitaqfc/lib/bank.c:46</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 farptr_read8(BankPtr ptr)
 {
     return __farpeek8(ptr.bank, (u16)ptr.ptr);
-}</code></pre></div></details></details><h3 id="module-chain">chain.h — 関節追従と座標履歴</h3><!-- api-module:start --><div data-module-contract="chain-body-source-20260922"><p>関節でつながる蛇・ひもなどを動かす<code>ChainBody</code>と、移動座標を記録する<code>Chain</code>を提供します。<code>ChainBody</code>は各節の現在位置と16方向の向きを保持し、曲がりを1節ずつ後方へ伝えます。画面端の折り返し、尾を複製する成長、1軸あたり最大2ピクセルの追従に対応します。</p></div><!-- api-module:end --><!-- chain-body:start --><details class="api searchable" id="api-chain_body_init" data-api-contract="chain-body-source-20260922"><summary><code>chain_body_init</code></summary><p>呼び出し側の3配列を関節データに割り当て、節数を0にします。メモリは確保しません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 chain_body_init(ChainBody* body, u8* x, u8* y, u8* heading, u8 capacity, u16 width, u16 height);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>対象の<code>ChainBody</code>。<code>0</code>なら処理しません。初期化以外は初期化済みの状態を渡します。</p></dd><dt><code>x</code></dt><dd><p>各節のX座標を保持する配列。</p></dd><dt><code>y</code></dt><dd><p>各節のY座標を保持する配列。</p></dd><dt><code>heading</code></dt><dd><p>各節の向きを保持する配列。</p></dd><dt><code>capacity</code></dt><dd><p>確保済み配列の長さ、1～255。</p></dd><dt><code>width</code></dt><dd><p>折り返す画面の幅、1～256。</p></dd><dt><code>height</code></dt><dd><p>折り返す画面の高さ、1～256。</p></dd></dl><h4>戻り値</h4><p>成功なら1、無効な引数なら0です。有効な<code>body</code>に対する失敗では<code>capacity</code>と<code>count</code>を0にし、以後の更新を無効にします。</p><h4>使用条件と制限</h4><p><code>chain.h</code>を読み込み、<code>chain.c</code>を1回だけコンパイルします。<code>ChainBody</code>は各節の現在位置と向きを保持します。座標履歴を蓄積する<code>Chain</code>とは別の状態型です。</p><p><code>x</code>、<code>y</code>、<code>heading</code>はそれぞれ<code>capacity</code>バイトの書き込み可能な配列です。相互に重ねず、使用中は保持してください。添字0が頭で、<code>count</code>には頭も含みます。初期化後にポインター・容量・画面サイズを直接変更しないでください。</p><p>向きは時計回りの16方向で、0=右、4=下、8=左、12=上です。入力は下位4ビットを使います。画面座標は右・下が正で、幅・高さは1～256ピクセルです。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>chain_body_init(&amp;body,joint_x,joint_y,joint_heading,8,160,144);
+}</code></pre></div></details></details><h3 id="module-chain">chain.h — 関節追従と座標履歴</h3><!-- api-module:start --><div data-module-contract="chain-body-source-20260922"><p>関節でつながる蛇・ひもなどを動かす<code>ChainBody</code>と、移動座標を記録する<code>Chain</code>を提供します。<code>ChainBody</code>は各節の現在位置と16方向の向きを保持し、曲がりを1節ずつ後方へ伝えます。画面端の折り返し、尾を複製する成長、1軸あたり最大2ピクセルの追従に対応します。</p></div><!-- api-module:end --><!-- chain-wrap:start --><details class="api searchable" id="api-chain_wrap_delta" data-api-contract="chain-wrap-source-20260923"><summary><code>chain_wrap_delta</code></summary><p>両端がつながった1本の座標軸で、現在位置から目標位置までの最短の符号付き差分を計算します。画面端をまたぐ追従や距離比較に使えます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>s16 chain_wrap_delta(u8 target, u8 current, u16 size);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>target</code></dt><dd><p>目標位置。0～size−1の範囲で指定します。</p></dd><dt><code>current</code></dt><dd><p>現在位置。0～size−1の範囲で指定します。</p></dd><dt><code>size</code></dt><dd><p>折り返す座標軸の長さ、1～256。X座標なら幅、Y座標なら高さです。256も渡せる16ビット引数です。</p></dd></dl><h4>戻り値</h4><p>最短差分をs16で返します。正は座標が増える方向、負は減る方向、0は同じ位置です。有効な入力では−128～+128に収まります。画面の右や下へ向かう差分が正になります。</p><h4>使用条件と制限</h4><p><code>chain.h</code>を読み込み、<code>chain.c</code>を1回だけコンパイルします。<code>Chain</code>や<code>ChainBody</code>の初期化は必要ありません。関数は計算だけを行い、座標配列、節数、画面を変更しません。</p><p>入力の範囲検査や正規化は行いません。size=0、size&gt;256、またはsize以上の座標を渡さないでください。広い座標系から値を渡す場合は、呼び出し前に0～size−1へ折り返します。</p><p>左右の経路が同じ長さなら、直接計算したtarget−currentの符号を保ちます。size=160では0→80が+80、80→0が−80です。サイズが1なら有効な座標は0だけで、結果も0です。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>distances[0]=chain_wrap_delta(1,159,160);   // +2: cross the right edge.
+    distances[1]=chain_wrap_delta(159,1,160);   // -2: cross the left edge.
+    distances[2]=chain_wrap_delta(80,0,160);    // +80: keep the direct sign.
+    distances[3]=chain_wrap_delta(0,80,160);    // -80: same-length routes.
+    distances[4]=chain_wrap_delta(0,0,1);       // 0: the only valid position.</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>このサンプルは座標の折り返しを学ぶためのものです。矢印の左が現在位置、右が目標位置です。幅160で画面端をまたぐ+02/−02、半周の+80/−80、幅1の+00を、関数の戻り値から表示します。先頭の0は2桁表示用です。物体を描画・移動する例ではありません。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-chain-wrap/example/fc/ntsc.png" alt="chain_wrap_delta: NTSC"><figcaption>NTSC</figcaption></figure><p><a href="samples/api-examples/fc/chain_wrap.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_wrap.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_wrap.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:39</p><div class="original"><b>宣言の注記（原文）</b><pre>Return target minus current along the shortest wrapped route.
+Supply size 1..256 and coordinates in 0..size-1; inputs are not normalized.
+Exactly half a field retains the direct displacement sign.</pre></div><p class="source">kitaqfc/lib/chain.c:103</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>s16 chain_wrap_delta(u8 target, u8 current, u16 size)
+{
+    s16 delta;
+    s16 half;
+    delta = (s16)((s16)target - (s16)current);
+    half = (s16)(size &gt;&gt; 1);
+    // At exactly half a field, retain the sign of the direct displacement.
+    if (((u16)delta &amp; 0x8000) != 0) {
+        if ((u16)(0 - delta) &gt; (u16)half) delta = (s16)(delta + (s16)size);
+    } else if ((u16)delta &gt; (u16)half) delta = (s16)(delta - (s16)size);
+    return delta;
+}</code></pre></div></details></details><!-- chain-wrap:end --><!-- chain-body:start --><details class="api searchable" id="api-chain_body_init" data-api-contract="chain-body-source-20260922"><summary><code>chain_body_init</code></summary><p>呼び出し側の3配列を関節データに割り当て、節数を0にします。メモリは確保しません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 chain_body_init(ChainBody* body, u8* x, u8* y, u8* heading, u8 capacity, u16 width, u16 height);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>対象の<code>ChainBody</code>。<code>0</code>なら処理しません。初期化以外は初期化済みの状態を渡します。</p></dd><dt><code>x</code></dt><dd><p>各節のX座標を保持する配列。</p></dd><dt><code>y</code></dt><dd><p>各節のY座標を保持する配列。</p></dd><dt><code>heading</code></dt><dd><p>各節の向きを保持する配列。</p></dd><dt><code>capacity</code></dt><dd><p>確保済み配列の長さ、1～255。</p></dd><dt><code>width</code></dt><dd><p>折り返す画面の幅、1～256。</p></dd><dt><code>height</code></dt><dd><p>折り返す画面の高さ、1～256。</p></dd></dl><h4>戻り値</h4><p>成功なら1、無効な引数なら0です。有効な<code>body</code>に対する失敗では<code>capacity</code>と<code>count</code>を0にし、以後の更新を無効にします。</p><h4>使用条件と制限</h4><p><code>chain.h</code>を読み込み、<code>chain.c</code>を1回だけコンパイルします。<code>ChainBody</code>は各節の現在位置と向きを保持します。座標履歴を蓄積する<code>Chain</code>とは別の状態型です。</p><p><code>x</code>、<code>y</code>、<code>heading</code>はそれぞれ<code>capacity</code>バイトの書き込み可能な配列です。相互に重ねず、使用中は保持してください。添字0が頭で、<code>count</code>には頭も含みます。初期化後にポインター・容量・画面サイズを直接変更しないでください。</p><p>向きは時計回りの16方向で、0=右、4=下、8=左、12=上です。入力は下位4ビットを使います。画面座標は右・下が正で、幅・高さは1～256ピクセルです。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>chain_body_init(&amp;body,joint_x,joint_y,joint_heading,8,160,144);
     // Eight caller-owned slots, including the head, on a wrapped 160x144 field.</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-chain-body/example/fc/ntsc.png" alt="chain_body_init: NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。"><figcaption>NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</figcaption></figure><p><a href="samples/api-examples/fc/chain_body.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:53</p><div class="original"><b>宣言の注記（原文）</b><pre>Attach three non-overlapping capacity-byte arrays. Return 1 on success.
-Invalid storage, zero capacity or dimensions outside 1..256 disable the body.</pre></div><p class="source">kitaqfc/lib/chain.c:120</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 chain_body_init(ChainBody* body, u8* x, u8* y, u8* heading, u8 capacity, u16 width, u16 height)
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:57</p><div class="original"><b>宣言の注記（原文）</b><pre>Attach three non-overlapping capacity-byte arrays. Return 1 on success.
+Invalid storage, zero capacity or dimensions outside 1..256 disable the body.</pre></div><p class="source">kitaqfc/lib/chain.c:127</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 chain_body_init(ChainBody* body, u8* x, u8* y, u8* heading, u8 capacity, u16 width, u16 height)
 {
     if (body == 0) return 0;
     body-&gt;x = x;
@@ -1391,10 +1409,13 @@ Invalid storage, zero capacity or dimensions outside 1..256 disable the body.</p
     body-&gt;capacity = capacity;
     return 1;
 }</code></pre></div></details></details><details class="api searchable" id="api-chain_body_reset" data-api-contract="chain-body-source-20260922"><summary><code>chain_body_reset</code></summary><p>指定した頭の位置から後方へ節を並べ、直線の初期姿勢を作ります。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 chain_body_reset(ChainBody* body, u8 count, u8 head_x, u8 head_y, u8 heading);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>対象の<code>ChainBody</code>。<code>0</code>なら処理しません。初期化以外は初期化済みの状態を渡します。</p></dd><dt><code>count</code></dt><dd><p>頭を含む節数。1～capacity。</p></dd><dt><code>head_x</code></dt><dd><p>頭のX座標。画面幅に合わせて折り返します。</p></dd><dt><code>head_y</code></dt><dd><p>頭のY座標。画面高さに合わせて折り返します。</p></dd><dt><code>heading</code></dt><dd><p>頭の16方向の向き。</p></dd></dl><h4>戻り値</h4><p>成功なら1。節数が0、容量超過、またはbodyが0なら姿勢を変えず0です。</p><h4>使用条件と制限</h4><p><code>chain.h</code>を読み込み、<code>chain.c</code>を1回だけコンパイルします。<code>ChainBody</code>は各節の現在位置と向きを保持します。座標履歴を蓄積する<code>Chain</code>とは別の状態型です。</p><p><code>x</code>、<code>y</code>、<code>heading</code>はそれぞれ<code>capacity</code>バイトの書き込み可能な配列です。相互に重ねず、使用中は保持してください。添字0が頭で、<code>count</code>には頭も含みます。初期化後にポインター・容量・画面サイズを直接変更しないでください。</p><p>向きは時計回りの16方向で、0=右、4=下、8=左、12=上です。入力は下位4ビットを使います。画面座標は右・下が正で、幅・高さは1～256ピクセルです。</p><p>上下左右は4ピクセル間隔です。斜めは整数ベクトル(4,1)、(3,3)、(1,4)などを使うため、実距離は厳密に4ピクセルではありません。画面端をまたぐ姿勢も生成できます。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>chain_body_reset(&amp;body,7,48,16,0); // Seven joints, facing right.</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-chain-body/example/fc/ntsc.png" alt="chain_body_reset: NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。"><figcaption>NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</figcaption></figure><p><a href="samples/api-examples/fc/chain_body.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:57</p><div class="original"><b>宣言の注記（原文）</b><pre>Seed count joints in a straight pose behind the head; count includes the head.
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:61</p><div class="original"><b>宣言の注記（原文）</b><pre>Seed count joints in a straight pose behind the head; count includes the head.
 Return 0 without changing the pose if count is zero or exceeds capacity.
-Coordinates wrap to the playfield and headings are masked to 0..15.</pre></div><p class="source">kitaqfc/lib/chain.c:136</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 chain_body_reset(ChainBody* body, u8 count, u8 head_x, u8 head_y, u8 heading)
+Coordinates wrap to the playfield and headings are masked to 0..15.</pre></div><p class="source">kitaqfc/lib/chain.c:143</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 chain_body_reset(ChainBody* body, u8 count, u8 head_x, u8 head_y, u8 heading)
 {
+    // Cache caller storage once; following math and old-heading propagation
+    // use these local values. Avoid decoding packed struct pointers per joint.
+    u8* coord_x;u8* coord_y;u8* directions;u16 width;u16 height;
     u8 i;
     u8 x;
     u8 y;
@@ -1402,18 +1423,20 @@ Coordinates wrap to the playfield and headings are masked to 0..15.</pre></div><
     s16 oy;
     if (body == 0) return 0;
     if (count == 0 || count &gt; body-&gt;capacity) return 0;
+    coord_x=body-&gt;x;coord_y=body-&gt;y;directions=body-&gt;heading;
+    width=body-&gt;width;height=body-&gt;height;
     heading = (u8)(heading &amp; 15);
-    x = chain_body_wrap((s16)head_x, body-&gt;width);
-    y = chain_body_wrap((s16)head_y, body-&gt;height);
+    x = chain_body_wrap((s16)head_x, width);
+    y = chain_body_wrap((s16)head_y, height);
     ox = chain_body_offset_x(heading);
     oy = chain_body_offset_y(heading);
     i = 0;
     while (i &lt; count) {
-        body-&gt;x[(__safe_index u8)i] = x;
-        body-&gt;y[(__safe_index u8)i] = y;
-        body-&gt;heading[(__safe_index u8)i] = heading;
-        x = chain_body_wrap((s16)((s16)x - ox), body-&gt;width);
-        y = chain_body_wrap((s16)((s16)y - oy), body-&gt;height);
+        coord_x[(__safe_index u8)i] = x;
+        coord_y[(__safe_index u8)i] = y;
+        directions[(__safe_index u8)i] = heading;
+        x = chain_body_wrap((s16)((s16)x - ox), width);
+        y = chain_body_wrap((s16)((s16)y - oy), height);
         i = (u8)(i + 1);
     }
     body-&gt;count = count;
@@ -1424,11 +1447,14 @@ Coordinates wrap to the playfield and headings are masked to 0..15.</pre></div><
         chain_body_step(&amp;body,48,(u8)(20+step),4);
     }
     // After four ticks, the new heading has reached joints 1 through 4.</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-chain-body/example/fc/ntsc.png" alt="chain_body_step: NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。"><figcaption>NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</figcaption></figure><p><a href="samples/api-examples/fc/chain_body.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:62</p><div class="original"><b>宣言の注記（原文）</b><pre>Install the caller&#x27;s head pose, then pull joints from front to rear.
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:66</p><div class="original"><b>宣言の注記（原文）</b><pre>Install the caller&#x27;s head pose, then pull joints from front to rear.
 Each joint aims four pixels behind its updated predecessor and receives that
 predecessor&#x27;s OLD heading. Each axis moves 1 pixel, or 2 when error exceeds 4.
-Call once per simulation tick; this does not advance head physics or render.</pre></div><p class="source">kitaqfc/lib/chain.c:163</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void chain_body_step(ChainBody* body, u8 head_x, u8 head_y, u8 heading)
+Call once per simulation tick; this does not advance head physics or render.</pre></div><p class="source">kitaqfc/lib/chain.c:175</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void chain_body_step(ChainBody* body, u8 head_x, u8 head_y, u8 heading)
 {
+    // Cache caller storage once; following math and old-heading propagation
+    // use these local values. Avoid decoding packed struct pointers per joint.
+    u8* coord_x;u8* coord_y;u8* directions;u16 width;u16 height;
     u8 i;
     u8 previous;
     u8 pull;
@@ -1441,24 +1467,26 @@ Call once per simulation tick; this does not advance head physics or render.</pr
     s16 sy;
     if (body == 0) return;
     if (body-&gt;count == 0) return;
+    coord_x=body-&gt;x;coord_y=body-&gt;y;directions=body-&gt;heading;
+    width=body-&gt;width;height=body-&gt;height;
     heading = (u8)(heading &amp; 15);
-    body-&gt;x[0] = chain_body_wrap((s16)head_x, body-&gt;width);
-    body-&gt;y[0] = chain_body_wrap((s16)head_y, body-&gt;height);
-    body-&gt;heading[0] = heading;
+    coord_x[0] = chain_body_wrap((s16)head_x, width);
+    coord_y[0] = chain_body_wrap((s16)head_y, height);
+    directions[0] = heading;
     pull = heading;
     i = 1;
     while (i &lt; body-&gt;count) {
         previous = (u8)(i - 1);
-        old = body-&gt;heading[(__safe_index u8)i];
-        x = body-&gt;x[(__safe_index u8)i];
-        y = body-&gt;y[(__safe_index u8)i];
-        tx = chain_body_wrap((s16)((s16)body-&gt;x[(__safe_index u8)previous] - chain_body_offset_x(pull)), body-&gt;width);
-        ty = chain_body_wrap((s16)((s16)body-&gt;y[(__safe_index u8)previous] - chain_body_offset_y(pull)), body-&gt;height);
-        sx = chain_body_correction(chain_body_delta(tx, x, body-&gt;width));
-        sy = chain_body_correction(chain_body_delta(ty, y, body-&gt;height));
-        body-&gt;heading[(__safe_index u8)i] = pull;
-        body-&gt;x[(__safe_index u8)i] = chain_body_wrap((s16)((s16)x + sx), body-&gt;width);
-        body-&gt;y[(__safe_index u8)i] = chain_body_wrap((s16)((s16)y + sy), body-&gt;height);
+        old = directions[(__safe_index u8)i];
+        x = coord_x[(__safe_index u8)i];
+        y = coord_y[(__safe_index u8)i];
+        tx = chain_body_wrap((s16)((s16)coord_x[(__safe_index u8)previous] - chain_body_offset_x(pull)), width);
+        ty = chain_body_wrap((s16)((s16)coord_y[(__safe_index u8)previous] - chain_body_offset_y(pull)), height);
+        sx = chain_body_correction(chain_wrap_delta(tx, x, width));
+        sy = chain_body_correction(chain_wrap_delta(ty, y, height));
+        directions[(__safe_index u8)i] = pull;
+        coord_x[(__safe_index u8)i] = chain_body_wrap((s16)((s16)x + sx), width);
+        coord_y[(__safe_index u8)i] = chain_body_wrap((s16)((s16)y + sy), height);
         // Save before overwriting: a bend advances by one joint per update.
         pull = old;
         i = (u8)(i + 1);
@@ -1468,8 +1496,8 @@ Call once per simulation tick; this does not advance head physics or render.</pr
     chain_body_step(&amp;body,48,16,0);
     chain_body_step(&amp;body,48,16,0);
     chain_body_step(&amp;body,48,16,0); // Allow the duplicated tail to separate.</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-chain-body/example/fc/ntsc.png" alt="chain_body_grow: NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。"><figcaption>NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</figcaption></figure><p><a href="samples/api-examples/fc/chain_body.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:65</p><div class="original"><b>宣言の注記（原文）</b><pre>Append a copy of the current tail; later steps separate the new joint.
-Return 1 on growth, or 0 for an empty, disabled or full body.</pre></div><p class="source">kitaqfc/lib/chain.c:201</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 chain_body_grow(ChainBody* body)
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:69</p><div class="original"><b>宣言の注記（原文）</b><pre>Append a copy of the current tail; later steps separate the new joint.
+Return 1 on growth, or 0 for an empty, disabled or full body.</pre></div><p class="source">kitaqfc/lib/chain.c:218</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 chain_body_grow(ChainBody* body)
 {
     u8 tail;
     u8 next;
@@ -1483,7 +1511,7 @@ Return 1 on growth, or 0 for an empty, disabled or full body.</pre></div><p clas
     body-&gt;count = (u8)(next + 1);
     return 1;
 }</code></pre></div></details></details><details class="api searchable" id="api-chain_body_clear" data-api-contract="chain-body-source-20260922"><summary><code>chain_body_clear</code></summary><p>節数だけを0にして、同じ配列と画面設定を再利用できるようにします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void chain_body_clear(ChainBody* body);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>対象の<code>ChainBody</code>。<code>0</code>なら処理しません。初期化以外は初期化済みの状態を渡します。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。</p><h4>使用条件と制限</h4><p><code>chain.h</code>を読み込み、<code>chain.c</code>を1回だけコンパイルします。<code>ChainBody</code>は各節の現在位置と向きを保持します。座標履歴を蓄積する<code>Chain</code>とは別の状態型です。</p><p><code>x</code>、<code>y</code>、<code>heading</code>はそれぞれ<code>capacity</code>バイトの書き込み可能な配列です。相互に重ねず、使用中は保持してください。添字0が頭で、<code>count</code>には頭も含みます。初期化後にポインター・容量・画面サイズを直接変更しないでください。</p><p>向きは時計回りの16方向で、0=右、4=下、8=左、12=上です。入力は下位4ビットを使います。画面座標は右・下が正で、幅・高さは1～256ピクセルです。</p><p>配列のバイト列は消去しません。再開には<code>chain_body_reset</code>を使います。クリア直後に<code>chain_body_grow</code>しても追加されません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>chain_body_clear(&amp;body); // Forget the pose; the three arrays remain owned by us.</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-chain-body/example/fc/ntsc.png" alt="chain_body_clear: NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。"><figcaption>NTSC — 画像は上から直線、下向きへ曲がって1回更新、4回更新の姿です。座標を2倍に拡大して描き、右端の頭から曲がりが後ろへ伝わります。CGB・FCでは頭が赤、胴が青、尾が緑、DMGでは黒です。成長時に重ねた尾を4回の更新で離してから比較しています。画像は同じ8節を3時点で並べたもので、24節の1本の鎖ではありません。</figcaption></figure><p><a href="samples/api-examples/fc/chain_body.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:67</p><div class="original"><b>宣言の注記（原文）</b><pre>Remove all joints while retaining caller-owned storage and playfield settings.</pre></div><p class="source">kitaqfc/lib/chain.c:216</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void chain_body_clear(ChainBody* body)
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\chain_body.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\chain_body.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\chain_body.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/chain.h:71</p><div class="original"><b>宣言の注記（原文）</b><pre>Remove all joints while retaining caller-owned storage and playfield settings.</pre></div><p class="source">kitaqfc/lib/chain.c:233</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void chain_body_clear(ChainBody* body)
 {
     if (body == 0) return;
     body-&gt;count = 0;
@@ -5039,6 +5067,11 @@ u8 chain_get_segment(const Chain* chain, u8 index, ChainPoint* out);
 // Return the number of stored points, or zero for a null chain.
 u8 chain_get_count(const Chain* chain);
 
+
+// Return target minus current along the shortest wrapped route.
+// Supply size 1..256 and coordinates in 0..size-1; inputs are not normalized.
+// Exactly half a field retains the direct displacement sign.
+s16 chain_wrap_delta(u8 target, u8 current, u16 size);
 
 // Articulated body: one current pose per joint, including the head at index 0.
 // Caller-owned byte arrays keep the inner loop compact on both GB and FC.

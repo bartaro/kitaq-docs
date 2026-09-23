@@ -212,6 +212,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_rob_examples(contracts))
     from api_chain_body_proofs import verified_examples as verified_chain_body_examples
     proofs.update(verified_chain_body_examples(contracts))
+    from api_chain_wrap_proofs import verified_examples as verified_chain_wrap_examples
+    proofs.update(verified_chain_wrap_examples(contracts))
     from api_fc_audio_vblank_proofs import verified_examples as verified_fc_audio_vblank_examples
     proofs.update(verified_fc_audio_vblank_examples(contracts))
     from api_mapper_proofs import verified_examples as verified_mapper_examples
@@ -296,6 +298,8 @@ def publish(language, require_complete=False):
             if volume in ['gb-library', 'fc-library']:
                 from api_chain_body_proofs import overview as chain_body_overview
                 text = chain_body_overview(text, platform, language)
+                from api_chain_wrap_proofs import overview as chain_wrap_overview
+                text = chain_wrap_overview(text, platform, language)
                 from api_zx0_proofs import overview as zx0_overview
                 text = zx0_overview(text, platform, language)
             if volume == 'gb-library':
