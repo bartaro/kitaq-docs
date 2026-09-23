@@ -22,6 +22,7 @@ def verified_examples(contracts):
     for r in rows:
         verify_row(r);assert r['actual']==values[r['mode'].rsplit('-',1)[0]]+[165,0]
         assert r['load_ids']==r['expected_load_ids']==[32,0]
+        assert r['pixel_mismatches']==0
     result={}
     for key,c in selected.items():
         ex=c['example'];source=(SITE/ex['program']).read_text(encoding='utf-8')

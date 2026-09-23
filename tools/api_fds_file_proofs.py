@@ -16,10 +16,26 @@ def verified_examples(contracts):
  rows=report['records'];assert len(rows)==2 and {r['mode'] for r in rows}=={'default','unoptimized'}
  for r in rows:
   verify_row(r);assert r['actual']==[0,11,44,0,0,7,28,0,165,2,3,1]
+  assert r['pixel_mismatches']==0
  state=read(SITE/'verification/api-fds-file/state/file_io.json')
  assert state['test_sha256']==sha(REPOS/'kitaqfc/scripts/test-fds-file-io.py') and state['fixture_sha256']==sha(REPOS/'kitaqfc/scripts/fds_fileio_fixture.py')
  assert state['compiler_sha256']==sha(REPOS/'kitaqfc/kitaqfc.exe') and state['emulator_sha256']==sha(REPOS/'kurosaki/kurosaki.exe')
  assert len(state['records'])==40 and all(r['passed'] for r in state['records'])
+ names={'relocate','forward-overlap','backward-overlap','native-null','same-address','zero-size','load-error','missing-count','save-error','unknown-id','boot-id','id-255','not-last','bad-size','bad-destination','wrap-destination','bad-source','table-page','side-1','side-2'}
+ assert {r['name'] for r in state['records']}=={n+'-'+v for n in names for v in ['default','O0']}
+ for r in state['records']:
+  name=r['name'].rsplit('-',1)[0];actual=r['actual']
+  assert r['build_exit']==0 and actual[5]==165
+  invalid_id=name in {'unknown-id','boot-id','id-255'}
+  invalid_dst=name in {'bad-destination','wrap-destination'}
+  invalid_save=invalid_id or name in {'not-last','bad-size','bad-source'}
+  transfer_error=39 if name=='load-error' else 64 if name=='missing-count' else 0
+  assert actual[0]==(255 if invalid_id or invalid_dst else transfer_error)
+  assert actual[1]==(255 if invalid_save else 3 if name=='save-error' else 0)
+  assert actual[4]==(255 if invalid_id else transfer_error)
+  assert r['load_calls']==(0 if invalid_id else 1 if invalid_dst else 2)
+  assert r['save_calls']==(0 if invalid_save else 1)
+  if not invalid_save:assert r['ordinal']==r['expected_ordinal']==(12 if name=='table-page' else 0 if name.startswith('side-') else 3)
  result={}
  for key,c in selected.items():
   ex=c['example'];source=(SITE/ex['program']).read_text(encoding='utf-8')

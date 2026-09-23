@@ -2561,7 +2561,7 @@
       "implementation_excerpt": "if (funcName == \"__fds_available\")\n            {\n                if (!Need(0)) return true;\n                EmitAsm(\"LDA\", Imm(isFds ? 1 : 0));\n                return true;\n            }",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 5053
+        "line": 5146
       }
     },
     {
@@ -2582,7 +2582,7 @@
       "implementation_excerpt": "case \"__fds_disk_ready\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(0x4032));\n                    EmitAsm(\"AND\", Imm(0x01));\n                    EmitAsm(\"EOR\", Imm(0x01));\n                    return true;\n                // Expose status bit 2 as the raw mask value 0 or 4, rather than a normalized Boolean.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 5067
+        "line": 5160
       }
     },
     {
@@ -2603,7 +2603,7 @@
       "implementation_excerpt": "case \"__fds_error\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(0x4030));\n                    return true;",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 5080
+        "line": 5173
       }
     },
     {
@@ -2624,7 +2624,7 @@
       "implementation_excerpt": "case \"__fds_side\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(0x4032));\n                    EmitAsm(\"AND\", Imm(0x04));\n                    return true;\n                // Read status register 4030 directly; the caller receives its complete byte value.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 5074
+        "line": 5167
       }
     },
     {
@@ -2645,7 +2645,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_wait_ready\");\n            string loop = NewGeneratedLabel(\"fds_wait_ready_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", Mem(0x4032));\n            EmitAsm(\"AND\", Imm(0x01));\n            EmitAsm(\"BNE\", Rel(loop));\n            EmitAsm(\"RTS\");",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9055
+        "line": 9148
       }
     },
     {
@@ -2666,7 +2666,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_wait_ready\");\n            string loop = NewGeneratedLabel(\"fds_wait_ready_loop\");\n            _assembly.Add(Expr.Make(Tag.Label, loop));\n            EmitAsm(\"LDA\", Mem(0x4032));\n            EmitAsm(\"AND\", Imm(0x01));\n            EmitAsm(\"BNE\", Rel(loop));\n            EmitAsm(\"RTS\");",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9055
+        "line": 9148
       }
     },
     {
@@ -2687,7 +2687,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_file_exists\");\n            EmitFdsMetadataSearch(foundReturnsSize: false);\n\n            // Return the compiled metadata size, using zero for an unmatched ID.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9388
+        "line": 9481
       }
     },
     {
@@ -2708,7 +2708,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_file_size\");\n            EmitFdsMetadataSearch(foundReturnsSize: true);",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9392
+        "line": 9485
       }
     },
     {
@@ -2729,7 +2729,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_load_file\");\n            // Load at the on-disk staging address, then memmove PRG data to non-null dst.\n            EmitAsm(\"JSR\", Abs(\"__kq_fds_find_io\"));\n            EmitAsm(\"CMP\", Imm(0));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_load_invalid\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 19));\n            EmitAsm(\"BMI\", Rel(\"__kq_fio_load_invalid\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 14));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 15));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 23));\n            EmitAsm(\"STA\", Mem(CallArgBase + 10));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 24));\n            EmitAsm(\"STA\", Mem(CallArgBase + 11));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 20));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_load_ppu\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 21));\n            EmitAsm(\"STA\", Mem(CallArgBase + 8));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 22));\n            EmitAsm(\"STA\", Mem(CallArgBase + 9));\n            EmitAsm(\"JSR\", Abs(\"__kq_fds_check_span\"));\n            EmitAsm(\"CMP\", Imm(0));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_load_invalid\"));\n            EmitAsm(\"JMP\", Abs(\"__kq_fio_load_dst\"));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_load_ppu\"));\n            // CHR/nametable files have no CPU buffer; null dst selects their native PPU destination.\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 14));\n            EmitAsm(\"ORA\", Mem(_runtimeFdsFileHeaderAddress + 15));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_load_invalid\"));\n            EmitAsm(\"JMP\", Abs(\"__kq_fio_load_bios\"));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_load_dst\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 14));\n            EmitAsm(\"ORA\", Mem(_runtimeFdsFileHeaderAddress + 15));\n            EmitAsm(\"BEQ\", Rel(\"__kq_fio_load_bios\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 14));\n            EmitAsm(\"STA\", Mem(CallArgBase + 8));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 15));\n            EmitAsm(\"STA\", Mem(CallArgBase + 9));\n            EmitAsm(\"JSR\", Abs(\"__kq_fds_check_span\"));\n            EmitAsm(\"CMP\", Imm(0));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_load_invalid\"));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_load_bios\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 17));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress + 1));\n            EmitAsm(\"JSR\", Mem(0xE1F8));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsFileHeaderAddress + 33)));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsLoadListAddress)));\n            EmitAsm(\"TAX\");\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"STA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"TXA\");\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_load_return\"));\n            EmitAsm(\"CPY\", Imm(1));\n            EmitAsm(\"BEQ\", Rel(\"__kq_fio_load_count_ok\"));\n            EmitAsm(\"LDA\", Imm(0x40));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_load_count_ok\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 14));\n            EmitAsm(\"ORA\", Mem(_runtimeFdsFileHeaderAddress + 15));\n            EmitAsm(\"BEQ\", Rel(\"__kq_fio_load_ok\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 21));\n            EmitAsm(\"STA\", Mem(CallArgBase + 0));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 14));\n            EmitAsm(\"STA\", Mem(CallArgBase + 2));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 23));\n            EmitAsm(\"STA\", Mem(CallArgBase + 4));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 22));\n            EmitAsm(\"STA\", Mem(CallArgBase + 1));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 15));\n            EmitAsm(\"STA\", Mem(CallArgBase + 3));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 24));\n            EmitAsm(\"STA\", Mem(CallArgBase + 5));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 4));\n            EmitAsm(\"ORA\", Mem(CallArgBase + 5));\n            EmitAsm(\"BEQ\", Rel(\"__kq_fio_load_ok\"));\n            // Copy backwards when destination starts above source, including overlapping buffers.\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3));\n            EmitAsm(\"CMP\", Mem(CallArgBase + 1));\n            EmitAsm(\"BCC\", Rel(\"__kq_fio_forward\"));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_back_setup\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"CMP\", Mem(CallArgBase + 0));\n            EmitAsm(\"BCC\", Rel(\"__kq_fio_forward\"));\n            EmitAsm(\"BEQ\", Rel(\"__kq_fio_load_ok\"));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_back_setup\"));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"LDA\", Mem(CallArgBase + 0));\n            EmitAsm(\"ADC\", Mem(CallArgBase + 4));\n            EmitAsm(\"STA\", Mem(CallArgBase + 0));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"ADC\", Mem(CallArgBase + 5));\n            EmitAsm(\"STA\", Mem(CallArgBase + 1));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"ADC\", Mem(CallArgBase + 4));\n            EmitAsm(\"STA\", Mem(CallArgBase + 2));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3));\n            EmitAsm(\"ADC\", Mem(CallArgBase + 5));\n            EmitAsm(\"STA\", Mem(CallArgBase + 3));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_backward\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 0));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_back_dec0\"));\n            EmitAsm(\"DEC\", Mem(CallArgBase + 1));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_back_dec0\"));\n            EmitAsm(\"DEC\", Mem(CallArgBase + 0));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_back_dec2\"));\n            EmitAsm(\"DEC\", Mem(CallArgBase + 3));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_back_dec2\"));\n            EmitAsm(\"DEC\", Mem(CallArgBase + 2));\n            EmitAsm(\"LDY\", Imm(0));\n            EmitAsm(\"LDA\", IndY(CallArgBase));\n            EmitAsm(\"STA\", IndY(CallArgBase + 2));\n            EmitAsm(\"JSR\", Abs(\"__kq_fds_copy_count\"));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_backward\"));\n            EmitAsm(\"JMP\", Abs(\"__kq_fio_load_ok\"));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_forward\"));\n            EmitAsm(\"LDY\", Imm(0));\n            EmitAsm(\"LDA\", IndY(CallArgBase));\n            EmitAsm(\"STA\", IndY(CallArgBase + 2));\n            EmitAsm(\"INC\", Mem(CallArgBase + 0));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_forward_inc0\"));\n            EmitAsm(\"INC\", Mem(CallArgBase + 1));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_forward_inc0\"));\n            EmitAsm(\"INC\", Mem(CallArgBase + 2));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_forward_inc2\"));\n            EmitAsm(\"INC\", Mem(CallArgBase + 3));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_forward_inc2\"));\n            EmitAsm(\"JSR\", Abs(\"__kq_fds_copy_count\"));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_forward\"));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_load_ok\"));\n            EmitAsm(\"LDA\", Imm(0));\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_load_return\"));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_load_invalid\"));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"RTS\");",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9130
+        "line": 9223
       }
     },
     {
@@ -2750,7 +2750,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_save_file\");\n            // Only a non-boot, final, fixed-size PRG slot can be overwritten without hiding later files.\n            EmitAsm(\"JSR\", Abs(\"__kq_fds_find_io\"));\n            EmitAsm(\"CMP\", Imm(0));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_save_invalid\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 19));\n            EmitAsm(\"AND\", Imm(0xC0));\n            EmitAsm(\"CMP\", Imm(0x40));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_save_invalid\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 20));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_save_invalid\"));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3));\n            EmitAsm(\"CMP\", Mem(_runtimeFdsFileHeaderAddress + 23));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_save_invalid\"));\n            EmitAsm(\"STA\", Mem(CallArgBase + 10));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(CallArgBase + 8));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 4));\n            EmitAsm(\"CMP\", Mem(_runtimeFdsFileHeaderAddress + 24));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_save_invalid\"));\n            EmitAsm(\"STA\", Mem(CallArgBase + 11));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"STA\", Mem(CallArgBase + 9));\n            EmitAsm(\"JSR\", Abs(\"__kq_fds_check_span\"));\n            EmitAsm(\"CMP\", Imm(0));\n            EmitAsm(\"BNE\", Rel(\"__kq_fio_save_invalid\"));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 17));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 0));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 25));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 1));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 26));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 2));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 27));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 3));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 28));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 4));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 29));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 5));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 30));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 6));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 31));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 7));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 32));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 8));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 21));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 9));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 3));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 11));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 14));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 22));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 10));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 4));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 12));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 2));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 15));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 13));\n            EmitAsm(\"STA\", Mem(_runtimeFdsFileHeaderAddress + 16));\n            EmitAsm(\"LDA\", Mem(_runtimeFdsFileHeaderAddress + 18));\n            EmitAsm(\"JSR\", Mem(0xE239));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsFileHeaderAddress + 33)));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsFileHeaderAddress)));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, \"__kq_fio_save_invalid\"));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"RTS\");\n\n            // Enable wave-RAM writes, copy 64 source bytes, then clear the wave-write control register.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9395
+        "line": 9488
       }
     },
     {
@@ -2771,7 +2771,7 @@
       "implementation_excerpt": "case \"__fds_current_bank\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Mem(_runtimeFdsResidentBankAddress));\n                    return true;",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 5129
+        "line": 5222
       }
     },
     {
@@ -2792,7 +2792,7 @@
       "implementation_excerpt": "if (string.Equals(funcName, \"__fds_overlay_farcall\", StringComparison.Ordinal) ||\n                string.Equals(funcName, \"__fds_farcall\", StringComparison.Ordinal))\n            {\n                // FDS overlay dispatch requires the configured FDS RAM layout and a named function target.\n                Expr[] farArgs = args ?? Array.Empty<Expr>();\n                if (farArgs.Length != 2)\n                {\n                    Program.Error(\"error KQFC2512: {0}(bank, func) expects exactly 2 arguments.\", funcName);\n                    return;\n                }\n                string targetName;\n                if (!farArgs[1].Match(Tag.Name, out targetName))\n                {\n                    Program.Error(\"error KQFC2513: {0}(bank, func) requires the 2nd argument to be a function name.\", funcName);\n                    return;\n                }\n                if (!Program.NesMapperProfile.HasFds || !Program.FdsPrgRamLayoutEnabled)\n                {\n                    Program.Error(\"error KQFC2514: {0} requires --mapper=fds with --fds-layout=fds32.\", funcName);\n                    return;\n                }\n                // Like ordinary __farcall, this entry supplies no callback arguments.\n                // Validate before emitting code so a data symbol cannot become a JSR target.\n                if (!_functionParameters.TryGetValue(targetName, out FieldInfo[] fdsParameters))\n                {\n                    Program.Error(\"error KQFC2610: {0} requires a declared function name; use an ordinary typed call for a function pointer.\", funcName);\n                    return;\n                }\n                if (fdsParameters.Length != 0)\n                {\n                    Program.Error(\"error KQFC2610: {0} requires a callback with no parameters.\", funcName);\n                    return;\n                }\n                // Evaluate the bank expression exactly once, even for a safe direct call.\n                // The named target's linked placement determines the dispatched bank.\n                EmitLoadValue(farArgs[0], ctx, 1);\n                int callerBank = ctx == null ? 0 : ctx.Bank;\n                int calleeBank = GetFunctionBank(targetName);\n                if (ShouldUseFdsOverlayThunk(callerBank, calleeBank))\n                {\n                    string directFdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                    EmitAsm(\"JSR\", Abs(directFdsThunkName));\n                    RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                    return;\n                }\n                if (calleeBank == 0 || calleeBank == callerBank)\n                {\n                    EmitAsm(\"JSR\", Abs(targetName));\n                    RecordCallEdge(targetName, calleeBank, \"direct\", viaThunk: false, viaFarcall: true);\n                    return;\n                }\n                string fdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                EmitAsm(\"JSR\", Abs(fdsThunkName));\n                RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                return;\n            }",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 3981
+        "line": 4074
       }
     },
     {
@@ -2813,7 +2813,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_is_bank_resident\");\n            string fdsResidentYes = NewGeneratedLabel(\"fds_resident_yes\");\n            string fdsResidentNo = NewGeneratedLabel(\"fds_resident_no\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsResidentNo));\n            EmitAsm(\"CMP\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"BEQ\", Rel(fdsResidentYes));\n            _assembly.Add(Expr.Make(Tag.Label, fdsResidentNo));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsResidentYes));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"RTS\");\n\n            // Query file existence in the compiled metadata table.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9372
+        "line": 9465
       }
     },
     {
@@ -2834,7 +2834,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_load_bank\");\n            string fdsLoadBankLoad = NewGeneratedLabel(\"fds_load_bank_load\");\n            string fdsLoadBankOverlay = NewGeneratedLabel(\"fds_load_bank_overlay\");\n            string fdsLoadBankCall = NewGeneratedLabel(\"fds_load_bank_call\");\n            string fdsLoadBankDone = NewGeneratedLabel(\"fds_load_bank_done\");\n            string fdsLoadBankPopInvalid = NewGeneratedLabel(\"fds_load_bank_pop_invalid\");\n            string fdsLoadBankInvalid = NewGeneratedLabel(\"fds_load_bank_invalid\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"CMP\", Imm(1));\n            EmitAsm(\"BCC\", Rel(fdsLoadBankInvalid));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankInvalid));\n            if (Program.FdsOverlayResidencyGuardEnabled)\n            {\n                EmitAsm(\"CMP\", Mem(_runtimeFdsResidentBankAddress));\n                EmitAsm(\"BNE\", Rel(fdsLoadBankLoad));\n                EmitAsm(\"LDA\", Imm(0));\n                EmitAsm(\"RTS\");\n                _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankLoad));\n            }\n            EmitAsm(\"PHA\");\n            EmitAsm(\"CMP\", Imm(1));\n            EmitAsm(\"BNE\", Rel(fdsLoadBankOverlay));\n            EmitAsm(\"LDA\", Abs(\"__kq_fds_boot_bank_file_id\"));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankPopInvalid));\n            EmitAsm(\"JMP\", Abs(fdsLoadBankCall));\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankOverlay));\n            EmitAsm(\"SEC\");\n            EmitAsm(\"SBC\", Imm(2));\n            EmitAsm(\"CLC\");\n            EmitAsm(\"ADC\", Imm(Program.FdsOverlayStartId & 0xFF));\n            EmitAsm(\"BCS\", Rel(fdsLoadBankPopInvalid));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankPopInvalid));\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankCall));\n            EmitAsm(\"STA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__fds_load_overlay\"));\n            EmitAsm(\"TAX\");\n            EmitAsm(\"PLA\");\n            EmitAsm(\"CPX\", Imm(0));\n            EmitAsm(\"BEQ\", Rel(fdsLoadBankDone));\n            // A failed BIOS transfer may have overwritten part of the window.\n            // Mark it unknown so a subsequent restore cannot be skipped by the guard.\n            EmitAsm(\"LDA\", Imm(0xFF));\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankDone));\n            EmitAsm(\"STA\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"STA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"TXA\");\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankPopInvalid));\n            EmitAsm(\"PLA\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsLoadBankInvalid));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"RTS\");\n\n            // Return success for the recorded resident bank, otherwise dispatch a bank load.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9301
+        "line": 9394
       }
     },
     {
@@ -2855,7 +2855,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_load_overlay\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress));\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsLoadListAddress + 1));\n            EmitAsm(\"JSR\", Mem(0xE1F8));\n            _assembly.Add(Expr.Make(Tag.Word, \"__kq_fds_disk_id_wildcard\"));\n            _assembly.Add(Expr.Make(Tag.Word, string.Format(\"${0:X4}\", _runtimeFdsLoadListAddress)));\n            // A raw file load can replace any part of the switchable window.\n            // Only the bank-aware wrapper may establish a known resident bank.\n            EmitAsm(\"TAX\");\n            EmitAsm(\"LDA\", Imm(0xFF));\n            EmitAsm(\"STA\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"STA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"TXA\");\n            EmitAsm(\"RTS\");\n\n            // Restore bank 1 from its separate boot file; map banks 2+ to overlay\n            // IDs. Keep the requested bank on the CPU stack across the BIOS call.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9282
+        "line": 9375
       }
     },
     {
@@ -2876,7 +2876,7 @@
       "implementation_excerpt": "if (string.Equals(funcName, \"__fds_overlay_farcall\", StringComparison.Ordinal) ||\n                string.Equals(funcName, \"__fds_farcall\", StringComparison.Ordinal))\n            {\n                // FDS overlay dispatch requires the configured FDS RAM layout and a named function target.\n                Expr[] farArgs = args ?? Array.Empty<Expr>();\n                if (farArgs.Length != 2)\n                {\n                    Program.Error(\"error KQFC2512: {0}(bank, func) expects exactly 2 arguments.\", funcName);\n                    return;\n                }\n                string targetName;\n                if (!farArgs[1].Match(Tag.Name, out targetName))\n                {\n                    Program.Error(\"error KQFC2513: {0}(bank, func) requires the 2nd argument to be a function name.\", funcName);\n                    return;\n                }\n                if (!Program.NesMapperProfile.HasFds || !Program.FdsPrgRamLayoutEnabled)\n                {\n                    Program.Error(\"error KQFC2514: {0} requires --mapper=fds with --fds-layout=fds32.\", funcName);\n                    return;\n                }\n                // Like ordinary __farcall, this entry supplies no callback arguments.\n                // Validate before emitting code so a data symbol cannot become a JSR target.\n                if (!_functionParameters.TryGetValue(targetName, out FieldInfo[] fdsParameters))\n                {\n                    Program.Error(\"error KQFC2610: {0} requires a declared function name; use an ordinary typed call for a function pointer.\", funcName);\n                    return;\n                }\n                if (fdsParameters.Length != 0)\n                {\n                    Program.Error(\"error KQFC2610: {0} requires a callback with no parameters.\", funcName);\n                    return;\n                }\n                // Evaluate the bank expression exactly once, even for a safe direct call.\n                // The named target's linked placement determines the dispatched bank.\n                EmitLoadValue(farArgs[0], ctx, 1);\n                int callerBank = ctx == null ? 0 : ctx.Bank;\n                int calleeBank = GetFunctionBank(targetName);\n                if (ShouldUseFdsOverlayThunk(callerBank, calleeBank))\n                {\n                    string directFdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                    EmitAsm(\"JSR\", Abs(directFdsThunkName));\n                    RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                    return;\n                }\n                if (calleeBank == 0 || calleeBank == callerBank)\n                {\n                    EmitAsm(\"JSR\", Abs(targetName));\n                    RecordCallEdge(targetName, calleeBank, \"direct\", viaThunk: false, viaFarcall: true);\n                    return;\n                }\n                string fdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                EmitAsm(\"JSR\", Abs(fdsThunkName));\n                RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                return;\n            }",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 3981
+        "line": 4074
       }
     },
     {
@@ -2897,7 +2897,7 @@
       "implementation_excerpt": "case \"__fds_overlay_function_count\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"LDA\", Abs(\"__kq_fds_overlay_function_table\"));\n                    return true;",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 5136
+        "line": 5229
       }
     },
     {
@@ -2918,7 +2918,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__fds_require_bank\");\n            string fdsRequireLoad = NewGeneratedLabel(\"fds_require_load\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"CMP\", Imm(0xFF));\n            EmitAsm(\"BEQ\", Rel(fdsRequireLoad));\n            EmitAsm(\"CMP\", Mem(_runtimeFdsResidentBankAddress));\n            EmitAsm(\"BNE\", Rel(fdsRequireLoad));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, fdsRequireLoad));\n            EmitAsm(\"JSR\", Abs(\"__fds_load_bank\"));\n            EmitAsm(\"RTS\");\n\n            // Compare the requested bank with the software residency record and return zero or one.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 9358
+        "line": 9451
       }
     },
     {

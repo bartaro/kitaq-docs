@@ -22,6 +22,7 @@ def verified_examples(contracts):
     expected=dict(zip(modes,[[1],[0],[1,0,0,2],[1,1,0,1,2,0,0,0,0],[1,1,0,2],[1,1,0,0]]))
     for r in rows:
         verify_row(r);assert r['actual']==expected[r['mode'].rsplit('-',1)[0]]
+        assert r['pixel_mismatches']==0
     result={}
     for key,c in selected.items():
         ex=c['example'];source=(SITE/ex['program']).read_text(encoding='utf-8')
