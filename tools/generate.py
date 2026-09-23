@@ -3,6 +3,7 @@ import re,json,html,shutil
 from collect import ROOT,SITE,read
 from chapters import TEXT,BOOKS
 from languages import language_nav
+from sample_guides import render as sample_guide
 E=html.escape
 def slug(t):return re.sub(r'[^\w-]+','-',t).strip('-')
 def code(t,lang='c'):return '<div class="codebox"><span class="lang">'+lang+'</span><button class="copy" type="button">コピー</button><pre><code>'+E(t.strip())+'</code></pre></div>'
@@ -127,7 +128,7 @@ def samples_section(platform,manifest):
   cmd+=' '+' '.join(d['options'])
 
   if d.get('known_issue'): cmd='# 既知のビルド制限：'+d['known_issue']+'\n'+cmd
-  out.append('<details class="sample searchable" id="sample-'+d['id']+'"><summary>'+E(d['title'])+' <code>'+d['file']+'</code></summary><p>期待結果：'+E(d['expected'])+'</p><p><a href="samples/'+d['file']+'" download>ソースを保存</a> ／ <a href="verification.html#'+d['id']+'">検証状況</a></p>'+code(cmd,'powershell')+code(read(SITE/'samples'/d['file']))+'</details>')
+  out.append('<details class="sample searchable" id="sample-'+d['id']+'"><summary>'+E(d['title'])+' <code>'+d['file']+'</code></summary>'+sample_guide(d['id'],'ja')+'<p><a href="samples/'+d['file']+'" download>ソースを保存</a> ／ <a href="verification.html#'+d['id']+'">検証状況</a></p>'+code(cmd,'powershell')+code(read(SITE/'samples'/d['file']))+'</details>')
  return ''.join(out)
 
 def api_section(platform,intrinsic):

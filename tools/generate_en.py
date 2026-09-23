@@ -9,6 +9,7 @@ import json
 import re
 from pathlib import Path
 import generate as g
+from sample_guides import GUIDES, render as sample_guide
 
 S = g.SITE
 E = html.escape
@@ -113,14 +114,14 @@ def samples_section(platform,manifest):
     for d in manifest:
         if d['platform']!=platform:continue
         name=d['id'].split('_',1)[1]
-        title=titles.get(name,name.replace('_',' ').capitalize())
+        title=GUIDES[d['id']]['en'][0]
         lib=platform=='gb' and 'kitaqgb/lib' or 'kitaqfc/lib'
         exe='.\\kitaqgb\\kitaqgb.exe' if platform=='gb' else '.\\kitaqfc\\kitaqfc.exe'
         cmd=exe+' '+' '.join(lib+'/'+f for f in d['libs'])+' kitaq-docs/samples/'+d['file']+' -I '+lib+' -I kitaq-docs/samples -o out/'+d['id']+('.gb' if platform=='gb' else '.nes')
         cmd+=' --profile=dev --rst-disable --stack-bank=fixed' if platform=='gb' else ' --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr'
         cmd+=' '+' '.join(d['options'])
         if d.get('known_issue'):cmd='# Known build limitation: '+d['known_issue']+'\n'+cmd
-        out.append('<details class="sample searchable" id="sample-'+d['id']+'"><summary>'+E(title)+' <code>'+d['file']+'</code></summary><p>Expected result: '+E(d['expected'])+'</p><p><a href="samples/'+d['file']+'" download>Download source</a> / <a href="verification.html#'+d['id']+'">Verification status</a></p>'+code(cmd,'powershell')+code(g.read(S/'samples'/d['file']))+'</details>')
+        out.append('<details class="sample searchable" id="sample-'+d['id']+'"><summary>'+E(title)+' <code>'+d['file']+'</code></summary>'+sample_guide(d['id'],'en')+'<p><a href="samples/'+d['file']+'" download>Download source</a> / <a href="verification.html#'+d['id']+'">Verification status</a></p>'+code(cmd,'powershell')+code(g.read(S/'samples'/d['file']))+'</details>')
     return ''.join(out)
 
 def api_section(platform,intrinsic):
