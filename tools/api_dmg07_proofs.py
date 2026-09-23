@@ -23,7 +23,8 @@ def verified_examples(contracts):
     if report['script_sha256']!=sha(SITE/'tools/check_dmg07_examples.py'):raise ValueError('DMG07 teaching checker changed')
     edges=read(folder/'edge_checks.json')
     if len(edges['records'])!=16 or edges['script_sha256']!=sha(SITE/'tools/check_dmg07_edges.py'):raise ValueError('DMG07 boundary matrix incomplete')
-    if len({(r['mode'],r['group']) for r in edges['records']})!=16:raise ValueError('Duplicate DMG07 boundary runs')
+    edge_groups={'initialization-and-start','invalid-status-and-saturation','membership-loss-count','pipeline-and-cached-read','aligned-restart-control','silence-preserves-inflight-byte','handshake-watchdog-and-readiness','sequence-wrap-and-invalid-phase'}
+    if {(r['mode'],r['group']) for r in edges['records']}!={(m,g) for m in ['dmg','cgb'] for g in edge_groups}:raise ValueError('DMG07 boundary variants missing or duplicated')
     for row in runs+edges['records']:verify_row(row)
     for row in runs:
         want=expectation(row['lesson'],row['slot']);want += [0]*(79-len(want))+[0xA55A]

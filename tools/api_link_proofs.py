@@ -20,6 +20,8 @@ def verified_examples(contracts):
     if report['script_sha256']!=sha(SITE/'tools/check_link_examples.py') or report['manifest_sha256']!=sha(author/'link_examples.json'):raise ValueError('Link checker/expectations changed')
     edges=read(folder/'edge_checks.json')
     if len(edges['records'])!=14 or edges['script_sha256']!=sha(SITE/'tools/check_link_edges.py'):raise ValueError('Link boundaries incomplete')
+    edge_groups={'topology-validation','send-validation-copy','parser-checksum-length','maximum-parser-mailbox','nak-retry-limit','ack-deadline-90','external-clock-stall'}
+    if {(r['mode'],r['group']) for r in edges['records']}!={(m,g) for m in ['dmg','cgb'] for g in edge_groups}:raise ValueError('Link boundary variants missing or duplicated')
     for row in runs+edges['records']:verify_row(row)
     for row in runs:
         spec=next(s for s in specs if s['source']==row['source'])
