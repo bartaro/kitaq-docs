@@ -46,7 +46,8 @@ void main() {
 def main():
     import subprocess,hashlib
     site=ROOT/'manual/latest';repos=ROOT/'publish/github_20260912'
-    out=ROOT/'publish/library_docs_20260914/raster/edges';out.mkdir(parents=True,exist_ok=True)
+    out=site/'verification/api-raster-wave/state';out.mkdir(parents=True,exist_ok=True)
+    sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
     source=out/'case.c';source.write_text(SOURCE,encoding='utf-8')
     expected=[0,1,1,11,8,1,0,246,253,3,246,250,23,2,0,3,3,6,6,0xA55A]
     records=[]
@@ -64,10 +65,14 @@ def main():
             data=json.loads(report.read_text(encoding='utf-8'));windows={r['name']:r['preview_bytes'] for r in data['watched_memory']}
             raw=sum((windows['r'+str(n)] for n in [0,16,32]),[])
             actual=[raw[n]+256*raw[n+1] for n in range(0,40,2)]
-            records.append(dict(variant=variant,mode=mode,actual=actual,expected=expected,passed=actual==expected))
+            records.append(dict(variant=variant,mode=mode,actual=actual,expected=expected,passed=actual==expected,
+                                rom=rom.relative_to(site).as_posix(),rom_sha256=sha(rom)))
             print(variant,mode,'PASS' if actual==expected else actual,flush=True)
     sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
-    report=dict(records=records,passed=all(r['passed'] for r in records),source_sha256=sha(source),compiler_sha256=sha(repos/'kitaqgb/kitaqgb.exe'),raster_sha256=sha(repos/'kitaqgb/lib/raster.c'))
+    report=dict(records=records,passed=all(r['passed'] for r in records),source=source.relative_to(site).as_posix(),source_sha256=sha(source),
+                script_sha256=sha(Path(__file__)),compiler_sha256=sha(repos/'kitaqgb/kitaqgb.exe'),emulator_sha256=sha(repos/'kokura/kokura-cli.exe'),
+                library_sha256={name:sha(repos/'kitaqgb/lib'/name) for name in ['raster.c','raster.h','scroll.c','scroll.h']},
+                support_sha256={name:sha(site/'samples'/name) for name in ['gb_common.h','font_gb.h']})
     (out/'results.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
     raise SystemExit(0 if report['passed'] else 1)
 

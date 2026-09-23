@@ -106,6 +106,7 @@ def main():
                        passed=mismatches==0 and count>=frames-8)
             records.append(entry);print(entry,flush=True)
     result = dict(records=records, animation_passed=animation,
+                  rom_sha256=sha(rom), title_rom_sha256=sha(title_rom),
                   source_sha256=sha(SOURCE), title_source_sha256=sha(title_source), compiler_sha256=sha(compiler), emulator_sha256=sha(emulator),
                   support_sha256={name:sha(SITE/'samples'/name) for name in ['gb_common.h','font_gb.h']},
                   library_sha256={name:sha(library/name) for name in ['raster.c','raster.h','scroll.c','scroll.h']},

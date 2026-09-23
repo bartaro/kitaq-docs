@@ -18,20 +18,34 @@ def verified_examples(contracts):
   report=read(PRIVATE/'zx0'/family/'results.json')
   assert report['script_sha256']==sha(PRIVATE/('check_zx0_'+family+'.py'))
   assert len(report['cases'])==count
+  variants={(p,v,m) for p in ['gb','fc'] for v in ['default','unoptimized'] for m in (['dmg','cgb'] if p=='gb' else ['ntsc'])}
+  if family=='targets':
+   expected={(name,producer,p,v,m) for name in ['one','overlap','pattern','far'] for producer in ['kitaq','official'] for p,v,m in variants}
+   assert {(r['name'],r['producer'],r['platform'],r['variant'],r['mode']) for r in report['cases']}==expected
+  else:assert {(r['platform'],r['variant'],r['mode']) for r in report['cases']}==variants
   for row in report['cases']:
    check_tools(row)
    p=row['platform'];v=row['variant']
-   if family=='targets':folder=PRIVATE/'zx0/targets'/row['name']/(row['producer']+'-'+p+'-'+v)
+   if family=='targets':
+    assert row['result']==row['expected_result'] and row['output_sha256']==row['expected_output_sha256']
+    folder=PRIVATE/'zx0/targets'/row['name']/(row['producer']+'-'+p+'-'+v)
    elif family=='edges':
     assert row['case_count']==41 and not row['failures'] and row['done']==165
     folder=PRIVATE/'zx0/edges'/(p+'-'+v)
-   else:folder=PRIVATE/'zx0/vram'/(p+'-'+row['mode']+'-'+v)
+   else:
+    assert row['actual']==row['expected']
+    folder=PRIVATE/'zx0/vram'/(p+'-'+row['mode']+'-'+v)
    assert sha(folder/'test.c')==row['source_sha256']
    assert sha(folder/('test.gb' if p=='gb' else 'test.nes'))==row['rom_sha256']
  host=read(PRIVATE/'zx0/host-results.json');assert len(host['cases'])==21 and all(r['passed'] for r in host['cases'])
+ assert len({r['name'] for r in host['cases']})==21
  assert host['script_sha256']==sha(PRIVATE/'check_zx0_host.py')
  assert host['tool_sha256']==sha(REPOS/'kitaqgb/kitaqgb-zx0.exe')
+ for name,digest in host['reference_sha256'].items():assert sha(PRIVATE/'zx0/reference'/name)==digest
+ for row in host['cases']:
+  for name,field in [('input.bin','input_sha256'),('ours.zx0','ours_sha256'),('official.zx0','official_sha256')]:assert sha(PRIVATE/'zx0'/row['name']/name)==row[field]
  edges=read(PRIVATE/'zx0/host-edges/results.json');assert len(edges['cases'])==68 and all(r['passed'] for r in edges['cases'])
+ assert len({(r['platform'],r['name']) for r in edges['cases']})==68
  assert edges['script_sha256']==sha(PRIVATE/'check_zx0_host_edges.py')
  for row in edges['cases']:
   name='kitaq'+row['platform'];assert row['tool_sha256']==sha(REPOS/name/(name+'-zx0.exe'))
