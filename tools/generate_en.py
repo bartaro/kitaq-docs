@@ -46,7 +46,7 @@ MODULES = dict(zip(g.MODULES, [
     'MIDI input and output interface','Mapper banks and IRQs','FDS disk operations','Loading FDS files',
     'FDS overlay code','FDS save declarations','FDS wavetable audio','VRC6 expansion audio',
     'VRC7 FM audio','Fast integer arithmetic','Fixed-point intrinsic interface','Lookup tables',
-    'Game-oriented operation macros','Wireframes for DMG']))
+    'Game-oriented operation macros','Wireframes for DMG','Sprite selection by priority and rotation']))
 assert len(MODULES) == len(g.MODULES)
 def code(t,lang='c'):
     return '<div class="codebox"><span class="lang">'+E(lang)+'</span><button class="copy" type="button">Copy</button><pre><code>'+E(t.strip())+'</code></pre></div>'

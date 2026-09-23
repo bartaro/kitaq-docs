@@ -70,6 +70,7 @@ MODULES={
 'mapper':'マッパーのバンクとIRQ','fds':'FDSディスク操作','fds_file':'FDSファイルのロード','fds_overlay':'FDSのオーバーレイコード',
 'fds_save':'FDS保存の宣言','fds_sound':'FDS波形音源','vrc6_sound':'VRC6拡張音源','vrc7_sound':'VRC7 FM音源',
 'math_fast':'高速な整数計算','math_fixed':'固定小数点計算の組み込み窓口','math_lut':'ルックアップテーブル','nes_game':'ゲーム向け操作名のマクロ','wire3d_dmg':'DMG向けワイヤーフレーム',
+'sprite_order':'優先度と交替によるスプライト選択',
 }
 def page(key,title,subtitle,body):
  depth='../' if '/' in key else ''

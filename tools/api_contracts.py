@@ -56,6 +56,8 @@ def render(record, contract, language, messages, ui):
             caption = shot['caption']
             if contract['review'] in ['physics-source-20260915','fc-physics-source-20260922','wireframe-source-20260915','raster-wave-source-20260922','raster-bands-source-20260922','rob-source-20260922','chain-body-source-20260922','fc-wireframe-source-20260922','fc-danmaku-source-20260922','zx0-source-20260922','sprite0-source-20260923','fds-query-source-20260923','fds-load-source-20260923','fds-file-source-20260923','peripheral-source-20260923']:
                 caption += ' — ' + ' '.join(messages[key][index].replace('`','') for key in example.get('expected', []))
+            if contract['review'] == 'sprite-order-source-20260923':
+                caption += ' — ' + ' '.join(messages[key][index].replace('`','') for key in example.get('expected', []))
             result.append('<figure class="example-result"><img class="screen" loading="lazy" src="' + prefix + html.escape(shot['image'], quote=True) + '" alt="' + html.escape(name + ': ' + caption, quote=True) + '"><figcaption>' + html.escape(caption) + '</figcaption></figure>')
         for clip in example.get('verified_audio', []):
             caption = clip['caption'] + ' — ' + ('確認した音声' if language == 'ja' else 'Captured audio')
@@ -233,6 +235,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_asset_examples(contracts))
     proofs.update(verified_bank_examples(contracts))
     proofs.update(verified_sprite_examples(contracts))
+    from api_sprite_order_proofs import verified_examples as verified_sprite_order_examples
+    proofs.update(verified_sprite_order_examples(contracts))
     proofs.update(verified_oam_examples(contracts))
     proofs.update(verified_fc_oam_examples(contracts))
     proofs.update(verified_oam_library_examples(contracts))
@@ -253,6 +257,9 @@ def publish(language, require_complete=False):
             path = folder / (volume + '.html')
             original = path.read_bytes()
             text = original.decode('utf-8').replace('\r\n', '\n')
+            if volume == 'gb-library':
+                from api_sprite_order_proofs import ensure_cards
+                text = ensure_cards(text, language)
             edits = []
             for name, start, end in CardRanges(text).ranges:
                 key = platform + ':' + name
@@ -380,6 +387,7 @@ def render_modules(text, platform, language, messages):
             if owner != platform: continue
             pattern = r'(<h3\b[^>]*id="module-' + re.escape(module) + r'"[^>]*>.*?</h3>)'
             review_date = '20260917' if path.stem == 'link_modules' else '20260916' if path.stem in ['sound_modules','batch300_modules'] else '20260915'
+            if path.stem == 'sprite_order_modules':review_date = '20260923'
             block = '<!-- api-module:start --><div data-module-contract="' + html.escape(path.stem.removesuffix('_modules'), quote=True) + '-source-' + review_date + '">'
             block += ''.join('<p>'+inline(messages[item][index])+'</p>' for item in paragraphs)
             block += '</div><!-- api-module:end -->'
@@ -1238,6 +1246,8 @@ def attach_verified_images(contracts, proofs):
                 caption += ' / frame ' + str(run['frames'])
             if result.get('kind') == 'dmg07':
                 caption += ' / player ' + str(run['slot'])
+            if result.get('kind') == 'sprite-order':
+                caption += ' / PHASE ' + str(run['state'][0]).zfill(2)
             matching[0]['verified_images'].append({'image': run['image'], 'caption': caption})
             if run.get('audio') and run.get('playback_clip',True):
                 matching[0]['verified_audio'].append({'audio': run['audio'], 'caption': caption})

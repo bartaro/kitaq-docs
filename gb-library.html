@@ -469,7 +469,7 @@ void main() {
     m_text(2,3,&quot;SOUND&quot;);
     Audio_Init(); Audio_PlaySFX(tone,1); m_number(42);
     while (1) { m_wait(); Audio_Update(); }
-}</code></pre></div></details><h2 id="api">ライブラリAPI辞典</h2><p>全540項目。各項目では、機能、引数、戻り値、制約、使用例と期待する結果を説明します。</p><!-- zx0-module:start --><section data-module-contract="zx0-source-20260922"><h3 id="module-zx0">zx0</h3><p>ZX0互換の圧縮素材をRAMやVRAMへ展開するライブラリです。PC側の<code>kitaqgb-zx0.exe</code>で素材を作り、実行中は必要なデータだけ展開します。<code>--format=auto</code>はraw・RLE・ZX0のペイロードを比較して最小を選びます。同サイズならraw、RLE、ZX0の順です。9バイトのヘッダーを含め65535バイト以内に収め、実際のCPUバンクやRAM容量にも合わせて素材を分割してください。</p><p>ZX0形式と元の圧縮アルゴリズムの設計者はEinar Saukas氏です。ここで提供する圧縮器・展開器はDAISUKE OBAによるKITAQ独自実装で、MITライセンスを適用します。</p><p>リポジトリ直下で実行するPC側のコマンド例です。ツールは`tools/zx0/build.ps1`でビルドできます。</p><pre><code>.\kitaqgb-zx0.exe tiles.bin tiles.zx0
+}</code></pre></div></details><h2 id="api">ライブラリAPI辞典</h2><p>全544項目。各項目では、機能、引数、戻り値、制約、使用例と期待する結果を説明します。</p><!-- zx0-module:start --><section data-module-contract="zx0-source-20260922"><h3 id="module-zx0">zx0</h3><p>ZX0互換の圧縮素材をRAMやVRAMへ展開するライブラリです。PC側の<code>kitaqgb-zx0.exe</code>で素材を作り、実行中は必要なデータだけ展開します。<code>--format=auto</code>はraw・RLE・ZX0のペイロードを比較して最小を選びます。同サイズならraw、RLE、ZX0の順です。9バイトのヘッダーを含め65535バイト以内に収め、実際のCPUバンクやRAM容量にも合わせて素材を分割してください。</p><p>ZX0形式と元の圧縮アルゴリズムの設計者はEinar Saukas氏です。ここで提供する圧縮器・展開器はDAISUKE OBAによるKITAQ独自実装で、MITライセンスを適用します。</p><p>リポジトリ直下で実行するPC側のコマンド例です。ツールは`tools/zx0/build.ps1`でビルドできます。</p><pre><code>.\kitaqgb-zx0.exe tiles.bin tiles.zx0
 .\kitaqgb-zx0.exe tiles.bin tiles.h --header=tiles
 .\kitaqgb-zx0.exe map.bin map.kqa --format=auto
 .\kitaqgb-zx0.exe tiles.zx0 restored.bin --decompress</code></pre><details class="api searchable" id="api-zx0_decompress" data-api-contract="zx0-source-20260922"><summary><code>zx0_decompress</code></summary><p>ZX0 v2の圧縮列を指定容量内のRAMへ展開します。既に展開したデータを参照して繰り返しを復元するため、出力先は読み書きできる必要があります。タイルマップやステージ表をCPUで加工してから使う場合に適しています。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u16 zx0_decompress(void* dst, u16 capacity, const void* src, u16 packed_size);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>展開先の書き込み可能なRAMの先頭です。NULLは使えません。容量は配列の要素数ではなくバイト数で指定します。</p></dd><dt><code>capacity</code></dt><dd><p>出力先に書き込めるバイト数です。ZX0の通常のデータは最低1バイト必要です。空のKQA1 rawデータだけは容量0で成功できます。</p></dd><dt><code>src</code></dt><dd><p>現在のバンクから読み出せる圧縮データの先頭です。NULLは使えません。</p></dd><dt><code>packed_size</code></dt><dd><p>入力データ全体のバイト数です。ZX0では終端までを含み、余分な末尾データは付けません。KQA1では9バイトのヘッダーも数えます。最大65535バイトです。</p></dd></dl><h4>戻り値</h4><p>成功時は展開したバイト数、エラー時は0を返します。必ず<code>zx0_error</code>も確認してください。</p><h4>使用条件と制限</h4><p><code>zx0.h</code>を読み込み、<code>lib/zx0.c</code>をコンパイルします。共有作業領域を使い、割り込みからの再入には対応しません。入力と出力を重ねず、CPUアドレスの折り返しや現在選択しているバンクの境界をまたがないようにしてください。ライブラリは素材のバンクを切り替えません。</p><p><code>zx0_error</code>は各呼び出しで更新します。0=成功、1=不正な引数、2=入力不足、3=不正な形式、4=出力容量不足、5=表示が有効です。エラーでは途中まで出力を書き込む場合があるため、失敗した出力は使わないでください。エラー番号は検出順で決まります。</p><p>順方向のZX0 v2に対応します。ZX0 v1、逆方向ストリーム、外部辞書は対象外です。展開前にPC側で作った素材と展開後サイズを把握し、十分な容量を確保してください。</p><p><a href="https://github.com/einar-saukas/ZX0">ZX0 format — Einar Saukas</a></p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>count=zx0_decompress(decoded_map,16,packed_map,packed_map_SIZE);
@@ -9173,6 +9173,115 @@ The byte additions wrap; this updates shadow storage even for an unallocated slo
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\sprite_shapes.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\sprite_shapes.gb --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/sprite.h:75</p><div class="original"><b>宣言の注記（原文）</b><pre>Report whether the software overlap estimate exceeds ten sprites on a scanline.</pre></div><p class="source">kitaqgb/lib/sprite.c:182</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 sprite_warn_scanline_overflow()
 {
     return (u8)(sprite_max_scanline_count() &gt; 10);
+}</code></pre></div></details></details><h3 id="module-sprite_order">sprite_order.h — 優先度と交替によるスプライト選択</h3><!-- api-module:start --><div data-module-contract="sprite_order-source-20260923"><p><code>sprite_order</code>は、重要な物体を先に選びつつ、同じ優先度の物体のOAM順を交替させるライブラリです。最大255件から画面全体で最大40件を出力し、走査線あたり10個という制限への対処を助けます。既存の<code>sprite</code>はスロットの確保やDMA転送を担当し、<code>sprite_order</code>は表示候補の選択順を担当します。</p><p><code>sprite_order.h</code>を読み込み、<code>sprite_order.c</code>を1回だけコンパイルします。初期化後は、各フレームで<code>begin</code>、必要な回数の<code>push</code>、<code>build</code>の順に呼びます。このライブラリだけなら<code>sprite.c</code>やグローバル変数の定義は不要です。</p><p>ハードウェアは同じ走査線にかかる最初の10個をOAM順に選びます。低いpriority値のものを先に置くことで、混雑時にも残したい物体を優先します。ただし、同じ優先度の物体へ均等な表示頻度を保証する方式ではありません。優先物体だけで10個に達すれば、その行の下位の物体は表示されません。</p><p><code>SpriteOrderOamEntry</code>はY、X、tile、flagsの4バイトです。<code>sprite.h</code>の影OAMを使う場合は<code>(SpriteOrderOamEntry*)kq_sprite_oam</code>へ出力できます。ただし<code>SPRITE_MAX</code>は標準の40とし、<code>sprite_alloc</code>の割当状態と並び替えを混在させないでください。<code>build</code>は割当管理情報を更新しません。</p></div><!-- api-module:end --><details class="api searchable" id="api-sprite_order_begin" data-api-contract="sprite-order-source-20260923"><summary><code>sprite_order_begin</code></summary><p>次のフレームの表示候補を登録するため、登録数を0にします。配列、高さ、回転位相を保持するため、毎フレームinitを呼ぶ場合と違って表示順の交替が続きます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void sprite_order_begin(SpriteOrder* order);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>order</code></dt><dd><p>呼び出し側で確保した<code>SpriteOrder</code>のアドレス。初回は<code>init</code>で設定し、処理中は前景コードだけで操作してください。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。orderがNULLなら何もしません。古い配列のバイト列や出力済みOAMは消去しません。</p><h4>使用条件と制限</h4><p><code>sprite_order.h</code>を読み込み、<code>sprite_order.c</code>を1回だけコンパイルします。初期化後は、各フレームで<code>begin</code>、必要な回数の<code>push</code>、<code>build</code>の順に呼びます。このライブラリだけなら<code>sprite.c</code>やグローバル変数の定義は不要です。</p><p>ハードウェアは同じ走査線にかかる最初の10個をOAM順に選びます。低いpriority値のものを先に置くことで、混雑時にも残したい物体を優先します。ただし、同じ優先度の物体へ均等な表示頻度を保証する方式ではありません。優先物体だけで10個に達すれば、その行の下位の物体は表示されません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>sprite_order_begin(&amp;order_demo);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase4/dmg-120.png" alt="sprite_order_begin: DMG / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>DMG / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase4/cgb-120.png" alt="sprite_order_begin: CGB / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>CGB / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase8/cgb-120.png" alt="sprite_order_begin: CGB / PHASE 08 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>CGB / PHASE 08 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><p><a href="samples/api-examples/gb/sprite_order_demo.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\sprite_order_demo.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\sprite_order_demo.gb --cgb=cgb --profile=dev --rst-disable --stack-bank=fixed --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/sprite_order.h:42</p><div class="original"><b>宣言の注記（原文）</b><pre>Discard this frame&#x27;s submissions while preserving storage, height and phase.
+A null state is ignored. Call once before submitting the next frame&#x27;s sprites.</pre></div><p class="source">kitaqgb/lib/sprite_order.c:24</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void sprite_order_begin(SpriteOrder* order)
+{
+    if (order != 0) order-&gt;count = 0;
+}</code></pre></div></details></details><details class="api searchable" id="api-sprite_order_build" data-api-contract="sprite-order-source-20260923"><summary><code>sprite_order_build</code></summary><p>登録済みの候補から、優先度と回転位相に従って160バイトの影OAMを作ります。使わない枠を全て0にして隠し、次回の位相へ進めます。登録用配列の順序は変えません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 sprite_order_build(SpriteOrder* order, SpriteOrderOamEntry* output, u8 limit);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>order</code></dt><dd><p>呼び出し側で確保した<code>SpriteOrder</code>のアドレス。初回は<code>init</code>で設定し、処理中は前景コードだけで操作してください。</p></dd><dt><code>output</code></dt><dd><p><code>SpriteOrderOamEntry</code>40件分の書き込み可能な配列。limitが0や40未満でも160バイト全体へ書き込みます。</p></dd><dt><code>limit</code></dt><dd><p>出力する最大件数0～40。40より大きい値は40に制限します。走査線ごとの上限指定ではなく、OAM全体の件数です。</p></dd></dl><h4>戻り値</h4><p>出力した件数0～40を返します。正常な空の登録列では全枠を消去しphase=0にします。空でなければphaseをcountで折り返して順序の開始位置に使い、最後に1進めて再び折り返します。limit=0でも位相は進みます。NULLのorder/output、無効な状態、高さ不正、count&gt;capacityでは0を返し、出力とphaseを変更しません。</p><h4>使用条件と制限</h4><p>ハードウェアは同じ走査線にかかる最初の10個をOAM順に選びます。低いpriority値のものを先に置くことで、混雑時にも残したい物体を優先します。ただし、同じ優先度の物体へ均等な表示頻度を保証する方式ではありません。優先物体だけで10個に達すれば、その行の下位の物体は表示されません。</p><p>ここでのpriorityは選択順です。背景より後ろに描く属性とは別です。DMGでは、選択された物体同士の重なりはX座標の小さいものが優先され、Xが同じときにOAM順で決まります。CGBの通常のカラー用重なり順はOAM順ですが、OPRIでDMG互換の順序を選ぶ設定には影響しません。このライブラリはハードウェアの優先規則を変更しません。</p><p><code>SpriteOrderOamEntry</code>はY、X、tile、flagsの4バイトです。<code>sprite.h</code>の影OAMを使う場合は<code>(SpriteOrderOamEntry*)kq_sprite_oam</code>へ出力できます。ただし<code>SPRITE_MAX</code>は標準の40とし、<code>sprite_alloc</code>の割当状態と並び替えを混在させないでください。<code>build</code>は割当管理情報を更新しません。</p><p><code>build</code>はRAMへの書き込みだけです。出力配列は160バイト必要で、状態や登録用配列と重ねてはいけません。OAM DMAに使うバッファは256バイト境界に配置します。書き込みを完了してからVBlank中に転送し、途中の配列を割り込みから転送しないでください。サンプルでは<code>sprite_flush_oam</code>を使います。</p><p>登録は1個ずつ一定量の処理で行い、出力時は最大4回、登録配列を走査して160バイトの影OAMを初期化します。配列自体の並び替えや一時ソート配列は不要です。255件を毎フレーム扱える速度を保証するものではありません。実際のゲームで必要な候補数に絞ってください。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>order_demo_state[1]=sprite_order_build(&amp;order_demo,(SpriteOrderOamEntry*)kq_sprite_oam,40);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase4/dmg-120.png" alt="sprite_order_build: DMG / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>DMG / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase4/cgb-120.png" alt="sprite_order_build: CGB / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>CGB / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase8/cgb-120.png" alt="sprite_order_build: CGB / PHASE 08 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>CGB / PHASE 08 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><p><a href="samples/api-examples/gb/sprite_order_demo.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\sprite_order_demo.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\sprite_order_demo.gb --cgb=cgb --profile=dev --rst-disable --stack-bank=fixed --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/sprite_order.h:62</p><div class="original"><b>宣言の注記（原文）</b><pre>Write a complete 160-byte shadow OAM: ascending priority, then cyclic order
+within each priority. Clamp limit to 40, return the number emitted and zero
+all unused entries (including Y) so they cannot consume scanline slots.
+Advance phase once for a nonempty valid queue, even when limit is zero.
+Empty queues reset phase to zero. Null/disabled/corrupt state or null output
+returns 0 without modifying output or phase.
+Output must provide 40 entries and must not overlap item/state storage.
+This only writes RAM. Build in foreground, then transfer during VBlank.
+DMG overlap priority also depends on X: this cannot override that hardware
+rule. OAM order chooses the first ten sprites per scanline on both DMG/CGB.
+It neither updates sprite_alloc&#x27;s bookkeeping nor performs OAM DMA.</pre></div><p class="source">kitaqgb/lib/sprite_order.c:57</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 sprite_order_build(SpriteOrder* order, SpriteOrderOamEntry* output, u8 limit)
+{
+    u8 i;
+    u8 count;
+    u8 phase;
+    u8 priority;
+    u8 visited;
+    u8 written;
+    SpriteOrderItem* item;
+    if (order == 0 || output == 0) return 0;
+    if (order-&gt;items == 0 || order-&gt;capacity == 0) return 0;
+    if (order-&gt;count &gt; order-&gt;capacity) return 0;
+    if (order-&gt;height != 8 &amp;&amp; order-&gt;height != 16) return 0;
+    // Clear all hardware slots regardless of the requested emission limit.
+    for (i = 0; i &lt; SPRITE_ORDER_OAM_COUNT; i++) {
+        output[i].y = 0;
+        output[i].x = 0;
+        output[i].tile = 0;
+        output[i].flags = 0;
+    }
+    count = order-&gt;count;
+    if (count == 0) {
+        order-&gt;phase = 0;
+        return 0;
+    }
+    if (limit &gt; SPRITE_ORDER_OAM_COUNT) limit = SPRITE_ORDER_OAM_COUNT;
+    phase = order-&gt;phase;
+    while (phase &gt;= count) phase = (u8)(phase - count);
+    written = 0;
+    for (priority = 0; priority &lt; SPRITE_ORDER_LEVELS &amp;&amp; written &lt; limit; priority++) {
+        i = phase;
+        visited = 0;
+        while (visited &lt; count &amp;&amp; written &lt; limit) {
+            item = &amp;order-&gt;items[i];
+            if (item-&gt;priority == priority) {
+                output[written].y = item-&gt;oam.y;
+                output[written].x = item-&gt;oam.x;
+                output[written].tile = item-&gt;oam.tile;
+                output[written].flags = item-&gt;oam.flags;
+                written++;
+            }
+            visited++;
+            i++;
+            if (i &gt;= count) i = 0;
+        }
+    }
+    phase++;
+    if (phase &gt;= count) phase = 0;
+    order-&gt;phase = phase;
+    return written;
+}</code></pre></div></details></details><details class="api searchable" id="api-sprite_order_init" data-api-contract="sprite-order-source-20260923"><summary><code>sprite_order_init</code></summary><p>表示順を管理する状態に登録用配列を関連付け、登録数と回転位相を0に戻します。新しいシーンや配列へ切り替えるときに使います。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 sprite_order_init(SpriteOrder* order, SpriteOrderItem* items, u8 capacity, u8 height);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>order</code></dt><dd><p>呼び出し側で確保した<code>SpriteOrder</code>のアドレス。初回は<code>init</code>で設定し、処理中は前景コードだけで操作してください。</p></dd><dt><code>items</code></dt><dd><p>書き込み可能な<code>SpriteOrderItem</code>配列。1件5バイトで、capacity件分を確保し、使用中は有効に保ってください。</p></dd><dt><code>capacity</code></dt><dd><p>配列の件数1～255。バイト数やハードウェアの表示枠数ではありません。</p></dd><dt><code>height</code></dt><dd><p>高さは全物体で共通です。LCDCの8×8／8×16設定に合わせて8または16を指定してください。ライブラリはLCDCを設定しません。8×16モードでは、ハードウェアがタイル番号の最下位ビットを無視します。</p></dd></dl><h4>戻り値</h4><p>成功は1、itemsがNULL、capacityが0、heightが8/16以外、またはorderがNULLなら0です。orderが非NULLの失敗ではitems=NULL、capacity=count=phase=0、height=8の無効状態になります。items配列は変更しません。</p><h4>使用条件と制限</h4><p><code>sprite_order.h</code>を読み込み、<code>sprite_order.c</code>を1回だけコンパイルします。初期化後は、各フレームで<code>begin</code>、必要な回数の<code>push</code>、<code>build</code>の順に呼びます。このライブラリだけなら<code>sprite.c</code>やグローバル変数の定義は不要です。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>sprite_init();sprite_order_init(&amp;order_demo,order_demo_items,14,8);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase4/dmg-120.png" alt="sprite_order_init: DMG / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>DMG / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase4/cgb-120.png" alt="sprite_order_init: CGB / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>CGB / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase8/cgb-120.png" alt="sprite_order_init: CGB / PHASE 08 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>CGB / PHASE 08 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><p><a href="samples/api-examples/gb/sprite_order_demo.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\sprite_order_demo.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\sprite_order_demo.gb --cgb=cgb --profile=dev --rst-disable --stack-bank=fixed --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/sprite_order.h:38</p><div class="original"><b>宣言の注記（原文）</b><pre>Bind writable item storage and select the hardware sprite height (8 or 16).
+Return 1 on success. Invalid storage, zero capacity or another height returns
+0 and leaves a non-null state disabled. A null state returns 0 without writes.</pre></div><p class="source">kitaqgb/lib/sprite_order.c:6</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 sprite_order_init(SpriteOrder* order, SpriteOrderItem* items, u8 capacity, u8 height)
+{
+    if (order == 0) return 0;
+    order-&gt;items = 0;
+    order-&gt;capacity = 0;
+    order-&gt;count = 0;
+    order-&gt;height = 8;
+    order-&gt;phase = 0;
+    if (items == 0 || capacity == 0) return 0;
+    if (height != 8 &amp;&amp; height != 16) return 0;
+    order-&gt;items = items;
+    order-&gt;capacity = capacity;
+    order-&gt;height = height;
+    return 1;
+}</code></pre></div></details></details><details class="api searchable" id="api-sprite_order_push" data-api-contract="sprite-order-source-20260923"><summary><code>sprite_order_push</code></summary><p>画面に少なくとも1ピクセル分かかるスプライトを1件登録します。画面外の物体は先に除外し、OAMの選択枠を無駄に使わないようにします。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 sprite_order_push(SpriteOrder* order, s16 x, s16 y, u8 tile, u8 flags, u8 priority);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>order</code></dt><dd><p>呼び出し側で確保した<code>SpriteOrder</code>のアドレス。初回は<code>init</code>で設定し、処理中は前景コードだけで操作してください。</p></dd><dt><code>x</code></dt><dd><p>画面左上を原点とする符号付きX座標。左端が−7～159なら受け付けます。−8以下または160以上は全体が画面外です。保存時に8を足してOAM座標へ変換します。</p></dd><dt><code>y</code></dt><dd><p>画面左上を原点とする符号付きY座標。高さ8なら−7～143、高さ16なら−15～143を受け付けます。保存時に16を足します。</p></dd><dt><code>tile</code></dt><dd><p>タイル番号0～255。そのまま保存します。8×16モードの扱いはheightの説明を参照してください。</p></dd><dt><code>flags</code></dt><dd><p>ハードウェア属性の1バイト。左右・上下反転、背景優先、DMG/CGBパレット、CGB VRAMバンクなどを指定し、そのまま保存します。</p></dd><dt><code>priority</code></dt><dd><p>ソフトウェアの選択優先度0～3。0が最優先です。4以上は登録を拒否します。ハードウェア属性のflagsとは別の値です。</p></dd></dl><h4>戻り値</h4><p>登録できれば1を返しcountを1増やします。NULLまたは無効な状態、高さ不正、満杯、不正なpriority、完全な画面外なら0で、登録配列とcountは変わりません。</p><h4>使用条件と制限</h4><p>高さは全物体で共通です。LCDCの8×8／8×16設定に合わせて8または16を指定してください。ライブラリはLCDCを設定しません。8×16モードでは、ハードウェアがタイル番号の最下位ビットを無視します。</p><p>ハードウェアは同じ走査線にかかる最初の10個をOAM順に選びます。低いpriority値のものを先に置くことで、混雑時にも残したい物体を優先します。ただし、同じ優先度の物体へ均等な表示頻度を保証する方式ではありません。優先物体だけで10個に達すれば、その行の下位の物体は表示されません。</p><p>ここでのpriorityは選択順です。背景より後ろに描く属性とは別です。DMGでは、選択された物体同士の重なりはX座標の小さいものが優先され、Xが同じときにOAM順で決まります。CGBの通常のカラー用重なり順はOAM順ですが、OPRIでDMG互換の順序を選ぶ設定には影響しません。このライブラリはハードウェアの優先規則を変更しません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>sprite_order_push(&amp;order_demo,8,64,128,0,0);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase4/dmg-120.png" alt="sprite_order_push: DMG / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>DMG / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase4/cgb-120.png" alt="sprite_order_push: CGB / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>CGB / PHASE 04 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-sprite-order/example/phase8/cgb-120.png" alt="sprite_order_push: CGB / PHASE 08 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。"><figcaption>CGB / PHASE 08 — このサンプルは、同じ走査線に14個を置いたときの表示選択を確認するものです。左のHIGHにある菱形2個が高優先度、右のNORMALの四角12個が通常優先度です。CGBでは菱形が赤、四角が青、DMGでは灰色と黒になります。菱形は常に2個とも表示され、四角は8個だけ表示されます。下の0～Bが四角の位置番号です。PHASE 04では4～B、PHASE 08では8～Bと0～3が見えます。通常ビルドは60回のフレーム待機ごとにPHASEを進めます。掲載画像は同じプログラムの位相を固定したもので、動作版でも表示する四角の変化を確認しています。</figcaption></figure><p><a href="samples/api-examples/gb/sprite_order_demo.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\sprite_order_demo.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\sprite_order_demo.gb --cgb=cgb --profile=dev --rst-disable --stack-bank=fixed --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/sprite_order.h:49</p><div class="original"><b>宣言の注記（原文）</b><pre>Submit one sprite at signed, top-left SCREEN pixel coordinates. Preserve the
+tile and attribute bytes; use priority 0 (first) through 3 (last). Fully
+off-screen sprites, invalid priorities, disabled state and full storage return
+0 without consuming a slot. Partly visible sprites are accepted. Return 1 on
+acceptance. Hardware 8x16 mode still ignores the tile index&#x27;s low bit.</pre></div><p class="source">kitaqgb/lib/sprite_order.c:31</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 sprite_order_push(SpriteOrder* order, s16 x, s16 y, u8 tile, u8 flags, u8 priority)
+{
+    SpriteOrderItem* item;
+    if (order == 0) return 0;
+    if (order-&gt;items == 0 || order-&gt;capacity == 0) return 0;
+    if (order-&gt;height != 8 &amp;&amp; order-&gt;height != 16) return 0;
+    if (order-&gt;count &gt;= order-&gt;capacity || priority &gt;= SPRITE_ORDER_LEVELS) return 0;
+    if (x &lt;= -8 || x &gt;= 160 || y &gt;= 144) return 0;
+    if (order-&gt;height == 16) {
+        if (y &lt;= -16) return 0;
+    } else {
+        if (y &lt;= -8) return 0;
+    }
+    item = &amp;order-&gt;items[order-&gt;count];
+    item-&gt;oam.y = (u8)(y + 16);
+    item-&gt;oam.x = (u8)(x + 8);
+    item-&gt;oam.tile = tile;
+    item-&gt;oam.flags = flags;
+    item-&gt;priority = priority;
+    order-&gt;count++;
+    return 1;
 }</code></pre></div></details></details><h3 id="module-system">system.h — 起動、フレーム数、待機と割り込み</h3><!-- api-module:start --><div data-module-contract="batch100-source-20260915"><p>フレーム待機回数の管理、待機後のコールバック、CPU割り込みの許可・禁止を扱います。</p></div><!-- api-module:end --><details class="api searchable" id="api-system_disable_interrupts" data-api-contract="batch100-source-20260915"><summary><code>system_disable_interrupts</code></summary><p>CPUのマスク可能な割り込みを禁止します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void system_disable_interrupts();</code></pre></div><h4>戻り値</h4><p>戻り値はありません。</p><h4>使用条件と制限</h4><p>必要な共有データの更新を短く保ち、更新後は適切に割り込みを再開してください。フレームの待機条件とは区別して使用します。</p><p>GB版の待機はLCDが停止していると直ちに戻ります。その場合もラッパーのカウンター加算とコールバックは行います。初期化だけではLCDや割り込み元は設定しません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>system_disable_interrupts();</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>サンプルでは禁止と再開を対にして呼びます。CPUの割り込み状態は専用の検証プログラムでも確認します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-batch100/gb-services/dmg/screen.png" alt="system_disable_interrupts: DMG"><figcaption>DMG</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-batch100/gb-services/cgb/screen.png" alt="system_disable_interrupts: CGB"><figcaption>CGB</figcaption></figure><p><a href="samples/api-examples/gb/batch_services.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqgb\kitaqgb.exe .\kitaq-docs\samples\api-examples\gb\batch_services.c -I .\kitaqgb\lib -I .\kitaq-docs\samples -o .\out\batch_services.gb --no-cache --no-disasm --profile=dev --rst-disable --stack-bank=fixed --cgb=cgb --cart=mbc5 --romsize=64k</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqgb/lib/system.h:25</p><div class="original"><b>宣言の注記（原文）</b><pre>Disable CPU interrupts and return; callers must explicitly re-enable them later.</pre></div><p class="source">kitaqgb/lib/system.c:52</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void system_disable_interrupts()
 {
@@ -18722,7 +18831,68 @@ u8 sprite_max_scanline_count();
 u8 metasprite_draw(u8 first_id, u8 x, u8 y, const MetaSpritePart* parts, u8 count);
 // Advance animation ticks/frame with wrapping frame selection and return the
 // resulting tile. Zero ticks-per-frame freezes animation; null state returns zero.
-u8 anim_update(SpriteAnim* anim);</code></pre></div><p class="source">kitaqgb/lib/sprite.h</p></details><details class="searchable"><summary><code>system.h</code> — 起動、フレーム数、待機と割り込み</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#pragma once
+u8 anim_update(SpriteAnim* anim);</code></pre></div><p class="source">kitaqgb/lib/sprite.h</p></details><details class="searchable"><summary><code>sprite_order.h</code> — 優先度と交替によるスプライト選択</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#pragma once
+// Copyright (c) 2026 DAISUKE OBA. MIT License.
+
+// Hardware-compatible layout without requiring the sprite allocator or its
+// global storage. Cast a sprite.h shadow buffer to this type when combining
+// the libraries; both layouts contain exactly Y, X, tile and flags bytes.
+typedef __packed struct {
+    u8 y;
+    u8 x;
+    u8 tile;
+    u8 flags;
+} SpriteOrderOamEntry;
+
+#define SPRITE_ORDER_LEVELS 4
+#define SPRITE_ORDER_OAM_COUNT 40
+
+// One submitted, visible sprite. Attributes retain their hardware meaning;
+// priority 0..3 controls OAM selection order, not the BG-over-OBJ flag.
+typedef __packed struct {
+    SpriteOrderOamEntry oam;
+    u8 priority;
+} SpriteOrderItem;
+
+// Caller-owned foreground state. Capacity is 1..255 items; count includes only
+// accepted submissions. Rebuild the same logical submission list each frame so
+// phase rotation distributes selection among equal-priority sprites.
+typedef struct {
+    SpriteOrderItem* items;
+    u8 capacity;
+    u8 count;
+    u8 height;
+    u8 phase;
+} SpriteOrder;
+
+// Bind writable item storage and select the hardware sprite height (8 or 16).
+// Return 1 on success. Invalid storage, zero capacity or another height returns
+// 0 and leaves a non-null state disabled. A null state returns 0 without writes.
+u8 sprite_order_init(SpriteOrder* order, SpriteOrderItem* items, u8 capacity, u8 height);
+
+// Discard this frame&#x27;s submissions while preserving storage, height and phase.
+// A null state is ignored. Call once before submitting the next frame&#x27;s sprites.
+void sprite_order_begin(SpriteOrder* order);
+
+// Submit one sprite at signed, top-left SCREEN pixel coordinates. Preserve the
+// tile and attribute bytes; use priority 0 (first) through 3 (last). Fully
+// off-screen sprites, invalid priorities, disabled state and full storage return
+// 0 without consuming a slot. Partly visible sprites are accepted. Return 1 on
+// acceptance. Hardware 8x16 mode still ignores the tile index&#x27;s low bit.
+u8 sprite_order_push(SpriteOrder* order, s16 x, s16 y, u8 tile, u8 flags, u8 priority);
+
+// Write a complete 160-byte shadow OAM: ascending priority, then cyclic order
+// within each priority. Clamp limit to 40, return the number emitted and zero
+// all unused entries (including Y) so they cannot consume scanline slots.
+// Advance phase once for a nonempty valid queue, even when limit is zero.
+// Empty queues reset phase to zero. Null/disabled/corrupt state or null output
+// returns 0 without modifying output or phase.
+// Output must provide 40 entries and must not overlap item/state storage.
+// This only writes RAM. Build in foreground, then transfer during VBlank.
+// DMG overlap priority also depends on X: this cannot override that hardware
+// rule. OAM order chooses the first ten sprites per scanline on both DMG/CGB.
+// It neither updates sprite_alloc&#x27;s bookkeeping nor performs OAM DMA.
+u8 sprite_order_build(SpriteOrder* order, SpriteOrderOamEntry* output, u8 limit);</code></pre></div><p class="source">kitaqgb/lib/sprite_order.h</p></details><details class="searchable"><summary><code>system.h</code> — 起動、フレーム数、待機と割り込み</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#pragma once
 
 // This callback runs in the caller of system_wait_vblank, not as an installed ISR.
 // Its plain pointer has no ROM bank component; keep the target callable in that mapping.

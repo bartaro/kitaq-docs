@@ -28,6 +28,8 @@ def overview(value,language):
     block+='<p><a href="'+prefix+'samples/api-examples/fc/wire3d_cube.c">'+('回転する立方体のサンプル' if language=='ja' else 'Rotating cube sample')+'</a></p>'
     build=r'.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\wire3d_cube.c -I .\kitaqfc\lib --mapper=nrom --nes-chr-ram -o .\wire_cube.nes'
     block+=md('```powershell\n'+build+'\n```')
+    label='コピー' if language=='ja' else 'Copy'
+    block=re.sub(r'(<button class="copy" type="button">)(?:コピー|Copy)(</button>)',lambda m:m[1]+label+m[2],block)
     for width,height in [(64,48),(96,64),(128,96)]:
         source=PROOFS/f'{width}-cube/screen.png';destination=SITE/f'verification/api-wireframe-fc/cube-{width}.png'
         destination.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,destination)

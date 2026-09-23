@@ -36,6 +36,13 @@ def public_file(relative):
         return False
     if path.parts[0] == 'verification' and any(part in ('state','oracle','multiply') for part in path.parts[2:]):
         return False
+    if path.parts[:2] == ('verification','api-sprite-order'):
+        return path.as_posix() in {
+            'verification/api-sprite-order/example/phase4/dmg-120.png',
+            'verification/api-sprite-order/example/phase4/cgb-120.png',
+            'verification/api-sprite-order/example/phase8/cgb-120.png',
+            'verification/api-sprite-order/example/animated/example.gb',
+        }
     if path.parts[:2] == ('verification','api-audio-queue'):
         return path.suffix in PUBLIC_EVIDENCE_SUFFIXES | {'.wav'}
     if path.parts[:2] == ('verification','api-fc-audio-vblank'):

@@ -34,6 +34,10 @@ Omitting all CHR options embeds a blank 8 KiB CHR ROM. Explicitly select `--nes-
 def overview(text,language):
     text=re.sub(r'<!-- fc-chr-ram:start -->.*?<!-- fc-chr-ram:end -->','',text,flags=re.S)
     block='<!-- fc-chr-ram:start --><section id="chr-ram-build">'+md(TEXT[language])+'</section><!-- fc-chr-ram:end -->'
+    # Standalone publication must not depend on generate_en's global code
+    # renderer override having run earlier in this Python process.
+    label='コピー' if language=='ja' else 'Copy'
+    block=re.sub(r'(<button class="copy" type="button">)(?:コピー|Copy)(</button>)',lambda m:m[1]+label+m[2],block)
     text,count=re.subn(r'(?=<h2[^>]*>9[ .　])',lambda m:block,text,count=1)
     assert count==1
     return text
