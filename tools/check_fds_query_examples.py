@@ -44,6 +44,10 @@ for lesson,mapper,extra,expected in [
         if lesson=='metadata':
             manifest=SITE/'samples/api-examples/fc/fds_metadata.json'
             cmd+=['--fds-meta='+str(manifest)];inputs[manifest.relative_to(SITE).as_posix()]=sha(manifest)
+            for entry in json.loads(manifest.read_text())['files']:
+                if entry.get('source'):
+                    payload=manifest.parent/entry['source']
+                    inputs[payload.relative_to(SITE).as_posix()]=sha(payload)
         p=subprocess.run(cmd,capture_output=True,cwd=folder,timeout=90)
         if p.returncode:raise RuntimeError(mode+': '+(p.stdout+p.stderr).decode(errors='replace')[-4000:])
         environment=None
