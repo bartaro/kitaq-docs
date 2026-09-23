@@ -48,7 +48,9 @@ def definitions(p, height=None):
   pos=m.start();line=t.count('\n',0,pos)+1
   proto=re.sub(r'\s+',' ',t[m.start():m.end()]).strip().rstrip(';{').strip()
   before=t[max(0,pos-1600):pos]
-  comment=re.search(r'((?:(?://[^\n]*\n)|(?:/\*.*?\*/\s*))+)[ \t\n]*$',before,re.S)
+  # Do not let backtracking extend one block comment past its closing marker.
+  # Otherwise earlier prototypes can be swallowed into the following API's notes.
+  comment=re.search(r'((?:(?://[^\n]*\n)|(?:/\*(?:(?!\*/).)*\*/\s*))+)[ \t\n]*$',before,re.S)
   desc=comment[1] if comment else ''
   desc=re.sub(r'^\s*// ?|/\*|\*/|^\s*\* ?','',desc,flags=re.M).strip()
   body=''
