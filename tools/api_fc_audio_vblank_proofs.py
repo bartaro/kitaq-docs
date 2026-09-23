@@ -11,7 +11,7 @@ read=lambda p:json.loads(p.read_text(encoding='utf-8'))
 def verified_examples(contracts):
  selected={k:v for k,v in contracts.items() if v['review']==REVIEW}
  if not selected:return {}
- assert len(selected)==13
+ assert len(selected)==16
  folder=SITE/'verification/api-fc-audio-vblank'
  state=read(folder/'state/results.json')
  assert state['script_sha256']==sha(SITE/'tools/check_fc_audio_vblank_state.py')
@@ -32,12 +32,31 @@ def verified_examples(contracts):
   assert sha(SITE/row['audio'])==row['audio_sha256']
   assert row['audio_segments']['during_busy']['rms']>100 and row['audio_segments']['after_refill']['rms']>100
   assert row['audio_segments']['after_end']['peak']==0
+ extended=read(folder/'extensions/state/results.json')
+ assert extended['script_sha256']==sha(SITE/'tools/check_fc_audio_vblank_extensions.py')
+ for name,path in [('compiler',REPOS/'kitaqfc/kitaqfc.exe'),('emulator',REPOS/'kurosaki/kurosaki.exe'),('library',REPOS/'kitaqfc/lib/audio_vblank.c'),('header',REPOS/'kitaqfc/lib/audio_vblank.h')]:
+  assert extended[name+'_sha256']==sha(path),name+' extension input changed'
+ assert len(extended['records'])==8
+ assert {(r['name'],r['variant']) for r in extended['records']}=={(n,v) for n in ['controls','overlay'] for v in ['default','unoptimized','no-inline','fastcall']}
+ for row in extended['records']:
+  assert row['passed'] and row['actual']==([66,0,165] if row['name']=='controls' else [1,0,165])
+  for key in ['source','rom']:assert sha(SITE/row[key])==row[key+'_sha256']
+  if row['name']=='overlay':assert row['writes']==row['expected_writes']
+ effects=read(folder/'extensions/example/results.json')
+ assert effects['script_sha256']==sha(SITE/'tools/check_fc_audio_vblank_effects.py')
+ assert len(effects['records'])==3 and {r['mode'] for r in effects['records']}=={'nrom','mmc3','nrom-O0'}
+ for row in effects['records']:
+  verify_row(row);assert row['actual']==[1,1,1,1,0,165]
+  assert sha(SITE/row['audio'])==row['audio_sha256'] and row['noise_triggers']==[8]
+  assert all(s.get('frequency_ok',True) for s in row['audio_segments'].values())
+  assert all(row['audio_segments'][k]['peak']==0 for k in ['paused','noise_decayed','finished'])
+  assert row['audio_segments']['noise_early']['rms']>row['audio_segments']['noise_late']['rms']>100
  for key,c in selected.items():
   sample=(SITE/c['example']['program']).read_text(encoding='utf-8')
   assert c['example']['code'] in sample
   if key!='fc:__nes_audio_vblank_tick':assert re.search(r'\b'+key.split(':')[1]+r'\s*\(',c['example']['code'])
  # Present one capture rather than repeat the same screen/audio for each build mode.
- return {key:dict(api=key.split(':')[1],kind='fc-audio-vblank',runs=[visual['records'][0]]) for key in selected}
+ return {key:dict(api=key.split(':')[1],kind='fc-audio-vblank',runs=[next(r for r in visual['records']+effects['records'] if r['mode']=='nrom' and r['source']==c['example']['program'])]) for key,c in selected.items()}
 
 def overview(text,language):
  import api_contracts as api
@@ -95,4 +114,4 @@ if __name__=='__main__':
   path.write_text(overview(path.read_text(encoding='utf-8'),lang),encoding='utf-8')
   path=path.with_name('kitaqfc.html')
   path.write_text(hook_overview(path.read_text(encoding='utf-8'),lang),encoding='utf-8')
- print('13 NMI music APIs rendered in JA/EN with the captured phrase')
+ print('16 NMI music APIs rendered in JA/EN with captured music and effects')

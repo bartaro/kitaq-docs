@@ -20,8 +20,8 @@
     "en": "The 40-byte RAM ring has eight physical slots, with one left empty to distinguish full from empty. Usable capacity is seven records. Use one foreground producer; do not enqueue, refill or initialize from NMI. The producer publishes a one-byte write position only after copying the complete record, so NMI cannot read a partial record."
   },
   "fc_audio_vblank_starvation": {
-    "ja": "待機時間が尽きて次のレコードがなければ4音源を消音し、再開可能な待機状態になります。補充後の次のNMIで再開します。空になってから補充されるまでを1回の補充不足として数えます。消音後にHOLDだけを送っても、前の音は復元しません。通常は各フレームにrefillを呼び、重い処理に入る前に十分な待機時間をキューへ入れます。",
-    "en": "If a delay expires with no next record, silence all four channels and wait for more data. Playback resumes at the next NMI after enqueueing. Each starvation episode is counted once, until a record arrives. HOLD alone does not restore notes silenced by starvation. Normally refill each frame and queue enough timed records before expensive work."
+    "ja": "待機時間が尽きて次のBGMレコードがなければBGMの音を停止し、補充後のNMIで再開します。独立したSFXは進み続けます。補充不足は空の状態へ移った回数として数えます。HOLDだけを補充しても停止前のBGM音は復元しません。通常は毎フレームrefillを呼び、重い処理の前に十分な待機時間をキューへ入れてください。",
+    "en": "When the delay expires without another BGM record, stop the BGM notes and resume at an NMI after data arrives. An independent SFX continues. Count entries into starvation, not every empty frame. Enqueueing only HOLD values does not restore the old BGM notes. Normally refill each frame and queue enough playing time before lengthy work."
   },
   "fc_audio_vblank_expected": {
     "ja": "サンプルは独自の4音源フレーズを1回再生します。前景処理が90フレーム補充を止めて整数計算をしている間も音楽が進みます。画面の「PHRASE COMPLETE / SILENT」「UNDERRUNS 0 / MATH OK」は、終了・補充不足0・計算結果一致を表します。添付の音声でパルスの旋律と伴奏、三角波の低音、ノイズを確認できます。終了後は無音です。画像は制御結果の表示であり、音の確認には音声を使ってください。",
@@ -52,20 +52,20 @@
     "en": "Return 1 when accepted. Full, null or invalid tonal/noise values return 0 without changing the queue. The four channel bytes of a terminator are not validated."
   },
   "fc_audio_vblank_queued_return": {
-    "ja": "0～7レコードです。現在鳴っている音の待機時間は数えません。NMIが消費を進めるので、読み取った時点の値です。",
-    "en": "Return 0..7 records, excluding the currently sounding record’s remaining delay. NMI can advance consumption, so this is a momentary value."
+    "ja": "BGMの0～7レコードです。現在の待機時間とSFXレコードは数えません。NMIが消費を進めるため、読み取り時点の値です。",
+    "en": "Return 0..7 queued BGM records, excluding the current delay and all SFX records. NMI advances consumption, so the result is a momentary observation."
   },
   "fc_audio_vblank_free_return": {
-    "ja": "0～7スロットで、`7−queued()`です。バイト数ではありません。1スロットに5バイトのレコードを1つ格納します。",
-    "en": "Return 0..7 slots, equal to `7−queued()`. This is not a byte count; one slot holds one five-byte record."
+    "ja": "BGMキューの0～7スロットで、7−queued()です。バイト数ではなく、1スロットに5バイトを格納します。SFXの35バイト領域はこのキューと別です。",
+    "en": "Return 0..7 BGM slots, equal to 7−queued(). This is a slot count, with five bytes per slot. The separate 35-byte SFX buffer is not part of this queue."
   },
   "fc_audio_vblank_start_note": {
-    "ja": "初期化と補充を先に行ってください。NMI自体は有効にしません。有効な待機時間が残っている再生中に呼んでも、待機時間や読み取り位置は変更しません。",
-    "en": "Initialize and enqueue first. This does not enable NMI itself. Calling during playback leaves the current delay and read position unchanged."
+    "ja": "初期化と補充を先に行ってください。NMI自体は有効にせず、現在の待機時間や読み取り位置も変更しません。一時停止の解除にはpause(0)を使います。startだけでは一時停止を解除しません。",
+    "en": "Initialize and enqueue first. This neither enables NMI nor changes the current delay or read position. Resume a paused driver with pause(0); start alone does not unpause it."
   },
   "fc_audio_vblank_stop_note": {
-    "ja": "一時停止位置は保存しません。再開にはset_musicまたはplay_musicを使います。音色と補充不足カウンターは保持し、NMIも無効にしません。",
-    "en": "No pause position is saved. Start another stream with set_music or play_music. Timbres and the starvation counter are retained; NMI stays enabled."
+    "ja": "BGMとSFXをともに停止し、キュー、補充元、両方の再生位置、一時停止状態を破棄します。音色と補充不足カウンターは保持し、NMIは無効にしません。位置を保って休止するにはpauseを使います。set_musicとplay_musicも内部でこの停止を行うため、SFXを取り消します。",
+    "en": "Stop both BGM and SFX, discarding the queue, feeder, both playback positions and pause state. Retain timbres and the starvation counter; do not disable NMI. Use pause to preserve position. set_music and play_music also perform this stop internally, cancelling SFX."
   },
   "fc_audio_vblank_set_return": {
     "ja": "ポインターと個数が有効なら1、null・0個・13107超なら0です。失敗時もそれまでの再生とキューは停止・破棄します。各レコードの内容は補充時に検査します。",
@@ -88,8 +88,8 @@
     "en": "Call init once first. play_music retains timbres and the starvation counter. Continue calling refill periodically for long or looping streams."
   },
   "fc_audio_vblank_playing_return": {
-    "ja": "有効なら1、停止または終端到達後は0です。補充不足で一時的に消音している間も1なので、この値だけでは実際に音が鳴っているとは判断できません。",
-    "en": "Return 1 when enabled, or 0 after stop/termination. Starvation remains enabled and returns 1 even while silent, so this is not an audible-sound indicator."
+    "ja": "BGM消費が有効なら1、停止・終端後は0です。一時停止中や補充不足中も1のままです。SFXだけが鳴っている場合は0です。この値は可聴音やSFXの再生中判定ではありません。",
+    "en": "Return 1 while the BGM consumer is enabled, including pause and starvation, or 0 after stop/end. An SFX playing alone still returns 0. This does not report audible output or SFX activity."
   },
   "fc_audio_vblank_underrun_return": {
     "ja": "0～255で、255に達すると増えません。空のまま待ったフレーム数ではなく、補充不足の発生回数です。initで0に戻り、stopや曲変更では保持します。正常な終端は数えません。",
@@ -100,8 +100,8 @@
     "en": "0=CH1 pulse 1, 1=CH2 pulse 2, 2=CH3 triangle, 3=CH4 noise. Values of 4 or more are rejected."
   },
   "fc_audio_vblank_control": {
-    "ja": "パルスは上位2ビットがデューティ（0=12.5%、1=25%、2=50%、3=75%）、下位4ビットが音量0～15です。ノイズは下位4ビットの音量だけを使います。三角波は0が消音設定、0以外が発音設定です。長さカウンター停止と固定音量をライブラリが設定します。",
-    "en": "For pulse channels, bits 7..6 select duty (0=12.5%, 1=25%, 2=50%, 3=75%); bits 3..0 select volume 0..15. Noise uses only volume bits 3..0. Triangle uses zero for a silent next note and nonzero for an audible one. The library supplies length-counter halt and constant-volume settings."
+    "ja": "パルスは上位2ビットがデューティ（0=12.5%、1=25%、2=50%、3=75%）、下位4ビットが固定音量0～15です。ノイズは通常、下位4ビットが固定音量です。NES_AUDIO_NOISE_ENVELOPE（128）をORすると、下位4ビットは減衰周期0～15になり、次のノイズ音は音量15から一度だけ減衰します。周期が大きいほど遅く、15では約1秒です。ノイズの長さカウンターは減衰が完了する長さに設定します。三角波は0で消音設定、0以外で発音設定です。",
+    "en": "For pulses, bits 7..6 select duty (0=12.5%, 1=25%, 2=50%, 3=75%) and bits 3..0 set constant volume 0..15. Noise normally uses bits 3..0 as constant volume. OR in NES_AUDIO_NOISE_ENVELOPE (128) to use those bits as decay period 0..15: the next noise note starts at volume 15 and decays once. Larger periods are slower; 15 takes about one second. The noise length counter allows the decay to finish. Triangle uses zero for a silent next note and nonzero for an audible one."
   },
   "fc_audio_vblank_timbre_return": {
     "ja": "有効なチャンネルなら1、4以上なら変更せず0です。",
@@ -110,6 +110,46 @@
   "fc_audio_vblank_hook": {
     "ja": "アプリケーションから直接呼ばないでください。音楽ライブラリをリンクするとコンパイラがNMIへ接続します。処理はA/X/Yを保存し、共通の式計算用ワーク領域を使いません。フックと音程表は固定ROMへ配置され、NMI中にROMバンクを切り替えません。これは音楽フック自身の保存処理であり、独自NMIハンドラーの他の処理に必要な保存を肩代わりするものではありません。",
     "en": "Do not call this directly from application code. Linking the music library connects it to NMI through the compiler. The hook saves A/X/Y and does not use shared expression scratch. The hook and pitch tables reside in fixed ROM; it never switches ROM banks in NMI. Its preservation applies to the music hook itself; a custom NMI handler remains responsible for preserving state used by its other work."
+  },
+  "fc_audio_vblank_foreground": {
+    "ja": "前景処理から呼びます。NMIはコピー済みのSFXデータを使います。別のAPUドライバーを並行して動かさず、BGMとSFXをこのライブラリで管理してください。",
+    "en": "Call from the foreground. NMI consumes the copied SFX data. Let this library manage both BGM and SFX; do not run another APU driver concurrently."
+  },
+  "fc_audio_vblank_pause_on": {
+    "ja": "0以外で休止、0で再開です。休止はAPUの4音源を直ちに無効にします。",
+    "en": "Nonzero pauses; zero resumes. Pausing immediately disables the four APU channels."
+  },
+  "fc_audio_vblank_pause_note": {
+    "ja": "休止中はBGMの待機時間・キュー読取位置とSFXの待機時間・読取位置が進みません。refillによる補充は可能です。再開後の最初のNMIで現在の音を再トリガーして通常の刻みを進めます。波形位相や減衰エンベロープの途中の音量は保存しません。is_playingのBGM有効フラグも変更しません。0は休止中でなくても音の復元を予約するため、毎フレーム呼ぶ用途には使わないでください。",
+    "en": "During pause, neither BGM delay/queue position nor SFX delay/position advances. Foreground refill remains possible. The first NMI after resume retriggers the current notes and advances the normal tick. Waveform phase and a partially decayed envelope level are not saved. The BGM enable flag reported by is_playing is unchanged. Zero requests note restoration even when already running, so do not call it every frame."
+  },
+  "fc_audio_vblank_sfx_pointer": {
+    "ja": "5バイトレコード列の先頭。戻るまでcount×5バイトを読み取れるように保持・マッピングします。コピー後は元の配列を再利用できます。",
+    "en": "Start of five-byte records. Keep count×5 bytes readable and mapped until the call returns. The source may be reused after the copy."
+  },
+  "fc_audio_vblank_sfx_count": {
+    "ja": "1～7レコード（最大35バイト）。各待機時間は1～255です。SFXでは待機時間0の終端を使わず、指定個数を再生すると終了します。",
+    "en": "1..7 records, at most 35 bytes. Every delay must be 1..255. SFX do not use delay-zero terminators; they end after the specified records."
+  },
+  "fc_audio_vblank_sfx_mask": {
+    "ja": "下位4ビットが対象音源です。1=CH1、2=CH2、4=CH3、8=CH4。ORで複数選べます。上位4ビットは無視します。下位が全て0なら拒否します。",
+    "en": "Low four bits select channels: 1=CH1, 2=CH2, 4=CH3, 8=CH4. OR bits to select several. High bits are ignored; a zero low mask is rejected."
+  },
+  "fc_audio_vblank_sfx_return": {
+    "ja": "コピーして有効にしたら1。null、範囲外の個数、対象音源なし、待機時間0、不正な音階・ノイズ値なら0です。不正入力では現在のSFXを変更しません。対象外の音源の値も検査します。",
+    "en": "Return 1 after copying and enabling the effect. Return 0 for null, an invalid count, no selected channels, a zero delay or invalid tonal/noise values. Invalid input leaves the current effect unchanged. Values on unselected channels are validated too."
+  },
+  "fc_audio_vblank_sfx_note": {
+    "ja": "BGMは背後で進み続け、効果音が終わるとその時点のBGM音へ戻ります。SFXは1本で、新しい呼び出しは前の効果音を置き換えます。HOLD/STOPの値はBGMと共通ですが、SFX開始時の保持音は停止状態なので、最初のHOLDはBGMの音を引き継ぎません。BGMが無効でもSFXは再生できます。一時停止中に予約したSFXは再開まで進みません。音色はBGMと共用です。",
+    "en": "BGM keeps advancing underneath; when the effect ends, outputs return to its current notes. There is one SFX stream; a new call replaces it. HOLD/STOP values match BGM, but an effect starts with stopped held notes, so an initial HOLD does not inherit the BGM note. SFX can play without BGM. An effect queued while paused waits for resume. Timbres are shared with BGM."
+  },
+  "fc_audio_vblank_stop_sfx_note": {
+    "ja": "APUレジスターをこの呼び出しでは書き換えません。BGMのキュー・位置・有効状態は保ちます。SFXだけを鳴らしていた場合は次のNMIで停止状態へ戻ります。一時停止中は再開後に反映されます。音を直ちに止めて両方の位置を破棄するにはstopを使います。",
+    "en": "This call does not write APU registers. It retains the BGM queue, position and enabled state. If SFX was playing alone, the next NMI returns the channels to stopped notes. While paused, the change takes effect on resume. Use stop to mute immediately and discard both positions."
+  },
+  "fc_audio_vblank_effects_expected": {
+    "ja": "サンプルは操作不要です。CH1の約220HzのBGMに約880HzのSFXを30フレーム重ね、現在のBGMへ戻ります。30フレームの無音の休止後にBGMが再開します。次のSFXは15フレームで明示的に打ち切ります。その後、CH4のノイズが一度だけゆっくり減衰します。画面のCOMPLETE / ALL CHANNELS OFFは全工程の終了を示します。添付音声で高低の切り替え、休止区間、ノイズの減衰を確認してください。",
+    "en": "No input is needed. CH1 plays BGM near 220 Hz, switches to an SFX near 880 Hz for 30 frames, then returns to the current BGM. After a 30-frame silent pause, BGM resumes. A second effect is explicitly cut short after 15 frames. Finally, CH4 noise decays slowly once. COMPLETE / ALL CHANNELS OFF marks the end. Listen to the attached recording for the pitch changes, silent pause and noise decay."
   },
   "fc_audio_vblank_init": {
     "ja": "APUとキューを初期化し、音楽・補充状態と補充不足カウンターをリセットします。",
@@ -160,8 +200,20 @@
     "en": "Configure duty or level for the next note on a channel, without retriggering its current note."
   },
   "fc_audio_vblank___hook": {
-    "ja": "NMIで待機時間を進め、必要ならキューから1レコードを取り出してAPUへ適用するコンパイラ用フックです。",
-    "en": "Compiler hook that advances the delay in NMI and applies one queued record to the APU when needed."
+    "ja": "NMIでBGMとSFXの待機時間を進め、現在の音源所有権に従ってAPUへ反映するフックです。",
+    "en": "NMI hook that advances BGM and SFX delays and updates the APU according to current channel ownership."
+  },
+  "fc_audio_vblank_pause": {
+    "ja": "BGMとSFXの再生位置を保ったまま両方を休止・再開します。",
+    "en": "Pause or resume both BGM and SFX while preserving their playback positions."
+  },
+  "fc_audio_vblank_play_sfx": {
+    "ja": "短い効果音をRAMへコピーし、選んだ音源の出力を次のNMIから一時的に置き換えます。",
+    "en": "Copy a short effect to RAM and temporarily take over selected channel outputs starting at the next NMI."
+  },
+  "fc_audio_vblank_stop_sfx": {
+    "ja": "効果音による音源の占有を取り消し、次のNMIで現在のBGM音へ戻します。",
+    "en": "Cancel effect ownership so the next NMI restores the current BGM notes."
   },
   "fc_audio_vblank_module": {
     "ja": "NMIで進む4音源の音楽ライブラリです。初期化→曲の設定と初回補充→NMIを有効にして再生→前景でrefillの順で使います。NMIはRAMキューを読むだけなので、補充を続ければ長い曲も小さなRAM使用量で再生できます。各音源は独立したHOLD/STOPを持ちます。",

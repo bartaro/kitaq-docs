@@ -32,6 +32,8 @@ data={
 'set_timbre':('指定した音源で、次に発音する音のデューティや音量を設定します。再生中の音は再トリガーしません。','Configure duty or level for the next note on a channel, without retriggering its current note.',[['channel',[msg('channel','0=CH1パルス1、1=CH2パルス2、2=CH3三角波、3=CH4ノイズです。4以上は拒否します。','0=CH1 pulse 1, 1=CH2 pulse 2, 2=CH3 triangle, 3=CH4 noise. Values of 4 or more are rejected.')]],['control',[msg('control','パルスは上位2ビットがデューティ（0=12.5%、1=25%、2=50%、3=75%）、下位4ビットが音量0～15です。ノイズは下位4ビットの音量だけを使います。三角波は0が消音設定、0以外が発音設定です。長さカウンター停止と固定音量をライブラリが設定します。','For pulse channels, bits 7..6 select duty (0=12.5%, 1=25%, 2=50%, 3=75%); bits 3..0 select volume 0..15. Noise uses only volume bits 3..0. Triangle uses zero for a silent next note and nonzero for an audible one. The library supplies length-counter halt and constant-volume settings.')]]],msg('timbre_return','有効なチャンネルなら1、4以上なら変更せず0です。','Return 1 for a valid channel; values of 4 or more return 0 without changes.'),[]),
 '__hook':('NMIで待機時間を進め、必要ならキューから1レコードを取り出してAPUへ適用するコンパイラ用フックです。','Compiler hook that advances the delay in NMI and applies one queued record to the APU when needed.',[],void,[msg('hook','アプリケーションから直接呼ばないでください。音楽ライブラリをリンクするとコンパイラがNMIへ接続します。処理はA/X/Yを保存し、共通の式計算用ワーク領域を使いません。フックと音程表は固定ROMへ配置され、NMI中にROMバンクを切り替えません。これは音楽フック自身の保存処理であり、独自NMIハンドラーの他の処理に必要な保存を肩代わりするものではありません。','Do not call this directly from application code. Linking the music library connects it to NMI through the compiler. The hook saves A/X/Y and does not use shared expression scratch. The hook and pitch tables reside in fixed ROM; it never switches ROM banks in NMI. Its preservation applies to the music hook itself; a custom NMI handler remains responsible for preserving state used by its other work.'),format_note])
 }
+from fc_audio_vblank_additions import extend
+effects_expected=extend(data,msg,texts,void)
 header=REPOS/'kitaqfc/lib/audio_vblank.h';library=header.with_suffix('.c')
 decls={r['name']:r for r in catalog.definitions(header)};impls={r['name']:r for r in catalog.definitions(library)}
 inventory=SITE/'reference/fc-api.json';doc=json.loads(inventory.read_text(encoding='utf-8'))
@@ -39,15 +41,19 @@ program='samples/api-examples/fc/audio_vblank.c';sample=(SITE/program).read_text
 build='New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaqfc\\lib\\audio_vblank.c .\\kitaq-docs\\samples\\api-examples\\fc\\audio_vblank.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\font.chr -o .\\out\\audio_vblank.nes --no-cache --no-disasm'
 for suffix,(ja,en,args,returns,notes) in data.items():
  name='__nes_audio_vblank_tick' if suffix=='__hook' else 'nes_audio_vblank_'+suffix
+ is_effect=suffix in ['pause','play_sfx','stop_sfx','set_timbre']
+ program='samples/api-examples/fc/'+('audio_vblank_effects.c' if is_effect else 'audio_vblank.c')
+ sample=(SITE/program).read_text(encoding='utf-8')
+ command=build.replace('audio_vblank.c -I','audio_vblank_effects.c -I').replace('out\\audio_vblank.nes','out\\audio_vblank_effects.nes') if is_effect else build
  r=decls[name];r.update(module='audio_vblank',definition=impls[name],availability='implementation',arity_only=False)
  fp=hashlib.sha256(json.dumps({k:r.get(k) for k in ['name','signature','comment','definition','implementation_excerpt']},sort_keys=True).encode()).hexdigest()
  snippet=re.search('// example:'+name+':start\s*\n(.*?)\s*// example:'+name+':end',sample,re.S)[1]
- contracts['fc:'+name]=dict(review='fc-audio-vblank-source-20260922',record_sha256=fp,purpose=[msg(suffix,ja,en)],args=args,returns=[returns],notes=[setup,scope]+notes,example=dict(program=program,code=snippet,expected=[expected],build=build))
+ contracts['fc:'+name]=dict(review='fc-audio-vblank-source-20260922',record_sha256=fp,purpose=[msg(suffix,ja,en)],args=args,returns=[returns],notes=[setup,scope]+notes,example=dict(program=program,code=snippet,expected=[effects_expected if is_effect else expected],build=command))
  doc['records']=[old for old in doc['records'] if old['name']!=name]+[r]
 doc['headers']=sorted(set(doc['headers']+['kitaqfc/lib/audio_vblank.h']));doc['records'].sort(key=lambda r:(r['module'],r['name']))
 inventory.write_text(json.dumps(doc,ensure_ascii=False,indent=2),encoding='utf-8')
 modules={'fc:audio_vblank':[msg('module','NMIで進む4音源の音楽ライブラリです。初期化→曲の設定と初回補充→NMIを有効にして再生→前景でrefillの順で使います。NMIはRAMキューを読むだけなので、補充を続ければ長い曲も小さなRAM使用量で再生できます。各音源は独立したHOLD/STOPを持ちます。','Four-channel music advances in NMI. Initialize, attach and prefill a song, enable NMI for playback, then refill from the foreground. NMI reads a RAM queue, letting a small amount of RAM serve a long stream as long as it is refilled. Each channel has independent HOLD/STOP commands.'),format_note,scope,starvation]}
 for filename,value in [('fc_audio_vblank_contracts.json',contracts),('fc_audio_vblank_texts.json',texts),('fc_audio_vblank_modules.json',modules)]:
  (HERE/filename).write_text(json.dumps(value,ensure_ascii=False,indent=2),encoding='utf-8')
-assert len(contracts)==13
-print('13 FC NMI music contracts and library overview authored in JA/EN')
+assert len(contracts)==16
+print('16 FC NMI music contracts and library overview authored in JA/EN')

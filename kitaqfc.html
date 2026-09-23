@@ -1665,33 +1665,46 @@ EmitHelperStart(&quot;__fds_wave_load&quot;);
             EmitAsm(&quot;STA&quot;, new AsmOperand(0x4040, AddressMode.AbsoluteY));
             EmitAsm(&quot;INY&quot;); EmitAsm(&quot;CPY&quot;, Imm(64)); EmitAsm(&quot;BNE&quot;, Rel(waveLoop));
             EmitAsm(&quot;LDA&quot;, Imm(0x00)); EmitAsm(&quot;STA&quot;, Mem(0x4089));
-            EmitAsm(&quot;RTS&quot;);</code></pre></div></details></details><h3 id="module-intrinsics">intrinsics.h — コンパイラ組み込み命令</h3><details class="api searchable" id="api-__nes_audio_vblank_tick" data-api-contract="fc-audio-vblank-source-20260922"><summary><code>__nes_audio_vblank_tick</code></summary><p>NMIで待機時間を進め、必要ならキューから1レコードを取り出してAPUへ適用するコンパイラ用フックです。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __nes_audio_vblank_tick(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。</p><h4>使用条件と制限</h4><p><code>audio_vblank.h</code>を読み込み、<code>audio_vblank.c</code>を1回だけビルドへ加えます。コンパイラは、このライブラリのフックを既定または独自のNMIハンドラーから1回ずつ呼びます。PPUのNMIを有効にしてください。音楽の更新を前景ループから呼ぶ必要はありません。</p><p>NTSC向けの4音源ドライバーです。CH1=パルス1、CH2=パルス2、CH3=三角波、CH4=ノイズで、チャンネル添字は0～3です。DMCと拡張音源は再生しません。<code>audio.c</code>の効果音関数など、同じAPUを直接書き換える処理とは同時に使わないでください。PAL用の音程表やテンポ補正はありません。</p><p>アプリケーションから直接呼ばないでください。音楽ライブラリをリンクするとコンパイラがNMIへ接続します。処理はA/X/Yを保存し、共通の式計算用ワーク領域を使いません。フックと音程表は固定ROMへ配置され、NMI中にROMバンクを切り替えません。これは音楽フック自身の保存処理であり、独自NMIハンドラーの他の処理に必要な保存を肩代わりするものではありません。</p><p>1レコードは5バイトで、<code>待機時間, CH1, CH2, CH3, CH4</code>の順です。待機時間1～255は、その音を維持するNMI回数です。0は終端で、残り4バイトは無視します。CH1～CH3の音階0～71はC2～B7（24=C4）。CH4の0～15は通常ノイズの周期番号、16～31は短周期モードです。各音源の255=<code>NES_AUDIO_HOLD</code>は変更せず、254=<code>NES_AUDIO_STOP</code>は停止します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// The linked audio_vblank.c supplies __nes_audio_vblank_tick().
+            EmitAsm(&quot;RTS&quot;);</code></pre></div></details></details><h3 id="module-intrinsics">intrinsics.h — コンパイラ組み込み命令</h3><details class="api searchable" id="api-__nes_audio_vblank_tick" data-api-contract="fc-audio-vblank-source-20260922"><summary><code>__nes_audio_vblank_tick</code></summary><p>NMIでBGMとSFXの待機時間を進め、現在の音源所有権に従ってAPUへ反映するフックです。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __nes_audio_vblank_tick(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。</p><h4>使用条件と制限</h4><p><code>audio_vblank.h</code>を読み込み、<code>audio_vblank.c</code>を1回だけビルドへ加えます。コンパイラは、このライブラリのフックを既定または独自のNMIハンドラーから1回ずつ呼びます。PPUのNMIを有効にしてください。音楽の更新を前景ループから呼ぶ必要はありません。</p><p>NTSC向けの4音源ドライバーです。CH1=パルス1、CH2=パルス2、CH3=三角波、CH4=ノイズで、チャンネル添字は0～3です。DMCと拡張音源は再生しません。<code>audio.c</code>の効果音関数など、同じAPUを直接書き換える処理とは同時に使わないでください。PAL用の音程表やテンポ補正はありません。</p><p>アプリケーションから直接呼ばないでください。音楽ライブラリをリンクするとコンパイラがNMIへ接続します。処理はA/X/Yを保存し、共通の式計算用ワーク領域を使いません。フックと音程表は固定ROMへ配置され、NMI中にROMバンクを切り替えません。これは音楽フック自身の保存処理であり、独自NMIハンドラーの他の処理に必要な保存を肩代わりするものではありません。</p><p>1レコードは5バイトで、<code>待機時間, CH1, CH2, CH3, CH4</code>の順です。待機時間1～255は、その音を維持するNMI回数です。0は終端で、残り4バイトは無視します。CH1～CH3の音階0～71はC2～B7（24=C4）。CH4の0～15は通常ノイズの周期番号、16～31は短周期モードです。各音源の255=<code>NES_AUDIO_HOLD</code>は変更せず、254=<code>NES_AUDIO_STOP</code>は停止します。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>// The linked audio_vblank.c supplies __nes_audio_vblank_tick().
     // The compiler calls that hook once per NMI. Do not call it in this loop.
     __nmi_wait();</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>サンプルは独自の4音源フレーズを1回再生します。前景処理が90フレーム補充を止めて整数計算をしている間も音楽が進みます。画面の「PHRASE COMPLETE / SILENT」「UNDERRUNS 0 / MATH OK」は、終了・補充不足0・計算結果一致を表します。添付の音声でパルスの旋律と伴奏、三角波の低音、ノイズを確認できます。終了後は無音です。画像は制御結果の表示であり、音の確認には音声を使ってください。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fc-audio-vblank/example/nrom/screen.png" alt="__nes_audio_vblank_tick: NROM"><figcaption>NROM</figcaption></figure><figure class="example-audio"><audio controls preload="none" aria-label="__nes_audio_vblank_tick: NROM — 確認した音声" src="verification/api-fc-audio-vblank/example/nrom/music.wav"></audio><figcaption>NROM — 確認した音声</figcaption></figure><p><a href="samples/api-examples/fc/audio_vblank.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaqfc\lib\audio_vblank.c .\kitaq-docs\samples\api-examples\fc\audio_vblank.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr -o .\out\audio_vblank.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio_vblank.h:49</p><div class="original"><b>宣言の注記（原文）</b><pre>Compiler NMI hook: linked automatically once per NMI. Do not call manually.
-Saves A/X/Y, uses no compiler scratch bytes and reads only RAM/fixed ROM.</pre></div><p class="source">kitaqfc/lib/audio_vblank.c:112</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __nes_audio_vblank_tick(void){
+.\kitaqfc\kitaqfc.exe .\kitaqfc\lib\audio_vblank.c .\kitaq-docs\samples\api-examples\fc\audio_vblank.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=nrom --nes-chr=.\kitaq-docs\samples\font.chr -o .\out\audio_vblank.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/audio_vblank.h:70</p><div class="original"><b>宣言の注記（原文）</b><pre>NMI hook: invoke exactly once per NMI. With a custom handler or a compiler
+without automatic audio-hook linking, call it there. Never call from main
+or call it again if the compiler already inserts the hook.
+Saves A/X/Y, uses no compiler scratch bytes and reads only RAM/fixed ROM.</pre></div><p class="source">kitaqfc/lib/audio_vblank.c:150</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __nes_audio_vblank_tick(void){
     __asm {
         PHA
         TXA
         PHA
         TYA
         PHA
+        LDA nav_paused
+        BEQ nav_tick_begin
+        JMP nav_tick_exit
+nav_tick_begin:
+        LDA #0
+        STA nav_dirty
+        LDA nav_refresh
+        BEQ nav_tick_music
+        LDA #0
+        STA nav_refresh
+        LDA #15
+        STA nav_dirty
+// Advance BGM even when an effect temporarily owns its output channel.
+nav_tick_music:
         LDA nav_active
         BNE nav_tick_active
-        JMP nav_tick_exit
+        JMP nav_tick_sfx
 nav_tick_active:
         LDA nav_delay
         BEQ nav_tick_next
         DEC nav_delay
         BEQ nav_tick_next
-        JMP nav_tick_exit
+        JMP nav_tick_sfx
 nav_tick_next:
         LDX nav_tail
         CPX nav_head
         BNE nav_tick_record
-        LDA #0
-        STA $4015
-        STA nav_enabled
         LDA nav_starved
         BNE nav_tick_empty_done
         INC nav_starved
@@ -1700,30 +1713,116 @@ nav_tick_next:
         BEQ nav_tick_empty_done
         INC nav_underruns
 nav_tick_empty_done:
-        JMP nav_tick_exit
+        JSR nav_silence_music
+        JMP nav_tick_sfx
 nav_tick_record:
         LDA #0
         STA nav_starved
         LDA nav_queue,X
         BNE nav_tick_timed
         STA nav_active
-        STA nav_enabled
-        STA $4015
+        JSR nav_silence_music
         JMP nav_tick_release
 nav_tick_timed:
         STA nav_delay
+        LDY #0
+// Remember the new BGM notes but do not retrigger channels owned by SFX.
+nav_tick_copy:
         INX
         LDA nav_queue,X
         CMP #255
-        BEQ nav_tick_ch1_done
+        BEQ nav_tick_copy_next
+        STA nav_notes,Y
+        LDA nav_bits,Y
+        AND nav_previous_mask
+        BNE nav_tick_copy_next
+        LDA nav_bits,Y
+        ORA nav_dirty
+        STA nav_dirty
+nav_tick_copy_next:
+        INY
+        CPY #4
+        BNE nav_tick_copy
+nav_tick_release:
+        LDA nav_tail
+        CLC
+        ADC #5
+        CMP #40
+        BNE nav_tick_publish
+        LDA #0
+nav_tick_publish:
+        STA nav_tail
+// The SFX has its own delay; completion releases its mask automatically.
+nav_tick_sfx:
+        LDA nav_sfx_active
+        BEQ nav_tick_select
+        LDA nav_sfx_delay
+        BEQ nav_sfx_next
+        DEC nav_sfx_delay
+        BNE nav_tick_select
+nav_sfx_next:
+        LDX nav_sfx_cursor
+        CPX nav_sfx_length
+        BCC nav_sfx_record
+        LDA #0
+        STA nav_sfx_active
+        JMP nav_tick_select
+nav_sfx_record:
+        LDA nav_sfx_queue,X
+        STA nav_sfx_delay
+        LDY #0
+nav_sfx_copy:
+        INX
+        LDA nav_sfx_queue,X
+        CMP #255
+        BEQ nav_sfx_copy_next
+        STA nav_sfx_notes,Y
+        LDA nav_bits,Y
+        AND nav_sfx_mask
+        ORA nav_dirty
+        STA nav_dirty
+nav_sfx_copy_next:
+        INY
+        CPY #4
+        BNE nav_sfx_copy
+        INX
+        STX nav_sfx_cursor
+nav_tick_select:
+        LDA #0
+        STA nav_effective_mask
+        LDA nav_sfx_active
+        BEQ nav_tick_restore
+        LDA nav_sfx_mask
+        STA nav_effective_mask
+// A changed ownership bit forces the newly selected note onto the APU.
+nav_tick_restore:
+        LDA nav_effective_mask
+        EOR nav_previous_mask
+        ORA nav_dirty
+        STA nav_dirty
+        LDA nav_effective_mask
+        STA nav_previous_mask
+        LDA nav_dirty
+        AND #1
+        BNE nav_apply_0
+        JMP nav_done_0
+nav_apply_0:
+        LDA nav_effective_mask
+        AND #1
+        BEQ nav_bg_0
+        LDA nav_sfx_notes+0
+        JMP nav_value_0
+nav_bg_0:
+        LDA nav_notes+0
+nav_value_0:
         CMP #254
-        BNE nav_tick_ch1_note
+        BNE nav_note_0
         LDA nav_enabled
         AND #254
         STA nav_enabled
         STA $4015
-        JMP nav_tick_ch1_done
-nav_tick_ch1_note:
+        JMP nav_done_0
+nav_note_0:
         TAY
         LDA nav_enabled
         ORA #1
@@ -1735,19 +1834,28 @@ nav_tick_ch1_note:
         STA $4002
         LDA nav_pulse_hi,Y
         STA $4003
-nav_tick_ch1_done:
-        INX
-        LDA nav_queue,X
-        CMP #255
-        BEQ nav_tick_ch2_done
+nav_done_0:
+        LDA nav_dirty
+        AND #2
+        BNE nav_apply_1
+        JMP nav_done_1
+nav_apply_1:
+        LDA nav_effective_mask
+        AND #2
+        BEQ nav_bg_1
+        LDA nav_sfx_notes+1
+        JMP nav_value_1
+nav_bg_1:
+        LDA nav_notes+1
+nav_value_1:
         CMP #254
-        BNE nav_tick_ch2_note
+        BNE nav_note_1
         LDA nav_enabled
         AND #253
         STA nav_enabled
         STA $4015
-        JMP nav_tick_ch2_done
-nav_tick_ch2_note:
+        JMP nav_done_1
+nav_note_1:
         TAY
         LDA nav_enabled
         ORA #2
@@ -1759,19 +1867,28 @@ nav_tick_ch2_note:
         STA $4006
         LDA nav_pulse_hi,Y
         STA $4007
-nav_tick_ch2_done:
-        INX
-        LDA nav_queue,X
-        CMP #255
-        BEQ nav_tick_ch3_done
+nav_done_1:
+        LDA nav_dirty
+        AND #4
+        BNE nav_apply_2
+        JMP nav_done_2
+nav_apply_2:
+        LDA nav_effective_mask
+        AND #4
+        BEQ nav_bg_2
+        LDA nav_sfx_notes+2
+        JMP nav_value_2
+nav_bg_2:
+        LDA nav_notes+2
+nav_value_2:
         CMP #254
-        BNE nav_tick_ch3_note
+        BNE nav_note_2
         LDA nav_enabled
         AND #251
         STA nav_enabled
         STA $4015
-        JMP nav_tick_ch3_done
-nav_tick_ch3_note:
+        JMP nav_done_2
+nav_note_2:
         TAY
         LDA nav_enabled
         ORA #4
@@ -1783,19 +1900,28 @@ nav_tick_ch3_note:
         STA $400A
         LDA nav_triangle_hi,Y
         STA $400B
-nav_tick_ch3_done:
-        INX
-        LDA nav_queue,X
-        CMP #255
-        BEQ nav_tick_ch4_done
+nav_done_2:
+        LDA nav_dirty
+        AND #8
+        BNE nav_apply_3
+        JMP nav_done_3
+nav_apply_3:
+        LDA nav_effective_mask
+        AND #8
+        BEQ nav_bg_3
+        LDA nav_sfx_notes+3
+        JMP nav_value_3
+nav_bg_3:
+        LDA nav_notes+3
+nav_value_3:
         CMP #254
-        BNE nav_tick_ch4_note
+        BNE nav_note_3
         LDA nav_enabled
         AND #247
         STA nav_enabled
         STA $4015
-        JMP nav_tick_ch4_done
-nav_tick_ch4_note:
+        JMP nav_done_3
+nav_note_3:
         TAY
         LDA nav_enabled
         ORA #8
@@ -1805,33 +1931,47 @@ nav_tick_ch4_note:
         STA $400C
         TYA
         AND #16
-        BEQ nav_tick_noise_long
+        BEQ nav_noise_long
         TYA
         AND #15
         ORA #128
-        JMP nav_tick_noise_period
-nav_tick_noise_long:
+        JMP nav_noise_period
+nav_noise_long:
         TYA
-nav_tick_noise_period:
+nav_noise_period:
         STA $400E
+        // A one-shot envelope must outlive its slowest 16-step decay.
+        // Length index 1 gives 254 half-frame ticks; index 0 cuts it at 10.
+        LDA nav_timbre+3
+        AND #16
+        BNE nav_noise_constant_length
+        LDA #8
+        JMP nav_noise_trigger
+nav_noise_constant_length:
         LDA #0
+nav_noise_trigger:
         STA $400F
-nav_tick_ch4_done:
-nav_tick_release:
-        LDA nav_tail
-        CLC
-        ADC #5
-        CMP #40
-        BNE nav_tick_publish
-        LDA #0
-nav_tick_publish:
-        STA nav_tail
+nav_done_3:
 nav_tick_exit:
         PLA
         TAY
         PLA
         TAX
         PLA
+        RTS
+// Internal subroutine: stop BGM channels without disturbing an active effect.
+// End/underrun forgets the BGM notes without cutting an independent SFX.
+nav_silence_music:
+        LDA #254
+        STA nav_notes+0
+        STA nav_notes+1
+        STA nav_notes+2
+        STA nav_notes+3
+        LDA nav_previous_mask
+        EOR #15
+        ORA nav_dirty
+        STA nav_dirty
+        RTS
     }
 }</code></pre></div></details></details><details class="api searchable" id="api-__ppu_mask_get" data-api-contract="ppu-shadow-source-20260922"><summary><code>__ppu_mask_get</code></summary><p>PPUMASKのソフトウェア側の保持値を返します。背景・スプライトの描画、左端表示、グレースケール、色強調の設定を保存して戻す用途です。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 __ppu_mask_get(void);</code></pre></div><h4>戻り値</h4><p>最後にライブラリまたは組み込み関数が設定した制御値をu8で返します。PPUSTATUSを読みません。</p><h4>使用条件と制限</h4><p>PPUCTRLとPPUMASKは書き込み専用です。この関数はハードウェアを読み戻すものではありません。$2000/$2001への直接書き込みや独自のアセンブリ操作は保持値に反映されません。設定は対応する__ppu_*_setなどを使って揃えてください。読み出しでラッチや割り込み状態は変わりません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>__ppu_mask_set(0xE7);
     if(__ppu_mask_get()!=0xE7)failures=1;
