@@ -3786,7 +3786,7 @@
       "implementation_excerpt": "if (expr.MatchAny(Tag.Call, out funcExpr, out args) &&\n                funcExpr != null &&\n                funcExpr.Match(Tag.Name, out name) &&\n                string.Equals(name, \"__bankof\", StringComparison.Ordinal) &&\n                args != null &&\n                args.Length == 1 &&\n                args[0] != null &&\n                args[0].Match(Tag.Name, out string bankedSymbol))\n            {\n                // Resolve __bankof from placement metadata and keep the byte-sized bank value.\n                value = ResolveSymbolBank(bankedSymbol) & 0xFF;\n                return true;\n            }",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 6446
+        "line": 6906
       }
     },
     {
@@ -3810,7 +3810,7 @@
       "implementation_excerpt": "case \"__prg_bank_set\":\n                case \"__bankswitch\":\n                    if (!Need(1)) return true;\n                    if (Program.NesMapperProfile.IsSurom512 && TryEvaluateConstant(args[0], out int constantBank) && (constantBank < 1 || constantBank > 30))\n                    {\n                        Program.Error(\"error KQFC2603 KQFC-SUROM-BANK-RANGE: {0} constant bank {1} is outside 1..30; common bank 0 is not a switch target.\", funcName, constantBank);\n                        return true;\n                    }\n                    _mapperWritingFunctions.Add(_currentFunctionName);\n                    Load1(args[0]); EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\")); return true;",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4451
+        "line": 4746
       }
     },
     {
@@ -3913,7 +3913,7 @@
       "args": "u8 bank",
       "signature": "void __chr_bank_set(u8 bank);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 311,
+      "line": 316,
       "comment": "Select a CNROM bank or MMC3 register 0 bank; unsupported mapper profiles produce a compile error.",
       "body": "",
       "kind": "function",
@@ -3929,7 +3929,7 @@
       "args": "u8 bank",
       "signature": "void __chr_bank_set0(u8 bank);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 313,
+      "line": 318,
       "comment": "Use the same CNROM/MMC3 register 0 selection as __chr_bank_set.",
       "body": "",
       "kind": "function",
@@ -3945,7 +3945,7 @@
       "args": "u8 bank",
       "signature": "void __chr_bank_set1(u8 bank);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 315,
+      "line": 320,
       "comment": "Select MMC3 register 1, or the same full CNROM bank register; this is mapper-specific banking.",
       "body": "",
       "kind": "function",
@@ -4047,7 +4047,7 @@
       "args": "void",
       "signature": "u8 __exp_pad_read1(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 223,
+      "line": 227,
       "comment": "Alias the port-1 D1 controller reader; the attached device must use the expected serial protocol.",
       "body": "",
       "kind": "function",
@@ -4063,7 +4063,7 @@
       "args": "void",
       "signature": "u8 __exp_pad_read2(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 225,
+      "line": 229,
       "comment": "Alias the port-2 D1 controller reader; this is not an expansion-device discovery operation.",
       "body": "",
       "kind": "function",
@@ -4110,7 +4110,7 @@
       "implementation_excerpt": "if (string.Equals(funcName, \"__farcall\", StringComparison.Ordinal))\n            {\n                Expr[] farArgs = args ?? Array.Empty<Expr>();\n                if (farArgs.Length != 2)\n                {\n                    Program.Error(\"error KQ0000: __farcall(bank, func) expects exactly 2 arguments.\");\n                    return;\n                }\n\n                string targetName;\n                if (!farArgs[1].Match(Tag.Name, out targetName))\n                {\n                    Program.Error(\"error KQ0000: __farcall(bank, func) requires the 2nd argument to be a function name.\");\n                    return;\n                }\n                // This intrinsic supplies no callback arguments. A variable name\n                // is not a static function target, even when its value is a pointer.\n                if (!_functionParameters.TryGetValue(targetName, out FieldInfo[] farParameters))\n                {\n                    Program.Error(\"error KQFC2610: __farcall requires a declared function name; use an ordinary typed call for a function pointer.\");\n                    return;\n                }\n                if (farParameters.Length != 0)\n                {\n                    Program.Error(\"error KQFC2610: __farcall requires a callback with no parameters.\");\n                    return;\n                }\n                if (Program.NesMapperProfile.IsSurom512 &&\n                    TryEvaluateConstant(farArgs[0], out int constantFarBank) &&\n                    (constantFarBank < 1 || constantFarBank > 30))\n                {\n                    Program.Error(\"error KQFC2603 KQFC-SUROM-BANK-RANGE: __farcall constant bank {0} is outside 1..30; common bank 0 is not a switch target.\", constantFarBank);\n                    return;\n                }\n\n                // Evaluate the requested far-call bank byte; the following dispatch uses the target function bank metadata.\n                EmitLoadValue(farArgs[0], ctx, 1);\n\n                int callerBank = ctx == null ? 0 : ctx.Bank;\n                int calleeBank = GetFunctionBank(targetName);\n                if (ShouldUseFdsOverlayThunk(callerBank, calleeBank))\n                {\n                    string fdsThunkName = EnsureFdsOverlayThunk(targetName, calleeBank);\n                    EmitAsm(\"JSR\", Abs(fdsThunkName));\n                    RecordCallEdge(targetName, calleeBank, \"fds_overlay_thunk\", viaThunk: true, viaFarcall: true);\n                    return;\n                }\n                bool bankedPrg = Program.NesMapperProfile.SupportsPrgBanking || Program.NesMapperProfile.UsesDuplicatedCommonBank;\n                bool directSafe = !bankedPrg || calleeBank == 0 || calleeBank == callerBank;\n                if (directSafe)\n                {\n                    EmitAsm(\"JSR\", Abs(targetName));\n                    RecordCallEdge(targetName, calleeBank, \"direct\", viaThunk: false, viaFarcall: true);\n                    return;\n                }\n\n                string thunkName = EnsureBankThunk(targetName, calleeBank);\n                EmitAsm(\"JSR\", Abs(thunkName));\n                RecordCallEdge(targetName, calleeBank, \"bank_thunk\", viaThunk: true, viaFarcall: true);\n                return;\n            }",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 3843
+        "line": 4131
       }
     },
     {
@@ -4134,7 +4134,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__farpeek16\");\n            // args: bank, addr16. Return A=lo, X=hi.\n            EmitAsm(\"LDA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"PHA\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\"));\n            EmitAsm(\"LDY\", Imm(0));\n            EmitAsm(\"LDA\", IndY(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"INY\");\n            EmitAsm(\"LDA\", IndY(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"PLA\");\n            EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\"));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LDX\", Mem(_runtimeIntrinsicTmp1Address));\n            EmitAsm(\"RTS\");\n\n            // Consume the word count while advancing source/destination pointers; zero count still restores the saved bank.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 8218
+        "line": 8698
       }
     },
     {
@@ -4158,7 +4158,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__farpeek8\");\n            // args: bank, addr16. Return A.\n            EmitAsm(\"LDA\", Mem(_runtimeCurrentBankAddress));\n            EmitAsm(\"PHA\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\"));\n            EmitAsm(\"LDY\", Imm(0));\n            EmitAsm(\"LDA\", IndY(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"PLA\");\n            EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\"));\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"RTS\");\n\n            // Retain both fetched bytes across bank restoration and return the word in A/X.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 8203
+        "line": 8683
       }
     },
     {
@@ -4324,7 +4324,7 @@
       "args": "u8 line",
       "signature": "void __irq_scanline_set(u8 line);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 319,
+      "line": 324,
       "comment": "Write the MMC3 IRQ latch and reload registers. This does not enable IRQ delivery.",
       "body": "",
       "kind": "function",
@@ -4340,7 +4340,7 @@
       "args": "void",
       "signature": "u8 __joypad2p_voice(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 227,
+      "line": 231,
       "comment": "Return controller-port 4016 bit 2 normalized to 0 or 1; this is a microphone level bit, not PCM audio.",
       "body": "",
       "kind": "function",
@@ -4419,7 +4419,7 @@
       "args": "void",
       "signature": "u8 __mapper_id(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 309,
+      "line": 314,
       "comment": "Mapper \nReturn the low byte of the mapper number selected for this build; no cartridge probe is performed.",
       "body": "",
       "kind": "function",
@@ -4435,7 +4435,7 @@
       "args": "void",
       "signature": "void __mapper_irq_ack(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 327,
+      "line": 332,
       "comment": "Use the same E000 write as disable; explicitly re-enable when another interrupt is needed.",
       "body": "",
       "kind": "function",
@@ -4451,7 +4451,7 @@
       "args": "void",
       "signature": "void __mapper_irq_disable(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 325,
+      "line": 330,
       "comment": "Write MMC3 E000 to disable and acknowledge mapper IRQs.",
       "body": "",
       "kind": "function",
@@ -4467,7 +4467,7 @@
       "args": "void",
       "signature": "void __mapper_irq_enable(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 323,
+      "line": 328,
       "comment": "Write MMC3 E001. The CPU IRQ mask and a valid handler are separate caller responsibilities.",
       "body": "",
       "kind": "function",
@@ -4483,7 +4483,7 @@
       "args": "u8 scanline",
       "signature": "void __mapper_irq_set(u8 scanline);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 321,
+      "line": 326,
       "comment": "Alias the MMC3 IRQ latch/reload operation; other mapper profiles are rejected.",
       "body": "",
       "kind": "function",
@@ -4610,7 +4610,7 @@
       "args": "void",
       "signature": "u8 __mic_read2p(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 229,
+      "line": 233,
       "comment": "Alias the same normalized microphone input bit as __joypad2p_voice.",
       "body": "",
       "kind": "function",
@@ -4836,7 +4836,7 @@
       "args": "u8 mode",
       "signature": "void __mirroring_set(u8 mode);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 317,
+      "line": 322,
       "comment": "Emit the selected mapper mirroring operation; available modes and writable control depend on the board.",
       "body": "",
       "kind": "function",
@@ -5126,7 +5126,7 @@
       "args": "u8 pad",
       "signature": "u8 __pad_buttons(u8 pad);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 209,
+      "line": 213,
       "comment": "Return pad & 0F for A/B/Select/Start; this masks a supplied snapshot and performs no polling.",
       "body": "",
       "kind": "function",
@@ -5142,7 +5142,7 @@
       "args": "u8 pad",
       "signature": "u8 __pad_dirs(u8 pad);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 211,
+      "line": 215,
       "comment": "Return pad & F0 in the original bit positions; this does not normalize directions to bits 0..3.",
       "body": "",
       "kind": "function",
@@ -5158,7 +5158,7 @@
       "args": "void",
       "signature": "u8 __pad_read1(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 201,
+      "line": 205,
       "comment": "Latch and sample eight D0 bits from port 1; bit order is A,B,Select,Start,Up,Down,Left,Right.",
       "body": "",
       "kind": "function",
@@ -5174,7 +5174,7 @@
       "args": "void",
       "signature": "u8 __pad_read1_d1(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 219,
+      "line": 223,
       "comment": "Famicom/NES expansion input devices.\nD1 readers are for expansion-port controllers/joysticks that expose a\nstandard 8-bit joypad stream on data line D1 instead of D0.\n__joypad2p_voice() / __mic_read2p() return the Famicom 2P microphone bit.\n \nLatch and read an eight-button stream from port-1 data line D1 rather than D0.",
       "body": "",
       "kind": "function",
@@ -5190,7 +5190,7 @@
       "args": "void",
       "signature": "u8 __pad_read1_safe(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 205,
+      "line": 209,
       "comment": "Repeat pairs of port-1 polls until both bytes match; the retry loop has no fixed limit.",
       "body": "",
       "kind": "function",
@@ -5209,7 +5209,7 @@
       "args": "void",
       "signature": "u8 __pad_read2(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 203,
+      "line": 207,
       "comment": "Latch and sample eight D0 bits from port 2 in the same NES button order.",
       "body": "",
       "kind": "function",
@@ -5225,7 +5225,7 @@
       "args": "void",
       "signature": "u8 __pad_read2_d1(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 221,
+      "line": 225,
       "comment": "Latch and read an eight-button stream from port-2 data line D1 rather than D0.",
       "body": "",
       "kind": "function",
@@ -5241,7 +5241,7 @@
       "args": "void",
       "signature": "u8 __pad_read2_safe(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 207,
+      "line": 211,
       "comment": "Repeat pairs of port-2 polls until both bytes match; this does not populate pad.c globals.",
       "body": "",
       "kind": "function",
@@ -5502,7 +5502,7 @@
       "implementation_excerpt": "case \"__prg_bank_set\":\n                case \"__bankswitch\":\n                    if (!Need(1)) return true;\n                    if (Program.NesMapperProfile.IsSurom512 && TryEvaluateConstant(args[0], out int constantBank) && (constantBank < 1 || constantBank > 30))\n                    {\n                        Program.Error(\"error KQFC2603 KQFC-SUROM-BANK-RANGE: {0} constant bank {1} is outside 1..30; common bank 0 is not a switch target.\", funcName, constantBank);\n                        return true;\n                    }\n                    _mapperWritingFunctions.Add(_currentFunctionName);\n                    Load1(args[0]); EmitAsm(\"JSR\", Abs(\"__kq_prg_set_bank_a\")); return true;",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 4451
+        "line": 4746
       }
     },
     {
@@ -5524,7 +5524,7 @@
       "implementation_excerpt": "case \"__rng8\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"JSR\", Abs(\"__rng8\"));\n                    return true;\n                // Far-memory helpers pack the address, bank and length arguments according to their explicit byte/word signatures.\n\nEmitHelperStart(\"__rng8\");\n            // 16-bit Galois LFSR: if low bit set, shift right then xor $B400.\n            EmitAsm(\"LDA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"ORA\", Mem(_runtimeRngHiAddress));\n            // Replace the all-zero LFSR state with a deterministic nonzero seed before advancing.\n            string seeded = NewGeneratedLabel(\"rng_seeded\");\n            EmitAsm(\"BNE\", Rel(seeded));\n            EmitAsm(\"LDA\", Imm(0x5A));\n            EmitAsm(\"STA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"LDA\", Imm(0xA5));\n            EmitAsm(\"STA\", Mem(_runtimeRngHiAddress));\n            _assembly.Add(Expr.Make(Tag.Label, seeded));\n            EmitAsm(\"LDA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"AND\", Imm(1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LSR\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"ROR\", Mem(_runtimeRngLoAddress));\n            string rngNoXor = NewGeneratedLabel(\"rng_no_xor\");\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"BEQ\", Rel(rngNoXor));\n            EmitAsm(\"LDA\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"EOR\", Imm(0xB4));\n            EmitAsm(\"STA\", Mem(_runtimeRngHiAddress));\n            _assembly.Add(Expr.Make(Tag.Label, rngNoXor));\n            EmitAsm(\"LDA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"EOR\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"RTS\");",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 8650
+        "line": 4663
       }
     },
     {
@@ -5546,7 +5546,7 @@
       "implementation_excerpt": "case \"__rng_seed\":\n                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2}, \"__rng_seed\");\n\nEmitHelperStart(\"__rng_seed\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"STA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"RTS\");",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 8643
+        "line": 4661
       }
     },
     {
@@ -5909,7 +5909,7 @@
       "args": "u8 x, u8 y",
       "signature": "void __split_scroll_sprite0(u8 x, u8 y);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 331,
+      "line": 336,
       "comment": "Wait for a new sprite-zero hit, reset the PPU latch and write X/Y scroll; requires a visible hit setup.",
       "body": "",
       "kind": "function",
@@ -5925,7 +5925,7 @@
       "args": "void",
       "signature": "void __sprite0_wait_hit(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 329,
+      "line": 334,
       "comment": "Wait for the current hit flag to clear, then for a new hit. No timeout is provided.",
       "body": "",
       "kind": "function",
@@ -6086,7 +6086,7 @@
       "args": "void",
       "signature": "u8 __vramq_capacity(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 160,
+      "line": 164,
       "comment": "Return total encoded command-buffer capacity; this is independent of PPU VRAM capacity.",
       "body": "",
       "kind": "function",
@@ -6105,7 +6105,7 @@
       "args": "void",
       "signature": "void __vramq_clear(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 142,
+      "line": 146,
       "comment": "NMI VRAM transfer queue. Queue entries are consumed by __vramq_exec(),\nand the default NMI handler calls __vramq_exec() automatically.\n \nReset pending intrinsic-queue records; this is separate from runtime.c nes_vram_queue_clear.",
       "body": "",
       "kind": "function",
@@ -6124,7 +6124,7 @@
       "args": "void",
       "signature": "void __vramq_clear_overflow(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 158,
+      "line": 162,
       "comment": "Clear the overflow latch explicitly after handling the failed submission.",
       "body": "",
       "kind": "function",
@@ -6143,7 +6143,7 @@
       "args": "void",
       "signature": "void __vramq_commit(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 150,
+      "line": 154,
       "comment": "Publish the pending records to the configured consumer. Do not mutate them while consumption can run.",
       "body": "",
       "kind": "function",
@@ -6162,7 +6162,7 @@
       "args": "u16 ppu_addr, const u8* src, u8 len",
       "signature": "void __vramq_copy(u16 ppu_addr, const u8* src, u8 len);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 146,
+      "line": 150,
       "comment": "Retain the source address for later consumption; keep its storage and bank mapping valid.",
       "body": "",
       "kind": "function",
@@ -6181,7 +6181,7 @@
       "args": "void",
       "signature": "void __vramq_exec(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 152,
+      "line": 156,
       "comment": "Execute a ready queue directly; committing and safe PPU timing are caller responsibilities.",
       "body": "",
       "kind": "function",
@@ -6200,7 +6200,7 @@
       "args": "u16 ppu_addr, u8 value, u8 len",
       "signature": "void __vramq_fill(u16 ppu_addr, u8 value, u8 len);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 148,
+      "line": 152,
       "comment": "Append a repeated-byte update; the source value is stored in the record.",
       "body": "",
       "kind": "function",
@@ -6219,7 +6219,7 @@
       "args": "void",
       "signature": "u8 __vramq_len(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 154,
+      "line": 158,
       "comment": "Return encoded bytes currently occupied, not transfer payload bytes or command count.",
       "body": "",
       "kind": "function",
@@ -6238,7 +6238,7 @@
       "args": "void",
       "signature": "u8 __vramq_overflow(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 156,
+      "line": 160,
       "comment": "Read the latched capacity failure; reading does not reset it.",
       "body": "",
       "kind": "function",
@@ -6257,7 +6257,7 @@
       "args": "u16 ppu_addr, u8 value",
       "signature": "void __vramq_put(u16 ppu_addr, u8 value);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 144,
+      "line": 148,
       "comment": "Append one address/value update; use the overflow latch to detect capacity failure.",
       "body": "",
       "kind": "function",
