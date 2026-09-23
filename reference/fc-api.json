@@ -4593,7 +4593,7 @@
       "args": "u8 oam_index, u8 base_x, u8 base_y, const u8* metasprite",
       "signature": "u8 __metasprite_draw(u8 oam_index, u8 base_x, u8 base_y, const u8* metasprite);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 199,
+      "line": 203,
       "comment": "Expand dx,dy,tile,attr records into page-02 shadow OAM until dx=FF; return the next index.\nCoordinates and the byte OAM cursor wrap; keep the terminated stream within the available slots.",
       "body": "",
       "kind": "function",
@@ -5072,7 +5072,7 @@
       "args": "void",
       "signature": "void __oam_clear(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 186,
+      "line": 190,
       "comment": "Hide all 64 page-02 shadow sprites by writing Y=F0; hardware OAM changes only after DMA.",
       "body": "",
       "kind": "function",
@@ -5089,8 +5089,8 @@
       "args": "void",
       "signature": "void __oam_dma(void);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 182,
-      "comment": "NMI / IRQ \nSpin until the runtime NMI counter changes; the configured handler must advance it. No timeout is emitted.\nvoid __nmi_wait(void);\nReturn the current wrapping NMI counter byte, not a Boolean ready flag.\nu8 __nmi_ready(void);\nSet bit 7 in the PPUCTRL shadow and write it to hardware, preserving the other shadow bits.\nvoid __nmi_enable(void);\nClear bit 7 in the PPUCTRL shadow and write it to hardware; CPU IRQ masking is separate.\nvoid __nmi_disable(void);\nEmit SEI to mask CPU IRQs; NMI is unaffected.\nvoid __irq_disable(void);\nEmit CLI to unmask CPU IRQs; the caller must have a valid interrupt handler.\nvoid __irq_enable(void);\nReturn the processor-status byte captured before SEI. Pass that byte to __irq_restore.\nu8 __irq_save(void);\nRestore processor status with PLP, including arithmetic flags and the saved IRQ mask.\nvoid __irq_restore(u8 state);\n\n OAM / input \nSet OAMADDR to zero and start DMA from CPU page 02; arrange safe PPU timing in the caller.",
+      "line": 186,
+      "comment": "OAM / input \nSet OAMADDR to zero and start DMA from CPU page 02; arrange safe PPU timing in the caller.",
       "body": "",
       "kind": "function",
       "module": "intrinsics",
@@ -5109,7 +5109,7 @@
       "args": "u8 page",
       "signature": "void __oam_dma_page(u8 page);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 184,
+      "line": 188,
       "comment": "Set OAMADDR to zero and DMA 256 bytes from page<<8. The source page must remain readable.",
       "body": "",
       "kind": "function",
@@ -5524,7 +5524,7 @@
       "implementation_excerpt": "case \"__rng8\":\n                    if (!Need(0)) return true;\n                    EmitAsm(\"JSR\", Abs(\"__rng8\"));\n                    return true;\n                // Far-memory helpers pack the address, bank and length arguments according to their explicit byte/word signatures.\n\nEmitHelperStart(\"__rng8\");\n            // 16-bit Galois LFSR: if low bit set, shift right then xor $B400.\n            EmitAsm(\"LDA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"ORA\", Mem(_runtimeRngHiAddress));\n            // Replace the all-zero LFSR state with a deterministic nonzero seed before advancing.\n            string seeded = NewGeneratedLabel(\"rng_seeded\");\n            EmitAsm(\"BNE\", Rel(seeded));\n            EmitAsm(\"LDA\", Imm(0x5A));\n            EmitAsm(\"STA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"LDA\", Imm(0xA5));\n            EmitAsm(\"STA\", Mem(_runtimeRngHiAddress));\n            _assembly.Add(Expr.Make(Tag.Label, seeded));\n            EmitAsm(\"LDA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"AND\", Imm(1));\n            EmitAsm(\"STA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"LSR\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"ROR\", Mem(_runtimeRngLoAddress));\n            string rngNoXor = NewGeneratedLabel(\"rng_no_xor\");\n            EmitAsm(\"LDA\", Mem(_runtimeIntrinsicTmp0Address));\n            EmitAsm(\"BEQ\", Rel(rngNoXor));\n            EmitAsm(\"LDA\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"EOR\", Imm(0xB4));\n            EmitAsm(\"STA\", Mem(_runtimeRngHiAddress));\n            _assembly.Add(Expr.Make(Tag.Label, rngNoXor));\n            EmitAsm(\"LDA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"EOR\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"RTS\");",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 8314
+        "line": 8650
       }
     },
     {
@@ -5546,7 +5546,7 @@
       "implementation_excerpt": "case \"__rng_seed\":\n                    return EmitKitaqfcHelperCall(funcName, args, ctx, new[] {2}, \"__rng_seed\");\n\nEmitHelperStart(\"__rng_seed\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"STA\", Mem(_runtimeRngLoAddress));\n            EmitAsm(\"LDA\", Mem(CallArgBase + 1));\n            EmitAsm(\"STA\", Mem(_runtimeRngHiAddress));\n            EmitAsm(\"RTS\");",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 8307
+        "line": 8643
       }
     },
     {
@@ -5941,7 +5941,7 @@
       "args": "u8 index, u8 attr",
       "signature": "void __sprite_attr(u8 index, u8 attr);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 194,
+      "line": 198,
       "comment": "Replace the selected shadow attribute byte, including palette, priority and flip bits.",
       "body": "",
       "kind": "function",
@@ -5961,7 +5961,7 @@
       "args": "u8 index",
       "signature": "void __sprite_hide(u8 index);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 196,
+      "line": 200,
       "comment": "Write F0 to the selected shadow Y byte; issue DMA to make the change visible.",
       "body": "",
       "kind": "function",
@@ -5981,7 +5981,7 @@
       "args": "u8 index, u8 x, u8 y",
       "signature": "void __sprite_move(u8 index, u8 x, u8 y);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 190,
+      "line": 194,
       "comment": "Replace only shadow X/Y for index 0..63; tile and attribute bytes remain unchanged.",
       "body": "",
       "kind": "function",
@@ -6001,7 +6001,7 @@
       "args": "u8 index, u8 x, u8 y, u8 tile, u8 attr",
       "signature": "void __sprite_set(u8 index, u8 x, u8 y, u8 tile, u8 attr);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 188,
+      "line": 192,
       "comment": "Write Y, tile, attributes and X to one shadow entry. Use indices 0..63; coordinates are raw OAM bytes.",
       "body": "",
       "kind": "function",
@@ -6021,7 +6021,7 @@
       "args": "u8 index, u8 tile",
       "signature": "void __sprite_tile(u8 index, u8 tile);",
       "path": "kitaqfc/lib/intrinsics.h",
-      "line": 192,
+      "line": 196,
       "comment": "Replace the selected shadow tile byte; this does not upload tile patterns.",
       "body": "",
       "kind": "function",

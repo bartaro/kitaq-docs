@@ -534,6 +534,8 @@ def verified_ppu_intrinsic_examples(contracts):
 
 def verified_oam_library_examples(contracts):
     """Require a matching source/image for every separately compiled API form."""
+    from api_oam_current_proofs import verify_oam_inputs
+    verify_oam_inputs(SITE, SOURCE, contracts, library=True)
     path=SITE/'verification/api-oam-library/results.json'
     if not path.exists():return {}
     runs=json.loads(path.read_text(encoding='utf-8'))['records']
@@ -572,6 +574,8 @@ def verified_oam_library_examples(contracts):
 
 def verified_fc_oam_examples(contracts):
     """Bind each FC OAM intrinsic to its executed page and exact colored image."""
+    from api_oam_current_proofs import verify_oam_inputs
+    verify_oam_inputs(SITE, SOURCE, contracts)
     path=SITE/'verification/api-fc-oam/results.json'
     if not path.exists():return {}
     runs=json.loads(path.read_text(encoding='utf-8'))['records']
