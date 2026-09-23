@@ -1,0 +1,112 @@
+{
+  "fc:core": {
+    "ja": ["整数型の共通名を定義します。`u8`・`s8`は8ビット、`u16`・`s16`は16ビットで、先頭のuは符号なし、sは符号付きを表します。座標、個数、ビットマスクなど、値の範囲に合う型を選びます。", "`TRUE`は1、`FALSE`は0です。ただし、状態レジスタの読み取り関数には0またはビットマスクを返すものもあります。真偽だけを調べる場合は、戻り値が0かどうかを判定してください。このヘッダーを使うためのCファイルの追加は不要です。"],
+    "en": ["Defines the shared integer type names. `u8` and `s8` are 8-bit types; `u16` and `s16` are 16-bit types. The u prefix means unsigned and s means signed. Choose a type that can hold the coordinates, counts or masks your code needs.", "`TRUE` is 1 and `FALSE` is 0. Some status readers return a bit mask rather than a normalized Boolean, so test whether the result is nonzero when that is all you need. These type definitions require no additional C implementation file."],
+    "links": []
+  },
+  "fc:fc": {
+    "ja": ["FC開発で使う型、入出力、描画、音源、物理計算などの宣言を一度に取り込むまとめ用ヘッダーです。`#include \"fc.h\"`だけで各ライブラリの実装まで組み込まれるわけではありません。使う関数に対応するCファイルは、個別説明のビルド例に従って追加します。", "末尾で取り込む`nes_game.h`には関数形式のマクロがあります。たとえば引数なしの`nes_oam_dma()`マクロと、転送元ページを受け取るruntimeの同名関数は使い方が異なります。名前が重なる補助APIを使う場合は、必要なヘッダーを個別に取り込んでください。"],
+    "en": ["A convenience include for FC types, input/output, graphics, audio, physics and other declarations. `#include \"fc.h\"` does not link every implementation. Add the C files required by the functions you use, following their individual build examples.", "The final `nes_game.h` include defines function-like macros. For example, its no-argument `nes_oam_dma()` macro differs from the runtime function of the same name that takes a source page. Use selective headers when working with helpers whose names overlap."],
+    "links": [["fc-library.html#api-nes_oam_dma", "nes_oam_dma"]]
+  },
+  "fc:fds": {
+    "ja": ["FDSの有無を表すビルド設定と、ディスク装置の状態レジスタを調べる組み込み関数をまとめています。`__fds_available()`はコンパイル時のマッパー選択を返し、実機を検出する関数ではありません。", "ディスク待機は挿入状態の監視です。読み書きの完了を待つものではなく、タイムアウトもありません。`__fds_side()`は状態ビット、`__fds_error()`はレジスタの生値なので、名前からディスク面番号やBIOSエラー番号と解釈しないでください。"],
+    "en": ["Groups intrinsics for the selected FDS target and the disk unit's status registers. `__fds_available()` reports the mapper selected at build time; it does not probe the hardware.", "The wait functions poll disk presence. They do not wait for a transfer to finish and have no timeout. `__fds_side()` returns a status bit and `__fds_error()` returns a raw register value, rather than a numbered disk side or a stored BIOS error code."],
+    "links": [["kitaqfc.html#api-__fds_available", "__fds_available"], ["kitaqfc.html#api-__fds_wait_ready", "__fds_wait_ready"], ["kitaqfc.html#api-__fds_side", "__fds_side"], ["kitaqfc.html#api-__fds_error", "__fds_error"]]
+  },
+  "fc:fds_file": {
+    "ja": ["FDSファイルの読み込み・上書き保存と、ビルド時のファイル表の照会をまとめています。`exists`と`size`はコンパイル済みメタデータを参照し、挿入されたディスクのディレクトリを読み直しません。", "読み込みはまずファイルに指定されたアドレスへ転送し、必要ならCPU側のデータを`dst`へ移します。保存はその面の最後にある非ブートPRGファイルを同じサイズで上書きします。ファイルIDと物理的な記録順は別です。呼び出し元の配置、RAM範囲、割り込み・表示状態の条件を各APIで確認してください。"],
+    "en": ["Groups FDS file loading, in-place saving and queries against the file table packaged at build time. The `exists` and `size` functions inspect compiled metadata; they do not reread the inserted disk's directory.", "Loading first transfers a file to its declared address, then relocates CPU data to `dst` when requested. Saving overwrites the last non-boot PRG file on a side with data of the same size. File IDs and physical file order are different. Check each API's common-code, RAM-span, interrupt and display requirements before calling it."],
+    "links": [["kitaqfc.html#api-__fds_load_file", "__fds_load_file"], ["kitaqfc.html#api-__fds_save_file", "__fds_save_file"], ["kitaqfc.html#api-__fds_file_exists", "__fds_file_exists"], ["kitaqfc.html#api-__fds_file_size", "__fds_file_size"]]
+  },
+  "fc:fds_overlay": {
+    "ja": ["FDSのPRG RAMへコードやデータを読み込み、同じメモリ領域を使い回すための宣言です。ファイルIDを指定する`load_overlay`と、論理バンク番号を指定する`load_bank`を区別してください。", "現在バンクの照会はソフトウェアの管理値です。RAM内容の検査ではなく、転送失敗などで不明になると255を返します。farcallは引数なしの関数名を指定して呼び出し元のバンクを復元します。復元に失敗した場合は安全に戻れないため、共通領域で停止します。"],
+    "en": ["Declares operations for loading code or data into FDS PRG RAM and reusing that memory window. Distinguish `load_overlay`, which takes a file ID, from `load_bank`, which takes a logical bank number.", "Residency queries read software bookkeeping rather than inspecting RAM contents. Unknown residency, including after a failed transfer, is reported as 255. The farcall helpers take a named function with no parameters and restore the caller's bank. If restoration fails, execution stops in common code because returning would be unsafe."],
+    "links": [["kitaqfc.html#api-__fds_load_overlay", "__fds_load_overlay"], ["kitaqfc.html#api-__fds_load_bank", "__fds_load_bank"], ["kitaqfc.html#api-__fds_current_bank", "__fds_current_bank"], ["kitaqfc.html#api-__fds_overlay_farcall", "__fds_overlay_farcall"]]
+  },
+  "fc:fds_save": {
+    "ja": ["FDSの保存処理を使うソースから、`fds_file.h`の宣言を取り込むための入口です。独自の保存形式、作業領域、実装関数を追加するヘッダーではありません。保存領域の確保とファイルサイズはゲーム側で決め、`__fds_save_file()`の条件に合わせます。"],
+    "en": ["An include entry point for the declarations in `fds_file.h` when writing save code. It adds no separate save format, workspace or implementation. The game defines its save slot and data size, subject to the requirements of `__fds_save_file()`."],
+    "links": [["kitaqfc.html#api-__fds_save_file", "__fds_save_file"]]
+  },
+  "fc:intrinsics": {
+    "ja": ["`__`で始まるFC用組み込み関数の宣言を集めたヘッダーです。コンパイラが6502命令または内部補助ルーチンを生成するため、宣言だけを見て「実装がない」と判断する必要はありません。使用例・引数・戻り値はコンパイラ説明書の個別項目で確認できます。", "PPUへの直接書き込みは呼び出し側が安全な時刻を確保します。内部の引数領域や作業領域を共有する処理もあるため、通常処理とNMI・IRQから同時に呼んでも安全とは限りません。各関数の制約に従って、描画や割り込みの担当を決めてください。"],
+    "en": ["Collects FC intrinsic declarations whose names begin with `__`. The compiler emits 6502 instructions or internal helper routines for these calls, so a declaration without a C body does not imply a missing implementation. The compiler reference provides each function's arguments, result and example.", "The caller must schedule direct PPU writes safely. Some generated helpers share argument or scratch storage, so calls from the main loop and NMI/IRQ are not automatically reentrant. Assign ownership of graphics updates and interrupt work according to each function's constraints."],
+    "links": [["kitaqfc.html#api-__memcpy", "__memcpy"], ["kitaqfc.html#api-__ppu_addr", "__ppu_addr"], ["kitaqfc.html#api-__nmi_wait", "__nmi_wait"]]
+  },
+  "fc:keyboard": {
+    "ja": ["ファミリーベーシックのキーボード行列を走査する組み込み関数です。接続判定、全行の読み取り、指定行・列群の読み取りを使い分けます。接続判定は信号パターンによる推定です。", "全行走査には18バイトの書き込み先を用意します。戻る値はキー名や文字コードではなく、ポートのマスク済みビット列です。通常のキー走査は行0～8を使い、押下状態をゲーム側で対応するキーへ変換してください。"],
+    "en": ["Provides matrix scanning for the Family BASIC keyboard: a detection heuristic, a full scan and a selected row/column-group read. Detection infers presence from signal patterns.", "A full scan needs an 18-byte destination. Samples are masked port bits, not key names or character codes. Use rows 0..8 for normal keys and map their pressed states to game actions in your own code."],
+    "links": [["kitaqfc.html#api-__fkb_detect", "__fkb_detect"], ["kitaqfc.html#api-__fkb_scan", "__fkb_scan"], ["kitaqfc.html#api-__fkb_read_row_col", "__fkb_read_row_col"]]
+  },
+  "fc:mapper": {
+    "ja": ["カートリッジのPRG・CHRバンク、ミラーリング、マッパー割り込みなどを操作します。同じ関数名でも使える範囲は`--mapper`で選ぶ基板に依存し、未対応の操作はコンパイル時に拒否されるものがあります。", "PRGを切り替えると、CPUから見えるコードやデータも変わります。通常のポインタが常に全バンクを参照できるわけではありません。離れたバンクの読み取り・コピーにはfar系APIを選びます。スプライト0待機はマッパーIRQとは別方式で、成立する画面条件が必要です。"],
+    "en": ["Controls cartridge PRG/CHR banks, mirroring and mapper interrupts. Available operations and ranges depend on the board selected by `--mapper`; unsupported combinations may be rejected at compile time.", "Switching PRG changes the code and data visible to the CPU. Ordinary pointers do not automatically address every bank; use the far-access APIs for reads and copies in another bank. Sprite-zero waiting is separate from mapper IRQs and requires a screen setup that can produce a hit."],
+    "links": [["kitaqfc.html#api-__bankswitch", "__bankswitch"], ["kitaqfc.html#api-__far_memcpy", "__far_memcpy"], ["kitaqfc.html#api-__mapper_irq_set", "__mapper_irq_set"], ["kitaqfc.html#api-__sprite0_wait_hit", "__sprite0_wait_hit"]]
+  },
+  "fc:math_fast": {
+    "ja": ["距離の目安、矩形内判定、タイル座標の一次元化、乱数のための組み込み関数をまとめています。距離はユークリッド距離ではなく縦横差の和で、戻り値は8ビットです。矩形は右端と下端を含まず、マップ添字の計算は範囲検査を行いません。", "乱数は共有状態を持つLFSRです。同じシードから同じ列を再現できるためゲームの再現試験に使えますが、暗号用途には使いません。これらはコンパイラの組み込み処理で、別のmath_fast.cをリンクする必要はありません。"],
+    "en": ["Groups intrinsics for a distance estimate, rectangle membership, linear tile indices and random numbers. Distance is the sum of horizontal and vertical differences, returned as a byte. Rectangle tests exclude the right and bottom edges; map-index calculation performs no bounds check.", "The random generator is an LFSR with shared state. Reusing a seed reproduces its sequence for repeatable game tests; it is not intended for cryptography. These operations are compiler intrinsics and require no separate math_fast.c implementation."],
+    "links": [["kitaqfc.html#api-__manhattan", "__manhattan"], ["kitaqfc.html#api-__xy_in_rect", "__xy_in_rect"], ["kitaqfc.html#api-__map_index", "__map_index"], ["kitaqfc.html#api-__rng8", "__rng8"]]
+  },
+  "fc:math_fixed": {
+    "ja": ["整数の乗算、積和、内積に使う組み込み関数です。8×8の上位バイトを得る処理と、16ビットの積や積和を得る処理は、値の尺度が異なります。積の下位16ビットを返す関数では桁あふれが周回し、飽和しません。", "FCの`__dot*_q8_8`は名前にQ8.8が含まれていても最後の縮尺調整や丸めを行いません。符号付き版は渡されたビット列を符号付き整数として扱います。座標や速度の小数部を何ビットにするかは、各APIの実際の計算に合わせて決めてください。"],
+    "en": ["Provides integer multiplication, multiply-accumulate and dot-product intrinsics. Taking the high byte of an 8×8 product is a different scaling operation from returning a 16-bit product or accumulated result. Functions returning the low word wrap on overflow rather than saturating.", "The FC `__dot*_q8_8` operations do not apply a final scaling shift or rounding despite the Q8.8 suffix. Signed forms interpret their input bit patterns as signed integers. Choose the fractional-bit convention for positions or velocities to match the actual arithmetic documented for each API."],
+    "links": [["kitaqfc.html#api-__mul8x8_hi", "__mul8x8_hi"], ["kitaqfc.html#api-__smul16x8", "__smul16x8"], ["kitaqfc.html#api-__dot2_q8_8", "__dot2_q8_8"]]
+  },
+  "fc:math_lut": {
+    "ja": ["`math_lut.c`に格納された、128を中心とする符号なしの正弦波テーブル`MATH_SIN`を宣言します。関数ではないため、添字で値を読み出します。テーブル本体を使うにはmath_lut.cもビルドに含めます。", "1周期を256等分した値で、有効な添字は0～255です。角度0・64・128・192の値は128・255・128・1になり、255の次は0へ戻せます。式は`128 + round(127*sin(2*pi*phase/256))`です。符号付きの振幅として使う場合は、16ビットの符号付き型へ広げて128を引きます。ワイヤーフレーム用の内部テーブルとは別のデータです。"],
+    "en": ["Declares `MATH_SIN`, an unsigned sine-wave table centered at 128 and stored in `math_lut.c`. This is data, not a function: read a sample by index and include math_lut.c in the build to supply the table itself.", "The table divides a cycle into 256 equal phase steps, with valid indices 0..255. Phases 0, 64, 128 and 192 yield 128, 255, 128 and 1; phase 255 wraps to zero. Samples follow `128 + round(127*sin(2*pi*phase/256))`. To obtain a signed amplitude, widen the sample to a signed 16-bit type before subtracting 128. This is separate from the wireframe renderer's internal tables."],
+    "links": []
+  },
+  "fc:mic": {
+    "ja": ["2Pコントローラーのマイク入力ビットを、0または1として読む組み込み関数です。`__joypad2p_voice()`と`__mic_read2p()`は同じ入力を読みます。音声サンプルの録音や音声認識ではなく、マイク入力に応じたゲーム操作のきっかけとして使います。"],
+    "en": ["Reads the second controller's microphone input bit as 0 or 1. `__joypad2p_voice()` and `__mic_read2p()` read the same signal. This is a digital input for triggering game actions, not audio recording or speech recognition."],
+    "links": [["kitaqfc.html#api-__mic_read2p", "__mic_read2p"]]
+  },
+  "fc:midi": {
+    "ja": ["外部シリアルアダプターへビットやMIDIメッセージを送受信する宣言です。note_on・note_offなどは指定したメッセージを同期送信し、FC内蔵音源を直接鳴らす関数ではありません。データ引数には有効な7ビット値を指定します。", "送信は固定命令列の待機を使い、割り込み時間も加わるため、この実装だけでMIDIの通信速度が保証されるわけではありません。受信にはタイムアウトや受信キューがありません。接続する回路と信号タイミングを確認し、同じコントローラーポートを使う処理と調整してください。"],
+    "en": ["Declares bit-level serial I/O and MIDI message helpers for an external adapter. Functions such as note_on and note_off send messages synchronously; they do not play the FC's internal sound channels. Supply valid 7-bit MIDI data values.", "Transmission uses fixed instruction delays, with interrupt overhead added, so this implementation alone does not establish a verified MIDI baud rate. Reception has no timeout or input queue. Check the adapter and signal timing, and coordinate other code that uses the same controller port."],
+    "links": [["kitaqfc.html#api-__serial_tx_bit", "__serial_tx_bit"], ["kitaqfc.html#api-__midi_out_byte", "__midi_out_byte"], ["kitaqfc.html#api-__midi_in_byte", "__midi_in_byte"], ["kitaqfc.html#api-__midi_note_on", "__midi_note_on"]]
+  },
+  "fc:oam": {
+    "ja": ["スプライトの表示情報をCPU側のシャドーOAMへ書き、DMAでPPUへ転送する組み込み関数です。通常のシャドーはCPUページ02の64項目です。set・move・tile・attrは項目の全部または一部を更新し、hideはY値を変更して隠します。", "シャドーの変更だけでは画面に反映されません。VBlankなど安全なタイミングでDMAを実行してください。`__oam_dma()`はページ02を転送し、`__oam_dma_page(page)`は転送元ページを指定します。タイル番号の変更は絵柄データのアップロードではありません。"],
+    "en": ["Provides intrinsics for editing CPU-side shadow OAM and transferring it to the PPU with DMA. The standard shadow holds 64 entries on CPU page 02. Set, move, tile and attr update all or part of an entry; hide changes its Y value to move it out of view.", "Editing the shadow does not immediately change the display. Perform DMA at a safe time, such as VBlank. `__oam_dma()` transfers page 02, while `__oam_dma_page(page)` selects a source page. Changing a tile number does not upload its graphic pattern."],
+    "links": [["kitaqfc.html#api-__sprite_set", "__sprite_set"], ["kitaqfc.html#api-__sprite_hide", "__sprite_hide"], ["kitaqfc.html#api-__oam_dma", "__oam_dma"], ["kitaqfc.html#api-__oam_dma_page", "__oam_dma_page"]]
+  },
+  "fc:oam_fair_impl": {
+    "ja": ["`OAM_FairDraw()`の実装を含むヘッダーです。ゲーム側に用意した64項目の座標・有効フラグを巡回し、開始位置を毎回13進めて表示順を分散します。宣言だけのヘッダーとは異なり、プログラム全体で一度だけ取り込みます。", "既に書いたOAM項目の後ろへ追加するため、`oam_fair_used`には4の倍数のバイト位置を設定します。カーソルの周回を避けるため最後の4バイト枠には書きません。未使用項目の消去とDMAは呼び出し側の担当で、走査線ごとのスプライト数制限も残ります。"],
+    "en": ["Contains the implementation of `OAM_FairDraw()`. It visits a game-owned pool of 64 positions and active flags, advancing the starting entry by 13 on each call to distribute display priority. Unlike a declaration-only header, it must be included exactly once in the program.", "Sprites are appended after entries already written, so `oam_fair_used` must be a byte offset divisible by four. The final four-byte slot is reserved to prevent the byte cursor from wrapping. The caller still hides unused entries and performs DMA; the hardware's per-scanline sprite limit remains."],
+    "links": [["fc-library.html#api-OAM_FairDraw", "OAM_FairDraw"]]
+  },
+  "fc:ppu_direct": {
+    "ja": ["PPUの表示制御、アドレス指定、データ書き込みをすぐに行う組み込み関数です。VRAMキューへ後回しにする処理ではありません。大量の書き換えは表示停止中に行い、表示中はVBlank内に収まる量へ制限します。", "PPUのアドレス指定とスクロールは書き込みラッチを共有します。状態レジスタの読み取りにもラッチのリセットやVBlankフラグのクリアという副作用があります。アドレス、転送、スクロール復元の順序を各APIの例に合わせてください。"],
+    "en": ["Groups intrinsics that change PPU control, addresses and data immediately. These operations do not defer work through a VRAM queue. Use rendering-off periods for bulk updates, or keep visible-frame transfers within VBlank.", "PPU addressing and scrolling share a write latch. Reading the status register also resets that latch and clears the VBlank flag. Follow the individual examples when ordering address setup, transfers and scroll restoration."],
+    "links": [["kitaqfc.html#api-__ppu_addr", "__ppu_addr"], ["kitaqfc.html#api-__vram_write", "__vram_write"], ["kitaqfc.html#api-__ppu_read_status", "__ppu_read_status"]]
+  },
+  "fc:rob": {
+    "ja": ["画面の明暗とフレーム待機を組み合わせて、R.O.B.向けの光パルス列を作る組み込み関数です。flashは表示マスクの変更、pulseはオン・オフ期間、send_byteは8ビットのパターン送信を担当します。send_byteは上位ビットから4/2または2/4フレームのパルスを出します。", "表示を有効にするだけでは白い画面になりません。明るさを決める絵柄とパレットをゲーム側で用意し、NMIのフレームカウンターが進む状態で呼びます。実際の受光装置との通信成立と、エミュレーターで確認する命令列・画面変化は区別してください。"],
+    "en": ["Builds optical pulse sequences for R.O.B. by combining screen brightness states with frame waits. Flash changes the rendering mask, pulse controls on/off durations, and send_byte transmits an eight-bit pattern. Bytes are sent most significant bit first using 4/2- or 2/4-frame pulses.", "Enabling rendering alone does not create a white screen. Supply suitable graphics and palette values, and keep the NMI frame counter advancing. Emulator checks of instructions and screen changes do not establish successful communication with a physical optical receiver."],
+    "links": [["kitaqfc.html#api-__rob_flash", "__rob_flash"], ["kitaqfc.html#api-__rob_pulse", "__rob_pulse"], ["kitaqfc.html#api-__rob_send_byte", "__rob_send_byte"]]
+  },
+  "fc:vram_queue": {
+    "ja": ["PPUへの書き込み命令をCPU側に蓄え、後でまとめて実行する組み込みキューです。値1個、コピー、塗りつぶしを登録し、commitで実行可能な状態へ進めます。runtime.cの`nes_vram_queue_*`とは別のキューです。", "copyは元データのアドレスを保存するため、消費が終わるまでデータとバンク配置を保ちます。lenは転送する画素数ではなく、命令バッファ内の使用バイト数です。overflowを確認して登録失敗を処理し、消費中にキューを書き換えないでください。"],
+    "en": ["Queues PPU update commands in CPU memory for later execution. Enqueue a byte write, copy or fill, then commit the pending commands for consumption. This intrinsic queue is separate from runtime.c's `nes_vram_queue_*` queue.", "Copy commands retain a source address, so its data and bank mapping must remain valid until consumption ends. Len reports encoded command-buffer bytes rather than pixels or payload bytes. Check the overflow latch for failed submissions and do not mutate a queue while it is being consumed."],
+    "links": [["kitaqfc.html#api-__vramq_copy", "__vramq_copy"], ["kitaqfc.html#api-__vramq_commit", "__vramq_commit"], ["kitaqfc.html#api-__vramq_exec", "__vramq_exec"], ["kitaqfc.html#api-__vramq_overflow", "__vramq_overflow"]]
+  },
+  "fc:wire3d": {
+    "ja": ["FC向けワイヤーフレーム描画の型と関数を宣言します。頂点を回転・平行移動・投影し、辺を1ビットの線画として描きます。描画範囲は64×48、96×64、128×96から選び、小さい範囲ほど描画量とCHR転送量を抑えられます。", "CHR RAMとPRG RAMを備える構成が必要です。初期化が管理するパターンテーブル・ネームテーブルや作業RAMへ、別の描画処理が同時に書かないようにします。EndFrameは変更タイルを複数のVBlankに分けて転送し、完了後に画面を切り替えます。サイズ選択とビルド例は専用ガイドにあります。"],
+    "en": ["Declares the FC wireframe types and functions. Vertices are rotated, translated and projected, then edges are drawn as one-bit line graphics. Select a 64×48, 96×64 or 128×96 viewport; smaller views reduce drawing work and CHR transfers.", "The cartridge configuration needs CHR RAM and PRG RAM. Other graphics code must not write concurrently to the pattern tables, nametable and work RAM owned by this renderer. EndFrame uploads changed tiles over as many VBlanks as needed, then swaps the visible image. The dedicated guide covers viewport selection and build commands."],
+    "links": [["fc-library.html#api-Wire3DFC_Init", "Wire3DFC_Init"], ["fc-library.html#api-Wire3DFC_DrawModel", "Wire3DFC_DrawModel"], ["fc-library.html#api-Wire3DFC_EndFrame", "Wire3DFC_EndFrame"]]
+  },
+  "fc:wire3d_tables": {
+    "ja": ["ワイヤーフレーム実装が使う32方向の正弦値、投影用の逆数、描画行のアドレス表を定義します。`WIRE3D_FC_WIDTH`に対応する表を選ぶため、wire3d.cを取り込む前に画面サイズを指定します。ゲームから直接呼ぶ関数や、別途リンクするモジュールではありません。", "正弦値は64を基準にした整数です。投影表は深度32未満を扱わず、最大画面の最短深度では8ビットに収まるよう値を255へ制限します。表の数値だけを変更すると描画ルーチンの尺度やアドレス計算と合わなくなるため、通常は公開描画APIを使ってください。"],
+    "en": ["Defines the wireframe implementation's 32-direction sine values, projection reciprocals and drawing-row address tables. Set the viewport size before including wire3d.c so it selects the tables for `WIRE3D_FC_WIDTH`. This is implementation data, not a separate module to link or a callable game API.", "Sine values use an integer scale of 64. Projection rejects depths below 32; the nearest depth at the largest viewport is capped at 255 to fit a byte. Editing table values alone can break the renderer's scaling or address calculations, so game code should normally use the public drawing API."],
+    "links": [["fc-library.html#api-Wire3DFC_ProjectPoint", "Wire3DFC_ProjectPoint"], ["fc-library.html#api-Wire3DFC_DrawLine2D", "Wire3DFC_DrawLine2D"]]
+  },
+  "fc:zapper": {
+    "ja": ["光線銃の引き金と受光状態をコントローラーポートから読む組み込み関数です。末尾1・2でポートを選び、末尾なしのtrigger・lightはポート2を使います。光線銃の画面座標を直接返す機能ではありません。", "rawは引き金と受光のビットを残した値を返します。triggerは0・1へ正規化し、lightはアクティブローの受光ビットを反転して「光を検出したら1」にします。照準の判定は、画面の明暗を変えるゲーム側の処理と組み合わせます。"],
+    "en": ["Reads a light gun's trigger and light sensor through the controller ports. Suffixes 1 and 2 select the port; unsuffixed trigger and light functions use port 2. These calls do not directly return screen coordinates.", "Raw readers retain the trigger and sensor bits. Trigger readers normalize to 0 or 1; light readers invert the active-low sensor bit so that 1 means light detected. Combine these inputs with game-controlled screen brightness to perform aiming tests."],
+    "links": [["kitaqfc.html#api-__zapper_raw2", "__zapper_raw2"], ["kitaqfc.html#api-__zapper_trigger", "__zapper_trigger"], ["kitaqfc.html#api-__zapper_light", "__zapper_light"]]
+  }
+}

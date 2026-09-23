@@ -4808,7 +4808,7 @@ struct NesBox16 {
 unsigned char nes_box16_intersects(struct NesBox16* a, struct NesBox16* b);
 // Test a half-open box: left/top edges are included and right/bottom edges
 // excluded. Callers provide valid pointers and non-overflowing edge coordinates.
-unsigned char nes_box16_contains_point(struct NesBox16* box, unsigned short px, unsigned short py);</code></pre></div><p class="source">kitaqfc/lib/collision.h</p></details><details class="searchable"><summary><code>core.h</code> — Basic integer types</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef CORE_H
+unsigned char nes_box16_contains_point(struct NesBox16* box, unsigned short px, unsigned short py);</code></pre></div><p class="source">kitaqfc/lib/collision.h</p></details><details class="searchable" id="header-fc-core"><summary><code>core.h</code> — Basic integer types</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:core"><p>Defines the shared integer type names. <code>u8</code> and <code>s8</code> are 8-bit types; <code>u16</code> and <code>s16</code> are 16-bit types. The u prefix means unsigned and s means signed. Choose a type that can hold the coordinates, counts or masks your code needs.</p><p><code>TRUE</code> is 1 and <code>FALSE</code> is 0. Some status readers return a bit mask rather than a normalized Boolean, so test whether the result is nonzero when that is all you need. These type definitions require no additional C implementation file.</p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef CORE_H
 #define CORE_H
 
 // Public scalar aliases for the compiler&#x27;s byte and 16-bit integer types.
@@ -4962,7 +4962,7 @@ u8 entity_count_active(void);
 // Release every entity and restore deterministic defaults, including the no-sprite sentinel.
 void entity_clear_all(void);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/entity.h</p></details><details class="searchable"><summary><code>fc.h</code> — Umbrella library header</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FC_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/entity.h</p></details><details class="searchable" id="header-fc-fc"><summary><code>fc.h</code> — Umbrella library header</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:fc"><p>A convenience include for FC types, input/output, graphics, audio, physics and other declarations. <code>#include &quot;fc.h&quot;</code> does not link every implementation. Add the C files required by the functions you use, following their individual build examples.</p><p>The final <code>nes_game.h</code> include defines function-like macros. For example, its no-argument <code>nes_oam_dma()</code> macro differs from the runtime function of the same name that takes a source page. Use selective headers when working with helpers whose names overlap.</p><p>Function details and examples: <a href="fc-library.html#api-nes_oam_dma"><code>nes_oam_dma</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FC_H
 #define FC_H
 
 // Convenience header collecting FC interfaces. Inclusion provides declarations
@@ -5008,7 +5008,7 @@ void entity_clear_all(void);
 // Use selective headers when calling the page-argument runtime API with the same name.
 #include &quot;nes_game.h&quot;
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/fc.h</p></details><details class="searchable"><summary><code>fds.h</code> — FDS disk operations</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FDS_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/fc.h</p></details><details class="searchable" id="header-fc-fds"><summary><code>fds.h</code> — FDS disk operations</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:fds"><p>Groups intrinsics for the selected FDS target and the disk unit&#x27;s status registers. <code>__fds_available()</code> reports the mapper selected at build time; it does not probe the hardware.</p><p>The wait functions poll disk presence. They do not wait for a transfer to finish and have no timeout. <code>__fds_side()</code> returns a status bit and <code>__fds_error()</code> returns a raw register value, rather than a numbered disk side or a stored BIOS error code.</p><p>Function details and examples: <a href="kitaqfc.html#api-__fds_available"><code>__fds_available</code></a>, <a href="kitaqfc.html#api-__fds_wait_ready"><code>__fds_wait_ready</code></a>, <a href="kitaqfc.html#api-__fds_side"><code>__fds_side</code></a>, <a href="kitaqfc.html#api-__fds_error"><code>__fds_error</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FDS_H
 #define FDS_H
 
 #include &quot;intrinsics.h&quot;
@@ -5026,7 +5026,7 @@ void __fds_wait_ready(void);
 // Alias the same disk-presence wait as __fds_wait_ready; the call can block indefinitely.
 void __fds_wait_insert(void);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/fds.h</p></details><details class="searchable"><summary><code>fds_file.h</code> — Loading FDS files</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FDS_FILE_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/fds.h</p></details><details class="searchable" id="header-fc-fds_file"><summary><code>fds_file.h</code> — Loading FDS files</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:fds_file"><p>Groups FDS file loading, in-place saving and queries against the file table packaged at build time. The <code>exists</code> and <code>size</code> functions inspect compiled metadata; they do not reread the inserted disk&#x27;s directory.</p><p>Loading first transfers a file to its declared address, then relocates CPU data to <code>dst</code> when requested. Saving overwrites the last non-boot PRG file on a side with data of the same size. File IDs and physical file order are different. Check each API&#x27;s common-code, RAM-span, interrupt and display requirements before calling it.</p><p>Function details and examples: <a href="kitaqfc.html#api-__fds_load_file"><code>__fds_load_file</code></a>, <a href="kitaqfc.html#api-__fds_save_file"><code>__fds_save_file</code></a>, <a href="kitaqfc.html#api-__fds_file_exists"><code>__fds_file_exists</code></a>, <a href="kitaqfc.html#api-__fds_file_size"><code>__fds_file_size</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FDS_FILE_H
 #define FDS_FILE_H
 
 #include &quot;intrinsics.h&quot;
@@ -5047,7 +5047,7 @@ u8 __fds_file_exists(u8 id);
 // Return the compiled metadata size, or zero if id is absent. No disk directory is read.
 u16 __fds_file_size(u8 id);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/fds_file.h</p></details><details class="searchable"><summary><code>fds_overlay.h</code> — FDS overlay code</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FDS_OVERLAY_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/fds_file.h</p></details><details class="searchable" id="header-fc-fds_overlay"><summary><code>fds_overlay.h</code> — FDS overlay code</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:fds_overlay"><p>Declares operations for loading code or data into FDS PRG RAM and reusing that memory window. Distinguish <code>load_overlay</code>, which takes a file ID, from <code>load_bank</code>, which takes a logical bank number.</p><p>Residency queries read software bookkeeping rather than inspecting RAM contents. Unknown residency, including after a failed transfer, is reported as 255. The farcall helpers take a named function with no parameters and restore the caller&#x27;s bank. If restoration fails, execution stops in common code because returning would be unsafe.</p><p>Function details and examples: <a href="kitaqfc.html#api-__fds_load_overlay"><code>__fds_load_overlay</code></a>, <a href="kitaqfc.html#api-__fds_load_bank"><code>__fds_load_bank</code></a>, <a href="kitaqfc.html#api-__fds_current_bank"><code>__fds_current_bank</code></a>, <a href="kitaqfc.html#api-__fds_overlay_farcall"><code>__fds_overlay_farcall</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FDS_OVERLAY_H
 #define FDS_OVERLAY_H
 
 #include &quot;intrinsics.h&quot;
@@ -5073,7 +5073,7 @@ u8 __fds_overlay_farcall(u8 bank, u16 func);
 // Same named, zero-argument dispatch as __fds_overlay_farcall; evaluate bank once.
 u8 __fds_farcall(u8 bank, u16 func);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/fds_overlay.h</p></details><details class="searchable"><summary><code>fds_save.h</code> — FDS save declarations</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FDS_SAVE_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/fds_overlay.h</p></details><details class="searchable" id="header-fc-fds_save"><summary><code>fds_save.h</code> — FDS save declarations</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:fds_save"><p>An include entry point for the declarations in <code>fds_file.h</code> when writing save code. It adds no separate save format, workspace or implementation. The game defines its save slot and data size, subject to the requirements of <code>__fds_save_file()</code>.</p><p>Function details and examples: <a href="kitaqfc.html#api-__fds_save_file"><code>__fds_save_file</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef FDS_SAVE_H
 #define FDS_SAVE_H
 
 // Compatibility include for FDS file/save declarations; this header adds no storage or implementation.
@@ -5237,7 +5237,7 @@ unsigned char nes_pad_repeat(unsigned char mask);
 // Return the requested newly-released bits from the latest pad poll.
 unsigned char nes_pad_release(unsigned char mask);
 // Return the requested currently-held bits in the NES pad layout.
-unsigned char nes_pad_held(unsigned char mask);</code></pre></div><p class="source">kitaqfc/lib/input_repeat.h</p></details><details class="searchable"><summary><code>intrinsics.h</code> — Compiler intrinsics</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef INTRINSICS_H
+unsigned char nes_pad_held(unsigned char mask);</code></pre></div><p class="source">kitaqfc/lib/input_repeat.h</p></details><details class="searchable" id="header-fc-intrinsics"><summary><code>intrinsics.h</code> — Compiler intrinsics</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:intrinsics"><p>Collects FC intrinsic declarations whose names begin with <code>__</code>. The compiler emits 6502 instructions or internal helper routines for these calls, so a declaration without a C body does not imply a missing implementation. The compiler reference provides each function&#x27;s arguments, result and example.</p><p>The caller must schedule direct PPU writes safely. Some generated helpers share argument or scratch storage, so calls from the main loop and NMI/IRQ are not automatically reentrant. Assign ownership of graphics updates and interrupt work according to each function&#x27;s constraints.</p><p>Function details and examples: <a href="kitaqfc.html#api-__memcpy"><code>__memcpy</code></a>, <a href="kitaqfc.html#api-__ppu_addr"><code>__ppu_addr</code></a>, <a href="kitaqfc.html#api-__nmi_wait"><code>__nmi_wait</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef INTRINSICS_H
 #define INTRINSICS_H
 
 /*
@@ -5641,7 +5641,7 @@ void __fds_volume_set(u8 volume);
 // The legacy parameter names do not describe three independently packed envelope fields.
 void __fds_env_set(u8 a, u8 b, u8 c);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/intrinsics.h</p></details><details class="searchable"><summary><code>keyboard.h</code> — Keyboard scanning</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef KEYBOARD_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/intrinsics.h</p></details><details class="searchable" id="header-fc-keyboard"><summary><code>keyboard.h</code> — Keyboard scanning</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:keyboard"><p>Provides matrix scanning for the Family BASIC keyboard: a detection heuristic, a full scan and a selected row/column-group read. Detection infers presence from signal patterns.</p><p>A full scan needs an 18-byte destination. Samples are masked port bits, not key names or character codes. Use rows 0..8 for normal keys and map their pressed states to game actions in your own code.</p><p>Function details and examples: <a href="kitaqfc.html#api-__fkb_detect"><code>__fkb_detect</code></a>, <a href="kitaqfc.html#api-__fkb_scan"><code>__fkb_scan</code></a>, <a href="kitaqfc.html#api-__fkb_read_row_col"><code>__fkb_read_row_col</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef KEYBOARD_H
 #define KEYBOARD_H
 #include &quot;intrinsics.h&quot;
 // Probe selected-row and disabled-matrix bit patterns and return 0 or 1; this is a heuristic detection.
@@ -5651,7 +5651,7 @@ void __fkb_scan(u8* dst18);
 // Select a matrix row and the low bit of col, then return raw 4017 &amp; 1E.
 // Use rows 0..8 for keys; row 9 is used by detection. No row-range validation is emitted.
 u8 __fkb_read_row_col(u8 row, u8 col);
-#endif</code></pre></div><p class="source">kitaqfc/lib/keyboard.h</p></details><details class="searchable"><summary><code>mapper.h</code> — Mapper banks and IRQs</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MAPPER_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/keyboard.h</p></details><details class="searchable" id="header-fc-mapper"><summary><code>mapper.h</code> — Mapper banks and IRQs</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:mapper"><p>Controls cartridge PRG/CHR banks, mirroring and mapper interrupts. Available operations and ranges depend on the board selected by <code>--mapper</code>; unsupported combinations may be rejected at compile time.</p><p>Switching PRG changes the code and data visible to the CPU. Ordinary pointers do not automatically address every bank; use the far-access APIs for reads and copies in another bank. Sprite-zero waiting is separate from mapper IRQs and requires a screen setup that can produce a hit.</p><p>Function details and examples: <a href="kitaqfc.html#api-__bankswitch"><code>__bankswitch</code></a>, <a href="kitaqfc.html#api-__far_memcpy"><code>__far_memcpy</code></a>, <a href="kitaqfc.html#api-__mapper_irq_set"><code>__mapper_irq_set</code></a>, <a href="kitaqfc.html#api-__sprite0_wait_hit"><code>__sprite0_wait_hit</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MAPPER_H
 #define MAPPER_H
 
 #include &quot;intrinsics.h&quot;
@@ -5696,7 +5696,7 @@ void __sprite0_wait_hit(void);
 // Wait for a new sprite-zero hit, reset the PPU latch and write X/Y scroll; requires a visible hit setup.
 void __split_scroll_sprite0(u8 x, u8 y);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/mapper.h</p></details><details class="searchable"><summary><code>math_fast.h</code> — Fast integer arithmetic</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MATH_FAST_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/mapper.h</p></details><details class="searchable" id="header-fc-math_fast"><summary><code>math_fast.h</code> — Fast integer arithmetic</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:math_fast"><p>Groups intrinsics for a distance estimate, rectangle membership, linear tile indices and random numbers. Distance is the sum of horizontal and vertical differences, returned as a byte. Rectangle tests exclude the right and bottom edges; map-index calculation performs no bounds check.</p><p>The random generator is an LFSR with shared state. Reusing a seed reproduces its sequence for repeatable game tests; it is not intended for cryptography. These operations are compiler intrinsics and require no separate math_fast.c implementation.</p><p>Function details and examples: <a href="kitaqfc.html#api-__manhattan"><code>__manhattan</code></a>, <a href="kitaqfc.html#api-__xy_in_rect"><code>__xy_in_rect</code></a>, <a href="kitaqfc.html#api-__map_index"><code>__map_index</code></a>, <a href="kitaqfc.html#api-__rng8"><code>__rng8</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MATH_FAST_H
 #define MATH_FAST_H
 
 #include &quot;intrinsics.h&quot;
@@ -5717,7 +5717,7 @@ u8 __rng8(void);
 // Replace both persistent state bytes. Reusing a seed reproduces the sequence; this is not cryptographic randomness.
 void __rng_seed(u16 seed);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/math_fast.h</p></details><details class="searchable"><summary><code>math_fixed.h</code> — Fixed-point intrinsic interface</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MATH_FIXED_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/math_fast.h</p></details><details class="searchable" id="header-fc-math_fixed"><summary><code>math_fixed.h</code> — Fixed-point intrinsic interface</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:math_fixed"><p>Provides integer multiplication, multiply-accumulate and dot-product intrinsics. Taking the high byte of an 8×8 product is a different scaling operation from returning a 16-bit product or accumulated result. Functions returning the low word wrap on overflow rather than saturating.</p><p>The FC <code>__dot*_q8_8</code> operations do not apply a final scaling shift or rounding despite the Q8.8 suffix. Signed forms interpret their input bit patterns as signed integers. Choose the fractional-bit convention for positions or velocities to match the actual arithmetic documented for each API.</p><p>Function details and examples: <a href="kitaqfc.html#api-__mul8x8_hi"><code>__mul8x8_hi</code></a>, <a href="kitaqfc.html#api-__smul16x8"><code>__smul16x8</code></a>, <a href="kitaqfc.html#api-__dot2_q8_8"><code>__dot2_q8_8</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MATH_FIXED_H
 #define MATH_FIXED_H
 
 #include &quot;intrinsics.h&quot;
@@ -5742,11 +5742,11 @@ u16 __sdot2_q8_8(u16 a0, u16 a1, u8 b0, u8 b1);
 // Sum three signed-pattern products modulo 65536; choose operand units explicitly in the caller.
 u16 __sdot3_q8_8(u16 a0, u16 a1, u16 a2, u8 b0, u8 b1, u8 b2);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/math_fixed.h</p></details><details class="searchable"><summary><code>math_lut.h</code> — Lookup tables</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MATH_LUT_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/math_fixed.h</p></details><details class="searchable" id="header-fc-math_lut"><summary><code>math_lut.h</code> — Lookup tables</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:math_lut"><p>Declares <code>MATH_SIN</code>, an unsigned sine-wave table centered at 128 and stored in <code>math_lut.c</code>. This is data, not a function: read a sample by index and include math_lut.c in the build to supply the table itself.</p><p>The table divides a cycle into 256 equal phase steps, with valid indices 0..255. Phases 0, 64, 128 and 192 yield 128, 255, 128 and 1; phase 255 wraps to zero. Samples follow <code>128 + round(127*sin(2*pi*phase/256))</code>. To obtain a signed amplitude, widen the sample to a signed 16-bit type before subtracting 128. This is separate from the wireframe renderer&#x27;s internal tables.</p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MATH_LUT_H
 #define MATH_LUT_H
 
-// Nominal legacy extent; math_lut.c actually supplies 254 initializer bytes.
-// This declaration alone does not supply missing samples at indices 254 and 255.
+// Uniform 256-phase unsigned sine table in ROM. Range 1..255, centered at 128.
+// Link math_lut.c once; indices 0..255 are valid and byte phase wrap is supported.
 extern unsigned char MATH_SIN[256];
 
 #endif</code></pre></div><p class="source">kitaqfc/lib/math_lut.h</p></details><details class="searchable"><summary><code>metasprite.h</code> — Images composed of several sprites</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>/*
@@ -5765,7 +5765,7 @@ unsigned char nes_metasprite_draw(unsigned char oam_index, unsigned char base_x,
 unsigned char __metasprite_draw(unsigned char oam_index, unsigned char base_x, unsigned char base_y, const unsigned char* metasprite);
 // Hide consecutive shadow slots by setting Y to 0xF8. Keep the requested
 // range within 64 slots to avoid wrapping and hiding earlier entries.
-void nes_metasprite_hide_from(unsigned char oam_index, unsigned char sprite_count);</code></pre></div><p class="source">kitaqfc/lib/metasprite.h</p></details><details class="searchable"><summary><code>mic.h</code> — Microphone input</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MIC_H
+void nes_metasprite_hide_from(unsigned char oam_index, unsigned char sprite_count);</code></pre></div><p class="source">kitaqfc/lib/metasprite.h</p></details><details class="searchable" id="header-fc-mic"><summary><code>mic.h</code> — Microphone input</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:mic"><p>Reads the second controller&#x27;s microphone input bit as 0 or 1. <code>__joypad2p_voice()</code> and <code>__mic_read2p()</code> read the same signal. This is a digital input for triggering game actions, not audio recording or speech recognition.</p><p>Function details and examples: <a href="kitaqfc.html#api-__mic_read2p"><code>__mic_read2p</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MIC_H
 #define MIC_H
 #define VOICE_H
 #include &quot;intrinsics.h&quot;
@@ -5773,7 +5773,7 @@ void nes_metasprite_hide_from(unsigned char oam_index, unsigned char sprite_coun
 u8 __joypad2p_voice(void);
 // Alias the same normalized microphone input bit as __joypad2p_voice.
 u8 __mic_read2p(void);
-#endif</code></pre></div><p class="source">kitaqfc/lib/mic.h</p></details><details class="searchable"><summary><code>midi.h</code> — MIDI input and output interface</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MIDI_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/mic.h</p></details><details class="searchable" id="header-fc-midi"><summary><code>midi.h</code> — MIDI input and output interface</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:midi"><p>Declares bit-level serial I/O and MIDI message helpers for an external adapter. Functions such as note_on and note_off send messages synchronously; they do not play the FC&#x27;s internal sound channels. Supply valid 7-bit MIDI data values.</p><p>Transmission uses fixed instruction delays, with interrupt overhead added, so this implementation alone does not establish a verified MIDI baud rate. Reception has no timeout or input queue. Check the adapter and signal timing, and coordinate other code that uses the same controller port.</p><p>Function details and examples: <a href="kitaqfc.html#api-__serial_tx_bit"><code>__serial_tx_bit</code></a>, <a href="kitaqfc.html#api-__midi_out_byte"><code>__midi_out_byte</code></a>, <a href="kitaqfc.html#api-__midi_in_byte"><code>__midi_in_byte</code></a>, <a href="kitaqfc.html#api-__midi_note_on"><code>__midi_note_on</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef MIDI_H
 #define MIDI_H
 #include &quot;intrinsics.h&quot;
 // Write bit &amp; 1 to 4016, replacing the port output value; coordinate with other port users.
@@ -5883,7 +5883,7 @@ void nes_nametable_apply_now(unsigned short nt_base, unsigned char* nam960, unsi
 #define nes_fds_load_bank(bank)            __fds_load_bank((bank))
 #define nes_fds_farcall(bank, func)        __fds_overlay_farcall((bank), (func))
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/nes_game.h</p></details><details class="searchable"><summary><code>oam.h</code> — OAM shadow operations</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef OAM_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/nes_game.h</p></details><details class="searchable" id="header-fc-oam"><summary><code>oam.h</code> — OAM shadow operations</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:oam"><p>Provides intrinsics for editing CPU-side shadow OAM and transferring it to the PPU with DMA. The standard shadow holds 64 entries on CPU page 02. Set, move, tile and attr update all or part of an entry; hide changes its Y value to move it out of view.</p><p>Editing the shadow does not immediately change the display. Perform DMA at a safe time, such as VBlank. <code>__oam_dma()</code> transfers page 02, while <code>__oam_dma_page(page)</code> selects a source page. Changing a tile number does not upload its graphic pattern.</p><p>Function details and examples: <a href="kitaqfc.html#api-__sprite_set"><code>__sprite_set</code></a>, <a href="kitaqfc.html#api-__sprite_hide"><code>__sprite_hide</code></a>, <a href="kitaqfc.html#api-__oam_dma"><code>__oam_dma</code></a>, <a href="kitaqfc.html#api-__oam_dma_page"><code>__oam_dma_page</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef OAM_H
 #define OAM_H
 
 #include &quot;intrinsics.h&quot;
@@ -5929,7 +5929,7 @@ extern u8 oam_fair_drawn;
 // Append active pool entries using the configured common tile/attributes. The emitter stops at byte cursor 252,
 // leaving slot 63 unused to avoid cursor wrap. Hide unused trailing OAM entries separately before DMA.
 void OAM_FairDraw(void);
-#endif</code></pre></div><p class="source">kitaqfc/lib/oam_fair.h</p></details><details class="searchable"><summary><code>oam_fair_impl.h</code> — Sprite rotation implementation</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#include &quot;oam_fair.h&quot;
+#endif</code></pre></div><p class="source">kitaqfc/lib/oam_fair.h</p></details><details class="searchable" id="header-fc-oam_fair_impl"><summary><code>oam_fair_impl.h</code> — Sprite rotation implementation</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:oam_fair_impl"><p>Contains the implementation of <code>OAM_FairDraw()</code>. It visits a game-owned pool of 64 positions and active flags, advancing the starting entry by 13 on each call to distribute display priority. Unlike a declaration-only header, it must be included exactly once in the program.</p><p>Sprites are appended after entries already written, so <code>oam_fair_used</code> must be a byte offset divisible by four. The final four-byte slot is reserved to prevent the byte cursor from wrapping. The caller still hides unused entries and performs DMA; the hardware&#x27;s per-scanline sprite limit remains.</p><p>Function details and examples: <a href="fc-library.html#api-OAM_FairDraw"><code>OAM_FairDraw</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#include &quot;oam_fair.h&quot;
 u8 oam_fair_phase;
 u8 oam_fair_limit;
 u8 oam_fair_tile;
@@ -6248,7 +6248,7 @@ void nes_ppu_seek_bytes(unsigned char hi, unsigned char lo);
 void nes_ppu_write_bytes(unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count);
 void nes_ppu_fill(unsigned char hi, unsigned char lo, unsigned char value, unsigned char count);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/ppu.h</p></details><details class="searchable"><summary><code>ppu_direct.h</code> — Direct PPU operations</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef PPU_DIRECT_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/ppu.h</p></details><details class="searchable" id="header-fc-ppu_direct"><summary><code>ppu_direct.h</code> — Direct PPU operations</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:ppu_direct"><p>Groups intrinsics that change PPU control, addresses and data immediately. These operations do not defer work through a VRAM queue. Use rendering-off periods for bulk updates, or keep visible-frame transfers within VBlank.</p><p>PPU addressing and scrolling share a write latch. Reading the status register also resets that latch and clears the VBlank flag. Follow the individual examples when ordering address setup, transfers and scroll restoration.</p><p>Function details and examples: <a href="kitaqfc.html#api-__ppu_addr"><code>__ppu_addr</code></a>, <a href="kitaqfc.html#api-__vram_write"><code>__vram_write</code></a>, <a href="kitaqfc.html#api-__ppu_read_status"><code>__ppu_read_status</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef PPU_DIRECT_H
 #define PPU_DIRECT_H
 
 #include &quot;intrinsics.h&quot;
@@ -6273,7 +6273,7 @@ void __vram_write(u16 ppu_addr, const u8* src, u8 len);
 // Write repeated bytes directly; this is not an enqueue operation.
 void __vram_fill(u16 ppu_addr, u8 value, u8 len);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/ppu_direct.h</p></details><details class="searchable"><summary><code>rob.h</code> — ROB control</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef ROB_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/ppu_direct.h</p></details><details class="searchable" id="header-fc-rob"><summary><code>rob.h</code> — ROB control</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:rob"><p>Builds optical pulse sequences for R.O.B. by combining screen brightness states with frame waits. Flash changes the rendering mask, pulse controls on/off durations, and send_byte transmits an eight-bit pattern. Bytes are sent most significant bit first using 4/2- or 2/4-frame pulses.</p><p>Enabling rendering alone does not create a white screen. Supply suitable graphics and palette values, and keep the NMI frame counter advancing. Emulator checks of instructions and screen changes do not establish successful communication with a physical optical receiver.</p><p>Function details and examples: <a href="kitaqfc.html#api-__rob_flash"><code>__rob_flash</code></a>, <a href="kitaqfc.html#api-__rob_pulse"><code>__rob_pulse</code></a>, <a href="kitaqfc.html#api-__rob_send_byte"><code>__rob_send_byte</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef ROB_H
 #define ROB_H
 #include &quot;intrinsics.h&quot;
 // Set PPUMASK and its shadow to 1E or 00, then wait for an NMI-counter change.
@@ -6281,9 +6281,8 @@ void __vram_fill(u16 ppu_addr, u8 value, u8 len);
 void __rob_flash(u8 bright);
 // Run on_frames enabled-mask waits followed by off_frames disabled-mask waits; NMI must advance.
 void __rob_pulse(u8 on_frames, u8 off_frames);
-// The intended sequence uses MSB-first 4/2 or 2/4 frame pulses.
-// The current backend reuses X in its nested pulse helper without preserving the outer bit count;
-// this entry point is not a verified eight-bit transmission routine.
+// Send eight bits MSB first, using 4/2-frame pulses for one and 2/4 for zero.
+// Preserve the outer bit counter and shifted pattern around each pulse helper.
 void __rob_send_byte(u8 pattern);
 #endif</code></pre></div><p class="source">kitaqfc/lib/rob.h</p></details><details class="searchable"><summary><code>runtime.h</code> — C helpers for NMI, OAM and PPU transfer</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>/*
  * Core NES runtime declarations.
@@ -6608,7 +6607,7 @@ u8 vram_get_queue_capacity(void);
 // Read the overflow latch without clearing it.
 u8 vram_get_overflowed(void);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/vram.h</p></details><details class="searchable"><summary><code>vram_queue.h</code> — VRAM queues processed by NMI</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef VRAM_QUEUE_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/vram.h</p></details><details class="searchable" id="header-fc-vram_queue"><summary><code>vram_queue.h</code> — VRAM queues processed by NMI</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:vram_queue"><p>Queues PPU update commands in CPU memory for later execution. Enqueue a byte write, copy or fill, then commit the pending commands for consumption. This intrinsic queue is separate from runtime.c&#x27;s <code>nes_vram_queue_*</code> queue.</p><p>Copy commands retain a source address, so its data and bank mapping must remain valid until consumption ends. Len reports encoded command-buffer bytes rather than pixels or payload bytes. Check the overflow latch for failed submissions and do not mutate a queue while it is being consumed.</p><p>Function details and examples: <a href="kitaqfc.html#api-__vramq_copy"><code>__vramq_copy</code></a>, <a href="kitaqfc.html#api-__vramq_commit"><code>__vramq_commit</code></a>, <a href="kitaqfc.html#api-__vramq_exec"><code>__vramq_exec</code></a>, <a href="kitaqfc.html#api-__vramq_overflow"><code>__vramq_overflow</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef VRAM_QUEUE_H
 #define VRAM_QUEUE_H
 
 #include &quot;intrinsics.h&quot;
@@ -6688,7 +6687,7 @@ void nes_vrc7_key_off(u8 channel);
 // Key off all six voices and set instrument zero with maximum attenuation.
 void nes_vrc7_silence_all(void);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/vrc7_sound.h</p></details><details class="searchable"><summary><code>wire3d.h</code> — Wireframes for DMG</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
+#endif</code></pre></div><p class="source">kitaqfc/lib/vrc7_sound.h</p></details><details class="searchable" id="header-fc-wire3d"><summary><code>wire3d.h</code> — Wireframes for DMG</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:wire3d"><p>Declares the FC wireframe types and functions. Vertices are rotated, translated and projected, then edges are drawn as one-bit line graphics. Select a 64×48, 96×64 or 128×96 viewport; smaller views reduce drawing work and CHR transfers.</p><p>The cartridge configuration needs CHR RAM and PRG RAM. Other graphics code must not write concurrently to the pattern tables, nametable and work RAM owned by this renderer. EndFrame uploads changed tiles over as many VBlanks as needed, then swaps the visible image. The dedicated guide covers viewport selection and build commands.</p><p>Function details and examples: <a href="fc-library.html#api-Wire3DFC_Init"><code>Wire3DFC_Init</code></a>, <a href="fc-library.html#api-Wire3DFC_DrawModel"><code>Wire3DFC_DrawModel</code></a>, <a href="fc-library.html#api-Wire3DFC_EndFrame"><code>Wire3DFC_EndFrame</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
 #ifndef KITAQFC_WIRE3D_H
 #define KITAQFC_WIRE3D_H
 #include &quot;core.h&quot;
@@ -6745,7 +6744,7 @@ void Wire3DFC_DrawModel(const Wire3DFC_Vec3* vertices,u8 vertex_count,const Wire
 // swap only after completion. Blocks across as many frames as needed. The two
 // counters report this call&#x27;s upload batches plus swap, and tile count.
 void Wire3DFC_EndFrame(void);
-#endif</code></pre></div><p class="source">kitaqfc/lib/wire3d.h</p></details><details class="searchable"><summary><code>wire3d_tables.h</code> — </summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
+#endif</code></pre></div><p class="source">kitaqfc/lib/wire3d.h</p></details><details class="searchable" id="header-fc-wire3d_tables"><summary><code>wire3d_tables.h</code> — </summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:wire3d_tables"><p>Defines the wireframe implementation&#x27;s 32-direction sine values, projection reciprocals and drawing-row address tables. Set the viewport size before including wire3d.c so it selects the tables for <code>WIRE3D_FC_WIDTH</code>. This is implementation data, not a separate module to link or a callable game API.</p><p>Sine values use an integer scale of 64. Projection rejects depths below 32; the nearest depth at the largest viewport is capped at 255 to fit a byte. Editing table values alone can break the renderer&#x27;s scaling or address calculations, so game code should normally use the public drawing API.</p><p>Function details and examples: <a href="fc-library.html#api-Wire3DFC_ProjectPoint"><code>Wire3DFC_ProjectPoint</code></a>, <a href="fc-library.html#api-Wire3DFC_DrawLine2D"><code>Wire3DFC_DrawLine2D</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
 // Generated from round(64*sin(2*pi*i/32)) and round(64*width/z).
 // Depths below 32 are rejected. Saturating 256 to 255 at the largest
 // viewport/nearest depth bounds the projection error without a ninth bit.
@@ -6867,7 +6866,7 @@ __prg_rom const u8 w3dfc_tile_row[96]={
     128,128,128,128,128,128,128,128,144,144,144,144,144,144,144,144,
     160,160,160,160,160,160,160,160,176,176,176,176,176,176,176,176,
 };
-#endif</code></pre></div><p class="source">kitaqfc/lib/wire3d_tables.h</p></details><details class="searchable"><summary><code>zapper.h</code> — Light-gun input interface</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef ZAPPER_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/wire3d_tables.h</p></details><details class="searchable" id="header-fc-zapper"><summary><code>zapper.h</code> — Light-gun input interface</summary><!-- header-guide:start --><div class="header-guide" data-header-contract="fc:zapper"><p>Reads a light gun&#x27;s trigger and light sensor through the controller ports. Suffixes 1 and 2 select the port; unsuffixed trigger and light functions use port 2. These calls do not directly return screen coordinates.</p><p>Raw readers retain the trigger and sensor bits. Trigger readers normalize to 0 or 1; light readers invert the active-low sensor bit so that 1 means light detected. Combine these inputs with game-controlled screen brightness to perform aiming tests.</p><p>Function details and examples: <a href="kitaqfc.html#api-__zapper_raw2"><code>__zapper_raw2</code></a>, <a href="kitaqfc.html#api-__zapper_trigger"><code>__zapper_trigger</code></a>, <a href="kitaqfc.html#api-__zapper_light"><code>__zapper_light</code></a></p></div><!-- header-guide:end --><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef ZAPPER_H
 #define ZAPPER_H
 #include &quot;intrinsics.h&quot;
 // Return raw 4016 &amp; 18, retaining trigger and active-low light bits.

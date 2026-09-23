@@ -313,7 +313,7 @@ def publish(language, require_complete=False):
                 from api_raster_bands_proofs import overview as raster_bands_overview
                 text = raster_bands_overview(text, language)
             text = feature_cards_overview(text, platform, language)
-            text = refresh_complete_headers(text, platform)
+            text = refresh_complete_headers(text, platform, language)
             validate_rendered_volume(text, records, volume)
             path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
     publish_verification(language, contracts, proofs, messages, ui)
@@ -353,18 +353,20 @@ def validate_rendered_volume(text, records, volume):
         raise ValueError(f'{volume}: missing={missing}, extra={extra}, duplicate={duplicates}, unreviewed={empty}')
 
 
-def refresh_complete_headers(text, platform):
+def refresh_complete_headers(text, platform, language='ja'):
     """Keep the full-header appendix consistent with the same published source as the API cards."""
     if '<h2 id="headers">' not in text:return text
+    from header_guides import remove_guides, render as render_header_guides
+    text = remove_guides(text)
     repos=SITE.parents[1]/'publish/github_20260912'
     if not repos.exists():repos=SITE.parent
     data=json.loads((SITE/'reference'/(platform+'-api.json')).read_text(encoding='utf-8'))
     for name in data['headers']:
-        pattern=r'(<details class="searchable"><summary><code>'+re.escape(html.escape(Path(name).name))+r'</code>.*?</summary><div class="codebox">.*?<pre><code>)(.*?)(</code></pre>.*?<p class="source">'+re.escape(html.escape(name))+r'</p></details>)'
+        pattern=r'(<details class="searchable"(?: id="[^"]+")?><summary><code>'+re.escape(html.escape(Path(name).name))+r'</code>.*?</summary><div class="codebox">.*?<pre><code>)(.*?)(</code></pre>.*?<p class="source">'+re.escape(html.escape(name))+r'</p></details>)'
         source=html.escape((repos/name).read_text(encoding='utf-8').strip())
         text,count=re.subn(pattern,lambda m:m[1]+source+m[3],text,count=1,flags=re.S)
         if count!=1:raise ValueError('Complete-header appendix entry missing: '+name)
-    return text
+    return render_header_guides(text, platform, language)
 
 
 def render_modules(text, platform, language, messages):
