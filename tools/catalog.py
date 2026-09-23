@@ -75,6 +75,23 @@ def definitions(p, height=None):
    body=t[m.start():i]
   out.append(dict(name=name,ret=ret.strip(),args=re.sub(r'\s+',' ',args).strip(),signature=proto+';',path=p.relative_to(ROOT).as_posix(),line=line,comment=desc[-1800:],body=body,kind='function'))
  return out
+
+def fc_far_copy_alias(source, compiler_path):
+ """Describe the registered FC spelling that has no separate header prototype."""
+ name='__farmemcpy'
+ registration='Add("__farmemcpy", CType.Void, 2, 1, 2, 2);'
+ assert registration in source
+ start=source.index('case "__far_memcpy":')
+ end=source.index('\n',source.index('return EmitKitaqfcHelperCall',start))
+ excerpt=source[start:end]
+ assert 'case "__farmemcpy":' in excerpt and 'new[] {2,1,2,2}' in excerpt
+ return dict(name=name,ret='void',args='u8* dst, u8 bank, u16 src, u16 len',
+  signature='void __farmemcpy(u8* dst, u8 bank, u16 src, u16 len);',
+  path=compiler_path,line=source.count('\n',0,source.index(registration))+1,
+  comment='',body='',kind='intrinsic',module='intrinsics',definition=None,
+  availability='compiler',implementation_excerpt=excerpt,
+  implementation_source=dict(path=compiler_path,line=source.count('\n',0,start)+1))
+
 def collect(platform):
  lib=ROOT/('kitaqgb/lib' if platform=='gb' else 'kitaqfc/lib')
  comp=ROOT/('kitaqgb/kitaqgb' if platform=='gb' else 'kitaqfc/kitaqfc')
@@ -134,6 +151,8 @@ def collect(platform):
              comment='Compatibility alias: '+new+'; WIRE3D_DMG_HEIGHT = '+str(height)+'.\n'+r['comment'])
     records[old]=r
  source=read(comp/'CodeGenerator.cs')
+ if platform=='fc':
+  records['__farmemcpy']=fc_far_copy_alias(source,(comp/'CodeGenerator.cs').relative_to(ROOT).as_posix())
  if platform=='gb':
   names=set(re.findall(r'funcName\s*==\s*"(__\w+)"',source))
  else:

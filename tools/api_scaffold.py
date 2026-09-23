@@ -18,7 +18,9 @@ def section(platform, intrinsic, language, modules):
     intro = ('全'+str(len(records))+'項目。各項目では、機能、引数、戻り値、制約、使用例と期待する結果を説明します。') if language == 'ja' else (str(len(records))+' entries. Each entry explains the operation, arguments, return value, constraints, usage example and expected result.')
     out = ['<h2 id="api">'+title+'</h2><p>'+intro+'</p>']
     for module in sorted({r['module'] for r in records}):
-        out.append('<h3 id="module-'+html.escape(module,quote=True)+'">'+html.escape(module+'.h — '+modules.get(module,module))+'</h3>')
+        # Headerless compiler records use a category name, not a fictitious include.
+        suffix = '' if platform == 'gb' and module == 'intrinsics' else '.h'
+        out.append('<h3 id="module-'+html.escape(module,quote=True)+'">'+html.escape(module+suffix+' — '+modules.get(module,module))+'</h3>')
         for record in sorted((r for r in records if r['module']==module),key=lambda r:r['name'].lower()):
             name = html.escape(record['name'],quote=True)
             # publish(require_complete=True) must replace every placeholder. No

@@ -58,6 +58,8 @@ def render(record, contract, language, messages, ui):
                 caption += ' — ' + ' '.join(messages[key][index].replace('`','') for key in example.get('expected', []))
             if contract['review'] == 'sprite-order-source-20260923':
                 caption += ' — ' + ' '.join(messages[key][index].replace('`','') for key in example.get('expected', []))
+            if contract['review'] == 'far-copy-alias-source-20260923':
+                caption += ' — ' + messages['fca_pairs'][index].replace('`','')
             result.append('<figure class="example-result"><img class="screen" loading="lazy" src="' + prefix + html.escape(shot['image'], quote=True) + '" alt="' + html.escape(name + ': ' + caption, quote=True) + '"><figcaption>' + html.escape(caption) + '</figcaption></figure>')
         for clip in example.get('verified_audio', []):
             caption = clip['caption'] + ' — ' + ('確認した音声' if language == 'ja' else 'Captured audio')
@@ -233,6 +235,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
+    from api_far_copy_alias_proofs import verified_examples as verified_far_copy_alias_examples
+    proofs.update(verified_far_copy_alias_examples(contracts))
     proofs.update(verified_bank_examples(contracts))
     proofs.update(verified_sprite_examples(contracts))
     from api_sprite_order_proofs import verified_examples as verified_sprite_order_examples
@@ -260,6 +264,9 @@ def publish(language, require_complete=False):
             if volume == 'gb-library':
                 from api_sprite_order_proofs import ensure_cards
                 text = ensure_cards(text, language)
+            if volume == 'kitaqfc':
+                from api_far_copy_alias_proofs import ensure_card
+                text = ensure_card(text)
             edits = []
             for name, start, end in CardRanges(text).ranges:
                 key = platform + ':' + name
@@ -372,6 +379,8 @@ def refresh_complete_headers(text, platform, language='ja'):
 def render_modules(text, platform, language, messages):
     """Place reviewed library introductions directly below their module headings."""
     text = re.sub(r'<!-- api-module:start -->.*?<!-- api-module:end -->','',text,flags=re.S)
+    if platform == 'gb':
+        text = text.replace('<h3 id="module-intrinsics">intrinsics.h — ', '<h3 id="module-intrinsics">intrinsics — ')
     # fds_sound.h declares compiler intrinsics, so it has no ordinary function
     # cards in the library volume. Keep the header discoverable here and link
     # each declaration to its complete compiler-reference lesson.
@@ -389,7 +398,7 @@ def render_modules(text, platform, language, messages):
             if owner != platform: continue
             pattern = r'(<h3\b[^>]*id="module-' + re.escape(module) + r'"[^>]*>.*?</h3>)'
             review_date = '20260917' if path.stem == 'link_modules' else '20260916' if path.stem in ['sound_modules','batch300_modules'] else '20260915'
-            if path.stem == 'sprite_order_modules':review_date = '20260923'
+            if path.stem in ['sprite_order_modules','intrinsics_modules']:review_date = '20260923'
             block = '<!-- api-module:start --><div data-module-contract="' + html.escape(path.stem.removesuffix('_modules'), quote=True) + '-source-' + review_date + '">'
             block += ''.join('<p>'+inline(messages[item][index])+'</p>' for item in paragraphs)
             block += '</div><!-- api-module:end -->'
@@ -719,10 +728,24 @@ def verified_asset_examples(contracts):
     path = SITE/'verification/api-asset/results.json'
     if not path.exists(): return {}
     runs = json.loads(path.read_text(encoding='utf-8'))['records']
+    repos = SITE.parents[1]/'publish/github_20260912'
+    if not repos.exists(): repos = SITE.parent
+    sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
     expected = {('gb','dmg'),('gb','cgb'),('fc','surom512')}
     if len(runs)!=3 or {(r['platform'],r['mode']) for r in runs}!=expected: return {}
     if not all(r['passed'] and r.get('frames')==300 and r['label_pixel_mismatches']==0 and
                r['geometry_pixel_mismatches']==0 and r['geometry_color_mismatches']==0 for r in runs): return {}
+    for run in runs:
+        platform = run['platform']
+        repo = repos/('kitaq'+platform)
+        if sha(repo/('kitaq'+platform+'.exe')) != run['compiler_sha256']:
+            raise ValueError('Asset sample compiler changed: '+platform)
+        emulator = repos/('kokura/kokura-cli.exe' if platform=='gb' else 'kurosaki/kurosaki.exe')
+        if sha(emulator) != run['emulator_sha256']:
+            raise ValueError('Asset sample emulator changed: '+platform)
+        for name, expected_hash in run['library_sha256'].items():
+            if sha(repo/'lib'/name) != expected_hash:
+                raise ValueError('Asset sample library changed: '+platform+'/'+name)
     result = {}
     for key,contract in contracts.items():
         if contract['review']!='asset-source-20260915': continue

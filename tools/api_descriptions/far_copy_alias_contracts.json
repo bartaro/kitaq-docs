@@ -1,0 +1,62 @@
+{
+  "fc:__farmemcpy": {
+    "review": "far-copy-alias-source-20260923",
+    "purpose": [
+      "fca_alias",
+      "as_far"
+    ],
+    "args": [
+      [
+        "dst",
+        [
+          "as_dst"
+        ]
+      ],
+      [
+        "bank",
+        [
+          "as_far_bank"
+        ]
+      ],
+      [
+        "src",
+        [
+          "as_far_src_fc"
+        ]
+      ],
+      [
+        "len",
+        [
+          "as_far_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "none"
+    ],
+    "notes": [
+      "fca_declaration",
+      "as_copy_bounds",
+      "as_fixed_code",
+      "fca_zero"
+    ],
+    "record_sha256": "9a6b6921360a10901c29d2e0396b8f50c1d64ef755b77cedb7323e264c461694",
+    "example": {
+      "program": "samples/api-examples/fc/far_copy_alias.c",
+      "code": "__farmemcpy(buffer,payload_bank,(u16)payload_pointer,32);\nexpect(*asset_bank_marker==0xA1 && bank_get_current()==1,27);\nfor(i=0;i<32;i++) expect(buffer[(__safe_index u8)i]==expected_shape_byte(i),28);\nbuffer[32]=0x55;\n__farmemcpy(buffer+32,2,(u16)asset_shapes,0);\nexpect(buffer[32]==0x55 && *asset_bank_marker==0xA1,30);",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\far_copy_alias.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\far_copy_alias.nes --mapper=mmc1 --board=surom512 --no-cache --no-disasm",
+      "expected": [
+        "as_demo_far",
+        "as_red_geometry",
+        "fca_pairs",
+        "as_status"
+      ]
+    },
+    "references": [
+      {
+        "url": "kitaqfc.html#api-__far_memcpy",
+        "title": "__far_memcpy"
+      }
+    ]
+  }
+}
