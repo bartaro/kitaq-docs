@@ -1,0 +1,130 @@
+{
+  "mapper_void": {
+    "ja": "戻り値はありません。",
+    "en": "No return value."
+  },
+  "mapper_header": {
+    "ja": "組み込み関数の宣言は`intrinsics.h`にあります。`nes_mapper_irq_*`のマクロには`nes_game.h`を読み込みます。マッパーはビルド時の`--mapper`で選びます。",
+    "en": "Intrinsic declarations are in `intrinsics.h`. Include `nes_game.h` for the `nes_mapper_irq_*` macros. Select the board at build time with `--mapper`."
+  },
+  "mapper_chr_units": {
+    "ja": "CNROMでは8 KiBのCHRバンク番号です。MMC3では1 KiB単位の番号で、2 KiBの窓を切り替えます。MMC3の最下位ビットは無視されるため、2と3はいずれも1 KiBバンク2・3を選びます。利用できるバンク数はCHR ROMの容量に依存し、APIは範囲検査しません。",
+    "en": "On CNROM this is an 8 KiB CHR bank number. On MMC3 it is a 1 KiB bank number selecting a 2 KiB window: the low bit is ignored, so 2 and 3 both select the pair of 1 KiB banks 2 and 3. Available banks depend on CHR ROM capacity; the API performs no range check."
+  },
+  "mapper_chr_side": {
+    "ja": "MMC3のバンク選択レジスターへ0または1を書き込むため、PRGモードビット6とCHR反転ビット7も0になります。別のモードを前提にしたPRG/CHR配置とは組み合わせないでください。描画中の変更は、その時点から参照する絵柄を変えます。サンプルは描画を止めて調べ、文字を表示する前にフォントのバンクへ戻します。",
+    "en": "Writing 0 or 1 to the MMC3 bank-select register also clears PRG mode bit 6 and CHR inversion bit 7. Do not combine this with a PRG/CHR layout that requires those bits to remain set. Switching during rendering changes subsequent pattern fetches. The sample checks with rendering off and restores the font banks before displaying results."
+  },
+  "mapper_chr_support": {
+    "ja": "この3つの組み込み関数はCNROMとMMC3に対応します。その他のマッパーではコンパイルエラーになります。SUROMではCHRが外側PRGバンク制御も兼ねるため、これらのCHR操作を使用できません。",
+    "en": "These three intrinsics support CNROM and MMC3. Other boards are rejected at compilation. SUROM also uses CHR control for outer PRG selection and does not allow these CHR operations."
+  },
+  "mapper_irq_latch": {
+    "ja": "0～255の8ビットカウンターラッチ値です。画面上の絶対Y座標ではありません。再ロードのタイミングとPPUのA12変化によって発生位置が決まります。0も書き込めますが、割り込み停止の意味ではありません。",
+    "en": "An 8-bit counter latch value, 0..255, not an absolute screen Y coordinate. Reload timing and qualified PPU A12 transitions determine when it fires. Zero is valid and does not mean “disable interrupts.”"
+  },
+  "mapper_irq_setup": {
+    "ja": "MMC3専用です。`__nes_irq`ハンドラー、PPUのA12変化、マッパー側の有効化、CPU側の`__irq_enable()`が必要です。サンプルは背景を$0000、スプライトを$1000のパターンテーブルにして描画を有効にしています。実機での特定ラインへの同期精度は、このサンプルの検証範囲に含みません。",
+    "en": "MMC3 only. Supply a `__nes_irq` handler, qualified PPU A12 transitions, mapper IRQ enable and CPU `__irq_enable()`. The sample enables rendering with background patterns at $0000 and sprite patterns at $1000. This lesson does not verify synchronization to an exact line on physical hardware."
+  },
+  "mapper_irq_ack_rule": {
+    "ja": "MMC3のACKと無効化はどちらも$E000への書き込みです。要求を解除すると同時に、次の要求も無効になります。繰り返し使う場合は必要なタイミングで`__mapper_irq_enable()`を呼んでください。CPUの割り込みマスクやNMIの有効状態は変更しません。",
+    "en": "MMC3 acknowledgment and disable both write $E000. This clears the current request and disables subsequent requests. Call `__mapper_irq_enable()` again at the intended time to arm another interrupt. Neither operation changes the CPU interrupt mask or NMI enable."
+  },
+  "mapper_irq_preserve": {
+    "ja": "独自ハンドラーの末尾にはコンパイラがRTIを生成しますが、A/X/Yや共有一時領域はハンドラー側で必要な分を保存・復元します。サンプルのハンドラーはA/X/Yを保存し、バイトの加算と引数なしのACKだけを行います。別のC関数を追加する場合は、その関数が触る共有領域も確認してください。",
+    "en": "The compiler emits RTI for a custom interrupt handler, but the handler must preserve any A/X/Y registers and shared scratch that it changes. The sample saves A/X/Y and uses only a byte increment and argument-free acknowledgment. If you add C calls, also inspect the shared storage they use."
+  },
+  "mapper_control_expected": {
+    "ja": "MMC3のサンプルはCHRのマーカー値19/20、21/22、23/24を表示します。CIRAMは縦配置でA B A B、横配置でA A B Bになります。IRQ回数は01→02→03→03です。最初の3回は明示的な再有効化で1回ずつ増え、無効化後は増えません。各段階で6フレーム待って確認します。",
+    "en": "The MMC3 sample displays CHR markers 19/20, 21/22 and 23/24. CIRAM reads show A B A B for vertical mirroring and A A B B for horizontal mirroring. IRQ counts are 01→02→03→03: each of the first three explicit enables permits one interrupt; the count stays unchanged after disable. Each stage waits six frames."
+  },
+  "mapper_cnrom_expected": {
+    "ja": "CNROMのサンプルでは、SET 2、SET0 1、SET1 3のマーカー値が33、25、41になります。すべて8 KiB全体を切り替えることを、各バンク内の独自マーカーをPPUから読み戻して示します。",
+    "en": "The CNROM lesson shows markers 33, 25 and 41 after SET 2, SET0 1 and SET1 3. It reads original marker bytes through the PPU to demonstrate that all three names switch the entire 8 KiB pattern region."
+  },
+  "mapper_mirror_expected": {
+    "ja": "サンプルは物理RAMの下側に17、上側に34を書き、4つの論理領域を読み戻します。Aは下側、Bは上側です。同じ文字の領域は同じRAMを共有するため、一方への書き込みが他方からも見えます。画面の列は$2000、$2400、$2800、$2C00、行はモード0～3です。読み戻し後に文字を表示しています。",
+    "en": "The lesson writes 17 to the lower physical RAM page and 34 to the upper page, then reads the four logical regions. A denotes the lower page and B the upper page. Regions with the same letter share RAM, so a write through one is visible through the others. Columns are $2000, $2400, $2800 and $2C00; rows are modes 0..3. Text is displayed after the readback."
+  },
+  "mapper_mirror_modes": {
+    "ja": "モード番号は基板ごとに異なります。MMC1/SUROM: 0=下側1画面、1=上側1画面、2=縦、3=横。MMC3: 0=縦、1=横。MMC5: 0=横、1=縦、2=下側1画面、3=上側1画面。AxROM: 0=下側1画面、1=上側1画面。FME7: 0=縦、1=横、2=下側1画面、3=上側1画面。MMC3/AxROMは下位1ビット、その他は下位2ビットを使います。",
+    "en": "Mode numbers vary by board. MMC1/SUROM: 0=lower single screen, 1=upper single screen, 2=vertical, 3=horizontal. MMC3: 0=vertical, 1=horizontal. MMC5: 0=horizontal, 1=vertical, 2=lower single screen, 3=upper single screen. AxROM: 0=lower single screen, 1=upper single screen. FME7: 0=vertical, 1=horizontal, 2=lower single screen, 3=upper single screen. MMC3/AxROM use the low bit; the others use the low two bits."
+  },
+  "mapper_mirror_layout": {
+    "ja": "縦ミラーリングは4領域の共有順がA B A B、横ミラーリングはA A B Bです。下側1画面はA A A A、上側1画面はB B B Bです。これはメモリの割り当てであり、背景画像の反転やコピーは行いません。固定ミラーリングのNROMなど、このAPIに対応しない基板はビルド時に拒否します。",
+    "en": "Vertical mirroring aliases the four regions as A B A B; horizontal mirroring gives A A B B. Lower single screen gives A A A A and upper single screen B B B B. This changes memory mapping; it neither flips nor copies background graphics. Unsupported boards, including fixed-mirroring NROM, are rejected at build time."
+  },
+  "mapper_mirror_side": {
+    "ja": "MMC1は制御値$0C|modeを書き込み、PRGを上側16 KiB固定、CHRを8 KiBモードにします。SUROMも制御シャドーを更新します。AxROMではランタイムのPRGバンク値を保ちながら画面選択ビットを変えます。直接レジスターを書く処理と併用する場合は、ランタイムのバンク状態と一致させてください。",
+    "en": "MMC1 writes control $0C|mode, selecting a fixed upper 16 KiB PRG window and 8 KiB CHR mode. SUROM also updates its control shadow. AxROM changes the screen bit while retaining the runtime PRG bank value. If you also write mapper registers directly, keep them consistent with the runtime bank state."
+  },
+  "mapper_mirror_mmc5": {
+    "ja": "MMC5では$5105に$50/$44/$00/$55を書きます。いずれも本体CIRAMの2ページだけを使う配置です。ExRAMや塗りつぶしモードはこのAPIの対象ではありません。KUROSAKIはCIRAMだけを使う16通りの配置に対応しますが、MMC5のExRAM・塗りつぶし描画は未対応です。",
+    "en": "For MMC5 the API writes $50/$44/$00/$55 to $5105. These arrangements use only the console’s two CIRAM pages. ExRAM and fill mode are outside this API. KUROSAKI supports all sixteen CIRAM-only arrangements; MMC5 ExRAM and fill rendering remain unsupported."
+  },
+  "mapper_id_return": {
+    "ja": "8ビットの番号です。NROM=0、MMC1=1、UxROM=2、CNROM=3、MMC3=4、MMC5=5、AxROM=7、VRC6=24、FME7=69、VRC7=85。実行中の基板を調べる処理ではなく、コンパイラが定数を生成します。",
+    "en": "An 8-bit mapper number: NROM=0, MMC1=1, UxROM=2, CNROM=3, MMC3=4, MMC5=5, AxROM=7, VRC6=24, FME7=69 and VRC7=85. The compiler emits a constant; this does not probe the running hardware."
+  },
+  "mapper___mapper_id": {
+    "ja": "ビルド時に選択したマッパー番号を返します。マッパー別の初期化や表示に使えます。",
+    "en": "Return the mapper number selected at build time, for board-specific initialization or display."
+  },
+  "mapper___chr_bank_set": {
+    "ja": "CHRバンクを選択します。MMC3ではR0を使い、PPU $0000～$07FFの2 KiBを変更します。CNROMでは$0000～$1FFFの8 KiB全体を変更します。",
+    "en": "Select a CHR bank. On MMC3 this selects R0, changing the 2 KiB window at PPU $0000–$07FF. On CNROM it changes the full 8 KiB region at $0000–$1FFF."
+  },
+  "mapper___chr_bank_set0": {
+    "ja": "MMC3のR0を選択し、PPU $0000～$07FFの2 KiBを変更します。`__chr_bank_set`と同じ動作です。CNROMでは8 KiB全体を変更します。",
+    "en": "Select MMC3 R0 and change the 2 KiB window at PPU $0000–$07FF. This is equivalent to `__chr_bank_set`. On CNROM it changes the full 8 KiB region."
+  },
+  "mapper___chr_bank_set1": {
+    "ja": "MMC3のR1を選択し、PPU $0800～$0FFFの2 KiBを変更します。R0の窓は変更しません。CNROMでは独立した第2窓はなく、8 KiB全体を変更します。",
+    "en": "Select MMC3 R1 and change the 2 KiB window at PPU $0800–$0FFF, leaving R0 unchanged. CNROM has no independent second window; it changes the full 8 KiB region."
+  },
+  "mapper_mirror_build": {
+    "ja": "サンプルの`--mapper=mmc3`をmmc1、mmc5、axrom、fme7へ変更して各基板の結果を確認できます。MMC5/FME7ではフォント用のCHRバンクを基板のレジスターで初期化しています。",
+    "en": "Change the sample’s `--mapper=mmc3` to mmc1, mmc5, axrom or fme7 to inspect each board. The sample initializes MMC5/FME7 font CHR banks through their board registers."
+  },
+  "mapper___mirroring_set": {
+    "ja": "論理ネームテーブル4領域を、本体の2ページの画面RAMへ割り当てます。スクロール用の共有配置や1画面の切り替えに使います。",
+    "en": "Map the four logical nametable regions onto the console’s two pages of screen RAM, for scrolling layouts or single-screen page selection."
+  },
+  "mapper___mapper_irq_set": {
+    "ja": "MMC3のIRQラッチを$C000へ設定し、$C001への書き込みで次の再ロードを要求します。割り込みの有効化は別操作です。",
+    "en": "Write the MMC3 IRQ latch at $C000 and request its next reload at $C001. Enabling interrupts is a separate operation."
+  },
+  "mapper___irq_scanline_set": {
+    "ja": "`__mapper_irq_set`と同じMMC3のラッチ設定・再ロード要求です。関数名のscanlineは絶対的な画面の行番号を保証しません。",
+    "en": "Alias of the MMC3 latch/reload operation in `__mapper_irq_set`. The word scanline does not guarantee an absolute screen row."
+  },
+  "mapper___mapper_irq_enable": {
+    "ja": "$E001へ書き、MMC3がカウンター条件に従ってIRQを要求できるようにします。ラッチ値や再ロード要求は設定しません。",
+    "en": "Write $E001 to let MMC3 assert IRQ when its counter condition is met. This sets neither the latch nor a reload request."
+  },
+  "mapper___mapper_irq_disable": {
+    "ja": "$E000へ書き、MMC3のIRQ要求を解除して、以後の要求を無効にします。",
+    "en": "Write $E000 to clear the MMC3 IRQ request and disable subsequent requests."
+  },
+  "mapper___mapper_irq_ack": {
+    "ja": "IRQハンドラーでMMC3の要求を解除します。$E000へ書くため、この呼び出しは次のIRQ要求も無効にします。",
+    "en": "Acknowledge MMC3 in the IRQ handler. Because this writes $E000, it also disables subsequent IRQ requests."
+  },
+  "mapper_nes_mapper_irq_set": {
+    "ja": "`nes_game.h`から使うMMC3ラッチ設定マクロです。引数を`__mapper_irq_set`へ1回渡して再ロードを要求します。",
+    "en": "MMC3 latch-setting macro from `nes_game.h`. It passes its argument once to `__mapper_irq_set` and requests reload."
+  },
+  "mapper_nes_mapper_irq_enable": {
+    "ja": "`nes_game.h`からMMC3のIRQを有効にします。`__mapper_irq_enable()`へ展開され、CPUの割り込みマスクは変えません。",
+    "en": "Enable MMC3 IRQ through `nes_game.h`. Expands to `__mapper_irq_enable()` without changing the CPU interrupt mask."
+  },
+  "mapper_nes_mapper_irq_disable": {
+    "ja": "`nes_game.h`からMMC3のIRQを無効化し、保留中の要求も解除します。`__mapper_irq_disable()`へ展開されます。",
+    "en": "Disable MMC3 IRQ and clear its pending request through `nes_game.h`. Expands to `__mapper_irq_disable()`."
+  },
+  "mapper_nes_mapper_irq_ack": {
+    "ja": "`nes_game.h`のハンドラー向けACKマクロです。`__mapper_irq_ack()`へ展開され、要求の解除と無効化を同時に行います。",
+    "en": "Handler acknowledgment macro from `nes_game.h`. Expands to `__mapper_irq_ack()`, clearing the request and disabling it at the same time."
+  }
+}

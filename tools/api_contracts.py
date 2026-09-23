@@ -212,6 +212,8 @@ def publish(language, require_complete=False):
     proofs.update(verified_chain_body_examples(contracts))
     from api_fc_audio_vblank_proofs import verified_examples as verified_fc_audio_vblank_examples
     proofs.update(verified_fc_audio_vblank_examples(contracts))
+    from api_mapper_proofs import verified_examples as verified_mapper_examples
+    proofs.update(verified_mapper_examples(contracts))
     proofs.update(verified_cgb_palette_examples(contracts))
     proofs.update(verified_cgb_dma_wram_examples(contracts))
     proofs.update(verified_asset_examples(contracts))
@@ -288,6 +290,9 @@ def publish(language, require_complete=False):
     publish_verification(language, contracts, proofs, messages, ui)
     from public_presentation import normalize
     normalize(language)
+    from api_mapper_proofs import kurosaki_overview, write_page
+    mapper_page = (SITE if language == 'ja' else SITE / language) / 'kurosaki.html'
+    write_page(mapper_page, kurosaki_overview(mapper_page.read_text(encoding='utf-8'), language))
     return {'active_languages': ACTIVE_LANGUAGES, 'reviewed': len(contracts), 'remaining': len(coverage), 'missing': coverage}
 
 
