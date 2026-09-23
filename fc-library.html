@@ -2570,7 +2570,7 @@ caller supplies pal_index 0..3; NES palette mirroring still applies.</pre></div>
     result[0]=world.gravity_y; result[1]=world.solver_iterations; result[2]=world.max_speed;</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_world_init: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:36</p><div class="original"><b>宣言の注記（原文）</b><pre>Retain the caller-owned body array without initializing its elements.
 Set gravity to (0,32), four contact iterations and a per-axis speed limit of 512.
-A null world is ignored; the array must outlive subsequent world operations.</pre></div><p class="source">kitaqfc/lib/physics2d.c:186</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_world_init(KQWorld2D* world, KQBody2D* bodies, u8 body_count)
+A null world is ignored; the array must outlive subsequent world operations.</pre></div><p class="source">kitaqfc/lib/physics2d.c:351</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_world_init(KQWorld2D* world, KQBody2D* bodies, u8 body_count)
 {
     if (world == 0) return;
 
@@ -2586,7 +2586,7 @@ A null world is ignored; the array must outlive subsequent world operations.</pr
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:41</p><div class="original"><b>宣言の注記（原文）</b><pre>Advance active dynamic bodies, then visit each active unordered pair for
 the configured contact passes (zero means one). Static bodies still participate
 as obstacles. The world borrows its array and uses non-reentrant helper scratch.
-This is discrete integration; fast bodies can pass through thin obstacles.</pre></div><p class="source">kitaqfc/lib/physics2d.c:416</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_step(KQWorld2D* world)
+This is discrete integration; fast bodies can pass through thin obstacles.</pre></div><p class="source">kitaqfc/lib/physics2d.c:581</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_step(KQWorld2D* world)
 {
     if (world == 0) return;
     if (world-&gt;bodies == 0) return;
@@ -2652,7 +2652,7 @@ This is discrete integration; fast bodies can pass through thin obstacles.</pre>
     result[18]=temp.x; result[19]=temp.y;</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_integrate_body: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:45</p><div class="original"><b>宣言の注記（原文）</b><pre>For one active dynamic body, add gravity, clamp each velocity axis and then
 add velocity to position. Null inputs are ignored; no contacts are solved.
-Use a nonnegative speed limit and keep additions in signed 16-bit range.</pre></div><p class="source">kitaqfc/lib/physics2d.c:286</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_integrate_body(KQWorld2D* world, KQBody2D* body)
+Use a nonnegative speed limit and keep additions in signed 16-bit range.</pre></div><p class="source">kitaqfc/lib/physics2d.c:451</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_integrate_body(KQWorld2D* world, KQBody2D* body)
 {
     if (world == 0) return;
     if (body == 0) return;
@@ -2686,7 +2686,7 @@ Use a nonnegative speed limit and keep additions in signed 16-bit range.</pre></
     bodies[1].x=40; result[21]=kq2d_overlap_aabb(&amp;bodies[0],&amp;bodies[1]);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_overlap_aabb: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:49</p><div class="original"><b>宣言の注記（原文）</b><pre>Test strict overlap of two centered boxes; touching edges return false.
 Both pointers must be valid. Active/mass flags are ignored, and coordinate
-differences and extent sums must fit the signed 16-bit calculations.</pre></div><p class="source">kitaqfc/lib/physics2d.c:201</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 kq2d_overlap_aabb(const KQBody2D* a, const KQBody2D* b)
+differences and extent sums must fit the signed 16-bit calculations.</pre></div><p class="source">kitaqfc/lib/physics2d.c:366</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 kq2d_overlap_aabb(const KQBody2D* a, const KQBody2D* b)
 {
     s16 dx = (s16)(b-&gt;x - a-&gt;x);
     s16 dy = (s16)(b-&gt;y - a-&gt;y);
@@ -2703,7 +2703,7 @@ differences and extent sums must fit the signed 16-bit calculations.</pre></div>
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_init" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_init</code></summary><p>中心と半サイズを設定し、速度0・逆質量256・有効状態の矩形bodyを作ります。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_init(KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>変更するbodyへのポインタ。この関数が使わないフィールドは保持されます。</p></dd><dt><code>x</code></dt><dd><p>中心または点のX座標。サンプルではピクセル単位です。</p></dd><dt><code>y</code></dt><dd><p>中心または点のY座標。サンプルでは下向きが正です。</p></dd><dt><code>half_x</code></dt><dd><p>X方向の半サイズ。箱の全幅はこの値の2倍です。</p></dd><dt><code>half_y</code></dt><dd><p>Y方向の半サイズ。箱の全高はこの値の2倍です。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。更新されるフィールドと反映時期を、この項目で説明しています。</p><h4>使用条件と制限</h4><p>座標・半径・半サイズ・速度・重力は、呼び出し側で統一した整数単位を使います。1回のstepが1時間刻みです。サンプルは1単位＝1ピクセルです。位置を自動的にQ8.8へ変換したり、描画したりはしません。</p><p>restitution_q8は0に設定します。bodyがNULLなら何もしません。半サイズは正の値を指定してください。</p><p>使用するヘッダーに加え、実装の.cもコンパイルしてください。2Dはfixed.cとphysics2d.c、3Dはこれらにphysics3d.cを加えます。サンプルはMMC3、CHR RAM、描画用のPRG RAM $6800～$6FFFを使います。この描画領域は物理ライブラリ自体の要件ではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>kq2d_body_init(&amp;temp,10,20,8,8);
     result[3]=temp.inv_mass_q8; result[4]=temp.active;</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_init: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:52</p><div class="original"><b>宣言の注記（原文）</b><pre>Initialize an active unit-inverse-mass body at the supplied center and half
-extents, with zero velocity and reserved restitution set to zero. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:219</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_init(KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y)
+extents, with zero velocity and reserved restitution set to zero. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:384</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_init(KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y)
 {
     if (body == 0) return;
     body-&gt;x = x;
@@ -2717,14 +2717,14 @@ extents, with zero velocity and reserved restitution set to zero. Null is ignore
     body-&gt;active = 1;
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_set_pos" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_set_pos</code></summary><p>bodyの中心座標だけを置き換えます。速度・大きさ・有効状態を変更しません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_set_pos(KQBody2D* body, s16 x, s16 y);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>変更するbodyへのポインタ。この関数が使わないフィールドは保持されます。</p></dd><dt><code>x</code></dt><dd><p>中心または点のX座標。サンプルではピクセル単位です。</p></dd><dt><code>y</code></dt><dd><p>中心または点のY座標。サンプルでは下向きが正です。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。更新されるフィールドと反映時期を、この項目で説明しています。</p><h4>使用条件と制限</h4><p>座標・半径・半サイズ・速度・重力は、呼び出し側で統一した整数単位を使います。1回のstepが1時間刻みです。サンプルは1単位＝1ピクセルです。位置を自動的にQ8.8へ変換したり、描画したりはしません。</p><p>NULLは無視します。無効bodyや固定bodyも、NULL以外なら変更します。</p><p>使用するヘッダーに加え、実装の.cもコンパイルしてください。2Dはfixed.cとphysics2d.c、3Dはこれらにphysics3d.cを加えます。サンプルはMMC3、CHR RAM、描画用のPRG RAM $6800～$6FFFを使います。この描画領域は物理ライブラリ自体の要件ではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>kq2d_body_set_pos(&amp;temp,-12,20);
     result[5]=temp.x; result[6]=temp.y;</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_set_pos: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:54</p><div class="original"><b>宣言の注記（原文）</b><pre>Replace the center without altering velocity, extents or activity. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:234</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_set_pos(KQBody2D* body, s16 x, s16 y)
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:54</p><div class="original"><b>宣言の注記（原文）</b><pre>Replace the center without altering velocity, extents or activity. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:399</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_set_pos(KQBody2D* body, s16 x, s16 y)
 {
     if (body == 0) return;
     body-&gt;x = x;
     body-&gt;y = y;
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_set_velocity" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_set_velocity</code></summary><p>bodyの速度を直接設定します。上限への制限や位置更新は行いません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_set_velocity(KQBody2D* body, s16 vx, s16 vy);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>変更するbodyへのポインタ。この関数が使わないフィールドは保持されます。</p></dd><dt><code>vx</code></dt><dd><p>X方向の1刻み当たりの変位。位置と同じ単位です。</p></dd><dt><code>vy</code></dt><dd><p>Y方向の1刻み当たりの変位。位置と同じ単位です。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。更新されるフィールドと反映時期を、この項目で説明しています。</p><h4>使用条件と制限</h4><p>座標・半径・半サイズ・速度・重力は、呼び出し側で統一した整数単位を使います。1回のstepが1時間刻みです。サンプルは1単位＝1ピクセルです。位置を自動的にQ8.8へ変換したり、描画したりはしません。</p><p>NULLは無視します。無効bodyや固定bodyも、NULL以外なら変更します。</p><p>使用するヘッダーに加え、実装の.cもコンパイルしてください。2Dはfixed.cとphysics2d.c、3Dはこれらにphysics3d.cを加えます。サンプルはMMC3、CHR RAM、描画用のPRG RAM $6800～$6FFFを使います。この描画領域は物理ライブラリ自体の要件ではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>kq2d_body_set_velocity(&amp;temp,40,-30);
     result[7]=temp.vx; result[8]=temp.vy;</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_set_velocity: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:56</p><div class="original"><b>宣言の注記（原文）</b><pre>Replace velocity without clamping or checking activity/mass. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:242</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_set_velocity(KQBody2D* body, s16 vx, s16 vy)
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:56</p><div class="original"><b>宣言の注記（原文）</b><pre>Replace velocity without clamping or checking activity/mass. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:407</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_set_velocity(KQBody2D* body, s16 vx, s16 vy)
 {
     if (body == 0) return;
     body-&gt;vx = vx;
@@ -2733,7 +2733,7 @@ extents, with zero velocity and reserved restitution set to zero. Null is ignore
     result[9]=temp.vx; result[10]=temp.vy;</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_apply_gravity: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:60</p><div class="original"><b>宣言の注記（原文）</b><pre>Add gravity and clamp each velocity axis separately for an active dynamic
 body. Null, inactive and static bodies are ignored. Supply a nonnegative limit
-and avoid overflow in the additions before clamping; position is unchanged.</pre></div><p class="source">kitaqfc/lib/physics2d.c:252</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_apply_gravity(KQBody2D* body, s16 gravity_x, s16 gravity_y, s16 max_speed)
+and avoid overflow in the additions before clamping; position is unchanged.</pre></div><p class="source">kitaqfc/lib/physics2d.c:417</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_apply_gravity(KQBody2D* body, s16 gravity_x, s16 gravity_y, s16 max_speed)
 {
     if (body == 0) return;
     if (body-&gt;active == 0) return;
@@ -2756,7 +2756,7 @@ and avoid overflow in the additions before clamping; position is unchanged.</pre
     result[11]=temp.vx; result[12]=temp.vy;</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_apply_friction: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:64</p><div class="original"><b>宣言の注記（原文）</b><pre>Scale both velocities by a signed eight-bit coefficient divided by 256.
 Despite the unsigned parameter, values 128..255 become negative coefficients;
-this is not a full-range unsigned Q8 damping helper. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:276</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_apply_friction(KQBody2D* body, u8 friction_q8)
+this is not a full-range unsigned Q8 damping helper. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:441</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_apply_friction(KQBody2D* body, u8 friction_q8)
 {
     if (body == 0) return;
     body-&gt;vx = kq2d_scale_q8(body-&gt;vx, (s16)(s8)friction_q8);
@@ -2764,35 +2764,200 @@ this is not a full-range unsigned Q8 damping helper. Null is ignored.</pre></div
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_rect_intersect" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_rect_intersect</code></summary><p>左上座標・幅・高さで表した2個の矩形について、内部の重なりを調べます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 kq2d_rect_intersect(KQRect a, KQRect b);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>a</code></dt><dd><p>左上座標と幅・高さを持つKQRectの値。幅と高さには正の値を指定します。</p></dd><dt><code>b</code></dt><dd><p>左上座標と幅・高さを持つKQRectの値。幅と高さには正の値を指定します。</p></dd></dl><h4>戻り値</h4><p>内部が重なれば1、接触のみまたは離れていれば0です。</p><h4>使用条件と制限</h4><p>加算・差・半サイズの和・接触補正の積を、符号付き16ビットの範囲に収めてください。速度制限は加算後に適用されるため、加算時のオーバーフローは防げません。</p><p>0以下の幅や高さを除外するチェックはありません。bodyの中心・半サイズをそのままKQRectへ入れないでください。</p><p>使用するヘッダーに加え、実装の.cもコンパイルしてください。2Dはfixed.cとphysics2d.c、3Dはこれらにphysics3d.cを加えます。サンプルはMMC3、CHR RAM、描画用のPRG RAM $6800～$6FFFを使います。この描画領域は物理ライブラリ自体の要件ではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>result[14]=kq2d_rect_intersect(r1,r2);
     r2.x=16; result[15]=kq2d_rect_intersect(r1,r2);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_rect_intersect: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:67</p><div class="original"><b>宣言の注記（原文）</b><pre>Delegate strict rectangle overlap to the fixed-point utility; edge-only
-contact is false. Coordinate-plus-size sums must remain representable as s16.</pre></div><p class="source">kitaqfc/lib/physics2d.c:320</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 kq2d_rect_intersect(KQRect a, KQRect b)
+contact is false. Coordinate-plus-size sums must remain representable as s16.</pre></div><p class="source">kitaqfc/lib/physics2d.c:485</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 kq2d_rect_intersect(KQRect a, KQRect b)
 {
     return kq_rect_intersect(a, b);
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_point_in_rect" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_point_in_rect</code></summary><p>点が矩形の左端・上端を含み、右端・下端を含まない範囲内にあるか調べます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 kq2d_point_in_rect(s16 x, s16 y, KQRect r);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>x</code></dt><dd><p>中心または点のX座標。サンプルではピクセル単位です。</p></dd><dt><code>y</code></dt><dd><p>中心または点のY座標。サンプルでは下向きが正です。</p></dd><dt><code>r</code></dt><dd><p>左上座標x/yと幅w・高さhを持つKQRectの値。</p></dd></dl><h4>戻り値</h4><p>範囲内なら1、範囲外なら0です。</p><h4>使用条件と制限</h4><p>加算・差・半サイズの和・接触補正の積を、符号付き16ビットの範囲に収めてください。速度制限は加算後に適用されるため、加算時のオーバーフローは防げません。</p><p>使用するヘッダーに加え、実装の.cもコンパイルしてください。2Dはfixed.cとphysics2d.c、3Dはこれらにphysics3d.cを加えます。サンプルはMMC3、CHR RAM、描画用のPRG RAM $6800～$6FFFを使います。この描画領域は物理ライブラリ自体の要件ではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>result[16]=kq2d_point_in_rect(0,0,r1);
     result[17]=kq2d_point_in_rect(16,0,r1);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/body2d/screen.png" alt="kq2d_point_in_rect: NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。"><figcaption>NTSC — 左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。初期値、設定、積分、矩形・点判定、符号付き倍率もRAMの期待値と照合します。</figcaption></figure><p><a href="samples/api-examples/fc/physics_body2d.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:70</p><div class="original"><b>宣言の注記（原文）</b><pre>Delegate the half-open point test: include left/top and exclude right/bottom.
-Coordinate-plus-size sums must remain representable as s16.</pre></div><p class="source">kitaqfc/lib/physics2d.c:327</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 kq2d_point_in_rect(s16 x, s16 y, KQRect r)
+Coordinate-plus-size sums must remain representable as s16.</pre></div><p class="source">kitaqfc/lib/physics2d.c:492</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 kq2d_point_in_rect(s16 x, s16 y, KQRect r)
 {
     return kq_point_in_rect(x, y, r);
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_scale_q8" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_scale_q8</code></summary><p>符号付き係数/256を掛け、正負どちらも0方向へ切り捨てます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>s16 kq2d_scale_q8(s16 value, s16 coefficient);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>value</code></dt><dd><p>倍率を掛ける符号付き16ビットの値。</p></dd><dt><code>coefficient</code></dt><dd><p>256を1.0とする符号付き係数（−256～256）。</p></dd></dl><h4>戻り値</h4><p>0方向に切り捨てた符号付き16ビットの結果を返します。</p><h4>使用条件と制限</h4><p>係数は−256～256だけを指定してください。±256では倍率が±1になります。value=−32768とcoefficient=−256の組み合わせの数学的な結果32768はs16に収まりません。</p><p>使用するヘッダーに加え、実装の.cもコンパイルしてください。2Dはfixed.cとphysics2d.c、3Dはこれらにphysics3d.cを加えます。サンプルはMMC3、CHR RAM、描画用のPRG RAM $6800～$6FFFを使います。この描画領域は物理ライブラリ自体の要件ではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>result[0]=kq2d_scale_q8(-257,128);
     result[1]=kq2d_scale_q8(300,-256);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/surface/screen.png" alt="kq2d_scale_q8: NTSC — 赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。"><figcaption>NTSC — 赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。</figcaption></figure><p><a href="samples/api-examples/fc/physics_surface.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:86</p><div class="original"><b>宣言の注記（原文）</b><pre>Truncates toward zero, including negative values; coefficient is -256..256.</pre></div><p class="source">kitaqfc/lib/physics2d.c:8</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>s16 kq2d_scale_q8(s16 value, s16 coefficient)
-{
-    u16 magnitude;
-    u16 factor;
-    u16 scaled;
-    u8 negative;
-    negative = (u8)((value &lt; 0) != (coefficient &lt; 0));
-    magnitude = value &lt; 0 ? (u16)(0 - (u16)value) : (u16)value;
-    factor = coefficient &lt; 0 ? (u16)(0 - coefficient) : (u16)coefficient;
-    // Split the magnitude before multiplying: each product fits unsigned 16 bits.
-    scaled = (u16)((magnitude &gt;&gt; 8) * factor + (((magnitude &amp; 255) * factor) &gt;&gt; 8));
-    if (negative != 0) return (s16)(0 - scaled);
-    return (s16)scaled;
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:86</p><div class="original"><b>宣言の注記（原文）</b><pre>Truncates toward zero, including negative values; coefficient is -256..256.</pre></div><p class="source">kitaqfc/lib/physics2d.c:8</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>s16 kq2d_scale_q8(s16 value,s16 coefficient) {
+    u16 magnitude;u16 product;u8 factor;u8 negative;
+    __asm {
+        LDA value
+        ORA value+1
+        BEQ kqfc_scale_zero
+        LDA coefficient
+        BNE kqfc_scale_fraction
+        LDA coefficient+1
+        BEQ kqfc_scale_zero
+        BMI kqfc_scale_negate_value
+        LDA value
+        LDX value+1
+        RTS
+kqfc_scale_negate_value:
+        SEC
+        LDA #0
+        SBC value
+        STA product
+        LDA #0
+        SBC value+1
+        TAX
+        LDA product
+        RTS
+kqfc_scale_zero:
+        LDA #0
+        LDX #0
+        RTS
+kqfc_scale_fraction:
+        LDA value+1
+        EOR coefficient+1
+        AND #128
+        STA negative
+        LDA value
+        STA magnitude
+        LDA value+1
+        STA magnitude+1
+        BPL kqfc_scale_value_positive
+        SEC
+        LDA #0
+        SBC magnitude
+        STA magnitude
+        LDA #0
+        SBC magnitude+1
+        STA magnitude+1
+kqfc_scale_value_positive:
+        LDA coefficient
+        STA factor
+        LDA coefficient+1
+        BPL kqfc_scale_factor_positive
+        SEC
+        LDA #0
+        SBC factor
+        STA factor
+kqfc_scale_factor_positive:
+        LDA #0
+        STA product
+        STA product+1
+        // Process coefficient bit 0; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_0
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_0:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 1; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_1
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_1:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 2; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_2
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_2:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 3; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_3
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_3:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 4; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_4
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_4:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 5; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_5
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_5:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 6; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_6
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_6:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 7; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_7
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_7:
+        ROR product+1
+        ROR product
+        LDA negative
+        BEQ kqfc_scale_positive
+        SEC
+        LDA #0
+        SBC product
+        STA product
+        LDA #0
+        SBC product+1
+        TAX
+        LDA product
+        RTS
+kqfc_scale_positive:
+        LDA product
+        LDX product+1
+        RTS
+    }
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_limit_speed" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_limit_speed</code></summary><p>速度ベクトルの長さを保守的に見積もり、両軸を同じ倍率で縮小して合成速度を制限します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_limit_speed(KQBody2D* body, s16 max_speed);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>変更するbodyへのポインタ。この関数が使わないフィールドは保持されます。</p></dd><dt><code>max_speed</code></dt><dd><p>速度の上限。軸ごとの制限か合成速度の制限かは関数ごとに異なります。</p></dd></dl><h4>戻り値</h4><p>戻り値はありません。更新されるフィールドと反映時期を、この項目で説明しています。</p><h4>使用条件と制限</h4><p>各速度の絶対値と正のmax_speedは16383以下にしてください。上限0以下は速度を0にします。NULLは無視しますが、activeや質量は無視して変更します。整数量子化により上限より小さくなり、ごく小さい倍率では0になります。</p><p>使用するヘッダーに加え、実装の.cもコンパイルしてください。2Dはfixed.cとphysics2d.c、3Dはこれらにphysics3d.cを加えます。サンプルはMMC3、CHR RAM、描画用のPRG RAM $6800～$6FFFを使います。この描画領域は物理ライブラリ自体の要件ではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>kq2d_body_limit_speed(&amp;body,250);
     result[2]=body.vx; result[3]=body.vy;</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/surface/screen.png" alt="kq2d_body_limit_speed: NTSC — 赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。"><figcaption>NTSC — 赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。</figcaption></figure><p><a href="samples/api-examples/fc/physics_surface.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:90</p><div class="original"><b>宣言の注記（原文）</b><pre>Conservative circular bound, with a shared Q8 scale for both components.
 Quantizes toward zero; very small limits relative to input may yield zero.
-Components and positive max_speed must be &lt;= 16383 in magnitude.</pre></div><p class="source">kitaqfc/lib/physics2d.c:49</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_limit_speed(KQBody2D* body, s16 max_speed)
+Components and positive max_speed must be &lt;= 16383 in magnitude.</pre></div><p class="source">kitaqfc/lib/physics2d.c:214</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void kq2d_body_limit_speed(KQBody2D* body, s16 max_speed)
 {
     u16 x;
     u16 y;
@@ -2821,7 +2986,7 @@ Components and positive max_speed must be &lt;= 16383 in magnitude.</pre></div><
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_resolve_surface" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_resolve_surface</code></summary><p>移動する面との相対速度を使い、法線方向の反発・最低反発速度と接線摩擦を速度へ適用します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>s16 kq2d_body_resolve_surface(KQBody2D* body, const KQSurface2D* surface);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>変更するbodyへのポインタ。この関数が使わないフィールドは保持されます。</p></dd><dt><code>surface</code></dt><dd><p>面の法線・移動速度・反発・摩擦を指定したKQSurface2Dへのポインタ。</p></dd></dl><h4>戻り値</h4><p>面へ向かう法線速度の正の大きさを返します。NULLまたは離れる動きでは0です。</p><h4>使用条件と制限</h4><p>法線は256を長さ1とするQ8単位ベクトルです。相対速度の各成分は±8191以内、thresholdとkickは0以上、係数は0～255にします。閾値を厳密に超えた時だけ反発係数を使い、kickを最低反発速度として適用します。NULLや離れる動きは無変更です。接触検出・めり込み解消は別途必要で、activeや質量の判定はしません。</p><p>使用するヘッダーに加え、実装の.cもコンパイルしてください。2Dはfixed.cとphysics2d.c、3Dはこれらにphysics3d.cを加えます。サンプルはMMC3、CHR RAM、描画用のPRG RAM $6800～$6FFFを使います。この描画領域は物理ライブラリ自体の要件ではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>result[6]=kq2d_body_resolve_surface(&amp;body,&amp;surface);
     result[7]=body.vx; result[8]=body.vy; result[9]=body.y;</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/surface/screen.png" alt="kq2d_body_resolve_surface: NTSC — 赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。"><figcaption>NTSC — 赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。</figcaption></figure><p><a href="samples/api-examples/fc/physics_surface.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:93</p><div class="original"><b>宣言の注記（原文）</b><pre>Kinematic surface response; returns incoming normal speed, or zero if separating.
-Caller resolves penetration separately. Relative components must fit +/-8191.</pre></div><p class="source">kitaqfc/lib/physics2d.c:103</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>s16 kq2d_body_resolve_surface(KQBody2D* body, const KQSurface2D* surface)
+Caller resolves penetration separately. Relative components must fit +/-8191.</pre></div><p class="source">kitaqfc/lib/physics2d.c:268</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>s16 kq2d_body_resolve_surface(KQBody2D* body, const KQSurface2D* surface)
 {
     s16 vx;
     s16 vy;
@@ -2864,7 +3029,7 @@ Caller resolves penetration separately. Relative components must fit +/-8191.</p
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_surface_toi_q8" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_surface_toi_q8</code></summary><p>開始・終了の符号付き距離から、線形運動で面を横切る刻み内時刻を見積もります。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>start_gap</code></dt><dd><p>刻み開始時の面までの符号付き距離。正は面の外側です。</p></dd><dt><code>end_gap</code></dt><dd><p>刻み終了時の面までの符号付き距離。負は面を通過した側です。</p></dd></dl><h4>戻り値</h4><p>0～256のQ8時刻を返します。192は刻みの75%です。</p><h4>使用条件と制限</h4><p>距離は±8191以内にしてください。開始距離0以下は0、終了距離0以上は256です。初期重なりと時刻0、交差なしとちょうど終点での接触は同じ戻り値になります。位置は変更しません。</p><p>使用するヘッダーに加え、実装の.cもコンパイルしてください。2Dはfixed.cとphysics2d.c、3Dはこれらにphysics3d.cを加えます。サンプルはMMC3、CHR RAM、描画用のPRG RAM $6800～$6FFFを使います。この描画領域は物理ライブラリ自体の要件ではありません。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>result[4]=kq2d_surface_toi_q8(6,-2);
     result[5]=kq2d_surface_toi_q8(6,0);</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-physics-fc/surface/screen.png" alt="kq2d_surface_toi_q8: NTSC — 赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。"><figcaption>NTSC — 赤い物体の位置は変わりません。緑の速度線が左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)と(88,48)、物体の中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の別の呼び出しでは(300,400)が(147,196)になります。</figcaption></figure><p><a href="samples/api-examples/fc/physics_surface.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/physics2d.h:96</p><div class="original"><b>宣言の注記（原文）</b><pre>Linear crossing time in Q8 (0..256); positive separation is outside.
-Returns 0 for initial overlap, 256 for no crossing. Gaps must fit +/-8191.</pre></div><p class="source">kitaqfc/lib/physics2d.c:80</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap)
+Returns 0 for initial overlap, 256 for no crossing. Gaps must fit +/-8191.</pre></div><p class="source">kitaqfc/lib/physics2d.c:245</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap)
 {
     if (start_gap &lt;= 0) return 0;
     if (end_gap &gt;= 0) return 256;
@@ -4807,7 +4972,6 @@ u8 chain_get_segment(const Chain* chain, u8 index, ChainPoint* out);
 // Return the number of stored points, or zero for a null chain.
 u8 chain_get_count(const Chain* chain);
 
-#endif
 
 // Articulated body: one current pose per joint, including the head at index 0.
 // Caller-owned byte arrays keep the inner loop compact on both GB and FC.
@@ -4839,7 +5003,9 @@ void chain_body_step(ChainBody* body, u8 head_x, u8 head_y, u8 heading);
 // Return 1 on growth, or 0 for an empty, disabled or full body.
 u8 chain_body_grow(ChainBody* body);
 // Remove all joints while retaining caller-owned storage and playfield settings.
-void chain_body_clear(ChainBody* body);</code></pre></div><p class="source">kitaqfc/lib/chain.h</p></details><details class="searchable"><summary><code>collision.h</code> — 矩形等の接触判定</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>/*
+void chain_body_clear(ChainBody* body);
+
+#endif</code></pre></div><p class="source">kitaqfc/lib/chain.h</p></details><details class="searchable"><summary><code>collision.h</code> — 矩形等の接触判定</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>/*
  * Optional declarations for the phase 11 collision helper.
  */
 

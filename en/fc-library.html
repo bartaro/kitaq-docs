@@ -2572,7 +2572,7 @@ caller supplies pal_index 0..3; NES palette mirroring still applies.</pre></div>
     result[0]=world.gravity_y; result[1]=world.solver_iterations; result[2]=world.max_speed;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_world_init: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:36</p><div class="original"><b>Declaration notes (original source)</b><pre>Retain the caller-owned body array without initializing its elements.
 Set gravity to (0,32), four contact iterations and a per-axis speed limit of 512.
-A null world is ignored; the array must outlive subsequent world operations.</pre></div><p class="source">kitaqfc/lib/physics2d.c:186</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_world_init(KQWorld2D* world, KQBody2D* bodies, u8 body_count)
+A null world is ignored; the array must outlive subsequent world operations.</pre></div><p class="source">kitaqfc/lib/physics2d.c:351</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_world_init(KQWorld2D* world, KQBody2D* bodies, u8 body_count)
 {
     if (world == 0) return;
 
@@ -2588,7 +2588,7 @@ A null world is ignored; the array must outlive subsequent world operations.</pr
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:41</p><div class="original"><b>Declaration notes (original source)</b><pre>Advance active dynamic bodies, then visit each active unordered pair for
 the configured contact passes (zero means one). Static bodies still participate
 as obstacles. The world borrows its array and uses non-reentrant helper scratch.
-This is discrete integration; fast bodies can pass through thin obstacles.</pre></div><p class="source">kitaqfc/lib/physics2d.c:416</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_step(KQWorld2D* world)
+This is discrete integration; fast bodies can pass through thin obstacles.</pre></div><p class="source">kitaqfc/lib/physics2d.c:581</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_step(KQWorld2D* world)
 {
     if (world == 0) return;
     if (world-&gt;bodies == 0) return;
@@ -2654,7 +2654,7 @@ This is discrete integration; fast bodies can pass through thin obstacles.</pre>
     result[18]=temp.x; result[19]=temp.y;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_integrate_body: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:45</p><div class="original"><b>Declaration notes (original source)</b><pre>For one active dynamic body, add gravity, clamp each velocity axis and then
 add velocity to position. Null inputs are ignored; no contacts are solved.
-Use a nonnegative speed limit and keep additions in signed 16-bit range.</pre></div><p class="source">kitaqfc/lib/physics2d.c:286</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_integrate_body(KQWorld2D* world, KQBody2D* body)
+Use a nonnegative speed limit and keep additions in signed 16-bit range.</pre></div><p class="source">kitaqfc/lib/physics2d.c:451</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_integrate_body(KQWorld2D* world, KQBody2D* body)
 {
     if (world == 0) return;
     if (body == 0) return;
@@ -2688,7 +2688,7 @@ Use a nonnegative speed limit and keep additions in signed 16-bit range.</pre></
     bodies[1].x=40; result[21]=kq2d_overlap_aabb(&amp;bodies[0],&amp;bodies[1]);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_overlap_aabb: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:49</p><div class="original"><b>Declaration notes (original source)</b><pre>Test strict overlap of two centered boxes; touching edges return false.
 Both pointers must be valid. Active/mass flags are ignored, and coordinate
-differences and extent sums must fit the signed 16-bit calculations.</pre></div><p class="source">kitaqfc/lib/physics2d.c:201</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 kq2d_overlap_aabb(const KQBody2D* a, const KQBody2D* b)
+differences and extent sums must fit the signed 16-bit calculations.</pre></div><p class="source">kitaqfc/lib/physics2d.c:366</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 kq2d_overlap_aabb(const KQBody2D* a, const KQBody2D* b)
 {
     s16 dx = (s16)(b-&gt;x - a-&gt;x);
     s16 dy = (s16)(b-&gt;y - a-&gt;y);
@@ -2705,7 +2705,7 @@ differences and extent sums must fit the signed 16-bit calculations.</pre></div>
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_init" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_init</code></summary><p>Initialize a centered box with the supplied half extents, zero velocity, inverse mass 256 and active status.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_init(KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>Pointer to the body to modify. Fields not used by this operation are retained.</p></dd><dt><code>x</code></dt><dd><p>X coordinate of the center or point, in pixels in the sample.</p></dd><dt><code>y</code></dt><dd><p>Y coordinate of the center or point; positive is downward in the sample.</p></dd><dt><code>half_x</code></dt><dd><p>Half extent along X; the full box width is twice this value.</p></dd><dt><code>half_y</code></dt><dd><p>Half extent along Y; the full box height is twice this value.</p></dd></dl><h4>Return value</h4><p>No return value. This entry describes the fields updated and when they take effect.</p><h4>Conditions and limits</h4><p>Choose consistent integer units for positions, radii, half extents, velocities and gravity. One step is one simulation tick. The samples use one unit per pixel. These routines neither convert positions to Q8.8 automatically nor render them.</p><p>Sets restitution_q8 to zero. A NULL body is ignored. Supply positive half extents.</p><p>Compile implementation files as well as including headers. For 2D use fixed.c and physics2d.c; for 3D also include physics3d.c. The examples use MMC3, CHR RAM and drawing storage at PRG RAM $6800–$6FFF. That drawing buffer is not a requirement of the physics library itself.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>kq2d_body_init(&amp;temp,10,20,8,8);
     result[3]=temp.inv_mass_q8; result[4]=temp.active;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_init: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:52</p><div class="original"><b>Declaration notes (original source)</b><pre>Initialize an active unit-inverse-mass body at the supplied center and half
-extents, with zero velocity and reserved restitution set to zero. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:219</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_init(KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y)
+extents, with zero velocity and reserved restitution set to zero. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:384</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_init(KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y)
 {
     if (body == 0) return;
     body-&gt;x = x;
@@ -2719,14 +2719,14 @@ extents, with zero velocity and reserved restitution set to zero. Null is ignore
     body-&gt;active = 1;
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_set_pos" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_set_pos</code></summary><p>Replace only the body center, retaining velocity, extents and activity.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_set_pos(KQBody2D* body, s16 x, s16 y);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>Pointer to the body to modify. Fields not used by this operation are retained.</p></dd><dt><code>x</code></dt><dd><p>X coordinate of the center or point, in pixels in the sample.</p></dd><dt><code>y</code></dt><dd><p>Y coordinate of the center or point; positive is downward in the sample.</p></dd></dl><h4>Return value</h4><p>No return value. This entry describes the fields updated and when they take effect.</p><h4>Conditions and limits</h4><p>Choose consistent integer units for positions, radii, half extents, velocities and gravity. One step is one simulation tick. The samples use one unit per pixel. These routines neither convert positions to Q8.8 automatically nor render them.</p><p>NULL is ignored. Inactive and static bodies are still changed when the pointer is valid.</p><p>Compile implementation files as well as including headers. For 2D use fixed.c and physics2d.c; for 3D also include physics3d.c. The examples use MMC3, CHR RAM and drawing storage at PRG RAM $6800–$6FFF. That drawing buffer is not a requirement of the physics library itself.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>kq2d_body_set_pos(&amp;temp,-12,20);
     result[5]=temp.x; result[6]=temp.y;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_set_pos: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:54</p><div class="original"><b>Declaration notes (original source)</b><pre>Replace the center without altering velocity, extents or activity. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:234</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_set_pos(KQBody2D* body, s16 x, s16 y)
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:54</p><div class="original"><b>Declaration notes (original source)</b><pre>Replace the center without altering velocity, extents or activity. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:399</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_set_pos(KQBody2D* body, s16 x, s16 y)
 {
     if (body == 0) return;
     body-&gt;x = x;
     body-&gt;y = y;
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_set_velocity" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_set_velocity</code></summary><p>Set velocity directly without clamping it or updating position.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_set_velocity(KQBody2D* body, s16 vx, s16 vy);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>Pointer to the body to modify. Fields not used by this operation are retained.</p></dd><dt><code>vx</code></dt><dd><p>X displacement per simulation tick, in the same units as position.</p></dd><dt><code>vy</code></dt><dd><p>Y displacement per simulation tick, in the same units as position.</p></dd></dl><h4>Return value</h4><p>No return value. This entry describes the fields updated and when they take effect.</p><h4>Conditions and limits</h4><p>Choose consistent integer units for positions, radii, half extents, velocities and gravity. One step is one simulation tick. The samples use one unit per pixel. These routines neither convert positions to Q8.8 automatically nor render them.</p><p>NULL is ignored. Inactive and static bodies are still changed when the pointer is valid.</p><p>Compile implementation files as well as including headers. For 2D use fixed.c and physics2d.c; for 3D also include physics3d.c. The examples use MMC3, CHR RAM and drawing storage at PRG RAM $6800–$6FFF. That drawing buffer is not a requirement of the physics library itself.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>kq2d_body_set_velocity(&amp;temp,40,-30);
     result[7]=temp.vx; result[8]=temp.vy;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_set_velocity: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:56</p><div class="original"><b>Declaration notes (original source)</b><pre>Replace velocity without clamping or checking activity/mass. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:242</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_set_velocity(KQBody2D* body, s16 vx, s16 vy)
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:56</p><div class="original"><b>Declaration notes (original source)</b><pre>Replace velocity without clamping or checking activity/mass. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:407</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_set_velocity(KQBody2D* body, s16 vx, s16 vy)
 {
     if (body == 0) return;
     body-&gt;vx = vx;
@@ -2735,7 +2735,7 @@ extents, with zero velocity and reserved restitution set to zero. Null is ignore
     result[9]=temp.vx; result[10]=temp.vy;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_apply_gravity: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:60</p><div class="original"><b>Declaration notes (original source)</b><pre>Add gravity and clamp each velocity axis separately for an active dynamic
 body. Null, inactive and static bodies are ignored. Supply a nonnegative limit
-and avoid overflow in the additions before clamping; position is unchanged.</pre></div><p class="source">kitaqfc/lib/physics2d.c:252</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_apply_gravity(KQBody2D* body, s16 gravity_x, s16 gravity_y, s16 max_speed)
+and avoid overflow in the additions before clamping; position is unchanged.</pre></div><p class="source">kitaqfc/lib/physics2d.c:417</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_apply_gravity(KQBody2D* body, s16 gravity_x, s16 gravity_y, s16 max_speed)
 {
     if (body == 0) return;
     if (body-&gt;active == 0) return;
@@ -2758,7 +2758,7 @@ and avoid overflow in the additions before clamping; position is unchanged.</pre
     result[11]=temp.vx; result[12]=temp.vy;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_body_apply_friction: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:64</p><div class="original"><b>Declaration notes (original source)</b><pre>Scale both velocities by a signed eight-bit coefficient divided by 256.
 Despite the unsigned parameter, values 128..255 become negative coefficients;
-this is not a full-range unsigned Q8 damping helper. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:276</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_apply_friction(KQBody2D* body, u8 friction_q8)
+this is not a full-range unsigned Q8 damping helper. Null is ignored.</pre></div><p class="source">kitaqfc/lib/physics2d.c:441</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_apply_friction(KQBody2D* body, u8 friction_q8)
 {
     if (body == 0) return;
     body-&gt;vx = kq2d_scale_q8(body-&gt;vx, (s16)(s8)friction_q8);
@@ -2766,35 +2766,200 @@ this is not a full-range unsigned Q8 damping helper. Null is ignored.</pre></div
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_rect_intersect" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_rect_intersect</code></summary><p>Test interior overlap of two rectangles represented by top-left positions and sizes.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 kq2d_rect_intersect(KQRect a, KQRect b);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>a</code></dt><dd><p>KQRect value with top-left coordinates and positive width and height.</p></dd><dt><code>b</code></dt><dd><p>KQRect value with top-left coordinates and positive width and height.</p></dd></dl><h4>Return value</h4><p>Returns 1 for interior overlap and 0 for touching or separated shapes.</p><h4>Conditions and limits</h4><p>Keep sums, differences, combined half extents and contact-correction products within signed 16-bit range. Velocity limits apply after addition and cannot prevent overflow during that addition.</p><p>Nonpositive dimensions are not explicitly rejected. Do not copy a body center and half extents directly into a KQRect.</p><p>Compile implementation files as well as including headers. For 2D use fixed.c and physics2d.c; for 3D also include physics3d.c. The examples use MMC3, CHR RAM and drawing storage at PRG RAM $6800–$6FFF. That drawing buffer is not a requirement of the physics library itself.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>result[14]=kq2d_rect_intersect(r1,r2);
     r2.x=16; result[15]=kq2d_rect_intersect(r1,r2);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_rect_intersect: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:67</p><div class="original"><b>Declaration notes (original source)</b><pre>Delegate strict rectangle overlap to the fixed-point utility; edge-only
-contact is false. Coordinate-plus-size sums must remain representable as s16.</pre></div><p class="source">kitaqfc/lib/physics2d.c:320</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 kq2d_rect_intersect(KQRect a, KQRect b)
+contact is false. Coordinate-plus-size sums must remain representable as s16.</pre></div><p class="source">kitaqfc/lib/physics2d.c:485</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 kq2d_rect_intersect(KQRect a, KQRect b)
 {
     return kq_rect_intersect(a, b);
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_point_in_rect" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_point_in_rect</code></summary><p>Test whether a point lies in a rectangle including its left/top edges but excluding right/bottom.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 kq2d_point_in_rect(s16 x, s16 y, KQRect r);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>x</code></dt><dd><p>X coordinate of the center or point, in pixels in the sample.</p></dd><dt><code>y</code></dt><dd><p>Y coordinate of the center or point; positive is downward in the sample.</p></dd><dt><code>r</code></dt><dd><p>KQRect value containing a top-left x/y position and width/height w/h.</p></dd></dl><h4>Return value</h4><p>Returns 1 inside and 0 outside.</p><h4>Conditions and limits</h4><p>Keep sums, differences, combined half extents and contact-correction products within signed 16-bit range. Velocity limits apply after addition and cannot prevent overflow during that addition.</p><p>Compile implementation files as well as including headers. For 2D use fixed.c and physics2d.c; for 3D also include physics3d.c. The examples use MMC3, CHR RAM and drawing storage at PRG RAM $6800–$6FFF. That drawing buffer is not a requirement of the physics library itself.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>result[16]=kq2d_point_in_rect(0,0,r1);
     result[17]=kq2d_point_in_rect(16,0,r1);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/body2d/screen.png" alt="kq2d_point_in_rect: NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling."><figcaption>NTSC — Left shows the initial state; right shows one tick later. A red 16×16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.</figcaption></figure><p><a href="../samples/api-examples/fc/physics_body2d.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_body2d.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_body2d.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:70</p><div class="original"><b>Declaration notes (original source)</b><pre>Delegate the half-open point test: include left/top and exclude right/bottom.
-Coordinate-plus-size sums must remain representable as s16.</pre></div><p class="source">kitaqfc/lib/physics2d.c:327</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 kq2d_point_in_rect(s16 x, s16 y, KQRect r)
+Coordinate-plus-size sums must remain representable as s16.</pre></div><p class="source">kitaqfc/lib/physics2d.c:492</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 kq2d_point_in_rect(s16 x, s16 y, KQRect r)
 {
     return kq_point_in_rect(x, y, r);
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_scale_q8" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_scale_q8</code></summary><p>Multiply by a signed coefficient divided by 256, truncating toward zero for either sign.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>s16 kq2d_scale_q8(s16 value, s16 coefficient);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>value</code></dt><dd><p>Signed 16-bit value to scale.</p></dd><dt><code>coefficient</code></dt><dd><p>Signed coefficient in -256..256, with 256 representing 1.0.</p></dd></dl><h4>Return value</h4><p>Returns the signed 16-bit result truncated toward zero.</p><h4>Conditions and limits</h4><p>Use coefficients only in -256..256; +/-256 gives +/-1. The mathematical result for value=-32768 and coefficient=-256 is 32768 and cannot fit s16.</p><p>Compile implementation files as well as including headers. For 2D use fixed.c and physics2d.c; for 3D also include physics3d.c. The examples use MMC3, CHR RAM and drawing storage at PRG RAM $6800–$6FFF. That drawing buffer is not a requirement of the physics library itself.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>result[0]=kq2d_scale_q8(-257,128);
     result[1]=kq2d_scale_q8(300,-256);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196).</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/surface/screen.png" alt="kq2d_scale_q8: NTSC — The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196)."><figcaption>NTSC — The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196).</figcaption></figure><p><a href="../samples/api-examples/fc/physics_surface.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:86</p><div class="original"><b>Declaration notes (original source)</b><pre>Truncates toward zero, including negative values; coefficient is -256..256.</pre></div><p class="source">kitaqfc/lib/physics2d.c:8</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>s16 kq2d_scale_q8(s16 value, s16 coefficient)
-{
-    u16 magnitude;
-    u16 factor;
-    u16 scaled;
-    u8 negative;
-    negative = (u8)((value &lt; 0) != (coefficient &lt; 0));
-    magnitude = value &lt; 0 ? (u16)(0 - (u16)value) : (u16)value;
-    factor = coefficient &lt; 0 ? (u16)(0 - coefficient) : (u16)coefficient;
-    // Split the magnitude before multiplying: each product fits unsigned 16 bits.
-    scaled = (u16)((magnitude &gt;&gt; 8) * factor + (((magnitude &amp; 255) * factor) &gt;&gt; 8));
-    if (negative != 0) return (s16)(0 - scaled);
-    return (s16)scaled;
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:86</p><div class="original"><b>Declaration notes (original source)</b><pre>Truncates toward zero, including negative values; coefficient is -256..256.</pre></div><p class="source">kitaqfc/lib/physics2d.c:8</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>s16 kq2d_scale_q8(s16 value,s16 coefficient) {
+    u16 magnitude;u16 product;u8 factor;u8 negative;
+    __asm {
+        LDA value
+        ORA value+1
+        BEQ kqfc_scale_zero
+        LDA coefficient
+        BNE kqfc_scale_fraction
+        LDA coefficient+1
+        BEQ kqfc_scale_zero
+        BMI kqfc_scale_negate_value
+        LDA value
+        LDX value+1
+        RTS
+kqfc_scale_negate_value:
+        SEC
+        LDA #0
+        SBC value
+        STA product
+        LDA #0
+        SBC value+1
+        TAX
+        LDA product
+        RTS
+kqfc_scale_zero:
+        LDA #0
+        LDX #0
+        RTS
+kqfc_scale_fraction:
+        LDA value+1
+        EOR coefficient+1
+        AND #128
+        STA negative
+        LDA value
+        STA magnitude
+        LDA value+1
+        STA magnitude+1
+        BPL kqfc_scale_value_positive
+        SEC
+        LDA #0
+        SBC magnitude
+        STA magnitude
+        LDA #0
+        SBC magnitude+1
+        STA magnitude+1
+kqfc_scale_value_positive:
+        LDA coefficient
+        STA factor
+        LDA coefficient+1
+        BPL kqfc_scale_factor_positive
+        SEC
+        LDA #0
+        SBC factor
+        STA factor
+kqfc_scale_factor_positive:
+        LDA #0
+        STA product
+        STA product+1
+        // Process coefficient bit 0; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_0
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_0:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 1; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_1
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_1:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 2; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_2
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_2:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 3; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_3
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_3:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 4; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_4
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_4:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 5; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_5
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_5:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 6; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_6
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_6:
+        ROR product+1
+        ROR product
+        // Process coefficient bit 7; carry is the product&#x27;s seventeenth bit.
+        LSR factor
+        BCC kqfc_scale_shift_7
+        CLC
+        LDA product
+        ADC magnitude
+        STA product
+        LDA product+1
+        ADC magnitude+1
+        STA product+1
+kqfc_scale_shift_7:
+        ROR product+1
+        ROR product
+        LDA negative
+        BEQ kqfc_scale_positive
+        SEC
+        LDA #0
+        SBC product
+        STA product
+        LDA #0
+        SBC product+1
+        TAX
+        LDA product
+        RTS
+kqfc_scale_positive:
+        LDA product
+        LDX product+1
+        RTS
+    }
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_limit_speed" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_limit_speed</code></summary><p>Estimate vector length conservatively and scale both axes together to limit combined speed.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_limit_speed(KQBody2D* body, s16 max_speed);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>Pointer to the body to modify. Fields not used by this operation are retained.</p></dd><dt><code>max_speed</code></dt><dd><p>Speed limit; the entry specifies whether this limits each axis or the combined vector.</p></dd></dl><h4>Return value</h4><p>No return value. This entry describes the fields updated and when they take effect.</p><h4>Conditions and limits</h4><p>Keep velocity magnitudes and a positive max_speed within 16383. A nonpositive limit zeros velocity. NULL is ignored, but activity and mass do not suppress modification. Integer quantization can undershoot the limit and tiny scale factors can produce zero.</p><p>Compile implementation files as well as including headers. For 2D use fixed.c and physics2d.c; for 3D also include physics3d.c. The examples use MMC3, CHR RAM and drawing storage at PRG RAM $6800–$6FFF. That drawing buffer is not a requirement of the physics library itself.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>kq2d_body_limit_speed(&amp;body,250);
     result[2]=body.vx; result[3]=body.vy;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196).</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/surface/screen.png" alt="kq2d_body_limit_speed: NTSC — The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196)."><figcaption>NTSC — The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196).</figcaption></figure><p><a href="../samples/api-examples/fc/physics_surface.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:90</p><div class="original"><b>Declaration notes (original source)</b><pre>Conservative circular bound, with a shared Q8 scale for both components.
 Quantizes toward zero; very small limits relative to input may yield zero.
-Components and positive max_speed must be &lt;= 16383 in magnitude.</pre></div><p class="source">kitaqfc/lib/physics2d.c:49</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_limit_speed(KQBody2D* body, s16 max_speed)
+Components and positive max_speed must be &lt;= 16383 in magnitude.</pre></div><p class="source">kitaqfc/lib/physics2d.c:214</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void kq2d_body_limit_speed(KQBody2D* body, s16 max_speed)
 {
     u16 x;
     u16 y;
@@ -2823,7 +2988,7 @@ Components and positive max_speed must be &lt;= 16383 in magnitude.</pre></div><
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_body_resolve_surface" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_body_resolve_surface</code></summary><p>Use velocity relative to a moving surface to apply normal bounce, minimum bounce speed and tangential friction.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>s16 kq2d_body_resolve_surface(KQBody2D* body, const KQSurface2D* surface);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>body</code></dt><dd><p>Pointer to the body to modify. Fields not used by this operation are retained.</p></dd><dt><code>surface</code></dt><dd><p>Pointer to a KQSurface2D containing its normal, velocity, bounce and friction settings.</p></dd></dl><h4>Return value</h4><p>Returns the positive incoming normal speed, or 0 for NULL inputs or separating motion.</p><h4>Conditions and limits</h4><p>Use a Q8 unit normal with length 256. Keep relative components within +/-8191, threshold/kick nonnegative and coefficients in 0..255. Restitution applies only strictly above the threshold, with kick as a minimum rebound speed. NULL inputs or separating motion leave velocity unchanged. Contact detection and penetration correction are separate; activity and mass are not checked.</p><p>Compile implementation files as well as including headers. For 2D use fixed.c and physics2d.c; for 3D also include physics3d.c. The examples use MMC3, CHR RAM and drawing storage at PRG RAM $6800–$6FFF. That drawing buffer is not a requirement of the physics library itself.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>result[6]=kq2d_body_resolve_surface(&amp;body,&amp;surface);
     result[7]=body.vx; result[8]=body.vy; result[9]=body.y;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196).</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/surface/screen.png" alt="kq2d_body_resolve_surface: NTSC — The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196)."><figcaption>NTSC — The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196).</figcaption></figure><p><a href="../samples/api-examples/fc/physics_surface.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:93</p><div class="original"><b>Declaration notes (original source)</b><pre>Kinematic surface response; returns incoming normal speed, or zero if separating.
-Caller resolves penetration separately. Relative components must fit +/-8191.</pre></div><p class="source">kitaqfc/lib/physics2d.c:103</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>s16 kq2d_body_resolve_surface(KQBody2D* body, const KQSurface2D* surface)
+Caller resolves penetration separately. Relative components must fit +/-8191.</pre></div><p class="source">kitaqfc/lib/physics2d.c:268</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>s16 kq2d_body_resolve_surface(KQBody2D* body, const KQSurface2D* surface)
 {
     s16 vx;
     s16 vy;
@@ -2866,7 +3031,7 @@ Caller resolves penetration separately. Relative components must fit +/-8191.</p
 }</code></pre></div></details></details><details class="api searchable" id="api-kq2d_surface_toi_q8" data-api-contract="fc-physics-source-20260922"><summary><code>kq2d_surface_toi_q8</code></summary><p>Estimate the within-tick crossing time from signed start/end gaps under linear motion.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>start_gap</code></dt><dd><p>Signed gap at the start of the tick; positive means outside the surface.</p></dd><dt><code>end_gap</code></dt><dd><p>Signed gap at the end of the tick; negative means past the surface.</p></dd></dl><h4>Return value</h4><p>Returns Q8 time in 0..256; 192 is 75% of the tick.</p><h4>Conditions and limits</h4><p>Keep gaps within +/-8191. A nonpositive start returns 0; a nonnegative end returns 256. Initial overlap and time zero share a return value, as do no crossing and contact exactly at the endpoint. No position is changed.</p><p>Compile implementation files as well as including headers. For 2D use fixed.c and physics2d.c; for 3D also include physics3d.c. The examples use MMC3, CHR RAM and drawing storage at PRG RAM $6800–$6FFF. That drawing buffer is not a requirement of the physics library itself.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>result[4]=kq2d_surface_toi_q8(6,-2);
     result[5]=kq2d_surface_toi_q8(6,0);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196).</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-physics-fc/surface/screen.png" alt="kq2d_surface_toi_q8: NTSC — The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196)."><figcaption>NTSC — The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,−8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48) and (88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. A separate speed-limit call reduces (300,400) to (147,196).</figcaption></figure><p><a href="../samples/api-examples/fc/physics_surface.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\physics_surface.c -I .\kitaqfc\lib -I .\kitaq-docs\samples --mapper=mmc3 --nes-chr-ram -o .\out\physics_surface.nes --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/physics2d.h:96</p><div class="original"><b>Declaration notes (original source)</b><pre>Linear crossing time in Q8 (0..256); positive separation is outside.
-Returns 0 for initial overlap, 256 for no crossing. Gaps must fit +/-8191.</pre></div><p class="source">kitaqfc/lib/physics2d.c:80</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap)
+Returns 0 for initial overlap, 256 for no crossing. Gaps must fit +/-8191.</pre></div><p class="source">kitaqfc/lib/physics2d.c:245</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap)
 {
     if (start_gap &lt;= 0) return 0;
     if (end_gap &gt;= 0) return 256;
@@ -4809,7 +4974,6 @@ u8 chain_get_segment(const Chain* chain, u8 index, ChainPoint* out);
 // Return the number of stored points, or zero for a null chain.
 u8 chain_get_count(const Chain* chain);
 
-#endif
 
 // Articulated body: one current pose per joint, including the head at index 0.
 // Caller-owned byte arrays keep the inner loop compact on both GB and FC.
@@ -4841,7 +5005,9 @@ void chain_body_step(ChainBody* body, u8 head_x, u8 head_y, u8 heading);
 // Return 1 on growth, or 0 for an empty, disabled or full body.
 u8 chain_body_grow(ChainBody* body);
 // Remove all joints while retaining caller-owned storage and playfield settings.
-void chain_body_clear(ChainBody* body);</code></pre></div><p class="source">kitaqfc/lib/chain.h</p></details><details class="searchable"><summary><code>collision.h</code> — Rectangle and other collision tests</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>/*
+void chain_body_clear(ChainBody* body);
+
+#endif</code></pre></div><p class="source">kitaqfc/lib/chain.h</p></details><details class="searchable"><summary><code>collision.h</code> — Rectangle and other collision tests</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>/*
  * Optional declarations for the phase 11 collision helper.
  */
 

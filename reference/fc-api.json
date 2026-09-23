@@ -7337,7 +7337,7 @@
         "args": "KQBody2D* body, u8 friction_q8",
         "signature": "void kq2d_body_apply_friction(KQBody2D* body, u8 friction_q8);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 276,
+        "line": 441,
         "comment": "Scale both velocities by a signed eight-bit coefficient divided by 256.\nDespite the unsigned parameter, values 128..255 become negative coefficients;\nthis is not a full-range unsigned Q8 damping helper. Null is ignored.",
         "body": "void kq2d_body_apply_friction(KQBody2D* body, u8 friction_q8)\n{\n    if (body == 0) return;\n    body->vx = kq2d_scale_q8(body->vx, (s16)(s8)friction_q8);\n    body->vy = kq2d_scale_q8(body->vy, (s16)(s8)friction_q8);\n}",
         "kind": "function"
@@ -7367,7 +7367,7 @@
         "args": "KQBody2D* body, s16 gravity_x, s16 gravity_y, s16 max_speed",
         "signature": "void kq2d_body_apply_gravity(KQBody2D* body, s16 gravity_x, s16 gravity_y, s16 max_speed);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 252,
+        "line": 417,
         "comment": "Add gravity and clamp each velocity axis separately for an active dynamic\nbody. Null, inactive and static bodies are ignored. Supply a nonnegative limit\nand avoid overflow in the additions before clamping; position is unchanged.",
         "body": "void kq2d_body_apply_gravity(KQBody2D* body, s16 gravity_x, s16 gravity_y, s16 max_speed)\n{\n    if (body == 0) return;\n    if (body->active == 0) return;\n    if (body->inv_mass_q8 <= 0) return;\n\n    kq2d_asm_value = body->vx;\n    kq2d_asm_operand = gravity_x;\n    kq2d__add_value();\n    kq2d_asm_limit = max_speed;\n    kq2d__clamp_value();\n    body->vx = kq2d_asm_value;\n\n    kq2d_asm_value = body->vy;\n    kq2d_asm_operand = gravity_y;\n    kq2d__add_value();\n    kq2d_asm_limit = max_speed;\n    kq2d__clamp_value();\n    body->vy = kq2d_asm_value;\n}",
         "kind": "function"
@@ -7397,7 +7397,7 @@
         "args": "KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y",
         "signature": "void kq2d_body_init(KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 219,
+        "line": 384,
         "comment": "Initialize an active unit-inverse-mass body at the supplied center and half\nextents, with zero velocity and reserved restitution set to zero. Null is ignored.",
         "body": "void kq2d_body_init(KQBody2D* body, s16 x, s16 y, s16 half_x, s16 half_y)\n{\n    if (body == 0) return;\n    body->x = x;\n    body->y = y;\n    body->vx = 0;\n    body->vy = 0;\n    body->half_x = half_x;\n    body->half_y = half_y;\n    body->inv_mass_q8 = 256;\n    body->restitution_q8 = 0;\n    body->active = 1;\n}",
         "kind": "function"
@@ -7427,7 +7427,7 @@
         "args": "KQBody2D* body, s16 max_speed",
         "signature": "void kq2d_body_limit_speed(KQBody2D* body, s16 max_speed);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 49,
+        "line": 214,
         "comment": "Reduce both velocity components with one conservative length estimate.\nA null body is ignored; a nonpositive limit zeros velocity. This helper ignores\nactive/mass flags. Components and positive limits must have magnitude <= 16383.",
         "body": "void kq2d_body_limit_speed(KQBody2D* body, s16 max_speed)\n{\n    u16 x;\n    u16 y;\n    u16 swap;\n    u16 ratio;\n    u16 length;\n    if (body == 0) return;\n    if (max_speed <= 0) { body->vx = 0; body->vy = 0; return; }\n    x = (u16)body->vx;\n    y = (u16)body->vy;\n    if (body->vx < 0) x = (u16)(0 - body->vx);\n    if (body->vy < 0) y = (u16)(0 - body->vy);\n    if (x + y <= (u16)max_speed) return;\n    if (x < y) { swap = x; x = y; y = swap; }\n    // major + minor/2 bounds hypot from above for 0 <= minor <= major.\n    if (x + (y >> 1) + 1 <= (u16)max_speed) return;\n    // Round the minor/major ratio upward for the 65-entry upper-bound table.\n    // The extra unit covers truncation when converting the estimate back to speed.\n    ratio = (kq2d__fraction_q8(y, x) + 4) >> 2;\n    if (ratio > 64) ratio = 64;\n    length = x + (u16)kq2d_scale_q8((s16)x, (s16)kq2d_hypot_extra[(u8)ratio]) + 1;\n    if (length <= (u16)max_speed) return;\n    ratio = kq2d__fraction_q8((u16)max_speed, length);\n    body->vx = kq2d_scale_q8(body->vx, (s16)ratio);\n    body->vy = kq2d_scale_q8(body->vy, (s16)ratio);\n}",
         "kind": "function"
@@ -7457,7 +7457,7 @@
         "args": "KQBody2D* body, const KQSurface2D* surface",
         "signature": "s16 kq2d_body_resolve_surface(KQBody2D* body, const KQSurface2D* surface);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 103,
+        "line": 268,
         "comment": "Resolve incoming velocity relative to a moving surface and return the\npositive incoming normal speed; null inputs or separating motion return zero.\nUse a Q8 unit normal, nonnegative threshold/kick, and relative components\nwithin +/-8191. This does not detect contact, move positions, or check body mass.",
         "body": "s16 kq2d_body_resolve_surface(KQBody2D* body, const KQSurface2D* surface)\n{\n    s16 vx;\n    s16 vy;\n    s16 speed;\n    s16 tangent;\n    s16 bounce = 0;\n    s16 impulse;\n    s16 friction;\n    if (body == 0 || surface == 0) return 0;\n    vx = (s16)(body->vx - surface->vx);\n    vy = (s16)(body->vy - surface->vy);\n    speed = (s16)(kq2d_scale_q8(vx,surface->nx_q8) + kq2d_scale_q8(vy,surface->ny_q8));\n    if (speed >= 0) return 0;\n    speed = (s16)(0 - speed);\n    if (speed > surface->bounce_threshold) bounce = kq2d_scale_q8(speed,(s16)surface->restitution_q8);\n    if (bounce < surface->kick) bounce = surface->kick;\n    impulse = (s16)(speed + bounce);\n    // A resting contact is a tangent constraint, not a tiny rounded bounce.\n    if (bounce == 0) {\n        tangent = (s16)(kq2d__rest_component(vy,surface->nx_q8) - kq2d__rest_component(vx,surface->ny_q8));\n        friction = kq2d_scale_q8(impulse,(s16)surface->friction_q8);\n        if (tangent > friction) tangent = (s16)(tangent - friction);\n        else if (tangent < (s16)(0 - friction)) tangent = (s16)(tangent + friction);\n        else tangent = 0;\n        body->vx = (s16)(surface->vx - kq2d__rest_component(tangent,surface->ny_q8));\n        body->vy = (s16)(surface->vy + kq2d__rest_component(tangent,surface->nx_q8));\n        return speed;\n    }\n    body->vx = (s16)(body->vx + kq2d_scale_q8(impulse,surface->nx_q8));\n    body->vy = (s16)(body->vy + kq2d_scale_q8(impulse,surface->ny_q8));\n    if (surface->friction_q8 != 0) {\n        tangent = (s16)(kq2d_scale_q8(vy,surface->nx_q8) - kq2d_scale_q8(vx,surface->ny_q8));\n        friction = kq2d_scale_q8(impulse,(s16)surface->friction_q8);\n        if (tangent > friction) tangent = friction;\n        if (tangent < (s16)(0 - friction)) tangent = (s16)(0 - friction);\n        body->vx = (s16)(body->vx + kq2d_scale_q8(tangent,surface->ny_q8));\n        body->vy = (s16)(body->vy - kq2d_scale_q8(tangent,surface->nx_q8));\n    }\n    return speed;\n}",
         "kind": "function"
@@ -7487,7 +7487,7 @@
         "args": "KQBody2D* body, s16 x, s16 y",
         "signature": "void kq2d_body_set_pos(KQBody2D* body, s16 x, s16 y);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 234,
+        "line": 399,
         "comment": "Replace the center without altering velocity, extents or activity. Null is ignored.",
         "body": "void kq2d_body_set_pos(KQBody2D* body, s16 x, s16 y)\n{\n    if (body == 0) return;\n    body->x = x;\n    body->y = y;\n}",
         "kind": "function"
@@ -7517,7 +7517,7 @@
         "args": "KQBody2D* body, s16 vx, s16 vy",
         "signature": "void kq2d_body_set_velocity(KQBody2D* body, s16 vx, s16 vy);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 242,
+        "line": 407,
         "comment": "Replace velocity without clamping or checking activity/mass. Null is ignored.",
         "body": "void kq2d_body_set_velocity(KQBody2D* body, s16 vx, s16 vy)\n{\n    if (body == 0) return;\n    body->vx = vx;\n    body->vy = vy;\n}",
         "kind": "function"
@@ -7547,7 +7547,7 @@
         "args": "KQWorld2D* world, KQBody2D* body",
         "signature": "void kq2d_integrate_body(KQWorld2D* world, KQBody2D* body);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 286,
+        "line": 451,
         "comment": "For one active dynamic body, add gravity, clamp each velocity axis and then\nadd velocity to position. Null inputs are ignored; no contacts are solved.\nUse a nonnegative speed limit and keep additions in signed 16-bit range.",
         "body": "void kq2d_integrate_body(KQWorld2D* world, KQBody2D* body)\n{\n    if (world == 0) return;\n    if (body == 0) return;\n    if (body->active == 0) return;\n    if (body->inv_mass_q8 <= 0) return;\n\n    kq2d_asm_value = body->vx;\n    kq2d_asm_operand = world->gravity_x;\n    kq2d__add_value();\n    kq2d_asm_limit = world->max_speed;\n    kq2d__clamp_value();\n    body->vx = kq2d_asm_value;\n\n    kq2d_asm_value = body->vy;\n    kq2d_asm_operand = world->gravity_y;\n    kq2d__add_value();\n    kq2d_asm_limit = world->max_speed;\n    kq2d__clamp_value();\n    body->vy = kq2d_asm_value;\n\n    kq2d_asm_value = body->x;\n    kq2d_asm_operand = body->vx;\n    kq2d__add_value();\n    body->x = kq2d_asm_value;\n\n    kq2d_asm_value = body->y;\n    kq2d_asm_operand = body->vy;\n    kq2d__add_value();\n    body->y = kq2d_asm_value;\n}",
         "kind": "function"
@@ -7577,7 +7577,7 @@
         "args": "const KQBody2D* a, const KQBody2D* b",
         "signature": "u8 kq2d_overlap_aabb(const KQBody2D* a, const KQBody2D* b);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 201,
+        "line": 366,
         "comment": "Test strict overlap of two centered boxes; touching edges return false.\nBoth pointers must be valid. Active/mass flags are ignored, and coordinate\ndifferences and extent sums must fit the signed 16-bit calculations.",
         "body": "u8 kq2d_overlap_aabb(const KQBody2D* a, const KQBody2D* b)\n{\n    s16 dx = (s16)(b->x - a->x);\n    s16 dy = (s16)(b->y - a->y);\n\n    s16 adx = kq2d__abs_s16(dx);\n    s16 ady = kq2d__abs_s16(dy);\n\n    s16 sx = (s16)(a->half_x + b->half_x);\n    s16 sy = (s16)(a->half_y + b->half_y);\n\n    if (adx >= sx) return 0;\n    if (ady >= sy) return 0;\n    return 1;\n}",
         "kind": "function"
@@ -7607,7 +7607,7 @@
         "args": "s16 x, s16 y, KQRect r",
         "signature": "u8 kq2d_point_in_rect(s16 x, s16 y, KQRect r);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 327,
+        "line": 492,
         "comment": "Delegate the half-open point test: include left/top and exclude right/bottom.\nCoordinate-plus-size sums must remain representable as s16.",
         "body": "u8 kq2d_point_in_rect(s16 x, s16 y, KQRect r)\n{\n    return kq_point_in_rect(x, y, r);\n}",
         "kind": "function"
@@ -7637,7 +7637,7 @@
         "args": "KQRect a, KQRect b",
         "signature": "u8 kq2d_rect_intersect(KQRect a, KQRect b);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 320,
+        "line": 485,
         "comment": "Delegate strict rectangle overlap to the fixed-point utility; edge-only\ncontact is false. Coordinate-plus-size sums must remain representable as s16.",
         "body": "u8 kq2d_rect_intersect(KQRect a, KQRect b)\n{\n    return kq_rect_intersect(a, b);\n}",
         "kind": "function"
@@ -7664,12 +7664,12 @@
       "definition": {
         "name": "kq2d_scale_q8",
         "ret": "s16",
-        "args": "s16 value, s16 coefficient",
-        "signature": "s16 kq2d_scale_q8(s16 value, s16 coefficient);",
+        "args": "s16 value,s16 coefficient",
+        "signature": "s16 kq2d_scale_q8(s16 value,s16 coefficient);",
         "path": "kitaqfc/lib/physics2d.c",
         "line": 8,
-        "comment": "Scale by a signed Q8 coefficient in -256..256, truncating the magnitude\nbefore restoring the sign. Splitting the product prevents intermediate overflow;\ncoefficients outside this interval are not supported.",
-        "body": "s16 kq2d_scale_q8(s16 value, s16 coefficient)\n{\n    u16 magnitude;\n    u16 factor;\n    u16 scaled;\n    u8 negative;\n    negative = (u8)((value < 0) != (coefficient < 0));\n    magnitude = value < 0 ? (u16)(0 - (u16)value) : (u16)value;\n    factor = coefficient < 0 ? (u16)(0 - coefficient) : (u16)coefficient;\n    // Split the magnitude before multiplying: each product fits unsigned 16 bits.\n    scaled = (u16)((magnitude >> 8) * factor + (((magnitude & 255) * factor) >> 8));\n    if (negative != 0) return (s16)(0 - scaled);\n    return (s16)scaled;\n}",
+        "comment": "Scale by a signed Q8 coefficient in -256..256, truncating the magnitude\nbefore restoring the sign. Eight unrolled shift/add stages keep the product\nin range; zero and +/-256 use exact shortcuts. Other coefficients are unsupported.",
+        "body": "s16 kq2d_scale_q8(s16 value,s16 coefficient) {\n    u16 magnitude;u16 product;u8 factor;u8 negative;\n    __asm {\n        LDA value\n        ORA value+1\n        BEQ kqfc_scale_zero\n        LDA coefficient\n        BNE kqfc_scale_fraction\n        LDA coefficient+1\n        BEQ kqfc_scale_zero\n        BMI kqfc_scale_negate_value\n        LDA value\n        LDX value+1\n        RTS\nkqfc_scale_negate_value:\n        SEC\n        LDA #0\n        SBC value\n        STA product\n        LDA #0\n        SBC value+1\n        TAX\n        LDA product\n        RTS\nkqfc_scale_zero:\n        LDA #0\n        LDX #0\n        RTS\nkqfc_scale_fraction:\n        LDA value+1\n        EOR coefficient+1\n        AND #128\n        STA negative\n        LDA value\n        STA magnitude\n        LDA value+1\n        STA magnitude+1\n        BPL kqfc_scale_value_positive\n        SEC\n        LDA #0\n        SBC magnitude\n        STA magnitude\n        LDA #0\n        SBC magnitude+1\n        STA magnitude+1\nkqfc_scale_value_positive:\n        LDA coefficient\n        STA factor\n        LDA coefficient+1\n        BPL kqfc_scale_factor_positive\n        SEC\n        LDA #0\n        SBC factor\n        STA factor\nkqfc_scale_factor_positive:\n        LDA #0\n        STA product\n        STA product+1\n        // Process coefficient bit 0; carry is the product's seventeenth bit.\n        LSR factor\n        BCC kqfc_scale_shift_0\n        CLC\n        LDA product\n        ADC magnitude\n        STA product\n        LDA product+1\n        ADC magnitude+1\n        STA product+1\nkqfc_scale_shift_0:\n        ROR product+1\n        ROR product\n        // Process coefficient bit 1; carry is the product's seventeenth bit.\n        LSR factor\n        BCC kqfc_scale_shift_1\n        CLC\n        LDA product\n        ADC magnitude\n        STA product\n        LDA product+1\n        ADC magnitude+1\n        STA product+1\nkqfc_scale_shift_1:\n        ROR product+1\n        ROR product\n        // Process coefficient bit 2; carry is the product's seventeenth bit.\n        LSR factor\n        BCC kqfc_scale_shift_2\n        CLC\n        LDA product\n        ADC magnitude\n        STA product\n        LDA product+1\n        ADC magnitude+1\n        STA product+1\nkqfc_scale_shift_2:\n        ROR product+1\n        ROR product\n        // Process coefficient bit 3; carry is the product's seventeenth bit.\n        LSR factor\n        BCC kqfc_scale_shift_3\n        CLC\n        LDA product\n        ADC magnitude\n        STA product\n        LDA product+1\n        ADC magnitude+1\n        STA product+1\nkqfc_scale_shift_3:\n        ROR product+1\n        ROR product\n        // Process coefficient bit 4; carry is the product's seventeenth bit.\n        LSR factor\n        BCC kqfc_scale_shift_4\n        CLC\n        LDA product\n        ADC magnitude\n        STA product\n        LDA product+1\n        ADC magnitude+1\n        STA product+1\nkqfc_scale_shift_4:\n        ROR product+1\n        ROR product\n        // Process coefficient bit 5; carry is the product's seventeenth bit.\n        LSR factor\n        BCC kqfc_scale_shift_5\n        CLC\n        LDA product\n        ADC magnitude\n        STA product\n        LDA product+1\n        ADC magnitude+1\n        STA product+1\nkqfc_scale_shift_5:\n        ROR product+1\n        ROR product\n        // Process coefficient bit 6; carry is the product's seventeenth bit.\n        LSR factor\n        BCC kqfc_scale_shift_6\n        CLC\n        LDA product\n        ADC magnitude\n        STA product\n        LDA product+1\n        ADC magnitude+1\n        STA product+1\nkqfc_scale_shift_6:\n        ROR product+1\n        ROR product\n        // Process coefficient bit 7; carry is the product's seventeenth bit.\n        LSR factor\n        BCC kqfc_scale_shift_7\n        CLC\n        LDA product\n        ADC magnitude\n        STA product\n        LDA product+1\n        ADC magnitude+1\n        STA product+1\nkqfc_scale_shift_7:\n        ROR product+1\n        ROR product\n        LDA negative\n        BEQ kqfc_scale_positive\n        SEC\n        LDA #0\n        SBC product\n        STA product\n        LDA #0\n        SBC product+1\n        TAX\n        LDA product\n        RTS\nkqfc_scale_positive:\n        LDA product\n        LDX product+1\n        RTS\n    }\n}",
         "kind": "function"
       },
       "example": {
@@ -7697,7 +7697,7 @@
         "args": "KQWorld2D* world",
         "signature": "void kq2d_step(KQWorld2D* world);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 416,
+        "line": 581,
         "comment": "Advance active dynamic bodies, then visit each active unordered pair for\nthe configured contact passes (zero means one). Static bodies still participate\nas obstacles. The world borrows its array and shares non-reentrant helper scratch.\nThis is discrete integration; fast bodies can pass through thin obstacles.",
         "body": "void kq2d_step(KQWorld2D* world)\n{\n    if (world == 0) return;\n    if (world->bodies == 0) return;\n\n    KQBody2D* bodies = world->bodies;\n    u8 count = world->body_count;\n\n    // Integrate dynamic bodies.\n    u8 i;\n    for (i = 0; i < count; i++)\n    {\n        KQBody2D* b = &bodies[(u8)i];\n        if (b->active == 0) continue;\n        if (b->inv_mass_q8 <= 0) continue;\n\n        kq2d_asm_value = b->vx;\n        kq2d_asm_operand = world->gravity_x;\n        kq2d__add_value();\n        kq2d_asm_limit = world->max_speed;\n        kq2d__clamp_value();\n        b->vx = kq2d_asm_value;\n\n        kq2d_asm_value = b->vy;\n        kq2d_asm_operand = world->gravity_y;\n        kq2d__add_value();\n        kq2d_asm_limit = world->max_speed;\n        kq2d__clamp_value();\n        b->vy = kq2d_asm_value;\n\n        kq2d_asm_value = b->x;\n        kq2d_asm_operand = b->vx;\n        kq2d__add_value();\n        b->x = kq2d_asm_value;\n\n        kq2d_asm_value = b->y;\n        kq2d_asm_operand = b->vy;\n        kq2d__add_value();\n        b->y = kq2d_asm_value;\n    }\n\n    // Solve contacts with a small fixed iteration count.\n    u8 iterations = world->solver_iterations;\n    if (iterations == 0) iterations = 1;\n\n    u8 it;\n    for (it = 0; it < iterations; it++)\n    {\n        for (i = 0; i < count; i++)\n        {\n            KQBody2D* a = &bodies[(u8)i];\n            if (a->active == 0) continue;\n\n            u8 j;\n            for (j = (u8)(i + 1); j < count; j++)\n            {\n                KQBody2D* b = &bodies[(u8)j];\n                if (b->active == 0) continue;\n                kq2d__resolve_pair(a, b);\n            }\n        }\n    }\n}",
         "kind": "function"
@@ -7727,7 +7727,7 @@
         "args": "s16 start_gap, s16 end_gap",
         "signature": "u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 80,
+        "line": 245,
         "comment": "Estimate a linear gap crossing: initial contact returns 0, and an endpoint\nstill outside or exactly on the surface returns 256. Otherwise interpolate in\nQ8. Keep both signed gaps within +/-8191; no body position is changed.",
         "body": "u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap)\n{\n    if (start_gap <= 0) return 0;\n    if (end_gap >= 0) return 256;\n    return kq2d__fraction_q8((u16)start_gap, (u16)(start_gap - end_gap));\n}",
         "kind": "function"
@@ -7757,7 +7757,7 @@
         "args": "KQWorld2D* world, KQBody2D* bodies, u8 body_count",
         "signature": "void kq2d_world_init(KQWorld2D* world, KQBody2D* bodies, u8 body_count);",
         "path": "kitaqfc/lib/physics2d.c",
-        "line": 186,
+        "line": 351,
         "comment": "Retain the caller-owned body array without initializing its elements.\nSet gravity to (0,32), four contact iterations and a per-axis speed limit of 512.\nA null world is ignored; the array must outlive subsequent world operations.",
         "body": "void kq2d_world_init(KQWorld2D* world, KQBody2D* bodies, u8 body_count)\n{\n    if (world == 0) return;\n\n    world->bodies = bodies;\n    world->body_count = body_count;\n    world->gravity_x = 0;\n    world->gravity_y = 32;\n    world->solver_iterations = 4;\n    world->max_speed = 512;\n}",
         "kind": "function"

@@ -73,6 +73,8 @@ These are compiler selections, not a hardware or emulator completeness table. `-
 
 Check board requirements for `--battery` / `--no-battery`, CHR capacity, PRG placement and banked calls. After changing a mapper or mirroring mode, test startup, scrolling and data switching as well as ROM generation.
 
+Ordinary indexed reads and C pointer references to ROM arrays place those arrays in common bank 0 unless `#pragma fixed_bank` explicitly fixes their placement. This keeps the data visible when a caller runs in a switchable bank. For explicit far access, pass the bare array name with `__bankof` of that same name in the same call, for example `__farpeek8(__bankof(table), table)`. A bank-number query alone does not request common-bank placement. Explicit fixed-bank data and references inside assembly require you to maintain the correct mapping; this rule is a syntax-based placement check, not pointer-flow analysis. Common-bank capacity still applies.
+
 ## 9. FDS, expansion sound and peripherals
 FDS involves disk-file placement, startup, overlays and saving. Consult `fds_manifest_sample.json` and the FDS headers. Prepare any required BIOS in your own runtime environment; the public distribution contains no BIOS.
 

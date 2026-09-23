@@ -221,6 +221,9 @@ def main():
         # Commands from the source-workspace edition need the public sibling layout.
         prose=prose.replace('.\\kitaqgb.exe','.\\kitaqgb\\kitaqgb.exe')
         body=g.md(prose)
+        if key=='kokura':
+            from kokura_guide import block
+            body+=block('en')
         if key=='index':body+='<h2 id="books">Choose a manual</h2><div class="books">'+''.join('<a class="book" href="'+k+'.html"><span>'+n+'</span><strong>'+E(t)+'</strong><small>'+E(s)+'</small></a>' for k,n,t,s in BOOKS)+'</div>'
         if key in ('kitaqgb','gb-library','kitaqfc','fc-library'):
             p='gb' if key in ('kitaqgb','gb-library') else 'fc'

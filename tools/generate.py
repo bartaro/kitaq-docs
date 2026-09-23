@@ -250,6 +250,9 @@ def main():
  origin=read(origin_path).strip() if origin_path.exists() else '名称の由来：作者への確認待ちです。推測で由来を確定しないため、この一文は回答後に確定します。'
  for key,num,title,sub in [('index','00','KITAQ SERIES','プログラミング・ユーザーズマニュアル'),*BOOKS]:
   body=md(TEXT[key].replace('{{ORIGIN}}',origin))
+  if key=='kokura':
+   from kokura_guide import block
+   body+=block('ja')
   if key=='index':
    body+='<h2 id="books">マニュアルを選ぶ</h2><div class="books">'+''.join('<a class="book" href="'+k+'.html"><span>'+n+'</span><strong>'+E(t)+'</strong><small>'+E(s)+'</small></a>' for k,n,t,s in BOOKS)+'</div>'
   if key in ('kitaqgb','gb-library','kitaqfc','fc-library'):
