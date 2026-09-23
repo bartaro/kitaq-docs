@@ -1,0 +1,109 @@
+{
+  "fc:__fds_load_file": {
+    "review": "fds-file-source-20260923",
+    "record_sha256": "6e465f97832734fdb1b6f120fd2955d06fc178526827c6dc590935dd9172e316",
+    "purpose": [
+      "fds_file_load_purpose"
+    ],
+    "args": [
+      [
+        "id",
+        [
+          "fds_file_id"
+        ]
+      ],
+      [
+        "dst",
+        [
+          "fds_file_dst"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_file_load_return"
+    ],
+    "notes": [
+      "fds_file_native",
+      "fds_file_staging",
+      "fds_file_buffers",
+      "fds_file_blocking",
+      "fds_file_boundary",
+      "fds_file_fixture"
+    ],
+    "references": [
+      {
+        "url": "https://www.nesdev.org/wiki/FDS_BIOS",
+        "title": "FDS BIOS calling convention"
+      }
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_file_io.c",
+      "code": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\nvoid main(void) {\n    u8 i;\n    u8* data=(u8*)0x8500;\n    u8* again=(u8*)0x8600;\n    __irq_disable();__ppu_ctrl_set(0);__ppu_mask_set(0);\n    // Keep rendering/NMI and non-disk IRQ sources disabled during disk I/O.\n    *((u8*)0xFF)=0;*((u8*)0x4010)=0;*((u8*)0x4017)=0x40;*((u8*)0x4022)=0;\n    fds_result[0]=__fds_load_file(73,data);\n    fds_result[1]=data[0];fds_result[2]=data[3];\n    for(i=0;i<4;i=i+1){data[i]=(i+1)*7;}\n    fds_result[3]=__fds_save_file(73,data,4);\n    fds_result[4]=__fds_load_file(73,again);\n    fds_result[5]=again[0];fds_result[6]=again[3];\n    // Check every returned byte, not only the displayed endpoints.\n    for(i=0;i<4;i=i+1){if(again[i]!=(i+1)*7){fds_result[7]=1;}}\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS LOAD / SAVE BUFFER\");m_wait();\n    m_text(2,5,\"LOAD TO 8500 STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"INITIAL FIRST/LAST\");fds_number(21,7,fds_result[1]);fds_number(25,7,fds_result[2]);m_wait();\n    m_text(2,9,\"SAVE FILE 73 STATUS\");fds_number(25,9,fds_result[3]);m_wait();\n    m_text(2,11,\"RELOAD TO 8600 STATUS\");fds_number(25,11,fds_result[4]);m_wait();\n    m_text(2,13,\"SAVED FIRST / LAST\");fds_number(21,13,fds_result[5]);fds_number(25,13,fds_result[6]);m_wait();\n    m_text(2,15,\"BYTE CHECK ERRORS\");fds_number(25,15,fds_result[7]);m_wait();\n    m_text(2,18,\"STAGING 8000 / SIZE 4\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_file_io.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_file_io.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-meta=.\\kitaq-docs\\samples\\api-examples\\fc\\fds_file_io_manifest.json --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\npython .\\kitaq-docs\\tools\\check_fds_file_examples.py",
+      "expected": [
+        "fds_file_expected"
+      ],
+      "files": [
+        "samples/api-examples/fc/fds_file_io_manifest.json",
+        "samples/api-examples/fc/fds_file_io_payload.bin"
+      ]
+    }
+  },
+  "fc:__fds_save_file": {
+    "review": "fds-file-source-20260923",
+    "record_sha256": "598f7d6adea16aaf6b8f50147921fd68d8bb2e7928a899bcd309438d1425432e",
+    "purpose": [
+      "fds_file_save_purpose"
+    ],
+    "args": [
+      [
+        "id",
+        [
+          "fds_file_id"
+        ]
+      ],
+      [
+        "src",
+        [
+          "fds_file_src"
+        ]
+      ],
+      [
+        "len",
+        [
+          "fds_file_len"
+        ]
+      ]
+    ],
+    "returns": [
+      "fds_file_save_return"
+    ],
+    "notes": [
+      "fds_file_native",
+      "fds_file_slot",
+      "fds_file_ordering",
+      "fds_file_buffers",
+      "fds_file_blocking",
+      "fds_file_boundary",
+      "fds_file_fixture"
+    ],
+    "references": [
+      {
+        "url": "https://www.nesdev.org/wiki/FDS_BIOS",
+        "title": "FDS BIOS calling convention"
+      }
+    ],
+    "example": {
+      "program": "samples/api-examples/fc/fds_file_io.c",
+      "code": "#pragma fixed_bank 0\n#include \"fc_fds_scene.h\"\nvoid main(void) {\n    u8 i;\n    u8* data=(u8*)0x8500;\n    u8* again=(u8*)0x8600;\n    __irq_disable();__ppu_ctrl_set(0);__ppu_mask_set(0);\n    // Keep rendering/NMI and non-disk IRQ sources disabled during disk I/O.\n    *((u8*)0xFF)=0;*((u8*)0x4010)=0;*((u8*)0x4017)=0x40;*((u8*)0x4022)=0;\n    fds_result[0]=__fds_load_file(73,data);\n    fds_result[1]=data[0];fds_result[2]=data[3];\n    for(i=0;i<4;i=i+1){data[i]=(i+1)*7;}\n    fds_result[3]=__fds_save_file(73,data,4);\n    fds_result[4]=__fds_load_file(73,again);\n    fds_result[5]=again[0];fds_result[6]=again[3];\n    // Check every returned byte, not only the displayed endpoints.\n    for(i=0;i<4;i=i+1){if(again[i]!=(i+1)*7){fds_result[7]=1;}}\n    fds_result[15]=165;\n    m_init();m_text(2,2,\"FDS LOAD / SAVE BUFFER\");m_wait();\n    m_text(2,5,\"LOAD TO 8500 STATUS\");fds_number(25,5,fds_result[0]);m_wait();\n    m_text(2,7,\"INITIAL FIRST/LAST\");fds_number(21,7,fds_result[1]);fds_number(25,7,fds_result[2]);m_wait();\n    m_text(2,9,\"SAVE FILE 73 STATUS\");fds_number(25,9,fds_result[3]);m_wait();\n    m_text(2,11,\"RELOAD TO 8600 STATUS\");fds_number(25,11,fds_result[4]);m_wait();\n    m_text(2,13,\"SAVED FIRST / LAST\");fds_number(21,13,fds_result[5]);fds_number(25,13,fds_result[6]);m_wait();\n    m_text(2,15,\"BYTE CHECK ERRORS\");fds_number(25,15,fds_result[7]);m_wait();\n    m_text(2,18,\"STAGING 8000 / SIZE 4\");m_wait();\n    while(1){m_wait();}\n}",
+      "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\fds_file_io.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\fds_file_io.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-meta=.\\kitaq-docs\\samples\\api-examples\\fc\\fds_file_io_manifest.json --nes-chr=.\\kitaq-docs\\samples\\font.chr --no-cache --no-disasm\npython .\\kitaq-docs\\tools\\check_fds_file_examples.py",
+      "expected": [
+        "fds_file_expected"
+      ],
+      "files": [
+        "samples/api-examples/fc/fds_file_io_manifest.json",
+        "samples/api-examples/fc/fds_file_io_payload.bin"
+      ]
+    }
+  }
+}

@@ -42,6 +42,8 @@ def public_file(relative):
         return path.suffix in PUBLIC_EVIDENCE_SUFFIXES | {'.wav'}
     if path.parts[:3] == ('verification','api-fds-query','example'):
         return path.name in ('example.fds','example.nes','screen.png')
+    if path.parts[:3] == ('verification','api-fds-file','example'):
+        return path.name in ('example.fds','screen.png')
     if path.parts[:3] == ('verification','api-fds-load','example'):
         return path.name in ('example.fds','screen.png')
     if path.parts[:2] == ('verification','api-peripheral'):

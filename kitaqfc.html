@@ -692,15 +692,13 @@ void main(void) {
     m_text(2,15,&quot;NO FILE TRANSFER TESTED&quot;); m_wait();
     while (1) { m_wait(); }
 }</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>PRESENT / PROTECT / STATUSの下に1 / 0 / 0、COMPLETED PRESENCE WAITSの下に2が出ます。二つの待機関数が戻ったことを示し、ファイル転送の成功表示ではありません。最下部にもNO FILE TRANSFER TESTEDと表示します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-query/example/status-fds-default/screen.png" alt="__fds_wait_insert: STATUS-FDS-DEFAULT — PRESENT / PROTECT / STATUSの下に1 / 0 / 0、COMPLETED PRESENCE WAITSの下に2が出ます。二つの待機関数が戻ったことを示し、ファイル転送の成功表示ではありません。最下部にもNO FILE TRANSFER TESTEDと表示します。"><figcaption>STATUS-FDS-DEFAULT — PRESENT / PROTECT / STATUSの下に1 / 0 / 0、COMPLETED PRESENCE WAITSの下に2が出ます。二つの待機関数が戻ったことを示し、ファイル転送の成功表示ではありません。最下部にもNO FILE TRANSFER TESTEDと表示します。</figcaption></figure><p><a href="samples/api-examples/fc/fds_status.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_status.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_status.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds.h:17</p><div class="original"><b>宣言の注記（原文）</b><pre>Alias the same disk-presence wait as __fds_wait_ready; the call can block indefinitely.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9053</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_wait_ready&quot;);
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_status.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_status.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds.h:17</p><div class="original"><b>宣言の注記（原文）</b><pre>Alias the same disk-presence wait as __fds_wait_ready; the call can block indefinitely.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9055</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_wait_ready&quot;);
             string loop = NewGeneratedLabel(&quot;fds_wait_ready_loop&quot;);
             _assembly.Add(Expr.Make(Tag.Label, loop));
             EmitAsm(&quot;LDA&quot;, Mem(0x4032));
             EmitAsm(&quot;AND&quot;, Imm(0x01));
             EmitAsm(&quot;BNE&quot;, Rel(loop));
-            EmitAsm(&quot;RTS&quot;);
-
-            // Build a one-file load list and supply inline wildcard-ID/list pointers to the BIOS LoadFiles entry.</code></pre></div></details></details><details class="api searchable" id="api-__fds_wait_ready" data-api-contract="fds-query-source-20260923"><summary><code>__fds_wait_ready</code></summary><p>ディスクが挿入されるまでCPUで待ちます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __fds_wait_ready(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。</p><h4>使用条件と制限</h4><p><code>--mapper=fds</code>でビルドしてください。<code>__fds_available</code>以外のFDS専用関数をカートリッジ向けに呼ぶと、KQFC2420でビルドを拒否します。</p><p>判定対象は$4032のビット0（ディスクの有無）です。ビット1の転送準備状態、ファイルの存在、ロード完了は確認しません。名前のreadyを「読み書きを開始できる」と解釈しないでください。</p><p>タイムアウトはありません。ディスクが入っていなければ戻らず、画面更新や入力処理を続けたい場合は<code>__fds_disk_ready()</code>を各フレームで調べてください。サンプルは先に存在を確認し、入っている場合だけ待機関数を呼びます。挿入済みなら、新たな抜き差しは待ちません。</p><p>KUROSAKIのFDSコントローラーは簡易モデルです。この例では挿入状態が1、書き込み禁止マスクが0、ステータスが0になりますが、未挿入・保護付きディスク・CRC異常への応答はこの画面で確認したことにはなりません。</p><p>掲載画像はKUROSAKIでディスクの起動ファイルをRAMへ直接配置して確認したものです。このサンプルはBIOSを呼ばず、ファイルの読み書き、ディスク交換、実機での起動を検証していません。検証用の空のファームウェアはBIOSの代用品ではありません。サンプルは画面更新用NMIを使い、不要なマスク可能IRQを無効にしています。</p><p>ビルド例ではBIOSの起動画面用の追加ファイルを付けず、ネイティブFDS配置の<code>.fds</code>を作ります。KUROSAKIの直接起動で確認するための構成です。実機用ディスクの起動手順は、これとは別に確認してください。</p><p><a href="https://www.nesdev.org/wiki/Famicom_Disk_System">NESdev: FDS hardware registers</a></p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void main(void) {
+            EmitAsm(&quot;RTS&quot;);</code></pre></div></details></details><details class="api searchable" id="api-__fds_wait_ready" data-api-contract="fds-query-source-20260923"><summary><code>__fds_wait_ready</code></summary><p>ディスクが挿入されるまでCPUで待ちます。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void __fds_wait_ready(void);</code></pre></div><h4>戻り値</h4><p>戻り値はありません。</p><h4>使用条件と制限</h4><p><code>--mapper=fds</code>でビルドしてください。<code>__fds_available</code>以外のFDS専用関数をカートリッジ向けに呼ぶと、KQFC2420でビルドを拒否します。</p><p>判定対象は$4032のビット0（ディスクの有無）です。ビット1の転送準備状態、ファイルの存在、ロード完了は確認しません。名前のreadyを「読み書きを開始できる」と解釈しないでください。</p><p>タイムアウトはありません。ディスクが入っていなければ戻らず、画面更新や入力処理を続けたい場合は<code>__fds_disk_ready()</code>を各フレームで調べてください。サンプルは先に存在を確認し、入っている場合だけ待機関数を呼びます。挿入済みなら、新たな抜き差しは待ちません。</p><p>KUROSAKIのFDSコントローラーは簡易モデルです。この例では挿入状態が1、書き込み禁止マスクが0、ステータスが0になりますが、未挿入・保護付きディスク・CRC異常への応答はこの画面で確認したことにはなりません。</p><p>掲載画像はKUROSAKIでディスクの起動ファイルをRAMへ直接配置して確認したものです。このサンプルはBIOSを呼ばず、ファイルの読み書き、ディスク交換、実機での起動を検証していません。検証用の空のファームウェアはBIOSの代用品ではありません。サンプルは画面更新用NMIを使い、不要なマスク可能IRQを無効にしています。</p><p>ビルド例ではBIOSの起動画面用の追加ファイルを付けず、ネイティブFDS配置の<code>.fds</code>を作ります。KUROSAKIの直接起動で確認するための構成です。実機用ディスクの起動手順は、これとは別に確認してください。</p><p><a href="https://www.nesdev.org/wiki/Famicom_Disk_System">NESdev: FDS hardware registers</a></p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void main(void) {
     // These BIOS-free queries need NMI for display, but no maskable IRQ.
     __irq_disable();
     fds_result[0] = __fds_disk_ready();
@@ -723,15 +721,13 @@ void main(void) {
     m_text(2,15,&quot;NO FILE TRANSFER TESTED&quot;); m_wait();
     while (1) { m_wait(); }
 }</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>PRESENT / PROTECT / STATUSの下に1 / 0 / 0、COMPLETED PRESENCE WAITSの下に2が出ます。二つの待機関数が戻ったことを示し、ファイル転送の成功表示ではありません。最下部にもNO FILE TRANSFER TESTEDと表示します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-query/example/status-fds-default/screen.png" alt="__fds_wait_ready: STATUS-FDS-DEFAULT — PRESENT / PROTECT / STATUSの下に1 / 0 / 0、COMPLETED PRESENCE WAITSの下に2が出ます。二つの待機関数が戻ったことを示し、ファイル転送の成功表示ではありません。最下部にもNO FILE TRANSFER TESTEDと表示します。"><figcaption>STATUS-FDS-DEFAULT — PRESENT / PROTECT / STATUSの下に1 / 0 / 0、COMPLETED PRESENCE WAITSの下に2が出ます。二つの待機関数が戻ったことを示し、ファイル転送の成功表示ではありません。最下部にもNO FILE TRANSFER TESTEDと表示します。</figcaption></figure><p><a href="samples/api-examples/fc/fds_status.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_status.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_status.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds.h:15</p><div class="original"><b>宣言の注記（原文）</b><pre>Poll disk presence until the absent bit clears. There is no timeout or cancellation path.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9053</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_wait_ready&quot;);
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_status.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_status.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds.h:15</p><div class="original"><b>宣言の注記（原文）</b><pre>Poll disk presence until the absent bit clears. There is no timeout or cancellation path.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9055</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_wait_ready&quot;);
             string loop = NewGeneratedLabel(&quot;fds_wait_ready_loop&quot;);
             _assembly.Add(Expr.Make(Tag.Label, loop));
             EmitAsm(&quot;LDA&quot;, Mem(0x4032));
             EmitAsm(&quot;AND&quot;, Imm(0x01));
             EmitAsm(&quot;BNE&quot;, Rel(loop));
-            EmitAsm(&quot;RTS&quot;);
-
-            // Build a one-file load list and supply inline wildcard-ID/list pointers to the BIOS LoadFiles entry.</code></pre></div></details></details><h3 id="module-fds_file">fds_file.h — FDSファイルのロード</h3><details class="api searchable" id="api-__fds_file_exists" data-api-contract="fds-query-source-20260923"><summary><code>__fds_file_exists</code></summary><p>指定IDのレコードが、コンパイル済みのファイル管理表にあるかを調べます。サイズ0のレコードも「存在する」と判定します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 __fds_file_exists(u8 id);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>id</code></dt><dd><p>検索するファイルID。管理表では0～254を使い、255は終端用です。ファイル番号、ファイル名、ロード先アドレスとは別の値です。</p></dd></dl><h4>戻り値</h4><p>管理表にあれば1、なければ0。挿入中ディスクの内容についての保証ではありません。</p><h4>使用条件と制限</h4><p><code>--mapper=fds</code>でビルドしてください。<code>__fds_available</code>以外のFDS専用関数をカートリッジ向けに呼ぶと、KQFC2420でビルドを拒否します。</p><p><code>--fds-meta=...</code>または<code>--fds-manifest=...</code>で指定した管理表と、自動生成したオーバーレイのレコードを検索します。ディスクのディレクトリは読みません。管理表にレコードがないファイルは、ディスクに収録されていても見つかりません。手動レコードと自動レコードの合計は42件までです。</p><p>返すサイズは管理表の宣言値です。sourceファイルから推定した実際の長さ、オーバーレイ末尾の切り詰め後の長さ、交換したディスクの内容と一致するとは限りません。実データの範囲確認には正しいサイズを管理表へ指定してください。</p><p>サンプルの<code>fds_metadata.json</code>と二つの<code>.bin</code>ファイルはCソースと同じフォルダーに置きます。ID 16の独自データは0～255を2回と末尾0の513バイト、ID 17のデータは空です。両方ともPRG形式（type 0）の非起動ファイルとして収録し、この例ではロードしません。sourceの相対パスは管理表のあるフォルダーを基準に解決します。</p><p>掲載画像はKUROSAKIでディスクの起動ファイルをRAMへ直接配置して確認したものです。このサンプルはBIOSを呼ばず、ファイルの読み書き、ディスク交換、実機での起動を検証していません。検証用の空のファームウェアはBIOSの代用品ではありません。サンプルは画面更新用NMIを使い、不要なマスク可能IRQを無効にしています。</p><p>ビルド例ではBIOSの起動画面用の追加ファイルを付けず、ネイティブFDS配置の<code>.fds</code>を作ります。KUROSAKIの直接起動で確認するための構成です。実機用ディスクの起動手順は、これとは別に確認してください。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void main(void) {
+            EmitAsm(&quot;RTS&quot;);</code></pre></div></details></details><h3 id="module-fds_file">fds_file.h — FDSファイルのロード</h3><details class="api searchable" id="api-__fds_file_exists" data-api-contract="fds-query-source-20260923"><summary><code>__fds_file_exists</code></summary><p>指定IDのレコードが、コンパイル済みのファイル管理表にあるかを調べます。サイズ0のレコードも「存在する」と判定します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 __fds_file_exists(u8 id);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>id</code></dt><dd><p>検索するファイルID。管理表では0～254を使い、255は終端用です。ファイル番号、ファイル名、ロード先アドレスとは別の値です。</p></dd></dl><h4>戻り値</h4><p>管理表にあれば1、なければ0。挿入中ディスクの内容についての保証ではありません。</p><h4>使用条件と制限</h4><p><code>--mapper=fds</code>でビルドしてください。<code>__fds_available</code>以外のFDS専用関数をカートリッジ向けに呼ぶと、KQFC2420でビルドを拒否します。</p><p><code>--fds-meta=...</code>または<code>--fds-manifest=...</code>で指定した管理表と、自動生成したオーバーレイのレコードを検索します。ディスクのディレクトリは読みません。管理表にレコードがないファイルは、ディスクに収録されていても見つかりません。手動レコードと自動レコードの合計は42件までです。</p><p>返すサイズは管理表の宣言値です。sourceファイルから推定した実際の長さ、オーバーレイ末尾の切り詰め後の長さ、交換したディスクの内容と一致するとは限りません。実データの範囲確認には正しいサイズを管理表へ指定してください。</p><p>サンプルの<code>fds_metadata.json</code>と二つの<code>.bin</code>ファイルはCソースと同じフォルダーに置きます。ID 16の独自データは0～255を2回と末尾0の513バイト、ID 17のデータは空です。両方ともPRG形式（type 0）の非起動ファイルとして収録し、この例ではロードしません。sourceの相対パスは管理表のあるフォルダーを基準に解決します。</p><p>掲載画像はKUROSAKIでディスクの起動ファイルをRAMへ直接配置して確認したものです。このサンプルはBIOSを呼ばず、ファイルの読み書き、ディスク交換、実機での起動を検証していません。検証用の空のファームウェアはBIOSの代用品ではありません。サンプルは画面更新用NMIを使い、不要なマスク可能IRQを無効にしています。</p><p>ビルド例ではBIOSの起動画面用の追加ファイルを付けず、ネイティブFDS配置の<code>.fds</code>を作ります。KUROSAKIの直接起動で確認するための構成です。実機用ディスクの起動手順は、これとは別に確認してください。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void main(void) {
     // These BIOS-free queries need NMI for display, but no maskable IRQ.
     __irq_disable();
     fds_result[0] = __fds_file_exists(16);
@@ -754,7 +750,7 @@ void main(void) {
     m_text(2,17,&quot;NO DISK DIRECTORY SCAN&quot;); m_wait();
     while (1) { m_wait(); }
 }</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>表のID 16は存在1・513バイト、ID 17は存在1・0バイト、ID 18は存在0・0バイトです。TABLE VALUES MATCH: PASSは取得値をこの組み合わせと比較した結果です。サイズ0だけでは「空のレコード」と「該当なし」を区別できないことを示します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-query/example/metadata-fds-default/screen.png" alt="__fds_file_exists: METADATA-FDS-DEFAULT — 表のID 16は存在1・513バイト、ID 17は存在1・0バイト、ID 18は存在0・0バイトです。TABLE VALUES MATCH: PASSは取得値をこの組み合わせと比較した結果です。サイズ0だけでは「空のレコード」と「該当なし」を区別できないことを示します。"><figcaption>METADATA-FDS-DEFAULT — 表のID 16は存在1・513バイト、ID 17は存在1・0バイト、ID 18は存在0・0バイトです。TABLE VALUES MATCH: PASSは取得値をこの組み合わせと比較した結果です。サイズ0だけでは「空のレコード」と「該当なし」を区別できないことを示します。</figcaption></figure><p><a href="samples/api-examples/fc/fds_metadata.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_metadata.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_metadata.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm --fds-meta=.\kitaq-docs\samples\api-examples\fc\fds_metadata.json</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_file.h:13</p><div class="original"><b>宣言の注記（原文）</b><pre>Query the compiled --fds-meta/--fds-manifest table, not the inserted disk; return 0 or 1.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9186</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_file_exists&quot;);
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_metadata.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_metadata.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm --fds-meta=.\kitaq-docs\samples\api-examples\fc\fds_metadata.json</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_file.h:18</p><div class="original"><b>宣言の注記（原文）</b><pre>Query the compiled --fds-meta/--fds-manifest table, not the inserted disk; return 0 or 1.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9388</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_file_exists&quot;);
             EmitFdsMetadataSearch(foundReturnsSize: false);
 
             // Return the compiled metadata size, using zero for an unmatched ID.</code></pre></div></details></details><details class="api searchable" id="api-__fds_file_size" data-api-contract="fds-query-source-20260923"><summary><code>__fds_file_size</code></summary><p>指定IDに対して管理表へ登録されたバイト数を返します。ロード予定の資産の宣言サイズを調べる用途です。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u16 __fds_file_size(u8 id);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>id</code></dt><dd><p>検索するファイルID。管理表では0～254を使い、255は終端用です。ファイル番号、ファイル名、ロード先アドレスとは別の値です。</p></dd></dl><h4>戻り値</h4><p>登録された16ビット符号なしサイズ（0～65535）。該当IDがない場合も0です。必要に応じて<code>__fds_file_exists()</code>を併用します。</p><h4>使用条件と制限</h4><p><code>--mapper=fds</code>でビルドしてください。<code>__fds_available</code>以外のFDS専用関数をカートリッジ向けに呼ぶと、KQFC2420でビルドを拒否します。</p><p><code>--fds-meta=...</code>または<code>--fds-manifest=...</code>で指定した管理表と、自動生成したオーバーレイのレコードを検索します。ディスクのディレクトリは読みません。管理表にレコードがないファイルは、ディスクに収録されていても見つかりません。手動レコードと自動レコードの合計は42件までです。</p><p>返すサイズは管理表の宣言値です。sourceファイルから推定した実際の長さ、オーバーレイ末尾の切り詰め後の長さ、交換したディスクの内容と一致するとは限りません。実データの範囲確認には正しいサイズを管理表へ指定してください。</p><p>サンプルの<code>fds_metadata.json</code>と二つの<code>.bin</code>ファイルはCソースと同じフォルダーに置きます。ID 16の独自データは0～255を2回と末尾0の513バイト、ID 17のデータは空です。両方ともPRG形式（type 0）の非起動ファイルとして収録し、この例ではロードしません。sourceの相対パスは管理表のあるフォルダーを基準に解決します。</p><p>掲載画像はKUROSAKIでディスクの起動ファイルをRAMへ直接配置して確認したものです。このサンプルはBIOSを呼ばず、ファイルの読み書き、ディスク交換、実機での起動を検証していません。検証用の空のファームウェアはBIOSの代用品ではありません。サンプルは画面更新用NMIを使い、不要なマスク可能IRQを無効にしています。</p><p>ビルド例ではBIOSの起動画面用の追加ファイルを付けず、ネイティブFDS配置の<code>.fds</code>を作ります。KUROSAKIの直接起動で確認するための構成です。実機用ディスクの起動手順は、これとは別に確認してください。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void main(void) {
@@ -780,16 +776,281 @@ void main(void) {
     m_text(2,17,&quot;NO DISK DIRECTORY SCAN&quot;); m_wait();
     while (1) { m_wait(); }
 }</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>表のID 16は存在1・513バイト、ID 17は存在1・0バイト、ID 18は存在0・0バイトです。TABLE VALUES MATCH: PASSは取得値をこの組み合わせと比較した結果です。サイズ0だけでは「空のレコード」と「該当なし」を区別できないことを示します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-query/example/metadata-fds-default/screen.png" alt="__fds_file_size: METADATA-FDS-DEFAULT — 表のID 16は存在1・513バイト、ID 17は存在1・0バイト、ID 18は存在0・0バイトです。TABLE VALUES MATCH: PASSは取得値をこの組み合わせと比較した結果です。サイズ0だけでは「空のレコード」と「該当なし」を区別できないことを示します。"><figcaption>METADATA-FDS-DEFAULT — 表のID 16は存在1・513バイト、ID 17は存在1・0バイト、ID 18は存在0・0バイトです。TABLE VALUES MATCH: PASSは取得値をこの組み合わせと比較した結果です。サイズ0だけでは「空のレコード」と「該当なし」を区別できないことを示します。</figcaption></figure><p><a href="samples/api-examples/fc/fds_metadata.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_metadata.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_metadata.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm --fds-meta=.\kitaq-docs\samples\api-examples\fc\fds_metadata.json</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_file.h:15</p><div class="original"><b>宣言の注記（原文）</b><pre>Return the compiled metadata size, or zero if id is absent. No disk directory is read.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9190</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_file_size&quot;);
-            EmitFdsMetadataSearch(foundReturnsSize: true);
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_metadata.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_metadata.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm --fds-meta=.\kitaq-docs\samples\api-examples\fc\fds_metadata.json</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_file.h:20</p><div class="original"><b>宣言の注記（原文）</b><pre>Return the compiled metadata size, or zero if id is absent. No disk directory is read.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9392</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_file_size&quot;);
+            EmitFdsMetadataSearch(foundReturnsSize: true);</code></pre></div></details></details><details class="api searchable" id="api-__fds_load_file" data-api-contract="fds-file-source-20260923"><summary><code>__fds_load_file</code></summary><p>ファイルをBIOSで読み込み、PRGデータを指定したCPUバッファへコピーします。セーブデータやステージデータを、ゲーム側で確保した領域へ取り込むための関数です。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 __fds_load_file(u8 id, u8* dst);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>id</code></dt><dd><p>生成するディスクに含まれる、起動時に読まないファイルのID（0～254）。サンプルは73です。ディスク上で何番目に並ぶかを表す番号とは異なります。255、見つからないID、起動用ファイルは拒否します。</p></dd><dt><code>dst</code></dt><dd><p>PRGファイルのコピー先。実際のファイル長以上の領域が必要です。0を渡すとコピーせず、ファイルヘッダーのロード先に残します。CHR・ネームテーブルのPPUファイルは0のみ指定でき、BIOSが本来のPPU宛先へ転送します。</p></dd></dl><h4>戻り値</h4><p>成功は0。BIOSの非ゼロエラーはそのまま返します。BIOSが成功を返しても転送数が1でなければ64（$40）、無効なID・バッファ・ファイル種別と宛先の組み合わせは255（$FF）です。</p><h4>使用条件と制限</h4><p><code>--mapper=fds --fds-layout=fds32</code>用です。<code>--fds-meta</code>でファイルのID、ロード先、種類、起動時に読むかどうか、配置順を指定します。転送先とサイズは、実際に生成したディスクの情報から決まります。挿入した任意のディスクの内容を調べるAPIではありません。</p><p>BIOSのロード先はディスクのヘッダーで決まるため、先にその領域へ読み込み、その後dstへコピーします。二つの領域が重なってもコピー方向を選んで内容を保持しますが、一時ロード先自体の確保も必要です。転送失敗時はコピーを行いません。BIOS呼び出し後はバンク常駐記録を255（不明）にします。</p><p>CPUバッファは、全体が$0200～$07FFまたは$6000～$DFFFの一方に収まる必要があります。範囲の折り返しやI/Oレジスタへの転送は拒否します。ただし、コード・OAM・他の変数・コンパイラの作業領域と重ならないことは呼び出し側で保証してください。サンプルは共通コードをバンク0に置き、$8000を一時ロード先、$8500と$8600を4バイトのバッファとして使います。</p><p>同期式のBIOS呼び出しです。実行中のコードや復帰先をロードで上書きしないよう共通バンクから呼んでください。割り込み内からは呼べません。ディスクI/O中は描画とNMIを停止し、PPUのアドレス増分を1にし、ディスク以外のIRQ源を停止するなど、BIOSの前提を満たす必要があります。転送中にゲームや音楽の処理が継続することは保証しません。</p><p>掲載画像は独自作成のBIOS呼び出し規約テストで、コンパイル後のCPU処理、バッファ内容、保存後の再読み込み、全画素を確認したものです。実際のBIOSや物理ディスクの書き込み、CRC、電源断時の復旧を確認した画像ではありません。KUROSAKIの通常のFDS実行だけでは同じ保存処理を検証できません。</p><p>サンプル本体に加え、同じフォルダーの<code>fds_file_io_manifest.json</code>と<code>fds_file_io_payload.bin</code>を使います。下記の検証コマンドは、テスト用処理を独自のソースから一時生成して実行後に削除します。市販BIOSを配布物に含めたり、通常のゲーム用BIOSとしてこの検証処理を使ったりするものではありません。</p><p><a href="https://www.nesdev.org/wiki/FDS_BIOS">FDS BIOS calling convention</a></p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#pragma fixed_bank 0
+#include &quot;fc_fds_scene.h&quot;
+void main(void) {
+    u8 i;
+    u8* data=(u8*)0x8500;
+    u8* again=(u8*)0x8600;
+    __irq_disable();__ppu_ctrl_set(0);__ppu_mask_set(0);
+    // Keep rendering/NMI and non-disk IRQ sources disabled during disk I/O.
+    *((u8*)0xFF)=0;*((u8*)0x4010)=0;*((u8*)0x4017)=0x40;*((u8*)0x4022)=0;
+    fds_result[0]=__fds_load_file(73,data);
+    fds_result[1]=data[0];fds_result[2]=data[3];
+    for(i=0;i&lt;4;i=i+1){data[i]=(i+1)*7;}
+    fds_result[3]=__fds_save_file(73,data,4);
+    fds_result[4]=__fds_load_file(73,again);
+    fds_result[5]=again[0];fds_result[6]=again[3];
+    // Check every returned byte, not only the displayed endpoints.
+    for(i=0;i&lt;4;i=i+1){if(again[i]!=(i+1)*7){fds_result[7]=1;}}
+    fds_result[15]=165;
+    m_init();m_text(2,2,&quot;FDS LOAD / SAVE BUFFER&quot;);m_wait();
+    m_text(2,5,&quot;LOAD TO 8500 STATUS&quot;);fds_number(25,5,fds_result[0]);m_wait();
+    m_text(2,7,&quot;INITIAL FIRST/LAST&quot;);fds_number(21,7,fds_result[1]);fds_number(25,7,fds_result[2]);m_wait();
+    m_text(2,9,&quot;SAVE FILE 73 STATUS&quot;);fds_number(25,9,fds_result[3]);m_wait();
+    m_text(2,11,&quot;RELOAD TO 8600 STATUS&quot;);fds_number(25,11,fds_result[4]);m_wait();
+    m_text(2,13,&quot;SAVED FIRST / LAST&quot;);fds_number(21,13,fds_result[5]);fds_number(25,13,fds_result[6]);m_wait();
+    m_text(2,15,&quot;BYTE CHECK ERRORS&quot;);fds_number(25,15,fds_result[7]);m_wait();
+    m_text(2,18,&quot;STAGING 8000 / SIZE 4&quot;);m_wait();
+    while(1){m_wait();}
+}</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>LOAD・SAVE・RELOADのSTATUSとBYTE CHECK ERRORSはすべて000です。INITIAL FIRST/LASTの011と044は、$8500へ読み込んだ4バイトの最初と最後です。内容を7・14・21・28へ変えて保存し、別の$8600へ読み直すため、SAVED FIRST / LASTは007と028になります。STAGING 8000 / SIZE 4はディスク側のロード先とファイル長です。独自テストでは、ID 73を実際の4番目のファイル（0起点の位置3）へ保存したことも確認しています。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-file/example/default/screen.png" alt="__fds_load_file: DEFAULT — LOAD・SAVE・RELOADのSTATUSとBYTE CHECK ERRORSはすべて000です。INITIAL FIRST/LASTの011と044は、$8500へ読み込んだ4バイトの最初と最後です。内容を7・14・21・28へ変えて保存し、別の$8600へ読み直すため、SAVED FIRST / LASTは007と028になります。STAGING 8000 / SIZE 4はディスク側のロード先とファイル長です。独自テストでは、ID 73を実際の4番目のファイル（0起点の位置3）へ保存したことも確認しています。"><figcaption>DEFAULT — LOAD・SAVE・RELOADのSTATUSとBYTE CHECK ERRORSはすべて000です。INITIAL FIRST/LASTの011と044は、$8500へ読み込んだ4バイトの最初と最後です。内容を7・14・21・28へ変えて保存し、別の$8600へ読み直すため、SAVED FIRST / LASTは007と028になります。STAGING 8000 / SIZE 4はディスク側のロード先とファイル長です。独自テストでは、ID 73を実際の4番目のファイル（0起点の位置3）へ保存したことも確認しています。</figcaption></figure><p><a href="samples/api-examples/fc/fds_file_io.c">使用例の完全なプログラム</a></p><p><a href="samples/api-examples/fc/fds_file_io_manifest.json">fds_file_io_manifest.json</a></p><p><a href="samples/api-examples/fc/fds_file_io_payload.bin">fds_file_io_payload.bin</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_file_io.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_file_io.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-meta=.\kitaq-docs\samples\api-examples\fc\fds_file_io_manifest.json --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm
+python .\kitaq-docs\tools\check_fds_file_examples.py</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_file.h:11</p><div class="original"><b>宣言の注記（原文）</b><pre>Native FDS32: load a non-boot file at its disk-header address, then memmove
+PRG bytes to dst. Null dst keeps the native destination (also for PPU files).
+Both CPU spans must fit $0200-$07FF or $6000-$DFFF and be owned by the caller.
+Return 0, a BIOS error, $40 for a missing transfer, or $FF for invalid input.
+Call from common code with disk-I/O interrupt/display prerequisites satisfied.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9130</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_load_file&quot;);
+            // Load at the on-disk staging address, then memmove PRG data to non-null dst.
+            EmitAsm(&quot;JSR&quot;, Abs(&quot;__kq_fds_find_io&quot;));
+            EmitAsm(&quot;CMP&quot;, Imm(0));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_load_invalid&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 19));
+            EmitAsm(&quot;BMI&quot;, Rel(&quot;__kq_fio_load_invalid&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 14));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 15));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 23));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 10));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 24));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 11));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 20));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_load_ppu&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 21));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 8));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 22));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 9));
+            EmitAsm(&quot;JSR&quot;, Abs(&quot;__kq_fds_check_span&quot;));
+            EmitAsm(&quot;CMP&quot;, Imm(0));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_load_invalid&quot;));
+            EmitAsm(&quot;JMP&quot;, Abs(&quot;__kq_fio_load_dst&quot;));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_load_ppu&quot;));
+            // CHR/nametable files have no CPU buffer; null dst selects their native PPU destination.
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 14));
+            EmitAsm(&quot;ORA&quot;, Mem(_runtimeFdsFileHeaderAddress + 15));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_load_invalid&quot;));
+            EmitAsm(&quot;JMP&quot;, Abs(&quot;__kq_fio_load_bios&quot;));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_load_dst&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 14));
+            EmitAsm(&quot;ORA&quot;, Mem(_runtimeFdsFileHeaderAddress + 15));
+            EmitAsm(&quot;BEQ&quot;, Rel(&quot;__kq_fio_load_bios&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 14));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 8));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 15));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 9));
+            EmitAsm(&quot;JSR&quot;, Abs(&quot;__kq_fds_check_span&quot;));
+            EmitAsm(&quot;CMP&quot;, Imm(0));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_load_invalid&quot;));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_load_bios&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 17));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsLoadListAddress));
+            EmitAsm(&quot;LDA&quot;, Imm(0xFF));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsLoadListAddress + 1));
+            EmitAsm(&quot;JSR&quot;, Mem(0xE1F8));
+            _assembly.Add(Expr.Make(Tag.Word, string.Format(&quot;${0:X4}&quot;, _runtimeFdsFileHeaderAddress + 33)));
+            _assembly.Add(Expr.Make(Tag.Word, string.Format(&quot;${0:X4}&quot;, _runtimeFdsLoadListAddress)));
+            EmitAsm(&quot;TAX&quot;);
+            EmitAsm(&quot;LDA&quot;, Imm(0xFF));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsResidentBankAddress));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeCurrentBankAddress));
+            EmitAsm(&quot;TXA&quot;);
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_load_return&quot;));
+            EmitAsm(&quot;CPY&quot;, Imm(1));
+            EmitAsm(&quot;BEQ&quot;, Rel(&quot;__kq_fio_load_count_ok&quot;));
+            EmitAsm(&quot;LDA&quot;, Imm(0x40));
+            EmitAsm(&quot;RTS&quot;);
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_load_count_ok&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 14));
+            EmitAsm(&quot;ORA&quot;, Mem(_runtimeFdsFileHeaderAddress + 15));
+            EmitAsm(&quot;BEQ&quot;, Rel(&quot;__kq_fio_load_ok&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 21));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 0));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 14));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 23));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 4));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 22));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 15));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 3));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 24));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 5));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 4));
+            EmitAsm(&quot;ORA&quot;, Mem(CallArgBase + 5));
+            EmitAsm(&quot;BEQ&quot;, Rel(&quot;__kq_fio_load_ok&quot;));
+            // Copy backwards when destination starts above source, including overlapping buffers.
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 3));
+            EmitAsm(&quot;CMP&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;BCC&quot;, Rel(&quot;__kq_fio_forward&quot;));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_back_setup&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;CMP&quot;, Mem(CallArgBase + 0));
+            EmitAsm(&quot;BCC&quot;, Rel(&quot;__kq_fio_forward&quot;));
+            EmitAsm(&quot;BEQ&quot;, Rel(&quot;__kq_fio_load_ok&quot;));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_back_setup&quot;));
+            EmitAsm(&quot;CLC&quot;);
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 0));
+            EmitAsm(&quot;ADC&quot;, Mem(CallArgBase + 4));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 0));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;ADC&quot;, Mem(CallArgBase + 5));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;CLC&quot;);
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;ADC&quot;, Mem(CallArgBase + 4));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 3));
+            EmitAsm(&quot;ADC&quot;, Mem(CallArgBase + 5));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 3));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_backward&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 0));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_back_dec0&quot;));
+            EmitAsm(&quot;DEC&quot;, Mem(CallArgBase + 1));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_back_dec0&quot;));
+            EmitAsm(&quot;DEC&quot;, Mem(CallArgBase + 0));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_back_dec2&quot;));
+            EmitAsm(&quot;DEC&quot;, Mem(CallArgBase + 3));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_back_dec2&quot;));
+            EmitAsm(&quot;DEC&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;LDY&quot;, Imm(0));
+            EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+            EmitAsm(&quot;STA&quot;, IndY(CallArgBase + 2));
+            EmitAsm(&quot;JSR&quot;, Abs(&quot;__kq_fds_copy_count&quot;));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_backward&quot;));
+            EmitAsm(&quot;JMP&quot;, Abs(&quot;__kq_fio_load_ok&quot;));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_forward&quot;));
+            EmitAsm(&quot;LDY&quot;, Imm(0));
+            EmitAsm(&quot;LDA&quot;, IndY(CallArgBase));
+            EmitAsm(&quot;STA&quot;, IndY(CallArgBase + 2));
+            EmitAsm(&quot;INC&quot;, Mem(CallArgBase + 0));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_forward_inc0&quot;));
+            EmitAsm(&quot;INC&quot;, Mem(CallArgBase + 1));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_forward_inc0&quot;));
+            EmitAsm(&quot;INC&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_forward_inc2&quot;));
+            EmitAsm(&quot;INC&quot;, Mem(CallArgBase + 3));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_forward_inc2&quot;));
+            EmitAsm(&quot;JSR&quot;, Abs(&quot;__kq_fds_copy_count&quot;));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_forward&quot;));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_load_ok&quot;));
+            EmitAsm(&quot;LDA&quot;, Imm(0));
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_load_return&quot;));
+            EmitAsm(&quot;RTS&quot;);
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_load_invalid&quot;));
+            EmitAsm(&quot;LDA&quot;, Imm(0xFF));
+            EmitAsm(&quot;RTS&quot;);</code></pre></div></details></details><details class="api searchable" id="api-__fds_save_file" data-api-contract="fds-file-source-20260923"><summary><code>__fds_save_file</code></summary><p>あらかじめディスクの最後に確保した固定長のPRGセーブ領域を、CPUバッファの内容で上書きします。ファイルのID・名前・次回のロード先を保持します。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 __fds_save_file(u8 id, const u8* src, u16 len);</code></pre></div><h4>引数</h4><dl class="api-parameters"><dt><code>id</code></dt><dd><p>生成するディスクに含まれる、起動時に読まないファイルのID（0～254）。サンプルは73です。ディスク上で何番目に並ぶかを表す番号とは異なります。255、見つからないID、起動用ファイルは拒否します。</p></dd><dt><code>src</code></dt><dd><p>保存するデータのCPU RAM上の先頭。lenバイトを読み出せる領域を渡します。VRAMを直接保存するAPIではありません。</p></dd><dt><code>len</code></dt><dd><p>保存するバイト数。生成済みファイルの実際の長さと一致させてください。データが短いときは、保存用バッファの残りをゲーム側で埋めます。</p></dd></dl><h4>戻り値</h4><p>成功は0、BIOSが返す書き込み保護・検証失敗などのエラーはその値です。無効なID、起動用またはPRG以外のファイル、同じ面で最後に並ばないファイル、長さの不一致、無効なCPU範囲は255（$FF）を返し、BIOSを呼びません。</p><h4>使用条件と制限</h4><p><code>--mapper=fds --fds-layout=fds32</code>用です。<code>--fds-meta</code>でファイルのID、ロード先、種類、起動時に読むかどうか、配置順を指定します。転送先とサイズは、実際に生成したディスクの情報から決まります。挿入した任意のディスクの内容を調べるAPIではありません。</p><p>BIOSのWriteFileは書き込む位置より後のファイルを論理的に隠すため、このAPIでは各面の最後にある非起動PRGファイルだけを保存対象にします。新規ファイルの追加や任意の長さへの変更は行いません。起動補助ファイルや自動オーバーレイも含め、最終配置で最後になっている必要があります。</p><p>コンパイラはファイルID、ヘッダーのnumber、物理的な並び順を区別します。サンプルのIDは73、管理表のnumberは200ですが、BIOSへ渡す位置は3です。ディスク番号・面番号も配置から設定します。マニフェストと異なる構成に改変したディスクでは使わないでください。</p><p>CPUバッファは、全体が$0200～$07FFまたは$6000～$DFFFの一方に収まる必要があります。範囲の折り返しやI/Oレジスタへの転送は拒否します。ただし、コード・OAM・他の変数・コンパイラの作業領域と重ならないことは呼び出し側で保証してください。サンプルは共通コードをバンク0に置き、$8000を一時ロード先、$8500と$8600を4バイトのバッファとして使います。</p><p>同期式のBIOS呼び出しです。実行中のコードや復帰先をロードで上書きしないよう共通バンクから呼んでください。割り込み内からは呼べません。ディスクI/O中は描画とNMIを停止し、PPUのアドレス増分を1にし、ディスク以外のIRQ源を停止するなど、BIOSの前提を満たす必要があります。転送中にゲームや音楽の処理が継続することは保証しません。</p><p>掲載画像は独自作成のBIOS呼び出し規約テストで、コンパイル後のCPU処理、バッファ内容、保存後の再読み込み、全画素を確認したものです。実際のBIOSや物理ディスクの書き込み、CRC、電源断時の復旧を確認した画像ではありません。KUROSAKIの通常のFDS実行だけでは同じ保存処理を検証できません。</p><p>サンプル本体に加え、同じフォルダーの<code>fds_file_io_manifest.json</code>と<code>fds_file_io_payload.bin</code>を使います。下記の検証コマンドは、テスト用処理を独自のソースから一時生成して実行後に削除します。市販BIOSを配布物に含めたり、通常のゲーム用BIOSとしてこの検証処理を使ったりするものではありません。</p><p><a href="https://www.nesdev.org/wiki/FDS_BIOS">FDS BIOS calling convention</a></p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#pragma fixed_bank 0
+#include &quot;fc_fds_scene.h&quot;
+void main(void) {
+    u8 i;
+    u8* data=(u8*)0x8500;
+    u8* again=(u8*)0x8600;
+    __irq_disable();__ppu_ctrl_set(0);__ppu_mask_set(0);
+    // Keep rendering/NMI and non-disk IRQ sources disabled during disk I/O.
+    *((u8*)0xFF)=0;*((u8*)0x4010)=0;*((u8*)0x4017)=0x40;*((u8*)0x4022)=0;
+    fds_result[0]=__fds_load_file(73,data);
+    fds_result[1]=data[0];fds_result[2]=data[3];
+    for(i=0;i&lt;4;i=i+1){data[i]=(i+1)*7;}
+    fds_result[3]=__fds_save_file(73,data,4);
+    fds_result[4]=__fds_load_file(73,again);
+    fds_result[5]=again[0];fds_result[6]=again[3];
+    // Check every returned byte, not only the displayed endpoints.
+    for(i=0;i&lt;4;i=i+1){if(again[i]!=(i+1)*7){fds_result[7]=1;}}
+    fds_result[15]=165;
+    m_init();m_text(2,2,&quot;FDS LOAD / SAVE BUFFER&quot;);m_wait();
+    m_text(2,5,&quot;LOAD TO 8500 STATUS&quot;);fds_number(25,5,fds_result[0]);m_wait();
+    m_text(2,7,&quot;INITIAL FIRST/LAST&quot;);fds_number(21,7,fds_result[1]);fds_number(25,7,fds_result[2]);m_wait();
+    m_text(2,9,&quot;SAVE FILE 73 STATUS&quot;);fds_number(25,9,fds_result[3]);m_wait();
+    m_text(2,11,&quot;RELOAD TO 8600 STATUS&quot;);fds_number(25,11,fds_result[4]);m_wait();
+    m_text(2,13,&quot;SAVED FIRST / LAST&quot;);fds_number(21,13,fds_result[5]);fds_number(25,13,fds_result[6]);m_wait();
+    m_text(2,15,&quot;BYTE CHECK ERRORS&quot;);fds_number(25,15,fds_result[7]);m_wait();
+    m_text(2,18,&quot;STAGING 8000 / SIZE 4&quot;);m_wait();
+    while(1){m_wait();}
+}</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>LOAD・SAVE・RELOADのSTATUSとBYTE CHECK ERRORSはすべて000です。INITIAL FIRST/LASTの011と044は、$8500へ読み込んだ4バイトの最初と最後です。内容を7・14・21・28へ変えて保存し、別の$8600へ読み直すため、SAVED FIRST / LASTは007と028になります。STAGING 8000 / SIZE 4はディスク側のロード先とファイル長です。独自テストでは、ID 73を実際の4番目のファイル（0起点の位置3）へ保存したことも確認しています。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-file/example/default/screen.png" alt="__fds_save_file: DEFAULT — LOAD・SAVE・RELOADのSTATUSとBYTE CHECK ERRORSはすべて000です。INITIAL FIRST/LASTの011と044は、$8500へ読み込んだ4バイトの最初と最後です。内容を7・14・21・28へ変えて保存し、別の$8600へ読み直すため、SAVED FIRST / LASTは007と028になります。STAGING 8000 / SIZE 4はディスク側のロード先とファイル長です。独自テストでは、ID 73を実際の4番目のファイル（0起点の位置3）へ保存したことも確認しています。"><figcaption>DEFAULT — LOAD・SAVE・RELOADのSTATUSとBYTE CHECK ERRORSはすべて000です。INITIAL FIRST/LASTの011と044は、$8500へ読み込んだ4バイトの最初と最後です。内容を7・14・21・28へ変えて保存し、別の$8600へ読み直すため、SAVED FIRST / LASTは007と028になります。STAGING 8000 / SIZE 4はディスク側のロード先とファイル長です。独自テストでは、ID 73を実際の4番目のファイル（0起点の位置3）へ保存したことも確認しています。</figcaption></figure><p><a href="samples/api-examples/fc/fds_file_io.c">使用例の完全なプログラム</a></p><p><a href="samples/api-examples/fc/fds_file_io_manifest.json">fds_file_io_manifest.json</a></p><p><a href="samples/api-examples/fc/fds_file_io_payload.bin">fds_file_io_payload.bin</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_file_io.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_file_io.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-meta=.\kitaq-docs\samples\api-examples\fc\fds_file_io_manifest.json --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm
+python .\kitaq-docs\tools\check_fds_file_examples.py</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_file.h:16</p><div class="original"><b>宣言の注記（原文）</b><pre>Overwrite the final non-boot PRG slot on its side, preserving its ID/name/load
+address. len must equal its packaged size; src must be a valid CPU RAM span.
+The resolved physical ordinal selects the slot, independently of file ID.
+Return 0, a BIOS error, or $FF before any write for an invalid slot/span/size.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9395</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_save_file&quot;);
+            // Only a non-boot, final, fixed-size PRG slot can be overwritten without hiding later files.
+            EmitAsm(&quot;JSR&quot;, Abs(&quot;__kq_fds_find_io&quot;));
+            EmitAsm(&quot;CMP&quot;, Imm(0));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_save_invalid&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 19));
+            EmitAsm(&quot;AND&quot;, Imm(0xC0));
+            EmitAsm(&quot;CMP&quot;, Imm(0x40));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_save_invalid&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 20));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_save_invalid&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 3));
+            EmitAsm(&quot;CMP&quot;, Mem(_runtimeFdsFileHeaderAddress + 23));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_save_invalid&quot;));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 10));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 8));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 4));
+            EmitAsm(&quot;CMP&quot;, Mem(_runtimeFdsFileHeaderAddress + 24));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_save_invalid&quot;));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 11));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;STA&quot;, Mem(CallArgBase + 9));
+            EmitAsm(&quot;JSR&quot;, Abs(&quot;__kq_fds_check_span&quot;));
+            EmitAsm(&quot;CMP&quot;, Imm(0));
+            EmitAsm(&quot;BNE&quot;, Rel(&quot;__kq_fio_save_invalid&quot;));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 17));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 0));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 25));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 1));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 26));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 2));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 27));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 3));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 28));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 4));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 29));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 5));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 30));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 6));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 31));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 7));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 32));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 8));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 21));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 9));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 3));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 11));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 1));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 14));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 22));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 10));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 4));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 12));
+            EmitAsm(&quot;LDA&quot;, Mem(CallArgBase + 2));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 15));
+            EmitAsm(&quot;LDA&quot;, Imm(0));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 13));
+            EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsFileHeaderAddress + 16));
+            EmitAsm(&quot;LDA&quot;, Mem(_runtimeFdsFileHeaderAddress + 18));
+            EmitAsm(&quot;JSR&quot;, Mem(0xE239));
+            _assembly.Add(Expr.Make(Tag.Word, string.Format(&quot;${0:X4}&quot;, _runtimeFdsFileHeaderAddress + 33)));
+            _assembly.Add(Expr.Make(Tag.Word, string.Format(&quot;${0:X4}&quot;, _runtimeFdsFileHeaderAddress)));
+            EmitAsm(&quot;RTS&quot;);
+            _assembly.Add(Expr.Make(Tag.Label, &quot;__kq_fio_save_invalid&quot;));
+            EmitAsm(&quot;LDA&quot;, Imm(0xFF));
+            EmitAsm(&quot;RTS&quot;);
 
-            // Construct a RAM-source WriteFile header and invoke the BIOS with inline descriptor pointers.</code></pre></div></details></details><details class="api searchable" id="api-__fds_load_file"><summary><code>__fds_load_file</code><span class="badge">コンパイラ組み込み</span></summary><p>FDSファイルのロードに関するAPIです。データを読み込みします。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 __fds_load_file(u8 id, u8* dst);</code></pre></div><p><b>引数（左から順）：</b>u8 id, u8* dst。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><p><b>戻り値の型：</b><code>u8</code>。意味・成功値・失敗値は原注記と実装のreturn条件を参照してください。</p><div class="original"><b>宣言に付属する原注記</b><pre>Call BIOS LoadFiles for id and return its error byte (zero on success).
-The disk header determines the load address; the current helper does not use dst.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 example_fds_load_file(u8 id, u8* dst) {
-    return __fds_load_file(id, dst);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/__fds_load_file.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/fds_file.h:8</p></details><details class="api searchable" id="api-__fds_save_file"><summary><code>__fds_save_file</code><span class="badge">コンパイラ組み込み</span></summary><p>FDSファイルのロードに関するAPIです。データを保存します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 __fds_save_file(u8 id, const u8* src, u16 len);</code></pre></div><p><b>引数（左から順）：</b>u8 id, const u8* src, u16 len。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p><p><b>戻り値の型：</b><code>u8</code>。意味・成功値・失敗値は原注記と実装のreturn条件を参照してください。</p><div class="original"><b>宣言に付属する原注記</b><pre>Call BIOS WriteFile with a RAM source and byte length, returning its error byte.
-The generated PRG descriptor uses id as file number and the fixed name KQFCFILE.</pre></div><h4>引数受け渡し例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 example_fds_save_file(u8 id, const u8* src, u16 len) {
-    return __fds_save_file(id, src, len);
-}</code></pre></div><p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p><p><a href="samples/api-fragments/fc/__fds_save_file.c" download>この断片を保存</a></p><p class="source">宣言・識別子の出典：kitaqfc/lib/fds_file.h:11</p></details><h3 id="module-fds_overlay">fds_overlay.h — FDSのオーバーレイコード</h3><details class="api searchable" id="api-__fds_current_bank" data-api-contract="fds-query-source-20260923"><summary><code>__fds_current_bank</code></summary><p>現在ロード済みとして記録されている論理バンク番号を返します。ディスクから読み直す操作は行いません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 __fds_current_bank(void);</code></pre></div><h4>戻り値</h4><p>ソフトウェアが保持する8ビットの常駐バンク番号。標準起動直後は1、不明な状態では255です。</p><h4>使用条件と制限</h4><p><code>--mapper=fds</code>でビルドしてください。<code>__fds_available</code>以外のFDS専用関数をカートリッジ向けに呼ぶと、KQFC2420でビルドを拒否します。</p><p>FDSの標準起動処理は常駐記録を1で初期化します。<code>__fds_load_bank()</code>はロード成功時に記録を更新します。<code>__fds_load_file()</code>または<code>__fds_load_overlay()</code>による直接ロード、およびバンク転送の失敗では記録が255（不明）になります。メモリ内容の照合は行わないため、直接メモリを書き換える場合は記録に依存しないでください。独自のリセット処理を用意する場合は初期化も自分で管理します。</p><p>掲載画像はKUROSAKIでディスクの起動ファイルをRAMへ直接配置して確認したものです。このサンプルはBIOSを呼ばず、ファイルの読み書き、ディスク交換、実機での起動を検証していません。検証用の空のファームウェアはBIOSの代用品ではありません。サンプルは画面更新用NMIを使い、不要なマスク可能IRQを無効にしています。</p><p>ビルド例ではBIOSの起動画面用の追加ファイルを付けず、ネイティブFDS配置の<code>.fds</code>を作ります。KUROSAKIの直接起動で確認するための構成です。実機用ディスクの起動手順は、これとは別に確認してください。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void main(void) {
+            // Enable wave-RAM writes, copy 64 source bytes, then clear the wave-write control register.</code></pre></div></details></details><h3 id="module-fds_overlay">fds_overlay.h — FDSのオーバーレイコード</h3><details class="api searchable" id="api-__fds_current_bank" data-api-contract="fds-query-source-20260923"><summary><code>__fds_current_bank</code></summary><p>現在ロード済みとして記録されている論理バンク番号を返します。ディスクから読み直す操作は行いません。</p><h4>書式</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>u8 __fds_current_bank(void);</code></pre></div><h4>戻り値</h4><p>ソフトウェアが保持する8ビットの常駐バンク番号。標準起動直後は1、不明な状態では255です。</p><h4>使用条件と制限</h4><p><code>--mapper=fds</code>でビルドしてください。<code>__fds_available</code>以外のFDS専用関数をカートリッジ向けに呼ぶと、KQFC2420でビルドを拒否します。</p><p>FDSの標準起動処理は常駐記録を1で初期化します。<code>__fds_load_bank()</code>はロード成功時に記録を更新します。<code>__fds_load_file()</code>または<code>__fds_load_overlay()</code>による直接ロード、およびバンク転送の失敗では記録が255（不明）になります。メモリ内容の照合は行わないため、直接メモリを書き換える場合は記録に依存しないでください。独自のリセット処理を用意する場合は初期化も自分で管理します。</p><p>掲載画像はKUROSAKIでディスクの起動ファイルをRAMへ直接配置して確認したものです。このサンプルはBIOSを呼ばず、ファイルの読み書き、ディスク交換、実機での起動を検証していません。検証用の空のファームウェアはBIOSの代用品ではありません。サンプルは画面更新用NMIを使い、不要なマスク可能IRQを無効にしています。</p><p>ビルド例ではBIOSの起動画面用の追加ファイルを付けず、ネイティブFDS配置の<code>.fds</code>を作ります。KUROSAKIの直接起動で確認するための構成です。実機用ディスクの起動手順は、これとは別に確認してください。</p><h4>使用例</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>void main(void) {
     // These BIOS-free queries need NMI for display, but no maskable IRQ.
     __irq_disable();
     request_overlay=0;
@@ -901,7 +1162,7 @@ python .\kitaq-docs\tools\check_fds_load_examples.py</code></pre></div><details 
     m_text(2,14,&quot;NO OVERLAY LOAD TESTED&quot;); m_wait();
     while (1) { m_wait(); }
 }</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>CURRENT BANKは1、BANK 1 RESIDENTは1、BANK 2 RESIDENTは0、OVERLAY FUNCTIONSは2です。バンク2に二つの関数を収録していても、起動直後にバンク2がロード済みになるわけではありません。<code>--fds-no-overlay-table</code>を付けた検証では最後の値だけ0になります。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-query/example/residency-fds-default/screen.png" alt="__fds_is_bank_resident: RESIDENCY-FDS-DEFAULT — CURRENT BANKは1、BANK 1 RESIDENTは1、BANK 2 RESIDENTは0、OVERLAY FUNCTIONSは2です。バンク2に二つの関数を収録していても、起動直後にバンク2がロード済みになるわけではありません。--fds-no-overlay-tableを付けた検証では最後の値だけ0になります。"><figcaption>RESIDENCY-FDS-DEFAULT — CURRENT BANKは1、BANK 1 RESIDENTは1、BANK 2 RESIDENTは0、OVERLAY FUNCTIONSは2です。バンク2に二つの関数を収録していても、起動直後にバンク2がロード済みになるわけではありません。--fds-no-overlay-tableを付けた検証では最後の値だけ0になります。</figcaption></figure><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-query/example/residency-fds-table-off-default/screen.png" alt="__fds_is_bank_resident: RESIDENCY-FDS-TABLE-OFF-DEFAULT — CURRENT BANKは1、BANK 1 RESIDENTは1、BANK 2 RESIDENTは0、OVERLAY FUNCTIONSは2です。バンク2に二つの関数を収録していても、起動直後にバンク2がロード済みになるわけではありません。--fds-no-overlay-tableを付けた検証では最後の値だけ0になります。"><figcaption>RESIDENCY-FDS-TABLE-OFF-DEFAULT — CURRENT BANKは1、BANK 1 RESIDENTは1、BANK 2 RESIDENTは0、OVERLAY FUNCTIONSは2です。バンク2に二つの関数を収録していても、起動直後にバンク2がロード済みになるわけではありません。--fds-no-overlay-tableを付けた検証では最後の値だけ0になります。</figcaption></figure><p><a href="samples/api-examples/fc/fds_residency.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_residency.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_residency.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_overlay.h:18</p><div class="original"><b>宣言の注記（原文）</b><pre>Compare a valid bank with the software resident-bank byte; FF (unknown) never matches.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9170</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_is_bank_resident&quot;);
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_residency.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_residency.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_overlay.h:18</p><div class="original"><b>宣言の注記（原文）</b><pre>Compare a valid bank with the software resident-bank byte; FF (unknown) never matches.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9372</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_is_bank_resident&quot;);
             string fdsResidentYes = NewGeneratedLabel(&quot;fds_resident_yes&quot;);
             string fdsResidentNo = NewGeneratedLabel(&quot;fds_resident_no&quot;);
             EmitAsm(&quot;LDA&quot;, Mem(CallArgBase));
@@ -946,7 +1207,7 @@ void main(void) {
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_bank_load.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_bank_load.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm
 python .\kitaq-docs\tools\check_fds_load_examples.py</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_overlay.h:11</p><div class="original"><b>宣言の注記（原文）</b><pre>Load logical bank 1 from its separate boot file, or bank 2+ from overlay-start-id+(bank-2).
 Return zero on success, FF for invalid/unavailable mappings, or the BIOS error.
-A failed BIOS transfer marks residency FF (unknown); a matching valid guard can skip loading.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9099</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_load_bank&quot;);
+A failed BIOS transfer marks residency FF (unknown); a matching valid guard can skip loading.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9301</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_load_bank&quot;);
             string fdsLoadBankLoad = NewGeneratedLabel(&quot;fds_load_bank_load&quot;);
             string fdsLoadBankOverlay = NewGeneratedLabel(&quot;fds_load_bank_overlay&quot;);
             string fdsLoadBankCall = NewGeneratedLabel(&quot;fds_load_bank_call&quot;);
@@ -1026,7 +1287,7 @@ void main(void) {
     while(1){m_wait();}
 }</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>独自のLoadFiles呼び出し規約テストでは、FILE 32 LOAD STATUSが000、転送したデータの両端が011と044です。RAWロード直後のUNKNOWN BANK RECORDは255、IS BANK 1 RESIDENTは000になります。REQUIRE BANK 1が000で成功した後はRESIDENT AFTER RELOADが001です。ファイルIDで読む操作と、論理バンクを管理する操作の違いを示します。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-load/example/raw_overlay-default/screen.png" alt="__fds_load_overlay: RAW_OVERLAY-DEFAULT — 独自のLoadFiles呼び出し規約テストでは、FILE 32 LOAD STATUSが000、転送したデータの両端が011と044です。RAWロード直後のUNKNOWN BANK RECORDは255、IS BANK 1 RESIDENTは000になります。REQUIRE BANK 1が000で成功した後はRESIDENT AFTER RELOADが001です。ファイルIDで読む操作と、論理バンクを管理する操作の違いを示します。"><figcaption>RAW_OVERLAY-DEFAULT — 独自のLoadFiles呼び出し規約テストでは、FILE 32 LOAD STATUSが000、転送したデータの両端が011と044です。RAWロード直後のUNKNOWN BANK RECORDは255、IS BANK 1 RESIDENTは000になります。REQUIRE BANK 1が000で成功した後はRESIDENT AFTER RELOADが001です。ファイルIDで読む操作と、論理バンクを管理する操作の違いを示します。</figcaption></figure><p><a href="samples/api-examples/fc/fds_raw_overlay.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_raw_overlay.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_raw_overlay.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm
-python .\kitaq-docs\tools\check_fds_load_examples.py</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_overlay.h:7</p><div class="original"><b>宣言の注記（原文）</b><pre>Load disk file id through BIOS, return its error byte and mark bank residency FF (unknown).</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9080</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_load_overlay&quot;);
+python .\kitaq-docs\tools\check_fds_load_examples.py</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_overlay.h:7</p><div class="original"><b>宣言の注記（原文）</b><pre>Load disk file id through BIOS, return its error byte and mark bank residency FF (unknown).</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9282</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_load_overlay&quot;);
             EmitAsm(&quot;LDA&quot;, Mem(CallArgBase));
             EmitAsm(&quot;STA&quot;, Mem(_runtimeFdsLoadListAddress));
             EmitAsm(&quot;LDA&quot;, Imm(0xFF));
@@ -1164,7 +1425,7 @@ void main(void) {
     while(1){m_wait();}
 }</code></pre></div><p>呼び出し部分のコード例です。完全なプログラムに組み込む際は、記載した初期化とバッファの条件を満たしてください。</p><h4>期待する結果</h4><p>独自のLoadFiles呼び出し規約テストでは、LOAD BANK 2 STATUS・REQUIRE SAME BANK・RESTORE BANK 1が000です。FIRST / LAST BYTEの011と044は実際に転送した4バイトの両端、RESIDENT BANKの001は復元後の番号です。無効なバンク0と255はそれぞれ255を返します。同一バンクのrequireは追加のロードを起こさず、検証したファイル読み込み要求は32→0の2回です。</p><figure class="example-result"><img class="screen" loading="lazy" src="verification/api-fds-load/example/bank_load-default/screen.png" alt="__fds_require_bank: BANK_LOAD-DEFAULT — 独自のLoadFiles呼び出し規約テストでは、LOAD BANK 2 STATUS・REQUIRE SAME BANK・RESTORE BANK 1が000です。FIRST / LAST BYTEの011と044は実際に転送した4バイトの両端、RESIDENT BANKの001は復元後の番号です。無効なバンク0と255はそれぞれ255を返します。同一バンクのrequireは追加のロードを起こさず、検証したファイル読み込み要求は32→0の2回です。"><figcaption>BANK_LOAD-DEFAULT — 独自のLoadFiles呼び出し規約テストでは、LOAD BANK 2 STATUS・REQUIRE SAME BANK・RESTORE BANK 1が000です。FIRST / LAST BYTEの011と044は実際に転送した4バイトの両端、RESIDENT BANKの001は復元後の番号です。無効なバンク0と255はそれぞれ255を返します。同一バンクのrequireは追加のロードを起こさず、検証したファイル読み込み要求は32→0の2回です。</figcaption></figure><p><a href="samples/api-examples/fc/fds_bank_load.c">使用例の完全なプログラム</a></p><h4>ビルドコマンド</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\fds_bank_load.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\fds_bank_load.fds --mapper=fds --fds-layout=fds32 --fds-no-license-bypass --fds-overlay-trim --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm
-python .\kitaq-docs\tools\check_fds_load_examples.py</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_overlay.h:13</p><div class="original"><b>宣言の注記（原文）</b><pre>Return zero when the software residency record matches, otherwise call __fds_load_bank.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9156</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_require_bank&quot;);
+python .\kitaq-docs\tools\check_fds_load_examples.py</code></pre></div><details class="api-source"><summary>実装とソース</summary><p class="source">kitaqfc/lib/fds_overlay.h:13</p><div class="original"><b>宣言の注記（原文）</b><pre>Return zero when the software residency record matches, otherwise call __fds_load_bank.</pre></div><p class="source">kitaqfc/kitaqfc/CodeGenerator.cs:9358</p><div class="codebox"><span class="lang">csharp</span><button class="copy" type="button">コピー</button><pre><code>EmitHelperStart(&quot;__fds_require_bank&quot;);
             string fdsRequireLoad = NewGeneratedLabel(&quot;fds_require_load&quot;);
             EmitAsm(&quot;LDA&quot;, Mem(CallArgBase));
             EmitAsm(&quot;CMP&quot;, Imm(0xFF));
