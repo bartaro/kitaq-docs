@@ -9,7 +9,7 @@ import json
 import re
 from pathlib import Path
 import generate as g
-from sample_guides import GUIDES, render as sample_guide
+from sample_guides import GUIDES, render as sample_guide, screen as sample_screen, gallery as sample_gallery
 
 S = g.SITE
 E = html.escape
@@ -48,53 +48,6 @@ MODULES = dict(zip(g.MODULES, [
     'VRC7 FM audio','Fast integer arithmetic','Fixed-point intrinsic interface','Lookup tables',
     'Game-oriented operation macros','Wireframes for DMG']))
 assert len(MODULES) == len(g.MODULES)
-SPECIAL = dict(zip(g.SPECIAL, [
-    'The low eight bits hold current keys; the high eight bits hold newly pressed keys. Supply the previous state to detect edges.',
-    'Wait for the next display update. Avoid accidentally waiting twice in one game frame.',
-    'Copy len bytes from source to destination. The caller must provide sufficient storage and valid bank mappings.',
-    'Fill a region with a repeated byte value. len is a byte count.',
-    'Get the placement bank of a symbol. This differs from passing an arbitrary numeric address.',
-    'Initialize previous and current input, edges and repeat state. Call once at startup.',
-    'Read the pad and update press and release edges, normally once per game frame.',
-    'Test whether the buttons selected by mask are currently held.',
-    'Test whether the buttons selected by mask were newly pressed in this update.',
-    'Test whether the buttons selected by mask were released in this update.',
-    'Test the initial press and subsequent repeats at the configured interval.',
-    'Initialize the sound hardware and driver state. Include the APU register definitions first.',
-    'Advance music, effects and fades, normally once per frame.',
-    'Start music from a bank number and song data in the driver stream format.',
-    'Start a sound effect at the requested priority and record the currently visible ROM bank.',
-    'Change the music/effect driver pause state. The game must separately pause its own logic.',
-    'On GB and FC, the wait function calls a non-null callback synchronously after completing its frame wait.',
-    'Allocate a free sprite slot. Check for the failure value before using the result.',
-    'Initialize a free object and return its ID, or 0xFF when the pool is full.',
-    'Return the object for a valid ID. Check for NULL for out-of-range or inactive IDs.',
-    'Convert an integer to Q8.8. Integer 1 is represented by 256.',
-    'Extract the integer part of Q8.8. Consult the implementation for rounding of negative values.',
-    'Multiply two Q8.8 values and return a Q8.8 result. Keep inputs within the supported range.',
-    'Divide Q8.8 values. Avoid zero divisors and values outside the representable range.',
-    'Pack RGB components, each in 0–31, into the Game Boy Color 15-bit format.',
-    'Select a BG palette and color slot, then set RGB components in 0–31.',
-    'Select an OBJ palette and color slot, then set RGB components in 0–31.',
-    'Wait for NMI-driven frame progress. Enable NMI before calling.',
-    'Commit prepared VRAM updates for processing by NMI.',
-    'Apply queued updates to the PPU, normally during the safe NMI interval.',
-    'Disable rendering before direct PPU updates such as initial loading.',
-    'Set NES scroll coordinates, including restoring scroll after PPU transfers.']))
-assert len(SPECIAL) == len(g.SPECIAL)
-
-def purpose(r):
-    if r['name'] in SPECIAL: return SPECIAL[r['name']]
-    verbs = [('init','Prepare initial state'),('clear','Clear contents or state'),('reset','Reset state'),
-        ('get','Retrieve a value or state'),('read','Read a value'),('write','Write a value'),
-        ('set','Set a value or operating condition'),('draw','Create drawing data'),('load','Load data'),
-        ('save','Save data'),('update','Update state'),('step','Advance one processing step'),
-        ('wait','Wait for a condition'),('enable','Enable a feature'),('disable','Disable a feature'),
-        ('copy','Copy data'),('fill','Fill a region'),('flush','Apply accumulated updates'),
-        ('count','Get a count'),('push','Append data'),('pop','Remove and retrieve data')]
-    verb = next((v for k,v in verbs if k in r['name'].lower()),'Perform the operation specified by the arguments')
-    return verb+'. Module: '+MODULES.get(r['module'],r['module'])+'. The declaration, original notes and implementation below define exact units, terminators and return conditions.'
-
 def code(t,lang='c'):
     return '<div class="codebox"><span class="lang">'+E(lang)+'</span><button class="copy" type="button">Copy</button><pre><code>'+E(t.strip())+'</code></pre></div>'
 
@@ -121,34 +74,12 @@ def samples_section(platform,manifest):
         cmd+=' --profile=dev --rst-disable --stack-bank=fixed' if platform=='gb' else ' --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr'
         cmd+=' '+' '.join(d['options'])
         if d.get('known_issue'):cmd='# Known build limitation: '+d['known_issue']+'\n'+cmd
-        out.append('<details class="sample searchable" id="sample-'+d['id']+'"><summary>'+E(title)+' <code>'+d['file']+'</code></summary>'+sample_guide(d['id'],'en')+'<p><a href="samples/'+d['file']+'" download>Download source</a> / <a href="verification.html#'+d['id']+'">Verification status</a></p>'+code(cmd,'powershell')+code(g.read(S/'samples'/d['file']))+'</details>')
+        out.append('<details class="sample searchable" id="sample-'+d['id']+'"><summary>'+E(title)+' <code>'+d['file']+'</code></summary>'+sample_guide(d['id'],'en')+sample_screen(d['id'],'en')+'<p><a href="samples/'+d['file']+'" download>Download source</a> / <a href="verification.html#'+d['id']+'">Verification status</a></p>'+code(cmd,'powershell')+code(g.read(S/'samples'/d['file']))+'</details>')
     return ''.join(out)
 
 def api_section(platform,intrinsic):
-    data=json.loads(g.read(S/'reference'/(platform+'-api.json')))
-    records=[r for r in data['records'] if r['name'].startswith('__')==intrinsic]
-    out=['<h2 id="api">'+('Compiler intrinsic' if intrinsic else 'Library API')+' dictionary</h2><p>'+str(len(records))+' entries. Open an entry for its syntax, arguments, source notes and usage example. Calling fragments require surrounding initialization; they are not standalone ROMs. Argument-passing examples show how prepared values reach the API, and do not establish device-level verification.</p><p>Source excerpts and original declaration notes are reproduced verbatim, including comments in their original language. The English explanation precedes each declaration.</p>']
-    for mod in sorted(set(r['module'] for r in records)):
-        out.append('<h3 id="module-'+mod+'">'+mod+'.h — '+E(MODULES.get(mod,'Compiler functionality'))+'</h3>')
-        for r in sorted((r for r in records if r['module']==mod),key=lambda r:r['name'].lower()):
-            status={'compiler':'Compiler intrinsic','implementation':'Implementation found','declaration':'Declaration only; body not found','macro':'Macro'}[r['availability']]
-            out.append('<details class="api searchable" id="api-'+r['name']+'"><summary><code>'+E(r['name'])+'</code><span class="badge">'+status+'</span></summary><p>'+E(purpose(r))+'</p>'+code(r['signature']))
-            if r.get('arity_only'):out.append('<p class="note">This syntax records the argument count from code generation. Names such as arg0 are explanatory placeholders, not type declarations. Follow the usage example and implementation requirements.</p>')
-            elif r['args'] and r['args']!='void':out.append('<p><b>Arguments, left to right: </b>'+E(r['args'])+'. For arrays and pointers, allocate sufficient storage and keep it valid until processing finishes.</p>')
-            if r['ret'] not in ('','void','macro'):out.append('<p><b>Return type: </b><code>'+E(r['ret'])+'</code>. The original notes and return conditions in the implementation define the meaning and success or failure values.</p>')
-            if r['comment']:out.append('<div class="original"><b>Original declaration notes (verbatim)</b><pre>'+E(r['comment'])+'</pre></div>')
-            if r['availability']=='declaration':out.append('<p class="note">A public header declares this API, but the collected sources did not reveal its body. This is not evidence that it links or runs. Identify the providing compilation unit before use.</p>')
-            ex=r.get('example')
-            if ex:
-                out.append('<h4>Calling example (surrounding-code fragment)</h4>'+code(ex['code'])+'<p class="source">Source: '+E(ex['path'])+':'+str(ex['line'])+'</p>')
-                if 'kitaq-docs/samples/' in ex['path']:out.append('<p><a href="samples/'+ex['path'].split('/')[-1]+'">Complete program for this example</a></p>')
-            else:
-                out.append('<h4>Argument-passing example</h4>'+code(r.get('new_example',r['signature']))+'<p>Prepare object initialization, buffer sizes, ROM banks and device state in the calling code. This function fragment has not been executed in isolation.</p><p><a href="samples/api-fragments/'+platform+'/'+r['name']+'.c" download>Download this fragment</a></p>')
-            d=r.get('definition')
-            if d:out.append('<p class="source"><b>Implementation to include: </b><code>'+E(d['path'])+'</code>:'+str(d['line'])+'. Include the providers of any additional functions it calls.</p><details><summary>Read the current implementation</summary>'+code(d['body'])+'</details>')
-            elif r.get('implementation_excerpt'):out.append('<details><summary>Code generator argument checks</summary>'+code(r['implementation_excerpt'],'csharp')+'</details>')
-            out.append('<p class="source">Declaration or identifier source: '+E(r['path'])+':'+str(r['line'])+'</p></details>')
-    return ''.join(out)
+    from api_scaffold import section
+    return section(platform,intrinsic,'en',MODULES)
 
 CLI_TITLES={
     'battery-export':'Export raw battery RAM from a saved state','battery-run':'Boot with saved RAM',
@@ -198,17 +129,7 @@ def asm_section(platform):
     return '<h2 id="assembly">Appendix: assembly instruction index</h2><p>This table is extracted from AsmInfo.cs. It describes the compiler internal spellings and operand formats. Entries with branch destinations or memory addresses are syntax examples, not standalone programs. Consult calling conventions and code generation for preserved registers and flag changes.</p>'+table
 
 def verification():
-    body='<h2 id="scope">Verification scope</h2><p>The records below belong to the September 12 source snapshot. The two compilers and KUROSAKI CLI were built from the collected sources. KOKURA and SARAKURA used local executables fingerprinted in the inventory. These checks do not cover all features, peripherals or physical hardware.</p><p>Each entry records compilation, a 120-frame emulator run and its screenshot. Pixel comparisons are separate evidence. Exit code zero alone does not prove correct input, sound or game behavior. Build and runtime evidence is documented in <a href="../PUBLICATION_CHECKS.md">publication checks</a>; test inputs and conditions are recorded there.</p>'
-    results=json.loads(g.read(S/'verification/samples.json'))
-    for r in results:
-        ident=r['id'];body+='<section id="'+ident+'"><h2 id="result-'+ident+'">'+ident+'</h2><p>Build exit code: '+E(str(r['build_exit']))+' / Runtime status: '+E(r['runtime'])+'</p><p>'+E(r.get('expected',''))+'</p>'
-        if (S/'verification'/(ident+'.png')).exists():body+='<img class="screen" loading="lazy" src="verification/'+ident+'.png" alt="Emulator screenshot for '+ident+'">'
-        body+='<p><a href="verification/'+ident+'-build.txt">Build log</a>'
-        if (S/'verification'/(ident+'-runtime.txt')).exists():body+=' / <a href="verification/'+ident+'-runtime.txt">Runtime log</a>'
-        body+='</p></section>'
-    for f,t in [('visual_checks.json','Pixel values and font comparisons'),('workflow.json','Diagnostic workflow'),('compiler_tests.json','Compiler regression checks'),('browser_checks.json','Browser display checks'),('site_checks.json','HTML structure and links'),('bilingual_checks.json','Complete bilingual edition checks'),('english_browser_checks.json','English edition browser checks')]:
-        if (S/'verification'/f).exists():body+='<h2 id="'+f.replace('.','-')+'">'+t+'</h2>'+code(g.read(S/'verification'/f),'json')
-    page('verification','VERIFICATION','Build, execution and display records',body)
+    page('verification','VERIFICATION','Captured screens',sample_gallery('en'))
 
 def main():
     inventory=json.loads(g.read(S/'reference/inventory.json'));manifest=json.loads(g.read(S/'samples/manifest.json'))
@@ -235,7 +156,7 @@ def main():
     from generate_prompts import publish
     publish('en')
     from api_contracts import publish as publish_api_contracts
-    publish_api_contracts('en')
+    publish_api_contracts('en', require_complete=True)
     print('Generated 10 English HTML pages including development prompts')
 
 if __name__=='__main__':main()

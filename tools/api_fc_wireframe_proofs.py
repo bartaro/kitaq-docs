@@ -71,6 +71,7 @@ def render_cards(text,language):
         assert len(edits)==8
         for start,end,value in reversed(edits):text=text[:start]+value+text[end:]
         return text
+    text=api_contracts.remove_standalone_module(text,'wire3d',{k.split(':')[1] for k in selected})
     title='各関数の使い方' if language=='ja' else 'Individual function reference'
     block='<!-- fc-wire-cards:start --><section data-module-contract="'+REVIEW+'"><h3 id="module-wire3d">wire3d — '+title+'</h3>'
     for key,contract in selected.items():

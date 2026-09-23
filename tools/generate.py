@@ -3,9 +3,12 @@ import re,json,html,shutil
 from collect import ROOT,SITE,read
 from chapters import TEXT,BOOKS
 from languages import language_nav
-from sample_guides import render as sample_guide
+from sample_guides import GUIDES, render as sample_guide, screen as sample_screen, gallery as sample_gallery
 E=html.escape
-def slug(t):return re.sub(r'[^\w-]+','-',t).strip('-')
+def slug(t):
+ # Keep incoming section links stable when a heading is clarified.
+ aliases={'5　ループと状態による分岐':'5-未対応構文の書き換え','5. Loops and state dispatch':'5-Rewrite-unsupported-constructs'}
+ return aliases.get(t,re.sub(r'[^\w-]+','-',t).strip('-'))
 def code(t,lang='c'):return '<div class="codebox"><span class="lang">'+lang+'</span><button class="copy" type="button">コピー</button><pre><code>'+E(t.strip())+'</code></pre></div>'
 def inline(t):
  stash=[]
@@ -19,6 +22,8 @@ def md(t):
  while i<len(lines):
   s=lines[i]
   if not s.strip():i+=1;continue
+  if re.fullmatch(r'<!-- [\w:-]+ -->',s.strip()):
+   out.append(s.strip());i+=1;continue
   if s.startswith('```'):
    lang=s[3:] or 'text';block=[];i+=1
    while i<len(lines) and not lines[i].startswith('```'):block.append(lines[i]);i+=1
@@ -66,48 +71,6 @@ MODULES={
 'fds_save':'FDS保存の宣言','fds_sound':'FDS波形音源','vrc6_sound':'VRC6拡張音源','vrc7_sound':'VRC7 FM音源',
 'math_fast':'高速な整数計算','math_fixed':'固定小数点計算の組み込み窓口','math_lut':'ルックアップテーブル','nes_game':'ゲーム向け操作名のマクロ','wire3d_dmg':'DMG向けワイヤーフレーム',
 }
-SPECIAL={
-'__readpadex':'下位8ビットは現在のキー、上位8ビットは新規押下。前回値を渡してエッジを求めます。',
-'__wait_vblank':'次の描画更新に合わせるための待機です。待機の重複に注意してください。',
-'__memcpy':'転送元から転送先へlenバイトを複製します。領域の大きさとバンクの有効性を呼び出し側で保証します。',
-'__memset':'指定領域を同じバイト値で埋めます。lenはバイト数です。',
-'__bankof':'シンボルの配置バンクを得ます。任意の数値アドレスを渡す操作と区別します。',
-'input_init':'前回値・現在値・エッジ・リピート状態を初期化します。起動時に一度呼びます。',
-'input_update':'パッドを読み、押下と解放を更新します。通常は1ゲームフレームに1回です。',
-'input_down':'maskで選んだボタンが現在押されているか調べます。',
-'input_pressed':'maskで選んだボタンが今回新たに押されたか調べます。',
-'input_released':'maskで選んだボタンが今回離されたか調べます。',
-'input_repeat':'押した瞬間と所定間隔のリピートを調べます。',
-'Audio_Init':'音源・ドライバー状態を初期化します。APUレジスター定義を先に結合してください。',
-'Audio_Update':'音楽・効果音・フェードを進めます。通常は1フレーム1回呼びます。',
-'Audio_PlayMusic':'バンク番号と曲データを指定して音楽を開始します。曲はドライバーのストリーム形式です。',
-'Audio_PlaySFX':'効果音を指定優先度で開始します。現在見えているROMバンクを記録します。',
-'Audio_SetPaused':'音楽／効果音のドライバー一時停止状態を変更します。ゲーム全体の停止処理はゲーム側に必要です。',
-'system_set_vblank_callback':'GBでは待機関数内から協調的に呼び出します。FCでは現実装は保存のみで、自動実行しません。',
-'sprite_alloc':'未使用スプライト枠を確保します。戻り値が失敗値でないことを確認して使用します。',
-'entity_create':'空いたオブジェクトを初期化してIDを返します。空きがなければ0xFFです。',
-'entity_get':'有効なIDのオブジェクトを返します。範囲外や無効なIDではNULLを確認してください。',
-'fix_from_int':'整数をQ8.8へ変換します。1は256に相当します。',
-'fix_to_int':'Q8.8から整数部分を得ます。負数の丸めは実装を参照してください。',
-'fix_mul':'Q8.8同士を掛け、Q8.8の結果へ戻します。入力範囲に注意してください。',
-'fix_div':'Q8.8の除算です。ゼロ除算を避け、表現範囲を超えない値を使います。',
-'cgb_rgb15':'各0～31のRGB成分をGBカラーの15ビット形式へ詰めます。',
-'cgb_bg_rgb':'BGのパレット番号と色番号を選び、各0～31のRGBを設定します。',
-'cgb_obj_rgb':'OBJのパレット番号と色番号を選び、各0～31のRGBを設定します。',
-'__nmi_wait':'NMIによるフレーム進行を待ちます。NMIを有効にして使用します。',
-'__vramq_commit':'準備したVRAM更新をNMI側へ渡すためのcommitです。',
-'__vramq_exec':'キューの内容をPPUへ反映します。通常はNMI側の安全な時間に実行します。',
-'__ppu_off':'画面描画を止め、初期ロードなどのPPU直接更新に備えます。',
-'__scroll_set':'NESのスクロール位置を設定します。PPU転送後のスクロール復元にも使います。',
-}
-def purpose(r):
- if r['name'] in SPECIAL:return SPECIAL[r['name']]
- module=MODULES.get(r['module'],'関連機能')
- n=r['name'].lower()
- verbs=[('init','初期状態を準備'),('clear','内容や状態を消去'),('reset','状態をリセット'),('get','値や状態を取得'),('read','値を読み取り'),('write','値を書き込み'),('set','値や動作条件を設定'),('draw','描画データを作成'),('load','データを読み込み'),('save','データを保存'),('update','状態を更新'),('step','処理を1ステップ進め'),('wait','条件の成立を待機'),('enable','機能を有効化'),('disable','機能を無効化'),('copy','データを複製'),('fill','領域を値で埋め'),('flush','蓄積した更新を反映'),('count','件数を取得'),('push','データを追加'),('pop','データを取り出し')]
- v=next((v for k,v in verbs if k in n),'引数に対応する処理を実行')
- return module+'に関するAPIです。'+v+'します。正確な引数の単位・終端・戻り値の条件は、以下の宣言・原注記・実装に従います。'
-
 def page(key,title,subtitle,body):
  depth='../' if '/' in key else ''
  nav='<a href="'+depth+'index.html">総合目次</a>'+''.join('<a '+('aria-current="page" ' if key==k else '')+'href="'+depth+k+'.html"><b>'+num+'</b> '+E(name)+'</a>' for k,num,name,sub in BOOKS)
@@ -128,40 +91,12 @@ def samples_section(platform,manifest):
   cmd+=' '+' '.join(d['options'])
 
   if d.get('known_issue'): cmd='# 既知のビルド制限：'+d['known_issue']+'\n'+cmd
-  out.append('<details class="sample searchable" id="sample-'+d['id']+'"><summary>'+E(d['title'])+' <code>'+d['file']+'</code></summary>'+sample_guide(d['id'],'ja')+'<p><a href="samples/'+d['file']+'" download>ソースを保存</a> ／ <a href="verification.html#'+d['id']+'">検証状況</a></p>'+code(cmd,'powershell')+code(read(SITE/'samples'/d['file']))+'</details>')
+  out.append('<details class="sample searchable" id="sample-'+d['id']+'"><summary>'+E(GUIDES[d['id']]['ja'][0])+' <code>'+d['file']+'</code></summary>'+sample_guide(d['id'],'ja')+sample_screen(d['id'],'ja')+'<p><a href="samples/'+d['file']+'" download>ソースを保存</a> ／ <a href="verification.html#'+d['id']+'">検証状況</a></p>'+code(cmd,'powershell')+code(read(SITE/'samples'/d['file']))+'</details>')
  return ''.join(out)
 
 def api_section(platform,intrinsic):
- data=json.loads(read(SITE/'reference'/(platform+'-api.json')))
- records=[r for r in data['records'] if r['name'].startswith('__')==intrinsic]
- out=['<h2 id="api">'+('組み込み命令' if intrinsic else 'ライブラリAPI')+'辞典</h2><p>全'+str(len(records))+'項目。項目名を開くと書式・引数・原注記・使用例を読めます。「呼び出し断片」は単独ROMではなく周辺の初期化が必要です。「引数受け渡し例」は、引数を用意した上位コードから使うための関数例で、実機器の操作確認を意味しません。</p>']
- for mod in sorted(set(r['module'] for r in records)):
-  out.append('<h3 id="module-'+mod+'">'+mod+'.h — '+E(MODULES.get(mod,'組み込み機能'))+'</h3>')
-  for r in sorted((r for r in records if r['module']==mod),key=lambda r:r['name'].lower()):
-   ident='api-'+r['name'];status={'compiler':'コンパイラ組み込み','implementation':'実装あり','declaration':'宣言のみ・本体未検出','macro':'マクロ'}[r['availability']]
-   out.append('<details class="api searchable" id="'+ident+'"><summary><code>'+E(r['name'])+'</code><span class="badge">'+status+'</span></summary><p>'+E(purpose(r))+'</p>'+code(r['signature']))
-   if r.get('arity_only'):out.append('<p class="note">引数個数をコード生成部から採取した書式です。arg0等は説明用の名前で、型宣言ではありません。呼び出し例と実装の要求を参照してください。</p>')
-   elif r['args'] and r['args']!='void':
-    out.append('<p><b>引数（左から順）：</b>'+E(r['args'])+'。配列・ポインタでは必要な領域を用意し、処理が終わるまで有効に保ちます。</p>')
-   if r['ret'] not in ('','void','macro'):out.append('<p><b>戻り値の型：</b><code>'+E(r['ret'])+'</code>。意味・成功値・失敗値は原注記と実装のreturn条件を参照してください。</p>')
-   if r['comment']:out.append('<div class="original"><b>宣言に付属する原注記</b><pre>'+E(r['comment'])+'</pre></div>')
-   if r['availability']=='declaration':out.append('<p class="note">公開ヘッダーに宣言がありますが、この採取範囲では対応する本体が見つかりません。リンク可能・動作済みとは扱いません。利用前に提供単位を確認してください。</p>')
-   ex=r.get('example')
-   if ex:
-    out.append('<h4>呼び出し例（周辺コードの断片）</h4>'+code(ex['code'])+'<p class="source">出典：'+E(ex['path'])+':'+str(ex['line'])+'</p>')
-    if 'kitaq-docs/samples/' in ex['path']:
-     f=ex['path'].split('/')[-1];out.append('<p><a href="samples/'+f+'">この例の完全なプログラム</a></p>')
-   else:
-    out.append('<h4>引数受け渡し例</h4>'+code(r.get('new_example',r['signature']))+'<p>オブジェクトの初期化、バッファの大きさ、ROMバンク、機器状態は上位コードで準備します。この関数断片単体は実行確認していません。</p>')
-    folder=SITE/'samples/api-fragments'/platform;folder.mkdir(parents=True,exist_ok=True)
-    file=folder/(r['name']+'.c');file.write_text('// Usage fragment, not a standalone ROM.\n// Declaration source: '+r['path']+'\n'+r.get('new_example',r['signature'])+'\n',encoding='utf-8')
-    out.append('<p><a href="samples/api-fragments/'+platform+'/'+r['name']+'.c" download>この断片を保存</a></p>')
-   d=r.get('definition')
-   if d:
-    out.append('<p class="source"><b>結合する本体：</b><code>'+E(d['path'])+'</code>:'+str(d['line'])+'。別の関数を呼ぶ場合はその提供単位も必要です。</p><details><summary>現在の実装を読む</summary>'+code(d['body'])+'</details>')
-   elif r.get('implementation_excerpt'):out.append('<details><summary>引数を検査するコード生成部</summary>'+code(r['implementation_excerpt'],'csharp')+'</details>')
-   out.append('<p class="source">宣言・識別子の出典：'+E(r['path'])+':'+str(r['line'])+'</p></details>')
- return ''.join(out)
+ from api_scaffold import section
+ return section(platform,intrinsic,'ja',MODULES)
 
 CLI_EXAMPLES={
 'kurosaki':{
@@ -264,21 +199,10 @@ def main():
   else:
    if key!='index':body+=cli_section(key,inventory)
   page(key,title,sub,body)
- # Verification is generated from recorded outcomes rather than aspirational claims.
- results=json.loads(read(SITE/'verification/samples.json')) if (SITE/'verification/samples.json').exists() else []
- body='<h2 id="scope">今回の確認範囲</h2><p>以下は9月12日時点のソースに対する検証記録です。コンパイラ2種とKUROSAKI CLIは記録したソースからビルドし、KOKURAとSARAKURAはローカルの実行ファイルを使用しました。全機能・全周辺機器・実機の試験ではありません。公開するソースと実行ファイルのビルド・実行検証は <a href="PUBLICATION_CHECKS.md">publication checks</a> に記録しています。</p><p>各サンプルのコンパイル終了コード、120フレームのエミュレータ実行、画面は以下です。期待値の画素照合は別の結果がある場合に明示します。終了コード0だけで入力・音・ゲーム挙動の正常を証明したとはしません。</p>'
- for r in results:
-  id=r['id'];body+='<section id="'+id+'"><h2 id="result-'+id+'">'+id+'</h2><p>ビルド終了コード：'+E(str(r['build_exit']))+' ／ 実行：'+E(r['runtime'])+'</p><p>'+E(r.get('expected',''))+'</p>'
-  if (SITE/'verification'/(id+'.png')).exists():body+='<img class="screen" loading="lazy" src="verification/'+id+'.png" alt="'+id+' のエミュレータ実行画面">'
-  body+='<p><a href="verification/'+id+'-build.txt">ビルドログ</a>'
-  if (SITE/'verification'/(id+'-runtime.txt')).exists():body+=' ／ <a href="verification/'+id+'-runtime.txt">実行ログ</a>'
-  body+='</p></section>'
- for filename,title in [('visual_checks.json','サンプル画面の数値・字体照合'),('workflow.json','診断ワークフロー'),('compiler_tests.json','コンパイラ修正の回帰試験'),('browser_checks.json','ブラウザーでの表示確認'),('site_checks.json','HTML構造とリンク')]:
-  if (SITE/'verification'/filename).exists():body+='<h2 id="'+filename.replace('.','-')+'">'+title+'</h2>'+code(read(SITE/'verification'/filename),'json')
- page('verification','VERIFICATION','ビルド・実行・表示の確認記録',body)
+ page('verification','VERIFICATION','確認した実行画面',sample_gallery('ja'))
  from generate_prompts import publish
  publish('ja')
  from api_contracts import publish as publish_api_contracts
- publish_api_contracts('ja')
+ publish_api_contracts('ja', require_complete=True)
  print('Generated 10 Japanese HTML pages including development prompts')
 if __name__=='__main__':main()

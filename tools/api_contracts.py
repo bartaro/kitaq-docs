@@ -307,6 +307,7 @@ def publish(language, require_complete=False):
                 text = raster_bands_overview(text, language)
             text = feature_cards_overview(text, platform, language)
             text = refresh_complete_headers(text, platform)
+            validate_rendered_volume(text, records, volume)
             path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
     publish_verification(language, contracts, proofs, messages, ui)
     from public_presentation import normalize
@@ -315,6 +316,34 @@ def publish(language, require_complete=False):
     mapper_page = (SITE if language == 'ja' else SITE / language) / 'kurosaki.html'
     write_page(mapper_page, kurosaki_overview(mapper_page.read_text(encoding='utf-8'), language))
     return {'active_languages': ACTIVE_LANGUAGES, 'reviewed': len(contracts), 'remaining': len(coverage), 'missing': coverage}
+
+
+def remove_standalone_module(text, module, names):
+    """Replace a base-generated module without duplicating its specialized guide.
+
+    Call after removing the guide's own marked block. Only its owned API cards,
+    heading and generated introduction are removed; adjacent modules survive.
+    """
+    for name, start, end in reversed(CardRanges(text).ranges):
+        if name in names:
+            text = text[:start]+text[end:]
+    pattern = r'<h3 id="module-'+re.escape(module)+r'">.*?</h3>(?:<!-- api-module:start -->.*?<!-- api-module:end -->)?'
+    return re.sub(pattern, '', text, flags=re.S)
+
+
+def validate_rendered_volume(text, records, volume):
+    """Require each catalog API exactly once, with a reviewed explanation."""
+    from collections import Counter
+    intrinsic = not volume.endswith('library')
+    expected = {r['name'] for r in records if r['name'].startswith('__') == intrinsic}
+    ranges = CardRanges(text).ranges
+    counts = Counter(name for name, start, end in ranges)
+    missing = sorted(expected-set(counts))
+    extra = sorted(set(counts)-expected)
+    duplicates = sorted(name for name,count in counts.items() if count != 1)
+    empty = sorted(name for name,start,end in ranges if 'data-api-contract=' not in text[start:end])
+    if missing or extra or duplicates or empty:
+        raise ValueError(f'{volume}: missing={missing}, extra={extra}, duplicate={duplicates}, unreviewed={empty}')
 
 
 def refresh_complete_headers(text, platform):

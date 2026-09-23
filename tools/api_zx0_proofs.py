@@ -79,13 +79,14 @@ def overview(text,platform,language):
   block+=api.render(r,c,language,messages,ui)
  block+='</section><!-- zx0-module:end -->'
  text=re.sub(r'<!-- zx0-module:start -->.*?<!-- zx0-module:end -->','',text,flags=re.S)
+ text=api.remove_standalone_module(text,'zx0',{k.split(':')[1] for k in chosen})
  anchor=re.search(r'<h3 id="module-[^"]+">',text);assert anchor
  text=text[:anchor.start()]+block+text[anchor.start():]
  # The appendix includes the exact public header, not a declaration-only stub.
  text=re.sub(r'<!-- zx0-header:start -->.*?<!-- zx0-header:end -->','',text,flags=re.S)
  source_path='kitaq'+platform+'/lib/zx0.h'
  header='<details class="searchable"><summary><code>zx0.h</code></summary><div class="codebox"><pre><code>'+html.escape((REPOS/source_path).read_text(encoding='utf-8'))+'</code></pre></div><p class="source">'+source_path+'</p></details>'
- if '<h2 id="headers">' in text:
+ if '<h2 id="headers">' in text and source_path+'</p></details>' not in text:
   pos=text.index('</h2>',text.index('<h2 id="headers">'))+5
   text=text[:pos]+'<!-- zx0-header:start -->'+header+'<!-- zx0-header:end -->'+text[pos:]
  return text

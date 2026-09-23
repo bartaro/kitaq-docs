@@ -55,6 +55,7 @@ def overview(text,language):
         block+=api_contracts.render(record,contract,language,messages,ui)
     block+='</section><!-- fc-danmaku:end -->'
     text=re.sub(r'<!-- fc-danmaku:start -->.*?<!-- fc-danmaku:end -->','',text,flags=re.S)
+    text=api_contracts.remove_standalone_module(text,'danmaku',{k.split(':')[1] for k in selected})
     anchor='<h3 id="module-debug">';assert text.count(anchor)==1
     from api_fc_wireframe_proofs import ensure_header
     return ensure_header(text.replace(anchor,block+anchor))

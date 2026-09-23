@@ -125,6 +125,32 @@ def render(sample_id, language):
     labels = ('目的', '処理の流れ', '操作と期待する結果') if language == 'ja' else ('Purpose', 'How it works', 'Controls and expected result')
     return '<div class="sample-guide">'+''.join('<p><b>'+label+'：</b>'+html.escape(text)+'</p>' if language=='ja' else '<p><b>'+label+': </b>'+html.escape(text)+'</p>' for label,text in zip(labels,(purpose,processing,expected)))+'</div>'
 
+
+def screen(sample_id, language):
+    """Place the captured screen beside its specific expected visual result."""
+    if not (SITE/'verification'/(sample_id+'.png')).is_file():
+        return ''
+    prefix = '' if language == 'ja' else '../'
+    caption = ('表示例：' if language == 'ja' else 'Display example: ')+GUIDES[sample_id][language][3]
+    alt = GUIDES[sample_id][language][0]+': '+GUIDES[sample_id][language][3]
+    return '<figure class="example-result"><img class="screen" loading="lazy" src="'+prefix+'verification/'+sample_id+'.png" alt="'+html.escape(alt,quote=True)+'"><figcaption>'+html.escape(caption)+'</figcaption></figure>'
+
+
+def gallery(language):
+    """Render a portable result gallery without exposing local execution logs."""
+    from public_presentation import INTRO, LANGUAGES
+    manifest = json.loads((SITE/'samples/manifest.json').read_text(encoding='utf-8'))
+    title = '確認した実行画面' if language == 'ja' else 'Captured screens'
+    out = ['<div data-public-gallery="true"><h2 id="scope">'+title+'</h2><p>'+html.escape(INTRO[LANGUAGES.index(language)])+'</p>']
+    for item in manifest:
+        sid = item['id']
+        platform = item['platform']
+        caption = GUIDES[sid][language][0]
+        links = [('kitaq'+platform, 'コンパイラ説明書のサンプルに戻る' if language == 'ja' else 'Return to the compiler manual example'),
+                 (platform+'-library', 'ライブラリ説明書のサンプルに戻る' if language == 'ja' else 'Return to the library manual example')]
+        out.append('<section id="'+sid+'"><h2 id="result-'+sid+'">'+html.escape(caption)+' <code>'+sid+'</code></h2>'+render(sid,language)+screen(sid,language)+'<p class="sample-return">'+' / '.join('<a href="'+page+'.html#sample-'+sid+'">'+label+'</a>' for page,label in links)+'</p></section>')
+    return ''.join(out)+'</div>'
+
 def update_existing():
     manifest=json.loads((SITE/'samples/manifest.json').read_text(encoding='utf-8'))
     assert {x['id'] for x in manifest} == set(GUIDES)

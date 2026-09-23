@@ -27,7 +27,7 @@
 <p>Q5.3 fractions represent eighths of a pixel. Keep integer coordinates, fractional parts, velocity and direction separately and perform addition and carry handling in game code. <code>fc_subpixel.c</code> adds 2/8 pixel eight times, moving from pixel 40 to pixel 42. Do not reuse the Q8.8 representation 256 unchanged as Q5.3.</p>
 <!-- fc-wire-guide:start --><section id="wire3d-fc-guide"><h3>8.1  Wireframes with a selectable viewport</h3><p><code>wire3d.c</code> draws independently authored 3D models as cyan lines on a dark background. It uses integer rotation, reciprocal-table perspective, a CPU pixel buffer and two CHR-RAM pattern tables. No commercial game code, model or graphics data is included. The source is licensed under MIT by DAISUKE OBA.</p>
 <p>Select one viewport before including <code>wire3d.c</code>: 64×48, 96×64 or 128×96. Define <strong>both</strong> <code>WIRE3D_FC_WIDTH</code> and <code>WIRE3D_FC_HEIGHT</code>; the default is 64×48. The viewport is centered on the 256×240 background. A larger viewport uses more tiles and draws longer lines, so choose it using measurements of your scene.</p>
-<div class="codebox"><span class="lang">c</span><button class="copy" type="button">コピー</button><pre><code>#define WIRE3D_FC_WIDTH 96
+<div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#define WIRE3D_FC_WIDTH 96
 #define WIRE3D_FC_HEIGHT 64
 #include &quot;wire3d.c&quot;
 
@@ -40,7 +40,7 @@ void main(void) {
     while(1) {}
 }</code></pre></div>
 <p>This example draws two crossing diagonals to check the chosen viewport and line coverage. Compile this source once; it already includes the implementation.</p>
-<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>.\kitaqfc\kitaqfc.exe .\cross.c -I .\kitaqfc\lib --mapper=nrom --nes-chr-ram -o .\cross.nes</code></pre></div>
+<div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe .\cross.c -I .\kitaqfc\lib --mapper=nrom --nes-chr-ram -o .\cross.nes</code></pre></div>
 <p>The ROM requires <strong>8 KiB writable CHR RAM</strong> and cartridge PRG RAM covering <code>$6800–$70BF</code>. The renderer owns both pattern tables, nametable zero, scroll and the background palette, and reserves zero-page <code>$00–$0A</code>. Do not overlap those regions or change their mapper mapping while drawing. <code>--nes-chr-ram</code> selects RAM instead of CHR ROM; it cannot be combined with an artwork file through <code>--nes-chr</code> or <code>--chr-rom</code>, and is rejected for the CNROM profile.</p>
 <p>The renderer is not reentrant. Initialization disables NMI and enables the background after setup. Drawing and upload run in the foreground; do not run another PPU writer or interrupt handler that changes its scratch memory. An upload can span multiple display frames. This implementation does not provide an asynchronous game-loop or audio-update scheduler.</p>
 <div class="tablewrap"><table>
@@ -55,7 +55,7 @@ void main(void) {
 <tr id="guide-Wire3DFC_EndFrame"><td><code>Wire3DFC_EndFrame()</code></td><td>Upload tiles touched by the staged image or by the previous contents of the hidden CHR buffer, including tiles that must be erased. Transfer at most 16 tiles per VBlank batch, restore scroll, and display the completed image at a fresh VBlank. Blocks until finished.</td></tr>
 </table></div>
 <p>After <code>EndFrame</code>, <code>wire3d_uploaded_tiles</code> reports uploaded tiles and <code>wire3d_transfer_frames</code> reports upload batches plus the final swap wait. The latter is <strong>not</strong> total elapsed rendering time: transformation, rasterization and CPU bookkeeping also take time. Perspective uses a quantized reciprocal table; its nearest 128-pixel-wide scale saturates from 256 to 255.</p>
-<p>The cube sample in the HTML manual demonstrates vertex sharing, rotation, projection, twelve indexed edges and complete-frame presentation. Its validation images show a cube rotated about the Y axis; all twelve edges should remain connected and no lines from a preceding image should remain.</p><p><a href="../samples/api-examples/fc/wire3d_cube.c">Rotating cube sample</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">コピー</button><pre><code>.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\wire3d_cube.c -I .\kitaqfc\lib --mapper=nrom --nes-chr-ram -o .\wire_cube.nes</code></pre></div><figure><img class="screen" width="512" height="480" style="image-rendering:pixelated" src="../verification/api-wireframe-fc/cube-64.png" alt="64×48: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background."><figcaption>64×48: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background.</figcaption></figure><figure><img class="screen" width="512" height="480" style="image-rendering:pixelated" src="../verification/api-wireframe-fc/cube-96.png" alt="96×64: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background."><figcaption>96×64: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background.</figcaption></figure><figure><img class="screen" width="512" height="480" style="image-rendering:pixelated" src="../verification/api-wireframe-fc/cube-128.png" alt="128×96: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background."><figcaption>128×96: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background.</figcaption></figure><p>KUROSAKI checked lines, a cube and clearing at each size: nine image checks in total. Additional checks cover projection boundaries, null pointers, all 32 rotation steps on each axis, combined rotations and rejected edges at three viewport sizes with four compiler configurations. The drawing examples use NROM; the larger boundary-test ROM uses MMC3. These are emulator checks, not hardware measurements.</p><!-- fc-wire-cards:start --><section data-module-contract="fc-wireframe-source-20260922"><!-- zx0-module:start --><section data-module-contract="zx0-source-20260922"><h3 id="module-zx0">zx0</h3><p>Decode ZX0-compatible assets into RAM or VRAM. Prepare assets with <code>kitaqfc-zx0.exe</code> on the PC, then decode only the data needed at runtime. <code>--format=auto</code> compares raw, RLE and ZX0 payloads and chooses the smallest; ties prefer raw, RLE, then ZX0. Keep the complete container within 65535 bytes including its nine-byte header, and split assets to fit actual CPU banks and RAM.</p><p>Einar Saukas designed the ZX0 format and original compression algorithm. The compressor and decompressor provided here are independent KITAQ implementations, copyright DAISUKE OBA, released under the MIT License.</p><p>Run these host commands from the repository root. Build the tool with tools/zx0/build.ps1.</p><pre><code>.\kitaqfc-zx0.exe tiles.bin tiles.zx0
+<p>The cube sample in the HTML manual demonstrates vertex sharing, rotation, projection, twelve indexed edges and complete-frame presentation. Its validation images show a cube rotated about the Y axis; all twelve edges should remain connected and no lines from a preceding image should remain.</p><p><a href="../samples/api-examples/fc/wire3d_cube.c">Rotating cube sample</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\wire3d_cube.c -I .\kitaqfc\lib --mapper=nrom --nes-chr-ram -o .\wire_cube.nes</code></pre></div><figure><img class="screen" width="512" height="480" style="image-rendering:pixelated" src="../verification/api-wireframe-fc/cube-64.png" alt="64×48: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background."><figcaption>64×48: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background.</figcaption></figure><figure><img class="screen" width="512" height="480" style="image-rendering:pixelated" src="../verification/api-wireframe-fc/cube-96.png" alt="96×64: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background."><figcaption>96×64: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background.</figcaption></figure><figure><img class="screen" width="512" height="480" style="image-rendering:pixelated" src="../verification/api-wireframe-fc/cube-128.png" alt="128×96: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background."><figcaption>128×96: a cube rotated 3/32 of a turn about Y. Expect twelve connected edges and no old lines in the background.</figcaption></figure><p>KUROSAKI checked lines, a cube and clearing at each size: nine image checks in total. Additional checks cover projection boundaries, null pointers, all 32 rotation steps on each axis, combined rotations and rejected edges at three viewport sizes with four compiler configurations. The drawing examples use NROM; the larger boundary-test ROM uses MMC3. These are emulator checks, not hardware measurements.</p><!-- fc-wire-cards:start --><section data-module-contract="fc-wireframe-source-20260922"><!-- zx0-module:start --><section data-module-contract="zx0-source-20260922"><h3 id="module-zx0">zx0</h3><p>Decode ZX0-compatible assets into RAM or VRAM. Prepare assets with <code>kitaqfc-zx0.exe</code> on the PC, then decode only the data needed at runtime. <code>--format=auto</code> compares raw, RLE and ZX0 payloads and chooses the smallest; ties prefer raw, RLE, then ZX0. Keep the complete container within 65535 bytes including its nine-byte header, and split assets to fit actual CPU banks and RAM.</p><p>Einar Saukas designed the ZX0 format and original compression algorithm. The compressor and decompressor provided here are independent KITAQ implementations, copyright DAISUKE OBA, released under the MIT License.</p><p>Run these host commands from the repository root. Build the tool with tools/zx0/build.ps1.</p><pre><code>.\kitaqfc-zx0.exe tiles.bin tiles.zx0
 .\kitaqfc-zx0.exe tiles.bin tiles.h --header=tiles
 .\kitaqfc-zx0.exe map.bin map.kqa --format=auto
 .\kitaqfc-zx0.exe tiles.zx0 restored.bin --decompress</code></pre><details class="api searchable" id="api-zx0_decompress" data-api-contract="zx0-source-20260922"><summary><code>zx0_decompress</code></summary><p>Decode a ZX0 v2 stream into bounded RAM. Matches reference previously decoded bytes, so the destination must be readable and writable. Use this for tile maps or level tables that the CPU will process before use.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u16 zx0_decompress(void* dst, u16 capacity, const void* src, u16 packed_size);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>dst</code></dt><dd><p>Start of writable destination RAM; must not be null. Express capacity in bytes, not array elements.</p></dd><dt><code>capacity</code></dt><dd><p>Number of writable destination bytes. An ordinary ZX0 stream needs at least one byte. An empty raw KQA1 asset can succeed with capacity zero.</p></dd><dt><code>src</code></dt><dd><p>Start of compressed data readable through the current bank mapping. Must not be null.</p></dd><dt><code>packed_size</code></dt><dd><p>Byte count of the complete input. A ZX0 stream includes its end marker and has no trailing bytes. A KQA1 container includes its nine-byte header. Maximum: 65535 bytes.</p></dd></dl><h4>Return value</h4><p>Return the decoded byte count on success, or zero on error. Always check <code>zx0_error</code> as well.</p><h4>Conditions and limits</h4><p>Include <code>zx0.h</code> and compile <code>lib/zx0.c</code>. These routines use shared scratch and are not reentrant from interrupts. Input and output must not overlap, wrap the CPU address space or cross currently mapped bank windows. The library does not switch asset banks.</p><p>Each call updates <code>zx0_error</code>: 0 success, 1 invalid argument, 2 truncated input, 3 malformed stream, 4 insufficient output space, 5 display active. A failure can leave partial output; do not use it. When multiple conditions are invalid, the first detected condition determines the code.</p><p>Accept forward ZX0 v2 streams. ZX0 v1, backward streams and external dictionaries are outside this interface. Know the decoded size of the host-generated asset and provide sufficient storage.</p><p><a href="https://github.com/einar-saukas/ZX0">ZX0 format — Einar Saukas</a></p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>count=zx0_decompress(decoded_map,16,packed_map,packed_map_SIZE);
@@ -346,7 +346,7 @@ counters report this call&#x27;s upload batches plus swap, and tile count.</pre>
 <p>FDS services are divided among <code>fds_file</code>, <code>fds_overlay</code>, <code>fds_save</code> and <code>fds_sound</code>. Loading an overlay replaces code at an existing address, so pay attention to return targets and data lifetimes. Do not assume ordinary cartridge far-call behavior.</p>
 <h2 id="10-Reference-entries-and-examples">10. Reference entries and examples</h2>
 <p>The dictionary below follows public headers and distinguishes functions, function-like macros and aliases. Full headers also expose structures and constants. Declaration-only APIs, stored-only callbacks and specialized device interfaces are identified separately from verified ordinary operations. Source comments are retained verbatim for accurate comparison with the implementation.</p>
-<p><code>vram_get_queue_capacity()</code> returns the total command-buffer capacity (128 bytes). <code>vram_get_queue_free()</code> returns the remaining bytes: total capacity minus <code>vram_get_queue_used()</code>. These are encoded command bytes, including metadata, not available space in hardware VRAM. A single-tile write needs 4 bytes, a fill needs 5, and a pointer-based copy needs 6. Check space before committing; NMI can consume a committed queue asynchronously.</p><h2 id="samples">Complete sample programs</h2><p>Each program, the shared headers, the supplied ascii.c and its converted assets are included. Names beginning with m_ are helpers written for these manuals. Read each build command together with its expected result and verification record. Run commands from the parent of the sibling repository folders.</p><p><a href="../samples/build.ps1">Batch build script</a> / <a href="verification.html">Results and screenshots</a></p><details class="sample searchable" id="sample-fc_font"><summary>Display the supplied character set <code>fc_font.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>See which letters, digits and punctuation marks the supplied original font contains and how to draw them.</p><p><b>How it works: </b>m_init prepares the display and font. m_text draws each row; m_put draws the double quote using character code 34.</p><p><b>Controls and expected result: </b>Look for 26 uppercase letters, 26 lowercase letters, 10 digits and 30 punctuation marks. Check that every glyph is legible. No input is required.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_font.png" alt="Captured screen: fc_font"><figcaption>Display example: Look for 26 uppercase letters, 26 lowercase letters, 10 digits and 30 punctuation marks. Check that every glyph is legible. No input is required.</figcaption></figure><p><a href="../samples/fc_font.c" download>Download source</a> / <a href="verification.html#fc_font">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_font.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_font.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Display the letters, digits and punctuation from the supplied ascii.c font.
+<p><code>vram_get_queue_capacity()</code> returns the total command-buffer capacity (128 bytes). <code>vram_get_queue_free()</code> returns the remaining bytes: total capacity minus <code>vram_get_queue_used()</code>. These are encoded command bytes, including metadata, not available space in hardware VRAM. A single-tile write needs 4 bytes, a fill needs 5, and a pointer-based copy needs 6. Check space before committing; NMI can consume a committed queue asynchronously.</p><h2 id="samples">Complete sample programs</h2><p>Each program, the shared headers, the supplied ascii.c and its converted assets are included. Names beginning with m_ are helpers written for these manuals. Read each build command together with its expected result and verification record. Run commands from the parent of the sibling repository folders.</p><p><a href="../samples/build.ps1">Batch build script</a> / <a href="verification.html">Results and screenshots</a></p><details class="sample searchable" id="sample-fc_font"><summary>Display the supplied character set <code>fc_font.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>See which letters, digits and punctuation marks the supplied original font contains and how to draw them.</p><p><b>How it works: </b>m_init prepares the display and font. m_text draws each row; m_put draws the double quote using character code 34.</p><p><b>Controls and expected result: </b>Look for 26 uppercase letters, 26 lowercase letters, 10 digits and 30 punctuation marks. Check that every glyph is legible. No input is required.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_font.png" alt="Display the supplied character set: Look for 26 uppercase letters, 26 lowercase letters, 10 digits and 30 punctuation marks. Check that every glyph is legible. No input is required."><figcaption>Display example: Look for 26 uppercase letters, 26 lowercase letters, 10 digits and 30 punctuation marks. Check that every glyph is legible. No input is required.</figcaption></figure><p><a href="../samples/fc_font.c" download>Download source</a> / <a href="verification.html#fc_font">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_font.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_font.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Display the letters, digits and punctuation from the supplied ascii.c font.
 // Expected: Uppercase, lowercase, numbers and all 30 supplied punctuation glyphs
 #include &quot;fc_common.h&quot;
 
@@ -365,7 +365,7 @@ void main(void) {
     m_text(2,14,&quot;:;&lt;=&gt;?@[]^_`{}~&quot;); m_wait();
     m_put(16,13,34); m_wait();
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_hello"><summary>Your first text display <code>fc_hello.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn the basic sequence for starting a ROM and drawing text and a number on the background.</p><p><b>How it works: </b>After m_init, m_text draws the greeting and m_number formats 42. The final loop waits for frames while leaving the screen visible.</p><p><b>Controls and expected result: </b>The screen shows HELLO WORLD and 042. The leading zero is three-digit decimal formatting.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_hello.png" alt="Captured screen: fc_hello"><figcaption>Display example: The screen shows HELLO WORLD and 042. The leading zero is three-digit decimal formatting.</figcaption></figure><p><a href="../samples/fc_hello.c" download>Download source</a> / <a href="verification.html#fc_hello">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_hello.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_hello.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Display a first message on screen.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_hello"><summary>Your first text display <code>fc_hello.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn the basic sequence for starting a ROM and drawing text and a number on the background.</p><p><b>How it works: </b>After m_init, m_text draws the greeting and m_number formats 42. The final loop waits for frames while leaving the screen visible.</p><p><b>Controls and expected result: </b>The screen shows HELLO WORLD and 042. The leading zero is three-digit decimal formatting.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_hello.png" alt="Your first text display: The screen shows HELLO WORLD and 042. The leading zero is three-digit decimal formatting."><figcaption>Display example: The screen shows HELLO WORLD and 042. The leading zero is three-digit decimal formatting.</figcaption></figure><p><a href="../samples/fc_hello.c" download>Download source</a> / <a href="verification.html#fc_hello">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_hello.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_hello.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Display a first message on screen.
 // Expected: HELLO WORLD and 042
 #include &quot;fc_common.h&quot;
 
@@ -378,7 +378,7 @@ void main(void) {
     m_text(2,5,&quot;HELLO WORLD&quot;);
     m_number(42);
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_arithmetic"><summary>Arithmetic with a wider intermediate <code>fc_arithmetic.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn to keep an intermediate result that does not fit in eight bits.</p><p><b>How it works: </b>(u16)200 + 100 produces 300. The program divides it by 10, then converts the result to u8 for display. Notice that the widening cast precedes the addition.</p><p><b>Controls and expected result: </b>030 represents the calculated result, 30.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_arithmetic.png" alt="Captured screen: fc_arithmetic"><figcaption>Display example: 030 represents the calculated result, 30.</figcaption></figure><p><a href="../samples/fc_arithmetic.c" download>Download source</a> / <a href="verification.html#fc_arithmetic">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_arithmetic.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_arithmetic.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Variables, arithmetic and type conversion.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_arithmetic"><summary>Arithmetic with a wider intermediate <code>fc_arithmetic.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn to keep an intermediate result that does not fit in eight bits.</p><p><b>How it works: </b>(u16)200 + 100 produces 300. The program divides it by 10, then converts the result to u8 for display. Notice that the widening cast precedes the addition.</p><p><b>Controls and expected result: </b>030 represents the calculated result, 30.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_arithmetic.png" alt="Arithmetic with a wider intermediate: 030 represents the calculated result, 30."><figcaption>Display example: 030 represents the calculated result, 30.</figcaption></figure><p><a href="../samples/fc_arithmetic.c" download>Download source</a> / <a href="verification.html#fc_arithmetic">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_arithmetic.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_arithmetic.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Variables, arithmetic and type conversion.
 // Expected: 030
 #include &quot;fc_common.h&quot;
 
@@ -392,7 +392,7 @@ void main(void) {
     sum = (u16)200 + 100;
     m_number((u8)(sum / 10));
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_control"><summary>Branches and loops <code>fc_control.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Try for, continue, while and if/else in a small calculation.</p><p><b>How it works: </b>The for loop skips 3 while adding 0 through 7, producing 25. The while loop advances to 32; the following if assigns 42 when that value matches.</p><p><b>Controls and expected result: </b>042 is the final result. This program uses an if/else branch.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_control.png" alt="Captured screen: fc_control"><figcaption>Display example: 042 is the final result. This program uses an if/else branch.</figcaption></figure><p><a href="../samples/fc_control.c" download>Download source</a> / <a href="verification.html#fc_control">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_control.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_control.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Conditional branches and loops.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_control"><summary>Branches and loops <code>fc_control.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Try for, continue, while and if/else in a small calculation.</p><p><b>How it works: </b>The for loop skips 3 while adding 0 through 7, producing 25. The while loop advances to 32; the following if assigns 42 when that value matches.</p><p><b>Controls and expected result: </b>042 is the final result. This program uses an if/else branch.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_control.png" alt="Branches and loops: 042 is the final result. This program uses an if/else branch."><figcaption>Display example: 042 is the final result. This program uses an if/else branch.</figcaption></figure><p><a href="../samples/fc_control.c" download>Download source</a> / <a href="verification.html#fc_control">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_control.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_control.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Conditional branches and loops.
 // Expected: 042
 #include &quot;fc_common.h&quot;
 
@@ -407,7 +407,7 @@ void main(void) {
     if (sum==32) sum=42; else sum=0;
     m_number(sum);
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_aggregate"><summary>Functions, arrays, structures and pointers <code>fc_aggregate.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn to group values and access them through functions and pointers.</p><p><b>How it works: </b>The program copies a Point containing (10,20), then writes 1 through 4 into an array through a pointer. It adds the function result 30 to array values 1, 2 and 4 and the constant 5.</p><p><b>Controls and expected result: </b>The sum is displayed as 042. Follow the structure copy, the ptr[i] writes and the function return value.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_aggregate.png" alt="Captured screen: fc_aggregate"><figcaption>Display example: The sum is displayed as 042. Follow the structure copy, the ptr[i] writes and the function return value.</figcaption></figure><p><a href="../samples/fc_aggregate.c" download>Download source</a> / <a href="verification.html#fc_aggregate">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_aggregate.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_aggregate.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Functions, arrays, structures and pointers.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_aggregate"><summary>Functions, arrays, structures and pointers <code>fc_aggregate.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn to group values and access them through functions and pointers.</p><p><b>How it works: </b>The program copies a Point containing (10,20), then writes 1 through 4 into an array through a pointer. It adds the function result 30 to array values 1, 2 and 4 and the constant 5.</p><p><b>Controls and expected result: </b>The sum is displayed as 042. Follow the structure copy, the ptr[i] writes and the function return value.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_aggregate.png" alt="Functions, arrays, structures and pointers: The sum is displayed as 042. Follow the structure copy, the ptr[i] writes and the function return value."><figcaption>Display example: The sum is displayed as 042. Follow the structure copy, the ptr[i] writes and the function return value.</figcaption></figure><p><a href="../samples/fc_aggregate.c" download>Download source</a> / <a href="verification.html#fc_aggregate">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_aggregate.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_aggregate.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Functions, arrays, structures and pointers.
 // Expected: 042
 #include &quot;fc_common.h&quot;
 
@@ -424,7 +424,7 @@ void main(void) {
     for(i=0;i&lt;4;i++) ptr[i]=(u8)(i+1);
     m_number((u8)(add(b.x,b.y)+ptr[0]+ptr[1]+ptr[3]+5));
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_bits_memory"><summary>Bit flags and buffer copying <code>fc_bits_memory.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Pack flags into a byte and copy a buffer into separate storage.</p><p><b>How it works: </b>__memset clears four bytes. The program sets bit 3, toggles bit 1, then copies all four bytes with __memcpy.</p><p><b>Controls and expected result: </b>The first destination byte is displayed as 010: bit 3 contributes 8 and bit 1 contributes 2.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_bits_memory.png" alt="Captured screen: fc_bits_memory"><figcaption>Display example: The first destination byte is displayed as 010: bit 3 contributes 8 and bit 1 contributes 2.</figcaption></figure><p><a href="../samples/fc_bits_memory.c" download>Download source</a> / <a href="verification.html#fc_bits_memory">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_bits_memory.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_bits_memory.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Bit operations and memory copying.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_bits_memory"><summary>Bit flags and buffer copying <code>fc_bits_memory.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Pack flags into a byte and copy a buffer into separate storage.</p><p><b>How it works: </b>__memset clears four bytes. The program sets bit 3, toggles bit 1, then copies all four bytes with __memcpy.</p><p><b>Controls and expected result: </b>The first destination byte is displayed as 010: bit 3 contributes 8 and bit 1 contributes 2.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_bits_memory.png" alt="Bit flags and buffer copying: The first destination byte is displayed as 010: bit 3 contributes 8 and bit 1 contributes 2."><figcaption>Display example: The first destination byte is displayed as 010: bit 3 contributes 8 and bit 1 contributes 2.</figcaption></figure><p><a href="../samples/fc_bits_memory.c" download>Download source</a> / <a href="verification.html#fc_bits_memory">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_bits_memory.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_bits_memory.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Bit operations and memory copying.
 // Expected: 010
 #include &quot;fc_common.h&quot;
 
@@ -437,7 +437,7 @@ void main(void) {
     __memset(data,0,4); __bit_set(data,3); __bit_toggle(data,1);
     __memcpy(copy,data,4); m_number(copy[0]);
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_input"><summary>Count new button presses <code>fc_input.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Distinguish a newly pressed button from one that remains held.</p><p><b>How it works: </b>Each frame calls input_update. The counter advances only when input_pressed(BTN_A) is true.</p><p><b>Controls and expected result: </b>The initial count is 000. Press A to get 001; holding it does not add more. Release and press again for 002. The byte counter wraps from 255 to 000.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_input.png" alt="Captured screen: fc_input"><figcaption>Display example: The initial count is 000. Press A to get 001; holding it does not add more. Release and press again for 002. The byte counter wraps from 255 to 000.</figcaption></figure><p><a href="../samples/fc_input.c" download>Download source</a> / <a href="verification.html#fc_input">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/input.c kitaq-docs/samples/fc_input.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_input.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Distinguish a new button press from a held button.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_input"><summary>Count new button presses <code>fc_input.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Distinguish a newly pressed button from one that remains held.</p><p><b>How it works: </b>Each frame calls input_update. The counter advances only when input_pressed(BTN_A) is true.</p><p><b>Controls and expected result: </b>The initial count is 000. Press A to get 001; holding it does not add more. Release and press again for 002. The byte counter wraps from 255 to 000.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_input.png" alt="Count new button presses: The initial count is 000. Press A to get 001; holding it does not add more. Release and press again for 002. The byte counter wraps from 255 to 000."><figcaption>Display example: The initial count is 000. Press A to get 001; holding it does not add more. Release and press again for 002. The byte counter wraps from 255 to 000.</figcaption></figure><p><a href="../samples/fc_input.c" download>Download source</a> / <a href="verification.html#fc_input">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/input.c kitaq-docs/samples/fc_input.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_input.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Distinguish a new button press from a held button.
 // Expected: 000 initially; A increments once per press
 #include &quot;fc_common.h&quot;
 #include &quot;input.h&quot;
@@ -450,7 +450,7 @@ void main(void) {
     input_init();
     m_number(0);
     while (1) { m_wait(); input_update(); if(input_pressed(BTN_A)) { manual_count++; m_number(manual_count); } }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_fixed"><summary>Multiply Q8.8 fixed-point values <code>fc_fixed.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn integer-to-Q8.8 conversion, multiplication and conversion back to an integer.</p><p><b>How it works: </b>fix_from_int converts 3 and 4 to Q8.8. fix_mul multiplies them, and fix_to_int converts the product back.</p><p><b>Controls and expected result: </b>012 means 3 × 4 = 12. It is the converted integer, not the internal value scaled by 256.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_fixed.png" alt="Captured screen: fc_fixed"><figcaption>Display example: 012 means 3 × 4 = 12. It is the converted integer, not the internal value scaled by 256.</figcaption></figure><p><a href="../samples/fc_fixed.c" download>Download source</a> / <a href="verification.html#fc_fixed">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/fixed.c kitaq-docs/samples/fc_fixed.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_fixed.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Calculate with signed Q8.8 fixed-point values.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_fixed"><summary>Multiply Q8.8 fixed-point values <code>fc_fixed.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn integer-to-Q8.8 conversion, multiplication and conversion back to an integer.</p><p><b>How it works: </b>fix_from_int converts 3 and 4 to Q8.8. fix_mul multiplies them, and fix_to_int converts the product back.</p><p><b>Controls and expected result: </b>012 means 3 × 4 = 12. It is the converted integer, not the internal value scaled by 256.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_fixed.png" alt="Multiply Q8.8 fixed-point values: 012 means 3 × 4 = 12. It is the converted integer, not the internal value scaled by 256."><figcaption>Display example: 012 means 3 × 4 = 12. It is the converted integer, not the internal value scaled by 256.</figcaption></figure><p><a href="../samples/fc_fixed.c" download>Download source</a> / <a href="verification.html#fc_fixed">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/fixed.c kitaq-docs/samples/fc_fixed.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_fixed.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Calculate with signed Q8.8 fixed-point values.
 // Expected: 012
 #include &quot;fc_common.h&quot;
 #include &quot;fixed.h&quot;
@@ -463,7 +463,7 @@ void main(void) {
     fix8 a; fix8 b; a=fix_from_int(3); b=fix_from_int(4);
     m_number((u8)fix_to_int(fix_mul(a,b)));
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_entity"><summary>Allocate from a fixed object pool <code>fc_entity.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Create an object from a fixed set of slots without dynamic allocation.</p><p><b>How it works: </b>entity_init resets the pool. entity_create creates type 1 at (20,30); the program checks for the failure ID 0xFF before setting vx to 2.</p><p><b>Controls and expected result: </b>001 is the active object count, not an ID or coordinate. This example does not update or draw the object, so no moving character appears.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_entity.png" alt="Captured screen: fc_entity"><figcaption>Display example: 001 is the active object count, not an ID or coordinate. This example does not update or draw the object, so no moving character appears.</figcaption></figure><p><a href="../samples/fc_entity.c" download>Download source</a> / <a href="verification.html#fc_entity">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/entity.c kitaq-docs/samples/fc_entity.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_entity.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Allocate an entity from a fixed-capacity object pool.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_entity"><summary>Allocate from a fixed object pool <code>fc_entity.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Create an object from a fixed set of slots without dynamic allocation.</p><p><b>How it works: </b>entity_init resets the pool. entity_create creates type 1 at (20,30); the program checks for the failure ID 0xFF before setting vx to 2.</p><p><b>Controls and expected result: </b>001 is the active object count, not an ID or coordinate. This example does not update or draw the object, so no moving character appears.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_entity.png" alt="Allocate from a fixed object pool: 001 is the active object count, not an ID or coordinate. This example does not update or draw the object, so no moving character appears."><figcaption>Display example: 001 is the active object count, not an ID or coordinate. This example does not update or draw the object, so no moving character appears.</figcaption></figure><p><a href="../samples/fc_entity.c" download>Download source</a> / <a href="verification.html#fc_entity">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/entity.c kitaq-docs/samples/fc_entity.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_entity.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Allocate an entity from a fixed-capacity object pool.
 // Expected: 001
 #include &quot;fc_common.h&quot;
 #include &quot;entity.h&quot;
@@ -476,7 +476,7 @@ void main(void) {
     u8 id; entity_init(); id=entity_create(1,20,30);
     if(id!=0xFF) entity_get(id)-&gt;vx=2; m_number(entity_count_active());
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_debug"><summary>Record a diagnostic value in RAM <code>fc_debug.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Keep a named game value in a diagnostic buffer separately from the screen display.</p><p><b>How it works: </b>The program initializes debugging, sets frame tag 1 and records the value 42 under the name HP.</p><p><b>Controls and expected result: </b>001 is the number of trace entries. HP=42 is stored in the diagnostic buffer; the screen alone does not show or verify that payload.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_debug.png" alt="Captured screen: fc_debug"><figcaption>Display example: 001 is the number of trace entries. HP=42 is stored in the diagnostic buffer; the screen alone does not show or verify that payload.</figcaption></figure><p><a href="../samples/fc_debug.c" download>Download source</a> / <a href="verification.html#fc_debug">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/debug.c kitaq-docs/samples/fc_debug.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_debug.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Record diagnostic values in the debug trace.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_debug"><summary>Record a diagnostic value in RAM <code>fc_debug.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Keep a named game value in a diagnostic buffer separately from the screen display.</p><p><b>How it works: </b>The program initializes debugging, sets frame tag 1 and records the value 42 under the name HP.</p><p><b>Controls and expected result: </b>001 is the number of trace entries. HP=42 is stored in the diagnostic buffer; the screen alone does not show or verify that payload.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_debug.png" alt="Record a diagnostic value in RAM: 001 is the number of trace entries. HP=42 is stored in the diagnostic buffer; the screen alone does not show or verify that payload."><figcaption>Display example: 001 is the number of trace entries. HP=42 is stored in the diagnostic buffer; the screen alone does not show or verify that payload.</figcaption></figure><p><a href="../samples/fc_debug.c" download>Download source</a> / <a href="verification.html#fc_debug">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/debug.c kitaq-docs/samples/fc_debug.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_debug.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Record diagnostic values in the debug trace.
 // Expected: 001; trace log contains HP=42
 #include &quot;fc_common.h&quot;
 #include &quot;debug.h&quot;
@@ -489,7 +489,7 @@ void main(void) {
     debug_init(); debug_set_frame(1); debug_trace_u8(&quot;HP&quot;,42);
     m_number(debug_get_trace_count());
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_chain"><summary>Store a position history <code>fc_chain.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn how to store a trail of positions in a ring buffer.</p><p><b>How it works: </b>chain_init attaches an array with room for four points. chain_push_head then records (20,30).</p><p><b>Controls and expected result: </b>042 is a fixed completion marker, not a coordinate or count. Inspect trail and points to check the stored history. This program does not draw a following body.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_chain.png" alt="Captured screen: fc_chain"><figcaption>Display example: 042 is a fixed completion marker, not a coordinate or count. Inspect trail and points to check the stored history. This program does not draw a following body.</figcaption></figure><p><a href="../samples/fc_chain.c" download>Download source</a> / <a href="verification.html#fc_chain">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/chain.c kitaq-docs/samples/fc_chain.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_chain.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Store a position history in a ring buffer.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_chain"><summary>Store a position history <code>fc_chain.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn how to store a trail of positions in a ring buffer.</p><p><b>How it works: </b>chain_init attaches an array with room for four points. chain_push_head then records (20,30).</p><p><b>Controls and expected result: </b>042 is a fixed completion marker, not a coordinate or count. Inspect trail and points to check the stored history. This program does not draw a following body.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_chain.png" alt="Store a position history: 042 is a fixed completion marker, not a coordinate or count. Inspect trail and points to check the stored history. This program does not draw a following body."><figcaption>Display example: 042 is a fixed completion marker, not a coordinate or count. Inspect trail and points to check the stored history. This program does not draw a following body.</figcaption></figure><p><a href="../samples/fc_chain.c" download>Download source</a> / <a href="verification.html#fc_chain">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/chain.c kitaq-docs/samples/fc_chain.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_chain.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Store a position history in a ring buffer.
 // Expected: 042; history contains (20,30)
 #include &quot;fc_common.h&quot;
 #include &quot;chain.h&quot;
@@ -502,7 +502,7 @@ void main(void) {
     chain_init(&amp;trail,points,4); chain_push_head(&amp;trail,20,30);
     m_number(42);
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_system"><summary>Read the library frame counter <code>fc_system.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>See how counted frame waits affect the library frame counter.</p><p><b>How it works: </b>After system_init, the program calls system_wait_vblank twice and displays system_get_frame8.</p><p><b>Controls and expected result: </b>The result is 002. The idle loop uses the manual helper m_wait, so the displayed value does not keep increasing.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_system.png" alt="Captured screen: fc_system"><figcaption>Display example: The result is 002. The idle loop uses the manual helper m_wait, so the displayed value does not keep increasing.</figcaption></figure><p><a href="../samples/fc_system.c" download>Download source</a> / <a href="verification.html#fc_system">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/system.c kitaq-docs/samples/fc_system.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_system.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Count completed frame waits.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_system"><summary>Read the library frame counter <code>fc_system.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>See how counted frame waits affect the library frame counter.</p><p><b>How it works: </b>After system_init, the program calls system_wait_vblank twice and displays system_get_frame8.</p><p><b>Controls and expected result: </b>The result is 002. The idle loop uses the manual helper m_wait, so the displayed value does not keep increasing.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_system.png" alt="Read the library frame counter: The result is 002. The idle loop uses the manual helper m_wait, so the displayed value does not keep increasing."><figcaption>Display example: The result is 002. The idle loop uses the manual helper m_wait, so the displayed value does not keep increasing.</figcaption></figure><p><a href="../samples/fc_system.c" download>Download source</a> / <a href="verification.html#fc_system">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/system.c kitaq-docs/samples/fc_system.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_system.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Count completed frame waits.
 // Expected: 002
 #include &quot;fc_common.h&quot;
 #include &quot;system.h&quot;
@@ -515,7 +515,7 @@ void main(void) {
     system_init(); system_wait_vblank(); system_wait_vblank();
     m_number(system_get_frame8());
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_scene"><summary>Select the current scene ID <code>fc_scene.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn to select an ID that can distinguish scenes such as a title screen and gameplay.</p><p><b>How it works: </b>The program registers two zero-initialized SceneDef entries and selects ID 1 with scene_change.</p><p><b>Controls and expected result: </b>001 is the current ID returned by scene_get_current. No scene callbacks or transition drawing are registered in this example.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_scene.png" alt="Captured screen: fc_scene"><figcaption>Display example: 001 is the current ID returned by scene_get_current. No scene callbacks or transition drawing are registered in this example.</figcaption></figure><p><a href="../samples/fc_scene.c" download>Download source</a> / <a href="verification.html#fc_scene">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/runtime.c kitaqfc/lib/scene.c kitaq-docs/samples/fc_scene.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_scene.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// The scene streaming module shares runtime.c queue symbols, even though this demo only changes IDs.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_scene"><summary>Select the current scene ID <code>fc_scene.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Learn to select an ID that can distinguish scenes such as a title screen and gameplay.</p><p><b>How it works: </b>The program registers two zero-initialized SceneDef entries and selects ID 1 with scene_change.</p><p><b>Controls and expected result: </b>001 is the current ID returned by scene_get_current. No scene callbacks or transition drawing are registered in this example.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_scene.png" alt="Select the current scene ID: 001 is the current ID returned by scene_get_current. No scene callbacks or transition drawing are registered in this example."><figcaption>Display example: 001 is the current ID returned by scene_get_current. No scene callbacks or transition drawing are registered in this example.</figcaption></figure><p><a href="../samples/fc_scene.c" download>Download source</a> / <a href="verification.html#fc_scene">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/runtime.c kitaqfc/lib/scene.c kitaq-docs/samples/fc_scene.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_scene.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// The scene streaming module shares runtime.c queue symbols, even though this demo only changes IDs.
 #define MANUAL_FC_RUNTIME 1
 // Switch the current scene ID.
 // Expected: 001; no callbacks registered
@@ -530,7 +530,7 @@ void main(void) {
     scene_init(manual_scenes,2); scene_change(1);
     m_number(scene_get_current());
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_subpixel"><summary>Accumulate fractional Q5.3 motion <code>fc_subpixel.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Keep subpixel motion as a remainder and carry whole pixels into the position.</p><p><b>How it works: </b>Starting at X=40, the loop adds 2/8 pixel eight times. A right shift extracts whole pixels; a mask retains the remainder.</p><p><b>Controls and expected result: </b>The total motion is two pixels, so the screen shows X=42 as 042. This manual integration example handles positive motion; negative motion needs a matching borrow path.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_subpixel.png" alt="Captured screen: fc_subpixel"><figcaption>Display example: The total motion is two pixels, so the screen shows X=42 as 042. This manual integration example handles positive motion; negative motion needs a matching borrow path.</figcaption></figure><p><a href="../samples/fc_subpixel.c" download>Download source</a> / <a href="verification.html#fc_subpixel">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_subpixel.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_subpixel.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Accumulate Q5.3 eighth-pixel motion into an integer coordinate.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_subpixel"><summary>Accumulate fractional Q5.3 motion <code>fc_subpixel.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Keep subpixel motion as a remainder and carry whole pixels into the position.</p><p><b>How it works: </b>Starting at X=40, the loop adds 2/8 pixel eight times. A right shift extracts whole pixels; a mask retains the remainder.</p><p><b>Controls and expected result: </b>The total motion is two pixels, so the screen shows X=42 as 042. This manual integration example handles positive motion; negative motion needs a matching borrow path.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_subpixel.png" alt="Accumulate fractional Q5.3 motion: The total motion is two pixels, so the screen shows X=42 as 042. This manual integration example handles positive motion; negative motion needs a matching borrow path."><figcaption>Display example: The total motion is two pixels, so the screen shows X=42 as 042. This manual integration example handles positive motion; negative motion needs a matching borrow path.</figcaption></figure><p><a href="../samples/fc_subpixel.c" download>Download source</a> / <a href="verification.html#fc_subpixel">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_subpixel.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_subpixel.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Accumulate Q5.3 eighth-pixel motion into an integer coordinate.
 // Expected: 042; explicit game-side integration using header constants
 #include &quot;fc_common.h&quot;
 #include &quot;physics2d.h&quot;
@@ -550,7 +550,7 @@ void main(void) {
     }
     m_number(x);
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_scroll"><summary>Scroll the NES background <code>fc_scroll.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Move the background by updating the PPU scroll position.</p><p><b>How it works: </b>Starting at __scroll_set(0,0), the program increments phase once per frame and uses it as the horizontal position.</p><p><b>Controls and expected result: </b>The word SCROLL changes horizontal position. phase wraps from 255 to 0. This is not a wide-map example spanning multiple nametables.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_scroll.png" alt="Captured screen: fc_scroll"><figcaption>Display example: The word SCROLL changes horizontal position. phase wraps from 255 to 0. This is not a wide-map example spanning multiple nametables.</figcaption></figure><p><a href="../samples/fc_scroll.c" download>Download source</a> / <a href="verification.html#fc_scroll">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_scroll.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_scroll.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Scroll the NES background horizontally.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_scroll"><summary>Scroll the NES background <code>fc_scroll.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Move the background by updating the PPU scroll position.</p><p><b>How it works: </b>Starting at __scroll_set(0,0), the program increments phase once per frame and uses it as the horizontal position.</p><p><b>Controls and expected result: </b>The word SCROLL changes horizontal position. phase wraps from 255 to 0. This is not a wide-map example spanning multiple nametables.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_scroll.png" alt="Scroll the NES background: The word SCROLL changes horizontal position. phase wraps from 255 to 0. This is not a wide-map example spanning multiple nametables."><figcaption>Display example: The word SCROLL changes horizontal position. phase wraps from 255 to 0. This is not a wide-map example spanning multiple nametables.</figcaption></figure><p><a href="../samples/fc_scroll.c" download>Download source</a> / <a href="verification.html#fc_scroll">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_scroll.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_scroll.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Scroll the NES background horizontally.
 // Expected: title scrolls horizontally
 #include &quot;fc_common.h&quot;
 
@@ -562,7 +562,7 @@ void main(void) {
     m_text(2,3,&quot;SCROLL&quot;);
     __scroll_set(0,0);
     while (1) { m_wait(); phase++; __scroll_set(phase,0); }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_vram_queue"><summary>Apply a tile update through NMI <code>fc_vram_queue.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Submit a PPU update from the main program for the NMI path to apply.</p><p><b>How it works: </b>__vramq_put queues tile 52 at nametable address 0x2103, and __vramq_commit submits it. That address corresponds to tile coordinate (3,8).</p><p><b>Controls and expected result: </b>A single 4 appears at background coordinate (3,8). Tile 52 is the digit 4 in the supplied font.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_vram_queue.png" alt="Captured screen: fc_vram_queue"><figcaption>Display example: A single 4 appears at background coordinate (3,8). Tile 52 is the digit 4 in the supplied font.</figcaption></figure><p><a href="../samples/fc_vram_queue.c" download>Download source</a> / <a href="verification.html#fc_vram_queue">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_vram_queue.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_vram_queue.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Submit a VRAM update for the NMI handler.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_vram_queue"><summary>Apply a tile update through NMI <code>fc_vram_queue.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Submit a PPU update from the main program for the NMI path to apply.</p><p><b>How it works: </b>__vramq_put queues tile 52 at nametable address 0x2103, and __vramq_commit submits it. That address corresponds to tile coordinate (3,8).</p><p><b>Controls and expected result: </b>A single 4 appears at background coordinate (3,8). Tile 52 is the digit 4 in the supplied font.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_vram_queue.png" alt="Apply a tile update through NMI: A single 4 appears at background coordinate (3,8). Tile 52 is the digit 4 in the supplied font."><figcaption>Display example: A single 4 appears at background coordinate (3,8). Tile 52 is the digit 4 in the supplied font.</figcaption></figure><p><a href="../samples/fc_vram_queue.c" download>Download source</a> / <a href="verification.html#fc_vram_queue">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_vram_queue.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_vram_queue.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Submit a VRAM update for the NMI handler.
 // Expected: 4 at (3,8)
 #include &quot;fc_common.h&quot;
 
@@ -574,7 +574,7 @@ void main(void) {
     m_text(2,3,&quot;VRAM QUEUE&quot;);
     __vramq_put(0x2103,52); __vramq_commit();
     while (1) { m_wait();  }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_sprite"><summary>Display an NES OAM sprite <code>fc_sprite.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Prepare sprite colors and OAM data to draw an image independently of the background.</p><p><b>How it works: </b>The program loads the sprite palette, sets slot 0 to position (70,80), tile 65 and attributes 0, enables rendering and repeats OAM DMA.</p><p><b>Controls and expected result: </b>A stationary letter A appears as a sprite. The example demonstrates OAM setup and transfer, not animation.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_sprite.png" alt="Captured screen: fc_sprite"><figcaption>Display example: A stationary letter A appears as a sprite. The example demonstrates OAM setup and transfer, not animation.</figcaption></figure><p><a href="../samples/fc_sprite.c" download>Download source</a> / <a href="verification.html#fc_sprite">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_sprite.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_sprite.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Display a sprite using NES OAM.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_sprite"><summary>Display an NES OAM sprite <code>fc_sprite.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Prepare sprite colors and OAM data to draw an image independently of the background.</p><p><b>How it works: </b>The program loads the sprite palette, sets slot 0 to position (70,80), tile 65 and attributes 0, enables rendering and repeats OAM DMA.</p><p><b>Controls and expected result: </b>A stationary letter A appears as a sprite. The example demonstrates OAM setup and transfer, not animation.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_sprite.png" alt="Display an NES OAM sprite: A stationary letter A appears as a sprite. The example demonstrates OAM setup and transfer, not animation."><figcaption>Display example: A stationary letter A appears as a sprite. The example demonstrates OAM setup and transfer, not animation.</figcaption></figure><p><a href="../samples/fc_sprite.c" download>Download source</a> / <a href="verification.html#fc_sprite">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe  kitaq-docs/samples/fc_sprite.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_sprite.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Display a sprite using NES OAM.
 // Expected: A sprite on screen
 #include &quot;fc_common.h&quot;
 
@@ -587,7 +587,7 @@ void main(void) {
     __palette_sp_load(manual_pal); __sprite_set(0,70,80,65,0);
     __ppu_mask_set(0x1E);
     while (1) { m_wait(); __oam_dma(); }
-}</code></pre></div></details><details class="sample searchable" id="sample-fc_sound"><summary>Play an APU pulse tone <code>fc_sound.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Set the built-in NES pulse channel control, timer and length values.</p><p><b>How it works: </b>After nes_apu_init, the program calls nes_sfx_square1(0xBF,400,20). Control 0xBF selects constant volume and halts the length counter, so the tone sustains. The value 20 is a length-table index, not 20 frames.</p><p><b>Controls and expected result: </b>A sustained pulse tone plays while 042 is displayed. Call nes_apu_silence_all to stop it. The displayed marker alone does not verify sound output.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_sound.png" alt="Captured screen: fc_sound"><figcaption>Display example: A sustained pulse tone plays while 042 is displayed. Call nes_apu_silence_all to stop it. The displayed marker alone does not verify sound output.</figcaption></figure><p><a href="../samples/fc_sound.c" download>Download source</a> / <a href="verification.html#fc_sound">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/audio.c kitaq-docs/samples/fc_sound.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_sound.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Play a pulse-channel effect on the built-in NES APU.
+}</code></pre></div></details><details class="sample searchable" id="sample-fc_sound"><summary>Play an APU pulse tone <code>fc_sound.c</code></summary><div class="sample-guide"><p><b>Purpose: </b>Set the built-in NES pulse channel control, timer and length values.</p><p><b>How it works: </b>After nes_apu_init, the program calls nes_sfx_square1(0xBF,400,20). Control 0xBF selects constant volume and halts the length counter, so the tone sustains. The value 20 is a length-table index, not 20 frames.</p><p><b>Controls and expected result: </b>A sustained pulse tone plays while 042 is displayed. Call nes_apu_silence_all to stop it. The displayed marker alone does not verify sound output.</p></div><figure class="example-result"><img class="screen" loading="lazy" src="../verification/fc_sound.png" alt="Play an APU pulse tone: A sustained pulse tone plays while 042 is displayed. Call nes_apu_silence_all to stop it. The displayed marker alone does not verify sound output."><figcaption>Display example: A sustained pulse tone plays while 042 is displayed. Call nes_apu_silence_all to stop it. The displayed marker alone does not verify sound output.</figcaption></figure><p><a href="../samples/fc_sound.c" download>Download source</a> / <a href="verification.html#fc_sound">Verification status</a></p><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>.\kitaqfc\kitaqfc.exe kitaqfc/lib/audio.c kitaq-docs/samples/fc_sound.c -I kitaqfc/lib -I kitaq-docs/samples -o out/fc_sound.nes --mapper=nrom --nes-chr=kitaq-docs/samples/font.chr</code></pre></div><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Play a pulse-channel effect on the built-in NES APU.
 // Expected: 042 and a pulse tone
 #include &quot;fc_common.h&quot;
 #include &quot;audio.h&quot;
@@ -602,7 +602,7 @@ void main(void) {
     nes_apu_init(); nes_sfx_square1(0xBF,400,20);
     m_number(42);
     while (1) { m_wait();  }
-}</code></pre></div></details><h2 id="api">Library API dictionary</h2><p>219 entries. Open an entry for its syntax, arguments, source notes and usage example. Calling fragments require surrounding initialization; they are not standalone ROMs. Argument-passing examples show how prepared values reach the API, and do not establish device-level verification.</p><p>Source excerpts and original declaration notes are reproduced verbatim, including comments in their original language. The English explanation precedes each declaration.</p><h3 id="module-actor">actor.h — Game actor arrays</h3><!-- api-module:start --><div data-module-contract="batch300-source-20260916"><p>NesActor groups world position, screen position and rectangle size. Helpers project through a camera, write metasprite OAM and test world-space overlap. The game owns velocity, offscreen culling and OAM DMA.</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_actor_collide" data-api-contract="batch300-source-20260916"><summary><code>nes_actor_collide</code></summary><p>Test overlap of axis-aligned actor rectangles in world coordinates.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>unsigned char nes_actor_collide(struct NesActor* a, struct NesActor* b);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>a</code></dt><dd><p>First actor.</p></dd><dt><code>b</code></dt><dd><p>Second actor.</p></dd></dl><h4>Return value</h4><p>Returns 1 for overlap; 0 for separation or edges that merely touch.</p><h4>Conditions and limits</h4><p>Use positive widths/heights and keep position+size≤65535. Screen coordinates, attr and flags are ignored.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>result[3]=nes_actor_collide(&amp;a,&amp;b);nes_actor_set_world(&amp;b,315,95);result[4]=nes_actor_collide(&amp;a,&amp;b);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Project world (300,95) through camera (268,32): red and blue 8×8 parts appear at (32,64) and (40,64). This demonstrates raw OAM Y=63 appearing at 64, and collision changing from zero for touching edges to one for a one-pixel overlap.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-batch300/fc-actor/nrom/screen.png" alt="nes_actor_collide: NROM"><figcaption>NROM</figcaption></figure><p><a href="../samples/api-examples/fc/batch3_actor.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+}</code></pre></div></details><h2 id="api">Library API dictionary</h2><p>282 entries. Each entry explains the operation, arguments, return value, constraints, usage example and expected result.</p><h3 id="module-actor">actor.h — Game actor arrays</h3><!-- api-module:start --><div data-module-contract="batch300-source-20260916"><p>NesActor groups world position, screen position and rectangle size. Helpers project through a camera, write metasprite OAM and test world-space overlap. The game owns velocity, offscreen culling and OAM DMA.</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_actor_collide" data-api-contract="batch300-source-20260916"><summary><code>nes_actor_collide</code></summary><p>Test overlap of axis-aligned actor rectangles in world coordinates.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>unsigned char nes_actor_collide(struct NesActor* a, struct NesActor* b);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>a</code></dt><dd><p>First actor.</p></dd><dt><code>b</code></dt><dd><p>Second actor.</p></dd></dl><h4>Return value</h4><p>Returns 1 for overlap; 0 for separation or edges that merely touch.</p><h4>Conditions and limits</h4><p>Use positive widths/heights and keep position+size≤65535. Screen coordinates, attr and flags are ignored.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>result[3]=nes_actor_collide(&amp;a,&amp;b);nes_actor_set_world(&amp;b,315,95);result[4]=nes_actor_collide(&amp;a,&amp;b);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>Project world (300,95) through camera (268,32): red and blue 8×8 parts appear at (32,64) and (40,64). This demonstrates raw OAM Y=63 appearing at 64, and collision changing from zero for touching edges to one for a one-pixel overlap.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-batch300/fc-actor/nrom/screen.png" alt="nes_actor_collide: NROM"><figcaption>NROM</figcaption></figure><p><a href="../samples/api-examples/fc/batch3_actor.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
 .\kitaqfc\kitaqfc.exe .\kitaqfc\lib\runtime.c .\kitaq-docs\samples\api-examples\fc\batch3_actor.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\batch3_actor.nes --no-cache --no-disasm --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\vram_shapes.chr</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/actor.h:29</p><div class="original"><b>Declaration notes (original source)</b><pre>Test overlap in world coordinates with exclusive right/bottom edges. Keep
 position-plus-size sums within u16; touching edges are not collisions.
 Require positive widths and heights; zero extents are not rejected before the edge tests.</pre></div><p class="source">kitaqfc/lib/actor.c:49</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>unsigned char nes_actor_collide(struct NesActor* a, struct NesActor* b)
@@ -1375,7 +1375,7 @@ bank_expect(pointer.bank==3 &amp;&amp; pointer.ptr==payload+1,23);</code></pre><
 .\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\banked_data_calls.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\banked_data_calls.nes --mapper=mmc3 --nes-chr=.\kitaq-docs\samples\font.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/bank.h:28</p><div class="original"><b>Declaration notes (original source)</b><pre>Read one byte using both the bank and address of the supplied far pointer.</pre></div><p class="source">kitaqfc/lib/bank.c:46</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>u8 farptr_read8(BankPtr ptr)
 {
     return __farpeek8(ptr.bank, (u16)ptr.ptr);
-}</code></pre></div></details></details><h3 id="module-chain">chain.h — Joint following and position history</h3><!-- api-module:start --><div data-module-contract="chain-body-source-20260922"><p>Use <code>ChainBody</code> for articulated snakes or ropes, and <code>Chain</code> for recorded position history. Each body joint stores its current position and one of 16 headings; bends travel backward one joint per update. Body operations support wrapped fields, growth by tail duplication and corrections of up to two pixels per axis.</p></div><!-- api-module:end --><!-- chain-wrap:start --><details class="api searchable" id="api-chain_wrap_delta" data-api-contract="chain-wrap-source-20260923"><summary><code>chain_wrap_delta</code></summary><p>Calculate the shortest signed displacement from the current position to a target on an axis whose ends join. Use it for following or distance comparisons across a field edge.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>s16 chain_wrap_delta(u8 target, u8 current, u16 size);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>target</code></dt><dd><p>Target coordinate, in 0..size−1.</p></dd><dt><code>current</code></dt><dd><p>Current coordinate, in 0..size−1.</p></dd><dt><code>size</code></dt><dd><p>Wrapped axis length, 1..256: width for X, height for Y. This is a 16-bit argument so that 256 is representable.</p></dd></dl><h4>Return value</h4><p>Return the shortest displacement as s16: positive toward increasing coordinates, negative toward decreasing coordinates, or zero at the same position. Valid inputs produce −128..+128. With screen coordinates, rightward and downward displacements are positive.</p><h4>Conditions and limits</h4><p>Include <code>chain.h</code> and compile <code>chain.c</code> exactly once. No <code>Chain</code> or <code>ChainBody</code> initialization is required. The function only calculates a displacement; it does not alter coordinate arrays, joint counts or the screen.</p><p>The function does not validate or normalize inputs. Do not pass size=0, size&gt;256, or coordinates at least as large as size. Wrap coordinates from a larger coordinate system into 0..size−1 before calling.</p><p>If both routes have the same length, retain the sign of the direct target−current displacement. With size=160, 0→80 returns +80 and 80→0 returns −80. With size=1, zero is the only valid coordinate and the result is zero.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>distances[0]=chain_wrap_delta(1,159,160);   // +2: cross the right edge.
+}</code></pre></div></details></details><h3 id="module-chain">chain.h — Ring buffers for position history</h3><!-- api-module:start --><div data-module-contract="batch100-source-20260915"><p>Use <code>ChainBody</code> for articulated snakes or ropes, and <code>Chain</code> for recorded position history. Each body joint stores its current position and one of 16 headings; bends travel backward one joint per update. Body operations support wrapped fields, growth by tail duplication and corrections of up to two pixels per axis.</p></div><!-- api-module:end --><!-- chain-wrap:start --><details class="api searchable" id="api-chain_wrap_delta" data-api-contract="chain-wrap-source-20260923"><summary><code>chain_wrap_delta</code></summary><p>Calculate the shortest signed displacement from the current position to a target on an axis whose ends join. Use it for following or distance comparisons across a field edge.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>s16 chain_wrap_delta(u8 target, u8 current, u16 size);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>target</code></dt><dd><p>Target coordinate, in 0..size−1.</p></dd><dt><code>current</code></dt><dd><p>Current coordinate, in 0..size−1.</p></dd><dt><code>size</code></dt><dd><p>Wrapped axis length, 1..256: width for X, height for Y. This is a 16-bit argument so that 256 is representable.</p></dd></dl><h4>Return value</h4><p>Return the shortest displacement as s16: positive toward increasing coordinates, negative toward decreasing coordinates, or zero at the same position. Valid inputs produce −128..+128. With screen coordinates, rightward and downward displacements are positive.</p><h4>Conditions and limits</h4><p>Include <code>chain.h</code> and compile <code>chain.c</code> exactly once. No <code>Chain</code> or <code>ChainBody</code> initialization is required. The function only calculates a displacement; it does not alter coordinate arrays, joint counts or the screen.</p><p>The function does not validate or normalize inputs. Do not pass size=0, size&gt;256, or coordinates at least as large as size. Wrap coordinates from a larger coordinate system into 0..size−1 before calling.</p><p>If both routes have the same length, retain the sign of the direct target−current displacement. With size=160, 0→80 returns +80 and 80→0 returns −80. With size=1, zero is the only valid coordinate and the result is zero.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>distances[0]=chain_wrap_delta(1,159,160);   // +2: cross the right edge.
     distances[1]=chain_wrap_delta(159,1,160);   // -2: cross the left edge.
     distances[2]=chain_wrap_delta(80,0,160);    // +80: keep the direct sign.
     distances[3]=chain_wrap_delta(0,80,160);    // -80: same-length routes.
@@ -3335,31 +3335,7 @@ extent sums must fit the signed 16-bit magnitude calculations.</pre></div><p cla
 Coefficients are signed bytes scaled by 1/256; the 16-bit sum is not saturated.</pre></div><p class="source">kitaqfc/lib/physics3d.c:407</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>s16 kq3d_dot_q8_8(s16 x, s16 y, s16 z, s8 ax, s8 ay, s8 az)
 {
     return (s16)(kq2d_scale_q8(x,(s16)ax) + kq2d_scale_q8(y,(s16)ay) + kq2d_scale_q8(z,(s16)az));
-}</code></pre></div></details></details></section><!-- fc-physics-worlds:end --><h3 id="module-ppu">ppu.h / ppu.c</h3><details class="api searchable" id="api-nes_ppu_seek_bytes" data-api-contract="runtime-ppu-source-20260915"><summary><code>nes_ppu_seek_bytes</code></summary><p>Reset the shared PPU address latch by reading PPUSTATUS, then set the address from separate hi and lo bytes. This form is useful when the game already stores the address as two bytes.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_seek_bytes(unsigned char hi, unsigned char lo);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>hi / lo</code></dt><dd><p><code>hi</code> and <code>lo</code> are the upper and lower bytes of a PPU address: for example, <code>0x23, 0x42</code> means <code>0x2342</code>. They are address bytes, not tile coordinates. Normal PPU address masking and mirroring apply.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>Include ppu.h and compile ppu.c once. The byte-pair helpers reset the shared address latch themselves. They can be linked with runtime.c; the word-address helper is nes_ppu_seek and the byte-pair helper is nes_ppu_seek_bytes.</p><p>Direct PPU access requires rendering to be off or the entire operation to fit a safe VBlank interval. These functions do not wait, queue, mask NMI or restore scroll. Prevent an interrupt from changing the shared latch/address during the call. PPUCTRL bit 2 selects a destination step of 1 or 32 per data byte. The PPU handles mirroring and address wrapping; CHR-ROM cannot be written. Set the intended scroll state after access and before rendering.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>nes_ppu_seek_bytes(0x23,0x42);
-PPUDATA=1; // Red 8x8 marker at pixel (16,208).</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The high/low-address example shows latch reset and eight-bit transfer counts. Its blue copied patterns and green filled regions each use 255 bytes, leaving the last cells at (248,72) and (248,152) black. Red markers at y=208 show seek and zero-length transfers. FAILED CHECKS is 0.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-runtime-ppu/pair/screen.png" alt="nes_ppu_seek_bytes: PAIR"><figcaption>PAIR</figcaption></figure><p><a href="../samples/api-examples/fc/ppu_address_pair.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\ppu_address_pair.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\ppu_address_pair.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\vram_shapes.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/ppu.c:8</p><div class="original"><b>Declaration notes (original source)</b><pre>Reset the shared scroll/address latch before writing the address byte pair.</pre></div><p class="source">kitaqfc/lib/ppu.c:8</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_seek_bytes(unsigned char hi, unsigned char lo)
-{
-    __ppu_read_status();
-    kq_ppu_addr_register = hi;
-    kq_ppu_addr_register = lo;
-}</code></pre></div></details></details><!-- api-module:start --><div data-module-contract="runtime-ppu-source-20260915"><p>Include or compile <code>ppu.c</code> once, without <code>runtime.c</code>. Call <code>__ppu_read_status()</code> before its address-pair helpers to reset the shared latch. <code>ppu.h</code> does not declare these functions: its four screen/palette/nametable declarations have no implementations in this distribution. Including <code>ppu.c</code> supplies the functions shown here; including <code>ppu.h</code> alone does not.</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_ppu_fill" data-api-contract="runtime-ppu-source-20260915"><summary><code>nes_ppu_fill</code></summary><p>Reset the address latch, set hi/lo and write value to PPUDATA count times. This immediate fill uses an eight-bit count and does not clip to rows or rectangles.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_fill(unsigned char hi, unsigned char lo, unsigned char value, unsigned char count);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>hi / lo</code></dt><dd><p><code>hi</code> and <code>lo</code> are the upper and lower bytes of a PPU address: for example, <code>0x23, 0x42</code> means <code>0x2342</code>. They are address bytes, not tile coordinates. Normal PPU address masking and mirroring apply.</p></dd><dt><code>value</code></dt><dd><p>One byte, 0–255, written repeatedly. Its visible meaning depends on whether the destination contains tile indices, pixel planes or another byte-based structure.</p></dd><dt><code>count</code></dt><dd><p>Byte count 0..255. Zero still resets the address latch and sets the address, without writing PPUDATA.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>Include ppu.h and compile ppu.c once. The byte-pair helpers reset the shared address latch themselves. They can be linked with runtime.c; the word-address helper is nes_ppu_seek and the byte-pair helper is nes_ppu_seek_bytes.</p><p>Direct PPU access requires rendering to be off or the entire operation to fit a safe VBlank interval. These functions do not wait, queue, mask NMI or restore scroll. Prevent an interrupt from changing the shared latch/address during the call. PPUCTRL bit 2 selects a destination step of 1 or 32 per data byte. The PPU handles mirroring and address wrapping; CHR-ROM cannot be written. Set the intended scroll state after access and before rendering.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>__ppu_read_status();nes_ppu_fill(0x21,0x80,1,255);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The high/low-address example shows latch reset and eight-bit transfer counts. Its blue copied patterns and green filled regions each use 255 bytes, leaving the last cells at (248,72) and (248,152) black. Red markers at y=208 show seek and zero-length transfers. FAILED CHECKS is 0.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-runtime-ppu/pair/screen.png" alt="nes_ppu_fill: PAIR"><figcaption>PAIR</figcaption></figure><p><a href="../samples/api-examples/fc/ppu_address_pair.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\ppu_address_pair.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\ppu_address_pair.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\vram_shapes.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/ppu.c:27</p><div class="original"><b>Declaration notes (original source)</b><pre>Set the address and issue count identical PPUDATA writes without waiting for VBlank.</pre></div><p class="source">kitaqfc/lib/ppu.c:27</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_fill(unsigned char hi, unsigned char lo, unsigned char value, unsigned char count)
-{
-    unsigned char i;
-    nes_ppu_seek_bytes(hi, lo);
-    for (i = 0; i != count; ++i)
-        kq_ppu_data_register = value;
-}</code></pre></div></details></details><details class="api searchable" id="api-nes_ppu_write_bytes" data-api-contract="runtime-ppu-source-20260915"><summary><code>nes_ppu_write_bytes</code></summary><p>Reset the address latch, set hi/lo and write count source bytes directly to PPUDATA. The eight-bit count limits a call to 255 bytes. Transfer finishes before return without a queue.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_write_bytes(unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>hi / lo</code></dt><dd><p><code>hi</code> and <code>lo</code> are the upper and lower bytes of a PPU address: for example, <code>0x23, 0x42</code> means <code>0x2342</code>. They are address bytes, not tile coordinates. Normal PPU address masking and mirroring apply.</p></dd><dt><code>src</code></dt><dd><p>CPU pointer to at least the requested number of readable bytes. Keep the source mapped and stable until this synchronous transfer returns. There is no bank switching, retained queue pointer or source-length check; a zero count does not dereference the pointer.</p></dd><dt><code>count</code></dt><dd><p>Byte count 0..255. Zero still resets the address latch and sets the address, without writing PPUDATA.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>Include ppu.h and compile ppu.c once. The byte-pair helpers reset the shared address latch themselves. They can be linked with runtime.c; the word-address helper is nes_ppu_seek and the byte-pair helper is nes_ppu_seek_bytes.</p><p>Direct PPU access requires rendering to be off or the entire operation to fit a safe VBlank interval. These functions do not wait, queue, mask NMI or restore scroll. Prevent an interrupt from changing the shared latch/address during the call. PPUCTRL bit 2 selects a destination step of 1 or 32 per data byte. The PPU handles mirroring and address wrapping; CHR-ROM cannot be written. Set the intended scroll state after access and before rendering.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>__ppu_read_status();nes_ppu_write_bytes(0x20,0x40,source_bytes,255);
-source_bytes[0]=3; // The completed transfer retains tile 1.</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The high/low-address example shows latch reset and eight-bit transfer counts. Its blue copied patterns and green filled regions each use 255 bytes, leaving the last cells at (248,72) and (248,152) black. Red markers at y=208 show seek and zero-length transfers. FAILED CHECKS is 0.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-runtime-ppu/pair/screen.png" alt="nes_ppu_write_bytes: PAIR"><figcaption>PAIR</figcaption></figure><p><a href="../samples/api-examples/fc/ppu_address_pair.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
-.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\ppu_address_pair.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\ppu_address_pair.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\vram_shapes.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/ppu.c:18</p><div class="original"><b>Declaration notes (original source)</b><pre>Set the address and write count bytes directly through PPUDATA. The current
-PPUCTRL increment mode determines how the destination advances.
-count is 0..255; zero still changes PPU address/latch state. No bank switch or payload copy is performed.</pre></div><p class="source">kitaqfc/lib/ppu.c:18</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_write_bytes(unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count)
-{
-    unsigned char i;
-    nes_ppu_seek_bytes(hi, lo);
-    for (i = 0; i != count; ++i)
-        kq_ppu_data_register = src[i];
-}</code></pre></div></details></details><details class="api searchable" id="api-nes_ppu_clear_nt" data-api-contract="ppu-declarations-source-20260915"><summary><code>nes_ppu_clear_nt</code></summary><p>Fill all 960 tile bytes and 64 packed attribute bytes of one logical nametable. Temporarily select address increment 1, then restore PPUCTRL. Invalid base addresses do nothing.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_clear_nt(unsigned short nt_base, unsigned char tile, unsigned char attr);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>nt_base / tile / attr</code></dt><dd><p>nt_base must be 0x2000, 0x2400, 0x2800 or 0x2C00. tile is the tile number for all 960 entries; attr is the packed four-quadrant palette byte for all 64 attribute entries. Cartridge mirroring determines which logical tables share memory.</p></dd></dl><h4>Return value</h4><p>No return value. Writes complete synchronously.</p><h4>Conditions and limits</h4><p>Compile ppu.c and include ppu.h. Bulk transfers require rendering off; these routines do not wait for VBlank or queue writes. Prevent concurrent PPU access and restore scroll before displaying. Set control/mask through library or intrinsic setters so their software shadows remain correct; direct register writes bypass those shadows.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>nes_ppu_clear_nt(0x2000,0,0); // All 960 tiles and 64 packed attribute bytes.
+}</code></pre></div></details></details></section><!-- fc-physics-worlds:end --><h3 id="module-ppu">ppu.h — PPU display declarations</h3><!-- api-module:start --><div data-module-contract="runtime-ppu-source-20260915"><p>Include ppu.h and compile ppu.c once. The byte-pair helpers reset the shared address latch themselves. They can be linked with runtime.c; the word-address helper is nes_ppu_seek and the byte-pair helper is nes_ppu_seek_bytes.</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_ppu_clear_nt" data-api-contract="ppu-declarations-source-20260915"><summary><code>nes_ppu_clear_nt</code></summary><p>Fill all 960 tile bytes and 64 packed attribute bytes of one logical nametable. Temporarily select address increment 1, then restore PPUCTRL. Invalid base addresses do nothing.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_clear_nt(unsigned short nt_base, unsigned char tile, unsigned char attr);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>nt_base / tile / attr</code></dt><dd><p>nt_base must be 0x2000, 0x2400, 0x2800 or 0x2C00. tile is the tile number for all 960 entries; attr is the packed four-quadrant palette byte for all 64 attribute entries. Cartridge mirroring determines which logical tables share memory.</p></dd></dl><h4>Return value</h4><p>No return value. Writes complete synchronously.</p><h4>Conditions and limits</h4><p>Compile ppu.c and include ppu.h. Bulk transfers require rendering off; these routines do not wait for VBlank or queue writes. Prevent concurrent PPU access and restore scroll before displaying. Set control/mask through library or intrinsic setters so their software shadows remain correct; direct register writes bypass those shadows.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>nes_ppu_clear_nt(0x2000,0,0); // All 960 tiles and 64 packed attribute bytes.
 // Nametable reads are buffered: discard one read, then inspect all 1024 bytes.
 __ppu_addr(0x2000);discarded_read=sample_ppudata;
 for(i=0;i&lt;1024;i++)if(sample_ppudata!=0)failures=1;</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The four library calls turn rendering off, load both palettes, clear a full nametable and turn rendering on. The sample reads the palette and cleared table back before drawing. Expect blue copied squares, bars and triangles at y=16, green filled tiles at y=96, and red square/bar/triangle markers at y=208. Each large block uses 255 tiles, leaving the last cell black. FAILED CHECKS is 0.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-ppu-declarations/alternatives/screen.png" alt="nes_ppu_clear_nt: ALTERNATIVES"><figcaption>ALTERNATIVES</figcaption></figure><p><a href="../samples/api-examples/fc/ppu_implemented.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
@@ -3375,6 +3351,13 @@ Accept exactly $2000/$2400/$2800/$2C00; invalid bases are ignored.</pre></div><p
     __nametable_rect_nt(table,0,0,32,30,tile);
     __vram_fill((u16)(nt_base+0x3C0),attr,64);
     __ppu_ctrl_set(saved_ctrl);
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_ppu_fill" data-api-contract="runtime-ppu-source-20260915"><summary><code>nes_ppu_fill</code></summary><p>Reset the address latch, set hi/lo and write value to PPUDATA count times. This immediate fill uses an eight-bit count and does not clip to rows or rectangles.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_fill(unsigned char hi, unsigned char lo, unsigned char value, unsigned char count);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>hi / lo</code></dt><dd><p><code>hi</code> and <code>lo</code> are the upper and lower bytes of a PPU address: for example, <code>0x23, 0x42</code> means <code>0x2342</code>. They are address bytes, not tile coordinates. Normal PPU address masking and mirroring apply.</p></dd><dt><code>value</code></dt><dd><p>One byte, 0–255, written repeatedly. Its visible meaning depends on whether the destination contains tile indices, pixel planes or another byte-based structure.</p></dd><dt><code>count</code></dt><dd><p>Byte count 0..255. Zero still resets the address latch and sets the address, without writing PPUDATA.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>Include ppu.h and compile ppu.c once. The byte-pair helpers reset the shared address latch themselves. They can be linked with runtime.c; the word-address helper is nes_ppu_seek and the byte-pair helper is nes_ppu_seek_bytes.</p><p>Direct PPU access requires rendering to be off or the entire operation to fit a safe VBlank interval. These functions do not wait, queue, mask NMI or restore scroll. Prevent an interrupt from changing the shared latch/address during the call. PPUCTRL bit 2 selects a destination step of 1 or 32 per data byte. The PPU handles mirroring and address wrapping; CHR-ROM cannot be written. Set the intended scroll state after access and before rendering.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>__ppu_read_status();nes_ppu_fill(0x21,0x80,1,255);</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The high/low-address example shows latch reset and eight-bit transfer counts. Its blue copied patterns and green filled regions each use 255 bytes, leaving the last cells at (248,72) and (248,152) black. Red markers at y=208 show seek and zero-length transfers. FAILED CHECKS is 0.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-runtime-ppu/pair/screen.png" alt="nes_ppu_fill: PAIR"><figcaption>PAIR</figcaption></figure><p><a href="../samples/api-examples/fc/ppu_address_pair.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\ppu_address_pair.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\ppu_address_pair.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\vram_shapes.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/ppu.c:27</p><div class="original"><b>Declaration notes (original source)</b><pre>Set the address and issue count identical PPUDATA writes without waiting for VBlank.</pre></div><p class="source">kitaqfc/lib/ppu.c:27</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_fill(unsigned char hi, unsigned char lo, unsigned char value, unsigned char count)
+{
+    unsigned char i;
+    nes_ppu_seek_bytes(hi, lo);
+    for (i = 0; i != count; ++i)
+        kq_ppu_data_register = value;
 }</code></pre></div></details></details><details class="api searchable" id="api-nes_ppu_load_palette" data-api-contract="ppu-declarations-source-20260915"><summary><code>nes_ppu_load_palette</code></summary><p>Transfer 16 background palette bytes followed by 16 sprite palette bytes from one 32-byte array. Temporarily select address increment 1 and restore PPUCTRL afterward. A null pointer does nothing.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_load_palette(unsigned char* pal32);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>pal32</code></dt><dd><p>Pointer to 32 readable color-code bytes: background first, then sprites. Keep the source bank mapped until return. Palette mirroring applies, including the universal background color aliases.</p></dd></dl><h4>Return value</h4><p>No return value. Writes complete synchronously.</p><h4>Conditions and limits</h4><p>Compile ppu.c and include ppu.h. Bulk transfers require rendering off; these routines do not wait for VBlank or queue writes. Prevent concurrent PPU access and restore scroll before displaying. Set control/mask through library or intrinsic setters so their software shadows remain correct; direct register writes bypass those shadows.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>nes_ppu_load_palette(stream_palette); // Sixteen BG bytes followed by sixteen sprite bytes.
 // Palette reads are immediate; both halves use the same original sample palette.
 __ppu_addr(0x3F00);
@@ -3399,6 +3382,23 @@ Disable background and sprite rendering, preserving other PPUMASK bits.</pre></d
     __scroll_set(0,0);
     __ppu_ctrl_set(ctrl);
     __ppu_mask_set(mask);
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_ppu_seek_bytes" data-api-contract="runtime-ppu-source-20260915"><summary><code>nes_ppu_seek_bytes</code></summary><p>Reset the shared PPU address latch by reading PPUSTATUS, then set the address from separate hi and lo bytes. This form is useful when the game already stores the address as two bytes.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_seek_bytes(unsigned char hi, unsigned char lo);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>hi / lo</code></dt><dd><p><code>hi</code> and <code>lo</code> are the upper and lower bytes of a PPU address: for example, <code>0x23, 0x42</code> means <code>0x2342</code>. They are address bytes, not tile coordinates. Normal PPU address masking and mirroring apply.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>Include ppu.h and compile ppu.c once. The byte-pair helpers reset the shared address latch themselves. They can be linked with runtime.c; the word-address helper is nes_ppu_seek and the byte-pair helper is nes_ppu_seek_bytes.</p><p>Direct PPU access requires rendering to be off or the entire operation to fit a safe VBlank interval. These functions do not wait, queue, mask NMI or restore scroll. Prevent an interrupt from changing the shared latch/address during the call. PPUCTRL bit 2 selects a destination step of 1 or 32 per data byte. The PPU handles mirroring and address wrapping; CHR-ROM cannot be written. Set the intended scroll state after access and before rendering.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>nes_ppu_seek_bytes(0x23,0x42);
+PPUDATA=1; // Red 8x8 marker at pixel (16,208).</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The high/low-address example shows latch reset and eight-bit transfer counts. Its blue copied patterns and green filled regions each use 255 bytes, leaving the last cells at (248,72) and (248,152) black. Red markers at y=208 show seek and zero-length transfers. FAILED CHECKS is 0.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-runtime-ppu/pair/screen.png" alt="nes_ppu_seek_bytes: PAIR"><figcaption>PAIR</figcaption></figure><p><a href="../samples/api-examples/fc/ppu_address_pair.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\ppu_address_pair.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\ppu_address_pair.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\vram_shapes.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/ppu.c:8</p><div class="original"><b>Declaration notes (original source)</b><pre>Reset the shared scroll/address latch before writing the address byte pair.</pre></div><p class="source">kitaqfc/lib/ppu.c:8</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_seek_bytes(unsigned char hi, unsigned char lo)
+{
+    __ppu_read_status();
+    kq_ppu_addr_register = hi;
+    kq_ppu_addr_register = lo;
+}</code></pre></div></details></details><details class="api searchable" id="api-nes_ppu_write_bytes" data-api-contract="runtime-ppu-source-20260915"><summary><code>nes_ppu_write_bytes</code></summary><p>Reset the address latch, set hi/lo and write count source bytes directly to PPUDATA. The eight-bit count limits a call to 255 bytes. Transfer finishes before return without a queue.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_write_bytes(unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>hi / lo</code></dt><dd><p><code>hi</code> and <code>lo</code> are the upper and lower bytes of a PPU address: for example, <code>0x23, 0x42</code> means <code>0x2342</code>. They are address bytes, not tile coordinates. Normal PPU address masking and mirroring apply.</p></dd><dt><code>src</code></dt><dd><p>CPU pointer to at least the requested number of readable bytes. Keep the source mapped and stable until this synchronous transfer returns. There is no bank switching, retained queue pointer or source-length check; a zero count does not dereference the pointer.</p></dd><dt><code>count</code></dt><dd><p>Byte count 0..255. Zero still resets the address latch and sets the address, without writing PPUDATA.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>Include ppu.h and compile ppu.c once. The byte-pair helpers reset the shared address latch themselves. They can be linked with runtime.c; the word-address helper is nes_ppu_seek and the byte-pair helper is nes_ppu_seek_bytes.</p><p>Direct PPU access requires rendering to be off or the entire operation to fit a safe VBlank interval. These functions do not wait, queue, mask NMI or restore scroll. Prevent an interrupt from changing the shared latch/address during the call. PPUCTRL bit 2 selects a destination step of 1 or 32 per data byte. The PPU handles mirroring and address wrapping; CHR-ROM cannot be written. Set the intended scroll state after access and before rendering.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>__ppu_read_status();nes_ppu_write_bytes(0x20,0x40,source_bytes,255);
+source_bytes[0]=3; // The completed transfer retains tile 1.</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The high/low-address example shows latch reset and eight-bit transfer counts. Its blue copied patterns and green filled regions each use 255 bytes, leaving the last cells at (248,72) and (248,152) black. Red markers at y=208 show seek and zero-length transfers. FAILED CHECKS is 0.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-runtime-ppu/pair/screen.png" alt="nes_ppu_write_bytes: PAIR"><figcaption>PAIR</figcaption></figure><p><a href="../samples/api-examples/fc/ppu_address_pair.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
+.\kitaqfc\kitaqfc.exe .\kitaq-docs\samples\api-examples\fc\ppu_address_pair.c -I .\kitaqfc\lib -I .\kitaq-docs\samples -o .\out\ppu_address_pair.nes --mapper=nrom --nes-chr=.\kitaq-docs\samples\api-examples\fc\vram_shapes.chr --no-cache --no-disasm</code></pre></div><details class="api-source"><summary>Implementation and source</summary><p class="source">kitaqfc/lib/ppu.c:18</p><div class="original"><b>Declaration notes (original source)</b><pre>Set the address and write count bytes directly through PPUDATA. The current
+PPUCTRL increment mode determines how the destination advances.
+count is 0..255; zero still changes PPU address/latch state. No bank switch or payload copy is performed.</pre></div><p class="source">kitaqfc/lib/ppu.c:18</p><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_write_bytes(unsigned char hi, unsigned char lo, const unsigned char* src, unsigned char count)
+{
+    unsigned char i;
+    nes_ppu_seek_bytes(hi, lo);
+    for (i = 0; i != count; ++i)
+        kq_ppu_data_register = src[i];
 }</code></pre></div></details></details><h3 id="module-runtime">runtime.h — C helpers for NMI, OAM and PPU transfer</h3><!-- api-module:start --><div data-module-contract="runtime-queue-source-20260915"><p>Use declarations from <code>runtime.h</code> and include or compile <code>runtime.c</code> exactly once. It supplies <code>__nes_nmi</code>, the runtime frame counter, direct PPU helpers and page-02 OAM storage as well as this queue. Coordinate its NMI handler with your program; declaring a function alone does not link its implementation.</p><p>This is a separate 192-byte queue in <code>runtime.c</code>, at CPU addresses <code>0x0300–0x03BF</code>. A literal record costs <code>3+len</code> bytes; a fill costs four. <code>nes_vram_queue_used</code> measures encoded bytes, not pending PPU writes or free VRAM. The intrinsic <code>__vramq_*</code> queue has a different format and is not cleared, queried or executed by these functions.</p><p>Build and consume batches in separate phases; no locking or double buffering is provided. For deterministic preparation, disable NMI while appending, then execute with rendering off or enable NMI for a batch that fits VBlank. <code>runtime.c</code> automatically flushes a nonempty queue from <code>__nes_nmi</code> without a commit call. The flush has no time budget, splitting or scroll restoration. Queue space alone does not guarantee safe VBlank timing.</p></div><!-- api-module:end --><details class="api searchable" id="api-nes_ppu_seek" data-api-contract="runtime-ppu-source-20260915"><summary><code>nes_ppu_seek</code></summary><p>Set the PPU address for subsequent PPUDATA access. Read PPUSTATUS to reset the shared latch, then write the high and low bytes of the 16-bit ppu_addr. This runtime.c function can be linked with the byte-pair helper nes_ppu_seek_bytes in ppu.c.</p><h4>Syntax</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>void nes_ppu_seek(unsigned short ppu_addr);</code></pre></div><h4>Parameters</h4><dl class="api-parameters"><dt><code>ppu_addr</code></dt><dd><p>PPU byte address (<code>0x0000</code>–<code>0x3FFF</code>), not a CPU pointer. The target must be writable: pattern changes need CHR RAM, not CHR ROM. PPU mapping and mirroring apply. Select increment 1 in PPUCTRL for contiguous copies and fills. Execute during safe PPU timing, then restore the desired scroll state; the executor writes PPUADDR and PPUDATA without restoring scroll settings.</p></dd></dl><h4>Return value</h4><p>None (<code>void</code>).</p><h4>Conditions and limits</h4><p>Use declarations from <code>runtime.h</code> and include or compile <code>runtime.c</code> exactly once. It supplies <code>__nes_nmi</code>, the runtime frame counter, direct PPU helpers and page-02 OAM storage as well as this queue. Coordinate its NMI handler with your program; declaring a function alone does not link its implementation.</p><p>Direct PPU access requires rendering to be off or the entire operation to fit a safe VBlank interval. These functions do not wait, queue, mask NMI or restore scroll. Prevent an interrupt from changing the shared latch/address during the call. PPUCTRL bit 2 selects a destination step of 1 or 32 per data byte. The PPU handles mirroring and address wrapping; CHR-ROM cannot be written. Set the intended scroll state after access and before rendering.</p><h4>Usage example</h4><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>PPUADDR=0x21; // Deliberately leave the shared address latch half-written.
 nes_ppu_seek(0x2342); // This runtime function resets the latch itself.
 PPUDATA=1; // Red 8x8 marker at pixel (16,208).</code></pre></div><p>This is a calling fragment. Follow the stated initialization and buffer requirements before using it in a complete program.</p><h4>Expected result</h4><p>The runtime example teaches direct transfer and the two wait methods. Expect a blue pattern of solid tiles, left-half bars and triangles at <code>(0,16)</code>, and a solid green block at <code>(0,96)</code>; each block is <code>256×64</code> pixels, from 256 tile bytes. The first blue tile remains solid after changing the source. At y=208, red markers at x=16, 224 and 240 show seek, zero-length write and zero-length fill; they are a solid 8×8 square, a 4×8 left-half bar and an eight-row triangle. Both wait indicators read 1 and FAILED CHECKS reads 0.</p><figure class="example-result"><img class="screen" loading="lazy" src="../verification/api-runtime-ppu/runtime/screen.png" alt="nes_ppu_seek: RUNTIME"><figcaption>RUNTIME</figcaption></figure><p><a href="../samples/api-examples/fc/runtime_ppu.c">Complete example program</a></p><h4>Build command</h4><div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>New-Item -ItemType Directory -Force .\out | Out-Null
@@ -4484,395 +4484,7 @@ The caller must arrange device timing and serialize register/data pairs against 
 {
     VRC7_ADDR = reg;
     VRC7_DATA = value;
-}</code></pre></div></details></details><h2 id="headers">Structures, constants and complete headers</h2><details class="searchable"><summary><code>audio_vblank.h</code> — Four-channel music driven by NMI</summary><div class="codebox"><pre><code>#ifndef NES_AUDIO_VBLANK_H
-#define NES_AUDIO_VBLANK_H
-#include &quot;core.h&quot;
-
-// Original MIT-licensed NMI sequencer. Channel order follows the physical APU:
-// CH1 pulse 1, CH2 pulse 2, CH3 triangle, CH4 noise (indices 0, 1, 2, 3).
-// Every record is five bytes: delay, CH1, CH2, CH3, CH4.
-// Delay 1..255 holds the new state for that many NMI ticks. Delay 0 ends playback.
-// Tonal notes 0..71 are C2..B7, tuned for NTSC. Noise 0..15 selects a long-mode
-// period; 16..31 selects short mode. HOLD preserves a channel; STOP silences it.
-#define NES_AUDIO_NOISE_ENVELOPE 128
-#define NES_AUDIO_HOLD 255
-#define NES_AUDIO_STOP 254
-#define NES_AUDIO_RECORD_BYTES 5
-#define NES_AUDIO_QUEUE_CAPACITY 7
-
-// Reset the queue, feeder and diagnostic counters; silence and initialize the
-// APU. Owns the four basic channels and disables DMC and APU frame IRQs.
-void nes_audio_vblank_init(void);
-// Copy one complete validated record to RAM and publish it atomically last.
-// Return 1 on success, 0 for null/invalid/full. Call from one foreground producer.
-u8 nes_audio_vblank_enqueue(const u8* record);
-// Return queued records (0..7), excluding the record whose delay is in progress.
-u8 nes_audio_vblank_queued(void);
-// Return available record slots (0..7), not bytes.
-u8 nes_audio_vblank_free(void);
-// Enable consumption at the next NMI. Does not enable PPU NMI itself.
-void nes_audio_vblank_start(void);
-// Disable consumption, silence, discard queued records and clear the feeder.
-void nes_audio_vblank_stop(void);
-// Stop and attach a readable five-byte-record stream; return 0 for null, zero
-// count or a count above 13107. Nonzero loop repeats the stream. Does not start.
-u8 nes_audio_vblank_set_music(const u8* records,u16 count,u8 loop);
-// Copy at most seven records from the attached stream. Return copies accepted.
-// A one-shot feeder appends a delay-zero terminator after the last timed record.
-// Keep the stream&#x27;s ROM bank mapped during this foreground call only.
-u8 nes_audio_vblank_refill(void);
-// Set the stream, prefill the queue and start. Return 0 for invalid setup/data.
-u8 nes_audio_vblank_play_music(const u8* records,u16 count,u8 loop);
-// Return 1 while the BGM consumer is enabled, including a recoverable queue underrun.
-u8 nes_audio_vblank_is_playing(void);
-// Saturating count of starvation episodes, cleared by init; END is not starvation.
-u8 nes_audio_vblank_underruns(void);
-// Configure the next note: pulse bits 7..6 select duty and 3..0 select volume;
-// noise uses volume 3..0, or NES_AUDIO_NOISE_ENVELOPE | decay_period (0..15)
-// for a one-shot hardware envelope (larger periods decay more slowly). The
-// next noise note starts at volume 15; its length permits a full decay.
-// Triangle uses zero for silent, nonzero for full level.
-// Return 0 for channel &gt;=4. Hardware has no triangle volume control.
-u8 nes_audio_vblank_set_timbre(u8 channel,u8 control);
-// Any nonzero argument freezes both timelines and mutes immediately. Zero
-// resumes from the stored delays and restores held notes on the next NMI.
-// BGM is_playing remains enabled during pause. Refill may still fill the queue.
-void nes_audio_vblank_pause(u8 on);
-// Copy 1..7 timed records. Bits 0..3 select channels temporarily owned by SFX.
-// BGM continues underneath and its current notes return when the effect ends.
-// Return 1 after copying; 0 for null, invalid count/data or an empty low mask.
-// Ignore mask bits 4..7. All fields are validated, even unselected channels.
-// Delay zero is not accepted for SFX. Invalid input preserves the current SFX.
-// Replacement restarts the effect; the first HOLD starts from a stopped note.
-// The source need only stay mapped/readable until this foreground call returns.
-u8 nes_audio_vblank_play_sfx(const u8* records,u8 count,u8 mask);
-// Release effect ownership at the next NMI, restoring current BGM notes.
-// This does not stop or restart the BGM and does not write the APU immediately.
-void nes_audio_vblank_stop_sfx(void);
-// NMI hook: invoke exactly once per NMI. With a custom handler or a compiler
-// without automatic audio-hook linking, call it there. Never call from main
-// or call it again if the compiler already inserts the hook.
-// Saves A/X/Y, uses no compiler scratch bytes and reads only RAM/fixed ROM.
-void __nes_audio_vblank_tick(void);
-#endif</code></pre></div><p class="source">kitaqfc/lib/audio_vblank.h</p></details><!-- zx0-header:start --><details class="searchable"><summary><code>zx0.h</code></summary><div class="codebox"><pre><code>#pragma once
-#include &quot;core.h&quot;
-// Copyright (c) 2026 DAISUKE OBA. MIT License.
-// ZX0-compatible forward v2 streams; format designed by Einar Saukas.
-#define ZX0_OK 0
-#define ZX0_BAD_ARGUMENT 1
-#define ZX0_TRUNCATED 2
-#define ZX0_BAD_STREAM 3
-#define ZX0_OUTPUT_FULL 4
-#define ZX0_DISPLAY_ACTIVE 5
-// Shared last-call status. These foreground routines are not reentrant.
-extern u8 zx0_error;
-// Return decoded bytes, or zero on error (possibly after partial writes).
-// Source and output must not overlap or cross their current CPU bank windows.
-// Capacity and packed_size are byte counts. No prefix/backward/v1 streams.
-u16 zx0_decompress(void* dst, u16 capacity, const void* src, u16 packed_size);
-// Decode a KQA1 raw/RLE/ZX0 asset produced with --format=auto.
-// Empty raw assets return zero with zx0_error==ZX0_OK.
-u16 asset_decompress(void* dst, u16 capacity, const void* src, u16 packed_size);
-// Decode into caller-owned RAM, then transfer to CHR RAM or nametable memory.
-// Rendering must be off. Preserve PPUCTRL; set scroll before enabling rendering.
-// The workspace must hold the whole output. No palette upload or CHR ROM writes.
-u16 zx0_decompress_vram(u16 ppu_addr,void* workspace,u16 capacity,const void* src,u16 packed_size);</code></pre></div><p class="source">kitaqfc/lib/zx0.h</p></details><!-- zx0-header:end --><details class="searchable"><summary><code>physics3d.h</code></summary><div class="codebox"><pre><code>#pragma once
-#include &quot;core.h&quot;
-
-// Lightweight deterministic 3D physics for KITAQFC.
-// AABB contacts, acceleration, mass-weighted bounce, and impact state flags.
-
-// The game owns break decisions: the solver records impact speeds but never
-// sets this flag or deactivates a body based on break_speed. Positions, extents,
-// velocities and acceleration use consistent caller-selected per-step units.
-#define KQ3D_BODY_BROKEN ((u8)0x01)
-
-typedef struct {
-    s16 x;
-    s16 y;
-    s16 z;
-    s16 vx;
-    s16 vy;
-    s16 vz;
-    s16 ax;
-    s16 ay;
-    s16 az;
-    s16 half_x;
-    s16 half_y;
-    s16 half_z;
-    s16 mass_q8;        // 256 means mass 1.0.
-    s16 inv_mass_q8;    // 0 means static body.
-    s16 restitution_q8; // 256 means perfectly elastic.
-    s16 break_speed;    // Reserved for game-side impact thresholds.
-    s16 last_impact_speed;
-    u8 active;
-    u8 flags;
-} KQBody3D;
-
-typedef struct {
-    KQBody3D* bodies;
-    u8 body_count;
-    s16 gravity_x;
-    s16 gravity_y;
-    s16 gravity_z;
-    u8 solver_iterations;
-    s16 max_speed;
-} KQWorld3D;
-
-// Borrow the body array without initializing it. Set gravity (0,24,0), four
-// contact passes and a per-axis speed limit of 512. Null world is ignored;
-// the caller retains ownership and must keep the array alive.
-void kq3d_world_init(KQWorld3D* world, KQBody3D* bodies, u8 body_count);
-// Initialize an active centered box with zero velocity/acceleration,
-// restitution 224, cleared impact/flags and mass set through the weight helper.
-// The caller supplies valid half extents. Null body is ignored.
-void kq3d_body_init(KQBody3D* body, s16 x, s16 y, s16 z, s16 half_x, s16 half_y, s16 half_z, s16 mass_q8);
-// Store the requested mass; nonpositive mass makes the body static.
-// For positive mass compute inverse weight as max(1,32767/max(mass,64)).
-// The stored mass retains the original input; this is a relative solver weight,
-// not an exact Q8 reciprocal. Null body is ignored.
-void kq3d_body_set_mass(KQBody3D* body, s16 mass_q8);
-// Integrate active dynamic bodies and reset their impact values, then solve
-// each active unordered pair for the configured passes (zero means one).
-// Static bodies retain previous impact maxima until the game clears them.
-// Acceleration persists; flags and break thresholds remain game-owned.
-// This discrete solver uses non-reentrant helper scratch and can miss fast crossings.
-void kq3d_step(KQWorld3D* world);
-// Reset impact for one active dynamic body, add gravity and persistent body
-// acceleration, clamp velocity per axis and advance position. Static/inactive
-// bodies retain impact state. Null inputs are ignored; no contacts are solved.
-// Use a nonnegative speed limit and avoid overflow before clamping.
-void kq3d_integrate_body(KQWorld3D* world, KQBody3D* body);
-// Test strict overlap on all three axes; face-only contact returns false.
-// Valid pointers are required and flags are ignored. Center differences and
-// extent sums must fit the signed 16-bit magnitude calculations.
-u8 kq3d_overlap_aabb(const KQBody3D* a, const KQBody3D* b);
-
-// Sum three signed products, dividing each by 256 (toward zero) before addition.
-// Coefficients are signed bytes scaled by 1/256; the 16-bit sum is not saturated.
-s16 kq3d_dot_q8_8(s16 x, s16 y, s16 z, s8 ax, s8 ay, s8 az);</code></pre></div><p class="source">kitaqfc/lib/physics3d.h</p></details><details class="searchable"><summary><code>wire3d_tables.h</code></summary><div class="codebox"><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
-// Generated from round(64*sin(2*pi*i/32)) and round(64*width/z).
-// Depths below 32 are rejected. Saturating 256 to 255 at the largest
-// viewport/nearest depth bounds the projection error without a ninth bit.
-__prg_rom const s8 w3dfc_sin[32]={
-    0,12,24,36,45,53,59,63,64,63,59,53,45,36,24,12,
-    0,-12,-24,-36,-45,-53,-59,-63,-64,-63,-59,-53,-45,-36,-24,-12,
-};
-#if WIRE3D_FC_WIDTH == 64
-__prg_rom const u8 w3dfc_recip[256]={
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    128,124,120,117,114,111,108,105,102,100,98,95,93,91,89,87,
-    85,84,82,80,79,77,76,74,73,72,71,69,68,67,66,65,
-    64,63,62,61,60,59,59,58,57,56,55,55,54,53,53,52,
-    51,51,50,49,49,48,48,47,47,46,46,45,45,44,44,43,
-    43,42,42,41,41,41,40,40,39,39,39,38,38,38,37,37,
-    37,36,36,36,35,35,35,34,34,34,34,33,33,33,33,32,
-    32,32,32,31,31,31,31,30,30,30,30,29,29,29,29,29,
-    28,28,28,28,28,27,27,27,27,27,27,26,26,26,26,26,
-    26,25,25,25,25,25,25,25,24,24,24,24,24,24,24,23,
-    23,23,23,23,23,23,23,22,22,22,22,22,22,22,22,21,
-    21,21,21,21,21,21,21,21,20,20,20,20,20,20,20,20,
-    20,20,20,19,19,19,19,19,19,19,19,19,19,19,18,18,
-    18,18,18,18,18,18,18,18,18,18,18,17,17,17,17,17,
-    17,17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,
-};
-__prg_rom const u8 w3dfc_row_lo[48]={
-    0,1,2,3,4,5,6,7,64,65,66,67,68,69,70,71,
-    128,129,130,131,132,133,134,135,192,193,194,195,196,197,198,199,
-    0,1,2,3,4,5,6,7,64,65,66,67,68,69,70,71,
-};
-__prg_rom const u8 w3dfc_row_hi[48]={
-    104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,
-    104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,
-    105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,
-};
-__prg_rom const u8 w3dfc_tile_row[48]={
-    0,0,0,0,0,0,0,0,8,8,8,8,8,8,8,8,
-    16,16,16,16,16,16,16,16,24,24,24,24,24,24,24,24,
-    32,32,32,32,32,32,32,32,40,40,40,40,40,40,40,40,
-};
-#elif WIRE3D_FC_WIDTH == 96
-__prg_rom const u8 w3dfc_recip[256]={
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    192,186,181,176,171,166,162,158,154,150,146,143,140,137,134,131,
-    128,125,123,120,118,116,114,112,110,108,106,104,102,101,99,98,
-    96,95,93,92,90,89,88,87,85,84,83,82,81,80,79,78,
-    77,76,75,74,73,72,71,71,70,69,68,68,67,66,65,65,
-    64,63,63,62,61,61,60,60,59,59,58,57,57,56,56,55,
-    55,54,54,53,53,53,52,52,51,51,50,50,50,49,49,48,
-    48,48,47,47,47,46,46,46,45,45,45,44,44,44,43,43,
-    43,42,42,42,42,41,41,41,40,40,40,40,39,39,39,39,
-    38,38,38,38,37,37,37,37,37,36,36,36,36,36,35,35,
-    35,35,35,34,34,34,34,34,33,33,33,33,33,33,32,32,
-    32,32,32,32,31,31,31,31,31,31,30,30,30,30,30,30,
-    30,29,29,29,29,29,29,29,28,28,28,28,28,28,28,28,
-    27,27,27,27,27,27,27,27,26,26,26,26,26,26,26,26,
-    26,25,25,25,25,25,25,25,25,25,25,24,24,24,24,24,
-};
-__prg_rom const u8 w3dfc_row_lo[64]={
-    0,1,2,3,4,5,6,7,96,97,98,99,100,101,102,103,
-    192,193,194,195,196,197,198,199,32,33,34,35,36,37,38,39,
-    128,129,130,131,132,133,134,135,224,225,226,227,228,229,230,231,
-    64,65,66,67,68,69,70,71,160,161,162,163,164,165,166,167,
-};
-__prg_rom const u8 w3dfc_row_hi[64]={
-    104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,
-    104,104,104,104,104,104,104,104,105,105,105,105,105,105,105,105,
-    105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,
-    106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,
-};
-__prg_rom const u8 w3dfc_tile_row[64]={
-    0,0,0,0,0,0,0,0,12,12,12,12,12,12,12,12,
-    24,24,24,24,24,24,24,24,36,36,36,36,36,36,36,36,
-    48,48,48,48,48,48,48,48,60,60,60,60,60,60,60,60,
-    72,72,72,72,72,72,72,72,84,84,84,84,84,84,84,84,
-};
-#elif WIRE3D_FC_WIDTH == 128
-__prg_rom const u8 w3dfc_recip[256]={
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    255,248,241,234,228,221,216,210,205,200,195,191,186,182,178,174,
-    171,167,164,161,158,155,152,149,146,144,141,139,137,134,132,130,
-    128,126,124,122,120,119,117,115,114,112,111,109,108,106,105,104,
-    102,101,100,99,98,96,95,94,93,92,91,90,89,88,87,86,
-    85,84,84,83,82,81,80,80,79,78,77,77,76,75,74,74,
-    73,72,72,71,71,70,69,69,68,68,67,67,66,66,65,65,
-    64,64,63,63,62,62,61,61,60,60,59,59,59,58,58,57,
-    57,56,56,56,55,55,55,54,54,54,53,53,53,52,52,52,
-    51,51,51,50,50,50,49,49,49,48,48,48,48,47,47,47,
-    47,46,46,46,46,45,45,45,45,44,44,44,44,43,43,43,
-    43,42,42,42,42,42,41,41,41,41,41,40,40,40,40,40,
-    39,39,39,39,39,38,38,38,38,38,38,37,37,37,37,37,
-    37,36,36,36,36,36,36,35,35,35,35,35,35,35,34,34,
-    34,34,34,34,34,33,33,33,33,33,33,33,33,32,32,32,
-};
-__prg_rom const u8 w3dfc_row_lo[96]={
-    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
-    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
-    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
-    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
-    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
-    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
-};
-__prg_rom const u8 w3dfc_row_hi[96]={
-    104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,
-    105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,
-    106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,
-    107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,
-    108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,
-    109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,
-};
-__prg_rom const u8 w3dfc_tile_row[96]={
-    0,0,0,0,0,0,0,0,16,16,16,16,16,16,16,16,
-    32,32,32,32,32,32,32,32,48,48,48,48,48,48,48,48,
-    64,64,64,64,64,64,64,64,80,80,80,80,80,80,80,80,
-    96,96,96,96,96,96,96,96,112,112,112,112,112,112,112,112,
-    128,128,128,128,128,128,128,128,144,144,144,144,144,144,144,144,
-    160,160,160,160,160,160,160,160,176,176,176,176,176,176,176,176,
-};
-#endif</code></pre></div><p class="source">kitaqfc/lib/wire3d_tables.h</p></details><details class="searchable"><summary><code>danmaku.h</code></summary><div class="codebox"><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
-#ifndef KITAQFC_DANMAKU_H
-#define KITAQFC_DANMAKU_H
-#include &quot;core.h&quot;
-#include &quot;intrinsics.h&quot;
-
-#define DANMAKU_MAX 64
-// Reserve cartridge PRG RAM 0x6000..0x627F (640 bytes), enabled and writable.
-// Bullet centers remain in [8,248) x [24,232). These margins prevent byte
-// wraparound even at the largest signed Q4.4 velocity accepted by spawn.
-extern u8 dm_x[64];
-extern u8 dm_y[64];
-extern u8 dm_active[64];
-extern u8 dm_grazed[64];
-extern u8 dm_count;
-extern u8 dm_peak;
-extern u8 dm_hit;
-extern u8 dm_graze;
-extern u8 dm_player_x;
-extern u8 dm_player_y;
-extern u8 dm_invulnerable;
-extern u16 dm_spawned;
-extern u16 dm_rejected;
-
-// Reset the pool, counters and rotating OAM priority. Player settings survive.
-void danmaku_reset(void);
-// Remove all bullets and step events; preserve lifetime/peak counters.
-void danmaku_clear(void);
-// Allocate a bullet at pixel-center x/y with signed 1/16-pixel velocities.
-// Return one on success, zero outside the playfield or when all 64 slots are full.
-u8 danmaku_spawn(u8 x, u8 y, s8 vx, s8 vy);
-// Emit up to 64 bullets. Angles wrap in 32 steps: 0 right, 8 down, 16 left,
-// 24 up. Speed is in 1/16 pixel, clamped to 64. Each failed allocation counts.
-void danmaku_fan(u8 x, u8 y, u8 direction, u8 step, u8 count, u8 speed);
-// Move all live bullets once. Remove offscreen/hitting bullets. Hit uses a
-// +/-3-pixel box; graze uses +/-11, once per bullet. Events describe this step.
-// This updates logic only; it neither writes OAM nor calls a game damage handler.
-void danmaku_step(void);
-// Write up to slots consecutive shadow-OAM entries starting at first_oam.
-// Rotate bullet priority by 13 modulo 64 and hide unused entries in that range.
-// tile is an 8x8 sprite centered at (4,4). Return the number emitted. DMA is
-// caller-owned and belongs in VBlank. Hardware&#x27;s eight-per-scanline limit remains.
-u8 danmaku_draw(u8 first_oam, u8 slots, u8 tile, u8 attributes);
-#endif</code></pre></div><p class="source">kitaqfc/lib/danmaku.h</p></details><details class="searchable"><summary><code>wire3d.h</code></summary><div class="codebox"><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
-#ifndef KITAQFC_WIRE3D_H
-#define KITAQFC_WIRE3D_H
-#include &quot;core.h&quot;
-#include &quot;intrinsics.h&quot;
-// Choose a supported viewport before including wire3d.c. Smaller views reduce
-// line work and dirty CHR transfers; all use original one-bit line graphics.
-#ifndef WIRE3D_FC_WIDTH
-#define WIRE3D_FC_WIDTH 64
-#endif
-#ifndef WIRE3D_FC_HEIGHT
-#define WIRE3D_FC_HEIGHT 48
-#endif
-#if WIRE3D_FC_WIDTH == 64 &amp;&amp; WIRE3D_FC_HEIGHT == 48
-#define WIRE3D_FC_TILES 48
-#elif WIRE3D_FC_WIDTH == 96 &amp;&amp; WIRE3D_FC_HEIGHT == 64
-#define WIRE3D_FC_TILES 96
-#elif WIRE3D_FC_WIDTH == 128 &amp;&amp; WIRE3D_FC_HEIGHT == 96
-#define WIRE3D_FC_TILES 192
-#else
-#error Select 64x48, 96x64 or 128x96 for the wireframe viewport
-#endif
-#define WIRE3D_FC_VERTEX_LIMIT 24
-typedef struct Wire3DFC_Vec3 { s8 x; s8 y; s8 z; } Wire3DFC_Vec3;
-typedef struct Wire3DFC_Edge { u8 a; u8 b; } Wire3DFC_Edge;
-extern u8 wire3d_transfer_frames;
-extern u8 wire3d_uploaded_tiles;
-
-// Own both CHR-RAM pattern tables and nametable zero. Requires writable 8 KiB
-// CHR RAM and PRG RAM 0x6800..0x70BF; reserves ZP 0x00..0x0A for drawing/transfer.
-// Build with --nes-chr-ram and provide cartridge PRG RAM for the stage.
-// Center the viewport, clear video memory, select cyan-on-dark colors and turn
-// on background rendering with NMI disabled. Do not run another PPU writer.
-void Wire3DFC_Init(void);
-// Clear the previous staged drawing. The displayed front image remains intact.
-void Wire3DFC_BeginFrame(void);
-// Draw a connected, inclusive segment. Endpoints must be -512..511. Pixels
-// outside the viewport are clipped; completely outside bounding boxes return.
-void Wire3DFC_DrawLine2D(s16 ax,s16 ay,s16 bx,s16 by);
-// Rotate a small model-space point in Y/X/Z order. Angles wrap in 32 steps.
-// Start with components in -63..63; supply three distinct writable pointers.
-void Wire3DFC_RotatePoint(s16* x,s16* y,s16* z,u8 rx,u8 ry,u8 rz);
-// Project camera-space coordinates using an integer reciprocal table. Require
-// x/y within -127..127 and z within 32..255. Return zero without touching outputs
-// on invalid input; success returns one and writes unclipped screen coordinates.
-u8 Wire3DFC_ProjectPoint(s16 x,s16 y,s16 z,s16* sx,s16* sy);
-// Draw when both endpoints pass the projection range. Near-plane crossings
-// are rejected, not intersected with the near plane; screen pixels are clipped.
-void Wire3DFC_DrawLine3D(s16 ax,s16 ay,s16 az,s16 bx,s16 by,s16 bz);
-// Rotate, translate and project up to 24 vertices, then draw indexed edges.
-// Invalid edge indices/depth endpoints are skipped. Model data must remain
-// readable in the current PRG mapping. This draws all edges, without face culling.
-void Wire3DFC_DrawModel(const Wire3DFC_Vec3* vertices,u8 vertex_count,const Wire3DFC_Edge* edges,u8 edge_count,s16 x,s16 y,s16 z,u8 rx,u8 ry,u8 rz);
-// Upload changed tiles to the hidden CHR table in bounded VBlank batches and
-// swap only after completion. Blocks across as many frames as needed. The two
-// counters report this call&#x27;s upload batches plus swap, and tile count.
-void Wire3DFC_EndFrame(void);
-#endif</code></pre></div><p class="source">kitaqfc/lib/wire3d.h</p></details><p>Consult these headers for non-function macros, structures, array limits, enums and aliases. They reproduce the collected source verbatim, including original comments.</p><details class="searchable"><summary><code>actor.h</code> — Game actor arrays</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>/*
+}</code></pre></div></details></details><h2 id="headers">Structures, constants and complete headers</h2><p>Consult these headers for non-function macros, structures, array limits, enums and aliases. They reproduce the collected source verbatim, including original comments.</p><details class="searchable"><summary><code>actor.h</code> — Game actor arrays</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>/*
  * Optional declarations for the phase 11 actor helper.
  */
 
@@ -4998,7 +4610,77 @@ void nes_dmc_stop(void);
 // Install sample parameters, then start DMC using the full-channel enable mask.
 void nes_dmc_play(u8 flags_rate, u8 output_level, u16 sample_addr, u16 sample_len);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/audio.h</p></details><details class="searchable"><summary><code>bank.h</code> — Bank-aware code and data access</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef BANK_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/audio.h</p></details><details class="searchable"><summary><code>audio_vblank.h</code> — Music playback through the VBlank IRQ</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef NES_AUDIO_VBLANK_H
+#define NES_AUDIO_VBLANK_H
+#include &quot;core.h&quot;
+
+// Original MIT-licensed NMI sequencer. Channel order follows the physical APU:
+// CH1 pulse 1, CH2 pulse 2, CH3 triangle, CH4 noise (indices 0, 1, 2, 3).
+// Every record is five bytes: delay, CH1, CH2, CH3, CH4.
+// Delay 1..255 holds the new state for that many NMI ticks. Delay 0 ends playback.
+// Tonal notes 0..71 are C2..B7, tuned for NTSC. Noise 0..15 selects a long-mode
+// period; 16..31 selects short mode. HOLD preserves a channel; STOP silences it.
+#define NES_AUDIO_NOISE_ENVELOPE 128
+#define NES_AUDIO_HOLD 255
+#define NES_AUDIO_STOP 254
+#define NES_AUDIO_RECORD_BYTES 5
+#define NES_AUDIO_QUEUE_CAPACITY 7
+
+// Reset the queue, feeder and diagnostic counters; silence and initialize the
+// APU. Owns the four basic channels and disables DMC and APU frame IRQs.
+void nes_audio_vblank_init(void);
+// Copy one complete validated record to RAM and publish it atomically last.
+// Return 1 on success, 0 for null/invalid/full. Call from one foreground producer.
+u8 nes_audio_vblank_enqueue(const u8* record);
+// Return queued records (0..7), excluding the record whose delay is in progress.
+u8 nes_audio_vblank_queued(void);
+// Return available record slots (0..7), not bytes.
+u8 nes_audio_vblank_free(void);
+// Enable consumption at the next NMI. Does not enable PPU NMI itself.
+void nes_audio_vblank_start(void);
+// Disable consumption, silence, discard queued records and clear the feeder.
+void nes_audio_vblank_stop(void);
+// Stop and attach a readable five-byte-record stream; return 0 for null, zero
+// count or a count above 13107. Nonzero loop repeats the stream. Does not start.
+u8 nes_audio_vblank_set_music(const u8* records,u16 count,u8 loop);
+// Copy at most seven records from the attached stream. Return copies accepted.
+// A one-shot feeder appends a delay-zero terminator after the last timed record.
+// Keep the stream&#x27;s ROM bank mapped during this foreground call only.
+u8 nes_audio_vblank_refill(void);
+// Set the stream, prefill the queue and start. Return 0 for invalid setup/data.
+u8 nes_audio_vblank_play_music(const u8* records,u16 count,u8 loop);
+// Return 1 while the BGM consumer is enabled, including a recoverable queue underrun.
+u8 nes_audio_vblank_is_playing(void);
+// Saturating count of starvation episodes, cleared by init; END is not starvation.
+u8 nes_audio_vblank_underruns(void);
+// Configure the next note: pulse bits 7..6 select duty and 3..0 select volume;
+// noise uses volume 3..0, or NES_AUDIO_NOISE_ENVELOPE | decay_period (0..15)
+// for a one-shot hardware envelope (larger periods decay more slowly). The
+// next noise note starts at volume 15; its length permits a full decay.
+// Triangle uses zero for silent, nonzero for full level.
+// Return 0 for channel &gt;=4. Hardware has no triangle volume control.
+u8 nes_audio_vblank_set_timbre(u8 channel,u8 control);
+// Any nonzero argument freezes both timelines and mutes immediately. Zero
+// resumes from the stored delays and restores held notes on the next NMI.
+// BGM is_playing remains enabled during pause. Refill may still fill the queue.
+void nes_audio_vblank_pause(u8 on);
+// Copy 1..7 timed records. Bits 0..3 select channels temporarily owned by SFX.
+// BGM continues underneath and its current notes return when the effect ends.
+// Return 1 after copying; 0 for null, invalid count/data or an empty low mask.
+// Ignore mask bits 4..7. All fields are validated, even unselected channels.
+// Delay zero is not accepted for SFX. Invalid input preserves the current SFX.
+// Replacement restarts the effect; the first HOLD starts from a stopped note.
+// The source need only stay mapped/readable until this foreground call returns.
+u8 nes_audio_vblank_play_sfx(const u8* records,u8 count,u8 mask);
+// Release effect ownership at the next NMI, restoring current BGM notes.
+// This does not stop or restart the BGM and does not write the APU immediately.
+void nes_audio_vblank_stop_sfx(void);
+// NMI hook: invoke exactly once per NMI. With a custom handler or a compiler
+// without automatic audio-hook linking, call it there. Never call from main
+// or call it again if the compiler already inserts the hook.
+// Saves A/X/Y, uses no compiler scratch bytes and reads only RAM/fixed ROM.
+void __nes_audio_vblank_tick(void);
+#endif</code></pre></div><p class="source">kitaqfc/lib/audio_vblank.h</p></details><details class="searchable"><summary><code>bank.h</code> — Bank-aware code and data access</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef BANK_H
 #define BANK_H
 
 #include &quot;core.h&quot;
@@ -5137,7 +4819,50 @@ typedef signed short s16;
 #define TRUE 1
 #define FALSE 0
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/core.h</p></details><details class="searchable"><summary><code>debug.h</code> — RAM records and assertions</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef DEBUG_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/core.h</p></details><details class="searchable"><summary><code>danmaku.h</code> — Bullet pools, fans, hits and grazing</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
+#ifndef KITAQFC_DANMAKU_H
+#define KITAQFC_DANMAKU_H
+#include &quot;core.h&quot;
+#include &quot;intrinsics.h&quot;
+
+#define DANMAKU_MAX 64
+// Reserve cartridge PRG RAM 0x6000..0x627F (640 bytes), enabled and writable.
+// Bullet centers remain in [8,248) x [24,232). These margins prevent byte
+// wraparound even at the largest signed Q4.4 velocity accepted by spawn.
+extern u8 dm_x[64];
+extern u8 dm_y[64];
+extern u8 dm_active[64];
+extern u8 dm_grazed[64];
+extern u8 dm_count;
+extern u8 dm_peak;
+extern u8 dm_hit;
+extern u8 dm_graze;
+extern u8 dm_player_x;
+extern u8 dm_player_y;
+extern u8 dm_invulnerable;
+extern u16 dm_spawned;
+extern u16 dm_rejected;
+
+// Reset the pool, counters and rotating OAM priority. Player settings survive.
+void danmaku_reset(void);
+// Remove all bullets and step events; preserve lifetime/peak counters.
+void danmaku_clear(void);
+// Allocate a bullet at pixel-center x/y with signed 1/16-pixel velocities.
+// Return one on success, zero outside the playfield or when all 64 slots are full.
+u8 danmaku_spawn(u8 x, u8 y, s8 vx, s8 vy);
+// Emit up to 64 bullets. Angles wrap in 32 steps: 0 right, 8 down, 16 left,
+// 24 up. Speed is in 1/16 pixel, clamped to 64. Each failed allocation counts.
+void danmaku_fan(u8 x, u8 y, u8 direction, u8 step, u8 count, u8 speed);
+// Move all live bullets once. Remove offscreen/hitting bullets. Hit uses a
+// +/-3-pixel box; graze uses +/-11, once per bullet. Events describe this step.
+// This updates logic only; it neither writes OAM nor calls a game damage handler.
+void danmaku_step(void);
+// Write up to slots consecutive shadow-OAM entries starting at first_oam.
+// Rotate bullet priority by 13 modulo 64 and hide unused entries in that range.
+// tile is an 8x8 sprite centered at (4,4). Return the number emitted. DMA is
+// caller-owned and belongs in VBlank. Hardware&#x27;s eight-per-scanline limit remains.
+u8 danmaku_draw(u8 first_oam, u8 slots, u8 tile, u8 attributes);
+#endif</code></pre></div><p class="source">kitaqfc/lib/danmaku.h</p></details><details class="searchable"><summary><code>debug.h</code> — RAM records and assertions</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef DEBUG_H
 #define DEBUG_H
 
 #include &quot;core.h&quot;
@@ -6426,7 +6151,81 @@ u16 kq2d_surface_toi_q8(s16 start_gap, s16 end_gap);
 typedef u8 KQ2DPosition;
 typedef u8 KQ2DFraction;
 typedef u8 KQ2DSpeed;
-typedef u8 KQ2DDirection;</code></pre></div><p class="source">kitaqfc/lib/physics2d.h</p></details><details class="searchable"><summary><code>ppu.h</code> — PPU display declarations</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef PPU_H
+typedef u8 KQ2DDirection;</code></pre></div><p class="source">kitaqfc/lib/physics2d.h</p></details><details class="searchable"><summary><code>physics3d.h</code> — 3D AABB physics</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#pragma once
+#include &quot;core.h&quot;
+
+// Lightweight deterministic 3D physics for KITAQFC.
+// AABB contacts, acceleration, mass-weighted bounce, and impact state flags.
+
+// The game owns break decisions: the solver records impact speeds but never
+// sets this flag or deactivates a body based on break_speed. Positions, extents,
+// velocities and acceleration use consistent caller-selected per-step units.
+#define KQ3D_BODY_BROKEN ((u8)0x01)
+
+typedef struct {
+    s16 x;
+    s16 y;
+    s16 z;
+    s16 vx;
+    s16 vy;
+    s16 vz;
+    s16 ax;
+    s16 ay;
+    s16 az;
+    s16 half_x;
+    s16 half_y;
+    s16 half_z;
+    s16 mass_q8;        // 256 means mass 1.0.
+    s16 inv_mass_q8;    // 0 means static body.
+    s16 restitution_q8; // 256 means perfectly elastic.
+    s16 break_speed;    // Reserved for game-side impact thresholds.
+    s16 last_impact_speed;
+    u8 active;
+    u8 flags;
+} KQBody3D;
+
+typedef struct {
+    KQBody3D* bodies;
+    u8 body_count;
+    s16 gravity_x;
+    s16 gravity_y;
+    s16 gravity_z;
+    u8 solver_iterations;
+    s16 max_speed;
+} KQWorld3D;
+
+// Borrow the body array without initializing it. Set gravity (0,24,0), four
+// contact passes and a per-axis speed limit of 512. Null world is ignored;
+// the caller retains ownership and must keep the array alive.
+void kq3d_world_init(KQWorld3D* world, KQBody3D* bodies, u8 body_count);
+// Initialize an active centered box with zero velocity/acceleration,
+// restitution 224, cleared impact/flags and mass set through the weight helper.
+// The caller supplies valid half extents. Null body is ignored.
+void kq3d_body_init(KQBody3D* body, s16 x, s16 y, s16 z, s16 half_x, s16 half_y, s16 half_z, s16 mass_q8);
+// Store the requested mass; nonpositive mass makes the body static.
+// For positive mass compute inverse weight as max(1,32767/max(mass,64)).
+// The stored mass retains the original input; this is a relative solver weight,
+// not an exact Q8 reciprocal. Null body is ignored.
+void kq3d_body_set_mass(KQBody3D* body, s16 mass_q8);
+// Integrate active dynamic bodies and reset their impact values, then solve
+// each active unordered pair for the configured passes (zero means one).
+// Static bodies retain previous impact maxima until the game clears them.
+// Acceleration persists; flags and break thresholds remain game-owned.
+// This discrete solver uses non-reentrant helper scratch and can miss fast crossings.
+void kq3d_step(KQWorld3D* world);
+// Reset impact for one active dynamic body, add gravity and persistent body
+// acceleration, clamp velocity per axis and advance position. Static/inactive
+// bodies retain impact state. Null inputs are ignored; no contacts are solved.
+// Use a nonnegative speed limit and avoid overflow before clamping.
+void kq3d_integrate_body(KQWorld3D* world, KQBody3D* body);
+// Test strict overlap on all three axes; face-only contact returns false.
+// Valid pointers are required and flags are ignored. Center differences and
+// extent sums must fit the signed 16-bit magnitude calculations.
+u8 kq3d_overlap_aabb(const KQBody3D* a, const KQBody3D* b);
+
+// Sum three signed products, dividing each by 256 (toward zero) before addition.
+// Coefficients are signed bytes scaled by 1/256; the 16-bit sum is not saturated.
+s16 kq3d_dot_q8_8(s16 x, s16 y, s16 z, s8 ax, s8 ay, s8 az);</code></pre></div><p class="source">kitaqfc/lib/physics3d.h</p></details><details class="searchable"><summary><code>ppu.h</code> — PPU display declarations</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef PPU_H
 #define PPU_H
 
 // Link ppu.c. Bulk palette/nametable transfers require rendering to be disabled.
@@ -6887,7 +6686,186 @@ void nes_vrc7_key_off(u8 channel);
 // Key off all six voices and set instrument zero with maximum attenuation.
 void nes_vrc7_silence_all(void);
 
-#endif</code></pre></div><p class="source">kitaqfc/lib/vrc7_sound.h</p></details><details class="searchable"><summary><code>zapper.h</code> — Light-gun input interface</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef ZAPPER_H
+#endif</code></pre></div><p class="source">kitaqfc/lib/vrc7_sound.h</p></details><details class="searchable"><summary><code>wire3d.h</code> — Wireframes for DMG</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
+#ifndef KITAQFC_WIRE3D_H
+#define KITAQFC_WIRE3D_H
+#include &quot;core.h&quot;
+#include &quot;intrinsics.h&quot;
+// Choose a supported viewport before including wire3d.c. Smaller views reduce
+// line work and dirty CHR transfers; all use original one-bit line graphics.
+#ifndef WIRE3D_FC_WIDTH
+#define WIRE3D_FC_WIDTH 64
+#endif
+#ifndef WIRE3D_FC_HEIGHT
+#define WIRE3D_FC_HEIGHT 48
+#endif
+#if WIRE3D_FC_WIDTH == 64 &amp;&amp; WIRE3D_FC_HEIGHT == 48
+#define WIRE3D_FC_TILES 48
+#elif WIRE3D_FC_WIDTH == 96 &amp;&amp; WIRE3D_FC_HEIGHT == 64
+#define WIRE3D_FC_TILES 96
+#elif WIRE3D_FC_WIDTH == 128 &amp;&amp; WIRE3D_FC_HEIGHT == 96
+#define WIRE3D_FC_TILES 192
+#else
+#error Select 64x48, 96x64 or 128x96 for the wireframe viewport
+#endif
+#define WIRE3D_FC_VERTEX_LIMIT 24
+typedef struct Wire3DFC_Vec3 { s8 x; s8 y; s8 z; } Wire3DFC_Vec3;
+typedef struct Wire3DFC_Edge { u8 a; u8 b; } Wire3DFC_Edge;
+extern u8 wire3d_transfer_frames;
+extern u8 wire3d_uploaded_tiles;
+
+// Own both CHR-RAM pattern tables and nametable zero. Requires writable 8 KiB
+// CHR RAM and PRG RAM 0x6800..0x70BF; reserves ZP 0x00..0x0A for drawing/transfer.
+// Build with --nes-chr-ram and provide cartridge PRG RAM for the stage.
+// Center the viewport, clear video memory, select cyan-on-dark colors and turn
+// on background rendering with NMI disabled. Do not run another PPU writer.
+void Wire3DFC_Init(void);
+// Clear the previous staged drawing. The displayed front image remains intact.
+void Wire3DFC_BeginFrame(void);
+// Draw a connected, inclusive segment. Endpoints must be -512..511. Pixels
+// outside the viewport are clipped; completely outside bounding boxes return.
+void Wire3DFC_DrawLine2D(s16 ax,s16 ay,s16 bx,s16 by);
+// Rotate a small model-space point in Y/X/Z order. Angles wrap in 32 steps.
+// Start with components in -63..63; supply three distinct writable pointers.
+void Wire3DFC_RotatePoint(s16* x,s16* y,s16* z,u8 rx,u8 ry,u8 rz);
+// Project camera-space coordinates using an integer reciprocal table. Require
+// x/y within -127..127 and z within 32..255. Return zero without touching outputs
+// on invalid input; success returns one and writes unclipped screen coordinates.
+u8 Wire3DFC_ProjectPoint(s16 x,s16 y,s16 z,s16* sx,s16* sy);
+// Draw when both endpoints pass the projection range. Near-plane crossings
+// are rejected, not intersected with the near plane; screen pixels are clipped.
+void Wire3DFC_DrawLine3D(s16 ax,s16 ay,s16 az,s16 bx,s16 by,s16 bz);
+// Rotate, translate and project up to 24 vertices, then draw indexed edges.
+// Invalid edge indices/depth endpoints are skipped. Model data must remain
+// readable in the current PRG mapping. This draws all edges, without face culling.
+void Wire3DFC_DrawModel(const Wire3DFC_Vec3* vertices,u8 vertex_count,const Wire3DFC_Edge* edges,u8 edge_count,s16 x,s16 y,s16 z,u8 rx,u8 ry,u8 rz);
+// Upload changed tiles to the hidden CHR table in bounded VBlank batches and
+// swap only after completion. Blocks across as many frames as needed. The two
+// counters report this call&#x27;s upload batches plus swap, and tile count.
+void Wire3DFC_EndFrame(void);
+#endif</code></pre></div><p class="source">kitaqfc/lib/wire3d.h</p></details><details class="searchable"><summary><code>wire3d_tables.h</code> — </summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>// Copyright (c) 2026 DAISUKE OBA. SPDX-License-Identifier: MIT
+// Generated from round(64*sin(2*pi*i/32)) and round(64*width/z).
+// Depths below 32 are rejected. Saturating 256 to 255 at the largest
+// viewport/nearest depth bounds the projection error without a ninth bit.
+__prg_rom const s8 w3dfc_sin[32]={
+    0,12,24,36,45,53,59,63,64,63,59,53,45,36,24,12,
+    0,-12,-24,-36,-45,-53,-59,-63,-64,-63,-59,-53,-45,-36,-24,-12,
+};
+#if WIRE3D_FC_WIDTH == 64
+__prg_rom const u8 w3dfc_recip[256]={
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    128,124,120,117,114,111,108,105,102,100,98,95,93,91,89,87,
+    85,84,82,80,79,77,76,74,73,72,71,69,68,67,66,65,
+    64,63,62,61,60,59,59,58,57,56,55,55,54,53,53,52,
+    51,51,50,49,49,48,48,47,47,46,46,45,45,44,44,43,
+    43,42,42,41,41,41,40,40,39,39,39,38,38,38,37,37,
+    37,36,36,36,35,35,35,34,34,34,34,33,33,33,33,32,
+    32,32,32,31,31,31,31,30,30,30,30,29,29,29,29,29,
+    28,28,28,28,28,27,27,27,27,27,27,26,26,26,26,26,
+    26,25,25,25,25,25,25,25,24,24,24,24,24,24,24,23,
+    23,23,23,23,23,23,23,22,22,22,22,22,22,22,22,21,
+    21,21,21,21,21,21,21,21,20,20,20,20,20,20,20,20,
+    20,20,20,19,19,19,19,19,19,19,19,19,19,19,18,18,
+    18,18,18,18,18,18,18,18,18,18,18,17,17,17,17,17,
+    17,17,17,17,17,17,17,17,17,16,16,16,16,16,16,16,
+};
+__prg_rom const u8 w3dfc_row_lo[48]={
+    0,1,2,3,4,5,6,7,64,65,66,67,68,69,70,71,
+    128,129,130,131,132,133,134,135,192,193,194,195,196,197,198,199,
+    0,1,2,3,4,5,6,7,64,65,66,67,68,69,70,71,
+};
+__prg_rom const u8 w3dfc_row_hi[48]={
+    104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,
+    104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,
+    105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,
+};
+__prg_rom const u8 w3dfc_tile_row[48]={
+    0,0,0,0,0,0,0,0,8,8,8,8,8,8,8,8,
+    16,16,16,16,16,16,16,16,24,24,24,24,24,24,24,24,
+    32,32,32,32,32,32,32,32,40,40,40,40,40,40,40,40,
+};
+#elif WIRE3D_FC_WIDTH == 96
+__prg_rom const u8 w3dfc_recip[256]={
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    192,186,181,176,171,166,162,158,154,150,146,143,140,137,134,131,
+    128,125,123,120,118,116,114,112,110,108,106,104,102,101,99,98,
+    96,95,93,92,90,89,88,87,85,84,83,82,81,80,79,78,
+    77,76,75,74,73,72,71,71,70,69,68,68,67,66,65,65,
+    64,63,63,62,61,61,60,60,59,59,58,57,57,56,56,55,
+    55,54,54,53,53,53,52,52,51,51,50,50,50,49,49,48,
+    48,48,47,47,47,46,46,46,45,45,45,44,44,44,43,43,
+    43,42,42,42,42,41,41,41,40,40,40,40,39,39,39,39,
+    38,38,38,38,37,37,37,37,37,36,36,36,36,36,35,35,
+    35,35,35,34,34,34,34,34,33,33,33,33,33,33,32,32,
+    32,32,32,32,31,31,31,31,31,31,30,30,30,30,30,30,
+    30,29,29,29,29,29,29,29,28,28,28,28,28,28,28,28,
+    27,27,27,27,27,27,27,27,26,26,26,26,26,26,26,26,
+    26,25,25,25,25,25,25,25,25,25,25,24,24,24,24,24,
+};
+__prg_rom const u8 w3dfc_row_lo[64]={
+    0,1,2,3,4,5,6,7,96,97,98,99,100,101,102,103,
+    192,193,194,195,196,197,198,199,32,33,34,35,36,37,38,39,
+    128,129,130,131,132,133,134,135,224,225,226,227,228,229,230,231,
+    64,65,66,67,68,69,70,71,160,161,162,163,164,165,166,167,
+};
+__prg_rom const u8 w3dfc_row_hi[64]={
+    104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,
+    104,104,104,104,104,104,104,104,105,105,105,105,105,105,105,105,
+    105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,
+    106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,
+};
+__prg_rom const u8 w3dfc_tile_row[64]={
+    0,0,0,0,0,0,0,0,12,12,12,12,12,12,12,12,
+    24,24,24,24,24,24,24,24,36,36,36,36,36,36,36,36,
+    48,48,48,48,48,48,48,48,60,60,60,60,60,60,60,60,
+    72,72,72,72,72,72,72,72,84,84,84,84,84,84,84,84,
+};
+#elif WIRE3D_FC_WIDTH == 128
+__prg_rom const u8 w3dfc_recip[256]={
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    255,248,241,234,228,221,216,210,205,200,195,191,186,182,178,174,
+    171,167,164,161,158,155,152,149,146,144,141,139,137,134,132,130,
+    128,126,124,122,120,119,117,115,114,112,111,109,108,106,105,104,
+    102,101,100,99,98,96,95,94,93,92,91,90,89,88,87,86,
+    85,84,84,83,82,81,80,80,79,78,77,77,76,75,74,74,
+    73,72,72,71,71,70,69,69,68,68,67,67,66,66,65,65,
+    64,64,63,63,62,62,61,61,60,60,59,59,59,58,58,57,
+    57,56,56,56,55,55,55,54,54,54,53,53,53,52,52,52,
+    51,51,51,50,50,50,49,49,49,48,48,48,48,47,47,47,
+    47,46,46,46,46,45,45,45,45,44,44,44,44,43,43,43,
+    43,42,42,42,42,42,41,41,41,41,41,40,40,40,40,40,
+    39,39,39,39,39,38,38,38,38,38,38,37,37,37,37,37,
+    37,36,36,36,36,36,36,35,35,35,35,35,35,35,34,34,
+    34,34,34,34,34,33,33,33,33,33,33,33,33,32,32,32,
+};
+__prg_rom const u8 w3dfc_row_lo[96]={
+    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
+    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
+    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
+    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
+    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
+    0,1,2,3,4,5,6,7,128,129,130,131,132,133,134,135,
+};
+__prg_rom const u8 w3dfc_row_hi[96]={
+    104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,104,
+    105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,105,
+    106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,106,
+    107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,107,
+    108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,108,
+    109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,109,
+};
+__prg_rom const u8 w3dfc_tile_row[96]={
+    0,0,0,0,0,0,0,0,16,16,16,16,16,16,16,16,
+    32,32,32,32,32,32,32,32,48,48,48,48,48,48,48,48,
+    64,64,64,64,64,64,64,64,80,80,80,80,80,80,80,80,
+    96,96,96,96,96,96,96,96,112,112,112,112,112,112,112,112,
+    128,128,128,128,128,128,128,128,144,144,144,144,144,144,144,144,
+    160,160,160,160,160,160,160,160,176,176,176,176,176,176,176,176,
+};
+#endif</code></pre></div><p class="source">kitaqfc/lib/wire3d_tables.h</p></details><details class="searchable"><summary><code>zapper.h</code> — Light-gun input interface</summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#ifndef ZAPPER_H
 #define ZAPPER_H
 #include &quot;intrinsics.h&quot;
 // Return raw 4016 &amp; 18, retaining trigger and active-low light bits.
@@ -6906,4 +6884,26 @@ u8 __zapper_light2(void);
 u8 __zapper_trigger(void);
 // Default to the port-2 normalized light reader.
 u8 __zapper_light(void);
-#endif</code></pre></div><p class="source">kitaqfc/lib/zapper.h</p></details><footer>Source edition 2026-09-14 • <a href="index.html">Contents</a> • <a href="verification.html">Verification</a> • <a href="../reference/inventory.json">Snapshot fingerprints</a><br>Sample builds, emulator execution and expected-result comparisons are recorded separately.</footer></main></div><script src="../assets/manual.js"></script></body></html>
+#endif</code></pre></div><p class="source">kitaqfc/lib/zapper.h</p></details><details class="searchable"><summary><code>zx0.h</code> — </summary><div class="codebox"><span class="lang">c</span><button class="copy" type="button">Copy</button><pre><code>#pragma once
+#include &quot;core.h&quot;
+// Copyright (c) 2026 DAISUKE OBA. MIT License.
+// ZX0-compatible forward v2 streams; format designed by Einar Saukas.
+#define ZX0_OK 0
+#define ZX0_BAD_ARGUMENT 1
+#define ZX0_TRUNCATED 2
+#define ZX0_BAD_STREAM 3
+#define ZX0_OUTPUT_FULL 4
+#define ZX0_DISPLAY_ACTIVE 5
+// Shared last-call status. These foreground routines are not reentrant.
+extern u8 zx0_error;
+// Return decoded bytes, or zero on error (possibly after partial writes).
+// Source and output must not overlap or cross their current CPU bank windows.
+// Capacity and packed_size are byte counts. No prefix/backward/v1 streams.
+u16 zx0_decompress(void* dst, u16 capacity, const void* src, u16 packed_size);
+// Decode a KQA1 raw/RLE/ZX0 asset produced with --format=auto.
+// Empty raw assets return zero with zx0_error==ZX0_OK.
+u16 asset_decompress(void* dst, u16 capacity, const void* src, u16 packed_size);
+// Decode into caller-owned RAM, then transfer to CHR RAM or nametable memory.
+// Rendering must be off. Preserve PPUCTRL; set scroll before enabling rendering.
+// The workspace must hold the whole output. No palette upload or CHR ROM writes.
+u16 zx0_decompress_vram(u16 ppu_addr,void* workspace,u16 capacity,const void* src,u16 packed_size);</code></pre></div><p class="source">kitaqfc/lib/zx0.h</p></details><footer>Source edition 2026-09-14 • <a href="index.html">Contents</a> • <a href="verification.html">Verification</a> • <a href="../reference/inventory.json">Snapshot fingerprints</a><br>Sample builds, emulator execution and expected-result comparisons are recorded separately.</footer></main></div><script src="../assets/manual.js"></script></body></html>

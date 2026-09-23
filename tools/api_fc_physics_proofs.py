@@ -53,6 +53,8 @@ def overview(text,language):
         block+='</section>'
     block+='<!-- fc-physics-worlds:end -->'
     text=re.sub(r'<!-- fc-physics-worlds:start -->.*?<!-- fc-physics-worlds:end -->','',text,flags=re.S)
+    for module in ['physics2d','physics3d']:
+        text=api_contracts.remove_standalone_module(text,module,{k.split(':')[1] for k in selected if records[k.split(':')[1]]['module']==module})
     anchor='<h3 id="module-ppu">';assert text.count(anchor)==1
     text=text.replace(anchor,block+anchor,1)
     appendix='<h2 id="headers">'
