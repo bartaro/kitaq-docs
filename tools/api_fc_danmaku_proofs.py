@@ -21,6 +21,7 @@ def verified_examples(contracts):
     folder=ROOT/'publish/library_docs_20260914/fc-effects/danmaku/state'
     state=json.loads((folder/'report.json').read_text())
     assert state['passed'] and len(state['records'])==4
+    assert {r['variant'] for r in state['records']}=={'default','unoptimized','no-inline','fastcall'}
     assert state['danmaku_checker_sha256']==sha(SITE/'tools/check_fc_danmaku.py')
     assert state['script_sha256']==sha(SITE/'tools/check_compiler_parity.py')
     assert state['fixtures_sha256']==sha(folder.parent/'fixtures.json')
