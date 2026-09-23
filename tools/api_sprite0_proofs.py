@@ -22,6 +22,8 @@ def verified_examples(contracts):
   verify_row(r);assert r['actual']==[1,1,64]
   assert [o['frames'] for o in r['observations']]==[120,121]
   assert [o['completed'] for o in r['observations']]==[116,117]
+  assert r['observations'][1]['hit_pixels']-r['observations'][0]['hit_pixels']==64
+  assert r['pixel_mismatches']==0
  state=read(SITE/'verification/api-sprite0/state/results.json')
  assert state['script_sha256']==sha(SITE/'tools/check_sprite0_state.py')
  assert len(state['records'])==18

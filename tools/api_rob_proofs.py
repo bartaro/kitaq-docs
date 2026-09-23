@@ -16,21 +16,33 @@ def verified_examples(contracts):
  assert report['compiler_sha256']==sha(REPOS/'kitaqfc/kitaqfc.exe')
  assert report['emulator_sha256']==sha(REPOS/'kurosaki/kurosaki.exe')
  assert report['header_sha256']==sha(REPOS/'kitaqfc/lib/intrinsics.h')
- names={*(f'flash-{n}' for n in [0,1,255]),*(f'pulse-{a}-{b}' for a,b in [(0,0),(0,3),(3,0),(2,4),(4,2),(1,255),(255,1)]),*(f'byte-{n}' for n in [0,255,128,64,32,16,8,4,2,1,85,170])}
- rows=report['records'];assert len(rows)==44
+ assert report['codegen_sha256']==sha(REPOS/'kitaqfc/kitaqfc/CodeGenerator.cs')
+ names={*(f'flash-{n}' for n in [0,1,255]),*(f'pulse-{a}-{b}' for a,b in [(0,0),(0,3),(3,0),(2,4),(4,2),(1,255),(255,1),(255,255)]),*(f'byte-{n}' for n in [0,255,128,64,32,16,8,4,2,1,85,170])}
+ rows=report['records'];assert len(rows)==46
  assert {(r['variant'],r['name']) for r in rows}=={(v,n) for v in ['default','unoptimized'] for n in names}
  for r in rows:
   assert r['passed'] and r['actual']==r['expected'] and r['mask_writes']==r['expected_masks']
+  assert r['build_exit']==0 and r['runtime_exit']==0 and r['trace_exit']==0
+  assert len(r['write_frames'])==len(r['mask_writes'])
   assert all(b-a==1 for a,b in zip(r['write_frames'],r['write_frames'][1:]))
   for key in ['source','rom']:assert sha(SITE/r[key])==r[key+'_sha256']
   if r['name'].startswith('byte-'):
    value=int(r['name'].split('-')[1]);want=[]
    for bit in range(7,-1,-1):want+=([30]*4+[0]*2) if value&(1<<bit) else ([30]*2+[0]*4)
    assert r['actual']==[165,48,0,0] and r['mask_writes']==want
+  elif r['name'].startswith('pulse-'):
+   _,on,off=r['name'].split('-');on,off=int(on),int(off)
+   mask=0 if off else 30 if on else 10
+   assert r['mask_writes']==[30]*on+[0]*off
+   assert r['actual']==[165,(on+off)%256,mask,mask]
+  else:
+   mask=30 if int(r['name'].split('-')[1]) else 0
+   assert r['mask_writes']==[mask] and r['actual']==[165,1,mask,mask]
  visual=read(SITE/'verification/api-rob/example/results.json')
  assert visual['script_sha256']==sha(SITE/'tools/check_rob_example.py')
  row=visual['record'];verify_row(row)
  assert row['actual']==[1,5,48,0,165] and row['diagram_pixels']==3072
+ assert row['pixel_mismatches']==0 and row['label_pixel_mismatches']==0
  for key,c in selected.items():
   source=(SITE/c['example']['program']).read_text(encoding='utf-8')
   assert c['example']['code'] in source

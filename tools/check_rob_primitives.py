@@ -17,7 +17,7 @@ sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
 cases=[]
 def add(name,body,masks,final):cases.append((name,body,masks,final))
 for value in [0,1,255]:add('flash-'+str(value),f'__rob_flash({value});',[30 if value else 0],30 if value else 0)
-for on,off in [(0,0),(0,3),(3,0),(2,4),(4,2),(1,255),(255,1)]:
+for on,off in [(0,0),(0,3),(3,0),(2,4),(4,2),(1,255),(255,1),(255,255)]:
  add(f'pulse-{on}-{off}',f'__rob_pulse({on},{off});',[30]*on+[0]*off,0 if off else 30 if on else 10)
 for value in [0,255,128,64,32,16,8,4,2,1,85,170]:
  masks=[]
@@ -53,9 +53,9 @@ for variant,flags in [('default',[]),('unoptimized',['-O0'])]:
     start=next((i+1 for i,e in enumerate(writes) if e.get('value')==10),len(writes))
     writes=writes[start:];got=[e['value'] for e in writes];ticks=[e['frame'] for e in writes]
     row.update(mask_writes=got,expected_masks=masks,write_frames=ticks,trace_exit=p.returncode,
-      passed=actual==expected and got==masks and all(b-a==1 for a,b in zip(ticks,ticks[1:])))
+      passed=p.returncode==0 and actual==expected and got==masks and len(ticks)==len(masks) and all(b-a==1 for a,b in zip(ticks,ticks[1:])))
     if row['passed']:snapshot.unlink();trace.unlink()
   rows.append(row);print(variant,name,'PASS' if row['passed'] else 'FAIL',flush=True)
-  (out/'results.json').write_text(json.dumps(dict(script_sha256=sha(Path(__file__)),compiler_sha256=sha(compiler),emulator_sha256=sha(emulator),header_sha256=sha(REPOS/'kitaqfc/lib/intrinsics.h'),records=rows),indent=2),encoding='utf-8')
+  (out/'results.json').write_text(json.dumps(dict(script_sha256=sha(Path(__file__)),compiler_sha256=sha(compiler),emulator_sha256=sha(emulator),header_sha256=sha(REPOS/'kitaqfc/lib/intrinsics.h'),codegen_sha256=sha(REPOS/'kitaqfc/kitaqfc/CodeGenerator.cs'),records=rows),indent=2),encoding='utf-8')
 print('Report:',out/'results.json')
 raise SystemExit(0 if all(r['passed'] for r in rows) else 1)

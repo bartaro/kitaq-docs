@@ -5565,7 +5565,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__rob_flash\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            string black = NewGeneratedLabel(\"rob_black\");\n            EmitAsm(\"BEQ\", Rel(black));\n            EmitAsm(\"LDA\", Imm(0x1E));\n            EmitAsm(\"STA\", Mem(_runtimePpuMaskShadowAddress));\n            EmitAsm(\"STA\", Mem(0x2001));\n            EmitAsm(\"JSR\", Abs(\"__nmi_wait\"));\n            EmitAsm(\"RTS\");\n            _assembly.Add(Expr.Make(Tag.Label, black));\n            EmitAsm(\"LDA\", Imm(0x00));\n            EmitAsm(\"STA\", Mem(_runtimePpuMaskShadowAddress));\n            EmitAsm(\"STA\", Mem(0x2001));\n            EmitAsm(\"JSR\", Abs(\"__nmi_wait\"));\n            EmitAsm(\"RTS\");\n\n            // Emit the requested number of enabled frames followed by the requested disabled frames.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 7694
+        "line": 7867
       }
     },
     {
@@ -5584,7 +5584,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__rob_pulse\");\n            EmitAsm(\"LDX\", Mem(CallArgBase));\n            string onLoop = NewGeneratedLabel(\"rob_on_loop\");\n            string offStart = NewGeneratedLabel(\"rob_off_start\");\n            _assembly.Add(Expr.Make(Tag.Label, onLoop));\n            EmitAsm(\"CPX\", Imm(0));\n            EmitAsm(\"BEQ\", Rel(offStart));\n            EmitAsm(\"LDA\", Imm(1));\n            EmitAsm(\"STA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__rob_flash\"));\n            EmitAsm(\"DEX\");\n            EmitAsm(\"BNE\", Rel(onLoop));\n            _assembly.Add(Expr.Make(Tag.Label, offStart));\n            EmitAsm(\"LDX\", Mem(CallArgBase + 1));\n            string offLoop = NewGeneratedLabel(\"rob_off_loop\");\n            string pulseDone = NewGeneratedLabel(\"rob_pulse_done\");\n            _assembly.Add(Expr.Make(Tag.Label, offLoop));\n            EmitAsm(\"CPX\", Imm(0));\n            EmitAsm(\"BEQ\", Rel(pulseDone));\n            EmitAsm(\"LDA\", Imm(0));\n            EmitAsm(\"STA\", Mem(CallArgBase));\n            EmitAsm(\"JSR\", Abs(\"__rob_flash\"));\n            EmitAsm(\"DEX\");\n            EmitAsm(\"BNE\", Rel(offLoop));\n            _assembly.Add(Expr.Make(Tag.Label, pulseDone));\n            EmitAsm(\"RTS\");\n\n            // Choose a four/two or two/four frame pulse pattern for each current high bit.",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 7711
+        "line": 7884
       }
     },
     {
@@ -5603,7 +5603,7 @@
       "implementation_excerpt": "EmitHelperStart(\"__rob_send_byte\");\n            EmitAsm(\"LDA\", Mem(CallArgBase));\n            EmitAsm(\"LDX\", Imm(8));\n            string bitLoop = NewGeneratedLabel(\"rob_bit_loop\");\n            string bitZero = NewGeneratedLabel(\"rob_bit_zero\");\n            string bitNext = NewGeneratedLabel(\"rob_bit_next\");\n            _assembly.Add(Expr.Make(Tag.Label, bitLoop));\n            // Preserve the remaining payload and outer count on the CPU stack.\n            // Pulse consumes X; its NMI wait also uses the shared scratch byte.\n            // ASL selects the next MSB in carry, which TXA/PHA leave unchanged.\n            EmitAsm(\"ASL\");\n            EmitAsm(\"PHA\");\n            EmitAsm(\"TXA\");\n            EmitAsm(\"PHA\");\n            EmitAsm(\"BCC\", Rel(bitZero));\n            EmitAsm(\"LDA\", Imm(4));\n            EmitAsm(\"STA\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(2));\n            EmitAsm(\"STA\", Mem(CallArgBase + 1));\n            EmitAsm(\"JSR\", Abs(\"__rob_pulse\"));\n            EmitAsm(\"JMP\", Abs(bitNext));\n            _assembly.Add(Expr.Make(Tag.Label, bitZero));\n            EmitAsm(\"LDA\", Imm(2));\n            EmitAsm(\"STA\", Mem(CallArgBase));\n            EmitAsm(\"LDA\", Imm(4));\n            EmitAsm(\"STA\", Mem(CallArgBase + 1));\n            EmitAsm(\"JSR\", Abs(\"__rob_pulse\"));\n            _assembly.Add(Expr.Make(Tag.Label, bitNext));\n            EmitAsm(\"PLA\");\n            EmitAsm(\"TAX\");\n            EmitAsm(\"PLA\");\n            EmitAsm(\"DEX\");\n            EmitAsm(\"BNE\", Rel(bitLoop));\n            EmitAsm(\"RTS\");\n        }",
       "implementation_source": {
         "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-        "line": 7739
+        "line": 7912
       }
     },
     {
