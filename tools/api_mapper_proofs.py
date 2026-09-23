@@ -26,12 +26,20 @@ def verified_examples(contracts):
  assert state['chr_sha256']==sha(SITE/'verification/api-mapper/state/bank-markers.chr')
  for name,digest in state['header_sha256'].items():assert sha(REPOS/'kitaqfc/lib'/name)==digest
  rows=state['records'];assert len(rows)==48
- assert len({(r['name'],r['variant']) for r in rows})==48
- assert {r['variant'] for r in rows}=={'default','unoptimized'}
+ names={'identity-'+m for m in ['nrom','mmc1','uxrom','cnrom','mmc3','mmc5','axrom','vrc6','vrc7','fme7']}
+ names|={'chr-'+m+'-'+api for m in ['cnrom','mmc3'] for api in ['__chr_bank_set','__chr_bank_set0','__chr_bank_set1']}
+ names|={'mirror-'+m for m in ['axrom','mmc1','mmc3','mmc5','fme7']}
+ names|={'irq-'+kind for kind in ['intrinsics','scanline','wrappers']}
+ assert {(r['name'],r['variant']) for r in rows}=={(n,v) for n in names for v in ['default','unoptimized']}
  for r in rows:
   assert r['passed'] and r['actual']==r['expected'] and r['done']==165
+  assert r['build_exit']==0 and r['run_exit']==0
   for key in ['source','rom']:assert sha(SITE/r[key])==r[key+'_sha256']
-  if r['name'].startswith('irq-'):assert r['trace_matches'] and r['trace_exit']==0
+  if r['name'].startswith('irq-'):
+   assert r['trace_matches'] and r['trace_exit']==0
+   expected_writes=[(0xE000,None),(0xC000,37),(0xC001,37),(0xE001,None),(0xE000,None),(0xE001,None),(0xE000,None),(0xC000,0),(0xC001,0),(0xC000,255),(0xC001,255)]
+   writes=r['mapper_writes'];assert len(writes)==len(expected_writes)
+   assert all(a==c and (d is None or b==d) for (a,b),(c,d) in zip(writes,expected_writes))
  visual=read(SITE/'verification/api-mapper/example/results.json')
  assert visual['script_sha256']==sha(SITE/'tools/check_mapper_examples.py')
  rows=visual['records'];assert len(rows)==14
