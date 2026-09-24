@@ -191,6 +191,8 @@ def main():
    body+=block('ja')
   if key=='index':
    body+='<h2 id="books">マニュアルを選ぶ</h2><div class="books">'+''.join('<a class="book" href="'+k+'.html"><span>'+n+'</span><strong>'+E(t)+'</strong><small>'+E(s)+'</small></a>' for k,n,t,s in BOOKS)+'</div>'
+   from application_guides import block as application_guides
+   body+=application_guides('ja')
   if key in ('kitaqgb','gb-library','kitaqfc','fc-library'):
    p='gb' if key in ('kitaqgb','gb-library') else 'fc'
    body+=samples_section(p,manifest)

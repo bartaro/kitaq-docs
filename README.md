@@ -54,6 +54,10 @@ The prose, additional samples and generation tools use the MIT License. On Septe
 
 The manuals include the [English license](LICENSE) and a [Japanese reference translation](LICENSE.ja). [Third-party notices](THIRD_PARTY_NOTICES.md) link to the Japanese licenses of the individual tools. The English original takes precedence if the translations differ. Software binary distributions also require the separate licenses of their dependencies. Permission to publish these manuals does not mean that every tool and dependency can be redistributed under MIT alone.
 
+### Game programming guide
+
+[HARAPEKO SHIROHEBI — English](https://bartaro.github.io/kitaq-docs/apps/harapeko_shirohebi/guide-en.html): program flow, snake movement and KITAQGB library usage. [Source and build instructions](https://github.com/bartaro/kitaqgb/tree/main/apps/harapeko_shirohebi).
+
 ### Build the samples
 
 Clone the repositories as siblings under one parent directory and run the following commands from that parent. See [GITHUB_SETUP.md](GITHUB_SETUP.md) for the layout. Use the supplied compilers or rebuild them using the manual instructions; this edition includes compiler fixes.
@@ -134,6 +138,10 @@ GBではASCII順へ並べ、FCではNESのビットプレーン形式へ変換�
 本文・追加サンプル・生成ツールはMITライセンスです。指定の92字形も、2026-09-12に作者から自作・MIT公開可の確認を得ています。元ソフトからの抜粋は原著作権表示を保持しています。[権利表記](THIRD_PARTY_NOTICES.md) と各LICENSEを一緒に配布してください。
 マニュアルのライセンスは[英語原文](LICENSE)と[日本語参考訳](LICENSE.ja)を同梱しています。各ソフトの日本語版へのリンクは[権利表記](THIRD_PARTY_NOTICES.md)にあります。解釈に相違がある場合は英語原文を優先します。
 ソフト本体のバイナリ配布では依存クレート等の別ライセンスも必要です。このマニュアルの公開許諾と、全ソフト・全依存物がMITだけで再配布できるという判断は異なります。
+
+### ゲームのプログラム解説
+
+[はらぺこしろへび — 日本語](https://bartaro.github.io/kitaq-docs/apps/harapeko_shirohebi/guide-ja.html)：フローチャート、白ヘビの挙動、KITAQGBライブラリの使い方。[ソースとビルド方法](https://github.com/bartaro/kitaqgb/tree/main/apps/harapeko_shirohebi)。
 
 ### サンプルをビルド
 

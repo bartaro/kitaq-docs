@@ -146,6 +146,9 @@ def main():
             from kokura_guide import block
             body+=block('en')
         if key=='index':body+='<h2 id="books">Choose a manual</h2><div class="books">'+''.join('<a class="book" href="'+k+'.html"><span>'+n+'</span><strong>'+E(t)+'</strong><small>'+E(s)+'</small></a>' for k,n,t,s in BOOKS)+'</div>'
+        if key=='index':
+            from application_guides import block as application_guides
+            body+=application_guides('en')
         if key in ('kitaqgb','gb-library','kitaqfc','fc-library'):
             p='gb' if key in ('kitaqgb','gb-library') else 'fc'
             body+=samples_section(p,manifest)+api_section(p,key in ('kitaqgb','kitaqfc'))
