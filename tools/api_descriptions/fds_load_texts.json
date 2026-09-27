@@ -1,114 +1,142 @@
 {
   "fds_load_native": {
     "ja": "`--mapper=fds --fds-layout=fds32`向けです。バンク0は$A000～$DFFFの共通コード、バンク1は起動時の$6000～$9FFF、バンク2以降は同じ16 KiB窓へ読み込むオーバーレイです。バンク2以降は`#pragma fixed_bank 2`などで配置します。",
-    "en": "Use with `--mapper=fds --fds-layout=fds32`. Bank 0 is common code at $A000–$DFFF. Bank 1 occupies $6000–$9FFF at startup; banks 2 and above are overlays loaded into that same 16 KiB window. Place overlay code or data with directives such as `#pragma fixed_bank 2`."
+    "en": "Use with `--mapper=fds --fds-layout=fds32`. Bank 0 is common code at $A000–$DFFF. Bank 1 occupies $6000–$9FFF at startup; banks 2 and above are overlays loaded into that same 16 KiB window. Place overlay code or data with directives such as `#pragma fixed_bank 2`.",
+    "zh-CN": "配合 `--mapper=fds --fds-layout=fds32` 使用。存储体 0 的公共代码位于 $A000–$DFFF。启动时存储体 1 占据 $6000–$9FFF；存储体 2 及以上作为覆盖内容加载到同一个 16 KiB 窗口。可用 `#pragma fixed_bank 2` 等指令放置覆盖代码或数据。"
   },
   "fds_load_boundary": {
     "ja": "掲載画像は、独自に作成したLoadFilesの呼び出し規約テスト用処理で、コンパイルしたコード・メモリ転送・画面の全画素を確認したものです。実際のBIOS、ディスク転送タイミング、CRC、実機起動を検証した画像ではありません。KUROSAKIのFDSコントローラーは簡易モデルで、この検証用処理なしの通常実行だけでは同じ転送結果を再現できません。",
-    "en": "These captures use an original LoadFiles calling-convention fixture to check compiled CPU code, memory transfers and every display pixel. They do not verify the real BIOS, disk-transfer timing, CRC or hardware boot. KUROSAKI has a partial FDS controller model; ordinary execution without this fixture does not establish the same transfer results."
+    "en": "These captures use an original LoadFiles calling-convention fixture to check compiled CPU code, memory transfers and every display pixel. They do not verify the real BIOS, disk-transfer timing, CRC or hardware boot. KUROSAKI has a partial FDS controller model; ordinary execution without this fixture does not establish the same transfer results.",
+    "zh-CN": "这些截图采用独立编写的 LoadFiles 调用约定测试替身，检查编译后的 CPU 代码、内存传送及每个显示像素。不验证真实 BIOS、磁盘传送时序、CRC 或硬件启动。KUROSAKI 的 FDS 控制器模型尚不完整；不使用该替身的普通运行，不能证明相同的传送结果。"
   },
   "fds_load_fixture": {
     "ja": "下記コマンドの最初の行で配布サンプルをビルドします。Pythonの検証コマンドは5本のサンプルを最適化あり・なしでビルドし、KUROSAKIで確認します。検証用処理は`scripts/fds_abi_fixture.py`から一時生成して削除するため、外部BIOSを用意する必要はありません。通常のゲームでこの検証用処理を使うものではありません。",
-    "en": "The first compiler command below builds the downloadable sample. The Python checker builds all five lessons with and without optimization, then checks them in KUROSAKI. It creates and removes a temporary fixture from `scripts/fds_abi_fixture.py`; no external BIOS is needed for these checks. The fixture is not a BIOS for normal games."
+    "en": "The first compiler command below builds the downloadable sample. The Python checker builds all five lessons with and without optimization, then checks them in KUROSAKI. It creates and removes a temporary fixture from `scripts/fds_abi_fixture.py`; no external BIOS is needed for these checks. The fixture is not a BIOS for normal games.",
+    "zh-CN": "下方第一条编译命令构建可下载示例。Python 检查程序分别启用和关闭优化，构建全部五个教学示例，再在 KUROSAKI 中检查。它根据 `scripts/fds_abi_fixture.py` 创建并删除临时替身；这些检查无需外部 BIOS。该替身不是普通游戏用的 BIOS。"
   },
   "fds_load_mapping": {
     "ja": "バンク1は$6000・16384バイトの独立した起動PRGファイルから復元します。管理表を省略した標準構成ではID 0がバンク1、ID 1が共通コード、ID 2がCHRです。独自の管理表を使う場合は起動PRGを$6000と$A000の16384バイトずつに分けてください。バンク2以降のファイルIDは`--fds-overlay-start-id`（既定32）+ バンク番号 - 2です。",
-    "en": "Bank 1 is restored from a separate 16,384-byte boot PRG file at $6000. Without a manifest, the default files are ID 0 for bank 1, ID 1 for common code and ID 2 for CHR. A custom manifest must split the boot PRG into 16,384-byte files at $6000 and $A000. For banks 2 and above, the file ID is `--fds-overlay-start-id` (32 by default) + bank number - 2."
+    "en": "Bank 1 is restored from a separate 16,384-byte boot PRG file at $6000. Without a manifest, the default files are ID 0 for bank 1, ID 1 for common code and ID 2 for CHR. A custom manifest must split the boot PRG into 16,384-byte files at $6000 and $A000. For banks 2 and above, the file ID is `--fds-overlay-start-id` (32 by default) + bank number - 2.",
+    "zh-CN": "存储体 1 从位于 $6000 的独立 16,384 字节启动 PRG 文件恢复。不提供清单时，默认文件为：ID 0 对应存储体 1，ID 1 对应公共代码，ID 2 对应 CHR。自定义清单必须将启动 PRG 拆分为位于 $6000 和 $A000 的两个 16,384 字节文件。存储体 2 及以上的文件 ID 为 `--fds-overlay-start-id`（默认 32）+ 存储体编号 − 2。"
   },
   "fds_load_blocking": {
     "ja": "BIOS呼び出しは同期処理です。読み込み中も毎フレームの処理が進むAPIではありません。割り込みハンドラーから呼ばず、共通コードに置いた通常の制御処理から使ってください。表示・音声の継続や実機でのBIOSとの共存は別途確認が必要です。",
-    "en": "BIOS calls are synchronous; this API does not keep the game loop advancing once per frame during a load. Use it from ordinary control code in the common bank, not from an interrupt handler. Display/audio continuity and coexistence with the real BIOS require separate verification."
+    "en": "BIOS calls are synchronous; this API does not keep the game loop advancing once per frame during a load. Use it from ordinary control code in the common bank, not from an interrupt handler. Display/audio continuity and coexistence with the real BIOS require separate verification.",
+    "zh-CN": "BIOS 调用是同步的；本 API 不会在加载期间保持游戏主循环每帧更新。请从公共存储体中的普通控制代码调用，不要从中断处理程序调用。画面/音频连续性以及与真实 BIOS 的共存情况，需要另行验证。"
   },
   "fds_load_window": {
     "ja": "ロード元と同じ$6000～$9FFF窓に置いた関数から直接バンクを切り替えると、自分のコードや復帰先を上書きします。このサンプルは呼び出し元と表示処理を`#pragma fixed_bank 0`へ置きます。別バンクの関数を呼んで戻る用途には`__fds_overlay_farcall()`または通常の型付き関数呼び出しを使います。",
-    "en": "Loading a different bank directly from code in the $6000–$9FFF window can overwrite the executing function or its return address. This sample places the caller and display code in `#pragma fixed_bank 0`. To call a function in another bank and return, use `__fds_overlay_farcall()` or an ordinary typed function call."
+    "en": "Loading a different bank directly from code in the $6000–$9FFF window can overwrite the executing function or its return address. This sample places the caller and display code in `#pragma fixed_bank 0`. To call a function in another bank and return, use `__fds_overlay_farcall()` or an ordinary typed function call.",
+    "zh-CN": "从 $6000–$9FFF 窗口中的代码直接加载其他存储体，可能覆盖当前函数或其返回地址。示例将调用方及显示代码放在 `#pragma fixed_bank 0`。若要调用另一存储体中的函数并返回，请使用 `__fds_overlay_farcall()` 或普通的带类型函数调用。"
   },
   "fds_load_bankarg": {
     "ja": "ロードする論理バンク番号1～254。0は共通コードなのでロード対象ではなく、255は不明状態の予約値です。バンク2以降では、計算したファイルIDも0～254に収まる必要があります。",
-    "en": "Logical bank to load, 1..254. Bank 0 is common code, not a loadable window; 255 is reserved for unknown residency. For bank 2 and above, the calculated file ID must also fit in 0..254."
+    "en": "Logical bank to load, 1..254. Bank 0 is common code, not a loadable window; 255 is reserved for unknown residency. For bank 2 and above, the calculated file ID must also fit in 0..254.",
+    "zh-CN": "要加载的逻辑存储体，范围为 1..254。存储体 0 是公共代码，不属于可加载窗口；255 保留表示驻留状态未知。存储体 2 及以上计算出的文件 ID 也必须在 0..254 范围内。"
   },
   "fds_load_status": {
     "ja": "成功時は0。番号0・255、ファイルIDの桁あふれ、復元用ファイルがないバンク1などは255。BIOS転送が失敗した場合はそのエラーバイトです。転送前の引数エラーでは常駐記録を変更せず、BIOS転送失敗時は255（不明）にします。",
-    "en": "Zero on success. Returns 255 for bank 0 or 255, a file-ID overflow, or bank 1 without a restore file. A failed BIOS transfer returns its error byte. Argument failures before a transfer preserve the residency record; failed BIOS transfers mark it 255 (unknown)."
+    "en": "Zero on success. Returns 255 for bank 0 or 255, a file-ID overflow, or bank 1 without a restore file. A failed BIOS transfer returns its error byte. Argument failures before a transfer preserve the residency record; failed BIOS transfers mark it 255 (unknown).",
+    "zh-CN": "成功返回零。存储体为 0 或 255、文件 ID 溢出，或存储体 1 缺少恢复文件时返回 255。BIOS 传送失败时返回其错误字节。传送前的参数错误保留驻留记录；BIOS 传送失败则将其设为 255，表示未知。"
   },
   "fds_load_guard": {
     "ja": "既定の常駐ガードが有効で、指定バンクがすでに記録されていれば、ディスクを読まず0を返します。`--fds-no-overlay-guard`は`__fds_load_bank()`のこの省略処理を無効にします。ロード成功後はバンク番号を記録します。記録はメモリの検査結果ではありません。",
-    "en": "With the default residency guard, an already-recorded bank returns zero without a disk read. `--fds-no-overlay-guard` disables this shortcut in `__fds_load_bank()`. A successful load records the requested bank. The record is not a validation of memory contents."
+    "en": "With the default residency guard, an already-recorded bank returns zero without a disk read. `--fds-no-overlay-guard` disables this shortcut in `__fds_load_bank()`. A successful load records the requested bank. The record is not a validation of memory contents.",
+    "zh-CN": "默认启用驻留检查；已记录为驻留的存储体直接返回零，不读取磁盘。`--fds-no-overlay-guard` 会关闭 `__fds_load_bank()` 中这一快捷路径。加载成功后记录请求的存储体。该记录不是对内存内容的验证。"
   },
   "fds_load_callbank": {
     "ja": "バンクを表す式。式は呼び出し前に一度だけ評価しますが、実際にロードするバンクはfuncのリンク時の配置から決まります。任意の番号へ同じアドレスを振り向ける機能ではありません。`__bankof(func)`など、対象と一致する値を渡してください。",
-    "en": "An expression representing the bank. It is evaluated once before the call, but the bank actually loaded comes from func’s linked placement. This does not dispatch an address into an arbitrary runtime-selected bank. Pass a matching value, such as `__bankof(func)`."
+    "en": "An expression representing the bank. It is evaluated once before the call, but the bank actually loaded comes from func’s linked placement. This does not dispatch an address into an arbitrary runtime-selected bank. Pass a matching value, such as `__bankof(func)`.",
+    "zh-CN": "表示存储体的表达式。调用前只求值一次，但实际加载的存储体取决于 func 的链接位置。它不会把地址分派到任意运行时选择的存储体。请传入匹配值，例如 `__bankof(func)`。"
   },
   "fds_load_funcarg": {
     "ja": "宣言済みで引数を取らない関数の名前。サンプルは`u8 overlay_answer(void)`を渡します。数値アドレス、実行時の関数ポインター、引数を必要とする関数は受け付けません。引数を渡す場合は通常の`target(a, b)`形式を使います。",
-    "en": "Name of a declared function with no parameters. The sample passes `u8 overlay_answer(void)`. Numeric addresses, runtime function pointers and functions requiring arguments are rejected. Use an ordinary `target(a, b)` call when arguments are needed."
+    "en": "Name of a declared function with no parameters. The sample passes `u8 overlay_answer(void)`. Numeric addresses, runtime function pointers and functions requiring arguments are rejected. Use an ordinary `target(a, b)` call when arguments are needed.",
+    "zh-CN": "已声明的无参数函数名称。示例传入 `u8 overlay_answer(void)`。数字地址、运行时函数指针及需要参数的函数都会被拒绝。需要参数时，请使用普通的 `target(a, b)` 调用。"
   },
   "fds_load_callreturn": {
     "ja": "対象関数が返した8ビット値。ロードに失敗して元のバンクを復元できた場合は、対象を呼ばずロードエラーのバイトを返します。そのため、関数の結果とエラーを区別する設計が必要です。",
-    "en": "The target function’s eight-bit result. If loading fails and the previous bank can be restored, the target is not called and the load error byte is returned instead. Design the result convention so an error can be distinguished from a normal result."
+    "en": "The target function’s eight-bit result. If loading fails and the previous bank can be restored, the target is not called and the load error byte is returned instead. Design the result convention so an error can be distinguished from a normal result.",
+    "zh-CN": "目标函数的八位结果。若加载失败但能恢复先前存储体，则不调用目标，而是返回加载错误字节。请设计返回值约定，使错误与正常结果可区分。"
   },
   "fds_load_restore": {
     "ja": "異なるバンクを呼ぶ場合は、呼び出し前のバンクを保存し、対象の実行後に復元してから戻ります。入れ子の呼び出しも同じ規則です。転送途中の失敗でも復元を試みます。復元そのものが失敗した場合は、上書きされたコードへ戻らず共通コード内で停止します。共通コード内の対象や同一バンクの対象には不要な転送を行いません。",
-    "en": "For a different-bank call, the previous bank is saved and restored before returning. Nested calls follow the same rule. Restoration is also attempted after a partially failed transfer. If restoration itself fails, execution stops in common code rather than returning to overwritten code. Common-bank targets and same-bank calls avoid unnecessary transfers."
+    "en": "For a different-bank call, the previous bank is saved and restored before returning. Nested calls follow the same rule. Restoration is also attempted after a partially failed transfer. If restoration itself fails, execution stops in common code rather than returning to overwritten code. Common-bank targets and same-bank calls avoid unnecessary transfers.",
+    "zh-CN": "跨存储体调用会保存先前存储体，并在返回前恢复。嵌套调用遵循相同规则。传送部分失败后也会尝试恢复。若恢复本身失败，执行会停止在公共代码中，而不是返回已被覆盖的代码。公共存储体目标和同存储体调用会避免不必要的传送。"
   },
   "fds_load_call_expected": {
     "ja": "独自のLoadFiles呼び出し規約テストでは、RETURN VALUEが042、CALLBACK COUNTとBANK EXPR COUNTが各001、BANK IN CALLBACKが002、BANK AFTER RETURNが001になります。対象とバンク式が一度ずつ実行され、バンク2で関数を呼んだ後にバンク1へ復元したことを表します。実際のディスク転送の検証画像ではありません。",
-    "en": "With the original LoadFiles ABI fixture, RETURN VALUE is 042; CALLBACK COUNT and BANK EXPR COUNT are both 001; BANK IN CALLBACK is 002; BANK AFTER RETURN is 001. The function and bank expression ran once each, and bank 1 was restored after calling bank 2. This is not a capture of a real disk-transfer test."
+    "en": "With the original LoadFiles ABI fixture, RETURN VALUE is 042; CALLBACK COUNT and BANK EXPR COUNT are both 001; BANK IN CALLBACK is 002; BANK AFTER RETURN is 001. The function and bank expression ran once each, and bank 1 was restored after calling bank 2. This is not a capture of a real disk-transfer test.",
+    "zh-CN": "使用独立编写的 LoadFiles ABI 替身时，RETURN VALUE 为 042；CALLBACK COUNT 和 BANK EXPR COUNT 均为 001；BANK IN CALLBACK 为 002；BANK AFTER RETURN 为 001。函数和存储体表达式各执行一次，调用存储体 2 后恢复了存储体 1。这不是真实磁盘传送测试的截图。"
   },
   "fds_load_load_expected": {
     "ja": "独自のLoadFiles呼び出し規約テストでは、LOAD BANK 2 STATUS・REQUIRE SAME BANK・RESTORE BANK 1が000です。FIRST / LAST BYTEの011と044は実際に転送した4バイトの両端、RESIDENT BANKの001は復元後の番号です。無効なバンク0と255はそれぞれ255を返します。同一バンクのrequireは追加のロードを起こさず、検証したファイル読み込み要求は32→0の2回です。",
-    "en": "With the original LoadFiles ABI fixture, LOAD BANK 2 STATUS, REQUIRE SAME BANK and RESTORE BANK 1 are all 000. FIRST / LAST BYTE shows 011 and 044 from the transferred four-byte payload; RESIDENT BANK is 001 after restoration. Invalid banks 0 and 255 each return 255. Requiring the same bank issues no extra load: the checked file requests are 32 then 0."
+    "en": "With the original LoadFiles ABI fixture, LOAD BANK 2 STATUS, REQUIRE SAME BANK and RESTORE BANK 1 are all 000. FIRST / LAST BYTE shows 011 and 044 from the transferred four-byte payload; RESIDENT BANK is 001 after restoration. Invalid banks 0 and 255 each return 255. Requiring the same bank issues no extra load: the checked file requests are 32 then 0.",
+    "zh-CN": "使用独立编写的 LoadFiles ABI 替身时，LOAD BANK 2 STATUS、REQUIRE SAME BANK 和 RESTORE BANK 1 均为 000。FIRST / LAST BYTE 显示所传送四字节数据的首尾值 011 和 044；恢复后 RESIDENT BANK 为 001。无效存储体 0 和 255 均返回 255。请求相同存储体不会额外加载：检查到的文件请求依次为 32 和 0。"
   },
   "fds_load_raw_expected": {
     "ja": "独自のLoadFiles呼び出し規約テストでは、FILE 32 LOAD STATUSが000、転送したデータの両端が011と044です。RAWロード直後のUNKNOWN BANK RECORDは255、IS BANK 1 RESIDENTは000になります。REQUIRE BANK 1が000で成功した後はRESIDENT AFTER RELOADが001です。ファイルIDで読む操作と、論理バンクを管理する操作の違いを示します。",
-    "en": "With the original LoadFiles ABI fixture, FILE 32 LOAD STATUS is 000 and the transferred payload’s end bytes are 011 and 044. After the raw load, UNKNOWN BANK RECORD is 255 and IS BANK 1 RESIDENT is 000. REQUIRE BANK 1 succeeds with 000, then RESIDENT AFTER RELOAD is 001. This distinguishes loading by file ID from managing a logical bank."
+    "en": "With the original LoadFiles ABI fixture, FILE 32 LOAD STATUS is 000 and the transferred payload’s end bytes are 011 and 044. After the raw load, UNKNOWN BANK RECORD is 255 and IS BANK 1 RESIDENT is 000. REQUIRE BANK 1 succeeds with 000, then RESIDENT AFTER RELOAD is 001. This distinguishes loading by file ID from managing a logical bank.",
+    "zh-CN": "使用独立编写的 LoadFiles ABI 替身时，FILE 32 LOAD STATUS 为 000，传送数据的首尾字节为 011 和 044。原始加载后，UNKNOWN BANK RECORD 为 255，IS BANK 1 RESIDENT 为 000。REQUIRE BANK 1 成功返回 000，随后 RESIDENT AFTER RELOAD 为 001。这区分了按文件 ID 加载与管理逻辑存储体。"
   },
   "fds_load___fds_load_bank_purpose": {
     "ja": "論理バンクをファイルIDへ変換し、$6000～$9FFFのオーバーレイ窓へ読み込みます。読み込み後、そのバンクを常駐中として記録します。",
-    "en": "Translate a logical bank into its file ID and load the $6000–$9FFF overlay window, recording that bank as resident afterward."
+    "en": "Translate a logical bank into its file ID and load the $6000–$9FFF overlay window, recording that bank as resident afterward.",
+    "zh-CN": "将逻辑存储体转换为文件 ID，加载到 $6000–$9FFF 覆盖窗口，并记录该存储体已驻留。"
   },
   "fds_load_require_guard": {
     "ja": "有効な番号が常駐記録と一致すれば0を返し、一致しなければ`__fds_load_bank()`を呼びます。この最初の比較は`--fds-no-overlay-guard`でも行います。255は常駐記録が255でも成功扱いにしません。",
-    "en": "A valid bank matching the record returns zero; otherwise this calls `__fds_load_bank()`. The initial comparison remains active with `--fds-no-overlay-guard`. Bank 255 never counts as resident, even when the record is 255."
+    "en": "A valid bank matching the record returns zero; otherwise this calls `__fds_load_bank()`. The initial comparison remains active with `--fds-no-overlay-guard`. Bank 255 never counts as resident, even when the record is 255.",
+    "zh-CN": "有效存储体与记录一致时返回零；否则调用 `__fds_load_bank()`。即使用 `--fds-no-overlay-guard`，最初的比较仍会执行。存储体 255 永远不算驻留，即使记录本身为 255。"
   },
   "fds_load___fds_require_bank_purpose": {
     "ja": "指定バンクが常駐していなければ読み込みます。資産を使う前に呼び、すでに利用可能な場合の不要な転送を省くための関数です。",
-    "en": "Load a bank only if it is not already recorded as resident. Call before accessing an asset to avoid an unnecessary transfer when it is already available."
+    "en": "Load a bank only if it is not already recorded as resident. Call before accessing an asset to avoid an unnecessary transfer when it is already available.",
+    "zh-CN": "只在存储体尚未被记录为驻留时加载。访问资源前调用，可在资源已经可用时避免不必要的传送。"
   },
   "fds_load_load_alias": {
     "ja": "`__fds_load_bank((bank))`へ展開します。bank式の重複評価はありません。引数範囲、常駐ガード、エラー処理は組み込み関数と同じです。",
-    "en": "Expands to `__fds_load_bank((bank))` without duplicating evaluation of bank. Argument limits, residency guarding and error behavior are those of the intrinsic."
+    "en": "Expands to `__fds_load_bank((bank))` without duplicating evaluation of bank. Argument limits, residency guarding and error behavior are those of the intrinsic.",
+    "zh-CN": "展开为 `__fds_load_bank((bank))`，不会重复求值 bank。参数限制、驻留检查和错误行为与内建函数相同。"
   },
   "fds_load_nes_fds_load_bank_purpose": {
     "ja": "`nes_game.h`が提供する`__fds_load_bank()`のマクロ名です。ゲーム用ヘッダーの表記で論理バンクを明示的に読み込みます。",
-    "en": "The `nes_game.h` macro spelling of `__fds_load_bank()`, for explicitly loading a logical bank through the game convenience header."
+    "en": "The `nes_game.h` macro spelling of `__fds_load_bank()`, for explicitly loading a logical bank through the game convenience header.",
+    "zh-CN": "`nes_game.h` 中对应 `__fds_load_bank()` 的宏写法，用于通过游戏便捷头文件明确加载逻辑存储体。"
   },
   "fds_load___fds_overlay_farcall_purpose": {
     "ja": "オーバーレイに配置した引数なし関数を呼び、呼び出し前のバンクを復元して戻ります。",
-    "en": "Call a parameterless function in an overlay and restore the previous bank before returning."
+    "en": "Call a parameterless function in an overlay and restore the previous bank before returning.",
+    "zh-CN": "调用覆盖存储体中的无参数函数，并在返回前恢复先前存储体。"
   },
   "fds_load___fds_farcall_purpose": {
     "ja": "FDS向けの名前で引数なしの遠隔関数呼び出しを行います。ロードと復元の動作は`__fds_overlay_farcall()`と同じです。",
-    "en": "Make a parameterless far call using the FDS-specific spelling. Loading and restoration behave exactly as in `__fds_overlay_farcall()`."
+    "en": "Make a parameterless far call using the FDS-specific spelling. Loading and restoration behave exactly as in `__fds_overlay_farcall()`.",
+    "zh-CN": "使用 FDS 专用写法执行无参数远调用。加载与恢复行为完全等同于 `__fds_overlay_farcall()`。"
   },
   "fds_load_nes_fds_farcall_purpose": {
     "ja": "`nes_game.h`から使うFDS遠隔呼び出しマクロです。`__fds_overlay_farcall((bank), (func))`へ展開します。",
-    "en": "The FDS far-call convenience macro in `nes_game.h`. Expands to `__fds_overlay_farcall((bank), (func))`."
+    "en": "The FDS far-call convenience macro in `nes_game.h`. Expands to `__fds_overlay_farcall((bank), (func))`.",
+    "zh-CN": "`nes_game.h` 中的 FDS 远调用便捷宏，展开为 `__fds_overlay_farcall((bank), (func))`。"
   },
   "fds_load_file_id": {
     "ja": "ディスク上のファイルID（0～254）。255はBIOSのファイルリスト終端に使うため渡さないでください。既定構成でバンク2を読むIDは32です。",
-    "en": "Disk file ID, 0..254. Do not pass 255: it terminates the BIOS file list. In the default layout, ID 32 contains bank 2."
+    "en": "Disk file ID, 0..254. Do not pass 255: it terminates the BIOS file list. In the default layout, ID 32 contains bank 2.",
+    "zh-CN": "磁盘文件 ID，范围为 0..254。不要传入 255：它是 BIOS 文件列表的结束标记。默认布局中，ID 32 包含存储体 2。"
   },
   "fds_load_raw_return": {
     "ja": "BIOSが返したエラーバイト（0が成功）。転送後の常駐記録は成功・失敗とも255（不明）です。ファイルIDだけでは論理バンクとの対応を確定しません。",
-    "en": "The BIOS error byte, with zero indicating success. After either success or failure, residency is marked 255 (unknown); a file ID alone does not establish a logical-bank mapping."
+    "en": "The BIOS error byte, with zero indicating success. After either success or failure, residency is marked 255 (unknown); a file ID alone does not establish a logical-bank mapping.",
+    "zh-CN": "BIOS 错误字节，零表示成功。无论成功或失败，驻留记录均设为 255，表示未知；仅凭文件 ID 无法建立逻辑存储体映射。"
   },
   "fds_load_raw_note": {
     "ja": "指定したファイルだけを読むため、要求IDと終端255のリストを作ります。ファイルが共通コードや実行中のコードを上書きしないよう、管理表のロード先を確認してください。論理バンクとして使う場合は`__fds_load_bank()`が記録管理を行います。",
-    "en": "Builds a list containing the requested ID and terminator 255. Check the manifest destination so the file cannot overwrite common or executing code. Prefer `__fds_load_bank()` for logical overlays; it manages residency."
+    "en": "Builds a list containing the requested ID and terminator 255. Check the manifest destination so the file cannot overwrite common or executing code. Prefer `__fds_load_bank()` for logical overlays; it manages residency.",
+    "zh-CN": "构造包含所请求 ID 和结束标记 255 的列表。请检查清单中的目标地址，避免文件覆盖公共代码或正在执行的代码。逻辑覆盖加载优先使用 `__fds_load_bank()`，由它管理驻留状态。"
   },
   "fds_load___fds_load_overlay_purpose": {
     "ja": "論理バンク番号ではなくディスクのファイルIDを指定してBIOSのLoadFilesを呼びます。ロード先はそのファイルのヘッダーで決まります。",
-    "en": "Call BIOS LoadFiles using a disk file ID rather than a logical bank number. The file header determines the destination."
+    "en": "Call BIOS LoadFiles using a disk file ID rather than a logical bank number. The file header determines the destination.",
+    "zh-CN": "使用磁盘文件 ID 而非逻辑存储体编号调用 BIOS LoadFiles。目标地址由文件头决定。"
   }
 }

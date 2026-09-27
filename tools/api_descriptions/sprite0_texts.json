@@ -1,62 +1,77 @@
 {
   "sprite0_none": {
     "ja": "戻り値はありません。",
-    "en": "No return value."
+    "en": "No return value.",
+    "zh-CN": "无返回值。"
   },
   "sprite0_hit": {
     "ja": "OAMの0番スプライトと背景の不透明なピクセルを重ねます。背景・スプライトの描画を両方有効にしてください。スプライトの「背景の後ろ」属性を付けてもヒットします。左端8ピクセルは該当する表示許可が必要で、X=255の重なりはヒットしません。",
-    "en": "Overlap an opaque pixel of OAM sprite 0 with an opaque background pixel, with both layers enabled. The behind-background priority flag still permits a hit. The leftmost eight pixels require the corresponding layer enables; overlap at X=255 cannot trigger a hit."
+    "en": "Overlap an opaque pixel of OAM sprite 0 with an opaque background pixel, with both layers enabled. The behind-background priority flag still permits a hit. The leftmost eight pixels require the corresponding layer enables; overlap at X=255 cannot trigger a hit.",
+    "zh-CN": "让 OAM 精灵 0 的不透明像素与背景不透明像素重叠，并启用两层。置于背景后方的优先级标志仍允许命中。最左八像素要求相应左缘层使能；X=255 处重叠不能触发命中。"
   },
   "sprite0_poll": {
     "ja": "PPUSTATUS（$2002）のビット6が0になるまで待ち、続いて1になるまで待ちます。呼び出した時点ですでにヒット済みなら、次のフレームの新しいヒットを待ちます。フラグは読み取りでは解除されず、PPUが次のフレームの準備中に解除します。",
-    "en": "Poll PPUSTATUS ($2002) bit 6 until it is clear, then until it is set. If a hit has already occurred when called, wait for a fresh hit in the next frame. Reading the flag does not acknowledge it; the PPU clears it during pre-render."
+    "en": "Poll PPUSTATUS ($2002) bit 6 until it is clear, then until it is set. If a hit has already occurred when called, wait for a fresh hit in the next frame. Reading the flag does not acknowledge it; the PPU clears it during pre-render.",
+    "zh-CN": "轮询 PPUSTATUS ($2002) 第 6 位，先等其清零，再等其置位。调用时若已命中，会等待下一帧的新命中。读取不确认或清除该标志；PPU 在预渲染期间清除。"
   },
   "sprite0_blocking": {
     "ja": "タイムアウトも失敗の戻り値もありません。0番スプライトが非表示、背景が透明、描画が無効など、重なりが発生しない設定では戻りません。呼ぶ前にヒット条件を保証してください。CPUのIRQ許可は不要で、この関数自身はNMIを有効化しません。サンプルのフレーム待機にはNMIを有効にしています。",
-    "en": "There is no timeout or failure return. A hidden sprite 0, transparent background, disabled rendering or another setup without overlap leaves the call blocked. Guarantee a hit before calling. CPU IRQ enable is not required, and this function does not enable NMI. The sample enables NMI for its separate frame wait."
+    "en": "There is no timeout or failure return. A hidden sprite 0, transparent background, disabled rendering or another setup without overlap leaves the call blocked. Guarantee a hit before calling. CPU IRQ enable is not required, and this function does not enable NMI. The sample enables NMI for its separate frame wait.",
+    "zh-CN": "没有超时或失败返回。精灵 0 隐藏、背景透明、渲染关闭或其他无重叠配置都会使调用阻塞。调用前须保证命中。不要求 CPU IRQ 使能，也不会启用 NMI。示例为独立的帧等待启用了 NMI。"
   },
   "sprite0_latch": {
     "ja": "$2002を読むので、PPUのアドレス／スクロール共有ラッチとVBlankフラグにも影響します。途中まで書いた$2005/$2006の2バイト操作を、この呼び出しを挟んで続けないでください。NMI/IRQハンドラーから呼ばず、前景ループで使います。",
-    "en": "Reads of $2002 also affect the shared PPU address/scroll write latch and the VBlank flag. Do not split a two-write $2005/$2006 operation around this call. Use it from the foreground, not from an NMI/IRQ handler."
+    "en": "Reads of $2002 also affect the shared PPU address/scroll write latch and the VBlank flag. Do not split a two-write $2005/$2006 operation around this call. Use it from the foreground, not from an NMI/IRQ handler.",
+    "zh-CN": "读取 $2002 还影响共享 PPU 地址/滚动写入锁存器及 VBlank 标志。不要把需要两次写入的 $2005/$2006 操作分放在本调用前后。请从前台使用，不要从 NMI/IRQ 处理程序调用。"
   },
   "sprite0_x": {
     "ja": "横スクロール値0～255。画面内の物体のX座標ではありません。サンプルでは32を指定し、同じ背景の下部を左へ32ピクセル移動して表示します。",
-    "en": "Horizontal scroll value, 0..255, not an object’s screen X coordinate. The sample uses 32 to display the lower part of the same background shifted left by 32 pixels."
+    "en": "Horizontal scroll value, 0..255, not an object’s screen X coordinate. The sample uses 32 to display the lower part of the same background shifted left by 32 pixels.",
+    "zh-CN": "水平滚动值，范围为 0..255，不是对象的屏幕 X 坐标。示例用 32 将同一背景的下半部分向左移 32 像素。"
   },
   "sprite0_y": {
     "ja": "縦スクロールの一時設定値0～255。通常の表示範囲は0～239です。このヘルパーは$2005へ書くため、描画中の縦位置を直ちに変更する機能ではありません。横分割のサンプルでは0を渡します。",
-    "en": "Temporary vertical scroll setting, 0..255; the usual visible range is 0..239. This helper writes $2005, so it does not immediately change the live vertical position during rendering. The horizontal-split sample passes zero."
+    "en": "Temporary vertical scroll setting, 0..255; the usual visible range is 0..239. This helper writes $2005, so it does not immediately change the live vertical position during rendering. The horizontal-split sample passes zero.",
+    "zh-CN": "临时垂直滚动设置，范围为 0..255，通常可见范围为 0..239。本辅助函数写 $2005，因此不会在渲染期间立即改变当前垂直位置。水平分割示例传入零。"
   },
   "sprite0_vertical": {
     "ja": "ヒット後に$2002を読み、$2005へX、Yの順に書きます。細かいX位置はすぐに変わり、タイル単位のX位置は次の水平再ロードで反映されます。Yは通常、次のプリレンダーで反映されますが、それまでに別のスクロール設定で上書きされることがあります。任意のX/Yへ即座に飛ばすラスタースクロール関数としては使わないでください。",
-    "en": "After the hit, read $2002 and write X then Y to $2005. Fine X changes immediately; coarse X takes effect at the next horizontal reload. Y normally takes effect at the next pre-render reload, unless another scroll write replaces it first. This is not an immediate arbitrary-X/Y raster repositioning operation."
+    "en": "After the hit, read $2002 and write X then Y to $2005. Fine X changes immediately; coarse X takes effect at the next horizontal reload. Y normally takes effect at the next pre-render reload, unless another scroll write replaces it first. This is not an immediate arbitrary-X/Y raster repositioning operation.",
+    "zh-CN": "命中后，读取 $2002，再向 $2005 依次写 X 和 Y。精细 X 立即改变；粗略 X 在下一次水平重载生效。Y 通常在下一次预渲染重载生效，除非先被其他滚动写入替换。这不是立即任意重定位 X/Y 的光栅操作。"
   },
   "sprite0_timing": {
     "ja": "書き込み位置にはポーリングと命令実行の遅れがあります。KUROSAKIは走査線単位で描画するため、実機のドット単位の境界位置をこの画像だけで保証しません。サンプルではY=96～103の白い帯の中に切り替えを収め、境界付近の誤差が青・赤の帯へ出ない構成にしています。",
-    "en": "Polling and instruction execution delay the writes. KUROSAKI renders by scanline, so these captures do not establish a dot-exact hardware boundary. The sample places the change inside the white band at Y=96..103, keeping boundary uncertainty away from the blue and red bars."
+    "en": "Polling and instruction execution delay the writes. KUROSAKI renders by scanline, so these captures do not establish a dot-exact hardware boundary. The sample places the change inside the white band at Y=96..103, keeping boundary uncertainty away from the blue and red bars.",
+    "zh-CN": "轮询及指令执行会延迟写入。KUROSAKI 按扫描行渲染，因此截图不能证明硬件上精确到像素时钟的边界。示例将变化放在 Y=96..103 的白色带内部，使边界不确定性远离蓝色和红色条形。"
   },
   "sprite0_scene": {
     "ja": "共有ヘッダー`fc_sprite0_scene.h`が独自の青・赤の帯と白い横帯を準備します。0番スプライトは画面(16,96)に置き、背景の後ろへ隠しています。OAMのYには表示位置−1の95を指定します。各フレームのVBlankで上部のスクロールを0へ戻してから、ヒットを待ちます。",
-    "en": "The shared header `fc_sprite0_scene.h` prepares original blue/red bars and a white horizontal band. Sprite 0 sits at screen (16,96), hidden behind the background; its raw OAM Y is 95 because display Y is OAM Y+1. Each frame restores the top scroll to zero during VBlank before waiting for the hit."
+    "en": "The shared header `fc_sprite0_scene.h` prepares original blue/red bars and a white horizontal band. Sprite 0 sits at screen (16,96), hidden behind the background; its raw OAM Y is 95 because display Y is OAM Y+1. Each frame restores the top scroll to zero during VBlank before waiting for the hit.",
+    "zh-CN": "共享头文件 `fc_sprite0_scene.h` 准备原创蓝/红条形及白色横带。精灵 0 位于屏幕 (16,96)，藏在背景后方；原始 OAM Y 为 95，因为显示 Y=OAM Y+1。每帧在 VBlank 期间先将顶部滚动恢复为零，再等待命中。"
   },
   "sprite0_wait_expected": {
     "ja": "青い縦帯はX=64～95、赤い縦帯はX=160～191にあり、白い横帯の上下で位置は変わりません。待つだけではスクロールを変更しないことを示します。120フレーム時点で116回、121フレームで117回の待機完了を確認し、次のフレームにも進み続けることを検証しています。",
-    "en": "The blue bar occupies X=64..95 and the red bar X=160..191, aligned above and below the white band. Waiting alone does not change scrolling. The executed lesson completes 116 waits after 120 frames and 117 after 121 frames, verifying that it keeps advancing."
+    "en": "The blue bar occupies X=64..95 and the red bar X=160..191, aligned above and below the white band. Waiting alone does not change scrolling. The executed lesson completes 116 waits after 120 frames and 117 after 121 frames, verifying that it keeps advancing.",
+    "zh-CN": "蓝条占 X=64..95，红条占 X=160..191，在白色带上下对齐。仅等待不改变滚动。实际运行在 120 帧后完成 116 次等待，121 帧后完成 117 次，证明持续推进。"
   },
   "sprite0_split_expected": {
     "ja": "白い横帯より上では青がX=64～95、赤がX=160～191です。Y=104以降の下部では青がX=32～63、赤がX=128～159になり、下部だけ左へ32ピクセルずれます。横帯はY=96～103、縦帯の下端はY=207です。毎フレーム1回ずつ処理が完了することと、画像全体の色・位置を検証しています。",
-    "en": "Above the white band, blue is at X=64..95 and red at X=160..191. Below it, from Y=104 onward, blue moves to X=32..63 and red to X=128..159: only the lower area shifts left by 32 pixels. The horizontal band is at Y=96..103 and the bars end at Y=207. Verification checks one completion per frame and every image pixel’s position and color."
+    "en": "Above the white band, blue is at X=64..95 and red at X=160..191. Below it, from Y=104 onward, blue moves to X=32..63 and red to X=128..159: only the lower area shifts left by 32 pixels. The horizontal band is at Y=96..103 and the bars end at Y=207. Verification checks one completion per frame and every image pixel’s position and color.",
+    "zh-CN": "白色带上方，蓝条位于 X=64..95，红条位于 X=160..191。其下方从 Y=104 起，蓝条移至 X=32..63，红条移至 X=128..159：只有下部左移 32 像素。横带位于 Y=96..103，条形延伸至 Y=207。验证检查每帧完成一次，以及每个图像像素的位置和颜色。"
   },
   "sprite0_wait": {
     "ja": "0番スプライトと背景が新しく重なるまで待ちます。画面内の既知の位置に処理を同期させるための待機で、スクロール値は変更しません。",
-    "en": "Wait for a fresh sprite-zero/background overlap, synchronizing foreground work to a known region of the screen without changing scroll values."
+    "en": "Wait for a fresh sprite-zero/background overlap, synchronizing foreground work to a known region of the screen without changing scroll values.",
+    "zh-CN": "等待新的精灵零/背景重叠，使前台工作与已知屏幕区域同步，不改变滚动值。"
   },
   "sprite0_split": {
     "ja": "0番スプライトの新しいヒットを待ち、横分割用にスクロールX/Yを書き込みます。上部を固定して下部の背景だけ横へずらす用途に使えます。",
-    "en": "Wait for a fresh sprite-zero hit and write scroll X/Y for a horizontal split, keeping the top aligned while shifting the lower background."
+    "en": "Wait for a fresh sprite-zero hit and write scroll X/Y for a horizontal split, keeping the top aligned while shifting the lower background.",
+    "zh-CN": "等待新的精灵零命中，然后写入滚动 X/Y 以实现水平分割，使顶部保持对齐、下部背景移位。"
   },
   "sprite0_split_alias": {
     "ja": "`nes_game.h`から使える画面分割マクロです。XとYを1回ずつ`__split_scroll_sprite0`へ渡し、同じ待機とスクロール書き込みを行います。",
-    "en": "Screen-split macro from `nes_game.h`. It passes X and Y once each to `__split_scroll_sprite0`, performing the same wait and scroll writes."
+    "en": "Screen-split macro from `nes_game.h`. It passes X and Y once each to `__split_scroll_sprite0`, performing the same wait and scroll writes.",
+    "zh-CN": "`nes_game.h` 的屏幕分割宏。X、Y 各求值传递一次给 `__split_scroll_sprite0`，执行相同等待和滚动写入。"
   }
 }

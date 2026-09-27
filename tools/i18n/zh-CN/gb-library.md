@@ -50,12 +50,12 @@
 
 `Audio_PlayMusic(bank,song)` 显式指定乐曲 bank；`Audio_PlaySFXBanked` 播放另一 bank 的音效。共享物理通道的音效由优先级仲裁。GB 只有 CH1、CH2、CH3、CH4 四个物理音频通道。
 
-音乐流命令 `AUDIO_CMD_NOTE`、`AUDIO_CMD_SET_INST` 使用以下通道编号：**0=CH1、1=CH2、2=CH4、3=CH3**。不要与一般 API 通道常量混淆。当前头文件定义 `AUDIO_NOTE_MAX=67`。
+音乐流命令 `AUDIO_CMD_NOTE`、`AUDIO_CMD_SET_INST` 和 `AUDIO_CMD_STOP_CHANNEL` 与普通 API 共用通道编号：**0=CH1、1=CH2、2=CH3、3=CH4**。CH1 为带扫频的脉冲通道，CH2 为脉冲通道，CH3 为波形通道，CH4 为噪声通道。头文件定义 `AUDIO_NOTE_MAX=67`。
 
 基本 CH1 音效流每帧读取音符/音量对，以音符 0 结束。CH3 使用不同标记和格式。请看 `gb_sound.c`。淡入淡出由 `Audio_Update` 推进，停止更新也会停止渐变。
 
 ## 8. VBlank IRQ 音乐
-`audio_vblank.c` 使用独立的播放格式。带时间信息的记录由5个字节组成：`delay, ch2_note, ch1_note, ch3_note, ch4_noise_param`。驱动可以读取可直接寻址的乐曲，也可以从WRAM队列取出数据。公开库不包含队列补充函数，游戏需要自行提供数据生产端，并协调其写入与ISR的执行。`LOOP` 仅用于直接寻址模式，`IMMEDIATE` 仅用于队列模式。普通 `audio.c` 的数据流不能原样传入。
+`audio_vblank.c` 使用独立播放格式。带时间信息的记录由五字节组成：`delay, ch1_note, ch2_note, ch3_note, ch4_noise_param`。驱动可读取能直接寻址的乐曲，也可消费 WRAM 队列。用 `AudioVBlank_QueueReset` 初始化队列模式，用 `AudioVBlank_QueueRefill` 提交完整五字节记录，再用 `AudioVBlank_QueuePlay` 开始播放。由一个前台生产者补充队列。`LOOP` 只用于直接数据流，`IMMEDIATE` 只用于队列模式。普通 `audio.c` 数据流不能原样传入。
 
 {{CODE:2}}
 
@@ -75,7 +75,7 @@ CGB版的线条请使用颜色编号1、2、3。普通128 × 96模式会叠加�
 160 × 144模式每帧最多分配127个图块。高速线条绘制路径遇到图块分配失败或屏幕范围外的坐标时，`Wire3DCGB_GetFullScreenOverflow()` 会返回非零值，并停止写入像素，直到下一帧重新初始化。请将顶点限制在所选视口内。三角形遮挡掩码的右侧余量在128 × 96模式下最多扩展到X=127，全屏模式下最多到X=159。使用全屏或FastMap功能时，尤其要遵守API说明中的WRAM存储体映射要求。
 
 ## 10. 场景、对象池与弹幕
-`scene` 管理标题、游戏、暂停等状态，`entity` 提供固定容量对象池，`chain` 保存蛇、列车、绳索的坐标历史。使用 `entity_get` 返回的指针前，先检查 0xFF 等分配失败值。
+`scene` 管理标题、游戏、暂停等状态，`entity` 提供固定容量对象池，`chain` 提供关节跟随和位置历史。用 `ChainBody` 移动由多个关节组成的蛇或绳索。使用 `entity_get` 返回的指针前，先检查 0xFF 等分配失败值。
 
 `danmaku` 提供定点弹池、定向和扇形发射、命中与擦弹。CGB 背景合成路径避开一般 OBJ 数量限制，但帧处理时间和背景传输带宽仍有限。应测量每帧处理时间，而不只追求弹数。
 

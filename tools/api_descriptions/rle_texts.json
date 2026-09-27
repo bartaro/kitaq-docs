@@ -1,24 +1,112 @@
 {
-  "rle_near": {"en":"Expand a run-length encoded byte stream into ordinary writable RAM. Each count/value pair repeats one byte count times; a zero count ends the stream. Use this path when the encoded data is already readable through an ordinary pointer and you want to inspect or modify the expanded bytes before uploading them.","ja":"ランレングス形式のバイト列を、通常の書き込み可能なRAMへ展開します。個数と値の組ごとに同じバイトを指定個数だけ繰り返し、個数0で終了します。圧縮データを通常のポインターで読める場合や、展開後の内容を確認・加工してから転送したい場合に使います。"},
-  "rle_far": {"en":"Expand the same count/value format into RAM while reading each encoded byte through __farpeek8 with the supplied ROM bank. Use it for compressed assets stored in a switchable ROM bank. The destination remains an ordinary RAM pointer; the bank argument describes the source.","ja":"指定したROMバンクから__farpeek8で圧縮データを1バイトずつ読み、同じ個数・値の形式をRAMへ展開します。切り替え式のROMバンクに置いた圧縮素材に使います。展開先は通常のRAMポインターであり、bank引数が指定するのは入力側のバンクです。"},
-  "rle_vram": {"en":"Expand a bank-qualified count/value stream directly into VRAM, without an intermediate output buffer in RAM. The compiler emits a loop that fetches each pair, fills its run using the LCD-aware VRAM write helper, and returns the number of output bytes. This is useful when loading compressed tile data or a byte-oriented tile map.","ja":"ROMバンクを指定した個数・値の列を、RAMの展開用バッファを介さずVRAMへ直接展開します。コンパイラが各組の取得と、LCDの状態を考慮した連続書き込みを行うループを生成し、出力バイト数を返します。圧縮したタイルデータや、バイト単位のタイルマップを読み込む場合に使えます。"},
-  "rle_ram_dst": {"en":"Pointer to enough writable RAM for the entire expanded stream. No capacity is passed to the function. Keep the output separate from the encoded source so that writes cannot overwrite pairs that have not yet been read.","ja":"展開後のデータ全体が入る、書き込み可能なRAMへのポインターです。関数には容量を渡せません。まだ読んでいない組を出力が上書きしないよう、入力と展開先を重ねないでください。"},
-  "rle_vram_dst": {"en":"16-bit CPU address of the first output byte, within 0x8000–0x9FFF. Reserve enough consecutive bytes without passing 0x9FFF. For example, 0x8860 is tile 134 in the unsigned tile-data layout. The function does not allocate tiles or check the destination range.","ja":"最初の出力バイトを置く16ビットのCPUアドレスで、0x8000〜0x9FFFの範囲を指定します。末尾が0x9FFFを越えないよう、連続した領域を確保してください。たとえば0x8860は、符号なしのタイル番号を使う配置ではタイル134の位置です。関数がタイルを割り当てたり、宛先の範囲を検査したりすることはありません。"},
-  "rle_src": {"en":"Readable pointer to count/value byte pairs terminated by a zero count. The count is 1–255 for an ordinary run; the repeated value can be any byte, including zero. A terminating zero has no following value byte. The pointer must remain readable in the current mapping throughout the call.","ja":"個数・値のバイト対が並び、個数0で終わる読み取り可能な列へのポインターです。通常の組の個数は1〜255で、値には0を含む任意のバイトを使えます。終端の0には値のバイトを続ける必要がありません。呼び出し中は、そのポインターを現在のメモリ配置で読み取れる状態に保ってください。"},
-  "rle_far_src": {"en":"CPU pointer to the encoded stream in the supplied bank. The function increments this address, but keeps the bank number fixed. Keep the full stream, including its terminating zero, inside a readable mapping; crossing 0x7FFF does not automatically continue in the next ROM bank.","ja":"指定したバンク内の圧縮列を指すCPUポインターです。アドレスは進みますが、バンク番号は変わりません。終端0までの列全体を読み取り可能な配置に収めてください。0x7FFFを越えても、次のROMバンクの先頭へ自動的に続くことはありません。"},
-  "rle_bank": {"en":"Source ROM bank number as u8. The bank and CPU address must match your cartridge mapper and asset placement. Bank selection is restored after each encoded-byte fetch; it is not a destination VRAM-bank selector and cannot express a 9-bit MBC5 bank number.","ja":"入力ROMのバンク番号をu8で指定します。カートリッジのマッパーと素材の配置に合う番号・CPUアドレスの組を使ってください。圧縮データの各バイト取得後には、元のROMバンク選択を復元します。展開先のVRAMバンクを選ぶ引数ではなく、MBC5の9ビットのバンク番号も表せません。"},
-  "rle_return": {"en":"Number of bytes written, as u16. An immediate zero count produces zero bytes and returns 0. The terminator is not copied. Keep the expanded length representable in u16; the return value has no separate error code and is not a tile count.","ja":"書き込んだバイト数をu16で返します。先頭の個数が0なら何も展開せず0を返し、終端そのものはコピーしません。展開長はu16で表せる範囲に収めてください。戻り値に別のエラーコードはなく、タイルの枚数でもありません。"},
-  "rle_format": {"en":"The encoding is byte-oriented, not text-oriented. For example, {3, 0x12, 2, 0xA5, 0} expands to five bytes: 12 12 12 A5 A5. Values are hexadecimal in that output listing. A zero value inside a nonzero-count pair is ordinary data, not the end marker.","ja":"文字列専用ではなく、バイト単位の形式です。たとえば{3, 0x12, 2, 0xA5, 0}は、16進表記で12 12 12 A5 A5の5バイトに展開されます。個数が0でない組の値が0でも、通常のデータとして扱い、終端とは見なしません。"},
-  "rle_bounds": {"en":"There is no encoded-size, output-capacity or malformed-data argument. Validate assets when creating or loading them, provide the zero terminator, and calculate their expanded size before decoding. An invalid or unterminated stream can read past the source and write past the destination.","ja":"圧縮後のサイズ、展開先の容量、不正データの扱いを指定する引数はありません。素材の作成時や読み込み時に形式を確認し、終端0を付けて、展開長を計算してから呼び出してください。不正な列や終端のない列では、入力・出力とも領域外へ進む可能性があります。"},
-  "rle_ram_timing": {"en":"The RAM decoders use ordinary stores and do not synchronize with LCD access periods. Keep their destinations in RAM. To display the result, upload it separately with a suitable VRAM copy API, as the sample does while the LCD is stopped.","ja":"RAM用の展開関数は通常の書き込みを行い、LCDのアクセス可能時間には同期しません。展開先はRAMにしてください。表示する場合は、適切なVRAMコピーAPIで別途転送します。サンプルではLCDを止めてから転送しています。"},
-  "rle_vram_timing": {"en":"With the LCD off, runs are written directly. With it on, the helper waits for a writable LCD mode for each output byte, using DI/EI around the wait and store. A long stream can therefore span multiple frames; this is a synchronous call, not a queued transfer. The LCD-on path enables interrupts after each byte instead of preserving an initially disabled interrupt state.","ja":"LCD停止中は直接書き込みます。表示中は出力1バイトごとに書き込み可能なLCDモードを待ち、その待機・書き込みをDI/EIで囲みます。そのため長い列は複数フレームにまたがる場合があります。キューに登録する非同期転送ではなく、完了まで戻らない呼び出しです。LCD表示中の経路は各バイト後に割り込みを有効にするため、呼び出し前の割り込み無効状態は保持しません。"},
-  "rle_vbk": {"en":"On CGB, writes use the currently selected VBK bank and leave that selection unchanged. Choose VBK 0 for the sample's tile data. The bank argument still selects ROM input, even when VBK 1 is selected for output. The decoder does not manage CGB palettes or map attributes.","ja":"CGBでは、VBKで現在選択されているVRAMバンクへ書き込み、その選択を変更しません。サンプルのタイルデータにはVBK 0を使います。出力にVBK 1を選んだ場合も、bank引数は入力ROMの指定です。CGBのパレットやマップ属性を管理する関数ではありません。"},
-  "rle_bank_context": {"en":"Do not let an interrupt routine change the ROM mapping or reuse the far-copy helper while a bank-qualified fetch is in progress. The helpers use shared bank bookkeeping. Place a near decoder and its source in compatible mappings; switching to a function's bank must not hide an ordinary source pointer.","ja":"バンク付きの読み取り中に、割り込み処理でROMの配置を変更したり、同じ遠距離コピーの補助処理を重ねて呼んだりしないでください。補助処理はバンク管理用の状態を共有します。通常ポインター版では、展開関数と入力データを同時に読める配置にします。関数のバンクへの切り替えで、入力ポインターが指すデータが隠れないようにしてください。"},
-  "rle_build": {"en":"rle_decode and rle_decode_far are declared in rpg.h and implemented in lib/rle.c. Compile that implementation once with your game. The complete example includes rle.c after #pragma bank 0 so that its caller and decoders stay in the common bank; do not also pass rle.c as a separate input for this example. The __rle_decode_vram intrinsic itself needs no library implementation file.","ja":"rle_decodeとrle_decode_farはrpg.hで宣言され、lib/rle.cに実装されています。ゲームと一緒に実装を一度だけコンパイルしてください。完全なサンプルでは呼び出し側と展開関数を共通バンクに置くため、#pragma bank 0の後でrle.cをインクルードしています。このサンプルのビルドでは、rle.cをさらに別の入力ファイルとして渡さないでください。__rle_decode_vram自体にはライブラリの実装ファイルは不要です。"},
-  "rle_demo_near": {"en":"This example expands nine encoded bytes into a guarded RAM buffer, then copies the 48-byte result to tile-data address 0x8800. RLE TO RAM reads 048. The top row is red on CGB and shows the three tiles decoded through this ordinary-pointer path.","ja":"9バイトの圧縮列を保護用バイト付きのRAMバッファへ展開し、48バイトの結果をタイルデータの0x8800へコピーするサンプルです。RLE TO RAMは048になります。最上段はCGBで赤く表示し、通常ポインターで展開した3枚を示します。"},
-  "rle_demo_far": {"en":"This example reads the encoded stream from ROM bank 2, expands 48 bytes into RAM, and uploads them at 0x8830. BANKED RAM reads 048. The middle row is green on CGB. A marker in ROM bank 1 is also checked to verify restoration of the caller's mapping.","ja":"ROMバンク2から圧縮列を読んで48バイトをRAMへ展開し、0x8830へ転送するサンプルです。BANKED RAMは048になります。中央の段はCGBで緑です。ROMバンク1の目印も読み、呼び出し前の配置に戻ったことを確認します。"},
-  "rle_demo_vram": {"en":"This example expands the bank-2 stream directly to VRAM at 0x8860, without a RAM output buffer. DIRECT VRAM reads 048. The bottom row is blue on CGB and must contain the same three tile patterns as the RAM-based rows. This teaching program performs the upload with the LCD off.","ja":"バンク2の圧縮列を、RAMの展開用バッファを使わずVRAMの0x8860へ直接展開するサンプルです。DIRECT VRAMは048になります。最下段はCGBで青く表示し、RAM経由の段と同じ3種類のタイルが並ぶ必要があります。この表示用サンプルではLCDを止めて転送します。"},
-  "rle_shapes": {"en":"Each row contains, from left to right, an 8×8 filled square, an 8×8 one-pixel outline, and a filled 4×8 rectangle occupying the left half of an 8×8 tile. Their tile columns are 2, 5 and 8 (pixel x = 16, 40 and 64). The three rows start at pixel y = 32, 72 and 112. DMG uses black shapes; CGB uses red, green and blue by row. FAILED must be 000. The numbers are byte counts: three 16-byte GB tiles require 48 decoded bytes.","ja":"各段は左から、8×8の塗りつぶし正方形、8×8で太さ1ピクセルの枠、8×8タイルの左半分を埋める4×8の長方形です。タイル列は2・5・8で、ピクセルのx座標では16・40・64です。三段の上端のy座標は32・72・112です。DMGは黒、CGBは段ごとに赤・緑・青で表示します。FAILEDは000になる必要があります。表示数値はバイト数で、1枚16バイトのGBタイル3枚には48バイトの展開先が必要です。"},
-  "rle_proof": {"en":"The verification matrix checks 42 cases covering an empty stream, a one-byte run, zero-valued data, a 255-byte run, 510-byte output across a destination page, and encoded data across a source page. It compares all 528 observed destination/guard bytes, output length and restored ROM mapping. Direct VRAM cases include LCD on/off on DMG and CGB, plus CGB VBK 1. The two teaching screens are checked after 240 emulator frames. Invalid assets, concurrent interrupt use and physical hardware are not covered.","ja":"検証は42条件で、空の列、1バイトの繰り返し、値0、255バイトの繰り返し、出力のページ境界を越える510バイト、入力のページ境界を越える列を扱います。宛先と保護領域の528バイト全体、展開長、ROMバンクの復元を照合します。直接VRAM版はDMG・CGBのLCD表示中と停止中、およびCGBのVBK 1も対象です。2枚の表示用サンプル画像はエミュレータの240フレーム後に確認します。不正な素材、割り込みからの並行利用、実機は検証対象に含みません。"},
-  "rle_module": {"en":"RLE decoding uses count/value byte pairs and a zero count terminator. rle_decode reads an ordinary pointer into RAM; rle_decode_far reads a ROM-bank-qualified pointer into RAM; __rle_decode_vram expands banked input directly to VRAM with LCD-aware stores. The RAM functions live in lib/rle.c, while the direct VRAM operation is compiler-generated. All three return output bytes and require a valid stream and enough destination space.","ja":"RLE展開は個数・値のバイト対と、個数0の終端を使います。rle_decodeは通常のポインターからRAMへ、rle_decode_farはROMバンク付きのポインターからRAMへ展開します。__rle_decode_vramはバンク付きの入力を、LCDの状態を考慮してVRAMへ直接展開します。RAM用の実装はlib/rle.c、直接VRAM用はコンパイラが生成します。いずれも出力バイト数を返し、有効な列と十分な展開先領域を呼び出し側で用意する必要があります。"}
+  "rle_near": {
+    "en": "Expand a run-length encoded byte stream into ordinary writable RAM. Each count/value pair repeats one byte count times; a zero count ends the stream. Use this path when the encoded data is already readable through an ordinary pointer and you want to inspect or modify the expanded bytes before uploading them.",
+    "ja": "ランレングス形式のバイト列を、通常の書き込み可能なRAMへ展開します。個数と値の組ごとに同じバイトを指定個数だけ繰り返し、個数0で終了します。圧縮データを通常のポインターで読める場合や、展開後の内容を確認・加工してから転送したい場合に使います。",
+    "zh-CN": "将游程编码的字节流展开到普通可写 RAM。每组数量／数值重复输出指定次数的一个字节，数量为零时结束。压缩数据可通过普通指针读取，且需要在上传前检查或修改展开结果时，使用此接口。"
+  },
+  "rle_far": {
+    "en": "Expand the same count/value format into RAM while reading each encoded byte through __farpeek8 with the supplied ROM bank. Use it for compressed assets stored in a switchable ROM bank. The destination remains an ordinary RAM pointer; the bank argument describes the source.",
+    "ja": "指定したROMバンクから__farpeek8で圧縮データを1バイトずつ読み、同じ個数・値の形式をRAMへ展開します。切り替え式のROMバンクに置いた圧縮素材に使います。展開先は通常のRAMポインターであり、bank引数が指定するのは入力側のバンクです。",
+    "zh-CN": "通过指定 ROM 存储体的 __farpeek8 逐字节读取相同的数量／数值格式，并展开到 RAM。适合放在可切换 ROM 存储体中的压缩素材。目标仍是普通 RAM 指针，bank 参数描述的是源数据。"
+  },
+  "rle_vram": {
+    "en": "Expand a bank-qualified count/value stream directly into VRAM, without an intermediate output buffer in RAM. The compiler emits a loop that fetches each pair, fills its run using the LCD-aware VRAM write helper, and returns the number of output bytes. This is useful when loading compressed tile data or a byte-oriented tile map.",
+    "ja": "ROMバンクを指定した個数・値の列を、RAMの展開用バッファを介さずVRAMへ直接展開します。コンパイラが各組の取得と、LCDの状態を考慮した連続書き込みを行うループを生成し、出力バイト数を返します。圧縮したタイルデータや、バイト単位のタイルマップを読み込む場合に使えます。",
+    "zh-CN": "将带存储体编号的数量／数值流直接展开到 VRAM，不使用中间 RAM 输出缓冲。编译器生成循环，读取每组数据，通过考虑 LCD 访问时机的写入函数填充，最后返回输出字节数。适合载入压缩图块或按字节存储的背景图数据。"
+  },
+  "rle_ram_dst": {
+    "en": "Pointer to enough writable RAM for the entire expanded stream. No capacity is passed to the function. Keep the output separate from the encoded source so that writes cannot overwrite pairs that have not yet been read.",
+    "ja": "展開後のデータ全体が入る、書き込み可能なRAMへのポインターです。関数には容量を渡せません。まだ読んでいない組を出力が上書きしないよう、入力と展開先を重ねないでください。",
+    "zh-CN": "目标可写 RAM 指针，空间必须足够容纳全部展开数据。函数没有容量参数。输出与压缩源数据须分开，防止覆盖尚未读取的编码。"
+  },
+  "rle_vram_dst": {
+    "en": "16-bit CPU address of the first output byte, within 0x8000–0x9FFF. Reserve enough consecutive bytes without passing 0x9FFF. For example, 0x8860 is tile 134 in the unsigned tile-data layout. The function does not allocate tiles or check the destination range.",
+    "ja": "最初の出力バイトを置く16ビットのCPUアドレスで、0x8000〜0x9FFFの範囲を指定します。末尾が0x9FFFを越えないよう、連続した領域を確保してください。たとえば0x8860は、符号なしのタイル番号を使う配置ではタイル134の位置です。関数がタイルを割り当てたり、宛先の範囲を検査したりすることはありません。",
+    "zh-CN": "首个输出字节的 16 位 CPU 地址，范围为 0x8000～0x9FFF。须预留连续空间，末尾不得超过 0x9FFF。例如，在无符号图块编号布局中，0x8860 是图块 134。函数不分配图块，也不检查目标范围。"
+  },
+  "rle_src": {
+    "en": "Readable pointer to count/value byte pairs terminated by a zero count. The count is 1–255 for an ordinary run; the repeated value can be any byte, including zero. A terminating zero has no following value byte. The pointer must remain readable in the current mapping throughout the call.",
+    "ja": "個数・値のバイト対が並び、個数0で終わる読み取り可能な列へのポインターです。通常の組の個数は1〜255で、値には0を含む任意のバイトを使えます。終端の0には値のバイトを続ける必要がありません。呼び出し中は、そのポインターを現在のメモリ配置で読み取れる状態に保ってください。",
+    "zh-CN": "指向数量／数值字节对的可读指针，以数量零结束。普通数据段的数量为 1～255，数值可以是任意字节，包括零。结束用的零后面没有数值字节。整个调用期间，源数据必须在当前映射中可读。"
+  },
+  "rle_far_src": {
+    "en": "CPU pointer to the encoded stream in the supplied bank. The function increments this address, but keeps the bank number fixed. Keep the full stream, including its terminating zero, inside a readable mapping; crossing 0x7FFF does not automatically continue in the next ROM bank.",
+    "ja": "指定したバンク内の圧縮列を指すCPUポインターです。アドレスは進みますが、バンク番号は変わりません。終端0までの列全体を読み取り可能な配置に収めてください。0x7FFFを越えても、次のROMバンクの先頭へ自動的に続くことはありません。",
+    "zh-CN": "指定存储体中压缩流的 CPU 指针。函数会递增地址，但存储体编号不变。包括结束标记在内的完整数据必须位于可读映射范围中；越过 0x7FFF 不会自动转到下一个 ROM 存储体。"
+  },
+  "rle_bank": {
+    "en": "Source ROM bank number as u8. The bank and CPU address must match your cartridge mapper and asset placement. Bank selection is restored after each encoded-byte fetch; it is not a destination VRAM-bank selector and cannot express a 9-bit MBC5 bank number.",
+    "ja": "入力ROMのバンク番号をu8で指定します。カートリッジのマッパーと素材の配置に合う番号・CPUアドレスの組を使ってください。圧縮データの各バイト取得後には、元のROMバンク選択を復元します。展開先のVRAMバンクを選ぶ引数ではなく、MBC5の9ビットのバンク番号も表せません。",
+    "zh-CN": "u8 类型的源 ROM 存储体编号。编号及 CPU 地址必须与卡带映射器和素材布局一致。每次读取编码字节后会恢复存储体选择。此参数不选择目标 VRAM 存储体，也不能表示 MBC5 的九位存储体编号。"
+  },
+  "rle_return": {
+    "en": "Number of bytes written, as u16. An immediate zero count produces zero bytes and returns 0. The terminator is not copied. Keep the expanded length representable in u16; the return value has no separate error code and is not a tile count.",
+    "ja": "書き込んだバイト数をu16で返します。先頭の個数が0なら何も展開せず0を返し、終端そのものはコピーしません。展開長はu16で表せる範囲に収めてください。戻り値に別のエラーコードはなく、タイルの枚数でもありません。",
+    "zh-CN": "以 u16 返回写入的字节数。首个数量为零时不输出数据，返回 0；结束标记不会被复制。展开长度须能用 u16 表示。返回值没有独立错误码，也不是图块数量。"
+  },
+  "rle_format": {
+    "en": "The encoding is byte-oriented, not text-oriented. For example, {3, 0x12, 2, 0xA5, 0} expands to five bytes: 12 12 12 A5 A5. Values are hexadecimal in that output listing. A zero value inside a nonzero-count pair is ordinary data, not the end marker.",
+    "ja": "文字列専用ではなく、バイト単位の形式です。たとえば{3, 0x12, 2, 0xA5, 0}は、16進表記で12 12 12 A5 A5の5バイトに展開されます。個数が0でない組の値が0でも、通常のデータとして扱い、終端とは見なしません。",
+    "zh-CN": "此格式面向字节，不是文本。例如 {3, 0x12, 2, 0xA5, 0} 展开为五字节：12 12 12 A5 A5，这里的输出以十六进制表示。非零数量之后的数值零属于普通数据，不是结束标记。"
+  },
+  "rle_bounds": {
+    "en": "There is no encoded-size, output-capacity or malformed-data argument. Validate assets when creating or loading them, provide the zero terminator, and calculate their expanded size before decoding. An invalid or unterminated stream can read past the source and write past the destination.",
+    "ja": "圧縮後のサイズ、展開先の容量、不正データの扱いを指定する引数はありません。素材の作成時や読み込み時に形式を確認し、終端0を付けて、展開長を計算してから呼び出してください。不正な列や終端のない列では、入力・出力とも領域外へ進む可能性があります。",
+    "zh-CN": "接口没有压缩长度、输出容量或错误数据参数。生成或载入素材时应验证格式，提供数量零的结束标记，并预先计算展开长度。无效或未终止的数据可能导致源读取越界和目标写入越界。"
+  },
+  "rle_ram_timing": {
+    "en": "The RAM decoders use ordinary stores and do not synchronize with LCD access periods. Keep their destinations in RAM. To display the result, upload it separately with a suitable VRAM copy API, as the sample does while the LCD is stopped.",
+    "ja": "RAM用の展開関数は通常の書き込みを行い、LCDのアクセス可能時間には同期しません。展開先はRAMにしてください。表示する場合は、適切なVRAMコピーAPIで別途転送します。サンプルではLCDを止めてから転送しています。",
+    "zh-CN": "RAM 解码函数使用普通写入，不与 LCD 可访问时段同步，因此目标必须放在 RAM 中。显示结果时应另行调用适当的 VRAM 复制 API；示例在关闭 LCD 后上传数据。"
+  },
+  "rle_vram_timing": {
+    "en": "With the LCD off, runs are written directly. With it on, the helper waits for a writable LCD mode for each output byte, using DI/EI around the wait and store. A long stream can therefore span multiple frames; this is a synchronous call, not a queued transfer. The LCD-on path enables interrupts after each byte instead of preserving an initially disabled interrupt state.",
+    "ja": "LCD停止中は直接書き込みます。表示中は出力1バイトごとに書き込み可能なLCDモードを待ち、その待機・書き込みをDI/EIで囲みます。そのため長い列は複数フレームにまたがる場合があります。キューに登録する非同期転送ではなく、完了まで戻らない呼び出しです。LCD表示中の経路は各バイト後に割り込みを有効にするため、呼び出し前の割り込み無効状態は保持しません。",
+    "zh-CN": "LCD 关闭时直接写入；开启时，每个输出字节都等待可写的 LCD 模式，并用 DI／EI 包围等待和写入。长数据可能跨越多个帧，本调用是同步执行，不是排队传输。LCD 开启路径会在每字节后启用中断，不保留调用前禁用中断的状态。"
+  },
+  "rle_vbk": {
+    "en": "On CGB, writes use the currently selected VBK bank and leave that selection unchanged. Choose VBK 0 for the sample's tile data. The bank argument still selects ROM input, even when VBK 1 is selected for output. The decoder does not manage CGB palettes or map attributes.",
+    "ja": "CGBでは、VBKで現在選択されているVRAMバンクへ書き込み、その選択を変更しません。サンプルのタイルデータにはVBK 0を使います。出力にVBK 1を選んだ場合も、bank引数は入力ROMの指定です。CGBのパレットやマップ属性を管理する関数ではありません。",
+    "zh-CN": "CGB 写入当前 VBK 选择的存储体，并保持该选择不变。示例图块数据应选择 VBK 0。即使输出选择 VBK 1，bank 参数仍表示 ROM 输入存储体。解码器不管理 CGB 调色板或背景图属性。"
+  },
+  "rle_bank_context": {
+    "en": "Do not let an interrupt routine change the ROM mapping or reuse the far-copy helper while a bank-qualified fetch is in progress. The helpers use shared bank bookkeeping. Place a near decoder and its source in compatible mappings; switching to a function's bank must not hide an ordinary source pointer.",
+    "ja": "バンク付きの読み取り中に、割り込み処理でROMの配置を変更したり、同じ遠距離コピーの補助処理を重ねて呼んだりしないでください。補助処理はバンク管理用の状態を共有します。通常ポインター版では、展開関数と入力データを同時に読める配置にします。関数のバンクへの切り替えで、入力ポインターが指すデータが隠れないようにしてください。",
+    "zh-CN": "读取带存储体编号的数据期间，不要让中断程序改变 ROM 映射或重用远地址复制辅助函数，因为这些操作共享存储体管理状态。普通指针解码函数及源数据必须处于兼容的映射中，切换到函数所在存储体时不能使源指针失效。"
+  },
+  "rle_build": {
+    "en": "rle_decode and rle_decode_far are declared in rpg.h and implemented in lib/rle.c. Compile that implementation once with your game. The complete example includes rle.c after #pragma bank 0 so that its caller and decoders stay in the common bank; do not also pass rle.c as a separate input for this example. The __rle_decode_vram intrinsic itself needs no library implementation file.",
+    "ja": "rle_decodeとrle_decode_farはrpg.hで宣言され、lib/rle.cに実装されています。ゲームと一緒に実装を一度だけコンパイルしてください。完全なサンプルでは呼び出し側と展開関数を共通バンクに置くため、#pragma bank 0の後でrle.cをインクルードしています。このサンプルのビルドでは、rle.cをさらに別の入力ファイルとして渡さないでください。__rle_decode_vram自体にはライブラリの実装ファイルは不要です。",
+    "zh-CN": "rle_decode 和 rle_decode_far 在 rpg.h 中声明，在 lib/rle.c 中实现；游戏应只编译一次实现。完整示例在 #pragma bank 0 后包含 rle.c，使调用方和解码器都位于公共存储体；对此示例不要再次把 rle.c 作为独立输入。__rle_decode_vram 内建函数本身无需库实现文件。"
+  },
+  "rle_demo_near": {
+    "en": "This example expands nine encoded bytes into a guarded RAM buffer, then copies the 48-byte result to tile-data address 0x8800. RLE TO RAM reads 048. The top row is red on CGB and shows the three tiles decoded through this ordinary-pointer path.",
+    "ja": "9バイトの圧縮列を保護用バイト付きのRAMバッファへ展開し、48バイトの結果をタイルデータの0x8800へコピーするサンプルです。RLE TO RAMは048になります。最上段はCGBで赤く表示し、通常ポインターで展開した3枚を示します。",
+    "zh-CN": "本例将九个编码字节展开到带保护区的 RAM 缓冲，再把 48 字节结果复制到图块地址 0x8800。RLE TO RAM 应显示 048。最上排展示普通指针路径解码的三个图块，在 CGB 上为红色。"
+  },
+  "rle_demo_far": {
+    "en": "This example reads the encoded stream from ROM bank 2, expands 48 bytes into RAM, and uploads them at 0x8830. BANKED RAM reads 048. The middle row is green on CGB. A marker in ROM bank 1 is also checked to verify restoration of the caller's mapping.",
+    "ja": "ROMバンク2から圧縮列を読んで48バイトをRAMへ展開し、0x8830へ転送するサンプルです。BANKED RAMは048になります。中央の段はCGBで緑です。ROMバンク1の目印も読み、呼び出し前の配置に戻ったことを確認します。",
+    "zh-CN": "本例从 ROM 存储体 2 读取压缩流，向 RAM 展开 48 字节，再上传到 0x8830。BANKED RAM 应显示 048。中间一排在 CGB 上为绿色，并检查 ROM 存储体 1 中的标记，以确认调用方映射得到恢复。"
+  },
+  "rle_demo_vram": {
+    "en": "This example expands the bank-2 stream directly to VRAM at 0x8860, without a RAM output buffer. DIRECT VRAM reads 048. The bottom row is blue on CGB and must contain the same three tile patterns as the RAM-based rows. This teaching program performs the upload with the LCD off.",
+    "ja": "バンク2の圧縮列を、RAMの展開用バッファを使わずVRAMの0x8860へ直接展開するサンプルです。DIRECT VRAMは048になります。最下段はCGBで青く表示し、RAM経由の段と同じ3種類のタイルが並ぶ必要があります。この表示用サンプルではLCDを止めて転送します。",
+    "zh-CN": "本例将存储体 2 的数据直接展开到 VRAM 地址 0x8860，不使用 RAM 输出缓冲。DIRECT VRAM 应显示 048。最下排在 CGB 上为蓝色，三个图案应与通过 RAM 上传的两排一致。教学程序在 LCD 关闭时上传。"
+  },
+  "rle_shapes": {
+    "en": "Each row contains, from left to right, an 8×8 filled square, an 8×8 one-pixel outline, and a filled 4×8 rectangle occupying the left half of an 8×8 tile. Their tile columns are 2, 5 and 8 (pixel x = 16, 40 and 64). The three rows start at pixel y = 32, 72 and 112. DMG uses black shapes; CGB uses red, green and blue by row. FAILED must be 000. The numbers are byte counts: three 16-byte GB tiles require 48 decoded bytes.",
+    "ja": "各段は左から、8×8の塗りつぶし正方形、8×8で太さ1ピクセルの枠、8×8タイルの左半分を埋める4×8の長方形です。タイル列は2・5・8で、ピクセルのx座標では16・40・64です。三段の上端のy座標は32・72・112です。DMGは黒、CGBは段ごとに赤・緑・青で表示します。FAILEDは000になる必要があります。表示数値はバイト数で、1枚16バイトのGBタイル3枚には48バイトの展開先が必要です。",
+    "zh-CN": "每排从左到右分别为 8×8 实心方块、单像素宽边框的 8×8 空心方框，以及占图块左半边的 4×8 实心矩形。图块列为 2、5、8，对应像素 X=16、40、64；三排起始 Y 为 32、72、112。DMG 使用黑色图形，CGB 三排依次为红、绿、蓝。FAILED 必须为 000。数值表示字节数：三个 16 字节 GB 图块共需展开 48 字节。"
+  },
+  "rle_proof": {
+    "en": "The verification matrix checks 42 cases covering an empty stream, a one-byte run, zero-valued data, a 255-byte run, 510-byte output across a destination page, and encoded data across a source page. It compares all 528 observed destination/guard bytes, output length and restored ROM mapping. Direct VRAM cases include LCD on/off on DMG and CGB, plus CGB VBK 1. The two teaching screens are checked after 240 emulator frames. Invalid assets, concurrent interrupt use and physical hardware are not covered.",
+    "ja": "検証は42条件で、空の列、1バイトの繰り返し、値0、255バイトの繰り返し、出力のページ境界を越える510バイト、入力のページ境界を越える列を扱います。宛先と保護領域の528バイト全体、展開長、ROMバンクの復元を照合します。直接VRAM版はDMG・CGBのLCD表示中と停止中、およびCGBのVBK 1も対象です。2枚の表示用サンプル画像はエミュレータの240フレーム後に確認します。不正な素材、割り込みからの並行利用、実機は検証対象に含みません。",
+    "zh-CN": "现有验证矩阵包含 42 个用例，覆盖空流、单字节数据段、数值零、255 字节数据段、跨目标页的 510 字节输出，以及跨源页的编码。检查全部 528 个观测目标／保护字节、输出长度和恢复后的 ROM 映射。直接 VRAM 用例包括 DMG、CGB 的 LCD 开／关及 CGB VBK 1。两个教学画面在模拟器运行 240 帧后检查。验证不涵盖无效素材、中断并发调用或实机。"
+  },
+  "rle_module": {
+    "en": "RLE decoding uses count/value byte pairs and a zero count terminator. rle_decode reads an ordinary pointer into RAM; rle_decode_far reads a ROM-bank-qualified pointer into RAM; __rle_decode_vram expands banked input directly to VRAM with LCD-aware stores. The RAM functions live in lib/rle.c, while the direct VRAM operation is compiler-generated. All three return output bytes and require a valid stream and enough destination space.",
+    "ja": "RLE展開は個数・値のバイト対と、個数0の終端を使います。rle_decodeは通常のポインターからRAMへ、rle_decode_farはROMバンク付きのポインターからRAMへ展開します。__rle_decode_vramはバンク付きの入力を、LCDの状態を考慮してVRAMへ直接展開します。RAM用の実装はlib/rle.c、直接VRAM用はコンパイラが生成します。いずれも出力バイト数を返し、有効な列と十分な展開先領域を呼び出し側で用意する必要があります。",
+    "zh-CN": "RLE 使用数量／数值字节对，以数量零结束。rle_decode 从普通指针读取并展开到 RAM；rle_decode_far 从带 ROM 存储体编号的指针读取并展开到 RAM；__rle_decode_vram 则根据 LCD 访问时机，将跨存储体输入直接展开到 VRAM。RAM 函数实现在 lib/rle.c 中，直接 VRAM 操作由编译器生成。三者均返回输出字节数，要求数据有效且目标空间充足。"
+  }
 }

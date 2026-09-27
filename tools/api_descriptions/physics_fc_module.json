@@ -28,5 +28,19 @@
     "build_title": "Build"
   },
   "code": "void game_step() {\n    u16 total;\n    total=(u16)position*KQ2D_SUBPIXEL_ONE+fraction;\n    if(direction==KQ2D_DIR_POSITIVE) total=total+speed;\n    else if(direction==KQ2D_DIR_NEGATIVE) total=total-speed;\n    position=(KQ2DPosition)(total>>KQ2D_SUBPIXEL_BITS);\n    fraction=(KQ2DFraction)(total&KQ2D_SUBPIXEL_MASK);\n}\n// Initial state: position=24; fraction=0; speed=4;\n// direction=KQ2D_DIR_POSITIVE; call game_step() 16 times.",
-  "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\physics_subpixel.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\physics_subpixel.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm"
+  "build": "New-Item -ItemType Directory -Force .\\out | Out-Null\n.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\physics_subpixel.c -I .\\kitaqfc\\lib -I .\\kitaq-docs\\samples -o .\\out\\physics_subpixel.nes --mapper=nrom --nes-chr=.\\kitaq-docs\\samples\\api-examples\\fc\\vram_shapes.chr --no-cache --no-disasm",
+  "zh-CN": {
+    "title": "使用 Q5.3 数据类型实现自定义移动",
+    "paragraphs": [
+      "除了 world/body 函数，physics2d.h 还定义了用于自定义小数位移的类型和常量。本例按 Q5.3 的数据约定实现 game_step，与 world/body 的积分处理是两种不同的用法。",
+      "KQ2DPosition 保存整数像素位置（0～255），KQ2DFraction 保存余数（0～7），KQ2DSpeed 保存每个更新步的位移大小（以 1/8 像素为单位，0～255），KQ2DDirection 保存方向。四种类型的底层类型均为 u8。方向单独存储，不以速度值的正负号表示。",
+      "使用 KQ2D_SUBPIXEL_BITS=3、ONE=8 和 MASK=7，在 16 位中间值中计算 position*8+fraction。方向 NONE=0 表示不移动，NEGATIVE=1 表示减法，POSITIVE=2 表示加法。游戏应自行处理边界，防止减法结果小于零，并确保最终整数位置保持在 0～255 范围内。",
+      "KQ2D_DRAG_BRAKE=1、STUN=2、COAST=3 和 THRUST=4 是用于区分制动、眩晕、惯性滑行和推进等游戏行为的标识值。仅给变量赋上这些值，不会自动产生加速或阻力。各效果及其持续时间需要在游戏的更新函数中实现。"
+    ],
+    "example_title": "示例：累积每步半个像素的位移",
+    "expected": "上方红色 16×16 像素方块表示起始位置 X=24；下方方块表示更新 16 步后的位置 X=32。速度 4 对应每步 4/8=0.5 像素，因此 16 步共移动 8 像素。两个方块的 Y 坐标不同，只是为了便于对照。后续数值检查再反向移动 8 步，应得到 X=28、余数为 0。",
+    "caption": "KUROSAKI 中确认的画面：起始位置，以及累积 16 次半像素位移后的位置。",
+    "download": "完整示例程序",
+    "build_title": "构建"
+  }
 }

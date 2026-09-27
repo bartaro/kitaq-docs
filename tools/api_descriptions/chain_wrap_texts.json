@@ -1,38 +1,47 @@
 {
   "chain_wrap_purpose": {
     "ja": "両端がつながった1本の座標軸で、現在位置から目標位置までの最短の符号付き差分を計算します。画面端をまたぐ追従や距離比較に使えます。",
-    "en": "Calculate the shortest signed displacement from the current position to a target on an axis whose ends join. Use it for following or distance comparisons across a field edge."
+    "en": "Calculate the shortest signed displacement from the current position to a target on an axis whose ends join. Use it for following or distance comparisons across a field edge.",
+    "zh-CN": "在首尾相接的坐标轴上，计算从当前位置到目标位置的最短带符号位移。可用于跨越屏幕边缘时的跟随或距离比较。"
   },
   "chain_wrap_target": {
     "ja": "目標位置。0～size−1の範囲で指定します。",
-    "en": "Target coordinate, in 0..size−1."
+    "en": "Target coordinate, in 0..size−1.",
+    "zh-CN": "目标坐标，范围为 0～size−1。"
   },
   "chain_wrap_current": {
     "ja": "現在位置。0～size−1の範囲で指定します。",
-    "en": "Current coordinate, in 0..size−1."
+    "en": "Current coordinate, in 0..size−1.",
+    "zh-CN": "当前坐标，范围为 0～size−1。"
   },
   "chain_wrap_size": {
     "ja": "折り返す座標軸の長さ、1～256。X座標なら幅、Y座標なら高さです。256も渡せる16ビット引数です。",
-    "en": "Wrapped axis length, 1..256: width for X, height for Y. This is a 16-bit argument so that 256 is representable."
+    "en": "Wrapped axis length, 1..256: width for X, height for Y. This is a 16-bit argument so that 256 is representable.",
+    "zh-CN": "回绕坐标轴的长度，范围为 1～256；X 轴使用宽度，Y 轴使用高度。该参数为 16 位，以便表示 256。"
   },
   "chain_wrap_returns": {
     "ja": "最短差分をs16で返します。正は座標が増える方向、負は減る方向、0は同じ位置です。有効な入力では−128～+128に収まります。画面の右や下へ向かう差分が正になります。",
-    "en": "Return the shortest displacement as s16: positive toward increasing coordinates, negative toward decreasing coordinates, or zero at the same position. Valid inputs produce −128..+128. With screen coordinates, rightward and downward displacements are positive."
+    "en": "Return the shortest displacement as s16: positive toward increasing coordinates, negative toward decreasing coordinates, or zero at the same position. Valid inputs produce −128..+128. With screen coordinates, rightward and downward displacements are positive.",
+    "zh-CN": "以 s16 返回最短位移：正值表示坐标增大的方向，负值表示减小的方向，零表示位置相同。有效输入的结果位于 −128～+128。屏幕坐标中，向右和向下的位移为正。"
   },
   "chain_wrap_setup": {
     "ja": "`chain.h`を読み込み、`chain.c`を1回だけコンパイルします。`Chain`や`ChainBody`の初期化は必要ありません。関数は計算だけを行い、座標配列、節数、画面を変更しません。",
-    "en": "Include `chain.h` and compile `chain.c` exactly once. No `Chain` or `ChainBody` initialization is required. The function only calculates a displacement; it does not alter coordinate arrays, joint counts or the screen."
+    "en": "Include `chain.h` and compile `chain.c` exactly once. No `Chain` or `ChainBody` initialization is required. The function only calculates a displacement; it does not alter coordinate arrays, joint counts or the screen.",
+    "zh-CN": "包含 `chain.h`，并且只编译一次 `chain.c`。无需初始化 `Chain` 或 `ChainBody`。函数只计算位移，不修改坐标数组、节数或画面。"
   },
   "chain_wrap_normalized": {
     "ja": "入力の範囲検査や正規化は行いません。size=0、size>256、またはsize以上の座標を渡さないでください。広い座標系から値を渡す場合は、呼び出し前に0～size−1へ折り返します。",
-    "en": "The function does not validate or normalize inputs. Do not pass size=0, size>256, or coordinates at least as large as size. Wrap coordinates from a larger coordinate system into 0..size−1 before calling."
+    "en": "The function does not validate or normalize inputs. Do not pass size=0, size>256, or coordinates at least as large as size. Wrap coordinates from a larger coordinate system into 0..size−1 before calling.",
+    "zh-CN": "函数不检查参数范围，也不将输入自动归一化。不要传入 size=0、size>256 或大于等于 size 的坐标。从更大的坐标系取得数值时，先将其回绕到 0～size−1，再调用本函数。"
   },
   "chain_wrap_ties": {
     "ja": "左右の経路が同じ長さなら、直接計算したtarget−currentの符号を保ちます。size=160では0→80が+80、80→0が−80です。サイズが1なら有効な座標は0だけで、結果も0です。",
-    "en": "If both routes have the same length, retain the sign of the direct target−current displacement. With size=160, 0→80 returns +80 and 80→0 returns −80. With size=1, zero is the only valid coordinate and the result is zero."
+    "en": "If both routes have the same length, retain the sign of the direct target−current displacement. With size=160, 0→80 returns +80 and 80→0 returns −80. With size=1, zero is the only valid coordinate and the result is zero.",
+    "zh-CN": "若两个方向的路程相同，保留直接计算的 target−current 的符号。size=160 时，0→80 返回 +80，80→0 返回 −80。size=1 时，唯一有效坐标为零，结果也为零。"
   },
   "chain_wrap_example": {
     "ja": "このサンプルは座標の折り返しを学ぶためのものです。矢印の左が現在位置、右が目標位置です。幅160で画面端をまたぐ+02/−02、半周の+80/−80、幅1の+00を、関数の戻り値から表示します。先頭の0は2桁表示用です。物体を描画・移動する例ではありません。",
-    "en": "This lesson demonstrates wrapped coordinates. Each arrow goes from the current position to the target. It displays computed results +02/−02 for crossing a width-160 edge, +80/−80 for half a field, and +00 for width 1. The leading zero is decimal padding. The lesson does not draw or move an object."
+    "en": "This lesson demonstrates wrapped coordinates. Each arrow goes from the current position to the target. It displays computed results +02/−02 for crossing a width-160 edge, +80/−80 for half a field, and +00 for width 1. The leading zero is decimal padding. The lesson does not draw or move an object.",
+    "zh-CN": "本例用于理解坐标回绕。箭头左侧为当前位置，右侧为目标位置。程序显示实际计算结果：宽度为 160 时跨越边缘得到 +02／−02，相隔半个区域得到 +80／−80；宽度为 1 时得到 +00。前导零用于补齐两位十进制数。本例不绘制或移动物体。"
   }
 }

@@ -7,11 +7,11 @@ Requires beautifulsoup4. Pass --inspect to write the outstanding string inventor
 from pathlib import Path
 import argparse, html, json, re, sys
 try:
-    from bs4 import BeautifulSoup, NavigableString
+    from bs4 import BeautifulSoup, NavigableString, Comment
 except ImportError:
     local = Path(__file__).resolve().parents[3] / '_translation_deps'
     sys.path.insert(0, str(local))
-    from bs4 import BeautifulSoup, NavigableString
+    from bs4 import BeautifulSoup, NavigableString, Comment
 import generate as g
 import generate_en as en
 
@@ -93,6 +93,7 @@ def make_page(lang,key,messages,inspect=False):
         section.extend(list(rendered.contents));start.insert_after(section)
     # Strings inside original source excerpts, command output and identifiers stay verbatim.
     for node in list(soup.find_all(string=True)):
+        if isinstance(node, Comment):continue
         if node.find_parent(attrs={'data-api-contract':True}) or node.find_parent(attrs={'data-module-contract':True}):continue
         if node.find_parent(['pre','code','script','style']):continue
         if node.find_parent(class_='authored'):continue
@@ -145,6 +146,9 @@ def main():
         publish(lang)
         from api_contracts import publish as publish_api_contracts
         publish_api_contracts(lang)
+        if lang=='zh-CN':
+            from localize_presentations import publish as localize_presentations
+            localize_presentations(lang)
     stale=S/'tools/i18n'/lang/'missing.json'
     if stale.exists():stale.unlink()
     print(f'{lang}: 9 pages '+('ready to generate' if args.inspect else 'generated')+'; all reference prose translated')

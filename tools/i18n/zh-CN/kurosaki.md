@@ -14,6 +14,9 @@ KUROSAKI 是能够读取 KITAQFC 信息的 NES/FC/FDS 观察型模拟器。CLI �
 用第 4 卷的 hello ROM 验证文字显示。`inspect-rom` 检查头部，`run` 推进 CPU/PPU 执行。检查头部成功不代表程序能正常运行。
 
 ## 3. 检查 mapper 与电路板
+### 名称表 RAM 映射
+PPU 读取、写入和渲染支持 AxROM 的低页/高页单屏选择、FME7 的垂直/水平/低页/高页选择，以及全部十六种纯 CIRAM 的 MMC5 布局。不支持 MMC5 ExRAM 和填充渲染。已测试行为请参阅 [KITAQFC 的板卡模式与运行示例](kitaqfc.html#api-__mirroring_set)。
+
 `mapper-list` 列出已注册类型，`mapper-info` 说明某一类型，`audit-board` 检查电路板约束。mapper 编号把 ROM 头与物理接线假设联系起来；仅有名称无法确定容量、CHR-RAM 或固定 bank 行为。
 
 {{CODE:2}}
@@ -54,8 +57,8 @@ KUROSAKI 是能够读取 KITAQFC 信息的 NES/FC/FDS 观察型模拟器。CLI �
 
 KUROSAKI 的 `--emit-diagnostics` 与 KOKURA 相同，接收 **JSONL 文件路径**。请区分 CPU 跟踪和诊断事件文件。
 
-## 10. 公开范围
-KUROSAKI-GUI 尚未公开。当前手册涵盖 CLI 与集成 API。
+## 10. 接口范围
+本手册涵盖 CLI 与集成 API。
 
 ## 11. FDS 与存档 RAM
 `fds-inspect` 检查磁盘结构，`export-assets` 导出素材。FDS 的启动、BIOS、磁盘访问条件与 NES 卡带不同，应单独测试。电池存档 `.sav` 与 `.kss.json` 快照用途不同，要采用实现支持的存储布局。

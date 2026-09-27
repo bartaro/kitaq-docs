@@ -1,222 +1,277 @@
 {
   "fc_audio_vblank_void": {
     "ja": "戻り値はありません。",
-    "en": "No return value."
+    "en": "No return value.",
+    "zh-CN": "无返回值。"
   },
   "fc_audio_vblank_setup": {
     "ja": "`audio_vblank.h`を読み込み、`audio_vblank.c`を1回だけビルドへ加えます。コンパイラは、このライブラリのフックを既定または独自のNMIハンドラーから1回ずつ呼びます。PPUのNMIを有効にしてください。音楽の更新を前景ループから呼ぶ必要はありません。",
-    "en": "Include `audio_vblank.h` and add `audio_vblank.c` to the build exactly once. The compiler calls its hook once from either the default or a custom NMI handler. Enable PPU NMI. The foreground loop does not call a music update routine."
+    "en": "Include `audio_vblank.h` and add `audio_vblank.c` to the build exactly once. The compiler calls its hook once from either the default or a custom NMI handler. Enable PPU NMI. The foreground loop does not call a music update routine.",
+    "zh-CN": "包含 `audio_vblank.h`，并将 `audio_vblank.c` 加入构建一次。编译器会从默认或自定义 NMI 处理程序中调用一次本库钩子。必须启用 PPU NMI；主循环无需调用音乐更新函数。"
   },
   "fc_audio_vblank_scope": {
     "ja": "NTSC向けの4音源ドライバーです。CH1=パルス1、CH2=パルス2、CH3=三角波、CH4=ノイズで、チャンネル添字は0～3です。DMCと拡張音源は再生しません。`audio.c`の効果音関数など、同じAPUを直接書き換える処理とは同時に使わないでください。PAL用の音程表やテンポ補正はありません。",
-    "en": "This four-channel driver is tuned for NTSC: CH1=pulse 1, CH2=pulse 2, CH3=triangle, CH4=noise, indexed 0..3. It does not play DMC or expansion audio. Do not run it alongside direct APU writers such as the effects in `audio.c`. There is no PAL pitch table or tempo correction."
+    "en": "This four-channel driver is tuned for NTSC: CH1=pulse 1, CH2=pulse 2, CH3=triangle, CH4=noise, indexed 0..3. It does not play DMC or expansion audio. Do not run it alongside direct APU writers such as the effects in `audio.c`. There is no PAL pitch table or tempo correction.",
+    "zh-CN": "这是面向 NTSC 的四声道驱动：CH1 为脉冲 1，CH2 为脉冲 2，CH3 为三角波，CH4 为噪声，对应索引 0～3。不支持 DMC 或扩展音源。不要同时运行 `audio.c` 音效函数等直接改写同一 APU 的代码。本库没有 PAL 音高表或速度补偿。"
   },
   "fc_audio_vblank_format": {
     "ja": "1レコードは5バイトで、`待機時間, CH1, CH2, CH3, CH4`の順です。待機時間1～255は、その音を維持するNMI回数です。0は終端で、残り4バイトは無視します。CH1～CH3の音階0～71はC2～B7（24=C4）。CH4の0～15は通常ノイズの周期番号、16～31は短周期モードです。各音源の255=`NES_AUDIO_HOLD`は変更せず、254=`NES_AUDIO_STOP`は停止します。",
-    "en": "A record contains five bytes: `delay, CH1, CH2, CH3, CH4`. Delay 1..255 is the number of NMI ticks for which the new state lasts. Zero terminates playback and ignores the other four bytes. Tonal notes 0..71 are C2..B7 (24=C4). Noise values 0..15 select a long-mode period, and 16..31 select short mode. For any channel, 255=`NES_AUDIO_HOLD` leaves it unchanged; 254=`NES_AUDIO_STOP` silences it."
+    "en": "A record contains five bytes: `delay, CH1, CH2, CH3, CH4`. Delay 1..255 is the number of NMI ticks for which the new state lasts. Zero terminates playback and ignores the other four bytes. Tonal notes 0..71 are C2..B7 (24=C4). Noise values 0..15 select a long-mode period, and 16..31 select short mode. For any channel, 255=`NES_AUDIO_HOLD` leaves it unchanged; 254=`NES_AUDIO_STOP` silences it.",
+    "zh-CN": "每条记录包含五字节，顺序为 `等待时间, CH1, CH2, CH3, CH4`。等待时间 1～255 表示本次声道状态持续的 NMI 次数；零表示结束播放，其余四字节被忽略。CH1～CH3 的音符值 0～71 对应 C2～B7，其中 24=C4。CH4 的 0～15 选择长序列噪声的周期编号，16～31 选择短序列模式。所有声道均使用 255=`NES_AUDIO_HOLD` 保持状态、254=`NES_AUDIO_STOP` 停止发声。"
   },
   "fc_audio_vblank_queue": {
     "ja": "RAMの40バイトに8スロットを用意し、満杯と空を区別するため1スロットを空けて使います。実際に予約できるのは7レコードです。生産側は前景処理1か所とし、NMIからenqueue/refillや初期化を呼ばないでください。コピー完了後に1バイトの書き込み位置を公開するため、途中のレコードをNMIが読むことはありません。",
-    "en": "The 40-byte RAM ring has eight physical slots, with one left empty to distinguish full from empty. Usable capacity is seven records. Use one foreground producer; do not enqueue, refill or initialize from NMI. The producer publishes a one-byte write position only after copying the complete record, so NMI cannot read a partial record."
+    "en": "The 40-byte RAM ring has eight physical slots, with one left empty to distinguish full from empty. Usable capacity is seven records. Use one foreground producer; do not enqueue, refill or initialize from NMI. The producer publishes a one-byte write position only after copying the complete record, so NMI cannot read a partial record.",
+    "zh-CN": "RAM 环形队列占 40 字节，共八个物理槽位；为区分满与空，始终留一个槽位不用，因此有效容量为七条记录。补充操作只能由主循环一侧的一个入口执行，不要从 NMI 调用 enqueue、refill 或初始化函数。完整记录复制完毕后才更新单字节写入位置，NMI 因而不会读到只复制了一部分的记录。"
   },
   "fc_audio_vblank_starvation": {
     "ja": "待機時間が尽きて次のBGMレコードがなければBGMの音を停止し、補充後のNMIで再開します。独立したSFXは進み続けます。補充不足は空の状態へ移った回数として数えます。HOLDだけを補充しても停止前のBGM音は復元しません。通常は毎フレームrefillを呼び、重い処理の前に十分な待機時間をキューへ入れてください。",
-    "en": "When the delay expires without another BGM record, stop the BGM notes and resume at an NMI after data arrives. An independent SFX continues. Count entries into starvation, not every empty frame. Enqueueing only HOLD values does not restore the old BGM notes. Normally refill each frame and queue enough playing time before lengthy work."
+    "en": "When the delay expires without another BGM record, stop the BGM notes and resume at an NMI after data arrives. An independent SFX continues. Count entries into starvation, not every empty frame. Enqueueing only HOLD values does not restore the old BGM notes. Normally refill each frame and queue enough playing time before lengthy work.",
+    "zh-CN": "当前等待时间耗尽却没有下一条 BGM 记录时，停止 BGM 发声；数据补齐后在随后的 NMI 中恢复。独立音效仍继续推进。欠载计数统计进入缺数据状态的次数，而非空队列持续的帧数。仅补入 HOLD 不会恢复停止前的音符。通常应每帧调用 refill，并在执行耗时工作前为队列准备足够的播放时长。"
   },
   "fc_audio_vblank_expected": {
     "ja": "サンプルは独自の4音源フレーズを1回再生します。前景処理が90フレーム補充を止めて整数計算をしている間も音楽が進みます。画面の「PHRASE COMPLETE / SILENT」「UNDERRUNS 0 / MATH OK」は、終了・補充不足0・計算結果一致を表します。添付の音声でパルスの旋律と伴奏、三角波の低音、ノイズを確認できます。終了後は無音です。画像は制御結果の表示であり、音の確認には音声を使ってください。",
-    "en": "The sample plays an original four-channel phrase once. Music continues while the foreground performs integer arithmetic without refilling for 90 frames. “PHRASE COMPLETE / SILENT” and “UNDERRUNS 0 / MATH OK” mean playback finished, no queue starvation occurred and arithmetic results matched. Listen to the captured audio for the pulse melody and accompaniment, triangle bass and noise. The end is silent. The image reports control results; use the audio to assess sound."
+    "en": "The sample plays an original four-channel phrase once. Music continues while the foreground performs integer arithmetic without refilling for 90 frames. “PHRASE COMPLETE / SILENT” and “UNDERRUNS 0 / MATH OK” mean playback finished, no queue starvation occurred and arithmetic results matched. Listen to the captured audio for the pulse melody and accompaniment, triangle bass and noise. The end is silent. The image reports control results; use the audio to assess sound.",
+    "zh-CN": "示例播放一次原创的四声道短曲。主循环连续 90 帧进行整数计算而不补充队列时，音乐仍会继续。画面上的 PHRASE COMPLETE / SILENT 和 UNDERRUNS 0 / MATH OK 表示播放结束、没有欠载且计算结果一致。请通过附带录音辨认脉冲旋律与伴奏、三角波低音和噪声；结尾应为静音。截图仅表示控制结果，声音效果需通过录音确认。"
   },
   "fc_audio_vblank_count": {
     "ja": "読み取れる5バイトレコードの個数、1～13107です。バイト数ではありません。count×5バイトが有効なCPUアドレス範囲に連続して存在する必要があります。",
-    "en": "Number of readable five-byte records, 1..13107; not a byte count. All count×5 bytes must occupy a contiguous valid CPU address range."
+    "en": "Number of readable five-byte records, 1..13107; not a byte count. All count×5 bytes must occupy a contiguous valid CPU address range.",
+    "zh-CN": "可读的五字节记录数，范围为 1～13107，不是字节数。全部 count×5 字节必须连续位于有效的 CPU 地址范围内。"
   },
   "fc_audio_vblank_pointer": {
     "ja": "音楽データの先頭。読み取り可能なROMまたはRAMを渡し、補充が終わるまで保持します。バンク切り替えは行わないので、refillを呼ぶ間は該当ROMバンクを読めるようにしてください。NMIはコピー済みのRAMだけを読みます。",
-    "en": "Start of the stream in readable ROM or RAM. Keep it alive until feeding finishes. No bank switching is performed: map the appropriate ROM bank while calling refill. NMI reads only the copied RAM records."
+    "en": "Start of the stream in readable ROM or RAM. Keep it alive until feeding finishes. No bank switching is performed: map the appropriate ROM bank while calling refill. NMI reads only the copied RAM records.",
+    "zh-CN": "可读 ROM 或 RAM 中的音乐流首地址。补充完成前必须保持数据有效。本函数不切换存储体，调用 refill 时应映射正确的 ROM 存储体；NMI 只读取已经复制到 RAM 的记录。"
   },
   "fc_audio_vblank_loop": {
     "ja": "0は1回再生、0以外は先頭から反復します。反復するデータに待機時間0の終端レコードを入れないでください。",
-    "en": "Zero selects one-shot playback; any nonzero value repeats from the start. Do not include a delay-zero terminator inside a looping stream."
+    "en": "Zero selects one-shot playback; any nonzero value repeats from the start. Do not include a delay-zero terminator inside a looping stream.",
+    "zh-CN": "零表示播放一次，非零表示从头循环。循环音频流中不要包含等待时间为零的结束记录。"
   },
   "fc_audio_vblank_init_settings": {
     "ja": "APUフレームIRQとDMCを無効にし、パルスのスイープも無効にします。既定音色はCH1=50%デューティ・音量12、CH2=25%・音量10、三角波=発音、ノイズ=音量8です。初期化だけでは音楽もNMIも開始しません。",
-    "en": "Disable APU frame IRQs, DMC and pulse sweep. Defaults are pulse 1 at 50% duty/volume 12, pulse 2 at 25%/volume 10, triangle enabled for notes, and noise volume 8. Initialization starts neither music nor NMI."
+    "en": "Disable APU frame IRQs, DMC and pulse sweep. Defaults are pulse 1 at 50% duty/volume 12, pulse 2 at 25%/volume 10, triangle enabled for notes, and noise volume 8. Initialization starts neither music nor NMI.",
+    "zh-CN": "禁用 APU 帧 IRQ、DMC 和脉冲扫频。默认音色为：脉冲 1 占空比 50%、音量 12；脉冲 2 占空比 25%、音量 10；三角波允许音符发声；噪声音量 8。仅初始化不会启动音乐，也不会启用 NMI。"
   },
   "fc_audio_vblank_record": {
     "ja": "コピーする5バイトの先頭。コピーが返るまで読める領域を指定します。返った後は元の配列を再利用できます。0は拒否します。",
-    "en": "Address of five readable bytes, valid until the call returns. The source array may then be reused. Null is rejected."
+    "en": "Address of five readable bytes, valid until the call returns. The source array may then be reused. Null is rejected.",
+    "zh-CN": "指向五个可读字节的地址，数据须保持有效直至调用返回。返回后即可复用源数组。空指针会被拒绝。"
   },
   "fc_audio_vblank_enqueue_return": {
     "ja": "受け入れたら1。満杯、null、不正な音階・ノイズ値なら0で、キューは変更しません。終端レコードは音源の4バイトを検査しません。",
-    "en": "Return 1 when accepted. Full, null or invalid tonal/noise values return 0 without changing the queue. The four channel bytes of a terminator are not validated."
+    "en": "Return 1 when accepted. Full, null or invalid tonal/noise values return 0 without changing the queue. The four channel bytes of a terminator are not validated.",
+    "zh-CN": "接收成功返回 1。队列已满、指针为空或音符／噪声值无效时返回 0，且不修改队列。结束记录的四个声道字节不参与验证。"
   },
   "fc_audio_vblank_queued_return": {
     "ja": "BGMの0～7レコードです。現在の待機時間とSFXレコードは数えません。NMIが消費を進めるため、読み取り時点の値です。",
-    "en": "Return 0..7 queued BGM records, excluding the current delay and all SFX records. NMI advances consumption, so the result is a momentary observation."
+    "en": "Return 0..7 queued BGM records, excluding the current delay and all SFX records. NMI advances consumption, so the result is a momentary observation.",
+    "zh-CN": "返回尚在队列中的 BGM 记录数，范围为 0～7，不计当前已取出记录的等待时间，也不计任何音效记录。NMI 会继续消耗队列，因此这是读取时刻的值。"
   },
   "fc_audio_vblank_free_return": {
     "ja": "BGMキューの0～7スロットで、7−queued()です。バイト数ではなく、1スロットに5バイトを格納します。SFXの35バイト領域はこのキューと別です。",
-    "en": "Return 0..7 BGM slots, equal to 7−queued(). This is a slot count, with five bytes per slot. The separate 35-byte SFX buffer is not part of this queue."
+    "en": "Return 0..7 BGM slots, equal to 7−queued(). This is a slot count, with five bytes per slot. The separate 35-byte SFX buffer is not part of this queue.",
+    "zh-CN": "返回 BGM 队列的空闲槽位数 0～7，等于 7−queued()。这是槽位数而非字节数，每槽容纳五字节。独立的 35 字节音效缓冲不属于此队列。"
   },
   "fc_audio_vblank_start_note": {
     "ja": "初期化と補充を先に行ってください。NMI自体は有効にせず、現在の待機時間や読み取り位置も変更しません。一時停止の解除にはpause(0)を使います。startだけでは一時停止を解除しません。",
-    "en": "Initialize and enqueue first. This neither enables NMI nor changes the current delay or read position. Resume a paused driver with pause(0); start alone does not unpause it."
+    "en": "Initialize and enqueue first. This neither enables NMI nor changes the current delay or read position. Resume a paused driver with pause(0); start alone does not unpause it.",
+    "zh-CN": "先初始化并填入记录。本函数既不启用 NMI，也不改变当前等待时间或读取位置。解除暂停需调用 pause(0)，仅调用 start 不会解除暂停。"
   },
   "fc_audio_vblank_stop_note": {
     "ja": "BGMとSFXをともに停止し、キュー、補充元、両方の再生位置、一時停止状態を破棄します。音色と補充不足カウンターは保持し、NMIは無効にしません。位置を保って休止するにはpauseを使います。set_musicとplay_musicも内部でこの停止を行うため、SFXを取り消します。",
-    "en": "Stop both BGM and SFX, discarding the queue, feeder, both playback positions and pause state. Retain timbres and the starvation counter; do not disable NMI. Use pause to preserve position. set_music and play_music also perform this stop internally, cancelling SFX."
+    "en": "Stop both BGM and SFX, discarding the queue, feeder, both playback positions and pause state. Retain timbres and the starvation counter; do not disable NMI. Use pause to preserve position. set_music and play_music also perform this stop internally, cancelling SFX.",
+    "zh-CN": "同时停止 BGM 和音效，丢弃队列、补充源、两者的播放位置及暂停状态。保留音色和欠载计数，不禁用 NMI。若要保留位置，应使用 pause。set_music 和 play_music 内部也会执行此停止操作，因此会取消当前音效。"
   },
   "fc_audio_vblank_set_return": {
     "ja": "ポインターと個数が有効なら1、null・0個・13107超なら0です。失敗時もそれまでの再生とキューは停止・破棄します。各レコードの内容は補充時に検査します。",
-    "en": "Return 1 for a valid pointer/count, or 0 for null, zero count or a count above 13107. Even on failure, existing playback and queued data are stopped/discarded. Record contents are checked during refill."
+    "en": "Return 1 for a valid pointer/count, or 0 for null, zero count or a count above 13107. Even on failure, existing playback and queued data are stopped/discarded. Record contents are checked during refill.",
+    "zh-CN": "指针和数量有效时返回 1；指针为空、数量为零或超过 13107 时返回 0。即使设置失败，也会停止现有播放并丢弃队列。各记录的内容在补充时验证。"
   },
   "fc_audio_vblank_refill_return": {
     "ja": "受け入れた0～7レコードの個数です。1回再生では最後に自動追加する終端も1個に数えます。補充元がない場合や満杯なら0です。不正なレコードに到達した場合は再生とキューを停止・破棄して0を返します。",
-    "en": "Return 0..7 accepted records, counting the automatically appended terminator for one-shot playback. No source or a full queue returns 0. Encountering an invalid record stops playback, discards the queue/feeder and returns 0."
+    "en": "Return 0..7 accepted records, counting the automatically appended terminator for one-shot playback. No source or a full queue returns 0. Encountering an invalid record stops playback, discards the queue/feeder and returns 0.",
+    "zh-CN": "返回接收的记录数 0～7，单次播放结束时自动追加的结束记录也计入其中。没有补充源或队列已满时返回 0。遇到无效记录则停止播放、丢弃队列和补充源，并返回 0。"
   },
   "fc_audio_vblank_refill_direct": {
     "ja": "ROM補充と直接enqueueは同じキューを使います。意図しない順番で混ぜないでください。refillは音源レジスターを書かず、再生開始もしません。ただし不正データを検出して停止するときは消音します。",
-    "en": "The ROM feeder and direct enqueue share one queue; combine them only with an intentional ordering. Refilling does not play records or start the consumer. Its invalid-data stop does silence the APU."
+    "en": "The ROM feeder and direct enqueue share one queue; combine them only with an intentional ordering. Refilling does not play records or start the consumer. Its invalid-data stop does silence the APU.",
+    "zh-CN": "ROM 补充函数与直接 enqueue 使用同一队列，混合使用时必须明确安排顺序。refill 本身不播放记录，也不启动消费端；但若因无效数据而停止，会使 APU 静音。"
   },
   "fc_audio_vblank_play_return": {
     "ja": "設定と最初の補充が成功したら1、設定不正または初回補充で不正データを見つけたら0です。曲全体の妥当性を事前保証する値ではありません。後続の不正レコードは後のrefillで検出します。",
-    "en": "Return 1 when setup and initial prefill succeed; return 0 for invalid setup or invalid data found during that prefill. Success does not validate the entire song: later malformed records are found by later refill calls."
+    "en": "Return 1 when setup and initial prefill succeed; return 0 for invalid setup or invalid data found during that prefill. Success does not validate the entire song: later malformed records are found by later refill calls.",
+    "zh-CN": "设置和首次预填成功时返回 1；设置无效或首次预填遇到无效数据时返回 0。成功并不表示整首曲目已经验证，后续的错误记录会在之后的 refill 调用中被发现。"
   },
   "fc_audio_vblank_play_init": {
     "ja": "最初にinitを1回呼びます。play_musicは音色と補充不足カウンターを保持します。長い曲や反復する曲では、その後も定期的にrefillしてください。",
-    "en": "Call init once first. play_music retains timbres and the starvation counter. Continue calling refill periodically for long or looping streams."
+    "en": "Call init once first. play_music retains timbres and the starvation counter. Continue calling refill periodically for long or looping streams.",
+    "zh-CN": "首次使用前调用一次 init。play_music 保留音色及欠载计数。长曲或循环曲目开始后，仍需定期调用 refill。"
   },
   "fc_audio_vblank_playing_return": {
     "ja": "BGM消費が有効なら1、停止・終端後は0です。一時停止中や補充不足中も1のままです。SFXだけが鳴っている場合は0です。この値は可聴音やSFXの再生中判定ではありません。",
-    "en": "Return 1 while the BGM consumer is enabled, including pause and starvation, or 0 after stop/end. An SFX playing alone still returns 0. This does not report audible output or SFX activity."
+    "en": "Return 1 while the BGM consumer is enabled, including pause and starvation, or 0 after stop/end. An SFX playing alone still returns 0. This does not report audible output or SFX activity.",
+    "zh-CN": "BGM 消费端启用时返回 1，包括暂停和欠载期间；停止或正常结束后返回 0。只有音效播放时仍返回 0。本值不表示当前一定有可听声音，也不能用来判断音效是否正在播放。"
   },
   "fc_audio_vblank_underrun_return": {
     "ja": "0～255で、255に達すると増えません。空のまま待ったフレーム数ではなく、補充不足の発生回数です。initで0に戻り、stopや曲変更では保持します。正常な終端は数えません。",
-    "en": "Return 0..255, saturating at 255. Count starvation episodes, not every frame spent waiting. init clears it; stop and song changes retain it. A normal terminator is not starvation."
+    "en": "Return 0..255, saturating at 255. Count starvation episodes, not every frame spent waiting. init clears it; stop and song changes retain it. A normal terminator is not starvation.",
+    "zh-CN": "返回 0～255，到达 255 后不再增加。统计的是欠载事件，不是等待数据的每一帧。init 会清零，stop 和切换曲目会保留。正常结束记录不算欠载。"
   },
   "fc_audio_vblank_channel": {
     "ja": "0=CH1パルス1、1=CH2パルス2、2=CH3三角波、3=CH4ノイズです。4以上は拒否します。",
-    "en": "0=CH1 pulse 1, 1=CH2 pulse 2, 2=CH3 triangle, 3=CH4 noise. Values of 4 or more are rejected."
+    "en": "0=CH1 pulse 1, 1=CH2 pulse 2, 2=CH3 triangle, 3=CH4 noise. Values of 4 or more are rejected.",
+    "zh-CN": "0=CH1 脉冲 1，1=CH2 脉冲 2，2=CH3 三角波，3=CH4 噪声。大于等于 4 的值会被拒绝。"
   },
   "fc_audio_vblank_control": {
     "ja": "パルスは上位2ビットがデューティ（0=12.5%、1=25%、2=50%、3=75%）、下位4ビットが固定音量0～15です。ノイズは通常、下位4ビットが固定音量です。NES_AUDIO_NOISE_ENVELOPE（128）をORすると、下位4ビットは減衰周期0～15になり、次のノイズ音は音量15から一度だけ減衰します。周期が大きいほど遅く、15では約1秒です。ノイズの長さカウンターは減衰が完了する長さに設定します。三角波は0で消音設定、0以外で発音設定です。",
-    "en": "For pulses, bits 7..6 select duty (0=12.5%, 1=25%, 2=50%, 3=75%) and bits 3..0 set constant volume 0..15. Noise normally uses bits 3..0 as constant volume. OR in NES_AUDIO_NOISE_ENVELOPE (128) to use those bits as decay period 0..15: the next noise note starts at volume 15 and decays once. Larger periods are slower; 15 takes about one second. The noise length counter allows the decay to finish. Triangle uses zero for a silent next note and nonzero for an audible one."
+    "en": "For pulses, bits 7..6 select duty (0=12.5%, 1=25%, 2=50%, 3=75%) and bits 3..0 set constant volume 0..15. Noise normally uses bits 3..0 as constant volume. OR in NES_AUDIO_NOISE_ENVELOPE (128) to use those bits as decay period 0..15: the next noise note starts at volume 15 and decays once. Larger periods are slower; 15 takes about one second. The noise length counter allows the decay to finish. Triangle uses zero for a silent next note and nonzero for an audible one.",
+    "zh-CN": "脉冲声道用第 7～6 位选择占空比：0=12.5%、1=25%、2=50%、3=75%；低四位设置固定音量 0～15。噪声通常也以低四位表示固定音量。按位或上 NES_AUDIO_NOISE_ENVELOPE（128）后，低四位改为衰减周期 0～15：下一次噪声从音量 15 开始，单次衰减。周期越大，衰减越慢；15 约为一秒。噪声长度计数器会设置得足以让衰减完成。三角波设为零时下一音符静音，非零时允许发声。"
   },
   "fc_audio_vblank_timbre_return": {
     "ja": "有効なチャンネルなら1、4以上なら変更せず0です。",
-    "en": "Return 1 for a valid channel; values of 4 or more return 0 without changes."
+    "en": "Return 1 for a valid channel; values of 4 or more return 0 without changes.",
+    "zh-CN": "声道有效时返回 1；大于等于 4 时返回 0，不作修改。"
   },
   "fc_audio_vblank_hook": {
     "ja": "アプリケーションから直接呼ばないでください。音楽ライブラリをリンクするとコンパイラがNMIへ接続します。処理はA/X/Yを保存し、共通の式計算用ワーク領域を使いません。フックと音程表は固定ROMへ配置され、NMI中にROMバンクを切り替えません。これは音楽フック自身の保存処理であり、独自NMIハンドラーの他の処理に必要な保存を肩代わりするものではありません。",
-    "en": "Do not call this directly from application code. Linking the music library connects it to NMI through the compiler. The hook saves A/X/Y and does not use shared expression scratch. The hook and pitch tables reside in fixed ROM; it never switches ROM banks in NMI. Its preservation applies to the music hook itself; a custom NMI handler remains responsible for preserving state used by its other work."
+    "en": "Do not call this directly from application code. Linking the music library connects it to NMI through the compiler. The hook saves A/X/Y and does not use shared expression scratch. The hook and pitch tables reside in fixed ROM; it never switches ROM banks in NMI. Its preservation applies to the music hook itself; a custom NMI handler remains responsible for preserving state used by its other work.",
+    "zh-CN": "应用程序不要直接调用。链接音乐库后，编译器会将本钩子接入 NMI。钩子保存 A／X／Y，不使用共享表达式计算临时区。钩子与音高表放在固定 ROM 中，NMI 内不会切换 ROM 存储体。这些保护只覆盖音乐钩子自身；自定义 NMI 处理程序仍须保存其余处理可能改动的状态。"
   },
   "fc_audio_vblank_foreground": {
     "ja": "前景処理から呼びます。NMIはコピー済みのSFXデータを使います。別のAPUドライバーを並行して動かさず、BGMとSFXをこのライブラリで管理してください。",
-    "en": "Call from the foreground. NMI consumes the copied SFX data. Let this library manage both BGM and SFX; do not run another APU driver concurrently."
+    "en": "Call from the foreground. NMI consumes the copied SFX data. Let this library manage both BGM and SFX; do not run another APU driver concurrently.",
+    "zh-CN": "从主循环一侧调用。NMI 使用已经复制好的音效数据。BGM 和音效均交由本库管理，不要同时运行另一套 APU 驱动。"
   },
   "fc_audio_vblank_pause_on": {
     "ja": "0以外で休止、0で再開です。休止はAPUの4音源を直ちに無効にします。",
-    "en": "Nonzero pauses; zero resumes. Pausing immediately disables the four APU channels."
+    "en": "Nonzero pauses; zero resumes. Pausing immediately disables the four APU channels.",
+    "zh-CN": "非零表示暂停，零表示继续。暂停会立即禁用 APU 的四个声道。"
   },
   "fc_audio_vblank_pause_note": {
     "ja": "休止中はBGMの待機時間・キュー読取位置とSFXの待機時間・読取位置が進みません。refillによる補充は可能です。再開後の最初のNMIで現在の音を再トリガーして通常の刻みを進めます。波形位相や減衰エンベロープの途中の音量は保存しません。is_playingのBGM有効フラグも変更しません。0は休止中でなくても音の復元を予約するため、毎フレーム呼ぶ用途には使わないでください。",
-    "en": "During pause, neither BGM delay/queue position nor SFX delay/position advances. Foreground refill remains possible. The first NMI after resume retriggers the current notes and advances the normal tick. Waveform phase and a partially decayed envelope level are not saved. The BGM enable flag reported by is_playing is unchanged. Zero requests note restoration even when already running, so do not call it every frame."
+    "en": "During pause, neither BGM delay/queue position nor SFX delay/position advances. Foreground refill remains possible. The first NMI after resume retriggers the current notes and advances the normal tick. Waveform phase and a partially decayed envelope level are not saved. The BGM enable flag reported by is_playing is unchanged. Zero requests note restoration even when already running, so do not call it every frame.",
+    "zh-CN": "暂停期间，BGM 的等待时间及队列读取位置、音效的等待时间及读取位置均停止推进，主循环仍可调用 refill。继续后的第一次 NMI 会重新触发当前音符，并执行正常的时间推进。波形相位和衰减包络中途的音量不会被保存。is_playing 所报告的 BGM 启用标志保持不变。即使未暂停，传入零也会请求恢复音符，因此不要每帧调用 pause(0)。"
   },
   "fc_audio_vblank_sfx_pointer": {
     "ja": "5バイトレコード列の先頭。戻るまでcount×5バイトを読み取れるように保持・マッピングします。コピー後は元の配列を再利用できます。",
-    "en": "Start of five-byte records. Keep count×5 bytes readable and mapped until the call returns. The source may be reused after the copy."
+    "en": "Start of five-byte records. Keep count×5 bytes readable and mapped until the call returns. The source may be reused after the copy.",
+    "zh-CN": "五字节记录序列的首地址。调用返回前须保持 count×5 字节可读且已正确映射；复制结束后可复用源数据。"
   },
   "fc_audio_vblank_sfx_count": {
     "ja": "1～7レコード（最大35バイト）。各待機時間は1～255です。SFXでは待機時間0の終端を使わず、指定個数を再生すると終了します。",
-    "en": "1..7 records, at most 35 bytes. Every delay must be 1..255. SFX do not use delay-zero terminators; they end after the specified records."
+    "en": "1..7 records, at most 35 bytes. Every delay must be 1..255. SFX do not use delay-zero terminators; they end after the specified records.",
+    "zh-CN": "1～7 条记录，最多 35 字节。每条等待时间必须为 1～255。音效不使用等待时间为零的结束记录，播放完指定数量后自动结束。"
   },
   "fc_audio_vblank_sfx_mask": {
     "ja": "下位4ビットが対象音源です。1=CH1、2=CH2、4=CH3、8=CH4。ORで複数選べます。上位4ビットは無視します。下位が全て0なら拒否します。",
-    "en": "Low four bits select channels: 1=CH1, 2=CH2, 4=CH3, 8=CH4. OR bits to select several. High bits are ignored; a zero low mask is rejected."
+    "en": "Low four bits select channels: 1=CH1, 2=CH2, 4=CH3, 8=CH4. OR bits to select several. High bits are ignored; a zero low mask is rejected.",
+    "zh-CN": "低四位选择声道：1=CH1、2=CH2、4=CH3、8=CH4，可按位或组合。高四位被忽略，低四位全为零时拒绝请求。"
   },
   "fc_audio_vblank_sfx_return": {
     "ja": "コピーして有効にしたら1。null、範囲外の個数、対象音源なし、待機時間0、不正な音階・ノイズ値なら0です。不正入力では現在のSFXを変更しません。対象外の音源の値も検査します。",
-    "en": "Return 1 after copying and enabling the effect. Return 0 for null, an invalid count, no selected channels, a zero delay or invalid tonal/noise values. Invalid input leaves the current effect unchanged. Values on unselected channels are validated too."
+    "en": "Return 1 after copying and enabling the effect. Return 0 for null, an invalid count, no selected channels, a zero delay or invalid tonal/noise values. Invalid input leaves the current effect unchanged. Values on unselected channels are validated too.",
+    "zh-CN": "复制并启用音效后返回 1。指针为空、数量超出范围、未选声道、等待时间为零或音符／噪声值无效时返回 0，保留当前音效。未选中声道对应的数据也会验证。"
   },
   "fc_audio_vblank_sfx_note": {
     "ja": "BGMは背後で進み続け、効果音が終わるとその時点のBGM音へ戻ります。SFXは1本で、新しい呼び出しは前の効果音を置き換えます。HOLD/STOPの値はBGMと共通ですが、SFX開始時の保持音は停止状態なので、最初のHOLDはBGMの音を引き継ぎません。BGMが無効でもSFXは再生できます。一時停止中に予約したSFXは再開まで進みません。音色はBGMと共用です。",
-    "en": "BGM keeps advancing underneath; when the effect ends, outputs return to its current notes. There is one SFX stream; a new call replaces it. HOLD/STOP values match BGM, but an effect starts with stopped held notes, so an initial HOLD does not inherit the BGM note. SFX can play without BGM. An effect queued while paused waits for resume. Timbres are shared with BGM."
+    "en": "BGM keeps advancing underneath; when the effect ends, outputs return to its current notes. There is one SFX stream; a new call replaces it. HOLD/STOP values match BGM, but an effect starts with stopped held notes, so an initial HOLD does not inherit the BGM note. SFX can play without BGM. An effect queued while paused waits for resume. Timbres are shared with BGM.",
+    "zh-CN": "BGM 在后台继续推进，音效结束后恢复到那一时刻的 BGM 音符。只有一条音效流，新调用会替换当前音效。HOLD／STOP 与 BGM 使用相同值，但音效初始保持状态为停止，因此开头的 HOLD 不会继承 BGM 音符。没有 BGM 也能播放音效；暂停期间提交的音效会等到继续后才推进。音效与 BGM 共享音色。"
   },
   "fc_audio_vblank_stop_sfx_note": {
     "ja": "APUレジスターをこの呼び出しでは書き換えません。BGMのキュー・位置・有効状態は保ちます。SFXだけを鳴らしていた場合は次のNMIで停止状態へ戻ります。一時停止中は再開後に反映されます。音を直ちに止めて両方の位置を破棄するにはstopを使います。",
-    "en": "This call does not write APU registers. It retains the BGM queue, position and enabled state. If SFX was playing alone, the next NMI returns the channels to stopped notes. While paused, the change takes effect on resume. Use stop to mute immediately and discard both positions."
+    "en": "This call does not write APU registers. It retains the BGM queue, position and enabled state. If SFX was playing alone, the next NMI returns the channels to stopped notes. While paused, the change takes effect on resume. Use stop to mute immediately and discard both positions.",
+    "zh-CN": "本次调用不写 APU 寄存器，保留 BGM 队列、位置及启用状态。若此前仅有音效发声，下一次 NMI 会将声道恢复为停止状态；暂停期间调用则在继续后生效。若要立即静音并丢弃两者的位置，应使用 stop。"
   },
   "fc_audio_vblank_effects_expected": {
     "ja": "サンプルは操作不要です。CH1の約220HzのBGMに約880HzのSFXを30フレーム重ね、現在のBGMへ戻ります。30フレームの無音の休止後にBGMが再開します。次のSFXは15フレームで明示的に打ち切ります。その後、CH4のノイズが一度だけゆっくり減衰します。画面のCOMPLETE / ALL CHANNELS OFFは全工程の終了を示します。添付音声で高低の切り替え、休止区間、ノイズの減衰を確認してください。",
-    "en": "No input is needed. CH1 plays BGM near 220 Hz, switches to an SFX near 880 Hz for 30 frames, then returns to the current BGM. After a 30-frame silent pause, BGM resumes. A second effect is explicitly cut short after 15 frames. Finally, CH4 noise decays slowly once. COMPLETE / ALL CHANNELS OFF marks the end. Listen to the attached recording for the pitch changes, silent pause and noise decay."
+    "en": "No input is needed. CH1 plays BGM near 220 Hz, switches to an SFX near 880 Hz for 30 frames, then returns to the current BGM. After a 30-frame silent pause, BGM resumes. A second effect is explicitly cut short after 15 frames. Finally, CH4 noise decays slowly once. COMPLETE / ALL CHANNELS OFF marks the end. Listen to the attached recording for the pitch changes, silent pause and noise decay.",
+    "zh-CN": "示例无需操作。CH1 先播放约 220 Hz 的 BGM，再切换到约 880 Hz 的音效，持续 30 帧后回到当前 BGM。静音暂停 30 帧后继续播放；第二段音效在 15 帧时被显式中止。最后，CH4 噪声缓慢衰减一次。COMPLETE / ALL CHANNELS OFF 表示全部步骤结束。请通过附带录音确认高低音切换、静音暂停段和噪声衰减。"
   },
   "fc_audio_vblank_init": {
     "ja": "APUとキューを初期化し、音楽・補充状態と補充不足カウンターをリセットします。",
-    "en": "Initialize the APU and queue, resetting playback, feeder state and the starvation counter."
+    "en": "Initialize the APU and queue, resetting playback, feeder state and the starvation counter.",
+    "zh-CN": "初始化 APU 与队列，重置播放状态、补充源状态和欠载计数。"
   },
   "fc_audio_vblank_enqueue": {
     "ja": "1レコードを検査してRAMキューへコピーします。ROM補充関数を使わず、ゲーム側で音楽を組み立てる場合にも使えます。",
-    "en": "Validate and copy one record into the RAM queue. Use this to generate music in game code without the ROM feeder."
+    "en": "Validate and copy one record into the RAM queue. Use this to generate music in game code without the ROM feeder.",
+    "zh-CN": "验证一条记录并复制到 RAM 队列。也可用于在游戏代码中直接生成音乐，而不使用 ROM 补充函数。"
   },
   "fc_audio_vblank_queued": {
     "ja": "まだNMIに取り出されていないレコード数を返します。",
-    "en": "Return the number of records that NMI has not yet consumed."
+    "en": "Return the number of records that NMI has not yet consumed.",
+    "zh-CN": "返回尚未被 NMI 取出的记录数。"
   },
   "fc_audio_vblank_free": {
     "ja": "キューへ追加できるレコードの空きスロット数を返します。",
-    "en": "Return the number of free record slots in the queue."
+    "en": "Return the number of free record slots in the queue.",
+    "zh-CN": "返回队列中可追加记录的空闲槽位数。"
   },
   "fc_audio_vblank_start": {
     "ja": "RAMキューの消費を有効にします。最初のレコードは次のNMIで取り出します。",
-    "en": "Enable RAM-queue consumption. The first record is taken at the next NMI."
+    "en": "Enable RAM-queue consumption. The first record is taken at the next NMI.",
+    "zh-CN": "启用 RAM 队列的消费端。第一条记录将在下一次 NMI 中取出。"
   },
   "fc_audio_vblank_stop": {
     "ja": "再生を無効にして4音源を消音し、キューとROM補充状態を破棄します。",
-    "en": "Disable playback, silence the four channels and discard the queue and ROM feeder."
+    "en": "Disable playback, silence the four channels and discard the queue and ROM feeder.",
+    "zh-CN": "禁用播放，使四个声道静音，并丢弃队列和 ROM 补充源。"
   },
   "fc_audio_vblank_set_music": {
     "ja": "再生を停止して音楽ストリームを補充元に設定します。キューへのコピーと再生開始は別操作です。",
-    "en": "Stop playback and attach a stream as the feeder source. Copying into the queue and starting playback are separate operations."
+    "en": "Stop playback and attach a stream as the feeder source. Copying into the queue and starting playback are separate operations.",
+    "zh-CN": "停止播放，并将指定音频流设为补充源。复制到队列和启动播放需要另外执行。"
   },
   "fc_audio_vblank_refill": {
     "ja": "設定したストリームから、空きスロットへ最大7レコードを補充します。長い曲を小さなRAMキューで再生するための前景処理です。",
-    "en": "Feed up to seven records from the attached stream into free slots. This foreground operation lets a small RAM queue play a long song."
+    "en": "Feed up to seven records from the attached stream into free slots. This foreground operation lets a small RAM queue play a long song.",
+    "zh-CN": "从已设置的音频流向空闲槽位补入最多七条记录。这项主循环侧的操作使小容量 RAM 队列也能播放长曲。"
   },
   "fc_audio_vblank_play_music": {
     "ja": "音楽の設定、最初の補充、再生有効化をまとめて行います。短い曲を始める基本の入口です。",
-    "en": "Attach a song, prefill the queue and enable playback in one call. This is the usual entry point for starting a phrase."
+    "en": "Attach a song, prefill the queue and enable playback in one call. This is the usual entry point for starting a phrase.",
+    "zh-CN": "一次完成曲目设置、队列预填和播放启用，是开始播放短曲的常用入口。"
   },
   "fc_audio_vblank_is_playing": {
     "ja": "NMIによるキュー消費が有効かを返します。",
-    "en": "Report whether NMI queue consumption is enabled."
+    "en": "Report whether NMI queue consumption is enabled.",
+    "zh-CN": "报告 NMI 队列消费是否已启用。"
   },
   "fc_audio_vblank_underruns": {
     "ja": "音楽の次のレコードが間に合わなかった回数を返します。補充の余裕を確認するために使います。",
-    "en": "Return the number of queue-starvation episodes, helping assess refill headroom."
+    "en": "Return the number of queue-starvation episodes, helping assess refill headroom.",
+    "zh-CN": "返回下一条音乐记录未及时到达的次数，用于判断补充数据是否留有足够余量。"
   },
   "fc_audio_vblank_set_timbre": {
     "ja": "指定した音源で、次に発音する音のデューティや音量を設定します。再生中の音は再トリガーしません。",
-    "en": "Configure duty or level for the next note on a channel, without retriggering its current note."
+    "en": "Configure duty or level for the next note on a channel, without retriggering its current note.",
+    "zh-CN": "设置指定声道下一次发声的占空比或音量，不重新触发当前音符。"
   },
   "fc_audio_vblank___hook": {
     "ja": "NMIでBGMとSFXの待機時間を進め、現在の音源所有権に従ってAPUへ反映するフックです。",
-    "en": "NMI hook that advances BGM and SFX delays and updates the APU according to current channel ownership."
+    "en": "NMI hook that advances BGM and SFX delays and updates the APU according to current channel ownership.",
+    "zh-CN": "在 NMI 中推进 BGM 与音效的等待时间，并根据当前声道归属更新 APU。"
   },
   "fc_audio_vblank_pause": {
     "ja": "BGMとSFXの再生位置を保ったまま両方を休止・再開します。",
-    "en": "Pause or resume both BGM and SFX while preserving their playback positions."
+    "en": "Pause or resume both BGM and SFX while preserving their playback positions.",
+    "zh-CN": "保留 BGM 与音效各自的播放位置，同时暂停或继续两者。"
   },
   "fc_audio_vblank_play_sfx": {
     "ja": "短い効果音をRAMへコピーし、選んだ音源の出力を次のNMIから一時的に置き換えます。",
-    "en": "Copy a short effect to RAM and temporarily take over selected channel outputs starting at the next NMI."
+    "en": "Copy a short effect to RAM and temporarily take over selected channel outputs starting at the next NMI.",
+    "zh-CN": "将短音效复制到 RAM，从下一次 NMI 起临时接管选定声道的输出。"
   },
   "fc_audio_vblank_stop_sfx": {
     "ja": "効果音による音源の占有を取り消し、次のNMIで現在のBGM音へ戻します。",
-    "en": "Cancel effect ownership so the next NMI restores the current BGM notes."
+    "en": "Cancel effect ownership so the next NMI restores the current BGM notes.",
+    "zh-CN": "取消音效对声道的占用，使下一次 NMI 恢复当前 BGM 音符。"
   },
   "fc_audio_vblank_module": {
     "ja": "NMIで進む4音源の音楽ライブラリです。初期化→曲の設定と初回補充→NMIを有効にして再生→前景でrefillの順で使います。NMIはRAMキューを読むだけなので、補充を続ければ長い曲も小さなRAM使用量で再生できます。各音源は独立したHOLD/STOPを持ちます。",
-    "en": "Four-channel music advances in NMI. Initialize, attach and prefill a song, enable NMI for playback, then refill from the foreground. NMI reads a RAM queue, letting a small amount of RAM serve a long stream as long as it is refilled. Each channel has independent HOLD/STOP commands."
+    "en": "Four-channel music advances in NMI. Initialize, attach and prefill a song, enable NMI for playback, then refill from the foreground. NMI reads a RAM queue, letting a small amount of RAM serve a long stream as long as it is refilled. Each channel has independent HOLD/STOP commands.",
+    "zh-CN": "由 NMI 推进的四声道音乐库。使用顺序为初始化、设置曲目并预填队列、启用 NMI 播放，然后在主循环中持续 refill。NMI 只读取 RAM 队列，只要及时补充，少量 RAM 就能支持长音频流。每个声道都可独立使用 HOLD／STOP。"
   }
 }

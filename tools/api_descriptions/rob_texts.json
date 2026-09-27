@@ -1,66 +1,82 @@
 {
   "rob_setup": {
     "ja": "`intrinsics.h`を読み込みます。既定のNMIハンドラーが動き、内部のNMIカウンターが更新される状態で使ってください。NMIが無効、または独自ハンドラーがカウンターを更新しない場合、待機は終わりません。タイムアウトはありません。",
-    "en": "Include `intrinsics.h`. The default NMI handler must be running and advancing its counter. Disabled NMI or a custom handler that does not maintain that counter leaves the wait blocked. There is no timeout."
+    "en": "Include `intrinsics.h`. The default NMI handler must be running and advancing its counter. Disabled NMI or a custom handler that does not maintain that counter leaves the wait blocked. There is no timeout.",
+    "zh-CN": "包含 `intrinsics.h`。默认 NMI 处理程序必须运行并推进其计数器。禁用 NMI 或自定义处理程序不维护该计数器时，等待会一直阻塞。没有超时。"
   },
   "rob_mask": {
     "ja": "点灯側はPPUMASKとその保持値を0x1E、消灯側は0にします。以前の描画マスクは復元しません。背景・スプライト・左端描画をまとめて切り替え、グレースケールや色強調の指定も上書きします。",
-    "en": "The on phase sets PPUMASK and its software shadow to 0x1E; the off phase sets both to zero. The previous mask is not restored. This changes background, sprite and left-edge rendering together and also replaces grayscale and color-emphasis settings."
+    "en": "The on phase sets PPUMASK and its software shadow to 0x1E; the off phase sets both to zero. The previous mask is not restored. This changes background, sprite and left-edge rendering together and also replaces grayscale and color-emphasis settings.",
+    "zh-CN": "亮阶段将 PPUMASK 及其软件影子值设为 0x1E；暗阶段均设为零。不恢复先前掩码。这会同时改变背景、精灵和左缘渲染，也会替换灰度及颜色强调设置。"
   },
   "rob_light": {
     "ja": "描画を有効にするだけでは白い画面になりません。明るいタイルとパレット、消灯中に見える暗い背景色を呼び出し側で用意します。サンプルは白い単色タイルと黒い背景色を使い、処理中に画面全体を点滅させます。",
-    "en": "Enabling rendering does not create a white screen by itself. Supply bright tiles and palette entries plus a dark backdrop for the off phase. The sample uses solid white tiles and a black backdrop, flashing the whole screen during the operation."
+    "en": "Enabling rendering does not create a white screen by itself. Supply bright tiles and palette entries plus a dark backdrop for the off phase. The sample uses solid white tiles and a black backdrop, flashing the whole screen during the operation.",
+    "zh-CN": "仅启用渲染不会自动产生白屏。请提供明亮图块和调色板，并为暗阶段设置暗色底色。示例使用纯白图块和黑色底色，使操作期间整个屏幕闪烁。"
   },
   "rob_timing": {
     "ja": "待機回数はNMIカウンターの変化数です。呼び出し時点から最初のNMIまでは1フレーム未満になる場合があります。前景処理から使い、割り込み内から呼ばないでください。別処理による描画マスクの変更は点滅を乱します。",
-    "en": "Wait counts measure NMI-counter changes. The interval from entry to the first NMI may be shorter than one frame. Call from foreground code, not an interrupt. Another routine changing the rendering mask can disturb the pattern."
+    "en": "Wait counts measure NMI-counter changes. The interval from entry to the first NMI may be shorter than one frame. Call from foreground code, not an interrupt. Another routine changing the rendering mask can disturb the pattern.",
+    "zh-CN": "等待次数按 NMI 计数器变化计算。进入到首次 NMI 的间隔可能不足一帧。应从前台代码调用，不要从中断调用。其他例程改变渲染掩码可能扰乱模式。"
   },
   "rob_scope": {
     "ja": "画面の明暗と待機のための低水準部品です。ロボット用コマンドの前置きや機種別の命令列、受信確認は生成しません。検証はKUROSAKI上のPPUMASK書き込み順序・NMI回数・画像を対象とし、実機ロボットの受信は確認していません。",
-    "en": "These are low-level display-mask and wait primitives. They do not generate a robot command preamble, device-specific command sequence or reception acknowledgement. Verification covers PPUMASK writes, NMI counts and pixels in KUROSAKI; physical robot reception has not been tested."
+    "en": "These are low-level display-mask and wait primitives. They do not generate a robot command preamble, device-specific command sequence or reception acknowledgement. Verification covers PPUMASK writes, NMI counts and pixels in KUROSAKI; physical robot reception has not been tested.",
+    "zh-CN": "这些是低层显示掩码及等待原语。不生成机器人命令前导、设备专用命令序列或接收确认。验证覆盖 KUROSAKI 中的 PPUMASK 写入、NMI 计数及像素；未测试实体机器人接收。"
   },
   "rob_void": {
     "ja": "戻り値はありません。指定した待機が終わると呼び出し元へ戻ります。",
-    "en": "No return value. Return to the caller after the requested waits complete."
+    "en": "No return value. Return to the caller after the requested waits complete.",
+    "zh-CN": "无返回值。完成指定等待后返回调用方。"
   },
   "rob_diagram": {
     "ja": "実行後、FLASH WAITS 1、PULSE 3 ON / 2 OFF = 5、A5 BYTE WAITS 48と表示します。下の図は0xA5のビット列で、上段が1・0・1・0、下段が0・1・0・1です。1区画は1回の待機、白は描画有効、黒は無効を表します。ビット1は白4区画＋黒2区画、ビット0は白2区画＋黒4区画です。FINAL MASK 0とTIMING CHECKS OKが完了を示します。",
-    "en": "After execution, the screen shows FLASH WAITS 1, PULSE 3 ON / 2 OFF = 5 and A5 BYTE WAITS 48. The diagram represents 0xA5: 1,0,1,0 on the upper row and 0,1,0,1 below. Each cell is one wait; white means rendering enabled and black means disabled. A one has four white cells followed by two black cells; a zero has two white followed by four black. FINAL MASK 0 and TIMING CHECKS OK indicate completion."
+    "en": "After execution, the screen shows FLASH WAITS 1, PULSE 3 ON / 2 OFF = 5 and A5 BYTE WAITS 48. The diagram represents 0xA5: 1,0,1,0 on the upper row and 0,1,0,1 below. Each cell is one wait; white means rendering enabled and black means disabled. A one has four white cells followed by two black cells; a zero has two white followed by four black. FINAL MASK 0 and TIMING CHECKS OK indicate completion.",
+    "zh-CN": "执行后，画面显示 FLASH WAITS 1、PULSE 3 ON / 2 OFF = 5、A5 BYTE WAITS 48。示意图表示 0xA5：上排为 1,0,1,0，下排为 0,1,0,1。每格代表一次等待，白色表示启用渲染，黑色表示关闭。一位 1 对应四个白格再接两个黑格；一位 0 对应两个白格再接四个黑格。FINAL MASK 0 和 TIMING CHECKS OK 表示完成。"
   },
   "rob_bright": {
     "ja": "0なら消灯、0以外なら点灯です。1だけでなく255なども点灯として扱います。輝度の段階指定ではありません。",
-    "en": "Zero selects off; any nonzero byte selects on, including 255. This is not a brightness level."
+    "en": "Zero selects off; any nonzero byte selects on, including 255. This is not a brightness level.",
+    "zh-CN": "零选择关闭，任意非零字节（包括 255）选择开启。这不是亮度级别。"
   },
   "rob_on": {
     "ja": "点灯側の待機回数0～255。0なら点灯側を実行しません。",
-    "en": "On-phase wait count, 0..255. Zero skips the on phase."
+    "en": "On-phase wait count, 0..255. Zero skips the on phase.",
+    "zh-CN": "亮阶段等待次数，范围为 0..255。零跳过亮阶段。"
   },
   "rob_off": {
     "ja": "消灯側の待機回数0～255。0なら消灯側を実行しません。合計は最大510回です。",
-    "en": "Off-phase wait count, 0..255. Zero skips the off phase. The total can reach 510 waits."
+    "en": "Off-phase wait count, 0..255. Zero skips the off phase. The total can reach 510 waits.",
+    "zh-CN": "暗阶段等待次数，范围为 0..255。零跳过暗阶段。合计最多 510 次等待。"
   },
   "rob_zero": {
     "ja": "両方0ならマスクも待機も変更しません。消灯回数が1以上なら終了時のマスクは0、点灯だけなら0x1Eです。",
-    "en": "With both counts zero, neither the mask nor timing changes. Any off waits leave mask zero; an on-only pulse leaves 0x1E."
+    "en": "With both counts zero, neither the mask nor timing changes. Any off waits leave mask zero; an on-only pulse leaves 0x1E.",
+    "zh-CN": "两个次数都为零时，不改变掩码或时序。只要有暗阶段等待，最终掩码为零；只有亮阶段的脉冲最终为 0x1E。"
   },
   "rob_pattern": {
     "ja": "送る8ビットのパターン0～255です。0xA5なら1,0,1,0,0,1,0,1の順になります。チャンネル番号やロボットの操作番号ではありません。",
-    "en": "Eight-bit pattern, 0..255. For 0xA5 the order is 1,0,1,0,0,1,0,1. This is not a channel ID or a robot action number."
+    "en": "Eight-bit pattern, 0..255. For 0xA5 the order is 1,0,1,0,0,1,0,1. This is not a channel ID or a robot action number.",
+    "zh-CN": "八位模式，范围为 0..255。0xA5 的顺序为 1,0,1,0,0,1,0,1。不是通道 ID 或机器人动作编号。"
   },
   "rob_final": {
     "ja": "最後のビットも必ず消灯待機で終わり、終了時のPPUMASKと保持値は0です。固定長の8ビットだけを送り、開始記号や終端記号は加えません。",
-    "en": "The last bit also ends with off waits, leaving PPUMASK and its shadow at zero. Send exactly eight bits; no start or end marker is added."
+    "en": "The last bit also ends with off waits, leaving PPUMASK and its shadow at zero. Send exactly eight bits; no start or end marker is added.",
+    "zh-CN": "最后一位也以暗阶段等待结束，使 PPUMASK 及其影子值为零。恰好发送八位，不添加起始或结束标记。"
   },
   "rob___rob_flash": {
     "ja": "描画を点灯側または消灯側へ設定し、NMIカウンターが1回変わるまで待ちます。設定したマスクは戻った後も維持します。",
-    "en": "Select the on or off rendering mask and wait for one NMI-counter change. The selected mask remains in effect after return."
+    "en": "Select the on or off rendering mask and wait for one NMI-counter change. The selected mask remains in effect after return.",
+    "zh-CN": "选择亮或暗的渲染掩码，等待 NMI 计数器变化一次。返回后所选掩码继续生效。"
   },
   "rob___rob_pulse": {
     "ja": "指定回数の点灯待機を行い、続けて指定回数の消灯待機を行います。1組のパルスを作る関数です。",
-    "en": "Perform the requested on waits followed by the requested off waits, producing one pulse."
+    "en": "Perform the requested on waits followed by the requested off waits, producing one pulse.",
+    "zh-CN": "先执行指定的亮阶段等待，再执行暗阶段等待，产生一个脉冲。"
   },
   "rob___rob_send_byte": {
     "ja": "1バイトを最上位ビットから8ビットの点滅パターンに変換します。1は点灯4回・消灯2回、0は点灯2回・消灯4回の待機で表し、合計48回のNMI待機を行います。",
-    "en": "Encode one byte as eight blink patterns, most-significant bit first. One uses four on waits and two off waits; zero uses two on waits and four off waits. The total is 48 NMI waits."
+    "en": "Encode one byte as eight blink patterns, most-significant bit first. One uses four on waits and two off waits; zero uses two on waits and four off waits. The total is 48 NMI waits.",
+    "zh-CN": "将一个字节编码为八组闪烁模式，最高有效位先发。1 使用四次亮等待和两次暗等待；0 使用两次亮等待和四次暗等待。总计 48 次 NMI 等待。"
   }
 }

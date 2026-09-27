@@ -5,8 +5,8 @@ it when changing the active edition set. New messages may instead be keyed by
 language code and need only cover the active editions.
 """
 ORDER = ['en', 'ja', 'ko', 'zh-CN', 'zh-TW', 'es', 'pt', 'fr', 'de']
-ACTIVE_LANGUAGES = ['ja', 'en']
-VISIBLE_LANGUAGES = ['en', 'ja']
+ACTIVE_LANGUAGES = ['ja', 'en', 'zh-CN']
+VISIBLE_LANGUAGES = ['en', 'ja', 'zh-CN']
 PAUSED_LANGUAGES = [language for language in ORDER if language not in ACTIVE_LANGUAGES]
 
 

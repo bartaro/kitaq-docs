@@ -29,6 +29,19 @@ New-Item -ItemType Directory -Force .\\out | Out-Null
 `--nes-chr=tiles.chr` or `--chr-rom=tiles.chr` embeds prepared patterns as CHR ROM. Neither can be combined with `--nes-chr-ram`. The CNROM profile also rejects CHR RAM mode. Check that the target mapper and board provide the required CHR RAM.
 
 Omitting all CHR options embeds a blank 8 KiB CHR ROM. Explicitly select `--nes-chr-ram` for examples that upload patterns at runtime. CHR RAM is separate from CPU-side PRG RAM; the wireframe staging buffer also needs its own PRG RAM allocation.
+''',
+'zh-CN':'''### 8.1　使用 CHR RAM 更新图形
+
+`--nes-chr-ram` 生成使用 8 KiB 可写 CHR RAM 的卡带 ROM。ROM 文件中不保存 CHR 数据，因此程序必须在初始化时将图块图案上传到 PPU。`wire3d.c` 渲染器使用此模式。
+
+```powershell
+New-Item -ItemType Directory -Force .\\out | Out-Null
+.\\kitaqfc\\kitaqfc.exe .\\kitaq-docs\\samples\\api-examples\\fc\\wire3d_projection.c -I .\\kitaqfc\\lib --mapper=nrom --nes-chr-ram -o .\\out\\wire3d_projection.nes
+```
+
+`--nes-chr=tiles.chr` 或 `--chr-rom=tiles.chr` 将准备好的图案作为 CHR ROM 嵌入。这两个选项都不能与 `--nes-chr-ram` 同时使用。CNROM 配置也不支持 CHR RAM 模式。请确认目标映射器和电路板具备所需的 CHR RAM。
+
+如果省略所有 CHR 选项，编译器会嵌入空白的 8 KiB CHR ROM。运行时上传图案的示例必须明确指定 `--nes-chr-ram`。CHR RAM 与 CPU 使用的 PRG RAM 是两块不同的内存；线框绘图的暂存缓冲区还需要单独分配 PRG RAM。
 '''}
 
 def overview(text,language):
@@ -36,7 +49,7 @@ def overview(text,language):
     block='<!-- fc-chr-ram:start --><section id="chr-ram-build">'+md(TEXT[language])+'</section><!-- fc-chr-ram:end -->'
     # Standalone publication must not depend on generate_en's global code
     # renderer override having run earlier in this Python process.
-    label='コピー' if language=='ja' else 'Copy'
+    label={'ja':'コピー','zh-CN':'复制'}.get(language,'Copy')
     block=re.sub(r'(<button class="copy" type="button">)(?:コピー|Copy)(</button>)',lambda m:m[1]+label+m[2],block)
     text,count=re.subn(r'(?=<h2[^>]*>9[ .　])',lambda m:block,text,count=1)
     assert count==1

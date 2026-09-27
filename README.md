@@ -5,6 +5,7 @@
 | --- | --- |
 | English | [KITAQGB](https://bartaro.github.io/kitaq-docs/en/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/en/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/en/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/en/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/en/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/en/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/en/sarakura.html) |
 | 日本語 | [KITAQGB](https://bartaro.github.io/kitaq-docs/kitaqgb.html) · [KITAQGB Library](https://bartaro.github.io/kitaq-docs/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/kitaqfc.html) · [KITAQFC Library](https://bartaro.github.io/kitaq-docs/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/sarakura.html) |
+| 简体中文 | [KITAQGB](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqgb.html) · [KITAQGB 库](https://bartaro.github.io/kitaq-docs/zh-CN/gb-library.html) · [KOKURA](https://bartaro.github.io/kitaq-docs/zh-CN/kokura.html) · [KITAQFC](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqfc.html) · [KITAQFC 库](https://bartaro.github.io/kitaq-docs/zh-CN/fc-library.html) · [KUROSAKI](https://bartaro.github.io/kitaq-docs/zh-CN/kurosaki.html) · [SARAKURA](https://bartaro.github.io/kitaq-docs/zh-CN/sarakura.html) |
 <!-- manual-language-links:end -->
 
 <!-- ai-prompts:start -->
@@ -23,7 +24,7 @@ Fill in the requirements, then give the complete prompt to your AI assistant. It
 
 
 
-[English](#english) | [日本語](#japanese)
+[English](#english) | [日本語](#japanese) | [简体中文](README.zh-CN.md)
 
 <a name="english"></a>
 
@@ -33,7 +34,7 @@ Fill in the requirements, then give the complete prompt to your AI assistant. It
 
 ### HTML manuals
 
-Seven volumes are presented in Japanese and English, based on the source snapshot of September 14, 2026. The reference inventory contains 1,055 API entries and 47 complete sample programs. Open `en/index.html` for English or `index.html` for Japanese; each volume provides language navigation. The sample explanations identify the tested behavior and conditions.
+Seven volumes are available in English, Japanese and Simplified Chinese, with individual API explanations and complete sample programs. Open `en/index.html` for English, `index.html` for Japanese or `zh-CN/index.html` for Simplified Chinese; each volume provides language navigation. The sample explanations identify the tested behavior and conditions.
 
 Original source excerpts are preserved verbatim; captured emulator screens appear beside the sample explanations. The HTML files support offline reading, searching within a volume, copying code and printing.
 
@@ -60,11 +61,11 @@ Original source excerpts are preserved verbatim; captured emulator screens appea
 
 [日本語 / Japanese](https://bartaro.github.io/kitaq-docs/) / [English](https://bartaro.github.io/kitaq-docs/en/)
 
-### 日本語・英語のHTMLマニュアル
+### 日本語・英語・中国語（簡体字）のHTMLマニュアル
 
-2026年9月14日のソースに基づく7冊のマニュアルを日本語・英語で収録しています。各言語版に共通の1,055個のAPI項目と47本の完全なサンプルプログラムがあります。英語版は `en/index.html`、日本語版は `index.html` から開けます。各巻上部で言語を切り替えられます。サンプルの説明には期待結果と確認した実行画像を掲載しています。
+7冊のマニュアルを日本語・英語・中国語（簡体字）で収録しています。各APIの個別説明と完全なサンプルプログラムを掲載しています。英語版は `en/index.html`、日本語版は `index.html`、簡体字版は `zh-CN/index.html` から開けます。各巻上部で言語を切り替えられます。サンプルの説明には期待結果と確認した実行画像を掲載しています。
 
-全言語に同じ1,055件のAPIと47本の完成サンプルを収録しています。元のソース抜粋は原文のまま保持し、確認した実行画像をサンプルの説明に添えています。
+各言語版で共通のAPIとサンプルを参照できます。元のソース抜粋は原文のまま保持し、確認した実行画像をサンプルの説明に添えています。
 `index.html` を開いてください。オフラインで閲覧・巻内検索・コードのコピー・印刷ができます。
 
 | ファイル | 内容 |

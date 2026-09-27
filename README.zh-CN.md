@@ -1,77 +1,39 @@
-# KITAQ SERIES手册
+# KITAQ 系列手册
 
-[English](README.md#english) | [日本語](README.md#japanese) | **简体中文**
+[English](README.md#english) · [日本語](README.md#japanese) · **简体中文**
 
-<!-- ai-prompts:start -->
-## 生成式 AI 游戏开发提示词
+[打开简体中文总目录](https://bartaro.github.io/kitaq-docs/zh-CN/index.html)
 
-填写需求后，将完整提示词交给 AI。内容涵盖实现、模拟器测试、SARAKURA 分析以及修复后的复测。
+这套手册从第一个可运行的程序开始，介绍语言语法、构建命令、库和编译器内建函数，并为示例说明用途、预期结果和使用条件。初学者可以先完成构建和运行，再逐步查阅所需的功能。
 
-KITAQGB · KITAQFC
-<!-- ai-prompts:end -->
-
-## 直接打开各工具的手册
-
-下列链接直接进入相应工具的简体中文分册。
+## 直接打开各分册
 
 | 分册 | 内容 |
 | --- | --- |
+| [KITAQGB](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqgb.html) | GB/CGB 的语言语法、内建函数和构建 |
+| [KITAQGB 库](https://bartaro.github.io/kitaq-docs/zh-CN/gb-library.html) | 图形、输入、音频、通信和游戏辅助功能 |
+| [KOKURA](https://bartaro.github.io/kitaq-docs/zh-CN/kokura.html) | GB/CGB 的运行、输入、观察、记录和调试命令 |
+| [KITAQFC](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqfc.html) | NES/FDS 的语言语法、内建函数和构建 |
+| [KITAQFC 库](https://bartaro.github.io/kitaq-docs/zh-CN/fc-library.html) | NES 图形、音频、物理、线框和外设功能 |
+| [KUROSAKI](https://bartaro.github.io/kitaq-docs/zh-CN/kurosaki.html) | NES/FDS 的运行、保存和分析 |
+| [SARAKURA](https://bartaro.github.io/kitaq-docs/zh-CN/sarakura.html) | 诊断报告、修复计划和复测 |
 
-## HTML手册
+## 阅读方式
 
-本套手册以2026年9月14日的源码为依据，共七册，提供九种语言版本。各语言版均包含相同的1,055个API条目和47个完整示例程序。简体中文请打开 `zh-CN/index.html`，英文打开 `en/index.html`，日文打开 `index.html`。每册均可切换语言。验证记录列明了测试所用的源码、可执行文件和条件。
+手册提供英文、日文和简体中文版，可在每册顶部切换到同一分册的其他语言。下载完整目录后，打开 `zh-CN/index.html` 即可离线阅读；请保留目录结构，以便加载样式、示例和图片。支持卷内搜索、复制代码和打印。
 
-原始源码摘录和实际捕获的工具输出保持原文不变。另请参阅[仓库获取与目录布局](GITHUB_SETUP.md)及[发布检查记录](PUBLICATION_CHECKS.md)。HTML支持离线阅读、册内搜索、代码复制和打印。
+原始源码摘录和工具输出保留原文。已确认的模拟器画面与示例说明一同展示。请结合预期结果判断；单张画面不能证明声音、输入、外设或实机运行正确。
 
-总目录和第一册开头说明了KITAQGB名称的双重含义，并致谢NORCAL。英文字母、数字和符号使用指定的 `samples/assets/ascii.c`。GB资源按ASCII顺序重新排列，FC资源转换为NES位平面格式；字形不作修改。
+## 游戏开发提示词
 
-正文、补充示例和生成工具采用MIT许可证。2026年9月12日，作者确认所提供的92个字形为原创作品，可以按MIT公开。来自原软件的摘录保留其著作权声明。再分发时请同时附上[第三方声明](THIRD_PARTY_NOTICES.md)及适用许可证。
+填写需求后，将完整提示词交给 AI。提示词涵盖实现、模拟器测试、SARAKURA 分析和修复后的复测，作为编译器分册中的参考示例提供。
 
-手册包含[英文许可证原文](LICENSE)和[日文参考译文](LICENSE.ja)。[第三方声明](THIRD_PARTY_NOTICES.md)也链接了各工具的日文许可证。若译文与原文有差异，以英文原文为准。软件二进制发行还需遵守依赖项各自的许可证。允许公开这些手册，并不等于所有工具和依赖项都能仅按MIT再分发。
+[KITAQGB 参考提示词](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqgb.html#loop-prompts) · [KITAQFC 参考提示词](https://bartaro.github.io/kitaq-docs/zh-CN/kitaqfc.html#loop-prompts)
 
-## 构建示例
+## 完整游戏的程序解说
 
-将各仓库clone到同一个父目录下，使它们成为同级目录，然后从该父目录运行以下命令。布局详见 [GITHUB_SETUP.md](GITHUB_SETUP.md)。可使用所附编译器，也可按手册重新构建；本版包含编译器修复。
+[《はらぺこしろへび》简体中文指南](https://bartaro.github.io/kitaq-docs/apps/harapeko_shirohebi/guide-zh-CN.html)介绍流程图、白蛇的运动与身体跟随算法，以及 KITAQGB 库的使用方法。[源码与构建说明](https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/README.zh-CN.md)。
 
-```powershell
-.\kitaq-docs\samples\build.ps1 -Only gb_hello,fc_hello
-.\kitaq-docs\samples\build.ps1
-```
+## 许可证
 
-若源码位于其他位置，请指定 `-Root "源码树的绝对路径"`。可用 `-GbCompiler` 和 `-FcCompiler` 选择其他目录中的编译器。生成的ROM与日志默认放在 `samples/out/<sample-id>`。本手册包不包含编译器可执行文件、商业ROM或BIOS。
-
-`samples/api-fragments` 是需要放入已完成初始化、并提供有效参数的程序中的代码片段。ROM批量构建覆盖 `samples/manifest.json` 中的47个完整程序。各册明确区分只有声明的API、未执行的片段和未在实机验证的功能。
-
-## 发布到GitHub
-
-1. 将本目录内容放在仓库根目录或 `docs` 目录。
-2. 一并上传 `index.html`、七册正文、`verification.html`、`loop-engineering.html`、`prompts`、语言目录、`assets`、`samples`、`reference`、`verification`、README和许可声明。请包含 `.nojekyll`。
-3. 在GitHub的 Settings → Pages → Build and deployment 中，将Source设为 Deploy from a branch。
-4. 选择已上传的分支，以及对应布局的 `/ (root)` 或 `/docs`，然后保存。
-5. 发布完成后，打开Pages中显示的地址，检查总目录和各分册的链接。
-
-详见[GitHub发布源设置说明](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)。`manual/_manual_work` 是本地构建与验证工作区，不属于发布内容。
-
-## 编辑与更新
-
-日文正文位于 `tools/chapters.py`，英文正文位于 `tools/en/*.md`。`tools/generate_en.py` 生成英文版，`tools/generate.py` 包含API字典和页面生成逻辑，`assets/manual.css` 定义样式。使用Python更新手册：
-
-```powershell
-python -B kitaq-docs/tools/collect.py
-python -B kitaq-docs/tools/make_samples.py
-python -B kitaq-docs/tools/catalog.py
-python -B kitaq-docs/tools/generate.py
-python -B kitaq-docs/tools/generate_en.py
-foreach ($language in @('ko','zh-CN','zh-TW','es','pt','fr','de')) {
-    python -B kitaq-docs/tools/generate_i18n.py --language $language
-    if ($LASTEXITCODE -ne 0) { throw "Manual generation failed: $language" }
-}
-python -B kitaq-docs/tools/check_site.py
-python -B kitaq-docs/tools/check_bilingual.py
-```
-
-已确认的画面与示例说明一同展示。公开文件不包含构建日志、运行日志或本地验证记录。上传前，请使用 `tools/export_public.py` 将手册导出到单独的 Git 工作目录。另请参阅[第三方声明](THIRD_PARTY_NOTICES.md)。
-
-## 本次源码公开范围
-
-KOKURA-GUI、KUROSAKI-GUI和PLITA不在本次上传范围内。公开源码和手册涵盖命令行工具、核心及集成API。
+[MIT 许可证](LICENSE) · [日文参考译文](LICENSE.ja) · [第三方声明](THIRD_PARTY_NOTICES.md)

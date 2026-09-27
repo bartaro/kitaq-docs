@@ -1,18 +1,22 @@
 {
   "cgb_tile_overview_role": {
     "ja": "`cgb_tile.h`は、タイルマップ操作の組み込み命令の宣言と、CGBのタイル属性を組み立てるマクロをまとめたヘッダーです。タイル番号は表示する絵柄を選び、属性はパレット、絵柄のVRAMバンク、左右・上下反転、背景の優先度を指定します。属性はタイル画像そのものを書き換える機能ではありません。",
-    "en": "`cgb_tile.h` groups declarations for tile-map intrinsics and macros for constructing CGB tile attributes. A tile number selects a pattern; its attribute selects the palette, pattern VRAM bank, flips and background priority. Setting attributes does not alter the pattern’s pixels."
+    "en": "`cgb_tile.h` groups declarations for tile-map intrinsics and macros for constructing CGB tile attributes. A tile number selects a pattern; its attribute selects the palette, pattern VRAM bank, flips and background priority. Setting attributes does not alter the pattern’s pixels.",
+    "zh-CN": "`cgb_tile.h` 集中了图块地图内建函数的声明，以及构造 CGB 图块属性的宏。图块编号选择图案；属性选择调色板、图案所在的 VRAM 存储体、翻转方式和背景优先级。设置属性不会改变图案的像素。"
   },
   "cgb_tile_overview_names": {
     "ja": "`__settile`系はマップ`0x9800`、`__settileat`系は指定したマップ先頭、`__settilebg`系はLCDCが選ぶ背景マップ、`__settilewin`系はLCDCが選ぶウィンドウマップを使います。`attr`は属性だけ、`cgb`はタイル番号と属性の両方を書きます。`bulk`は指定アドレスから連続したバイト列を転送します。用途に合わせて、書き込み先と書く内容の両方から命令を選んでください。",
-    "en": "The `__settile` family addresses map `0x9800`; `__settileat` uses an explicit map base; `__settilebg` uses the background map selected by LCDC; and `__settilewin` uses its window map. The `attr` forms write attributes only, while the `cgb` forms write both tile numbers and attributes. The `bulk` forms transfer consecutive bytes at the supplied address. Choose an entry point by both its destination and the data it writes."
+    "en": "The `__settile` family addresses map `0x9800`; `__settileat` uses an explicit map base; `__settilebg` uses the background map selected by LCDC; and `__settilewin` uses its window map. The `attr` forms write attributes only, while the `cgb` forms write both tile numbers and attributes. The `bulk` forms transfer consecutive bytes at the supplied address. Choose an entry point by both its destination and the data it writes.",
+    "zh-CN": "`__settile` 系列访问地图 `0x9800`；`__settileat` 使用明确指定的地图基地址；`__settilebg` 使用 LCDC 选择的背景地图；`__settilewin` 使用 LCDC 选择的窗口地图。`attr` 形式只写属性，`cgb` 形式同时写图块编号和属性。`bulk` 形式在给定地址传送连续字节。请根据目标位置和要写入的数据选择函数。"
   },
   "cgb_tile_overview_attributes": {
     "ja": "`KQ_CGB_ATTR_PAL`などのマクロで各属性のビットを作り、`KQ_CGB_ATTR`でまとめて指定できます。`bank`は絵柄を読むVRAMバンクで、ROMバンク番号ではありません。通常のタイル番号書き込みは選択中のVRAMバンクを使うため、タイルと属性を一緒に設定する前にバンク0を選択してください。DMGでは属性だけの操作は何もせず、タイルと属性を組み合わせた操作はタイル番号だけを書きます。",
-    "en": "Use macros such as `KQ_CGB_ATTR_PAL` for individual attribute bits, or `KQ_CGB_ATTR` to combine the fields. The bank field selects the VRAM bank containing the pattern, not a ROM bank. Ordinary tile-number writes use the currently selected VRAM bank, so select bank zero before combined tile/attribute operations. On DMG, attribute-only operations do nothing; combined operations still write the tile numbers."
+    "en": "Use macros such as `KQ_CGB_ATTR_PAL` for individual attribute bits, or `KQ_CGB_ATTR` to combine the fields. The bank field selects the VRAM bank containing the pattern, not a ROM bank. Ordinary tile-number writes use the currently selected VRAM bank, so select bank zero before combined tile/attribute operations. On DMG, attribute-only operations do nothing; combined operations still write the tile numbers.",
+    "zh-CN": "使用 `KQ_CGB_ATTR_PAL` 等宏设置单个属性字段，或用 `KQ_CGB_ATTR` 组合各字段。bank 字段选择存放图案的 VRAM 存储体，而不是 ROM 存储体。普通图块编号写入使用当前选择的 VRAM 存储体，因此执行图块/属性组合操作前，应先选择存储体零。在 DMG 上，仅属性操作不产生效果；组合操作仍会写入图块编号。"
   },
   "cgb_tile_overview_timing": {
     "ja": "`__`で始まる命令はコンパイラが実装を生成するため、これらのために`cgb_tile.c`をリンクする必要はありません。通常の書き込み経路はVRAMアクセスを待ちますが、割り込み許可状態を変更するものがあります。`_unsafe`と`_fast`はその待機を省くため、LCD停止中など、呼び出し側が書き込み可能な期間を保証できる場面で使います。各命令の割り込み・バンク・転送長の条件も確認してください。",
-    "en": "The compiler emits the implementation of the `__` intrinsics; they do not require linking `cgb_tile.c`. Ordinary write paths wait for VRAM access, but some also change the interrupt-enable state. The `_unsafe` and `_fast` forms omit those waits: use them only when the caller guarantees writable VRAM, such as while the LCD is off. Check each entry’s interrupt, bank and transfer-length conditions."
+    "en": "The compiler emits the implementation of the `__` intrinsics; they do not require linking `cgb_tile.c`. Ordinary write paths wait for VRAM access, but some also change the interrupt-enable state. The `_unsafe` and `_fast` forms omit those waits: use them only when the caller guarantees writable VRAM, such as while the LCD is off. Check each entry’s interrupt, bank and transfer-length conditions.",
+    "zh-CN": "编译器会生成 `__` 内建函数的实现，无需链接 `cgb_tile.c`。普通写入路径会等待 VRAM 可访问，但部分路径也会改变中断启用状态。`_unsafe` 和 `_fast` 形式省略等待：仅在调用方保证 VRAM 可写时使用，例如 LCD 关闭期间。请查看每个条目的中断、存储体和传送长度条件。"
   }
 }

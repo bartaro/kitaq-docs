@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>HARAPEKO SHIROHEBI — 程序设计指南</title><link href="guide.css" rel="stylesheet"/></head><body>
+<header id="top"><div class="tag">KITAQGB 应用指南 · GB / CGB</div>
+<h1>HARAPEKO SHIROHEBI</h1>
+<p>程序设计指南 · 程序流程、运动算法与库的使用</p>
+<div class="edition"><a href="../../zh-CN/index.html">KITAQ 系列手册</a><a href="guide-en.html" lang="en">English</a><a href="guide-ja.html" lang="ja">日本語</a><span lang="zh-CN">简体中文</span><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/README.zh-CN.md">README</a><span>DAISUKE OBA · MIT</span></div></header>
+<main>
+<nav aria-label="目录" class="toc"><strong>目录</strong>
+<ol>
+<li><a href="#start">从这里开始</a></li>
+<li><a href="#build">构建与文件组织</a></li>
+<li><a href="#flow">程序流程与状态</a></li>
+<li><a href="#motion">蛇头运动：定点数与转向</a></li>
+<li><a href="#chain">白蛇身体的跟随算法</a></li>
+<li><a href="#collision">水果、碰撞与失败演出</a></li>
+<li><a href="#display">绘制：图块与精灵顺序</a></li>
+<li><a href="#audio">音乐与 VBlank 的分工</a></li>
+<li><a href="#save">成绩保存与姓名输入</a></li>
+<li><a href="#libraries">KITAQGB 库的使用方法</a></li>
+<li><a href="#sources">源码导航与修改要点</a></li>
+</ol>
+</nav>
+<section id="start">
+<h2><span class="num">01</span>从这里开始</h2>
+<p>本指南从按键输入讲到屏幕绘制，介绍 HARAPEKO SHIROHEBI（はらぺこしろへび）的实现。游戏由 <strong>DAISUKE OBA</strong> 创作。玩家操纵白蛇吃石榴、增长身体，同时避开地雷和自己的身体。随附的程序、原创素材及本指南采用 <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/LICENSE">MIT 许可证</a>。</p>
+<p>画面尺寸为 160 × 144 像素。同一个 ROM 支持初代 Game Boy（DMG）和 Game Boy Color（CGB），程序在运行时选择显示方式。卡带配置为 MBC5、64 KiB ROM 和 8 KiB 电池备份 RAM。可玩的发行版见 <a href="https://bartaro.itch.io/harapeko-shirohebi">游戏的 itch.io 页面</a>。</p>
+<p><strong>建议阅读顺序：</strong>先看流程图，再结合阅读蛇头运动和身体跟随两节。库的使用表会指出相应入口及示例源码。源码标识符中的 <code>Apple</code> 指画面上的石榴，<code>Block</code> 指地雷。</p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="build">
+<h2><span class="num">02</span>构建与文件组织</h2>
+<p>下载完整的 KITAQGB 仓库。在安装了 .NET Framework 4.8 和 PowerShell 的 Windows 上，从仓库根目录运行以下命令：</p>
+<pre><code>powershell -NoProfile -ExecutionPolicy Bypass -File .\apps\harapeko_shirohebi\build.ps1</code></pre>
+<p>构建脚本按指定顺序拼接 17 个 C 源码片段。音乐、导出的素材和 ROM 存储体选择包装文件作为独立编译输入。构建使用仓库中的 <code>lib/</code>，无需私有美术工程或素材导出器。各片段通过拼接后的编译单元共享声明，不能把它们逐个加入普通 C 项目单独编译。</p>
+<table>
+<thead>
+<tr><th>选项／输出文件</th><th>用途</th></tr>
+</thead>
+<tbody>
+<tr><td><code>-KitaqgbRoot</code></td><td>指定包含 <code>kitaqgb.exe</code> 和 <code>lib/</code> 的目录。按仓库默认目录结构使用时可省略。</td></tr>
+<tr><td><code>-OutputDirectory</code></td><td>指定输出目录，默认为游戏目录下的 <code>out/</code>。</td></tr>
+<tr><td><code>-KeepBuildFiles</code></td><td>构建成功后保留拼接源码、临时音频适配文件和编译诊断。</td></tr>
+<tr><td><code>shirohebi.gb</code></td><td>本次编译生成的 ROM。构建失败后，不要把之前遗留的 ROM 当作本次结果。</td></tr>
+<tr><td><code>shirohebi.map</code></td><td>本次构建的符号地址表，调试时应使用与 ROM 对应的这份文件。</td></tr>
+<tr><td><code>build_manifest.json</code></td><td>记录编译器和 ROM 的哈希值、输出大小及中断向量地址。</td></tr>
+</tbody>
+</table>
+<h3>为什么需要构建后的处理步骤</h3>
+<p>无论当前切换到了哪个 ROM 存储体，VBlank 音乐中断都必须能访问其代码。脚本检查四个中断相关符号是否位于固定存储体 0，在 <code>$0040</code> 安装 <code>JP</code> 指令，并重新计算卡带的两个校验和。若中断向量与预期不符，构建会停止。临时音频源码副本会禁用主循环的音乐服务，防止主循环和中断重复推进音乐；另一份临时副本负责安排音频辅助函数并使用可达的绝对跳转。仓库中的库源码保持不变。</p>
+<p>完整的输入顺序和编译选项见 <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/build.ps1">build.ps1</a>。主要选项为 <code>--profile=release --stack-bank=fixed --rst-disable --cgb=cgb --cart=mbc5_ram_battery --romsize=64k --ramsize=8k</code>。</p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="flow">
+<h2><span class="num">03</span>程序流程与状态</h2>
+<figure><div class="flow"><div class="box"><strong>初始化</strong><small>硬件、显示与共享状态</small></div><div aria-hidden="true" class="arrow">→</div><div class="box"><strong>启用中断</strong><small>音频钩子、读取成绩、标题画面</small></div><div aria-hidden="true" class="arrow">→</div><div class="box"><strong>主循环</strong><small>输入 → 状态更新 → 显示</small></div></div><div class="lane"><strong>一次主循环：</strong>音频状态维护 → 读取持续按下和新按下的按键 → 快捷键与松键门控 → 执行当前状态处理 → 生成 OAM 影子缓冲 → 等待 VBlank → 传输 OAM → 处理音效 → 更新需要重绘的覆盖文字，然后重复。</div>
+<figcaption>图 1：主程序流程。主循环执行期间，硬件仍可能触发 VBlank 中断。</figcaption>
+</figure>
+<table>
+<thead>
+<tr><th>状态转换</th><th>触发条件与结果</th></tr>
+</thead>
+<tbody>
+<tr><td>TITLE → READY → PLAY</td><td>按 START 开始游戏；START 提示演出结束后才开始移动。</td></tr>
+<tr><td>PLAY ⇄ PAUSE</td><td>按 START 暂停或继续。暂停期间停止物理更新和身体跟随。</td></tr>
+<tr><td>PAUSE → RETURN_CONFIRM</td><td>按 SELECT 打开返回标题确认框，默认选择 NO。取消后回到原来的暂停状态；选择 YES 返回标题。</td></tr>
+<tr><td>PLAY → MISS</td><td>碰到地雷或自身身体时，播放对应的失败演出。</td></tr>
+<tr><td>MISS → NAME_ENTRY / GAMEOVER</td><td>成绩进入排行榜时打开姓名输入，否则直接询问是否重试。确认姓名后保存成绩，再进入重试界面。</td></tr>
+<tr><td>GAMEOVER → READY / TITLE</td><td>重试选 YES 开始新一局，选 NO 返回标题。</td></tr>
+<tr><td>TITLE ⇄ ERASE</td><td>SELECT+START 打开成绩删除确认框。A 确认，B 或 START 取消；默认选择 NO。</td></tr>
+</tbody>
+</table>
+<p>松键门控会屏蔽输入，直到所有按键都已松开；检测到松开的那一次循环也不会执行操作。这样，打开界面的按键就不会紧接着确认下一项。演示模式用自动转向输入驱动同一套运动与碰撞代码。标题画面的空闲时间按 900 次主循环计数，演示时长按 1,800 次 VBlank 计数，两者都不应表述为保证准确的现实时间。</p>
+<aside class="note">一次游戏逻辑更新对应一次主循环，并不保证每个硬件帧恰好更新一次：计算繁忙时可能错过 VBlank。音乐和中断计数器由 VBlank 独立推进。</aside>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="motion">
+<h2><span class="num">04</span>蛇头运动：定点数与转向</h2>
+<p>只有蛇头使用 <code>KQBody2D</code>。它所在的 <code>KQWorld2D</code> 中只有一个活动刚体，重力为零，接触求解迭代次数为零；移动后的碰撞判断由游戏自行完成。Q4 坐标以 16 个整数单位表示一个像素，例如 <code>160</code> 表示 10 像素，因而不使用浮点数也能保留不足一个像素的运动。</p>
+<pre><code>base = 8 + 2 * min(score / 5, 10)     // Q4 component limit
+first UP update: limit = base + (base &gt;&gt; 2)
+held UP:        limit += max(base &gt;&gt; 2, 1), capped at 2 * base
+released UP:    limit -= max(base &gt;&gt; 2, 1), floored at base
+pixel_center = (q4_position + 8) &gt;&gt; 4</code></pre>
+<p>基础速度分量上限为每次更新 0.5～1.75 像素。方向按顺时针分为 16 档：0 向右、4 向下、8 向左、12 向上。LEFT／RIGHT 每次使目标朝向转过一档；长按时先使用 8 次更新的倒计时，再以 4 次更新的倒计时重复转向，同时按下左右键则不转向。</p>
+<p>目标速度分量由完整值、四分之三值、四分之一值或零组成。实际速度的每个分量在一次更新中最多向目标靠近 3 个 Q4 单位。这是计算量较小的整数近似，向量没有经过三角函数归一化。因此，画面上的朝向可能先改变，而运动方向仍在逐步跟上。</p>
+<p>调用 <code>kq2d_step</code> 后，蛇头按中心坐标边界穿屏：X 小于 4 时设为 156，大于 156 时设为 4；Y 使用 4 和 140 两个边界。随后统一取整为像素坐标，供绘制和碰撞使用。蛇头采用这套边界跳转规则，身体跟随则使用模 160／144 的坐标回绕。</p>
+<p>相关源码：<a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a>／<a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_flow.c"><code>shirohebi_flow.c</code></a>。</p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="chain">
+<h2><span class="num">05</span>白蛇身体的跟随算法</h2>
+<p><code>ChainBody</code> 直接引用 <code>SND_TraceX</code>、<code>SND_TraceY</code> 和 <code>SND_TraceDir</code>。这些数组保存<strong>每一节当前的位置与朝向</strong>，并非蛇头走过的轨迹。碰撞和绘制读取同一组数组。白蛇起初由一个头和三节身体组成，最多可增长到 31 节（含头）。</p>
+<figure><div class="diagram-scroll"><svg aria-labelledby="chain-title" class="chain-svg" role="img" viewbox="0 0 880 175"><title id="chain-title">蛇头的新朝向逐节向后传递</title><defs><marker id="tip" markerheight="8" markerwidth="8" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8 Z" fill="#1c6954"></path></marker></defs><g fill="#e4ead9" stroke="#1c6954" stroke-width="2"><rect height="90" rx="10" width="180" x="20" y="25"></rect><rect height="90" rx="10" width="180" x="340" y="25"></rect><rect height="90" rx="10" width="180" x="660" y="25"></rect></g><g marker-end="url(#tip)" stroke="#1c6954" stroke-width="2"><path d="M210,65 H325"></path><path d="M530,65 H645"></path></g><g fill="#173734" font-family="system-ui,sans-serif" font-size="19" text-anchor="middle"><text x="110" y="60">蛇头 [0]</text><text x="110" y="92">朝向 = 0</text><text x="430" y="60">身体 [1]</text><text x="430" y="92">原 15 → 新 0</text><text x="750" y="60">身体 [2]</text><text x="750" y="92">原 14 → 新 15</text><text font-size="15" x="268" y="48">0</text><text font-size="15" x="588" y="48">15</text><text font-size="17" x="440" y="150">向下一节传递的是事先保存的原朝向。</text></g></svg></div>
+<figcaption>图 2：一次更新中的方向传递。先保存原朝向，再写入新朝向，弯曲便会逐节向后传递；位置计算使用前一节更新后的坐标。</figcaption>
+</figure>
+<ol>
+<li>把蛇头的像素坐标和朝向写入索引 0，并将 <code>pull</code> 设为该朝向。</li>
+<li>处理第 <code>i</code> 节时，先保存它的原朝向，再从前一节更新后的位置减去与 <code>pull</code> 对应的小偏移，得到目标位置。</li>
+<li>分别求 X、Y 轴跨越边界时的最短位移，按下表在各轴移动 0、1 或 2 像素。</li>
+<li>把本节朝向设为 <code>pull</code>，对新位置做回绕处理，再把保存的原朝向传给第 <code>i + 1</code> 节。</li>
+</ol>
+<table>
+<thead>
+<tr><th>带符号位移 d</th><th>该轴的移动量</th></tr>
+</thead>
+<tbody>
+<tr><td>d &gt; 4</td><td>+2</td></tr>
+<tr><td>0 &lt; d ≤ 4</td><td>+1</td></tr>
+<tr><td>d = 0</td><td>0</td></tr>
+<tr><td>−4 ≤ d &lt; 0</td><td>−1</td></tr>
+<tr><td>d &lt; −4</td><td>−2</td></tr>
+</tbody>
+</table>
+<p>方向 0～15 的 X 偏移依次为 <code>[4,4,3,1,0,-1,-3,-4,-4,-4,-3,-1,0,1,3,4]</code>；Y 偏移使用同一张表，将索引偏移 12 档。坐标在 160 × 144 的区域内回绕。对长度为 W 的轴，位移大于 W/2 时减去 W，小于 −W/2 时加上 W；恰好相隔半个区域时保留原位移的符号。</p>
+<h3>屏幕边缘的计算示例</h3>
+<p>假设前一节位于 (2, 50) 且朝右，后一节的目标在其后方四像素处，即 X = (2 − 4) mod 160 = 158。若后一节当前 X=156，位移为 +2，本次移动 +1，得到 X=157。若当前 X=0，最短位移为 −2，本次移动到 X=159。这样身体会从屏幕边缘跟过去，而不是横穿整个屏幕。</p>
+<p>增长时复制尾节的位置和朝向，然后增加有效节数。新尾节会在随后的跟随更新中逐渐分离。原尾节会高亮显示 20 次更新。库的包装文件将跟随函数及其辅助函数一起放入存储体 2，避免每处理一节都切换存储体。</p>
+<pre><code>/* Excerpt: the game owns these arrays for the entire run. */
+chain_body_init(&amp;SND_ChainBody, SND_TraceX, SND_TraceY, SND_TraceDir,
+                SND_MAX_SEGMENTS, SND_SCREEN_W, SND_SCREEN_H);
+chain_body_reset(&amp;SND_ChainBody, SND_Length,
+                 SND_HeadX, SND_HeadY, SND_Facing);
+
+/* Once per PLAY update, after integrating and rounding the head. */
+SND_ChainBody.count = SND_Length;
+chain_body_step(&amp;SND_ChainBody, SND_HeadX, SND_HeadY, SND_Facing);
+
+/* On fruit collection, within capacity. */
+chain_body_grow(&amp;SND_ChainBody);
+SND_Length = SND_ChainBody.count;</code></pre>
+<p>这段代码展示数组的生命周期和调用顺序；完整游戏还会检查增长是否成功，并设置高亮效果。相关源码：<a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a>／<a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_chain.c"><code>shirohebi_chain.c</code></a>／<a href="https://github.com/bartaro/kitaqgb/blob/main/lib/chain.c"><code>chain.c</code></a>。</p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="collision">
+<h2><span class="num">06</span>水果、碰撞与失败演出</h2>
+<p>PLAY 状态的更新顺序为：加速 → 转向 → 蛇头物理运动 → 蛇头穿屏与取整 → 身体跟随 → 地雷碰撞 → 自身碰撞 → 吃水果 → 高亮计时结束处理。同一次更新中，致命碰撞优先于吃到水果。</p>
+<table>
+<thead>
+<tr><th>检测对象</th><th>实际规则</th></tr>
+</thead>
+<tbody>
+<tr><td>地雷</td><td>逐节检查中心坐标是否落在含边界的矩形内：X=46…58 或 102…114，Y=62…74。</td></tr>
+<tr><td>自身身体</td><td>蛇头与索引 2 及其后的各节比较，要求回绕后的最短 |dx| &lt; 3 且 |dy| &lt; 3；紧邻蛇头的一节不参与此检测。</td></tr>
+<tr><td>水果</td><td>蛇头与水果中心的普通坐标距离满足 |dx| &lt; 7 且 |dy| &lt; 7，不使用边界回绕距离。吃到后加分、尝试增长并选择下一个位置。</td></tr>
+</tbody>
+</table>
+<p>这些判断分别比较两轴距离，属于轴对齐范围判断，并非圆形距离检测。程序按确定的顺序检查 16 个固定水果候选位置。与地雷的最小图块距离随成绩变化：分数达到 0、10、20、30 时分别为 4、3、2、1；与地雷位于同一图块的候选始终被排除。一次搜索最多尝试 16 个位置。分数用 8 位数值保存，不是无限增长的计数器。</p>
+<p>撞到自身时，身体保持碰撞时的姿态并逐渐淡出。碰到地雷时，各节以定点速度散开，配合延迟生效的重力和错开的爆炸时序，最后显示弹坑。失败计时结束后，符合条件的成绩进入姓名输入，其余进入重试提示。CGB 使用彩色效果，DMG 使用灰阶调色板。</p>
+<p><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_collision.c"><code>shirohebi_collision.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_apples.c"><code>shirohebi_apples.c</code></a></p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="display">
+<h2><span class="num">07</span>绘制：图块与精灵顺序</h2>
+<p>初始化时先等待安全的显示时机，再关闭 LCD、清空 VRAM、载入图块、字形和调色板，最后启用显示。CGB 路径设置背景属性和颜色调色板，DMG 路径设置灰阶寄存器。导出的背景每行 20 个图块，硬件背景图每行则占 32 个图块，索引计算不能混用。</p>
+<p>每次循环在 RAM 中生成 OAM 影子缓冲。写入精灵坐标时需加上硬件规定的偏移：X+8、Y+16。调用 <code>system_wait_vblank()</code> 后再提交 OAM。白蛇占用槽位 0…30，文字使用剩余槽位，未使用的项目会被清空。</p>
+<p>前六节的 OAM 优先顺序保持固定，后面的节每次绘制按增加四的相位轮换排列。这使每条扫描线最多显示十个精灵的限制在后半身各节之间轮流体现，并不会解除硬件限制，也不会删除身体节。修改最大长度时，需要同时检查数组容量和全部 40 个 OAM 槽位的分配。</p>
+<p>START 和 PAUSE 覆盖文字分别记录期望状态、已显示状态以及待重绘标记。移除文字时，先根据当前水果状态恢复每个格子，再在需要时使用背景图。若一律填成某个空白图块，就会擦掉文字下方的水果。字形掩码由八行 1 位数据展开为十六字节的 2 位图块数据，字形像素优先于背景图案。</p>
+<p><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_render.c"><code>shirohebi_render.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_display.c"><code>shirohebi_display.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_pause.c"><code>shirohebi_pause.c</code></a></p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="audio">
+<h2><span class="num">08</span>音乐与 VBlank 的分工</h2>
+<p><code>audio_vblank.c</code> 读取固定存储体中的音乐流。每条普通记录按<strong>等待时间、CH1、CH2、CH3、CH4</strong>排列，对应带扫频的脉冲、脉冲、波形和噪声声道，顺序与硬件一致。音乐控制使用 <code>AudioVBlank_PlayMusic</code>、<code>AudioVBlank_Stop</code> 和 <code>AudioVBlank_SetEnabled</code>。</p>
+<p>普通 <code>audio.c</code> 驱动负责游戏音效；构建时通过临时宏定义排除它的音乐服务。游戏用 <code>__bankof</code> 取得音效数据所在的存储体，并使用优先级控制播放；地雷效果还直接使用 CH4 噪声。暂停操作协调音乐与音效。主循环调用的 <code>SND_AudioServiceWork</code> 特意保持为空，防止身体越长、辅助调用越多，音乐就推进得越快。</p>
+<p><code>AudioVBlank_FrameHook</code> 调用固定存储体中的 <code>SND_DemoVBlankHook</code>。该钩子递增一个 8 位演示计数器，并在保留 P1 选择值的前提下采样系统按键组。相应功能启用时，它锁存标题画面的 SELECT+START 和暂停时的 SELECT，使短按不会因主循环繁忙而遗漏。钩子中不绘图，也不调用可切换存储体中的函数。</p>
+<aside class="note">所有共享标志和音频状态初始化后，才能安装钩子。通用系统回调 API 中保存的函数指针不能代替这个中断钩子。中断可能访问的全部代码和数据都必须常驻。</aside>
+<pre><code>/* Excerpt from initialization, after shared state has been set up. */
+SND_AudioInit();
+AudioVBlank_FrameHook = SND_DemoVBlankHook;
+AudioVBlank_EnableIrq();</code></pre>
+<p><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_lib_bank0.c"><code>shirohebi_lib_bank0.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/music.c"><code>music.c</code></a></p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="save">
+<h2><span class="num">09</span>成绩保存与姓名输入</h2>
+<p>槽位 0 保存 42 字节的应用数据：标记 <code>0x53</code>、版本 <code>2</code>、十个单字节分数和三十个姓名字符。存档库负责外层长度与校验和验证。读取程序也能识别 5 字节和 15 字节的成绩数据，写入时统一使用 42 字节格式。</p>
+<p>符合入榜条件的非零分数按降序插入。比较使用严格大于，因此相同分数排在已有记录之后，姓名随对应分数一起移动。新记录先在 RAM 中以 AAA 为初始姓名，玩家确认三个字符后才写入 SRAM。若放弃尚未确认的成绩，游戏重新读取已保存的排行榜。</p>
+<p>UP／DOWN 选择 A–Z 或句点。RIGHT／SELECT 循环移到下一个字符，LEFT 循环移到前一个字符；B 仅在光标不位于第一个字符时后退。A 移到下一位，在最后一位则确认；START 可在任意位置确认。松键门控防止这次确认同时选中重试选项。</p>
+<p><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_save.c"><code>shirohebi_save.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_flow.c"><code>shirohebi_flow.c</code></a></p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="libraries">
+<h2><span class="num">10</span>KITAQGB 库的使用方法</h2>
+<p>请配套使用仓库中的库源码与头文件。游戏的包装文件和配置也是示例的一部分，尤其需要注意存储体布局及两套音频处理的协调。</p>
+<table>
+<thead>
+<tr><th>库</th><th>入口与用途</th><th>使用示例</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/system.c"><code>system.c</code></a></td><td><code>system_init, system_wait_vblank</code><br/>初始化系统状态并同步显示提交。音频中断钩子需另外安装。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_main.c"><code>shirohebi_main.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/chain.c"><code>chain.c</code></a></td><td><code>chain_body_init, chain_body_reset, chain_body_step, chain_body_grow</code><br/>绑定持续有效的数组、生成初始姿态、跟随蛇头并追加尾节。本游戏使用 ChainBody 接口。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/physics2d.c"><code>physics2d.c</code></a></td><td><code>kq2d_world_init, kq2d_step</code><br/>更新一个 Q4 蛇头刚体；重力和接触求解迭代次数均设为零。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/sprite.c"><code>sprite.c</code></a></td><td><code>sprite_init; kq_sprite_oam and companion state</code><br/>初始化并使用 OAM 影子缓冲。游戏直接写入项目后统一提交，须遵守槽位和坐标规则。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_render.c"><code>shirohebi_render.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/audio_vblank.c"><code>audio_vblank.c</code></a></td><td><code>AudioVBlank_Init, PlayMusic, Stop, SetEnabled, EnableIrq, FrameHook</code><br/>播放常驻音乐流，并在中断中调用游戏钩子。IRQ 代码和数据须位于固定 ROM。此处首项之后的简称均带有 AudioVBlank_ 前缀。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/audio.c"><code>audio.c</code></a></td><td><code>Audio_Init, Audio_Update, Audio_PlaySFXBanked, Audio_StopSfx, Audio_SetPaused</code><br/>控制音效播放、优先级和暂停，并与 VBlank 音乐驱动协调。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/save.c"><code>save.c</code></a></td><td><code>save_exists, save_read, save_write</code><br/>在槽位 0 读写带版本信息的排行榜。save_read 验证请求的精确长度和校验和后返回成功或失败；游戏另行检查自身数据标记。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_save.c"><code>shirohebi_save.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/cgb_palette.c"><code>cgb_palette.c</code></a></td><td><code>cgb_bg_palette, cgb_obj_palette</code><br/>设置 CGB 颜色；DMG 的灰阶寄存器则另外显式设置。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_display.c"><code>shirohebi_display.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/map.c"><code>map.c</code></a></td><td><code>map_load and the exported map_t descriptor</code><br/>支持素材文件中的地图辅助函数；游戏恢复背景时自行逐格写入。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_assets.c"><code>shirohebi_assets.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/fixed.c"><code>fixed.c</code></a></td><td><code>fixed-point support</code><br/>作为支持代码参与链接。蛇头运动通过 physics2d 和整数 Q4 运算实现。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_common.c"><code>shirohebi_common.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/audio_hwregs_gb.c"><code>audio_hwregs_gb.c</code></a></td><td><code>shared audio register bindings</code><br/>提供两套音频处理共同需要的 Game Boy 硬件寄存器定义。</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a></td></tr>
+</tbody>
+</table>
+<h3>与库配合使用的编译器内建函数</h3>
+<p><code>__readpadex(previous)</code> 在低字节返回持续按下的按键，在高字节返回新按下的按键。<code>__cgb_is_cgb()</code> 用于选择彩色处理路径。<code>__settile</code>、<code>__settileattr</code> 等内建函数更新背景图格；<code>__bankof</code> 提供音效数据的 ROM 存储体编号。这些功能由编译器提供，无需另外复制一份 C 实现到游戏中。</p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<section id="sources">
+<h2><span class="num">11</span>源码导航与修改要点</h2>
+<table>
+<thead>
+<tr><th>文件</th><th>职责</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_common.c"><code>shirohebi_common.c</code></a></td><td>类型、常量、共享状态及前置声明。追踪某个符号时建议先看这里。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_main.c"><code>shirohebi_main.c</code></a></td><td>启动流程，以及输入 → 更新 → 绘制 → VBlank 的主循环。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_flow.c"><code>shirohebi_flow.c</code></a></td><td>状态分派：标题选项、READY、PLAY、暂停、失败、姓名输入和重试。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_input.c"><code>shirohebi_input.c</code></a></td><td>松键门控、标题快捷键和返回标题确认。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a></td><td>蛇头物理运动、加速、相对转向、穿屏，以及身体跟随的初始化、更新和增长。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_chain.c"><code>shirohebi_chain.c</code></a></td><td>存储体 2 的包装文件，包含完整的共享 chain 实现。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_collision.c"><code>shirohebi_collision.c</code></a></td><td>地雷与自身碰撞、碰撞类型区分及身体散开动画。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_apples.c"><code>shirohebi_apples.c</code></a></td><td>石榴候选位置选择、收集、计分和增长；内部标识符使用 Apple。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_demo.c"><code>shirohebi_demo.c</code></a></td><td>演示模式转向、长蛇姿态及基于 VBlank 计数器的经过时间统计。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_render.c"><code>shirohebi_render.c</code></a></td><td>OAM 影子缓冲填充、头身尾图块、优先顺序轮换和失败特效。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_display.c"><code>shirohebi_display.c</code></a></td><td>LCD／VRAM 初始化、调色板和字形载入，以及标题与排行榜布局。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_background.c"><code>shirohebi_background.c</code></a></td><td>游戏背景图格、地雷及被覆盖图格的恢复。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_pause.c"><code>shirohebi_pause.c</code></a></td><td>START／PAUSE 覆盖文字的期望、已显示和待重绘状态。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_text.c"><code>shirohebi_text.c</code></a></td><td>字符到图块的转换、字符串、数值成绩和菜单光标。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_save.c"><code>shirohebi_save.c</code></a></td><td>排行榜验证与插入、三个字符的姓名及 SRAM 存储。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a></td><td>音乐与音效的初始化、启停、选项、暂停及声道协调。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/music.c"><code>music.c</code></a></td><td>常驻的定长 VBlank 音乐记录，包含开始短曲、主曲及游戏结束曲。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/sfx.c"><code>sfx.c</code></a></td><td>由游戏音频函数选择的音效字节流。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/text_tiles.c"><code>text_tiles.c</code></a></td><td>字形掩码及其到 Game Boy 2 位图块行数据的转换。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_assets.c"><code>shirohebi_assets.c</code></a></td><td>导出的图块、背景图、属性、碰撞与事件表，以及地图描述符和辅助函数。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_input_shared.h"><code>shirohebi_input_shared.h</code></a></td><td>与中断共享的 WRAM 输入标志和固定存储体回调声明。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_lib_bank0.c"><code>shirohebi_lib_bank0.c</code></a></td><td>固定存储体中的 VBlank 输入／时钟回调、共享 WRAM 标志，并为后续系统和音频编译输入选择存储体 0。</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_lib_bank1.c"><code>shirohebi_lib_bank1.c</code></a></td><td>为后续支持库编译输入选择存储体 1。</td></tr>
+</tbody>
+</table>
+<h3>修改游戏时的检查要点</h3>
+<ul>
+<li><strong>速度与转向：</strong>修改 Q4 常量后，检查低速转弯和 UP 加速。蛇头显示的朝向档位不等于当前精确的速度方向。</li>
+<li><strong>长度：</strong>同步调整数组容量、跟随链容量及 OAM 预留槽位，检查尾部的地雷／自身碰撞和扫描线精灵限制。</li>
+<li><strong>图形：</strong>保持图块编号、背景图行跨度和 CGB 属性一致。移除覆盖文字时恢复下方当前实际内容。</li>
+<li><strong>音频：</strong>保持中断代码常驻固定存储体，并确保音乐时钟只有一个推进来源。除了正常播放，也要检查暂停与继续。</li>
+<li><strong>存档：</strong>修改数据布局时更新版本号；访问数据前检查长度，并测试空白和无效 SRAM。</li>
+</ul>
+<p>重新构建后，调试时使用本次生成的地址表。分别在 DMG 与 CGB 模式下检查标题、START 提示、移动、转向、吃水果、自身／地雷碰撞、暂停／继续、返回确认及排行榜。编译成功本身并不能证明这些操作路径正确，也不能替代实机验证。</p>
+<p class="back"><a href="#top">↑ 返回目录</a></p>
+</section>
+<footer>© 2026 DAISUKE OBA · <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/LICENSE">MIT 许可证</a> · <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/LICENSE.ja">日本語参考訳</a>
+<p>本指南无需外部脚本或字体。源码与许可证链接指向 GitHub 上的 KITAQGB 仓库。</p>
+</footer>
+</main>
+</body></html>
