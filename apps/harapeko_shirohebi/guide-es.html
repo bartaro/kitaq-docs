@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>HARAPEKO SHIROHEBI — Guía de programación</title><link href="guide.css" rel="stylesheet"/><style>.diagram-hint{display:none}@media(max-width:680px){.diagram-hint{display:block;font-size:13px;color:var(--muted)}}</style></head><body>
+<header id="top"><div class="tag">GUÍA DE APLICACIÓN DE KITAQGB · GB / CGB</div>
+<h1>HARAPEKO SHIROHEBI</h1>
+<p>Guía de programación · Flujo, movimiento y uso de bibliotecas</p>
+<div class="edition"><a href="../../es/index.html">Manuales de KITAQ</a><a href="guide-en.html" lang="en" hreflang="en">English</a><a href="guide-ja.html" lang="ja" hreflang="ja">日本語</a><a href="guide-ko.html" lang="ko" hreflang="ko">한국어</a><a href="guide-zh-CN.html" lang="zh-CN" hreflang="zh-CN">简体中文</a><a href="guide-zh-TW.html" lang="zh-TW" hreflang="zh-TW">繁體中文</a><a href="guide-fr.html" lang="fr" hreflang="fr">Français</a><span lang="es" aria-current="page">Español</span><a href="guide-de.html" lang="de" hreflang="de">Deutsch</a><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/README.es.md">README</a><span>DAISUKE OBA · MIT</span></div></header>
+<main>
+<nav aria-label="Índice" class="toc"><strong>Índice</strong>
+<ol>
+<li><a href="#start">Primeros pasos</a></li>
+<li><a href="#build">Compilación y organización de archivos</a></li>
+<li><a href="#flow">Flujo y estados del programa</a></li>
+<li><a href="#motion">Movimiento de la cabeza: punto fijo y giros</a></li>
+<li><a href="#chain">Cómo sigue el cuerpo a la cabeza</a></li>
+<li><a href="#collision">Frutas, colisiones y animaciones de derrota</a></li>
+<li><a href="#display">Dibujo: tiles y orden de sprites</a></li>
+<li><a href="#audio">La música y el papel del VBlank</a></li>
+<li><a href="#save">Guardar puntuaciones e introducir el nombre</a></li>
+<li><a href="#libraries">Uso de las bibliotecas de KITAQGB</a></li>
+<li><a href="#sources">Guía del código y precauciones al modificarlo</a></li>
+</ol>
+</nav>
+<section id="start">
+<h2><span class="num">01</span>Primeros pasos</h2>
+<p>Esta guía explica cómo funciona HARAPEKO SHIROHEBI, desde las entradas del mando hasta los píxeles de la pantalla. El juego es obra de <strong>DAISUKE OBA</strong>. Hay que comer granadas para que crezca la serpiente blanca, evitando las minas y el propio cuerpo. El programa incluido, los recursos originales y esta guía se distribuyen con la <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/LICENSE">licencia MIT</a>.</p>
+<p>La pantalla tiene 160 × 144 píxeles. Una misma ROM admite la Game Boy original (DMG) y la Game Boy Color (CGB); el modo de color se elige durante la ejecución. El cartucho utiliza MBC5, 64 KiB de ROM y 8 KiB de RAM respaldada por batería. La versión jugable está disponible en <a href="https://bartaro.itch.io/harapeko-shirohebi">la página del juego en itch.io</a>.</p>
+<p><strong>Orden de lectura recomendado:</strong> empieza por el diagrama de flujo y después lee juntas las secciones del movimiento de la cabeza y del seguimiento del cuerpo. La tabla de bibliotecas relaciona cada técnica con el código que puedes consultar. En los identificadores, Apple se refiere a la granada de la pantalla y Block a la mina.</p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="build">
+<h2><span class="num">02</span>Compilación y organización de archivos</h2>
+<p>Descarga el repositorio completo de KITAQGB. En Windows, con .NET Framework 4.8 y PowerShell instalados, ejecuta este comando desde la raíz del repositorio:</p>
+<pre><code>powershell -NoProfile -ExecutionPolicy Bypass -File .\apps\harapeko_shirohebi\build.ps1</code></pre>
+<p>El script une 17 fragmentos de código C en un orden explícito. La música, los recursos exportados y los archivos envoltorio que seleccionan los bancos son entradas independientes del compilador. La compilación enlaza <code>lib/</code> del repositorio; no necesita un proyecto gráfico privado ni una herramienta de exportación. No añadas los fragmentos por separado a un proyecto C genérico: comparten declaraciones dentro de la unidad de traducción ensamblada.</p>
+<table>
+<thead>
+<tr><th>Opción / archivo generado</th><th>Función</th></tr>
+</thead>
+<tbody>
+<tr><td><code>-KitaqgbRoot</code></td><td>Selecciona el directorio que contiene <code>kitaqgb.exe</code> y <code>lib/</code>. Se puede omitir con la estructura prevista por el repositorio.</td></tr>
+<tr><td><code>-OutputDirectory</code></td><td>Elige el directorio de salida; por defecto es <code>out/</code> dentro del directorio del juego.</td></tr>
+<tr><td><code>-KeepBuildFiles</code></td><td>Conserva el código combinado, las adaptaciones temporales de audio y los diagnósticos del compilador tras una compilación correcta.</td></tr>
+<tr><td><code>shirohebi.gb</code></td><td>La ROM recién compilada. Si la compilación falla, no utilices una ROM anterior como si fuera el nuevo resultado.</td></tr>
+<tr><td><code>shirohebi.map</code></td><td>Direcciones de los símbolos para depurar exactamente esta compilación.</td></tr>
+<tr><td><code>build_manifest.json</code></td><td>Hashes del compilador y de la ROM, tamaño de salida y dirección del vector de interrupción.</td></tr>
+</tbody>
+</table>
+<h3>Por qué hay un paso posterior a la compilación</h3>
+<p>La interrupción de música VBlank debe poder acceder a su código con cualquier banco ROM conmutable seleccionado. El script comprueba que cuatro símbolos relacionados con la interrupción estén en el banco fijo 0, instala un <code>JP</code> en <code>$0040</code> y vuelve a calcular las dos sumas de comprobación del cartucho. Si el vector no es el esperado, detiene la compilación. Una copia temporal del código de audio desactiva el servicio musical ordinario para que el bucle principal y la interrupción no hagan avanzar la música por duplicado. Otra copia temporal sitúa las funciones auxiliares de audio y utiliza un salto absoluto cuyo destino es alcanzable. No se modifican las bibliotecas del repositorio.</p>
+<p>Consulta <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/build.ps1">build.ps1</a> para conocer el orden completo de las entradas y las opciones del compilador. Las principales son <code>--profile=release --stack-bank=fixed --rst-disable --cgb=cgb --cart=mbc5_ram_battery --romsize=64k --ramsize=8k</code>.</p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="flow">
+<h2><span class="num">03</span>Flujo y estados del programa</h2>
+<figure><div class="flow"><div class="box"><strong>INICIALIZAR</strong><small>Hardware, pantalla y estado compartido</small></div><div aria-hidden="true" class="arrow">→</div><div class="box"><strong>ACTIVAR INTERRUPCIÓN</strong><small>Función de audio, carga de puntuaciones y título</small></div><div aria-hidden="true" class="arrow">→</div><div class="box"><strong>BUCLE PRINCIPAL</strong><small>Entrada → actualizar estado → mostrar</small></div></div><div class="lane"><strong>Una vuelta del bucle:</strong> gestionar el estado de audio → leer botones mantenidos y recién pulsados → procesar atajos y espera de liberación → ejecutar el manejador del estado actual → preparar la copia de OAM en RAM → esperar al VBlank → transferir OAM → atender efectos sonoros → actualizar los textos superpuestos pendientes de redibujado. Después se repite.</div>
+<figcaption>Figura 1. Flujo principal del programa. Las interrupciones VBlank del hardware pueden producirse mientras se ejecuta el bucle principal.</figcaption>
+</figure>
+<table>
+<thead>
+<tr><th>Transición de estado</th><th>Condición y efecto</th></tr>
+</thead>
+<tbody>
+<tr><td>TITLE → READY → PLAY</td><td>START inicia una partida. La animación de START termina antes de que comience el movimiento.</td></tr>
+<tr><td>PLAY ⇄ PAUSE</td><td>START pausa o reanuda la partida. Durante la pausa se detienen la física y el seguimiento del cuerpo.</td></tr>
+<tr><td>PAUSE → RETURN_CONFIRM</td><td>SELECT abre la confirmación de vuelta al título, con NO seleccionado por defecto. Cancelar devuelve a la misma partida en pausa; YES vuelve a TITLE.</td></tr>
+<tr><td>PLAY → MISS</td><td>Chocar con una mina o con el propio cuerpo inicia la animación correspondiente.</td></tr>
+<tr><td>MISS → NAME_ENTRY / GAMEOVER</td><td>Si la puntuación entra en la clasificación, se abre la entrada del nombre. En caso contrario, se pregunta directamente si se quiere reintentar. Al confirmar el nombre, se guarda y se abre esa misma pregunta.</td></tr>
+<tr><td>GAMEOVER → READY / TITLE</td><td>YES inicia una partida nueva; NO vuelve al título.</td></tr>
+<tr><td>TITLE ⇄ ERASE</td><td>SELECT+START abre la confirmación de borrado de puntuaciones. A confirma; B o START cancela. La opción inicial es NO.</td></tr>
+</tbody>
+</table>
+<p>La espera de liberación descarta las entradas hasta que se hayan soltado todos los botones, incluida la vuelta en la que se detecta que ya están sueltos. Así, el botón que abrió una pantalla no confirma de inmediato la siguiente acción. El modo de demostración sustituye las entradas de dirección y utiliza el mismo código de movimiento y colisión. La inactividad en el título se cuenta como 900 vueltas del bucle principal; la demostración dura 1.800 VBlank. Ninguno de los dos contadores garantiza una duración exacta en tiempo real.</p>
+<aside class="note">Una actualización del juego equivale a una vuelta del bucle principal. No garantiza una actualización por fotograma del hardware: un bucle ocupado puede perder un VBlank. La música y el contador de interrupciones avanzan con el VBlank de forma independiente.</aside>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="motion">
+<h2><span class="num">04</span>Movimiento de la cabeza: punto fijo y giros</h2>
+<p>Solo la cabeza es un <code>KQBody2D</code>. Su <code>KQWorld2D</code> contiene un cuerpo activo, gravedad nula y cero iteraciones del solucionador de contactos. El juego realiza sus propias comprobaciones de colisión después del movimiento. Las coordenadas Q4 usan 16 unidades enteras por píxel: <code>160</code> representa 10 píxeles. Esto conserva el movimiento inferior a un píxel sin operaciones de coma flotante.</p>
+<pre><code>base = 8 + 2 * min(score / 5, 10)     // Q4 component limit
+first UP update: limit = base + (base &gt;&gt; 2)
+held UP:        limit += max(base &gt;&gt; 2, 1), capped at 2 * base
+released UP:    limit -= max(base &gt;&gt; 2, 1), floored at base
+pixel_center = (q4_position + 8) &gt;&gt; 4</code></pre>
+<p>El límite base de cada componente de velocidad va de 0,5 a 1,75 píxeles por actualización. Las 16 orientaciones siguen el sentido horario: derecha (0), abajo (4), izquierda (8), arriba (12). LEFT y RIGHT cambian la orientación deseada en un sector. Si se mantiene el botón, se usa primero una cuenta atrás de 8 actualizaciones y después se repite con una de 4; pulsar LEFT y RIGHT a la vez anula el giro.</p>
+<p>Las componentes de la velocidad objetivo toman el valor completo del límite, tres cuartos, un cuarto o cero. Cada componente real se acerca a su objetivo como máximo 3 unidades Q4 por actualización. Son aproximaciones enteras de bajo coste, no vectores trigonométricos normalizados. Por ello, la orientación visible puede cambiar antes de que la velocidad termine de alinearse.</p>
+<p>Después de <code>kq2d_step</code>, la cabeza salta al borde opuesto si su centro rebasa los límites: X menor que 4 pasa a 156 y X mayor que 156 pasa a 4; Y utiliza del mismo modo 4 y 140. A continuación se redondea una sola vez a coordenadas de píxel, compartidas por dibujo y colisiones. Esta regla de la cabeza difiere del retorno módulo 160/144 utilizado por el cuerpo.</p>
+<p>Consulta <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_flow.c"><code>shirohebi_flow.c</code></a>.</p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="chain">
+<h2><span class="num">05</span>Cómo sigue el cuerpo a la cabeza</h2>
+<p><code>ChainBody</code> apunta directamente a <code>SND_TraceX</code>, <code>SND_TraceY</code> y <code>SND_TraceDir</code>. Estos arrays contienen <strong>la posición y orientación actuales de cada segmento</strong>, no un historial del recorrido de la cabeza. Las colisiones y el dibujo leen los mismos arrays. La serpiente empieza con una cabeza y tres segmentos de cuerpo, y puede crecer hasta 31 segmentos en total.</p>
+<figure><p class="diagram-hint">En pantallas estrechas, desplaza el diagrama horizontalmente.</p><div aria-label="La nueva orientación pasa de la cabeza a los segmentos siguientes" class="diagram-scroll" role="region" tabindex="0"><svg aria-labelledby="chain-title" class="chain-svg" role="img" viewbox="0 0 880 175"><title id="chain-title">La nueva orientación pasa de la cabeza a los segmentos siguientes</title><defs><marker id="tip" markerheight="8" markerwidth="8" orient="auto" refx="7" refy="4"><path d="M0,0 L8,4 L0,8 Z" fill="#1c6954"></path></marker></defs><g fill="#e4ead9" stroke="#1c6954" stroke-width="2"><rect height="90" rx="10" width="180" x="20" y="25"></rect><rect height="90" rx="10" width="180" x="340" y="25"></rect><rect height="90" rx="10" width="180" x="660" y="25"></rect></g><g marker-end="url(#tip)" stroke="#1c6954" stroke-width="2"><path d="M210,65 H325"></path><path d="M530,65 H645"></path></g><g fill="#173734" font-family="system-ui,sans-serif" font-size="19" text-anchor="middle"><text x="110" y="60">CABEZA [0]</text><text x="110" y="92">dirección = 0</text><text x="430" y="60">SEGMENTO [1]</text><text x="430" y="92">antes 15 → ahora 0</text><text x="750" y="60">SEGMENTO [2]</text><text x="750" y="92">antes 14 → ahora 15</text><text font-size="15" x="268" y="48">0</text><text font-size="15" x="588" y="48">15</text><text font-size="17" x="440" y="150">Pasar la dirección ANTERIOR guardada al siguiente segmento.</text></g></svg></div>
+<figcaption>Figura 2. Una actualización. Se conserva la orientación anterior antes de sobrescribirla, de modo que la curva avanza un segmento cada vez. La posición se calcula con el predecesor ya actualizado.</figcaption>
+</figure>
+<ol>
+<li>Guardar la posición en píxeles y la orientación de la cabeza en el índice 0; asignar esa orientación a <code>pull</code>.</li>
+<li>Para el segmento <code>i</code>, conservar su orientación anterior. Restar un pequeño desplazamiento dependiente de la dirección a la posición ya actualizada del predecesor para obtener el objetivo.</li>
+<li>Calcular el desplazamiento X/Y más corto hasta el objetivo teniendo en cuenta el retorno por los bordes. Mover cada eje 0, 1 o 2 píxeles según la tabla siguiente.</li>
+<li>Asignar <code>pull</code> a la orientación del segmento, ajustar su nueva posición para que retorne dentro del área y pasar la orientación anterior guardada al segmento <code>i + 1</code>.</li>
+</ol>
+<table>
+<thead>
+<tr><th>Desplazamiento con signo d</th><th>Corrección en cada eje</th></tr>
+</thead>
+<tbody>
+<tr><td>d &gt; 4</td><td>+2</td></tr>
+<tr><td>0 &lt; d ≤ 4</td><td>+1</td></tr>
+<tr><td>d = 0</td><td>0</td></tr>
+<tr><td>−4 ≤ d &lt; 0</td><td>−1</td></tr>
+<tr><td>d &lt; −4</td><td>−2</td></tr>
+</tbody>
+</table>
+<p>Los desplazamientos X para las orientaciones de 0 a 15 son <code>[4,4,3,1,0,-1,-3,-4,-4,-4,-3,-1,0,1,3,4]</code>; Y utiliza los mismos valores con el índice desplazado 12 sectores. Las coordenadas retornan por el borde opuesto dentro de un área de 160 × 144. Para un eje de longitud W, se resta W a un desplazamiento mayor que W/2 y se suma W si es menor que −W/2. Un desplazamiento de exactamente medio campo conserva su signo.</p>
+<h3>Ejemplo de cálculo en el borde de la pantalla</h3>
+<p>Si el segmento anterior está en (2, 50) y mira a la derecha, el objetivo del siguiente queda cuatro píxeles detrás: X objetivo = (2 − 4) mod 160 = 158. Si el siguiente está en X=156, el desplazamiento es +2, por lo que avanza +1 hasta X=157. Desde X=0, el desplazamiento más corto es −2 y se mueve a X=159. Así sigue al anterior a través del borde, sin cruzar toda la pantalla.</p>
+<p>Al crecer, se duplican la posición y la orientación de la cola y se aumenta el número de segmentos activos. Las actualizaciones posteriores separan gradualmente el nuevo segmento. La antigua cola se resalta durante 20 actualizaciones. El archivo envoltorio de la biblioteca mantiene la función de seguimiento y sus auxiliares juntas en el banco 2, evitando un cambio de banco por segmento.</p>
+<pre><code>/* Excerpt: the game owns these arrays for the entire run. */
+chain_body_init(&amp;SND_ChainBody, SND_TraceX, SND_TraceY, SND_TraceDir,
+                SND_MAX_SEGMENTS, SND_SCREEN_W, SND_SCREEN_H);
+chain_body_reset(&amp;SND_ChainBody, SND_Length,
+                 SND_HeadX, SND_HeadY, SND_Facing);
+
+/* Once per PLAY update, after integrating and rounding the head. */
+SND_ChainBody.count = SND_Length;
+chain_body_step(&amp;SND_ChainBody, SND_HeadX, SND_HeadY, SND_Facing);
+
+/* On fruit collection, within capacity. */
+chain_body_grow(&amp;SND_ChainBody);
+SND_Length = SND_ChainBody.count;</code></pre>
+<p>Este fragmento muestra la duración de los arrays y el orden de las llamadas; el juego completo también comprueba si el crecimiento ha tenido éxito y activa el resaltado. Fuentes: <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_chain.c"><code>shirohebi_chain.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/lib/chain.c"><code>chain.c</code></a>.</p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="collision">
+<h2><span class="num">06</span>Frutas, colisiones y animaciones de derrota</h2>
+<p>Una actualización PLAY sigue este orden: aceleración → giro → física de la cabeza → retorno por el borde y redondeo de la cabeza → seguimiento del cuerpo → minas → colisión con el propio cuerpo → fruta → fin del resaltado. Las colisiones mortales tienen prioridad sobre recoger una fruta en la misma actualización.</p>
+<table>
+<thead>
+<tr><th>Prueba</th><th>Regla aplicada</th></tr>
+</thead>
+<tbody>
+<tr><td>Minas</td><td>Se comprueba el centro de cada segmento dentro de rectángulos con límites incluidos: X=46…58 o 102…114, Y=62…74.</td></tr>
+<tr><td>Propio cuerpo</td><td>Se compara la cabeza con los segmentos desde el índice 2: las distancias mínimas con retorno por los bordes deben cumplir |dx| &lt; 3 e |dy| &lt; 3. Se excluye el segmento inmediatamente posterior a la cabeza.</td></tr>
+<tr><td>Fruta</td><td>Entre la cabeza y el centro de la fruta, las distancias ordinarias sin retorno por los bordes deben cumplir |dx| &lt; 7 e |dy| &lt; 7. Se suma un punto, se intenta crecer y se elige la posición siguiente.</td></tr>
+</tbody>
+</table>
+<p>Estas comprobaciones comparan umbrales por eje; no calculan una distancia circular. Se examinan 16 posiciones fijas de fruta en un orden determinista. La distancia mínima a una mina, medida en tiles, disminuye con la puntuación: 4, 3, 2 y 1 para 0, 10, 20 y 30 puntos. Siempre se descarta una posición en el mismo tile que una mina. La búsqueda prueba como máximo 16 candidatos. La puntuación es un valor de 8 bits, por lo que no es un contador ilimitado.</p>
+<p>Una colisión con el cuerpo congela su postura y la desvanece. Una mina dispersa los segmentos con velocidades de punto fijo, gravedad retardada y explosiones escalonadas, y finalmente muestra un cráter. Al terminar el temporizador de derrota, las puntuaciones que entran en la clasificación pasan a la entrada del nombre; las demás, a la pregunta de reintento. CGB utiliza colores para los efectos y DMG sus paletas de tonos.</p>
+<p><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_collision.c"><code>shirohebi_collision.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_apples.c"><code>shirohebi_apples.c</code></a></p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="display">
+<h2><span class="num">07</span>Dibujo: tiles y orden de sprites</h2>
+<p>La inicialización espera una fase segura de la pantalla, apaga el LCD, limpia la VRAM, carga tiles, caracteres y paletas, y activa la pantalla. La ruta CGB configura atributos del fondo y paletas de color; la ruta DMG usa registros de tonos. El fondo exportado tiene 20 tiles por fila, pero el mapa del hardware usa un paso de 32, de modo que sus índices no son intercambiables.</p>
+<p>En cada vuelta del bucle, el juego prepara una copia de OAM en RAM. Cada sprite se escribe con los desplazamientos del hardware X+8 e Y+16. Después de <code>system_wait_vblank()</code>, se transfieren los datos OAM. La serpiente ocupa las posiciones de 0 a 30; el texto utiliza las restantes. Las entradas sin uso se borran.</p>
+<p>Los seis primeros segmentos conservan una prioridad OAM fija. El orden de los posteriores rota con una fase que aumenta en cuatro por dibujo. Así se reparte entre los segmentos traseros el efecto del límite de diez sprites por línea de barrido; no se elimina el límite ni se borran segmentos del cuerpo. Al cambiar la longitud máxima, hay que revisar tanto la capacidad de los arrays como la asignación de las 40 posiciones OAM.</p>
+<p>Los textos superpuestos START y PAUSE registran por separado el estado deseado, el mostrado y la necesidad de redibujar. Al retirar el texto, cada celda se restaura primero según el estado actual de la fruta y, si hace falta, a partir del mapa de fondo. Rellenar toda la zona con un único tile borraría una fruta situada debajo. Las máscaras de caracteres pasan de ocho filas de un bit por píxel a dieciséis bytes de datos de tiles de dos bits por píxel; los píxeles del carácter tienen prioridad sobre el dibujo del fondo.</p>
+<p><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_render.c"><code>shirohebi_render.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_display.c"><code>shirohebi_display.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_pause.c"><code>shirohebi_pause.c</code></a></p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="audio">
+<h2><span class="num">08</span>La música y el papel del VBlank</h2>
+<p><code>audio_vblank.c</code> lee el flujo musical del banco fijo. Cada registro normal sigue el orden <strong>espera, CH1, CH2, CH3, CH4</strong>: pulso con barrido de frecuencia, pulso, onda y ruido. La identidad de los canales sigue, por tanto, el orden físico del hardware. La música se controla con <code>AudioVBlank_PlayMusic</code>, <code>AudioVBlank_Stop</code> y <code>AudioVBlank_SetEnabled</code>.</p>
+<p>El controlador ordinario <code>audio.c</code> gestiona los efectos del juego. Su servicio musical se excluye mediante una definición temporal durante la compilación. Los efectos utilizan <code>__bankof</code> para seleccionar el banco de sus datos y respetan prioridades; el efecto de mina también usa directamente el ruido de CH4. La pausa coordina música y efectos. Las llamadas a <code>SND_AudioServiceWork</code> del bucle principal están vacías a propósito: procesar más segmentos no debe hacer avanzar más deprisa el reloj musical.</p>
+<p><code>AudioVBlank_FrameHook</code> llama a <code>SND_DemoVBlankHook</code>, situado en el banco fijo del juego. Este incrementa un contador de demostración de 8 bits y lee el grupo de botones del sistema conservando la selección de P1. Cuando la función correspondiente está activa, retiene SELECT+START en el título y SELECT durante la pausa para no perder pulsaciones breves mientras el bucle principal está ocupado. No dibuja ni llama a funciones de bancos conmutables.</p>
+<aside class="note">Instala esta función de interrupción solo después de inicializar todos los indicadores compartidos y el estado de audio. Un puntero guardado mediante una API general de callbacks del sistema no sustituye este mecanismo. Todo el código y los datos accesibles desde la interrupción deben permanecer residentes.</aside>
+<pre><code>/* Excerpt from initialization, after shared state has been set up. */
+SND_AudioInit();
+AudioVBlank_FrameHook = SND_DemoVBlankHook;
+AudioVBlank_EnableIrq();</code></pre>
+<p><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_lib_bank0.c"><code>shirohebi_lib_bank0.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/music.c"><code>music.c</code></a></p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="save">
+<h2><span class="num">09</span>Guardar puntuaciones e introducir el nombre</h2>
+<p>La ranura 0 guarda 42 bytes de datos de la aplicación: la marca <code>0x53</code>, la versión <code>2</code>, diez puntuaciones de un byte y treinta caracteres de nombres. La biblioteca de guardado comprueba la longitud y la suma de comprobación de la envoltura. El lector también reconoce datos de puntuación de 5 y 15 bytes, pero la escritura utiliza el formato de 42 bytes.</p>
+<p>Una puntuación no nula que cumple los requisitos se inserta en orden descendente. La comparación es estrictamente mayor, de modo que los empates se sitúan después de las entradas existentes. Los nombres se desplazan junto con sus puntuaciones. Una entrada nueva empieza como AAA en RAM; el juego escribe en SRAM cuando el jugador confirma el nombre de tres caracteres. Abandonar un resultado pendiente vuelve a cargar la clasificación guardada en lugar de escribirlo.</p>
+<p>UP y DOWN eligen A–Z o un punto. RIGHT y SELECT pasan al carácter siguiente de forma circular; LEFT retrocede también de forma circular. B solo retrocede si el cursor no está en el primer carácter. A avanza o confirma desde el último carácter; START confirma desde cualquier posición. La espera de liberación evita que esa confirmación seleccione también el reintento.</p>
+<p><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_save.c"><code>shirohebi_save.c</code></a> / <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_flow.c"><code>shirohebi_flow.c</code></a></p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="libraries">
+<h2><span class="num">10</span>Uso de las bibliotecas de KITAQGB</h2>
+<p>Utiliza juntas la biblioteca y la cabecera del repositorio. Los archivos envoltorio y los ajustes específicos del juego forman parte del ejemplo, especialmente la distribución de bancos y la coordinación del audio.</p>
+<table>
+<thead>
+<tr><th>Biblioteca</th><th>Puntos de entrada y función</th><th>Fuente de ejemplo</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/system.c"><code>system.c</code></a></td><td><code>system_init, system_wait_vblank</code><br/>Inicializa el estado del sistema y sincroniza la presentación. La función de la IRQ de audio se instala por separado.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_main.c"><code>shirohebi_main.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/chain.c"><code>chain.c</code></a></td><td><code>chain_body_init, chain_body_reset, chain_body_step, chain_body_grow</code><br/>Asocia arrays persistentes, crea la postura inicial, sigue a la cabeza y añade un segmento a la cola. No se utiliza la API Chain de historial circular.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/physics2d.c"><code>physics2d.c</code></a></td><td><code>kq2d_world_init, kq2d_step</code><br/>Integra el movimiento de un único cuerpo Q4 para la cabeza. La gravedad y las iteraciones del solucionador de contactos se fijan en cero.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/sprite.c"><code>sprite.c</code></a></td><td><code>sprite_init; kq_sprite_oam y estado asociado</code><br/>Inicializa y utiliza la copia de OAM en RAM. El juego escribe las entradas directamente y luego las transfiere; hay que respetar las reglas de posiciones y coordenadas.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_render.c"><code>shirohebi_render.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/audio_vblank.c"><code>audio_vblank.c</code></a></td><td><code>AudioVBlank_Init, PlayMusic, Stop, SetEnabled, EnableIrq, FrameHook</code><br/>Reproduce el flujo musical residente y llama al callback del juego durante la interrupción. El código y los datos IRQ deben estar en ROM fija. Los nombres abreviados después del primero también llevan el prefijo AudioVBlank_.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/audio.c"><code>audio.c</code></a></td><td><code>Audio_Init, Audio_Update, Audio_PlaySFXBanked, Audio_StopSfx, Audio_SetPaused</code><br/>Reproducción, prioridad y pausa de efectos, coordinadas con el controlador musical VBlank.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/save.c"><code>save.c</code></a></td><td><code>save_exists, save_read, save_write</code><br/>Lee y escribe la clasificación con información de versión en la ranura 0. save_read indica éxito o fallo después de comprobar la longitud exacta solicitada y la suma de comprobación; el juego también valida su propia marca.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_save.c"><code>shirohebi_save.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/cgb_palette.c"><code>cgb_palette.c</code></a></td><td><code>cgb_bg_palette, cgb_obj_palette</code><br/>Configura los colores CGB; los registros de paleta DMG se establecen explícitamente por separado.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_display.c"><code>shirohebi_display.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/map.c"><code>map.c</code></a></td><td><code>map_load y descriptor map_t exportado</code><br/>Da soporte a la función auxiliar de mapa del archivo de recursos; el juego restaura por sí mismo las celdas individuales.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_assets.c"><code>shirohebi_assets.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/fixed.c"><code>fixed.c</code></a></td><td><code>soporte de punto fijo</code><br/>Código de apoyo enlazado; el movimiento de la cabeza se expresa mediante physics2d y aritmética entera Q4.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_common.c"><code>shirohebi_common.c</code></a></td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/lib/audio_hwregs_gb.c"><code>audio_hwregs_gb.c</code></a></td><td><code>definiciones compartidas de registros de audio</code><br/>Proporciona las definiciones de registros de Game Boy que necesitan ambos tratamientos de audio.</td><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a></td></tr>
+</tbody>
+</table>
+<h3>Funciones intrínsecas del compilador utilizadas con las bibliotecas</h3>
+<p><code>__readpadex(previous)</code> devuelve los botones mantenidos en el byte bajo y los recién pulsados en el alto. <code>__cgb_is_cgb()</code> permite elegir la ruta de color. Las funciones intrínsecas de tiles y atributos, como <code>__settile</code> y <code>__settileattr</code>, actualizan celdas del fondo; <code>__bankof</code> proporciona el banco ROM de los datos de efectos. Son funciones del compilador, no implementaciones C adicionales que haya que copiar al juego.</p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<section id="sources">
+<h2><span class="num">11</span>Guía del código y precauciones al modificarlo</h2>
+<table>
+<thead>
+<tr><th>Archivo</th><th>Responsabilidad</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_common.c"><code>shirohebi_common.c</code></a></td><td>Tipos, constantes, estado compartido y declaraciones anticipadas. Empieza por aquí al seguir un símbolo.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_main.c"><code>shirohebi_main.c</code></a></td><td>Secuencia de arranque y bucle entrada → actualización → dibujo → VBlank.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_flow.c"><code>shirohebi_flow.c</code></a></td><td>Selección del procesamiento por estado: opciones del título, READY, PLAY, pausa, derrota, entrada del nombre y reintento.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_input.c"><code>shirohebi_input.c</code></a></td><td>Espera de liberación, atajo del título y confirmación de vuelta al título.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_snake.c"><code>shirohebi_snake.c</code></a></td><td>Física de la cabeza, aceleración, giro relativo, paso por los bordes e inicialización, actualización y crecimiento del cuerpo.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_chain.c"><code>shirohebi_chain.c</code></a></td><td>Archivo envoltorio del banco 2 que incluye toda la implementación compartida de chain.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_collision.c"><code>shirohebi_collision.c</code></a></td><td>Colisiones con minas y el propio cuerpo, clasificación del impacto y animación de segmentos dispersos.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_apples.c"><code>shirohebi_apples.c</code></a></td><td>Selección de la posición de la granada, recogida, puntuación y crecimiento. Apple es el identificador interno.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_demo.c"><code>shirohebi_demo.c</code></a></td><td>Dirección de la demostración, postura de la serpiente larga y cómputo de los ticks transcurridos con el contador VBlank.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_render.c"><code>shirohebi_render.c</code></a></td><td>Preparación de OAM en RAM, tiles de cabeza, cuerpo y cola, rotación de prioridades y efectos de derrota.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_display.c"><code>shirohebi_display.c</code></a></td><td>Inicialización de LCD/VRAM, carga de paletas y caracteres, disposición del título y la clasificación.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_background.c"><code>shirohebi_background.c</code></a></td><td>Celdas del fondo de juego, minas y restauración de celdas sobrescritas.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_pause.c"><code>shirohebi_pause.c</code></a></td><td>Textos superpuestos START/PAUSE con estado solicitado, mostrado y pendiente de redibujado.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_text.c"><code>shirohebi_text.c</code></a></td><td>Conversión de caracteres a tiles, cadenas, puntuaciones numéricas y cursores de menús.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_save.c"><code>shirohebi_save.c</code></a></td><td>Validación e inserción en la clasificación, nombres de tres caracteres y almacenamiento en SRAM.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_audio.c"><code>shirohebi_audio.c</code></a></td><td>Configuración de música y efectos, inicio y parada, opciones, pausa y coordinación de canales.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/music.c"><code>music.c</code></a></td><td>Registros musicales VBlank residentes de longitud fija para la melodía de inicio, el tema principal y el de fin de partida.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/sfx.c"><code>sfx.c</code></a></td><td>Flujos de bytes de efectos seleccionados por las funciones de audio del juego.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/text_tiles.c"><code>text_tiles.c</code></a></td><td>Máscaras de caracteres y conversión a filas de tiles de Game Boy de dos bits por píxel.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_assets.c"><code>shirohebi_assets.c</code></a></td><td>Tiles, mapa, atributos y tablas de colisión/eventos exportados; descriptor del mapa y funciones auxiliares.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_input_shared.h"><code>shirohebi_input_shared.h</code></a></td><td>Declaraciones de los indicadores de entrada en WRAM y del callback en banco fijo compartidos con la interrupción.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_lib_bank0.c"><code>shirohebi_lib_bank0.c</code></a></td><td>Callback VBlank de entrada y reloj en banco fijo, indicadores WRAM compartidos y selección del banco 0 para las siguientes entradas de compilación de sistema y audio.</td></tr>
+<tr><td><a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/shirohebi_lib_bank1.c"><code>shirohebi_lib_bank1.c</code></a></td><td>Selección del banco 1 para las siguientes entradas de compilación de bibliotecas de apoyo.</td></tr>
+</tbody>
+</table>
+<h3>Qué revisar al modificar el juego</h3>
+<ul>
+<li><strong>Velocidad y giros:</strong> tras cambiar las constantes Q4, comprueba los giros lentos y la aceleración con UP. El sector hacia el que mira la cabeza no es la dirección exacta de su velocidad.</li>
+<li><strong>Longitud:</strong> actualiza conjuntamente la capacidad de los arrays, la de la cadena y la reserva de posiciones OAM. Comprueba las colisiones de la cola con minas o con la cabeza, y el límite de sprites por línea.</li>
+<li><strong>Gráficos:</strong> conserva los números de tile, el paso entre filas del mapa y los atributos CGB. Al retirar textos superpuestos, restaura el contenido actual de la celda inferior.</li>
+<li><strong>Audio:</strong> mantén el código de interrupción en el banco fijo y una única fuente de avance del reloj musical. Prueba la pausa y la reanudación, además de la reproducción normal.</li>
+<li><strong>Guardado:</strong> cambia la versión del formato cuando modifiques su estructura; valida la longitud antes de acceder mediante índices y prueba SRAM nueva e inválida.</li>
+</ul>
+<p>Después de recompilar, utiliza el archivo de direcciones generado en esa compilación. Comprueba el título, la introducción START, el movimiento, los giros, las frutas, las colisiones con el cuerpo y las minas, la pausa y la reanudación, la confirmación de vuelta y la clasificación en ambos modos de hardware. Una compilación correcta no demuestra por sí sola que funcionen esos recorridos ni que el juego se comporte correctamente en una consola real.</p>
+<p class="back"><a href="#top">↑ Volver al índice</a></p>
+</section>
+<footer>© 2026 DAISUKE OBA · <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/LICENSE">Licencia MIT</a> · <a href="https://github.com/bartaro/kitaqgb/blob/main/apps/harapeko_shirohebi/LICENSE.ja">Traducción japonesa de referencia</a>
+<p>Esta guía no necesita scripts ni fuentes externos. Los enlaces al código y a las licencias abren el repositorio KITAQGB en GitHub.</p>
+</footer>
+</main>
+<script data-guide-language-links="true">
+(() => {
+  function update() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const hash = id && document.getElementById(id) ? location.hash : '';
+    document.querySelectorAll('.edition a[hreflang]').forEach(link => {
+      const url = new URL(link.href, location.href); url.hash = hash; link.href = url.href;
+    });
+  }
+  addEventListener('hashchange', update); update();
+})();
+</script></body></html>

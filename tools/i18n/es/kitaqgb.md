@@ -55,6 +55,25 @@ Empieza usando estos nombres cortos. No supongas que `int`, `long`, `float`, `do
 
 No confundas `=` con `==`. Usa paréntesis en expresiones complejas y evita acumular llamadas y efectos secundarios en una sola sentencia. No dividas por cero ni accedas fuera de un array. `sizeof` da el tamaño en bytes y `offsetof` el desplazamiento de un miembro.
 
+<!-- common-language-kitaqgb:start -->
+### Resultados de las expresiones y evaluación
+
+Los operadores de comparación `==`, `!=`, `<`, `<=`, `>`, `>=` y los operadores lógicos `!`, `&&`, `||` devuelven 0 para falso y 1 para verdadero. Puedes guardar el resultado en un `u16`, pasarlo como argumento, devolverlo o usarlo en operaciones aritméticas. Por ejemplo, `score = 500 + (lives != 0);` produce 501 si queda alguna vida y 500 en caso contrario.
+
+`&&` omite la evaluación del operando derecho cuando el izquierdo es cero. `||` la omite cuando el izquierdo no es cero. En `pointer != 0 && pointer->active != 0`, un puntero nulo impide el acceso al miembro. Los dos bytes de un valor de 16 bits intervienen en la comprobación lógica, por lo que 256 es verdadero. Los operadores de bits `&` y `|` no realizan evaluación en cortocircuito.
+
+`++value` devuelve el valor actualizado; `value++`, el valor original. Estos operadores también admiten elementos de arrays, punteros desreferenciados y miembros de estructuras. `buffer[index()]++` llama a `index()` una sola vez. Para `u16 *p`, `p++` avanza dos bytes hasta el siguiente elemento, mientras que `(*p)++` incrementa el valor apuntado.
+
+`sizeof(array)` da el tamaño en bytes del array completo; `sizeof(pointer)` es 2. Para `u16 values[9];`, `sizeof(values)` es 18. Esto incluye arrays en ROM, arrays locales y miembros de tipo array. `sizeof(function())` examina el tipo de retorno sin llamar a la función.
+
+La declaración y la definición de una función deben coincidir en los tipos y el orden de los parámetros. Sus nombres pueden ser distintos; el cuerpo usa los de la definición. Por ejemplo, `u8 next(u8 input);` puede definirse como `u8 next(u8 value) { return (u8)(value + 1); }`. Los parámetros y las variables locales ocultan las variables globales con el mismo nombre.
+
+Seleccionar arrays o cadenas con `?:` produce un puntero al tipo de elemento seleccionado. Puedes pasarlo directamente, como en `show(ready ? "READY" : "WAIT");`. Para los arrays `u16` llamados `a` y `b`, `(ready ? a : b) + 1` avanza dos bytes hasta el segundo elemento del array elegido. No copia el array.
+
+`condition ? yes : no` evalúa la condición y después solo la rama seleccionada. La condición y las ramas pueden incluir desplazamientos con cantidades de bits variables. Por ejemplo, `on = (pattern & (0x80 >> bit)) != 0 ? 4 : 2;` elige cuatro o dos según el bit indicado. Tampoco se ejecutan las llamadas a funciones de un operando derecho omitido por `&&` o `||`. Un `continue` en un bucle `for` ejecuta una vez la expresión de actualización antes de reevaluar la condición; en `while` y `do ... while`, pasa a la condición.
+
+<!-- common-language-kitaqgb:end -->
+
 ## 6. Condiciones y bucles
 {{CODE:4}}
 
@@ -65,7 +84,7 @@ No confundas `=` con `==`. Usa paréntesis en expresiones complejas y evita acum
 
 Los índices empiezan en cero: un array de cuatro elementos admite del 0 al 3. `player.x` accede a un miembro y `pointer->x` lo hace mediante un puntero. El analizador admite estructuras, uniones y enumeraciones, pero su disposición depende de los tipos y de `__packed` / `__aligned`. Comprueba `sizeof` antes de compartir datos con hardware o formatos binarios.
 
-La ABI Legacy predeterminada coloca argumentos y almacenamiento local en ubicaciones fijas. No presupongas recursión o reentrada desde interrupciones como en un sistema de escritorio. `__stackcall` y `--abi=stack` son opciones avanzadas. Si mezclas convenciones, revisa los informes de ABI y verifica la ejecución.
+La ABI Legacy predeterminada coloca los argumentos y el almacenamiento local en posiciones fijas. No presupongas recursión ni reentrada desde interrupciones como en un equipo de escritorio. `__stackcall` y `--abi=stack` son opciones avanzadas de convención de llamada. Si combinas convenciones, examina los informes de ABI y verifica la ejecución. `--abi=stack` no admite llamadas a callbacks mediante punteros a función. Compila los ejemplos completos de callbacks de sistema y escenas con la ABI Legacy predeterminada, tal como indican sus comandos de compilación.
 
 ## 8. Varios archivos y preprocesador
 Pon tipos, constantes y declaraciones en encabezados, y los cuerpos de funciones en archivos `.c`. Usa `#pragma once` o guardas de inclusión para evitar duplicados. La compilación condicional admite `#define`, `#undef`, `#if`, `#ifdef`, `#ifndef`, `#elif`, `#else` y `#endif`.

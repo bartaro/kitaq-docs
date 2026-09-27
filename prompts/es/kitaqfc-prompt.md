@@ -34,7 +34,7 @@ Repite este ciclo hasta cumplir los criterios de aceptación: concretar la espec
 
 - Considera NROM para un juego pequeño y elige MMC3 u otro mapper cuando el tamaño o los cambios de banco lo requieran. Comprueba las funciones necesarias de la placa con `inspect-rom`, `mapper-info`, `audit-board` y su implementación; el nombre del mapper no demuestra que estén soportadas.
 - Planifica tamaños PRG/CHR, CHR-ROM o CHR-RAM, mirroring, bancos fijos, vectores de interrupción y RAM de guardado. Tras optimizar o cambiar bancos, compara la cabecera con la distribución real. `--nes-local-ram` utiliza la RAM interna de CPU `$0000–$07FF`; evita solapamientos con página cero, pila, búferes OAM y áreas del runtime o las bibliotecas.
-- Utiliza el dialecto C de KITAQFC, las bibliotecas FC y `void main(void)`. No supongas compatibilidad con las API de GB. Algunas cabeceras solo contienen declaraciones: localiza las implementaciones e incluye los `.c` necesarios.
+- Utiliza el dialecto C de KITAQFC, las bibliotecas FC y `void main(void)`. No supongas compatibilidad con las API de GB. Algunas entradas de las cabeceras son solo declaraciones: localiza las implementaciones e incluye los `.c` necesarios.
 - Ten en cuenta registros PPU, NMI, OAM DMA, límite de sprites por línea, desplazamiento, mirroring, tablas de atributos y APU/DMC. El espacio libre de la cola no es la capacidad de VRAM del PPU; limita el trabajo por NMI.
 - Convierte la fuente original `ascii.c` a CHR de FC y verifica CHR, paletas, tablas de nombres y atributos. Para FDS, comprueba por separado acceso al disco, guardado y requisitos de BIOS; no presupongas el arranque de un cartucho.
 

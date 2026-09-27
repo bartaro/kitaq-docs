@@ -42,5 +42,75 @@
     "caption": "KUROSAKI 中确认的画面：起始位置，以及累积 16 次半像素位移后的位置。",
     "download": "完整示例程序",
     "build_title": "构建"
+  },
+  "ko": {
+    "title": "Q5.3 데이터 타입으로 구현하는 이동",
+    "paragraphs": [
+      "physics2d.h는 world/body 함수 외에도 독자적인 소수 이동에 쓸 타입과 상수를 정의합니다. 이 예제는 Q5.3 데이터 규칙으로 game_step을 구현합니다. world/body 적분 처리와는 별개의 방식입니다.",
+      "KQ2DPosition은 정수 픽셀 위치(0..255), KQ2DFraction은 나머지(0..7), KQ2DSpeed는 틱당 이동량의 크기(1/8픽셀 단위, 0..255), KQ2DDirection은 방향을 저장합니다. 네 타입 모두 u8입니다. 방향은 속도의 부호로 표현하지 않고 따로 저장합니다.",
+      "KQ2D_SUBPIXEL_BITS=3, ONE=8, MASK=7을 사용해 position*8+fraction을 16비트 중간값으로 계산합니다. 방향 NONE=0은 정지, NEGATIVE=1은 빼기, POSITIVE=2는 더하기를 뜻합니다. 게임 쪽에서 경계를 처리해 빼기 결과가 음수가 되지 않고 최종 정수 위치가 0..255에 머물도록 해야 합니다.",
+      "KQ2D_DRAG_BRAKE=1, STUN=2, COAST=3, THRUST=4는 게임에서 정의하는 제동, 기절, 관성 이동, 추진 동작의 식별값입니다. 값을 대입하는 것만으로 가속이나 저항이 적용되지는 않습니다. 갱신 루틴에서 각 효과와 지속 시간을 정의하세요."
+    ],
+    "example_title": "예제: 반 픽셀 이동 누적",
+    "caption": "KUROSAKI에서 확인한 화면: 초기 위치와 반 픽셀 이동을 16회 누적한 위치.",
+    "download": "완전한 샘플 프로그램",
+    "build_title": "빌드",
+    "expected": "위쪽의 빨간 16×16픽셀 상자는 X=24에서 시작하고, 아래쪽 상자는 16틱 뒤의 X=32를 보여 줍니다. 속도 4는 틱당 4/8=0.5픽셀, 즉 16틱 동안 8픽셀을 뜻합니다. 비교하기 쉽도록 두 상태의 Y 위치를 달리했습니다. 이어지는 수치 검사는 8틱 동안 뒤로 이동해 X=28, 소수부 0을 얻습니다."
+  },
+  "zh-TW": {
+    "title": "使用 Q5.3 資料型別自訂移動",
+    "paragraphs": [
+      "除了 world/body 函式，physics2d.h 也定義了自訂小數位移所需的型別與常數。此範例依 Q5.3 資料慣例實作 game_step，與 world/body 積分是不同的做法。",
+      "KQ2DPosition 儲存整數像素位置（0..255），KQ2DFraction 儲存餘數（0..7），KQ2DSpeed 儲存每 tick 的位移大小（以 1/8 像素為單位，0..255），KQ2DDirection 儲存方向。四種型別都是 u8。方向另外儲存，不以速度的正負號表示。",
+      "使用 KQ2D_SUBPIXEL_BITS=3、ONE=8、MASK=7，將 position*8+fraction 合併為 16 位元中間值。方向 NONE=0 表示不移動，NEGATIVE=1 表示減法，POSITIVE=2 表示加法。遊戲必須自行處理邊界，使減法結果非負，且最終整數位置維持在 0..255。",
+      "KQ2D_DRAG_BRAKE=1、STUN=2、COAST=3、THRUST=4 是供遊戲定義煞車、暈眩、慣性滑行與推進行為的識別值。僅指定其中一個值不會套用加速度或阻力。請在更新常式中定義各效果及持續時間。"
+    ],
+    "example_title": "範例：累積半像素位移",
+    "caption": "KUROSAKI 驗證畫面：初始位置，以及累積 16 次半像素位移後的位置。",
+    "download": "完整範例程式",
+    "build_title": "建置",
+    "expected": "上方紅色 16×16 像素方盒從 X=24 開始；下方方盒顯示 16 tick 後的 X=32。速度 4 代表每 tick 移動 4/8=0.5 像素，因此 16 tick 共移動八像素。不同的 Y 位置用來分開兩個狀態，方便比較。後續數值檢查向回移動八 tick，得到 X=28、小數部分為 0。"
+  },
+  "fr": {
+    "title": "Déplacement personnalisé avec les types Q5.3",
+    "paragraphs": [
+      "En plus des fonctions world/body, physics2d.h définit des types et constantes pour des déplacements fractionnaires personnalisés. Cet exemple implémente game_step avec la convention Q5.3, selon une approche distincte de l’intégration world/body.",
+      "KQ2DPosition stocke la position en pixels entiers (0..255), KQ2DFraction le reste (0..7), KQ2DSpeed l’amplitude du déplacement par tick en huitièmes de pixel (0..255), et KQ2DDirection la direction. Les quatre types sont des u8. La direction est stockée séparément de la vitesse et non encodée par un signe.",
+      "Utilisez KQ2D_SUBPIXEL_BITS=3, ONE=8 et MASK=7 pour combiner position*8+fraction dans un intermédiaire sur 16 bits. La direction NONE=0 signifie aucun mouvement, NEGATIVE=1 une soustraction et POSITIVE=2 une addition. Le jeu doit gérer les limites afin que la soustraction reste positive ou nulle et que la position entière finale reste dans 0..255.",
+      "KQ2D_DRAG_BRAKE=1, STUN=2, COAST=3 et THRUST=4 identifient des comportements de freinage, d’étourdissement, de roue libre et de poussée définis par le jeu. Une simple affectation n’applique ni accélération ni résistance. Définissez chaque effet et sa durée dans votre routine de mise à jour."
+    ],
+    "example_title": "Exemple : accumuler des déplacements d’un demi-pixel",
+    "caption": "Vérifié dans KUROSAKI : position initiale et position après accumulation de 16 déplacements d’un demi-pixel.",
+    "download": "Programme d’exemple complet",
+    "build_title": "Compilation",
+    "expected": "Le carré rouge supérieur de 16×16 pixels démarre à X=24 ; celui du bas montre X=32 après 16 ticks. Une vitesse de 4 signifie 4/8=0.5 pixel par tick, soit huit pixels en 16 ticks. Les positions Y différentes séparent les deux états pour les comparer. Une vérification numérique suivante recule pendant huit ticks et obtient X=28, avec une fraction de 0."
+  },
+  "es": {
+    "title": "Movimiento personalizado con tipos Q5.3",
+    "paragraphs": [
+      "Además de las funciones world/body, physics2d.h define tipos y constantes para movimientos fraccionarios personalizados. Este ejemplo implementa game_step con la convención de datos Q5.3, mediante un enfoque distinto de la integración world/body.",
+      "KQ2DPosition almacena la posición en píxeles enteros (0..255), KQ2DFraction el resto (0..7), KQ2DSpeed la magnitud del desplazamiento por tick en octavos de píxel (0..255) y KQ2DDirection la dirección. Los cuatro tipos son u8. La dirección se almacena aparte de la velocidad, no como un signo.",
+      "Use KQ2D_SUBPIXEL_BITS=3, ONE=8 y MASK=7 para combinar position*8+fraction en un valor intermedio de 16 bits. La dirección NONE=0 indica ausencia de movimiento, NEGATIVE=1 una resta y POSITIVE=2 una suma. El juego debe gestionar los límites para que la resta no sea negativa y la posición entera resultante permanezca en 0..255.",
+      "KQ2D_DRAG_BRAKE=1, STUN=2, COAST=3 y THRUST=4 identifican comportamientos de frenado, aturdimiento, movimiento por inercia y empuje definidos por el juego. Asignar uno de esos valores no aplica aceleración ni resistencia. Defina cada efecto y su duración en la rutina de actualización."
+    ],
+    "example_title": "Ejemplo: acumular desplazamientos de medio píxel",
+    "caption": "Verificado en KUROSAKI: posición inicial y posición tras acumular 16 desplazamientos de medio píxel.",
+    "download": "Programa de ejemplo completo",
+    "build_title": "Compilación",
+    "expected": "El cuadro rojo superior de 16×16 píxeles empieza en X=24; el inferior muestra X=32 después de 16 ticks. La velocidad 4 equivale a 4/8=0.5 píxeles por tick, es decir, ocho píxeles en 16 ticks. Las distintas posiciones Y separan ambos estados para compararlos. Una comprobación numérica posterior retrocede ocho ticks y obtiene X=28 con fracción 0."
+  },
+  "de": {
+    "title": "Eigene Bewegung mit Q5.3-Datentypen",
+    "paragraphs": [
+      "Neben den world/body-Funktionen definiert physics2d.h Typen und Konstanten für eigene Bewegungen mit Nachkommaanteil. Dieses Beispiel implementiert game_step mit der Q5.3-Datenkonvention. Das ist ein anderer Ansatz als die world/body-Integration.",
+      "KQ2DPosition speichert die ganzzahlige Pixelposition (0..255), KQ2DFraction den Rest (0..7), KQ2DSpeed den Bewegungsbetrag pro Tick in Achtelpixeln (0..255) und KQ2DDirection die Richtung. Alle vier Typen sind u8. Die Richtung wird getrennt von der Geschwindigkeit gespeichert, nicht als Vorzeichen.",
+      "Verwenden Sie KQ2D_SUBPIXEL_BITS=3, ONE=8 und MASK=7, um position*8+fraction in einem 16-Bit-Zwischenwert zusammenzufassen. Richtung NONE=0 bedeutet Stillstand, NEGATIVE=1 Subtraktion und POSITIVE=2 Addition. Das Spiel muss die Grenzen so behandeln, dass die Subtraktion nicht negativ wird und die resultierende Ganzzahlposition im Bereich 0..255 bleibt.",
+      "KQ2D_DRAG_BRAKE=1, STUN=2, COAST=3 und THRUST=4 kennzeichnen vom Spiel definierte Verhaltensweisen für Bremsen, Betäubung, Ausrollen und Schub. Die reine Zuweisung eines Wertes wendet keine Beschleunigung oder Reibung an. Definieren Sie jeden Effekt und seine Dauer in Ihrer Aktualisierungsroutine."
+    ],
+    "example_title": "Beispiel: Halbpixelbewegungen aufsummieren",
+    "caption": "In KUROSAKI geprüft: Anfangsposition und Position nach 16 aufsummierten Halbpixelschritten.",
+    "download": "Vollständiges Beispielprogramm",
+    "build_title": "Build",
+    "expected": "Das obere rote 16×16-Pixel-Quadrat beginnt bei X=24; das untere zeigt X=32 nach 16 Ticks. Geschwindigkeit 4 bedeutet 4/8=0.5 Pixel pro Tick, also acht Pixel in 16 Ticks. Unterschiedliche Y-Positionen trennen die beiden Zustände zum Vergleich. Eine anschließende numerische Prüfung geht acht Ticks zurück und erhält X=28 mit Nachkommaanteil 0."
   }
 }

@@ -46,10 +46,16 @@ New-Item -ItemType Directory -Force .\\out | Out-Null
 
 def overview(text,language):
     text=re.sub(r'<!-- fc-chr-ram:start -->.*?<!-- fc-chr-ram:end -->','',text,flags=re.S)
-    block='<!-- fc-chr-ram:start --><section id="chr-ram-build">'+md(TEXT[language])+'</section><!-- fc-chr-ram:end -->'
+    if language in TEXT:prose=TEXT[language]
+    else:
+        prose=(SITE/'tools/i18n'/language/'fc-chr-ram.md').read_text(encoding='utf-8')
+        assert prose.count('{{BUILD}}')==1
+        command=re.search(r'```powershell\n.*?```',TEXT['en'],re.S)[0]
+        prose=prose.replace('{{BUILD}}',command)
+    block='<!-- fc-chr-ram:start --><section id="chr-ram-build">'+md(prose)+'</section><!-- fc-chr-ram:end -->'
     # Standalone publication must not depend on generate_en's global code
     # renderer override having run earlier in this Python process.
-    label={'ja':'コピー','zh-CN':'复制'}.get(language,'Copy')
+    label={'ja':'コピー','zh-CN':'复制','ko':'복사','zh-TW':'複製','fr':'Copier','es':'Copiar','de':'Kopieren'}.get(language,'Copy')
     block=re.sub(r'(<button class="copy" type="button">)(?:コピー|Copy)(</button>)',lambda m:m[1]+label+m[2],block)
     text,count=re.subn(r'(?=<h2[^>]*>9[ .　])',lambda m:block,text,count=1)
     assert count==1

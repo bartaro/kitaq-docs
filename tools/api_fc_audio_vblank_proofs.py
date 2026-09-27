@@ -64,10 +64,14 @@ def overview(text,language):
  selected={k:contracts[k] for k in proofs};api.attach_verified_images(selected,proofs)
  doc=read(SITE/'reference/fc-api.json');records={r['name']:r for r in doc['records']}
  index=api.ORDER.index(language);title='NMIによる4音源の音楽再生' if language=='ja' else 'Four-channel music driven by NMI'
+ localized=read(SITE/'tools/i18n/fc-audio-overview.json').get(language)
+ if localized:title=localized['title']
  modules=read(SITE/'tools/api_descriptions/fc_audio_vblank_modules.json')['fc:audio_vblank']
  block='<!-- fc-audio-vblank:start --><section data-module-contract="'+REVIEW+'"><h3 id="module-audio_vblank">audio_vblank.h — '+title+'</h3>'
  block+=''.join('<p>'+api.inline(messages[k][index])+'</p>' for k in modules)
  labels=['待機時間','CH1: パルス1','CH2: パルス2','CH3: 三角波','CH4: ノイズ'] if language=='ja' else ['Delay','CH1: pulse 1','CH2: pulse 2','CH3: triangle','CH4: noise']
+ if localized:
+  labels=localized['labels'];assert len(labels)==5
  block+='<table><thead><tr>'+''.join('<th>'+label+'</th>' for label in labels)+'</tr></thead><tbody><tr><td>24</td><td>24 (C4)</td><td>12 (C3)</td><td>0 (C2)</td><td>2</td></tr></tbody></table>'
  block+='<p><a href="kitaqfc.html#api-__nes_audio_vblank_tick">'+('コンパイラが接続するNMIフック' if language=='ja' else 'NMI hook connected by the compiler')+'</a></p>'
  for key,c in selected.items():
@@ -88,6 +92,9 @@ def overview(text,language):
  # the alphabetic API dictionary and the repository README.
  text=re.sub(r'<!-- fc-audio-vblank-guide:start -->.*?<!-- fc-audio-vblank-guide:end -->','',text,flags=re.S)
  guide=('NMIで4音源の音楽を進めるには、<a href="#module-audio_vblank">audio_vblank.h</a>を使います。RAMキューの補充、音の維持・停止、反復再生の説明と、実際に録音したサンプル音声を掲載しています。' if language=='ja' else 'Use <a href="#module-audio_vblank">audio_vblank.h</a> for four-channel music driven by NMI. Its reference explains RAM-queue refill, held and stopped notes, looping playback, and includes captured audio from the complete sample.')
+ if localized:
+  assert localized['guide'].count('{{LINK}}')==1
+  guide=localized['guide'].replace('{{LINK}}','<a href="#module-audio_vblank">audio_vblank.h</a>')
  text=re.sub(r'(<h2 id="6-[^"]+">.*?</h2>)',lambda m:m[1]+'<!-- fc-audio-vblank-guide:start --><p>'+guide+'</p><!-- fc-audio-vblank-guide:end -->',text,count=1,flags=re.S)
  # Ensure the complete-header appendix gains the actual new public header.
  path='kitaqfc/lib/audio_vblank.h'

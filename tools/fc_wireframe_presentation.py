@@ -1,4 +1,4 @@
-"""Insert the bilingual FC wireframe guide and verified images beside mathematics."""
+"""Insert the localized FC wireframe guide and verified images beside mathematics."""
 from pathlib import Path
 import hashlib,json,re,shutil
 from generate import md
@@ -20,6 +20,13 @@ def overview(value,language):
     if language=='ja':
         text=ja.replace('上のサンプルは、',example+'\n\n'+command+'\n\nこのサンプルは、')
         title='8.1　画面サイズを選べるワイヤーフレーム'
+    elif language in {'ko','zh-TW','fr','es','de'}:
+        # Author complete paragraphs so inline identifiers do not impose
+        # English word order on the translated technical explanation.
+        text=(SITE/'tools/i18n'/language/'fc-wireframe.md').read_text(encoding='utf-8')
+        assert text.count('{{EXAMPLE}}')==text.count('{{BUILD}}')==1
+        text=text.replace('{{EXAMPLE}}',example).replace('{{BUILD}}',command)
+        title='8.1  Wireframes with a selectable viewport'
     else:
         text=en.split('\n',1)[1];title='8.1  Wireframes with a selectable viewport'
     prefix='' if language=='ja' else '../'

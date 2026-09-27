@@ -1,5 +1,5 @@
 ## Outil Windows prêt à l'emploi
-Le dépôt contient désormais `sarakura.exe` à sa racine. Téléchargez l'archive ZIP du dépôt et conservez les mentions de licence avec l'exécutable. Cet outil Windows x64 en ligne de commande ne nécessite aucune installation de Rust, Python ou .NET pour fonctionner. Les étapes de compilation ci-dessous servent à le reconstruire depuis les sources. Le code propre au projet est proposé par DAISUKE OBA sous licence MIT ; les conditions des dépendances sont conservées dans BINARY_NOTICES.md et licenses/.
+Le dépôt contient `sarakura.exe` à sa racine. Téléchargez l'archive ZIP du dépôt et conservez les mentions de licence avec l'exécutable. Cet outil Windows x64 en ligne de commande ne nécessite aucune installation de Rust, Python ou .NET pour fonctionner. Les étapes de compilation ci-dessous servent à le reconstruire depuis les sources. Le code propre au projet est proposé par DAISUKE OBA sous licence MIT ; les conditions des dépendances sont conservées dans BINARY_NOTICES.md et licenses/.
 
 ## 1. Le rôle de SARAKURA
 SARAKURA rassemble les informations de compilation et les événements de diagnostic des émulateurs pour les présenter sous une forme utile aux corrections et aux nouveaux tests. Il n'exécute pas les ROM et ne modifie pas discrètement votre code C.

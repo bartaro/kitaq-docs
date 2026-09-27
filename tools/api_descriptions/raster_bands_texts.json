@@ -2,256 +2,511 @@
   "raster_bands_common": {
     "ja": "`raster.h`を読み込み、`raster.c`と`scroll.c`をコンパイルします。最大8バンドの共有表を使います。`Raster_*`で構築している間は、直接`Scroll_Split*`や`__scroll_split_*`を呼ばないでください。別経路の操作はRaster側の個数・行番号と一致しなくなります。",
     "en": "Include `raster.h` and compile `raster.c` plus `scroll.c`. A shared table holds up to eight bands. Do not interleave direct `Scroll_Split*` or `__scroll_split_*` calls while building with `Raster_*`; they bypass the wrapper count and last-line bookkeeping.",
-    "zh-CN": "包含 `raster.h`，并编译 `raster.c` 和 `scroll.c`。共享表最多容纳八个分段。用 `Raster_*` 构建时，不要交错直接调用 `Scroll_Split*` 或 `__scroll_split_*`；它们会绕过封装层的计数和最后行号记录。"
+    "zh-CN": "包含 `raster.h`，并编译 `raster.c` 和 `scroll.c`。共享表最多容纳八个分段。用 `Raster_*` 构建时，不要交错直接调用 `Scroll_Split*` 或 `__scroll_split_*`；它们会绕过封装层的计数和最后行号记录。",
+    "ko": "`raster.h`를 포함하고 `raster.c`와 `scroll.c`를 컴파일하세요. 공유 테이블에는 최대 8개 밴드를 저장할 수 있습니다. `Raster_*`로 테이블을 구성하는 도중 `Scroll_Split*` 또는 `__scroll_split_*`를 직접 호출하지 마세요. 이 호출들은 래퍼의 항목 수와 마지막 줄 기록을 갱신하지 않습니다.",
+    "zh-TW": "引入 `raster.h`，並編譯 `raster.c` 與 `scroll.c`。共用表最多容納 8 個區帶。使用 `Raster_*` 建表時，請勿穿插直接呼叫 `Scroll_Split*` 或 `__scroll_split_*`；這些呼叫不會更新包裝層的數量與最後一條線的記錄。",
+    "fr": "Incluez `raster.h` et compilez `raster.c` ainsi que `scroll.c`. Une table partagée contient jusqu’à huit bandes. Pendant sa construction avec `Raster_*`, n’intercalez pas d’appels directs à `Scroll_Split*` ou `__scroll_split_*` : ils contournent le suivi du nombre d’entrées et de la dernière ligne par la couche Raster.",
+    "es": "Incluye `raster.h` y compila `raster.c` junto con `scroll.c`. Una tabla compartida admite hasta ocho franjas. Mientras la construyes con `Raster_*`, no intercales llamadas directas a `Scroll_Split*` ni a `__scroll_split_*`: no actualizan el recuento ni el registro de la última línea de la capa Raster.",
+    "de": "Binden Sie `raster.h` ein und kompilieren Sie `raster.c` zusammen mit `scroll.c`. Eine gemeinsame Tabelle fasst bis zu acht Bänder. Mischen Sie beim Aufbau mit `Raster_*` keine direkten Aufrufe von `Scroll_Split*` oder `__scroll_split_*` ein: Sie umgehen die Zählung und die Verwaltung der letzten Zeile im Wrapper."
   },
   "raster_bands_schedule": {
     "ja": "表を作り直すときはVBlankなど描画への影響を管理できる区間でClear→登録→Commitを行います。Clearは実行中の分割も停止し、独立した二重バッファへの編集ではありません。バンドのLYは割り込みの予約行で、実際のレジスター書き込みには処理時間がかかります。毎走査線の波形描画には別の`Raster_LineX*`系を使い、同時には動かしません。",
     "en": "Rebuild in VBlank or another interval where you control the display impact: clear, add entries, then commit. Clear stops the active splits too; this is not editing an independent back buffer. LY schedules an interrupt, and register writes take additional time. Use the separate `Raster_LineX*` family for per-scanline wave rendering; do not run both drivers together.",
-    "zh-CN": "在 VBlank 或其他能控制显示影响的时段重建：先清除，再追加，最后提交。清除也会停止当前分段，因此不是编辑独立的后备缓冲区。LY 用于安排中断，寄存器写入还需要额外时间。逐扫描行波浪绘制请使用独立的 `Raster_LineX*` 系列；不要同时运行两个驱动。"
+    "zh-CN": "在 VBlank 或其他能控制显示影响的时段重建：先清除，再追加，最后提交。清除也会停止当前分段，因此不是编辑独立的后备缓冲区。LY 用于安排中断，寄存器写入还需要额外时间。逐扫描行波浪绘制请使用独立的 `Raster_LineX*` 系列；不要同时运行两个驱动。",
+    "ko": "VBlank 또는 화면에 미치는 영향을 제어할 수 있는 구간에서 지우기, 항목 추가, 커밋 순으로 재구성하세요. 지우기는 실행 중인 화면 분할도 멈추므로 독립된 백 버퍼를 편집하는 방식이 아닙니다. LY에서 인터럽트가 예약되며 레지스터 쓰기에는 추가 시간이 걸립니다. 매 주사선의 물결 효과에는 별도의 `Raster_LineX*` 계열을 사용하고 두 드라이버를 함께 실행하지 마세요.",
+    "zh-TW": "請在 VBlank 或可掌握顯示影響的時段，依清除、加入項目、提交的順序重建。清除也會停止目前的分割效果，並不是在編輯獨立的後備緩衝區。LY 排定的是中斷時機，寫入暫存器還需額外時間。逐掃描線波浪效果請使用獨立的 `Raster_LineX*` 系列，勿同時執行兩種驅動。",
+    "fr": "Reconstruisez pendant VBlank ou à un moment où vous maîtrisez l’effet sur l’affichage : effacez, ajoutez les entrées, puis validez. L’effacement arrête aussi les divisions actives ; vous ne modifiez pas un tampon arrière indépendant. LY programme une interruption, et les écritures de registres prennent un temps supplémentaire. Pour une ondulation ligne par ligne, utilisez la famille distincte `Raster_LineX*` ; n’exécutez pas les deux pilotes ensemble.",
+    "es": "Reconstruye durante VBlank o en otro intervalo en el que controles el efecto sobre la imagen: borra, añade entradas y confirma. Borrar también detiene las divisiones activas; no estás editando un búfer secundario independiente. LY programa una interrupción y las escrituras en registros requieren tiempo adicional. Para ondas por línea de barrido, usa la familia independiente `Raster_LineX*`; no ejecutes ambos controladores a la vez.",
+    "de": "Bauen Sie die Tabelle während VBlank oder in einem anderen Zeitraum mit kontrollierbarer Bildwirkung neu auf: leeren, Einträge hinzufügen, aktivieren. Das Leeren stoppt auch aktive Teilungen; es wird kein unabhängiger Hintergrundpuffer bearbeitet. LY plant einen Interrupt, Registerzugriffe benötigen zusätzliche Zeit. Für Wellen pro Rasterzeile verwenden Sie die separate Familie `Raster_LineX*`; betreiben Sie nicht beide Treiber gleichzeitig."
   },
   "raster_bands_errors": {
     "ja": "状態コードは0=OK、1=FULL、2=BAD_LY、3=UNSORTED、4=BAD_RANGEです。Push系はLY範囲、容量、行順序の順に検査します。失敗した登録は表を増やしません。次の成功した登録やClearでエラーは0になるため、各戻り値をその場で確認してください。",
     "en": "Status codes are 0 OK, 1 FULL, 2 BAD_LY, 3 UNSORTED and 4 BAD_RANGE. Push operations check LY range, capacity and ordering in that order. A rejected entry does not grow the table. A later successful push or clear resets the error to zero, so check each return value when it occurs.",
-    "zh-CN": "状态码为 0 OK、1 FULL、2 BAD_LY、3 UNSORTED、4 BAD_RANGE。追加操作依次检查 LY 范围、容量及顺序。被拒绝的条目不增加表长。之后成功追加或清除会将错误重置为零，因此每次调用都应立即检查返回值。"
+    "zh-CN": "状态码为 0 OK、1 FULL、2 BAD_LY、3 UNSORTED、4 BAD_RANGE。追加操作依次检查 LY 范围、容量及顺序。被拒绝的条目不增加表长。之后成功追加或清除会将错误重置为零，因此每次调用都应立即检查返回值。",
+    "ko": "상태 코드는 0 OK, 1 FULL, 2 BAD_LY, 3 UNSORTED, 4 BAD_RANGE입니다. 추가 연산은 LY 범위, 용량, 정렬 순서대로 검사합니다. 거부된 항목은 테이블 크기를 늘리지 않습니다. 이후 추가가 성공하거나 테이블을 지우면 오류가 0으로 초기화되므로 각 호출의 반환값을 즉시 확인하세요.",
+    "zh-TW": "狀態碼為 0 OK、1 FULL、2 BAD_LY、3 UNSORTED、4 BAD_RANGE。加入操作依序檢查 LY 範圍、容量與排序。遭拒的項目不會增加表的大小。之後成功加入項目或清除表，錯誤碼都會歸零，因此每次呼叫後都應立即檢查回傳值。",
+    "fr": "Les codes d’état sont 0 OK, 1 FULL, 2 BAD_LY, 3 UNSORTED et 4 BAD_RANGE. Les ajouts vérifient dans cet ordre la plage LY, la capacité, puis l’ordre des lignes. Une entrée refusée n’agrandit pas la table. Un ajout réussi ultérieur ou un effacement remet l’erreur à zéro : vérifiez chaque valeur de retour au moment de l’appel.",
+    "es": "Los códigos de estado son 0 OK, 1 FULL, 2 BAD_LY, 3 UNSORTED y 4 BAD_RANGE. Las inserciones comprueban, en este orden, el rango de LY, la capacidad y el orden de las líneas. Una entrada rechazada no aumenta la tabla. Una inserción posterior correcta o un borrado pone el error a cero; comprueba el retorno de cada llamada en ese momento.",
+    "de": "Die Statuscodes sind 0 OK, 1 FULL, 2 BAD_LY, 3 UNSORTED und 4 BAD_RANGE. Beim Hinzufügen werden LY-Bereich, Kapazität und Reihenfolge in dieser Reihenfolge geprüft. Ein abgelehnter Eintrag vergrößert die Tabelle nicht. Ein späterer erfolgreicher Eintrag oder das Leeren setzt den Fehler auf null zurück; prüfen Sie daher jeden Rückgabewert unmittelbar."
   },
   "raster_bands_status": {
     "ja": "成功ならKQ_RASTER_OK（0）、失敗なら状態コード1～4を返します。詳細は各関数の制約と`Raster_GetLastError`を参照してください。",
     "en": "Return KQ_RASTER_OK (0) on success or an error status 1..4. See the function constraints and `Raster_GetLastError`.",
-    "zh-CN": "成功返回 KQ_RASTER_OK (0)，否则返回错误状态 1..4。请参见函数限制和 `Raster_GetLastError`。"
+    "zh-CN": "成功返回 KQ_RASTER_OK (0)，否则返回错误状态 1..4。请参见函数限制和 `Raster_GetLastError`。",
+    "ko": "성공하면 KQ_RASTER_OK(0), 오류이면 상태값 1..4를 반환합니다. 해당 함수의 제약과 `Raster_GetLastError`를 참조하세요.",
+    "zh-TW": "成功時傳回 KQ_RASTER_OK（0），失敗時傳回 1..4 的錯誤狀態。請參閱函式限制與 `Raster_GetLastError`。",
+    "fr": "Renvoie KQ_RASTER_OK (0) en cas de succès, ou un état d’erreur de 1 à 4. Consultez les contraintes de la fonction et `Raster_GetLastError`.",
+    "es": "Devuelve KQ_RASTER_OK (0) si tiene éxito o un estado de error de 1 a 4. Consulta las restricciones de la función y `Raster_GetLastError`.",
+    "de": "Liefert bei Erfolg KQ_RASTER_OK (0), sonst einen Fehlerstatus von 1 bis 4. Beachten Sie die Funktionsbedingungen und `Raster_GetLastError`."
   },
   "raster_bands_void": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "raster_bands_ly": {
     "ja": "予約する可視行0～143です。同じ表では前のLYより大きくしてください。先頭のLY=0はフレーム開始用としてVBlank処理で適用されます。",
     "en": "Visible scheduled line, 0..143, strictly greater than the previous entry in the table. A first entry at LY=0 is applied by VBlank handling to establish the frame-start state.",
-    "zh-CN": "安排的可见行号，范围为 0..143，且必须严格大于表中前一项。第一项若为 LY=0，将由 VBlank 处理应用，以建立帧起始状态。"
+    "zh-CN": "安排的可见行号，范围为 0..143，且必须严格大于表中前一项。第一项若为 LY=0，将由 VBlank 处理应用，以建立帧起始状态。",
+    "ko": "예약할 가시 영역 줄 번호 0..143입니다. 테이블의 이전 항목보다 반드시 커야 합니다. 첫 항목이 LY=0이면 VBlank 처리에서 적용해 프레임 시작 상태를 설정합니다.",
+    "zh-TW": "排定的可見線，範圍 0..143，必須嚴格大於表中前一個項目。若第一個項目為 LY=0，會由 VBlank 處理套用，以建立影格開始時的狀態。",
+    "fr": "Ligne visible programmée, de 0 à 143, strictement supérieure à l’entrée précédente. Une première entrée à LY=0 est appliquée par le traitement VBlank pour établir l’état de début d’image.",
+    "es": "Línea visible programada, de 0 a 143, estrictamente mayor que la entrada anterior. Una primera entrada en LY=0 se aplica durante el tratamiento de VBlank para establecer el estado inicial del fotograma.",
+    "de": "Geplante sichtbare Zeile in 0..143, strikt größer als die vorherige Tabellenzeile. Ein erster Eintrag bei LY=0 wird in der VBlank-Behandlung angewendet und legt den Zustand am Frameanfang fest."
   },
   "raster_bands_scroll": {
     "ja": "背景のスクロール値0～255です。SCX/SCYは画面の位置ではなく背景マップを読み始める座標です。背景は256ピクセル単位で折り返します。",
     "en": "Background scroll byte, 0..255. SCX/SCY specify where to read the background map, not a screen-space position. Coordinates wrap across the 256-pixel background.",
-    "zh-CN": "背景滚动字节，范围为 0..255。SCX/SCY 指定从背景地图何处读取，不是屏幕位置。坐标在 256 像素背景内回绕。"
+    "zh-CN": "背景滚动字节，范围为 0..255。SCX/SCY 指定从背景地图何处读取，不是屏幕位置。坐标在 256 像素背景内回绕。",
+    "ko": "배경 스크롤 바이트이며 범위는 0..255입니다. SCX/SCY는 화면상의 위치가 아니라 배경 맵을 읽기 시작할 위치입니다. 좌표는 256픽셀 배경 안에서 순환합니다.",
+    "zh-TW": "背景捲動位元組，範圍 0..255。SCX/SCY 指定從背景地圖何處讀取，而非螢幕座標。座標會在 256 像素背景中循環。",
+    "fr": "Octet de défilement du fond, de 0 à 255. SCX/SCY indiquent où lire la carte de fond, pas une position à l’écran. Les coordonnées bouclent sur le fond de 256 pixels.",
+    "es": "Byte de desplazamiento del fondo, de 0 a 255. SCX/SCY indican desde dónde leer el mapa de fondo, no una posición en pantalla. Las coordenadas se repiten en el fondo de 256 píxeles.",
+    "de": "Hintergrund-Scrollbyte in 0..255. SCX/SCY geben die Leseposition in der Hintergrundkarte an, keine Bildschirmposition. Die Koordinaten laufen innerhalb des 256-Pixel-Hintergrunds zyklisch um."
   },
   "raster_bands_wx": {
     "ja": "ハードウェアのWX値です。通常の画面Xに7を加えた値を渡します。画面左端はWX=7です。値の範囲検査や補正は行いません。",
     "en": "Raw hardware WX value. Add seven to an ordinary screen X coordinate; WX=7 places the window at the left edge. This function does not clamp or validate WX.",
-    "zh-CN": "原始硬件 WX 值。普通屏幕 X 坐标须加七；WX=7 将窗口置于左边缘。本函数不限制或验证 WX。"
+    "zh-CN": "原始硬件 WX 值。普通屏幕 X 坐标须加七；WX=7 将窗口置于左边缘。本函数不限制或验证 WX。",
+    "ko": "하드웨어 WX 원시 값입니다. 일반 화면 X 좌표에 7을 더하세요. WX=7이면 윈도우가 왼쪽 가장자리에 놓입니다. 이 함수는 WX를 제한하거나 검사하지 않습니다.",
+    "zh-TW": "硬體 WX 原始值。一般螢幕 X 座標需加 7；WX=7 會將視窗放在左邊緣。此函式不限制或驗證 WX。",
+    "fr": "Valeur matérielle brute de WX. Ajoutez sept à la coordonnée X écran habituelle ; WX=7 place la fenêtre au bord gauche. La fonction ne borne ni ne valide WX.",
+    "es": "Valor bruto de WX del hardware. Suma siete a la coordenada X normal de pantalla; WX=7 coloca la ventana en el borde izquierdo. La función no limita ni valida WX.",
+    "de": "Roher Hardwarewert WX. Addieren Sie sieben zur normalen Bildschirm-X-Koordinate; WX=7 setzt das Fenster an den linken Rand. Die Funktion begrenzt oder prüft WX nicht."
   },
   "raster_bands_wy": {
     "ja": "ウィンドウのWYです。画面上端からのピクセル数で、横方向と違い7の加算はありません。WYが144以上なら可視領域に開始行がありません。",
     "en": "Window WY in pixels from the top edge. Unlike X, Y needs no addition of seven. WY values of 144 or more have no start line in the visible area.",
-    "zh-CN": "窗口 WY，以距顶边的像素数表示。与 X 不同，Y 无需加七。WY≥144 时，在可见区域内没有窗口起始行。"
+    "zh-CN": "窗口 WY，以距顶边的像素数表示。与 X 不同，Y 无需加七。WY≥144 时，在可见区域内没有窗口起始行。",
+    "ko": "위쪽 가장자리에서 픽셀 단위로 잰 윈도우 WY입니다. X와 달리 Y에는 7을 더하지 않습니다. WY가 144 이상이면 가시 영역 안에 시작 줄이 없습니다.",
+    "zh-TW": "視窗 WY，以距離上邊緣的像素數表示。Y 不像 X，無須加 7。WY 大於或等於 144 時，可見區域中沒有起始線。",
+    "fr": "WY de la fenêtre, en pixels depuis le bord supérieur. Contrairement à X, Y ne nécessite pas l’ajout de sept. À partir de 144, WY ne désigne aucune ligne de départ dans la zone visible.",
+    "es": "WY de la ventana, en píxeles desde el borde superior. A diferencia de X, Y no necesita sumar siete. Los valores WY de 144 o más no tienen línea inicial en la zona visible.",
+    "de": "Fenster-WY in Pixeln ab dem oberen Rand. Anders als bei X wird zu Y keine sieben addiert. WY-Werte ab 144 haben keine Startzeile im sichtbaren Bereich."
   },
   "raster_bands_screenx": {
     "ja": "ウィンドウ左端の画面X座標です。内部で7を足してWXへ変換します。通常は0～159を使います。249以上は8ビット加算が折り返すため、画面外へ隠す目的で指定しないでください。",
     "en": "Screen X coordinate of the window left edge. The wrapper adds seven to form WX. Normally use 0..159. Values of 249 or more wrap during byte addition; do not use them as a way to hide the window.",
-    "zh-CN": "窗口左缘的屏幕 X 坐标。封装函数加七得到 WX，通常使用 0..159。值≥249 时，字节加法会回绕；不要用这些值隐藏窗口。"
+    "zh-CN": "窗口左缘的屏幕 X 坐标。封装函数加七得到 WX，通常使用 0..159。值≥249 时，字节加法会回绕；不要用这些值隐藏窗口。",
+    "ko": "윈도우 왼쪽 가장자리의 화면 X 좌표입니다. 래퍼가 7을 더해 WX를 만듭니다. 보통 0..159를 사용하세요. 249 이상은 바이트 덧셈에서 순환하므로 윈도우를 숨기는 용도로 사용하지 마세요.",
+    "zh-TW": "視窗左邊緣的螢幕 X 座標。包裝函式加 7 形成 WX。通常使用 0..159；249 以上會在位元組加法中回繞，請勿藉此隱藏視窗。",
+    "fr": "Coordonnée X écran du bord gauche de la fenêtre. La fonction ajoute sept pour obtenir WX. Utilisez normalement 0..159. Les valeurs à partir de 249 débordent lors de l’addition sur un octet ; ne les utilisez pas pour masquer la fenêtre.",
+    "es": "Coordenada X de pantalla del borde izquierdo de la ventana. La función suma siete para obtener WX. Normalmente usa 0..159. Los valores de 249 o más se desbordan al sumar en un byte; no los uses para ocultar la ventana.",
+    "de": "Bildschirm-X-Koordinate des linken Fensterrands. Der Wrapper addiert sieben, um WX zu bilden. Verwenden Sie normalerweise 0..159. Werte ab 249 laufen bei der Byteaddition über; nutzen Sie sie nicht zum Verstecken des Fensters."
   },
   "raster_bands_flags": {
     "ja": "BG=1で背景、WIN=2でWX/WY、WIN_SHOW=4で表示、WIN_HIDE=8で非表示、BG_COLOR0=16でCGB背景色0を更新します。未知の上位ビットは捨てます。SHOWとHIDEを同時指定するとSHOWが最後に適用されます。色操作はSCX/SCY欄を色に使うため、通常のBGスクロールと混ぜないでください。",
     "en": "Flags: BG=1 updates background scroll, WIN=2 updates WX/WY, WIN_SHOW=4 shows the window, WIN_HIDE=8 hides it, BG_COLOR0=16 updates CGB background color zero. Unknown upper bits are discarded. With both SHOW and HIDE, SHOW is applied last. Color updates reuse SCX/SCY payload fields; do not combine them with ordinary background scrolling.",
-    "zh-CN": "标志：BG=1 更新背景滚动，WIN=2 更新 WX/WY，WIN_SHOW=4 显示窗口，WIN_HIDE=8 隐藏窗口，BG_COLOR0=16 更新 CGB 背景颜色零。未知高位被丢弃。SHOW 和 HIDE 同时存在时，最后应用 SHOW。颜色更新复用 SCX/SCY 数据字段；不要与普通背景滚动组合。"
+    "zh-CN": "标志：BG=1 更新背景滚动，WIN=2 更新 WX/WY，WIN_SHOW=4 显示窗口，WIN_HIDE=8 隐藏窗口，BG_COLOR0=16 更新 CGB 背景颜色零。未知高位被丢弃。SHOW 和 HIDE 同时存在时，最后应用 SHOW。颜色更新复用 SCX/SCY 数据字段；不要与普通背景滚动组合。",
+    "ko": "플래그: BG=1은 배경 스크롤, WIN=2는 WX/WY를 갱신합니다. WIN_SHOW=4는 윈도우 표시, WIN_HIDE=8은 숨김, BG_COLOR0=16은 CGB 배경색 0 갱신입니다. 알 수 없는 상위 비트는 버립니다. SHOW와 HIDE가 함께 있으면 SHOW가 마지막에 적용됩니다. 색 갱신은 SCX/SCY 데이터 필드를 재사용하므로 일반 배경 스크롤과 함께 지정하지 마세요.",
+    "zh-TW": "旗標：BG=1 更新背景捲動，WIN=2 更新 WX/WY，WIN_SHOW=4 顯示視窗，WIN_HIDE=8 隱藏視窗，BG_COLOR0=16 更新 CGB 背景色零。未知高位元會丟棄。同時指定 SHOW 與 HIDE 時，最後套用 SHOW。色彩更新會重用 SCX/SCY 資料欄位，不可與一般背景捲動合併。",
+    "fr": "Indicateurs : BG=1 modifie le défilement du fond, WIN=2 modifie WX/WY, WIN_SHOW=4 affiche la fenêtre, WIN_HIDE=8 la masque et BG_COLOR0=16 modifie la couleur zéro du fond CGB. Les bits supérieurs inconnus sont ignorés. Si SHOW et HIDE sont tous deux présents, SHOW s’applique en dernier. Les changements de couleur réutilisent les champs SCX/SCY ; ne les combinez pas avec un défilement ordinaire du fond.",
+    "es": "Banderas: BG=1 actualiza el desplazamiento del fondo, WIN=2 actualiza WX/WY, WIN_SHOW=4 muestra la ventana, WIN_HIDE=8 la oculta y BG_COLOR0=16 actualiza el color cero del fondo CGB. Se descartan los bits superiores desconocidos. Si están SHOW y HIDE, SHOW se aplica al final. Los cambios de color reutilizan los campos SCX/SCY; no los combines con desplazamiento normal del fondo.",
+    "de": "Flags: BG=1 aktualisiert den Hintergrundscroll, WIN=2 WX/WY, WIN_SHOW=4 zeigt das Fenster, WIN_HIDE=8 verbirgt es, BG_COLOR0=16 aktualisiert CGB-Hintergrundfarbe null. Unbekannte obere Bits werden verworfen. Sind SHOW und HIDE gesetzt, wird SHOW zuletzt angewendet. Farbänderungen verwenden die Datenfelder SCX/SCY erneut; kombinieren Sie sie nicht mit normalem Hintergrundscrollen."
   },
   "raster_bands_winflags": {
     "ja": "通常はWIN_SHOWまたはWIN_HIDEを指定します。ラッパーがWINを追加するので、座標更新だけなら0でも使えます。その他の対応ビットも通過するため、意図しないBGや色操作は指定しないでください。",
     "en": "Normally pass WIN_SHOW or WIN_HIDE. The wrapper adds WIN, so zero is sufficient to update coordinates without changing visibility. Other supported bits pass through; avoid unintended BG or color operations.",
-    "zh-CN": "通常传 WIN_SHOW 或 WIN_HIDE。封装函数自动加上 WIN，因此零即可只更新坐标、不改变可见性。其他支持位会继续传递；应避免意外的背景或颜色操作。"
+    "zh-CN": "通常传 WIN_SHOW 或 WIN_HIDE。封装函数自动加上 WIN，因此零即可只更新坐标、不改变可见性。其他支持位会继续传递；应避免意外的背景或颜色操作。",
+    "ko": "보통 WIN_SHOW 또는 WIN_HIDE를 전달합니다. 래퍼가 WIN을 추가하므로 0을 전달하면 표시 상태를 바꾸지 않고 좌표만 갱신할 수 있습니다. 지원되는 다른 비트도 그대로 전달되므로 의도하지 않은 BG 또는 색 연산을 넣지 않도록 하세요.",
+    "zh-TW": "通常傳入 WIN_SHOW 或 WIN_HIDE。包裝函式會加上 WIN，因此傳入零即可更新座標而不改變顯示狀態。其他支援的位元會原樣傳遞，請避免意外觸發 BG 或色彩操作。",
+    "fr": "Passez normalement WIN_SHOW ou WIN_HIDE. La fonction ajoute WIN ; zéro suffit donc pour modifier les coordonnées sans changer la visibilité. Les autres bits pris en charge sont transmis ; évitez les opérations BG ou de couleur involontaires.",
+    "es": "Normalmente pasa WIN_SHOW o WIN_HIDE. La función añade WIN, por lo que basta cero para actualizar las coordenadas sin cambiar la visibilidad. Los demás bits admitidos se transmiten tal cual; evita operaciones BG o de color no deseadas.",
+    "de": "Übergeben Sie normalerweise WIN_SHOW oder WIN_HIDE. Der Wrapper ergänzt WIN; null genügt daher zum Ändern der Koordinaten ohne Änderung der Sichtbarkeit. Andere unterstützte Bits werden weitergereicht. Vermeiden Sie unbeabsichtigte BG- oder Farboperationen."
   },
   "raster_bands_builder": {
     "ja": "範囲が正しければ既存の分割を停止して表を消し、新しいバンドを登録します。範囲が不正なら表と個数をそのままにしてBAD_RANGEを保存します。成功後も`Raster_Commit`が必要です。",
     "en": "Valid parameters stop existing splits, clear the table and add the new bands. Invalid parameters preserve the table and count while storing BAD_RANGE. A successful build still requires `Raster_Commit`.",
-    "zh-CN": "参数有效时，停止现有分段、清空表并添加新分段。参数无效时保留表和计数，但记录 BAD_RANGE。构建成功后仍需 `Raster_Commit`。"
+    "zh-CN": "参数有效时，停止现有分段、清空表并添加新分段。参数无效时保留表和计数，但记录 BAD_RANGE。构建成功后仍需 `Raster_Commit`。",
+    "ko": "매개변수가 유효하면 기존 화면 분할을 멈추고 테이블을 지운 뒤 새 밴드를 추가합니다. 잘못된 매개변수는 테이블과 항목 수를 보존하고 BAD_RANGE를 저장합니다. 구성이 성공해도 `Raster_Commit`을 호출해야 합니다.",
+    "zh-TW": "參數有效時，會停止現有分割、清除表並加入新區帶。參數無效時，保留表與數量，只儲存 BAD_RANGE。成功建表後仍須呼叫 `Raster_Commit`。",
+    "fr": "Des paramètres valides arrêtent les divisions existantes, vident la table et ajoutent les nouvelles bandes. Des paramètres invalides préservent la table et son compteur, tout en mémorisant BAD_RANGE. Même après une construction réussie, `Raster_Commit` reste nécessaire.",
+    "es": "Con parámetros válidos, detiene las divisiones existentes, vacía la tabla y añade las nuevas franjas. Con parámetros inválidos, conserva la tabla y el recuento y guarda BAD_RANGE. Aunque la construcción tenga éxito, sigue siendo necesario llamar a `Raster_Commit`.",
+    "de": "Gültige Parameter stoppen bestehende Teilungen, leeren die Tabelle und fügen neue Bänder hinzu. Ungültige Parameter lassen Tabelle und Anzahl unverändert und speichern BAD_RANGE. Auch nach erfolgreichem Aufbau ist `Raster_Commit` erforderlich."
   },
   "raster_bands_disable_note": {
     "ja": "分割停止はSCX・SCY・WX・WYを0へ戻す操作ではありません。通常の背景・ウィンドウ設定には`Scroll_SetBg`などを使います。IEのVBlank/STATビットやIMEを元の状態に戻す関数でもありません。",
     "en": "Stopping splits does not zero SCX, SCY, WX or WY. Use ordinary setters such as `Scroll_SetBg` for the desired base state. These functions also do not restore previous VBlank/STAT IE bits or IME.",
-    "zh-CN": "停止分段不会将 SCX、SCY、WX 或 WY 清零。请用 `Scroll_SetBg` 等普通设置函数建立所需基础状态。这些函数也不恢复先前的 VBlank/STAT IE 位或 IME。"
+    "zh-CN": "停止分段不会将 SCX、SCY、WX 或 WY 清零。请用 `Scroll_SetBg` 等普通设置函数建立所需基础状态。这些函数也不恢复先前的 VBlank/STAT IE 位或 IME。",
+    "ko": "화면 분할을 멈춰도 SCX, SCY, WX, WY는 0이 되지 않습니다. 원하는 기본 상태는 `Scroll_SetBg` 같은 일반 설정 함수로 지정하세요. 이 함수들은 이전의 VBlank/STAT IE 비트나 IME도 복원하지 않습니다.",
+    "zh-TW": "停止分割不會將 SCX、SCY、WX 或 WY 歸零。請用 `Scroll_SetBg` 等一般設定函式建立所需的基本狀態。這些函式也不會還原先前的 VBlank/STAT IE 位元或 IME。",
+    "fr": "L’arrêt des divisions ne remet pas SCX, SCY, WX ou WY à zéro. Définissez l’état de base souhaité avec les fonctions habituelles, telles que `Scroll_SetBg`. Ces fonctions ne restaurent pas non plus les anciens bits IE VBlank/STAT ni IME.",
+    "es": "Detener las divisiones no pone SCX, SCY, WX ni WY a cero. Usa funciones normales como `Scroll_SetBg` para establecer el estado base deseado. Estas funciones tampoco restauran los bits IE de VBlank/STAT ni IME anteriores.",
+    "de": "Das Stoppen der Teilungen setzt SCX, SCY, WX und WY nicht auf null. Stellen Sie den gewünschten Grundzustand mit normalen Setzfunktionen wie `Scroll_SetBg` her. Auch vorherige VBlank-/STAT-IE-Bits oder IME werden nicht wiederhergestellt."
   },
   "raster_bands_count_result": {
     "ja": "登録済みの個数0～8です。空き数が必要なら8から引きます。読み取りで状態は変わりません。",
     "en": "Return the entry count, 0..8. Subtract it from eight for remaining capacity. Reading does not alter state.",
-    "zh-CN": "返回条目数 0..8。用八减去该值即可得到剩余容量。读取不改变状态。"
+    "zh-CN": "返回条目数 0..8。用八减去该值即可得到剩余容量。读取不改变状态。",
+    "ko": "항목 수 0..8을 반환합니다. 남은 용량은 8에서 이 값을 뺀 값입니다. 읽어도 상태는 바뀌지 않습니다.",
+    "zh-TW": "傳回項目數 0..8。以 8 減去此值即為剩餘容量。讀取不改變狀態。",
+    "fr": "Renvoie le nombre d’entrées, de 0 à 8. Soustrayez-le de huit pour connaître la capacité restante. La lecture ne modifie pas l’état.",
+    "es": "Devuelve el número de entradas, de 0 a 8. Réstalo de ocho para obtener la capacidad restante. La lectura no altera el estado.",
+    "de": "Liefert die Anzahl der Einträge in 0..8. Acht minus dieser Wert ergibt die freie Kapazität. Das Lesen verändert keinen Zustand."
   },
   "raster_bands_error_result": {
     "ja": "保存中の状態コード0～4です。Commitはこの値を返しますが、それまでの失敗を自動で取り消したり表を破棄したりしません。",
     "en": "Return the stored status, 0..4. Commit returns this value but does not automatically undo a failure or discard the table.",
-    "zh-CN": "返回保存的状态 0..4。Commit 返回此值，但不会自动撤销失败或丢弃表。"
+    "zh-CN": "返回保存的状态 0..4。Commit 返回此值，但不会自动撤销失败或丢弃表。",
+    "ko": "저장된 상태값 0..4를 반환합니다. 커밋은 이 값을 반환하지만 오류를 자동으로 되돌리거나 테이블을 폐기하지 않습니다.",
+    "zh-TW": "傳回儲存的狀態 0..4。提交會回傳此值，但不會自動復原失敗操作或捨棄表。",
+    "fr": "Renvoie l’état mémorisé, de 0 à 4. La validation renvoie cette valeur, mais n’annule pas automatiquement un échec et ne jette pas la table.",
+    "es": "Devuelve el estado guardado, de 0 a 4. La confirmación devuelve este valor, pero no deshace automáticamente un fallo ni descarta la tabla.",
+    "de": "Liefert den gespeicherten Status in 0..4. Das Aktivieren gibt diesen Wert zurück, macht aber weder einen Fehler automatisch rückgängig noch verwirft es die Tabelle."
   },
   "raster_bands_rgb": {
     "ja": "RGB15です。赤はビット0～4、緑は5～9、青は10～14です。0x001Fが赤、0x03E0が緑、0x7C00が青です。入力値の範囲検査は行いません。",
     "en": "RGB15: red in bits 0..4, green in 5..9, blue in 10..14. 0x001F is red, 0x03E0 green and 0x7C00 blue. The input is not range-checked.",
-    "zh-CN": "RGB15：红色占位 0..4，绿色占位 5..9，蓝色占位 10..14。0x001F 为红，0x03E0 为绿，0x7C00 为蓝。不检查输入范围。"
+    "zh-CN": "RGB15：红色占位 0..4，绿色占位 5..9，蓝色占位 10..14。0x001F 为红，0x03E0 为绿，0x7C00 为蓝。不检查输入范围。",
+    "ko": "RGB15 형식으로 빨강은 비트 0..4, 초록은 5..9, 파랑은 10..14입니다. 0x001F는 빨강, 0x03E0은 초록, 0x7C00은 파랑입니다. 입력 범위는 검사하지 않습니다.",
+    "zh-TW": "RGB15：紅色位於位元 0..4，綠色為 5..9，藍色為 10..14。0x001F 是紅色、0x03E0 是綠色、0x7C00 是藍色。不檢查輸入範圍。",
+    "fr": "RGB15 : rouge dans les bits 0..4, vert dans 5..9 et bleu dans 10..14. 0x001F donne du rouge, 0x03E0 du vert et 0x7C00 du bleu. La plage de l’entrée n’est pas vérifiée.",
+    "es": "RGB15: rojo en los bits 0..4, verde en 5..9 y azul en 10..14. 0x001F es rojo, 0x03E0 verde y 0x7C00 azul. No se comprueba el rango de entrada.",
+    "de": "RGB15: Rot in Bits 0..4, Grün in 5..9, Blau in 10..14. 0x001F ist Rot, 0x03E0 Grün und 0x7C00 Blau. Der Eingabebereich wird nicht geprüft."
   },
   "raster_bands_color_note": {
     "ja": "色更新はBCPS/BCPDを使い、BCPSの元のインデックスは保持しません。前景処理からパレットを書く際もインデックスを明示してください。転送できるLCDモードを待つので、予約行と実際の色境界には遅れがあります。",
     "en": "Color updates use BCPS/BCPD and do not preserve the previous BCPS index. Set the index explicitly when foreground code writes palettes too. The handler waits for an accessible LCD mode, so the visible color boundary can follow the scheduled LY.",
-    "zh-CN": "颜色更新使用 BCPS/BCPD，不保留先前 BCPS 索引。前台代码也写调色板时，应明确设置索引。处理程序等待 LCD 可访问模式，因此可见颜色边界可能晚于安排的 LY。"
+    "zh-CN": "颜色更新使用 BCPS/BCPD，不保留先前 BCPS 索引。前台代码也写调色板时，应明确设置索引。处理程序等待 LCD 可访问模式，因此可见颜色边界可能晚于安排的 LY。",
+    "ko": "색 갱신은 BCPS/BCPD를 사용하며 이전 BCPS 인덱스를 보존하지 않습니다. 메인 코드에서도 팔레트를 쓰면 인덱스를 명시적으로 설정하세요. 핸들러는 접근 가능한 LCD 모드를 기다리므로 실제 색 경계가 예약된 LY보다 뒤에 나타날 수 있습니다.",
+    "zh-TW": "色彩更新使用 BCPS/BCPD，且不保留先前的 BCPS 索引。主程式也寫入調色盤時，請明確設定索引。處理常式會等待可存取的 LCD 模式，因此可見色彩邊界可能落在排定的 LY 之後。",
+    "fr": "Les changements de couleur utilisent BCPS/BCPD et ne conservent pas l’ancien index BCPS. Si le code principal écrit aussi les palettes, réglez explicitement cet index. Le gestionnaire attend un mode LCD accessible ; la séparation visible des couleurs peut donc survenir après la ligne LY programmée.",
+    "es": "Los cambios de color usan BCPS/BCPD y no conservan el índice BCPS anterior. Si el código principal también escribe paletas, establece el índice explícitamente. El manejador espera un modo LCD accesible, por lo que el cambio de color visible puede aparecer después del LY programado.",
+    "de": "Farbänderungen nutzen BCPS/BCPD und erhalten den bisherigen BCPS-Index nicht. Setzen Sie den Index ausdrücklich, wenn auch der Hauptcode Paletten schreibt. Der Handler wartet auf einen zugänglichen LCD-Modus; die sichtbare Farbgrenze kann daher nach der geplanten LY-Zeile liegen."
   },
   "raster_bands_commit_result": {
     "ja": "保存中の最終エラーコードを返します。0だからといって、それ以前のすべての登録が成功した証明にはなりません。",
     "en": "Return the last stored error. Zero does not prove that every earlier registration succeeded.",
-    "zh-CN": "返回最近保存的错误。零不能证明之前每次注册都成功。"
+    "zh-CN": "返回最近保存的错误。零不能证明之前每次注册都成功。",
+    "ko": "마지막으로 저장된 오류를 반환합니다. 0이라고 해서 이전의 모든 등록이 성공했다는 뜻은 아닙니다.",
+    "zh-TW": "傳回最後儲存的錯誤。零不代表先前每次登錄都成功。",
+    "fr": "Renvoie la dernière erreur mémorisée. Zéro ne prouve pas que tous les ajouts précédents ont réussi.",
+    "es": "Devuelve el último error guardado. Cero no demuestra que todos los registros anteriores hayan tenido éxito.",
+    "de": "Liefert den zuletzt gespeicherten Fehler. Null beweist nicht, dass alle vorherigen Eintragungen erfolgreich waren."
   },
   "raster_bands_commit_irq": {
     "ja": "空でない表ではIEのVBlank/STATビットを立て、EIで割り込みを有効にします。他のIEビットは保持します。空の表では分割を停止し、割り込み全体の設定は復元しません。",
     "en": "A nonempty table sets the VBlank/STAT IE bits and executes EI, enabling interrupts; other IE bits are preserved. An empty table disables split scheduling without restoring the global interrupt configuration.",
-    "zh-CN": "非空表会设置 VBlank/STAT IE 位并执行 EI，启用中断；其他 IE 位保留。空表会关闭分段调度，但不恢复全局中断配置。"
+    "zh-CN": "非空表会设置 VBlank/STAT IE 位并执行 EI，启用中断；其他 IE 位保留。空表会关闭分段调度，但不恢复全局中断配置。",
+    "ko": "테이블이 비어 있지 않으면 VBlank/STAT IE 비트를 설정하고 EI를 실행해 인터럽트를 활성화합니다. 다른 IE 비트는 보존합니다. 빈 테이블은 화면 분할 예약을 비활성화하지만 전역 인터럽트 설정을 복원하지 않습니다.",
+    "zh-TW": "表非空時，設定 VBlank/STAT IE 位元並執行 EI 以啟用中斷；其餘 IE 位元保留。空表會停用分割排程，但不還原全域中斷設定。",
+    "fr": "Une table non vide active les bits IE VBlank/STAT et exécute EI pour autoriser les interruptions ; les autres bits IE sont conservés. Une table vide désactive la programmation des divisions sans restaurer la configuration globale des interruptions.",
+    "es": "Una tabla no vacía activa los bits IE de VBlank/STAT y ejecuta EI para habilitar las interrupciones; conserva los demás bits IE. Una tabla vacía desactiva la programación de divisiones sin restaurar la configuración global de interrupciones.",
+    "de": "Eine nicht leere Tabelle setzt die VBlank-/STAT-IE-Bits und führt EI aus, um Interrupts zu aktivieren; andere IE-Bits bleiben erhalten. Eine leere Tabelle deaktiviert die Teilungsplanung, stellt aber die globale Interruptkonfiguration nicht wieder her."
   },
   "raster_bands_hud_height": {
     "ja": "分割する行1～143です。0や144以上はBAD_RANGEとなります。",
     "en": "Split line, 1..143. Zero or 144 and above return BAD_RANGE.",
-    "zh-CN": "分割行，范围为 1..143。零或≥144 返回 BAD_RANGE。"
+    "zh-CN": "分割行，范围为 1..143。零或≥144 返回 BAD_RANGE。",
+    "ko": "분할 줄 1..143입니다. 0 또는 144 이상은 BAD_RANGE를 반환합니다.",
+    "zh-TW": "分割線為 1..143。零或 144 以上會傳回 BAD_RANGE。",
+    "fr": "Ligne de séparation, de 1 à 143. Zéro et les valeurs à partir de 144 renvoient BAD_RANGE.",
+    "es": "Línea de división, de 1 a 143. Cero o valores de 144 en adelante devuelven BAD_RANGE.",
+    "de": "Teilungszeile in 1..143. Null oder Werte ab 144 liefern BAD_RANGE."
   },
   "raster_bands_hud_y": {
     "ja": "分割する行1～143です。0や144以上はBAD_RANGEとなります。",
     "en": "Split line, 1..143. Zero or 144 and above return BAD_RANGE.",
-    "zh-CN": "分割行，范围为 1..143。零或≥144 返回 BAD_RANGE。"
+    "zh-CN": "分割行，范围为 1..143。零或≥144 返回 BAD_RANGE。",
+    "ko": "분할 줄 1..143입니다. 0 또는 144 이상은 BAD_RANGE를 반환합니다.",
+    "zh-TW": "分割線為 1..143。零或 144 以上會傳回 BAD_RANGE。",
+    "fr": "Ligne de séparation, de 1 à 143. Zéro et les valeurs à partir de 144 renvoient BAD_RANGE.",
+    "es": "Línea de división, de 1 a 143. Cero o valores de 144 en adelante devuelven BAD_RANGE.",
+    "de": "Teilungszeile in 1..143. Null oder Werte ab 144 liefern BAD_RANGE."
   },
   "raster_bands_split_y": {
     "ja": "分割する行1～143です。0や144以上はBAD_RANGEとなります。",
     "en": "Split line, 1..143. Zero or 144 and above return BAD_RANGE.",
-    "zh-CN": "分割行，范围为 1..143。零或≥144 返回 BAD_RANGE。"
+    "zh-CN": "分割行，范围为 1..143。零或≥144 返回 BAD_RANGE。",
+    "ko": "분할 줄 1..143입니다. 0 또는 144 이상은 BAD_RANGE를 반환합니다.",
+    "zh-TW": "分割線為 1..143。零或 144 以上會傳回 BAD_RANGE。",
+    "fr": "Ligne de séparation, de 1 à 143. Zéro et les valeurs à partir de 144 renvoient BAD_RANGE.",
+    "es": "Línea de división, de 1 a 143. Cero o valores de 144 en adelante devuelven BAD_RANGE.",
+    "de": "Teilungszeile in 1..143. Null oder Werte ab 144 liefern BAD_RANGE."
   },
   "raster_bands_y1": {
     "ja": "分割行です。1 ≤ y1 < y2 ≤ 143を満たしてください。",
     "en": "Split line; require 1 <= y1 < y2 <= 143.",
-    "zh-CN": "分割行；要求 1 <= y1 < y2 <= 143。"
+    "zh-CN": "分割行；要求 1 <= y1 < y2 <= 143。",
+    "ko": "분할 줄이며, 1 <= y1 < y2 <= 143을 만족해야 합니다.",
+    "zh-TW": "分割線，必須符合 1 <= y1 < y2 <= 143。",
+    "fr": "Lignes de séparation, avec 1 <= y1 < y2 <= 143.",
+    "es": "Líneas de división; deben cumplir 1 <= y1 < y2 <= 143.",
+    "de": "Teilungszeilen mit der Bedingung 1 <= y1 < y2 <= 143."
   },
   "raster_bands_y2": {
     "ja": "分割行です。1 ≤ y1 < y2 ≤ 143を満たしてください。",
     "en": "Split line; require 1 <= y1 < y2 <= 143.",
-    "zh-CN": "分割行；要求 1 <= y1 < y2 <= 143。"
+    "zh-CN": "分割行；要求 1 <= y1 < y2 <= 143。",
+    "ko": "분할 줄이며, 1 <= y1 < y2 <= 143을 만족해야 합니다.",
+    "zh-TW": "分割線，必須符合 1 <= y1 < y2 <= 143。",
+    "fr": "Lignes de séparation, avec 1 <= y1 < y2 <= 143.",
+    "es": "Líneas de división; deben cumplir 1 <= y1 < y2 <= 143.",
+    "de": "Teilungszeilen mit der Bedingung 1 <= y1 < y2 <= 143."
   },
   "raster_bands_expected_bands": {
     "ja": "赤い矩形（DMGでは黒）が上から(32,16)、(24,80)、(16,112)へ並びます。幅24・高さ16で、下の段ほど左へずれます。表の個数3、エラー0、Commitの戻り値0を内部で記録しています。",
     "en": "Red rectangles (black on DMG), each 24 by 16 pixels, appear at (32,16), (24,80) and (16,112). Lower bands shift farther left. Internal results record count 3, error 0 and commit result 0.",
-    "zh-CN": "三个 24×16 像素红色矩形（DMG 上为黑色）显示在 (32,16)、(24,80)、(16,112)。越靠下的分段向左位移越大。内部结果记录 count=3、error=0、commit result=0。"
+    "zh-CN": "三个 24×16 像素红色矩形（DMG 上为黑色）显示在 (32,16)、(24,80)、(16,112)。越靠下的分段向左位移越大。内部结果记录 count=3、error=0、commit result=0。",
+    "ko": "각각 24x16픽셀인 빨간색 사각형(DMG에서는 검은색)이 (32,16), (24,80), (16,112)에 나타납니다. 아래쪽 밴드일수록 왼쪽으로 더 많이 이동합니다. 내부 결과에는 항목 수 3, 오류 0, 커밋 결과 0이 기록됩니다.",
+    "zh-TW": "三個 24x16 像素的紅色矩形（DMG 上為黑色）出現在 (32,16)、(24,80)、(16,112)。越下方的區帶向左偏移越多。內部結果記錄數量 3、錯誤 0、提交結果 0。",
+    "fr": "Des rectangles rouges de 24x16 pixels, noirs sur DMG, apparaissent en (32,16), (24,80) et (16,112). Les bandes inférieures sont davantage décalées vers la gauche. Les résultats internes indiquent un compteur de 3, une erreur de 0 et un résultat de validation de 0.",
+    "es": "Aparecen rectángulos rojos de 24x16 píxeles, negros en DMG, en (32,16), (24,80) y (16,112). Las franjas inferiores se desplazan más hacia la izquierda. Los resultados internos registran un recuento de 3, error 0 y resultado de confirmación 0.",
+    "de": "Rote Rechtecke von jeweils 24x16 Pixeln, auf DMG schwarz, erscheinen bei (32,16), (24,80) und (16,112). Tiefere Bänder werden weiter nach links verschoben. Intern werden Anzahl 3, Fehler 0 und Aktivierungsergebnis 0 gespeichert."
   },
   "raster_bands_Raster_Init": {
     "ja": "共有バンド表を空にして分割を停止し、個数・最終LYの有効フラグ・エラーを初期化します。背景やウィンドウの座標を初期化する`Scroll_Init`とは役割が異なります。",
     "en": "Empty the shared band table, stop splits, and initialize count, last-LY validity and error state. Unlike `Scroll_Init`, this does not initialize background/window coordinates.",
-    "zh-CN": "清空共享分段表，停止分段，并初始化计数、最后 LY 有效性及错误状态。与 `Scroll_Init` 不同，不初始化背景/窗口坐标。"
+    "zh-CN": "清空共享分段表，停止分段，并初始化计数、最后 LY 有效性及错误状态。与 `Scroll_Init` 不同，不初始化背景/窗口坐标。",
+    "ko": "공유 밴드 테이블을 비우고 화면 분할을 멈춥니다. 항목 수, 마지막 LY의 유효 여부, 오류 상태를 초기화합니다. `Scroll_Init`과 달리 배경·윈도우 좌표는 초기화하지 않습니다.",
+    "zh-TW": "清空共用區帶表、停止分割，並初始化數量、最後 LY 的有效狀態與錯誤狀態。與 `Scroll_Init` 不同，此操作不初始化背景／視窗座標。",
+    "fr": "Vide la table de bandes partagée, arrête les divisions et initialise le compteur, la validité du dernier LY et l’état d’erreur. Contrairement à `Scroll_Init`, ne réinitialise pas les coordonnées du fond et de la fenêtre.",
+    "es": "Vacía la tabla compartida de franjas, detiene las divisiones e inicializa el recuento, la validez del último LY y el estado de error. A diferencia de `Scroll_Init`, no inicializa las coordenadas del fondo ni de la ventana.",
+    "de": "Leert die gemeinsame Bandtabelle, stoppt Teilungen und initialisiert Anzahl, Gültigkeit des letzten LY sowie Fehlerzustand. Anders als `Scroll_Init` initialisiert dies nicht die Hintergrund- und Fensterkoordinaten."
   },
   "raster_bands_Raster_Clear": {
     "ja": "実行中の分割をただちに停止し、登録個数・行順序・エラーをリセットします。同じ場面で新しい表を組み直す前に使います。表のデータ領域全体を0埋めする操作ではありません。",
     "en": "Immediately stop split scheduling and reset count, ordering and error state before rebuilding a table in the same scene. It does not zero every byte of table storage.",
-    "zh-CN": "立即停止分段调度，重置计数、顺序和错误状态，以便在同一场景重建表。不会将表存储的每个字节都清零。"
+    "zh-CN": "立即停止分段调度，重置计数、顺序和错误状态，以便在同一场景重建表。不会将表存储的每个字节都清零。",
+    "ko": "같은 장면에서 테이블을 다시 구성하기 전에 화면 분할 예약을 즉시 멈추고 항목 수, 순서, 오류 상태를 초기화합니다. 테이블 저장 공간의 모든 바이트를 0으로 만들지는 않습니다.",
+    "zh-TW": "在同一場景重建表之前，立即停止分割排程，並重設數量、排序與錯誤狀態。不會將表的所有儲存位元組歸零。",
+    "fr": "Arrête immédiatement la programmation des divisions et réinitialise le compteur, l’ordre et l’état d’erreur avant de reconstruire une table dans la même scène. Ne met pas à zéro tous les octets de stockage de la table.",
+    "es": "Detiene inmediatamente la programación de divisiones y reinicia el recuento, el orden y el estado de error antes de reconstruir la tabla en la misma escena. No pone a cero todos los bytes de la memoria de la tabla.",
+    "de": "Stoppt die Teilungsplanung sofort und setzt Anzahl, Reihenfolge und Fehlerzustand zurück, bevor die Tabelle in derselben Szene neu aufgebaut wird. Nicht jedes Byte des Tabellenspeichers wird auf null gesetzt."
   },
   "raster_bands_Raster_Disable": {
     "ja": "Clearの後で空の表をCommitし、ラスターバンドを無効にします。スクロール分割のない場面へ移る際の明示的な停止操作です。",
     "en": "Clear and commit an empty table to disable raster bands. Use this as an explicit stop when entering a scene without split scrolling.",
-    "zh-CN": "清除并提交空表，以禁用光栅分段。进入不使用分段滚动的场景时，可用它明确停止效果。"
+    "zh-CN": "清除并提交空表，以禁用光栅分段。进入不使用分段滚动的场景时，可用它明确停止效果。",
+    "ko": "테이블을 지우고 빈 테이블을 커밋해 래스터 밴드를 비활성화합니다. 분할 스크롤을 사용하지 않는 장면으로 들어갈 때 명시적으로 멈추는 용도로 사용합니다.",
+    "zh-TW": "清除並提交空表，以停用光柵區帶。進入不使用分割捲動的場景時，可用此操作明確停止效果。",
+    "fr": "Efface puis valide une table vide pour désactiver les bandes raster. Utilisez cet arrêt explicite en entrant dans une scène sans défilement divisé.",
+    "es": "Borra y confirma una tabla vacía para desactivar las franjas ráster. Úsalo como parada explícita al entrar en una escena sin desplazamiento dividido.",
+    "de": "Leert und aktiviert eine leere Tabelle, um Rasterbänder abzuschalten. Verwenden Sie dies als ausdrücklichen Stopp beim Wechsel in eine Szene ohne geteiltes Scrollen."
   },
   "raster_bands_Raster_GetCount": {
     "ja": "Rasterラッパーで登録した現在のバンド数を読みます。Clear/Disable後は0、Commitだけでは個数を消しません。",
     "en": "Read the number of bands registered through the Raster wrapper. Clear/Disable reset it to zero; committing alone preserves it.",
-    "zh-CN": "读取通过 Raster 封装注册的分段数量。Clear/Disable 将其清零；仅提交会保留数量。"
+    "zh-CN": "读取通过 Raster 封装注册的分段数量。Clear/Disable 将其清零；仅提交会保留数量。",
+    "ko": "Raster 래퍼를 통해 등록한 밴드 수를 읽습니다. Clear/Disable은 0으로 초기화하며, 커밋만 하면 값은 유지됩니다.",
+    "zh-TW": "讀取透過 Raster 包裝層登錄的區帶數。Clear/Disable 會歸零；僅提交則保留數量。",
+    "fr": "Lit le nombre de bandes ajoutées par la couche Raster. Clear/Disable le remet à zéro ; une simple validation le conserve.",
+    "es": "Lee el número de franjas registradas mediante la capa Raster. Clear/Disable lo pone a cero; confirmar por sí solo lo conserva.",
+    "de": "Liest die Anzahl der über den Raster-Wrapper eingetragenen Bänder. Clear/Disable setzt sie auf null; bloßes Aktivieren erhält sie."
   },
   "raster_bands_Raster_GetLastError": {
     "ja": "最後に保存されたRaster状態コードを読みます。読み取りでエラーは消えません。過去に発生したすべてのエラーを蓄積する機能ではありません。",
     "en": "Read the last stored Raster status without clearing it. This is not a cumulative record of every previous failure.",
-    "zh-CN": "读取最近保存的 Raster 状态，不清除它。这不是全部以往失败的累计记录。"
+    "zh-CN": "读取最近保存的 Raster 状态，不清除它。这不是全部以往失败的累计记录。",
+    "ko": "마지막으로 저장된 Raster 상태를 지우지 않고 읽습니다. 이전의 모든 실패를 누적해서 기록하는 값은 아닙니다.",
+    "zh-TW": "讀取最後儲存的 Raster 狀態，不將其清除。這不是先前所有失敗的累計記錄。",
+    "fr": "Lit le dernier état Raster mémorisé sans l’effacer. Ce n’est pas un historique cumulatif de tous les échecs précédents.",
+    "es": "Lee el último estado Raster guardado sin borrarlo. No es un registro acumulado de todos los fallos anteriores.",
+    "de": "Liest den zuletzt gespeicherten Raster-Status, ohne ihn zu löschen. Er ist keine kumulative Aufzeichnung aller früheren Fehler."
   },
   "raster_bands_Raster_Push": {
     "ja": "LYで背景SCX/SCYを切り替えるバンドを1個追加します。ウィンドウや色は変更しない、背景スクロール専用の登録関数です。",
     "en": "Append one band that changes background SCX/SCY at the scheduled LY. This background-only operation does not change the window or colors.",
-    "zh-CN": "追加一个分段，在安排的 LY 改变背景 SCX/SCY。此操作只影响背景，不改变窗口或颜色。"
+    "zh-CN": "追加一个分段，在安排的 LY 改变背景 SCX/SCY。此操作只影响背景，不改变窗口或颜色。",
+    "ko": "예약된 LY에서 배경 SCX/SCY를 바꾸는 밴드 하나를 추가합니다. 배경 전용 연산이므로 윈도우나 색은 바꾸지 않습니다.",
+    "zh-TW": "加入一個在指定 LY 改變背景 SCX/SCY 的區帶。此操作只處理背景，不改變視窗或色彩。",
+    "fr": "Ajoute une bande qui modifie SCX/SCY du fond au LY programmé. Cette opération réservée au fond ne change ni la fenêtre ni les couleurs.",
+    "es": "Añade una franja que cambia SCX/SCY del fondo en el LY programado. Esta operación exclusiva del fondo no modifica la ventana ni los colores.",
+    "de": "Fügt ein Band hinzu, das Hintergrund-SCX/SCY beim geplanten LY ändert. Diese reine Hintergrundoperation verändert weder Fenster noch Farben."
   },
   "raster_bands_Raster_PushEx": {
     "ja": "背景・ウィンドウ・表示状態・色のうち、flagsで指定した操作を行う拡張バンドを追加します。通常の背景だけならRaster_Pushを使うと引数が少なくなります。",
     "en": "Append an extended band that performs the background, window, visibility or color operations selected by flags. Use Raster_Push for ordinary background-only changes with fewer arguments.",
-    "zh-CN": "追加扩展分段，执行标志选择的背景、窗口、可见性或颜色操作。普通背景变化可用参数更少的 Raster_Push。"
+    "zh-CN": "追加扩展分段，执行标志选择的背景、窗口、可见性或颜色操作。普通背景变化可用参数更少的 Raster_Push。",
+    "ko": "플래그로 선택한 배경, 윈도우, 표시 여부, 색 연산을 수행하는 확장 밴드를 추가합니다. 배경만 바꾸려면 인수가 더 적은 Raster_Push를 사용하세요.",
+    "zh-TW": "加入擴充區帶，執行旗標選定的背景、視窗、顯示或色彩操作。一般僅改變背景時，請使用參數較少的 Raster_Push。",
+    "fr": "Ajoute une bande étendue exécutant les opérations de fond, de fenêtre, de visibilité ou de couleur choisies par les indicateurs. Pour modifier seulement le fond, utilisez Raster_Push, qui prend moins d’arguments.",
+    "es": "Añade una franja ampliada que ejecuta las operaciones de fondo, ventana, visibilidad o color elegidas por las banderas. Para cambios normales solo del fondo, usa Raster_Push, que requiere menos argumentos.",
+    "de": "Fügt ein erweitertes Band mit den durch Flags gewählten Hintergrund-, Fenster-, Sichtbarkeits- oder Farboperationen hinzu. Für reine Hintergrundänderungen nutzen Sie Raster_Push mit weniger Argumenten."
   },
   "raster_bands_expected_window_raw": {
     "ja": "WX=31、WY=48により、ウィンドウ左上は画面(24,48)です。青い16×16矩形はその中の(8,8)、つまり画面(32,56)に見えます。上の赤い背景矩形は(32,16)です。DMGではどちらも黒になります。",
     "en": "WX=31 and WY=48 place the window origin at screen (24,48). Its blue 16-by-16 rectangle at local (8,8) appears at screen (32,56). The upper red background rectangle stays at (32,16). Both are black on DMG.",
-    "zh-CN": "WX=31、WY=48 将窗口原点置于屏幕 (24,48)。窗口局部 (8,8) 的蓝色 16×16 矩形显示在屏幕 (32,56)。上方红色背景矩形保持在 (32,16)。DMG 上两者均为黑色。"
+    "zh-CN": "WX=31、WY=48 将窗口原点置于屏幕 (24,48)。窗口局部 (8,8) 的蓝色 16×16 矩形显示在屏幕 (32,56)。上方红色背景矩形保持在 (32,16)。DMG 上两者均为黑色。",
+    "ko": "WX=31, WY=48이면 윈도우 원점은 화면 (24,48)입니다. 윈도우 내부 (8,8)의 파란색 16x16 사각형은 화면 (32,56)에 나타납니다. 위쪽 빨간색 배경 사각형은 (32,16)에 남습니다. DMG에서는 둘 다 검은색입니다.",
+    "zh-TW": "WX=31、WY=48 會將視窗原點設在螢幕 (24,48)。視窗內 (8,8) 的藍色 16x16 矩形出現在螢幕 (32,56)。上方紅色背景矩形保持在 (32,16)。DMG 上兩者皆為黑色。",
+    "fr": "WX=31 et WY=48 placent l’origine de la fenêtre en (24,48) à l’écran. Son rectangle bleu de 16x16 en position locale (8,8) apparaît en (32,56). Le rectangle rouge du fond supérieur reste en (32,16). Les deux sont noirs sur DMG.",
+    "es": "WX=31 y WY=48 colocan el origen de la ventana en (24,48) de la pantalla. Su rectángulo azul de 16x16 en la posición local (8,8) aparece en (32,56). El rectángulo rojo del fondo superior permanece en (32,16). Ambos son negros en DMG.",
+    "de": "WX=31 und WY=48 legen den Fensterursprung auf Bildschirmposition (24,48). Das blaue 16x16-Rechteck an lokaler Position (8,8) erscheint bei (32,56). Das obere rote Hintergrundrechteck bleibt bei (32,16). Auf dem DMG sind beide schwarz."
   },
   "raster_bands_Raster_PushWindowRaw": {
     "ja": "ハードウェアWX/WYをそのまま使うウィンドウバンドを追加します。WINビットを自動で追加し、背景用の2バイトには0を渡します。",
     "en": "Append a window band using raw hardware WX/WY. It automatically adds WIN and supplies zero for the two background payload bytes.",
-    "zh-CN": "使用原始硬件 WX/WY 追加窗口分段。自动加上 WIN，并将两个背景数据字节设为零。"
+    "zh-CN": "使用原始硬件 WX/WY 追加窗口分段。自动加上 WIN，并将两个背景数据字节设为零。",
+    "ko": "하드웨어 원시 WX/WY로 윈도우 밴드를 추가합니다. WIN을 자동으로 추가하고 두 배경 데이터 바이트에는 0을 전달합니다.",
+    "zh-TW": "使用硬體原始 WX/WY 加入視窗區帶，自動加上 WIN，並將兩個背景資料位元組設為零。",
+    "fr": "Ajoute une bande de fenêtre avec les valeurs matérielles brutes WX/WY. Ajoute automatiquement WIN et fournit zéro pour les deux octets de données du fond.",
+    "es": "Añade una franja de ventana con los valores brutos WX/WY del hardware. Añade WIN automáticamente y pasa cero en los dos bytes de datos del fondo.",
+    "de": "Fügt ein Fensterband mit rohen Hardwarewerten WX/WY hinzu. Ergänzt automatisch WIN und übergibt null für beide Hintergrund-Datenbytes."
   },
   "raster_bands_expected_window_screen": {
     "ja": "画面座標(24,48)を直接指定しても、青いウィンドウ矩形はRaw版と同じ画面(32,56)に表示されます。Xへの7の加算はライブラリが行います。上の赤い背景矩形は(32,16)です。",
     "en": "Passing screen (24,48) directly produces the same blue window rectangle at (32,56) as the raw example. The library adds seven to X. The upper red background rectangle is at (32,16).",
-    "zh-CN": "直接传入屏幕 (24,48)，得到与原始坐标示例相同的结果：蓝色窗口矩形位于 (32,56)。库会给 X 加七。上方红色背景矩形位于 (32,16)。"
+    "zh-CN": "直接传入屏幕 (24,48)，得到与原始坐标示例相同的结果：蓝色窗口矩形位于 (32,56)。库会给 X 加七。上方红色背景矩形位于 (32,16)。",
+    "ko": "화면 좌표 (24,48)을 직접 전달하면 원시 값 예제와 동일하게 파란색 윈도우 사각형이 (32,56)에 나타납니다. 라이브러리가 X에 7을 더합니다. 위쪽 빨간색 배경 사각형은 (32,16)에 있습니다.",
+    "zh-TW": "直接傳入螢幕座標 (24,48)，會得到與原始值範例相同、位於 (32,56) 的藍色視窗矩形。函式庫會在 X 加上 7。上方紅色背景矩形位於 (32,16)。",
+    "fr": "Passer directement les coordonnées écran (24,48) produit le même rectangle bleu de fenêtre en (32,56) que l’exemple brut. La bibliothèque ajoute sept à X. Le rectangle rouge du fond supérieur est en (32,16).",
+    "es": "Pasar directamente las coordenadas de pantalla (24,48) produce el mismo rectángulo azul de ventana en (32,56) que el ejemplo con valores brutos. La biblioteca suma siete a X. El rectángulo rojo del fondo superior está en (32,16).",
+    "de": "Die direkte Übergabe der Bildschirmkoordinaten (24,48) erzeugt dasselbe blaue Fensterrechteck bei (32,56) wie das Beispiel mit Rohwerten. Die Bibliothek addiert sieben zu X. Das obere rote Hintergrundrechteck liegt bei (32,16)."
   },
   "raster_bands_Raster_PushWindowScreen": {
     "ja": "画面座標でウィンドウバンドを追加します。Xに7を加えてからRaw版へ渡すため、画面XとWXを取り違えずに配置できます。",
     "en": "Append a window band in screen coordinates. It adds seven to X before calling the raw variant, so callers can position the window without mixing up screen X and WX.",
-    "zh-CN": "使用屏幕坐标追加窗口分段。先给 X 加七，再调用原始坐标版本，使调用方无需混淆屏幕 X 和 WX。"
+    "zh-CN": "使用屏幕坐标追加窗口分段。先给 X 加七，再调用原始坐标版本，使调用方无需混淆屏幕 X 和 WX。",
+    "ko": "화면 좌표로 윈도우 밴드를 추가합니다. 원시 값 함수를 호출하기 전에 X에 7을 더하므로 화면 X와 WX를 혼동하지 않고 윈도우를 배치할 수 있습니다.",
+    "zh-TW": "以螢幕座標加入視窗區帶。在呼叫原始值版本前先將 X 加 7，呼叫端可直接定位視窗，避免混淆螢幕 X 與 WX。",
+    "fr": "Ajoute une bande de fenêtre en coordonnées écran. Ajoute sept à X avant d’appeler la variante brute, afin de positionner la fenêtre sans confondre X écran et WX.",
+    "es": "Añade una franja de ventana en coordenadas de pantalla. Suma siete a X antes de llamar a la variante bruta, para colocar la ventana sin confundir la X de pantalla con WX.",
+    "de": "Fügt ein Fensterband in Bildschirmkoordinaten hinzu. Addiert vor dem Aufruf der Rohwertvariante sieben zu X, damit Bildschirm-X und WX beim Positionieren nicht verwechselt werden."
   },
   "raster_bands_expected_bg_window": {
     "ja": "背景X=8により赤い背景矩形が(24,16)へ移ります。ウィンドウ左上は(24,48)で、青い矩形は(32,56)のままです。背景とウィンドウの座標系が独立していることが分かります。",
     "en": "Background X=8 moves the red background rectangle to (24,16). The window origin remains (24,48), keeping its blue rectangle at (32,56). This shows the independent coordinate systems.",
-    "zh-CN": "背景 X=8 将红色背景矩形移到 (24,16)。窗口原点仍为 (24,48)，蓝色矩形保持在 (32,56)，展示两套坐标系统互相独立。"
+    "zh-CN": "背景 X=8 将红色背景矩形移到 (24,16)。窗口原点仍为 (24,48)，蓝色矩形保持在 (32,56)，展示两套坐标系统互相独立。",
+    "ko": "배경 X=8은 빨간색 배경 사각형을 (24,16)으로 옮깁니다. 윈도우 원점은 (24,48)을 유지하므로 파란색 사각형은 (32,56)에 남습니다. 두 좌표계가 독립적임을 보여 줍니다.",
+    "zh-TW": "背景 X=8 將紅色背景矩形移至 (24,16)。視窗原點維持 (24,48)，因此藍色矩形仍在 (32,56)，展示兩套座標系統彼此獨立。",
+    "fr": "Un X de fond à 8 déplace le rectangle rouge en (24,16). L’origine de la fenêtre reste en (24,48), donc son rectangle bleu demeure en (32,56). Cela montre l’indépendance des deux systèmes de coordonnées.",
+    "es": "X=8 en el fondo mueve el rectángulo rojo a (24,16). El origen de la ventana sigue en (24,48), manteniendo su rectángulo azul en (32,56). Así se muestra que los sistemas de coordenadas son independientes.",
+    "de": "Hintergrund-X=8 verschiebt das rote Hintergrundrechteck nach (24,16). Der Fensterursprung bleibt bei (24,48), sein blaues Rechteck damit bei (32,56). Dies zeigt die unabhängigen Koordinatensysteme."
   },
   "raster_bands_Raster_PushBgWindowScreen": {
     "ja": "1個のバンドで背景スクロールとウィンドウ座標を両方更新します。BGとWINを自動で追加し、ウィンドウXを画面座標からWXへ変換します。",
     "en": "Update background scroll and window coordinates in a single band. The wrapper adds BG and WIN and converts window screen X to WX.",
-    "zh-CN": "在同一个分段中更新背景滚动和窗口坐标。封装函数加上 BG 和 WIN，并将窗口屏幕 X 转换为 WX。"
+    "zh-CN": "在同一个分段中更新背景滚动和窗口坐标。封装函数加上 BG 和 WIN，并将窗口屏幕 X 转换为 WX。",
+    "ko": "밴드 하나에서 배경 스크롤과 윈도우 좌표를 갱신합니다. 래퍼가 BG와 WIN을 추가하고 윈도우 화면 X를 WX로 변환합니다.",
+    "zh-TW": "在單一區帶更新背景捲動與視窗座標。包裝函式加上 BG 與 WIN，並將視窗螢幕 X 轉成 WX。",
+    "fr": "Modifie le défilement du fond et les coordonnées de la fenêtre dans une même bande. La fonction ajoute BG et WIN et convertit le X écran de la fenêtre en WX.",
+    "es": "Actualiza el desplazamiento del fondo y las coordenadas de ventana en una sola franja. La función añade BG y WIN y convierte la X de pantalla de la ventana a WX.",
+    "de": "Aktualisiert Hintergrundscroll und Fensterkoordinaten in einem Band. Der Wrapper ergänzt BG und WIN und wandelt Fenster-Bildschirm-X in WX um."
   },
   "raster_bands_expected_color": {
     "ja": "CGB通常速度の検証画像では、上から行0～65が青、66～113が赤、114～143が緑です。予約LYは0・64・112で、割り込み処理とパレット待ちによる遅延が画面境界に含まれます。DMG版のカラー表示はありません。",
     "en": "In the verified CGB normal-speed capture, rows 0..65 are blue, 66..113 red and 114..143 green. Scheduled LY values are 0, 64 and 112; interrupt and palette-access latency contribute to the visible boundaries. There is no DMG color version.",
-    "zh-CN": "已验证的 CGB 普通速度截图中，第 0..65 行为蓝色，66..113 为红色，114..143 为绿色。安排的 LY 为 0、64、112；中断及调色板访问延迟影响实际可见边界。没有 DMG 彩色版本。"
+    "zh-CN": "已验证的 CGB 普通速度截图中，第 0..65 行为蓝色，66..113 为红色，114..143 为绿色。安排的 LY 为 0、64、112；中断及调色板访问延迟影响实际可见边界。没有 DMG 彩色版本。",
+    "ko": "확인한 CGB 일반 속도 캡처에서는 0..65행이 파랑, 66..113행이 빨강, 114..143행이 초록입니다. 예약된 LY는 0, 64, 112이며, 인터럽트와 팔레트 접근 지연이 실제 경계 위치에 영향을 줍니다. DMG용 컬러 버전은 없습니다.",
+    "zh-TW": "已驗證的 CGB 一般速度擷取中，第 0..65 列為藍色、66..113 列為紅色、114..143 列為綠色。排定的 LY 是 0、64、112；中斷與調色盤存取延遲會影響可見邊界。沒有 DMG 彩色版本。",
+    "fr": "Dans la capture CGB vérifiée à vitesse normale, les lignes 0..65 sont bleues, 66..113 rouges et 114..143 vertes. Les LY programmés sont 0, 64 et 112 ; les délais d’interruption et d’accès à la palette contribuent au décalage des limites visibles. Il n’existe pas de version couleur DMG.",
+    "es": "En la captura CGB verificada a velocidad normal, las filas 0..65 son azules, 66..113 rojas y 114..143 verdes. Los LY programados son 0, 64 y 112; la latencia de interrupción y de acceso a paleta influye en los límites visibles. No hay versión de color para DMG.",
+    "de": "In der geprüften CGB-Aufnahme bei normaler Geschwindigkeit sind Zeilen 0..65 blau, 66..113 rot und 114..143 grün. Geplant sind LY 0, 64 und 112; Interrupt- und Palettenzugriffslatenz beeinflussen die sichtbaren Grenzen. Eine DMG-Farbversion gibt es nicht."
   },
   "raster_bands_Raster_PushBgColor0": {
     "ja": "CGBの背景パレット0の色0を走査途中で切り替えるバンドを追加します。背景全体のパレット選択や他の3色を変更する操作ではありません。DMGでは登録できてもカラー効果はありません。",
     "en": "Append a band that changes color zero of CGB background palette zero during the frame. It does not select a different palette or change its other three colors. Registration on DMG does not produce a color effect.",
-    "zh-CN": "追加分段，在一帧中改变 CGB 背景调色板零的颜色零。不选择其他调色板，也不改变其余三个颜色。在 DMG 上注册不会产生彩色效果。"
+    "zh-CN": "追加分段，在一帧中改变 CGB 背景调色板零的颜色零。不选择其他调色板，也不改变其余三个颜色。在 DMG 上注册不会产生彩色效果。",
+    "ko": "프레임 도중 CGB 배경 팔레트 0의 색 0을 바꾸는 밴드를 추가합니다. 다른 팔레트를 선택하거나 나머지 세 색을 바꾸지 않습니다. DMG에서 등록해도 색 효과는 나오지 않습니다.",
+    "zh-TW": "加入在影格中途改變 CGB 背景調色盤 0 之色彩 0 的區帶。不會選擇其他調色盤，也不改變其餘三色。在 DMG 登錄不會產生色彩效果。",
+    "fr": "Ajoute une bande qui change la couleur zéro de la palette de fond CGB zéro pendant l’image. Ne sélectionne pas une autre palette et ne modifie pas ses trois autres couleurs. L’enregistrement sur DMG ne produit aucun effet de couleur.",
+    "es": "Añade una franja que cambia el color cero de la paleta de fondo CGB cero durante el fotograma. No selecciona otra paleta ni modifica sus otros tres colores. Registrarla en DMG no produce un efecto de color.",
+    "de": "Fügt ein Band hinzu, das während des Frames Farbe null der CGB-Hintergrundpalette null ändert. Es wählt keine andere Palette und ändert nicht deren drei weitere Farben. Eine Eintragung auf dem DMG erzeugt keinen Farbeffekt."
   },
   "raster_bands_Raster_Commit": {
     "ja": "構築した共有表を有効にします。先にPushが失敗していても、それまでに登録できた表を適用します。呼び出し側で各登録の成否を確認してください。",
     "en": "Activate the constructed shared table. Even if a previous push failed, entries successfully added before it are activated; caller code must check each registration.",
-    "zh-CN": "启用已构建的共享表。即使先前某次追加失败，之前成功追加的条目仍会启用；调用方须检查每次注册结果。"
+    "zh-CN": "启用已构建的共享表。即使先前某次追加失败，之前成功追加的条目仍会启用；调用方须检查每次注册结果。",
+    "ko": "구성한 공유 테이블을 활성화합니다. 앞선 추가가 실패했더라도 그 전에 성공적으로 들어간 항목은 활성화되므로 호출자가 각 등록 결과를 검사해야 합니다.",
+    "zh-TW": "啟用已建立的共用表。即使先前某次加入失敗，之前成功加入的項目仍會啟用；呼叫端須逐次檢查登錄結果。",
+    "fr": "Active la table partagée construite. Même si un ajout a échoué, les entrées ajoutées avec succès auparavant sont activées ; l’appelant doit vérifier chaque ajout.",
+    "es": "Activa la tabla compartida construida. Aunque una inserción anterior haya fallado, se activan las entradas añadidas correctamente antes de ella; el código que llama debe comprobar cada registro.",
+    "de": "Aktiviert die aufgebaute gemeinsame Tabelle. Auch wenn ein Hinzufügen fehlschlug, werden zuvor erfolgreich eingetragene Bänder aktiviert. Der aufrufende Code muss jede Eintragung prüfen."
   },
   "raster_bands_expected_hud_top": {
     "ja": "上端32行を固定します。上の矩形は(32,16)のままで、下の2個はカメラ(8,8)により(24,72)と(24,104)へ移ります。上端のFIXED TOP HUDは動きません。",
     "en": "The top 32 rows stay fixed. The upper rectangle remains at (32,16); camera (8,8) moves the other two to (24,72) and (24,104). FIXED TOP HUD remains at the top.",
-    "zh-CN": "顶部 32 行保持固定。上方矩形仍为 (32,16)；摄像机 (8,8) 将另外两个移到 (24,72) 和 (24,104)。FIXED TOP HUD 保持在顶部。"
+    "zh-CN": "顶部 32 行保持固定。上方矩形仍为 (32,16)；摄像机 (8,8) 将另外两个移到 (24,72) 和 (24,104)。FIXED TOP HUD 保持在顶部。",
+    "ko": "위쪽 32개 줄은 고정됩니다. 위쪽 사각형은 (32,16)에 남고, 카메라 (8,8)은 나머지 두 사각형을 (24,72), (24,104)로 옮깁니다. FIXED TOP HUD는 위쪽에 유지됩니다.",
+    "zh-TW": "上方 32 列保持固定。上方矩形仍在 (32,16)；攝影機 (8,8) 將另外兩個移至 (24,72) 與 (24,104)。FIXED TOP HUD 留在頂端。",
+    "fr": "Les 32 premières lignes restent fixes. Le rectangle supérieur reste en (32,16) ; la caméra (8,8) déplace les deux autres en (24,72) et (24,104). FIXED TOP HUD demeure en haut.",
+    "es": "Las 32 primeras filas permanecen fijas. El rectángulo superior sigue en (32,16); la cámara (8,8) mueve los otros dos a (24,72) y (24,104). FIXED TOP HUD permanece arriba.",
+    "de": "Die oberen 32 Zeilen bleiben fest. Das obere Rechteck bleibt bei (32,16); Kamera (8,8) verschiebt die anderen beiden nach (24,72) und (24,104). FIXED TOP HUD bleibt oben."
   },
   "raster_bands_Raster_BuildHudTop": {
     "ja": "上側を固定したHUD用に、LY=0で背景(0,0)、hud_heightでカメラ座標となる2バンドを作ります。ウィンドウではなく背景スクロールの分割です。",
     "en": "Build two background bands for a fixed top HUD: (0,0) at LY=0, then camera coordinates at hud_height. This splits background scrolling; it does not use the window.",
-    "zh-CN": "为固定顶部 HUD 构建两个背景分段：LY=0 使用 (0,0)，从 hud_height 起使用摄像机坐标。这是背景滚动分段，不使用窗口。"
+    "zh-CN": "为固定顶部 HUD 构建两个背景分段：LY=0 使用 (0,0)，从 hud_height 起使用摄像机坐标。这是背景滚动分段，不使用窗口。",
+    "ko": "위쪽 HUD를 고정하는 배경 밴드 두 개를 구성합니다. LY=0에서 (0,0), hud_height에서 카메라 좌표를 적용합니다. 배경 스크롤을 분할하는 방식이며 윈도우는 사용하지 않습니다.",
+    "zh-TW": "建立兩個背景區帶以固定頂端 HUD：LY=0 使用 (0,0)，到 hud_height 改用攝影機座標。這是分割背景捲動，不使用視窗。",
+    "fr": "Construit deux bandes de fond pour un HUD supérieur fixe : (0,0) à LY=0, puis les coordonnées caméra à hud_height. Cela divise le défilement du fond sans utiliser la fenêtre.",
+    "es": "Construye dos franjas de fondo para un HUD superior fijo: (0,0) en LY=0 y después las coordenadas de cámara en hud_height. Divide el desplazamiento del fondo; no usa la ventana.",
+    "de": "Erstellt zwei Hintergrundbänder für ein festes oberes HUD: (0,0) bei LY=0, danach Kamerakoordinaten ab hud_height. Dies teilt den Hintergrundscroll und verwendet kein Fenster."
   },
   "raster_bands_expected_hud_bottom": {
     "ja": "96行目から下を固定します。上の2個の矩形はカメラ(8,8)により(24,8)と(24,72)、下の矩形は(32,112)です。下端のFIXED BOTTOM HUDも固定します。",
     "en": "Rows from 96 downward stay fixed. Camera (8,8) places the upper rectangles at (24,8) and (24,72), while the bottom rectangle stays at (32,112). FIXED BOTTOM HUD stays at the bottom.",
-    "zh-CN": "从第 96 行往下保持固定。摄像机 (8,8) 使上方矩形位于 (24,8) 和 (24,72)，底部矩形保持 (32,112)。FIXED BOTTOM HUD 保持在底部。"
+    "zh-CN": "从第 96 行往下保持固定。摄像机 (8,8) 使上方矩形位于 (24,8) 和 (24,72)，底部矩形保持 (32,112)。FIXED BOTTOM HUD 保持在底部。",
+    "ko": "96행부터 아래는 고정됩니다. 카메라 (8,8)은 위쪽 사각형들을 (24,8), (24,72)에 놓고, 아래쪽 사각형은 (32,112)에 남습니다. FIXED BOTTOM HUD는 아래쪽에 유지됩니다.",
+    "zh-TW": "從第 96 列起向下保持固定。攝影機 (8,8) 將上方矩形放在 (24,8) 與 (24,72)，底部矩形仍在 (32,112)。FIXED BOTTOM HUD 留在底端。",
+    "fr": "Les lignes à partir de 96 restent fixes. La caméra (8,8) place les rectangles supérieurs en (24,8) et (24,72), tandis que celui du bas reste en (32,112). FIXED BOTTOM HUD demeure en bas.",
+    "es": "Las filas desde la 96 hacia abajo permanecen fijas. La cámara (8,8) coloca los rectángulos superiores en (24,8) y (24,72), mientras el inferior sigue en (32,112). FIXED BOTTOM HUD permanece abajo.",
+    "de": "Die Zeilen ab 96 bleiben fest. Kamera (8,8) setzt die oberen Rechtecke auf (24,8) und (24,72), während das untere bei (32,112) bleibt. FIXED BOTTOM HUD bleibt unten."
   },
   "raster_bands_Raster_BuildHudBottom": {
     "ja": "上側をスクロールするプレイ領域、下側を固定HUDとする2バンドを作ります。LY=0はカメラ座標、hud_y以降は背景(0,0)です。",
     "en": "Build a scrolling upper playfield and fixed bottom HUD. LY=0 uses camera coordinates; hud_y switches to background (0,0).",
-    "zh-CN": "构建上方滚动游戏区和底部固定 HUD。LY=0 使用摄像机坐标，在 hud_y 切换为背景 (0,0)。"
+    "zh-CN": "构建上方滚动游戏区和底部固定 HUD。LY=0 使用摄像机坐标，在 hud_y 切换为背景 (0,0)。",
+    "ko": "위쪽은 스크롤하는 플레이 영역, 아래쪽은 고정 HUD로 구성합니다. LY=0에서 카메라 좌표를 사용하고 hud_y에서 배경 (0,0)으로 전환합니다.",
+    "zh-TW": "建立可捲動的上方遊戲區與固定的底部 HUD。LY=0 使用攝影機座標，hud_y 處切換為背景 (0,0)。",
+    "fr": "Construit une zone de jeu supérieure défilante et un HUD inférieur fixe. LY=0 utilise les coordonnées caméra ; hud_y revient au fond (0,0).",
+    "es": "Construye una zona de juego superior desplazable y un HUD inferior fijo. LY=0 usa las coordenadas de cámara; hud_y cambia al fondo (0,0).",
+    "de": "Erstellt ein scrollendes oberes Spielfeld und ein festes unteres HUD. LY=0 verwendet Kamerakoordinaten; hud_y schaltet den Hintergrund auf (0,0)."
   },
   "raster_bands_expected_parallax2": {
     "ja": "64行目でXを0から16へ切り替えます。上の矩形は(32,16)、下の2個は(16,80)と(16,112)となり、下側だけ16ピクセル左へ動きます。",
     "en": "X changes from 0 to 16 at the scheduled line 64. Rectangles appear at (32,16), (16,80) and (16,112); only the lower region shifts sixteen pixels left.",
-    "zh-CN": "X 在安排的第 64 行从 0 变为 16。矩形显示在 (32,16)、(16,80)、(16,112)；只有下部区域左移十六像素。"
+    "zh-CN": "X 在安排的第 64 行从 0 变为 16。矩形显示在 (32,16)、(16,80)、(16,112)；只有下部区域左移十六像素。",
+    "ko": "예약된 64행에서 X가 0에서 16으로 바뀝니다. 사각형은 (32,16), (16,80), (16,112)에 나타나며 아래쪽 영역만 왼쪽으로 16픽셀 이동합니다.",
+    "zh-TW": "在排定的第 64 線，X 從 0 改為 16。矩形出現在 (32,16)、(16,80)、(16,112)，只有下方區域向左移動 16 像素。",
+    "fr": "X passe de 0 à 16 à la ligne programmée 64. Les rectangles apparaissent en (32,16), (16,80) et (16,112) ; seule la région inférieure se décale de seize pixels vers la gauche.",
+    "es": "X cambia de 0 a 16 en la línea programada 64. Los rectángulos aparecen en (32,16), (16,80) y (16,112); solo la zona inferior se desplaza dieciséis píxeles a la izquierda.",
+    "de": "X wechselt an der geplanten Zeile 64 von 0 auf 16. Rechtecke erscheinen bei (32,16), (16,80) und (16,112); nur der untere Bereich wird sechzehn Pixel nach links verschoben."
   },
   "raster_bands_Raster_BuildParallax2": {
     "ja": "上下2段の背景を別々のXスクロール値で描く表を作ります。LY=0はfar_scx、split_y以降はnear_scxとなり、Yは共通です。",
     "en": "Build two background bands with separate horizontal offsets: far_scx at LY=0 and near_scx from split_y, sharing the same Y scroll.",
-    "zh-CN": "构建水平偏移不同的两个背景分段：LY=0 使用 far_scx，从 split_y 起使用 near_scx，共用同一个 Y 滚动值。"
+    "zh-CN": "构建水平偏移不同的两个背景分段：LY=0 使用 far_scx，从 split_y 起使用 near_scx，共用同一个 Y 滚动值。",
+    "ko": "수평 오프셋이 서로 다른 배경 밴드 두 개를 구성합니다. LY=0에는 far_scx, split_y부터는 near_scx를 사용하며 Y 스크롤은 공유합니다.",
+    "zh-TW": "建立水平偏移不同的兩個背景區帶：LY=0 使用 far_scx，split_y 起使用 near_scx，兩者共用 Y 捲動。",
+    "fr": "Construit deux bandes de fond avec des décalages horizontaux distincts : far_scx à LY=0 et near_scx à partir de split_y, avec le même défilement Y.",
+    "es": "Construye dos franjas de fondo con desplazamientos horizontales distintos: far_scx en LY=0 y near_scx desde split_y, compartiendo el desplazamiento Y.",
+    "de": "Erstellt zwei Hintergrundbänder mit getrennten horizontalen Offsets: far_scx bei LY=0 und near_scx ab split_y, bei gemeinsamem Y-Scroll."
   },
   "raster_bands_expected_parallax3": {
     "ja": "64行目と104行目でXを0→8→16へ切り替えます。矩形は(32,16)、(24,80)、(16,112)へ段階的に左へずれ、3段の差が見えます。",
     "en": "Scheduled lines 64 and 104 select X offsets 0, 8 and 16. Rectangles at (32,16), (24,80) and (16,112) show the increasing displacement across three bands.",
-    "zh-CN": "安排的第 64、104 行使 X 偏移依次为 0、8、16。位于 (32,16)、(24,80)、(16,112) 的矩形展示三个分段逐渐增大的位移。"
+    "zh-CN": "安排的第 64、104 行使 X 偏移依次为 0、8、16。位于 (32,16)、(24,80)、(16,112) 的矩形展示三个分段逐渐增大的位移。",
+    "ko": "예약된 64행과 104행을 경계로 X 오프셋 0, 8, 16을 선택합니다. (32,16), (24,80), (16,112)의 사각형이 세 밴드의 점점 커지는 이동량을 보여 줍니다.",
+    "zh-TW": "以排定的第 64、104 線為分界，選用 X 偏移 0、8、16。位於 (32,16)、(24,80)、(16,112) 的矩形呈現三個區帶逐漸增加的位移。",
+    "fr": "Les lignes programmées 64 et 104 délimitent les décalages X de 0, 8 et 16. Les rectangles en (32,16), (24,80) et (16,112) montrent le déplacement croissant entre les trois bandes.",
+    "es": "Las líneas programadas 64 y 104 delimitan los desplazamientos X de 0, 8 y 16. Los rectángulos en (32,16), (24,80) y (16,112) muestran el desplazamiento creciente de las tres franjas.",
+    "de": "Die geplanten Zeilen 64 und 104 begrenzen Bereiche mit X-Offsets 0, 8 und 16. Rechtecke bei (32,16), (24,80) und (16,112) zeigen die zunehmende Verschiebung über drei Bänder."
   },
   "raster_bands_Raster_BuildParallax3": {
     "ja": "LY=0・y1・y2の3段に対して、それぞれscx0・scx1・scx2を登録します。遠景・中景・近景の横移動を分け、Yは共通にできます。",
     "en": "Register scx0, scx1 and scx2 for bands beginning at LY=0, y1 and y2. Give far, middle and near layers different horizontal offsets while sharing Y scroll.",
-    "zh-CN": "为从 LY=0、y1、y2 开始的分段注册 scx0、scx1、scx2。远、中、近层使用不同水平偏移，共用 Y 滚动值。"
+    "zh-CN": "为从 LY=0、y1、y2 开始的分段注册 scx0、scx1、scx2。远、中、近层使用不同水平偏移，共用 Y 滚动值。",
+    "ko": "LY=0, y1, y2에서 시작하는 밴드에 scx0, scx1, scx2를 등록합니다. 먼·중간·가까운 레이어에 서로 다른 수평 오프셋을 주고 Y 스크롤은 공유합니다.",
+    "zh-TW": "為從 LY=0、y1、y2 開始的區帶登錄 scx0、scx1、scx2。遠、中、近層使用不同水平偏移，並共用 Y 捲動。",
+    "fr": "Enregistre scx0, scx1 et scx2 pour les bandes commençant à LY=0, y1 et y2. Attribue des décalages horizontaux distincts aux plans lointain, intermédiaire et proche, tout en partageant le défilement Y.",
+    "es": "Registra scx0, scx1 y scx2 para franjas que empiezan en LY=0, y1 e y2. Asigna distintos desplazamientos horizontales a las capas lejana, intermedia y cercana, con desplazamiento Y compartido.",
+    "de": "Trägt scx0, scx1 und scx2 für Bänder ab LY=0, y1 und y2 ein. Ferne, mittlere und nahe Ebenen erhalten verschiedene horizontale Offsets bei gemeinsamem Y-Scroll."
   },
   "raster_bands_module": {
     "ja": "Rasterライブラリには、最大8個の境界を登録するバンド方式と、全144走査線のXを動かすLineX方式があります。バンド方式は固定HUD・多重スクロール・ウィンドウ切り替え・CGB色帯に向きます。LineX方式は波打つタイトルや画面演出に使います。両方式を同時には動かさず、必要な方式を選んでください。",
     "en": "The Raster library provides an eight-entry band table and a LineX renderer that changes X on all 144 visible lines. Bands suit fixed HUDs, parallax, window changes and CGB color regions. LineX suits rippling titles and screen effects. Choose one driver; do not run both together.",
-    "zh-CN": "Raster 库提供八项分段表，以及在全部 144 条可见行改变 X 的 LineX 渲染器。分段适合固定 HUD、视差、窗口变化和 CGB 颜色区域；LineX 适合波动标题和屏幕特效。请选择一种驱动，不要同时运行。"
+    "zh-CN": "Raster 库提供八项分段表，以及在全部 144 条可见行改变 X 的 LineX 渲染器。分段适合固定 HUD、视差、窗口变化和 CGB 颜色区域；LineX 适合波动标题和屏幕特效。请选择一种驱动，不要同时运行。",
+    "ko": "Raster 라이브러리는 8항목 밴드 테이블과 144개 가시 줄 모두에서 X를 바꾸는 LineX 렌더러를 제공합니다. 밴드는 고정 HUD, 시차 스크롤, 윈도우 변경, CGB 색 영역에 적합합니다. LineX는 물결치는 타이틀과 화면 효과에 적합합니다. 드라이버 하나를 선택하고 두 가지를 함께 실행하지 마세요.",
+    "zh-TW": "Raster 函式庫提供 8 項區帶表，以及在全部 144 條可見線改變 X 的 LineX 繪製器。區帶適用於固定 HUD、視差、視窗變更及 CGB 色彩區域；LineX 適合波動標題與畫面效果。請選用一種驅動，勿同時執行。",
+    "fr": "La bibliothèque Raster propose une table de huit bandes et un moteur LineX qui modifie X sur les 144 lignes visibles. Les bandes conviennent aux HUD fixes, à la parallaxe, aux changements de fenêtre et aux régions colorées CGB. LineX convient aux titres ondulants et aux effets d’écran. Choisissez un seul pilote ; ne les exécutez pas ensemble.",
+    "es": "La biblioteca Raster ofrece una tabla de ocho franjas y un renderizador LineX que cambia X en las 144 líneas visibles. Las franjas sirven para HUD fijos, paralaje, cambios de ventana y regiones de color CGB. LineX sirve para títulos ondulantes y efectos de pantalla. Elige un controlador; no ejecutes ambos a la vez.",
+    "de": "Die Raster-Bibliothek bietet eine Tabelle mit acht Bändern und einen LineX-Renderer, der X auf allen 144 sichtbaren Zeilen ändert. Bänder eignen sich für feste HUDs, Parallaxe, Fensteränderungen und CGB-Farbbereiche. LineX eignet sich für wellenförmige Titel und Bildschirmeffekte. Wählen Sie einen Treiber; betreiben Sie nicht beide gleichzeitig."
   }
 }

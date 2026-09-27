@@ -1,7 +1,7 @@
 ## 1. KITAQFC et le compilateur GB
 KITAQFC reprend la partie frontale de KITAQGB pour générer du code destiné au processeur de la famille 6502 de la NES/Famicom. Il ne convertit pas une ROM GB en ROM NES. Écrivez le logiciel pour l'affichage, le son, la mémoire et le mapper de la machine cible.
 
-Les vérifications consignées ont exécuté des exemples utilisant des copies de structures et des appels de fonctions ordinaires. En revanche, **do-while et switch ont provoqué des erreurs de génération de code non prise en charge sur NES**. La présence d'une construction dans l'analyseur syntaxique ne suffit pas à démontrer qu'elle est utilisable sur cette cible.
+KITAQFC prend en charge les copies de structures, les appels de fonctions ordinaires et les boucles for, while et do-while. Une boucle do-while exécute son corps au moins une fois avant de tester la condition. continue passe à ce test final ; break quitte la boucle. Un switch sélectionne une constante case comprise entre 0 et 255, ou le corps default si aucun case ne correspond. Son expression de sélection n’est évaluée qu’une fois. break quitte la boucle ou le switch le plus interne ; un continue à l’intérieur d’un switch passe à l’itération suivante de la boucle englobante.
 
 ## 2. Prérequis et compilation
 {{CODE:0}}
@@ -22,12 +22,31 @@ Les instructions et expressions du volume GB constituent une base commune. FC ac
 
 Respectez les plages des entiers sur 8 ou 16 bits. Les indices des tableaux commencent à zéro. `fc_aggregate.c` présente les fonctions, pointeurs et structures ; `fc_arithmetic.c`, les calculs ; `fc_control.c`, les boucles. N'incluez pas de registres CGB ni de fonctions intrinsèques réservées à la GB dans un programme FC.
 
-## 5. Réécrire les constructions non prises en charge
+<!-- common-language-kitaqfc:start -->
+### Résultats des expressions et évaluation
+
+Les opérateurs de comparaison `==`, `!=`, `<`, `<=`, `>`, `>=` et les opérateurs logiques `!`, `&&`, `||` renvoient 0 pour faux et 1 pour vrai. Vous pouvez stocker le résultat dans un `u16`, le passer en argument, le renvoyer ou l’utiliser dans un calcul. Par exemple, `score = 500 + (lives != 0);` donne 501 s’il reste une vie, et 500 sinon.
+
+`&&` n’évalue pas son opérande droit lorsque celui de gauche vaut zéro. `||` n’évalue pas son opérande droit lorsque celui de gauche est non nul. Dans `pointer != 0 && pointer->active != 0`, un pointeur nul empêche l’accès au membre. Les deux octets d’une valeur de 16 bits participent au test logique : 256 est donc vrai. Les opérateurs bit à bit `&` et `|` ne court-circuitent pas l’évaluation.
+
+`++value` renvoie la valeur mise à jour ; `value++` renvoie la valeur initiale. Ces opérateurs acceptent aussi les éléments de tableau, les pointeurs déréférencés et les membres de structure. `buffer[index()]++` appelle `index()` une seule fois. Avec `u16 *p`, `p++` avance de deux octets vers l’élément suivant, tandis que `(*p)++` incrémente la valeur pointée.
+
+`sizeof(array)` donne la taille en octets de tout le tableau ; `sizeof(pointer)` vaut 2. Pour `u16 values[9];`, `sizeof(values)` vaut 18. Cela s’applique aux tableaux en ROM, aux tableaux locaux et aux membres de type tableau. `sizeof(function())` examine le type de retour sans appeler la fonction.
+
+La déclaration et la définition d’une fonction doivent avoir les mêmes types de paramètres, dans le même ordre. Les noms peuvent différer ; le corps utilise ceux de la définition. Par exemple, `u8 next(u8 input);` peut être défini par `u8 next(u8 value) { return (u8)(value + 1); }`. Les paramètres et variables locales masquent les variables globales de même nom.
+
+La sélection de tableaux ou de chaînes avec `?:` produit un pointeur vers le type d’élément sélectionné. Vous pouvez le passer directement, par exemple dans `show(ready ? "READY" : "WAIT");`. Pour des tableaux `u16` nommés `a` et `b`, `(ready ? a : b) + 1` avance de deux octets vers le deuxième élément du tableau choisi. Le tableau n’est pas copié.
+
+`condition ? yes : no` évalue la condition, puis uniquement la branche choisie. La condition et les branches peuvent contenir des décalages dont le nombre de bits est variable. Par exemple, `on = (pattern & (0x80 >> bit)) != 0 ? 4 : 2;` choisit quatre ou deux selon le bit désigné. Les appels de fonction présents dans un opérande droit ignoré par `&&` ou `||` sont eux aussi ignorés. Un `continue` dans une boucle `for` exécute une fois l’expression de mise à jour avant de réévaluer la condition ; dans `while` et `do ... while`, il passe à la condition.
+
+<!-- common-language-kitaqfc:end -->
+
+## 5. Boucles et répartition par état
 {{CODE:4}}
 
-Pour remplacer do-while, exécutez le corps de la boucle une première fois avant d'en tester la condition de sortie. Un aiguillage simple par switch peut devenir une suite de if/else. Ces fragments servent d'explication : fournissez vos propres fonctions `update` et de gestion d'état. L'exemple `fc_control.c` constitue un programme ROM complet.
+Ces fragments montrent une boucle qui effectue au moins une mise à jour et une branche qui choisit le traitement de l’état courant. Définissez update, condition, state et les traitements des états dans votre programme. Consultez fc_control.c pour un exemple complet de boucle, et l’exemple de gestion des images et des scènes de la bibliothèque pour une ROM complète de gestion des scènes.
 
-Ne supposez pas que la récursivité, les appels indirects de fonctions ou les fonctions à nombre variable d'arguments sont pris en charge comme sur un ordinateur de bureau. Certaines API de scène ou d'entité conservent actuellement des pointeurs de fonction sans les appeler indirectement.
+Enregistrez les rappels de scène, d’entité et de système avec les types d’arguments et de retour exigés par leurs déclarations. Les bibliothèques appellent les traitements enregistrés depuis les opérations correspondantes de mise à jour, de dessin ou d’attente d’image. Respectez les contraintes de banque ROM et de mappage de chaque API. Ne supposez pas que la récursion ou les fonctions variadiques sont prises en charge comme sur un ordinateur de bureau.
 
 ## 6. Mémoire et PPU
 La RAM interne du processeur NES occupe 0x0000–0x07FF. Ses miroirs au-delà de 0x0800 ne constituent pas de la RAM supplémentaire. La pile du 6502 occupe la page 1 ; les copies de travail de l'OAM et les files réservent d'autres régions. Les réglages avancés `--nes-local-ram=START:LENGTH` et `--nes-temp-ram=START:LENGTH` nécessitent d'examiner le fichier de placement.
@@ -55,6 +74,8 @@ Il s'agit des choix du compilateur, pas d'un tableau de compatibilité matériel
 {{CODE:6}}
 
 Vérifiez les exigences de la carte pour `--battery` / `--no-battery`, la capacité CHR, le placement PRG et les appels entre banques. Après un changement de mapper ou de mode miroir, testez le démarrage, le défilement et la commutation des données, en plus de la génération de la ROM.
+
+Les lectures ordinaires par indice et les références par pointeur C à des tableaux en ROM placent ces tableaux dans la banque commune 0, sauf si `#pragma fixed_bank` fixe explicitement leur emplacement. Les données restent ainsi visibles lorsque l’appelant s’exécute dans une banque commutable. Pour un accès distant explicite, passez dans le même appel le nom du tableau seul et `__bankof` appliqué à ce même nom, par exemple `__farpeek8(__bankof(table), table)`. Une simple demande de numéro de banque ne demande pas de placement en banque commune. Pour les données explicitement fixées à une banque et les références en assembleur, vous devez maintenir le mappage correct. Cette règle vérifie le placement à partir de la syntaxe ; elle n’analyse pas le cheminement des pointeurs. La capacité de la banque commune reste limitée.
 
 ## 9. FDS, extensions sonores et périphériques
 Le FDS implique le placement des fichiers sur disque, le démarrage, les overlays et les sauvegardes. Consultez `fds_manifest_sample.json` et les en-têtes FDS. Préparez le BIOS éventuellement nécessaire dans votre propre environnement d'exécution ; la distribution publique ne contient aucun BIOS.

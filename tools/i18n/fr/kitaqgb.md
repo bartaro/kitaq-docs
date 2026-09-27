@@ -55,6 +55,25 @@ Commencez par ces noms de types courts. Ne supposez pas que `int`, `long`, `floa
 
 Distinguez `=` de `==`. Utilisez des parenthèses pour rendre les expressions complexes lisibles et évitez d'accumuler appels et effets de bord dans une seule instruction. Évitez les divisions par zéro et les accès hors des limites des tableaux. `sizeof` donne une taille en octets ; `offsetof`, le décalage d'un membre dans une structure.
 
+<!-- common-language-kitaqgb:start -->
+### Résultats des expressions et évaluation
+
+Les opérateurs de comparaison `==`, `!=`, `<`, `<=`, `>`, `>=` et les opérateurs logiques `!`, `&&`, `||` renvoient 0 pour faux et 1 pour vrai. Vous pouvez stocker le résultat dans un `u16`, le passer en argument, le renvoyer ou l’utiliser dans un calcul. Par exemple, `score = 500 + (lives != 0);` donne 501 s’il reste une vie, et 500 sinon.
+
+`&&` n’évalue pas son opérande droit lorsque celui de gauche vaut zéro. `||` n’évalue pas son opérande droit lorsque celui de gauche est non nul. Dans `pointer != 0 && pointer->active != 0`, un pointeur nul empêche l’accès au membre. Les deux octets d’une valeur de 16 bits participent au test logique : 256 est donc vrai. Les opérateurs bit à bit `&` et `|` ne court-circuitent pas l’évaluation.
+
+`++value` renvoie la valeur mise à jour ; `value++` renvoie la valeur initiale. Ces opérateurs acceptent aussi les éléments de tableau, les pointeurs déréférencés et les membres de structure. `buffer[index()]++` appelle `index()` une seule fois. Avec `u16 *p`, `p++` avance de deux octets vers l’élément suivant, tandis que `(*p)++` incrémente la valeur pointée.
+
+`sizeof(array)` donne la taille en octets de tout le tableau ; `sizeof(pointer)` vaut 2. Pour `u16 values[9];`, `sizeof(values)` vaut 18. Cela s’applique aux tableaux en ROM, aux tableaux locaux et aux membres de type tableau. `sizeof(function())` examine le type de retour sans appeler la fonction.
+
+La déclaration et la définition d’une fonction doivent avoir les mêmes types de paramètres, dans le même ordre. Les noms peuvent différer ; le corps utilise ceux de la définition. Par exemple, `u8 next(u8 input);` peut être défini par `u8 next(u8 value) { return (u8)(value + 1); }`. Les paramètres et variables locales masquent les variables globales de même nom.
+
+La sélection de tableaux ou de chaînes avec `?:` produit un pointeur vers le type d’élément sélectionné. Vous pouvez le passer directement, par exemple dans `show(ready ? "READY" : "WAIT");`. Pour des tableaux `u16` nommés `a` et `b`, `(ready ? a : b) + 1` avance de deux octets vers le deuxième élément du tableau choisi. Le tableau n’est pas copié.
+
+`condition ? yes : no` évalue la condition, puis uniquement la branche choisie. La condition et les branches peuvent contenir des décalages dont le nombre de bits est variable. Par exemple, `on = (pattern & (0x80 >> bit)) != 0 ? 4 : 2;` choisit quatre ou deux selon le bit désigné. Les appels de fonction présents dans un opérande droit ignoré par `&&` ou `||` sont eux aussi ignorés. Un `continue` dans une boucle `for` exécute une fois l’expression de mise à jour avant de réévaluer la condition ; dans `while` et `do ... while`, il passe à la condition.
+
+<!-- common-language-kitaqgb:end -->
+
 ## 6. Branchements et boucles
 {{CODE:4}}
 
@@ -65,7 +84,7 @@ Distinguez `=` de `==`. Utilisez des parenthèses pour rendre les expressions co
 
 Les indices des tableaux commencent à zéro : un tableau de quatre éléments utilise les indices 0 à 3. `player.x` sélectionne un membre ; `pointer->x` y accède par un pointeur. Le compilateur analyse les structures, les unions et les énumérations, mais leur disposition dépend des types et des attributs `__packed` / `__aligned`. Vérifiez `sizeof` avant de partager des données avec le matériel ou un format binaire.
 
-L'ABI Legacy utilisée par défaut place les arguments et les variables locales à des adresses fixes. Ne supposez pas que la récursivité ou la réentrance depuis une interruption fonctionne comme sur un ordinateur de bureau. `__stackcall` et `--abi=stack` proposent d'autres conventions d'appel, destinées à un usage avancé. Si vous combinez plusieurs conventions, examinez les rapports ABI et vérifiez l'exécution.
+L’ABI Legacy par défaut place les arguments et le stockage local à des adresses fixes. Ne supposez pas une récursion ou une réentrance depuis les interruptions comparable à celle d’un ordinateur de bureau. `__stackcall` et `--abi=stack` sont des choix avancés de convention d’appel. Si vous combinez plusieurs conventions, examinez les rapports ABI et vérifiez l’exécution. Les rappels par pointeur de fonction ne sont pas pris en charge avec `--abi=stack`. Compilez les exemples complets de rappels système et de scène avec l’ABI Legacy par défaut, comme indiqué dans leurs commandes de compilation.
 
 ## 8. Plusieurs fichiers et préprocesseur
 Placez les types, constantes et déclarations dans les en-têtes, et le corps des fonctions dans les fichiers `.c`. Utilisez `#pragma once` ou des gardes d'inclusion pour éviter les inclusions répétées. La compilation conditionnelle prend en charge `#define`, `#undef`, `#if`, `#ifdef`, `#ifndef`, `#elif`, `#else` et `#endif`.

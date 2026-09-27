@@ -8,14 +8,14 @@ No apuntes `-I` a la biblioteca GB de nombre parecido. Por ejemplo, `__oam_dma()
 ## 2. Runtime y system
 `runtime.c` ofrece funciones C para los registros PPU, la copia de OAM en RAM y las colas VRAM. También existen rutas intrínsecas como `__vramq_*`. Comprueba qué datos consume la NMI antes de mezclar colas diferentes con nombres semejantes.
 
-`system_init` inicializa los fotogramas y activa NMI. `system_wait_vblank` espera NMI e incrementa el contador de software. **En FC, `system_set_vblank_callback` guarda el valor, pero la función de espera actual no ejecuta el callback.** No concentres allí toda la actualización suponiendo que funciona como en GB.
+`system_init` inicializa el estado de los fotogramas y habilita las NMI. `system_wait_vblank` espera una NMI, incrementa el contador de fotogramas por software y llama una vez, de forma síncrona, al callback registrado. Pase cero a `system_set_vblank_callback` para desactivarlo. El callback se ejecuta en el contexto que llama a la función de espera, no dentro del manejador NMI.
 
 ## 3. PPU, tiles, atributos y paletas
 `ppu_direct.h` ofrece acceso directo; `vram_queue.h`, actualizaciones por NMI; `tilemap` / `nametable_asset`, tablas y recursos; `attribute`, atributos; `palette`, paletas. Separa la carga inicial del trabajo por fotograma.
 
 Las paletas de fondo y sprites ocupan 16 bytes cada una. Sus valores son códigos de color NES, no componentes RGB. Los atributos eligen colores para grupos de tiles: cambiar la paleta aparente de uno puede afectar a sus vecinos.
 
-Algunas declaraciones de `ppu.h` no coinciden con nombres de implementación de `ppu.c`. Las entradas marcadas **solo declaración** no tienen un cuerpo localizado en las fuentes recogidas y no se llaman directamente en los ejemplos iniciales. Las lecciones ejecutables usan operaciones verificadas. Una declaración no demuestra que la función esté terminada ni que pueda enlazarse.
+`ppu.h` y `ppu.c` proporcionan control de pantalla, transferencia de una paleta de 32 bytes e inicialización completa de una tabla de nombres. `nes_ppu_seek_bytes(hi,lo)` reinicia el latch de dirección y establece una dirección a partir de dos bytes. Puede enlazarse junto con `nes_ppu_seek(address)` de `runtime.c`, que recibe la dirección en una sola palabra. Desactive el renderizado antes de las transferencias y la inicialización.
 
 ## 4. OAM, metasprites y reparto de visibilidad
 NES admite hasta 64 sprites, normalmente ocho por línea de barrido. Nueve enemigos o proyectiles alineados no pueden verse todos a la vez. Los metasprites unen varios OBJ en una imagen; comprueba límites de asignación y formatos de terminación.
@@ -35,12 +35,12 @@ Las muestras DMC tienen restricciones de dirección, longitud, alineación y fre
 VRC6 aporta canales de pulso y diente de sierra; VRC7, registros FM; FDS, síntesis por tabla de ondas. Usa el mapper correspondiente y graba el resultado. Estas API son independientes del controlador `Audio_*` de GB.
 
 ## 7. Escenas, actores y entidades
-`actor` y `entity` almacenan objetos en arrays fijos; `scene` mantiene el estado de escena. Detecta el agotamiento de capacidad y deja de usar los ID destruidos. Algunas API FC registran callbacks sin llamarlos. Para empezar, despacha explícitamente las funciones de cada estado desde el bucle principal.
+`actor` y `entity` almacenan los objetos del juego en arrays de tamaño fijo; `scene` gestiona el estado de las escenas. Detecta cuándo se agota la capacidad y deja de usar los ID destruidos. Las transiciones, actualizaciones y operaciones de dibujo de escenas invocan sus callbacks registrados de forma síncrona. Comprueba el orden de llamada y las restricciones de reentrada de cada API.
 
-`chain` conserva posiciones anteriores y `collision` comprueba contactos entre rectángulos y otras formas. Un orden constante de mover, comprobar colisiones y dibujar evita decisiones de colisión con un fotograma de retraso.
+`chain` proporciona seguimiento de cuerpos articulados mediante `ChainBody` e historial de posiciones mediante `Chain`; `collision` comprueba el contacto entre formas, como rectángulos. Mantener el orden movimiento, colisión y dibujo evita que las decisiones de colisión lleguen con un fotograma de retraso.
 
 ## 8. Matemáticas y física
-`fixed.h` ofrece Q8.8; `math_fast` / `math_fixed`, operaciones numéricas; `math_lut`, cálculos por tablas. El `physics2d.h` actual proporciona **tipos y constantes Q5.3**, no una función de integración ni macros de actualización. No es la API de mundos y cuerpos de GB.
+`fixed.h` proporciona aritmética Q8.8, `math_fast` y `math_fixed` operaciones numéricas, y `math_lut` cálculos mediante tablas. `physics2d` gestiona la integración del movimiento de cajas, la gravedad, los contactos AABB y la respuesta de las superficies. `physics3d` gestiona cajas 3D sin rotación, rebotes y valores de impacto. Reserva un mundo y un array de cuerpos, inicialízalos, configura sus parámetros y llama a la función de paso de simulación. Las posiciones y velocidades usan unidades enteras coherentes elegidas por quien llama a la API.
 
 La parte fraccionaria Q5.3 mide octavos de píxel. Conserva por separado coordenada entera, fracción, velocidad y dirección, y realiza la suma y el acarreo en el juego. `fc_subpixel.c` añade 2/8 de píxel ocho veces, pasando de 40 a 42. No reutilices el valor 256 de Q8.8 como si representara lo mismo en Q5.3.
 

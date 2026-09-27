@@ -2,121 +2,241 @@
   "zx0_credit": {
     "ja": "ZX0形式と元の圧縮アルゴリズムの設計者はEinar Saukas氏です。ここで提供する圧縮器・展開器はDAISUKE OBAによるKITAQ独自実装で、MITライセンスを適用します。",
     "en": "Einar Saukas designed the ZX0 format and original compression algorithm. The compressor and decompressor provided here are independent KITAQ implementations, copyright DAISUKE OBA, released under the MIT License.",
-    "zh-CN": "ZX0 格式及原始压缩算法由 Einar Saukas 设计。这里提供的压缩器和解压器是 KITAQ 的独立实现，版权归 DAISUKE OBA 所有，采用 MIT 许可证。"
+    "zh-CN": "ZX0 格式及原始压缩算法由 Einar Saukas 设计。这里提供的压缩器和解压器是 KITAQ 的独立实现，版权归 DAISUKE OBA 所有，采用 MIT 许可证。",
+    "ko": "ZX0 형식과 원래 압축 알고리즘은 Einar Saukas가 설계했습니다. 여기의 압축기와 압축 해제기는 KITAQ의 독립 구현이며, 저작권자는 DAISUKE OBA이고 MIT 라이선스로 배포됩니다.",
+    "zh-TW": "ZX0 格式與原始壓縮演算法由 Einar Saukas 設計。此處提供的壓縮器與解壓縮器為 KITAQ 的獨立實作，著作權屬於 DAISUKE OBA，以 MIT 授權條款發布。",
+    "fr": "Einar Saukas a conçu le format ZX0 et l’algorithme de compression original. Le compresseur et le décompresseur fournis ici sont des implémentations KITAQ indépendantes, sous copyright DAISUKE OBA et publiées sous licence MIT.",
+    "es": "Einar Saukas diseñó el formato ZX0 y el algoritmo de compresión original. El compresor y el descompresor incluidos aquí son implementaciones independientes de KITAQ, con copyright de DAISUKE OBA y publicados bajo la licencia MIT.",
+    "de": "Einar Saukas entwickelte das ZX0-Format und den ursprünglichen Kompressionsalgorithmus. Der hier bereitgestellte Kompressor und Dekompressor sind unabhängige KITAQ-Implementierungen, Copyright DAISUKE OBA, veröffentlicht unter der MIT-Lizenz."
   },
   "zx0_common": {
     "ja": "`zx0.h`を読み込み、`lib/zx0.c`をコンパイルします。共有作業領域を使い、割り込みからの再入には対応しません。入力と出力を重ねず、CPUアドレスの折り返しや現在選択しているバンクの境界をまたがないようにしてください。ライブラリは素材のバンクを切り替えません。",
     "en": "Include `zx0.h` and compile `lib/zx0.c`. These routines use shared scratch and are not reentrant from interrupts. Input and output must not overlap, wrap the CPU address space or cross currently mapped bank windows. The library does not switch asset banks.",
-    "zh-CN": "包含 `zx0.h` 并编译 `lib/zx0.c`。这些函数使用共享临时区，不允许从中断重入。输入和输出不得重叠、越过 CPU 地址空间末端或跨出当前映射的存储体窗口。库不会切换素材所在存储体。"
+    "zh-CN": "包含 `zx0.h` 并编译 `lib/zx0.c`。这些函数使用共享临时区，不允许从中断重入。输入和输出不得重叠、越过 CPU 地址空间末端或跨出当前映射的存储体窗口。库不会切换素材所在存储体。",
+    "ko": "`zx0.h`를 포함하고 `lib/zx0.c`를 컴파일하세요. 공유 임시 영역을 사용하므로 인터럽트에서 재진입할 수 없습니다. 입력과 출력은 서로 겹치거나 CPU 주소 공간을 래핑하거나 현재 매핑된 뱅크 창을 넘어서는 안 됩니다. 라이브러리는 자산 뱅크를 전환하지 않습니다.",
+    "zh-TW": "引入 `zx0.h` 並編譯 `lib/zx0.c`。這些常式使用共用暫存區，不可從中斷重入。輸入與輸出不可重疊、繞回 CPU 位址空間，或跨越目前映射的記憶體庫視窗。函式庫不切換素材記憶體庫。",
+    "fr": "Incluez `zx0.h` et compilez `lib/zx0.c`. Ces routines partagent un espace temporaire et ne sont pas réentrantes depuis les interruptions. Entrée et sortie ne doivent ni se chevaucher, ni boucler dans l’espace d’adressage CPU, ni franchir les fenêtres de banques actuellement mappées. La bibliothèque ne change pas les banques de ressources.",
+    "es": "Incluye `zx0.h` y compila `lib/zx0.c`. Estas rutinas comparten memoria temporal y no admiten reentrada desde interrupciones. La entrada y la salida no deben solaparse, dar la vuelta al espacio de direcciones de CPU ni cruzar ventanas de bancos actualmente mapeados. La biblioteca no cambia los bancos de recursos.",
+    "de": "Binden Sie `zx0.h` ein und kompilieren Sie `lib/zx0.c`. Diese Routinen teilen sich Arbeitsspeicher und sind aus Interrupts nicht reentrant. Ein- und Ausgabe dürfen weder überlappen noch im CPU-Adressraum umbrechen oder aktuell eingeblendete Bankfenster überschreiten. Die Bibliothek schaltet keine Asset-Bänke um."
   },
   "zx0_status": {
     "ja": "`zx0_error`は各呼び出しで更新します。0=成功、1=不正な引数、2=入力不足、3=不正な形式、4=出力容量不足、5=表示が有効です。エラーでは途中まで出力を書き込む場合があるため、失敗した出力は使わないでください。エラー番号は検出順で決まります。",
     "en": "Each call updates `zx0_error`: 0 success, 1 invalid argument, 2 truncated input, 3 malformed stream, 4 insufficient output space, 5 display active. A failure can leave partial output; do not use it. When multiple conditions are invalid, the first detected condition determines the code.",
-    "zh-CN": "每次调用都会更新 `zx0_error`：0 成功，1 参数无效，2 输入被截断，3 数据流格式错误，4 输出空间不足，5 显示处于开启状态。失败时可能已写入部分结果，不要使用这些数据。若同时存在多个错误，以首先检测到的条件决定错误码。"
+    "zh-CN": "每次调用都会更新 `zx0_error`：0 成功，1 参数无效，2 输入被截断，3 数据流格式错误，4 输出空间不足，5 显示处于开启状态。失败时可能已写入部分结果，不要使用这些数据。若同时存在多个错误，以首先检测到的条件决定错误码。",
+    "ko": "매 호출은 `zx0_error`를 갱신합니다. 0=성공, 1=유효하지 않은 인수, 2=입력 잘림, 3=잘못된 스트림, 4=출력 공간 부족, 5=화면 활성입니다. 실패하면 부분 출력이 남을 수 있으므로 사용하지 마세요. 여러 조건이 잘못되었으면 먼저 감지한 조건으로 코드를 정합니다.",
+    "zh-TW": "每次呼叫均更新 `zx0_error`：0 成功、1 無效引數、2 輸入截斷、3 格式錯誤的串流、4 輸出空間不足、5 顯示啟用。失敗可能留下部分輸出，請勿使用。若多項條件無效，以最先偵測到的條件決定錯誤碼。",
+    "fr": "Chaque appel met à jour `zx0_error` : 0 succès, 1 argument invalide, 2 entrée tronquée, 3 flux malformé, 4 espace de sortie insuffisant, 5 affichage actif. Un échec peut laisser une sortie partielle : ne l’utilisez pas. Si plusieurs conditions sont invalides, la première détectée détermine le code.",
+    "es": "Cada llamada actualiza `zx0_error`: 0 éxito, 1 argumento inválido, 2 entrada truncada, 3 flujo malformado, 4 espacio de salida insuficiente, 5 pantalla activa. Un fallo puede dejar una salida parcial; no la uses. Si varias condiciones son inválidas, la primera detectada determina el código.",
+    "de": "Jeder Aufruf aktualisiert `zx0_error`: 0 Erfolg, 1 ungültiges Argument, 2 abgeschnittene Eingabe, 3 fehlerhafter Datenstrom, 4 zu wenig Ausgabespeicher, 5 aktive Anzeige. Ein Fehler kann Teilausgabe hinterlassen; verwenden Sie diese nicht. Bei mehreren ungültigen Bedingungen bestimmt die zuerst erkannte den Code."
   },
   "zx0_result": {
     "ja": "成功時は展開したバイト数、エラー時は0を返します。必ず`zx0_error`も確認してください。",
     "en": "Return the decoded byte count on success, or zero on error. Always check `zx0_error` as well.",
-    "zh-CN": "成功时返回解压字节数，错误时返回零。必须同时检查 `zx0_error`。"
+    "zh-CN": "成功时返回解压字节数，错误时返回零。必须同时检查 `zx0_error`。",
+    "ko": "성공하면 디코딩한 바이트 수, 오류면 0을 반환합니다. 항상 `zx0_error`도 확인하세요.",
+    "zh-TW": "成功時傳回解碼位元組數，錯誤時為零。務必同時檢查 `zx0_error`。",
+    "fr": "Renvoie le nombre d’octets décodés en cas de succès, zéro en cas d’erreur. Vérifiez toujours aussi `zx0_error`.",
+    "es": "Devuelve la cantidad de bytes decodificados si tiene éxito o cero si hay error. Comprueba siempre también `zx0_error`.",
+    "de": "Liefert bei Erfolg die Anzahl decodierter Bytes, bei Fehler null. Prüfen Sie stets auch `zx0_error`."
   },
   "zx0_expected": {
     "ja": "上段のRAM MAPには四角・ひし形・市松模様が順に並びます。中央のAUTO RLE MAPは16個の四角がつながった横棒です。下段のVRAM TILESは、VRAMへ展開した同じ3種類のタイルを並べます。CGBとFCでは四角が白、ひし形が赤、市松模様が青で、DMGでは濃淡になります。末尾のCHECKS OKは3回の展開が期待するサイズで成功したことを示します。",
     "en": "The RAM MAP row repeats a square, diamond and checker tile. AUTO RLE MAP forms a horizontal bar from sixteen square tiles. VRAM TILES repeats the same three tiles after decoding their pixels into VRAM. On CGB and FC the square is white, the diamond red and the checker blue; DMG uses gray shades. CHECKS OK confirms that all three calls returned the expected decoded sizes without an error.",
-    "zh-CN": "RAM MAP 一排重复显示方块、菱形和棋盘格图块。AUTO RLE MAP 用十六个方块组成水平条。VRAM TILES 将像素数据解压到 VRAM 后重复显示相同的三个图块。CGB 和 FC 上方块为白色、菱形为红色、棋盘格为蓝色；DMG 使用灰阶。CHECKS OK 表示三个调用都返回了预期长度且没有错误。"
+    "zh-CN": "RAM MAP 一排重复显示方块、菱形和棋盘格图块。AUTO RLE MAP 用十六个方块组成水平条。VRAM TILES 将像素数据解压到 VRAM 后重复显示相同的三个图块。CGB 和 FC 上方块为白色、菱形为红色、棋盘格为蓝色；DMG 使用灰阶。CHECKS OK 表示三个调用都返回了预期长度且没有错误。",
+    "ko": "RAM MAP 행은 정사각형·마름모·체커 타일을 반복합니다. AUTO RLE MAP은 정사각형 타일 16개로 수평 막대를 만듭니다. VRAM TILES는 픽셀을 VRAM에 디코딩한 뒤 같은 세 타일을 반복합니다. CGB와 FC에서 정사각형은 흰색, 마름모는 빨간색, 체커는 파란색이며 DMG는 회색 명암을 사용합니다. CHECKS OK는 세 호출 모두 오류 없이 예상 디코딩 크기를 반환했음을 나타냅니다.",
+    "zh-TW": "RAM MAP 列重複正方形、菱形與棋盤格圖塊。AUTO RLE MAP 以十六個正方形圖塊形成水平條。VRAM TILES 將像素解碼至 VRAM 後，重複相同三種圖塊。CGB 與 FC 上正方形為白色、菱形為紅色、棋盤格為藍色；DMG 使用灰階。CHECKS OK 表示三次呼叫均無錯誤，且傳回預期解碼大小。",
+    "fr": "La ligne RAM MAP répète les tuiles carré, losange et damier. AUTO RLE MAP forme une barre horizontale avec seize carrés. VRAM TILES répète les trois mêmes tuiles après décodage de leurs pixels en VRAM. Sur CGB et FC, le carré est blanc, le losange rouge et le damier bleu ; DMG utilise des nuances de gris. CHECKS OK confirme que les trois appels ont renvoyé les tailles décodées attendues sans erreur.",
+    "es": "La fila RAM MAP repite tiles de cuadrado, rombo y damero. AUTO RLE MAP forma una barra horizontal con dieciséis cuadrados. VRAM TILES repite los mismos tres tiles tras decodificar sus píxeles en VRAM. En CGB y FC, el cuadrado es blanco, el rombo rojo y el damero azul; DMG usa tonos grises. CHECKS OK confirma que las tres llamadas devolvieron los tamaños decodificados esperados sin error.",
+    "de": "Die Zeile RAM MAP wiederholt Quadrat-, Rauten- und Schachbrett-Tiles. AUTO RLE MAP bildet aus sechzehn Quadraten einen waagerechten Balken. VRAM TILES wiederholt dieselben drei Tiles nach Decodierung ihrer Pixel ins VRAM. Auf CGB und FC ist das Quadrat weiß, die Raute rot und das Schachbrett blau; DMG verwendet Graustufen. CHECKS OK bestätigt die erwarteten decodierten Größen ohne Fehler bei allen drei Aufrufen."
   },
   "zx0_src": {
     "ja": "現在のバンクから読み出せる圧縮データの先頭です。NULLは使えません。",
     "en": "Start of compressed data readable through the current bank mapping. Must not be null.",
-    "zh-CN": "在当前存储体映射下可读的压缩数据首地址，不得为空指针。"
+    "zh-CN": "在当前存储体映射下可读的压缩数据首地址，不得为空指针。",
+    "ko": "현재 뱅크 매핑으로 읽을 수 있는 압축 데이터의 시작점입니다. null이면 안 됩니다.",
+    "zh-TW": "透過目前記憶體庫映射可讀的壓縮資料起點，不可為 null。",
+    "fr": "Début des données compressées lisibles avec le mappage de banque courant. Ne doit pas être null.",
+    "es": "Inicio de los datos comprimidos legibles mediante el mapeo de banco actual. No debe ser null.",
+    "de": "Beginn der über die aktuelle Bankeinblendung lesbaren komprimierten Daten. Darf nicht null sein."
   },
   "zx0_size": {
     "ja": "入力データ全体のバイト数です。ZX0では終端までを含み、余分な末尾データは付けません。KQA1では9バイトのヘッダーも数えます。最大65535バイトです。",
     "en": "Byte count of the complete input. A ZX0 stream includes its end marker and has no trailing bytes. A KQA1 container includes its nine-byte header. Maximum: 65535 bytes.",
-    "zh-CN": "完整输入的字节数。ZX0 流须包含结束标记，后面不能再有多余字节；KQA1 容器长度包括九字节头部。最大为 65535 字节。"
+    "zh-CN": "完整输入的字节数。ZX0 流须包含结束标记，后面不能再有多余字节；KQA1 容器长度包括九字节头部。最大为 65535 字节。",
+    "ko": "전체 입력의 바이트 수입니다. ZX0 스트림은 종료 마커를 포함하며 뒤에 추가 바이트가 없어야 합니다. KQA1 컨테이너는 9바이트 헤더를 포함합니다. 최대 65535바이트입니다.",
+    "zh-TW": "完整輸入的位元組數。ZX0 串流須包含結束標記，且後面不得有額外位元組。KQA1 容器須包含其九位元組標頭。最大 65535 位元組。",
+    "fr": "Nombre d’octets de l’entrée complète. Un flux ZX0 inclut son marqueur de fin et n’a pas d’octets supplémentaires après lui. Un conteneur KQA1 inclut son en-tête de neuf octets. Maximum : 65535 octets.",
+    "es": "Cantidad de bytes de la entrada completa. Un flujo ZX0 incluye su marcador final y no tiene bytes adicionales después. Un contenedor KQA1 incluye su cabecera de nueve bytes. Máximo: 65535 bytes.",
+    "de": "Byteanzahl der vollständigen Eingabe. Ein ZX0-Strom enthält seine Endmarkierung und keine nachfolgenden Bytes. Ein KQA1-Container enthält seinen Neun-Byte-Header. Maximum: 65535 Bytes."
   },
   "zx0_dst": {
     "ja": "展開先の書き込み可能なRAMの先頭です。NULLは使えません。容量は配列の要素数ではなくバイト数で指定します。",
     "en": "Start of writable destination RAM; must not be null. Express capacity in bytes, not array elements.",
-    "zh-CN": "可写目标 RAM 的首地址，不得为空指针。容量按字节指定，不是数组元素数。"
+    "zh-CN": "可写目标 RAM 的首地址，不得为空指针。容量按字节指定，不是数组元素数。",
+    "ko": "쓰기 가능한 대상 RAM의 시작점이며 null이면 안 됩니다. 용량은 배열 요소 수가 아닌 바이트로 지정하세요.",
+    "zh-TW": "可寫入目的 RAM 的起點，不可為 null。容量須以位元組表示，不是陣列元素數。",
+    "fr": "Début de la RAM de destination accessible en écriture ; ne doit pas être null. Exprimez la capacité en octets, pas en éléments de tableau.",
+    "es": "Inicio de la RAM de destino escribible; no debe ser null. Expresa la capacidad en bytes, no en elementos del array.",
+    "de": "Beginn des beschreibbaren Ziel-RAM; darf nicht null sein. Geben Sie die Kapazität in Bytes an, nicht in Arrayelementen."
   },
   "zx0_capacity": {
     "ja": "出力先に書き込めるバイト数です。ZX0の通常のデータは最低1バイト必要です。空のKQA1 rawデータだけは容量0で成功できます。",
     "en": "Number of writable destination bytes. An ordinary ZX0 stream needs at least one byte. An empty raw KQA1 asset can succeed with capacity zero.",
-    "zh-CN": "目标可写字节数。普通 ZX0 流至少需要一个字节；空的原始格式 KQA1 素材允许容量为零。"
+    "zh-CN": "目标可写字节数。普通 ZX0 流至少需要一个字节；空的原始格式 KQA1 素材允许容量为零。",
+    "ko": "대상에 쓸 수 있는 바이트 수입니다. 일반 ZX0 스트림에는 최소 1바이트가 필요합니다. 빈 raw KQA1 자산은 용량 0으로도 성공할 수 있습니다.",
+    "zh-TW": "目的地可寫入的位元組數。一般 ZX0 串流至少需要一位元組。空的 raw KQA1 素材可在容量零時成功。",
+    "fr": "Nombre d’octets inscriptibles en destination. Un flux ZX0 ordinaire nécessite au moins un octet. Une ressource KQA1 brute vide peut réussir avec une capacité nulle.",
+    "es": "Cantidad de bytes escribibles en el destino. Un flujo ZX0 normal necesita al menos un byte. Un recurso KQA1 raw vacío puede tener éxito con capacidad cero.",
+    "de": "Anzahl beschreibbarer Zielbytes. Ein gewöhnlicher ZX0-Strom benötigt mindestens ein Byte. Ein leeres unkomprimiertes KQA1-Asset kann mit Kapazität null erfolgreich sein."
   },
   "zx0_format": {
     "ja": "順方向のZX0 v2に対応します。ZX0 v1、逆方向ストリーム、外部辞書は対象外です。展開前にPC側で作った素材と展開後サイズを把握し、十分な容量を確保してください。",
     "en": "Accept forward ZX0 v2 streams. ZX0 v1, backward streams and external dictionaries are outside this interface. Know the decoded size of the host-generated asset and provide sufficient storage.",
-    "zh-CN": "接受正向 ZX0 v2 数据流。此接口不支持 ZX0 v1、反向数据流或外部字典。应掌握 PC 端生成素材的解压长度，并提供足够空间。"
+    "zh-CN": "接受正向 ZX0 v2 数据流。此接口不支持 ZX0 v1、反向数据流或外部字典。应掌握 PC 端生成素材的解压长度，并提供足够空间。",
+    "ko": "순방향 ZX0 v2 스트림을 받습니다. ZX0 v1, 역방향 스트림과 외부 사전은 이 인터페이스에 포함되지 않습니다. 호스트에서 만든 자산의 디코딩 크기를 알고 충분한 공간을 제공하세요.",
+    "zh-TW": "接受正向 ZX0 v2 串流。ZX0 v1、反向串流與外部字典不在此介面支援範圍。須掌握主機產生素材的解碼大小，並提供足夠儲存空間。",
+    "fr": "Accepte les flux ZX0 v2 en sens avant. ZX0 v1, les flux inverses et les dictionnaires externes sont hors de cette interface. Connaissez la taille décodée de la ressource produite sur l’hôte et fournissez assez de stockage.",
+    "es": "Acepta flujos ZX0 v2 hacia delante. ZX0 v1, flujos hacia atrás y diccionarios externos quedan fuera de esta interfaz. Conoce el tamaño decodificado del recurso generado en el equipo anfitrión y proporciona suficiente espacio.",
+    "de": "Akzeptiert vorwärtsgerichtete ZX0-v2-Ströme. ZX0 v1, Rückwärtsströme und externe Wörterbücher gehören nicht zu dieser Schnittstelle. Kennen Sie die decodierte Größe des am Host erzeugten Assets und stellen Sie ausreichend Speicher bereit."
   },
   "zx0_auto_note": {
     "ja": "KQA1はKITAQの素材コンテナーです。識別子4バイト、方式1バイト（0=raw、1=RLE、2=ZX0）、展開後サイズu16、ペイロードサイズu16、ペイロードの順です。u16は下位バイトが先です。RLEは個数1～255と値の組を繰り返し、個数0で終えます。空のrawは戻り値0・エラー0で成功します。",
     "en": "KQA1 is the KITAQ asset container: four-byte magic, one-byte codec (0 raw, 1 RLE, 2 ZX0), decoded size u16, payload size u16, then payload. The u16 fields are little-endian. RLE repeats count/value pairs, with counts 1..255 and a zero-count terminator. An empty raw asset succeeds with return value zero and error zero.",
-    "zh-CN": "KQA1 是 KITAQ 素材容器：四字节标记、一个字节的编码类型（0 原始、1 RLE、2 ZX0）、u16 解压长度、u16 载荷长度，之后为载荷。u16 使用小端序。RLE 以数量／数值对重复数据，数量为 1～255，以数量零结束。空原始素材成功时返回零，错误码也为零。"
+    "zh-CN": "KQA1 是 KITAQ 素材容器：四字节标记、一个字节的编码类型（0 原始、1 RLE、2 ZX0）、u16 解压长度、u16 载荷长度，之后为载荷。u16 使用小端序。RLE 以数量／数值对重复数据，数量为 1～255，以数量零结束。空原始素材成功时返回零，错误码也为零。",
+    "ko": "KQA1은 KITAQ 자산 컨테이너입니다. 4바이트 매직 값, 1바이트 코덱(0 raw, 1 RLE, 2 ZX0), 디코딩 크기 u16, 페이로드 크기 u16, 페이로드 순서입니다. u16 필드는 리틀 엔디언입니다. RLE는 count/value 쌍을 반복하며 count는 1~255, 종료는 count 0입니다. 빈 raw 자산은 반환값 0, 오류 0으로 성공합니다.",
+    "zh-TW": "KQA1 是 KITAQ 素材容器：四位元組識別碼、一位元組編碼方式（0 raw、1 RLE、2 ZX0）、解碼大小 u16、酬載大小 u16，接著是酬載。u16 欄位採小端序。RLE 重複 count/value 配對，count 為 1..255，以 count 零結束。空的 raw 素材成功時傳回零且錯誤為零。",
+    "fr": "KQA1 est le conteneur de ressources KITAQ : signature de quatre octets, codec d’un octet (0 brut, 1 RLE, 2 ZX0), taille décodée u16, taille de charge utile u16, puis charge utile. Les champs u16 sont en petit-boutiste. RLE répète des paires compte/valeur avec comptes de 1 à 255 et un terminateur de compte zéro. Une ressource brute vide réussit avec valeur de retour zéro et erreur zéro.",
+    "es": "KQA1 es el contenedor de recursos KITAQ: identificador de cuatro bytes, códec de un byte (0 raw, 1 RLE, 2 ZX0), tamaño decodificado u16, tamaño de carga útil u16 y la carga útil. Los campos u16 usan orden little-endian. RLE repite pares count/value con count entre 1 y 255 y un terminador count cero. Un recurso raw vacío tiene éxito con retorno cero y error cero.",
+    "de": "KQA1 ist der KITAQ-Asset-Container: Vier-Byte-Kennung, Ein-Byte-Codec (0 unkomprimiert, 1 RLE, 2 ZX0), decodierte Größe u16, Nutzdatengröße u16, danach Nutzdaten. Die u16-Felder sind Little-Endian. RLE wiederholt Anzahl/Wert-Paare mit Anzahlen 1..255 und einem Abschluss mit Anzahl null. Ein leeres unkomprimiertes Asset ist mit Rückgabewert null und Fehler null erfolgreich."
   },
   "zx0_gb_module": {
     "ja": "ZX0互換の圧縮素材をRAMやVRAMへ展開するライブラリです。PC側の`kitaqgb-zx0.exe`で素材を作り、実行中は必要なデータだけ展開します。`--format=auto`はraw・RLE・ZX0のペイロードを比較して最小を選びます。同サイズならraw、RLE、ZX0の順です。9バイトのヘッダーを含め65535バイト以内に収め、実際のCPUバンクやRAM容量にも合わせて素材を分割してください。",
     "en": "Decode ZX0-compatible assets into RAM or VRAM. Prepare assets with `kitaqgb-zx0.exe` on the PC, then decode only the data needed at runtime. `--format=auto` compares raw, RLE and ZX0 payloads and chooses the smallest; ties prefer raw, RLE, then ZX0. Keep the complete container within 65535 bytes including its nine-byte header, and split assets to fit actual CPU banks and RAM.",
-    "zh-CN": "将 ZX0 兼容素材解压到 RAM 或 VRAM。先在 PC 上用 `kitaqgb-zx0.exe` 准备素材，运行时仅解压当前需要的数据。`--format=auto` 比较原始、RLE 和 ZX0 载荷，选择最小者；大小相同时依次优先原始、RLE、ZX0。包含九字节头部的整个容器不得超过 65535 字节，还须按实际 CPU 存储体窗口和 RAM 容量拆分素材。"
+    "zh-CN": "将 ZX0 兼容素材解压到 RAM 或 VRAM。先在 PC 上用 `kitaqgb-zx0.exe` 准备素材，运行时仅解压当前需要的数据。`--format=auto` 比较原始、RLE 和 ZX0 载荷，选择最小者；大小相同时依次优先原始、RLE、ZX0。包含九字节头部的整个容器不得超过 65535 字节，还须按实际 CPU 存储体窗口和 RAM 容量拆分素材。",
+    "ko": "ZX0 호환 자산을 RAM 또는 VRAM에 디코딩합니다. PC에서 `kitaqgb-zx0.exe`로 준비한 뒤 실행 중 필요한 데이터만 디코딩하세요. `--format=auto`는 raw, RLE, ZX0 페이로드 크기를 비교해 가장 작은 것을 선택하며, 같은 크기면 raw, RLE, ZX0 순으로 우선합니다. 9바이트 헤더를 포함한 전체 컨테이너를 65535바이트 이내로 유지하고 실제 CPU 뱅크와 RAM에 맞게 자산을 나누세요.",
+    "zh-TW": "將 ZX0 相容素材解碼至 RAM 或 VRAM。先在 PC 上用 `kitaqgb-zx0.exe` 準備素材，執行時只解碼所需資料。`--format=auto` 比較 raw、RLE 與 ZX0 酬載並選擇最小者；相同大小時依 raw、RLE、ZX0 順序優先。含九位元組標頭的完整容器須不超過 65535 位元組，並依實際 CPU 記憶體庫與 RAM 容量拆分素材。",
+    "fr": "Décode les ressources compatibles ZX0 en RAM ou VRAM. Préparez-les sur PC avec `kitaqgb-zx0.exe`, puis décodez seulement les données nécessaires à l’exécution. `--format=auto` compare les charges utiles brutes, RLE et ZX0 et choisit la plus petite ; à égalité, l’ordre de préférence est brut, RLE, puis ZX0. Limitez le conteneur complet à 65535 octets, en-tête de neuf octets compris, et divisez les ressources selon les banques CPU et la RAM disponibles.",
+    "es": "Decodifica recursos compatibles con ZX0 en RAM o VRAM. Prepáralos en el PC con `kitaqgb-zx0.exe` y decodifica durante la ejecución solo los datos necesarios. `--format=auto` compara las cargas raw, RLE y ZX0 y elige la menor; en empate prefiere raw, RLE y después ZX0. Mantén el contenedor completo dentro de 65535 bytes, incluida su cabecera de nueve bytes, y divide los recursos para ajustarlos a los bancos CPU y la RAM reales.",
+    "de": "Decodiert ZX0-kompatible Assets in RAM oder VRAM. Bereiten Sie Assets am PC mit `kitaqgb-zx0.exe` vor und decodieren Sie zur Laufzeit nur benötigte Daten. `--format=auto` vergleicht unkomprimierte, RLE- und ZX0-Nutzdaten und wählt die kleinsten; bei Gleichstand gilt die Reihenfolge unkomprimiert, RLE, ZX0. Der gesamte Container einschließlich Neun-Byte-Header darf 65535 Bytes nicht überschreiten. Teilen Sie Assets passend zu tatsächlichen CPU-Bänken und RAM auf."
   },
   "zx0_gb_ram": {
     "ja": "ZX0 v2の圧縮列を指定容量内のRAMへ展開します。既に展開したデータを参照して繰り返しを復元するため、出力先は読み書きできる必要があります。タイルマップやステージ表をCPUで加工してから使う場合に適しています。",
     "en": "Decode a ZX0 v2 stream into bounded RAM. Matches reference previously decoded bytes, so the destination must be readable and writable. Use this for tile maps or level tables that the CPU will process before use.",
-    "zh-CN": "将 ZX0 v2 数据流解压到有容量限制的 RAM。匹配引用先前已解码的数据，因此目标必须同时可读、可写。适合 CPU 使用前还需处理的背景图或关卡表。"
+    "zh-CN": "将 ZX0 v2 数据流解压到有容量限制的 RAM。匹配引用先前已解码的数据，因此目标必须同时可读、可写。适合 CPU 使用前还需处理的背景图或关卡表。",
+    "ko": "제한된 RAM 영역에 ZX0 v2 스트림을 디코딩합니다. 일치 복사는 이미 디코딩한 바이트를 참조하므로 대상은 읽기·쓰기가 모두 가능해야 합니다. CPU가 사용 전에 처리할 타일 맵이나 레벨 테이블 등에 쓰세요.",
+    "zh-TW": "將 ZX0 v2 串流解碼至有界 RAM 區域。相符片段會參照先前已解碼的位元組，因此目的地須可讀寫。適用於 CPU 使用前還要處理的圖塊地圖或關卡表。",
+    "fr": "Décode un flux ZX0 v2 dans une zone RAM bornée. Les correspondances référencent des octets déjà décodés ; la destination doit donc être lisible et inscriptible. Utilisez-le pour des cartes de tuiles ou tables de niveaux que le CPU traitera avant utilisation.",
+    "es": "Decodifica un flujo ZX0 v2 en una región RAM acotada. Las coincidencias referencian bytes ya decodificados, por lo que el destino debe permitir lectura y escritura. Úsalo para mapas de tiles o tablas de niveles que la CPU procese antes de utilizarlos.",
+    "de": "Decodiert einen ZX0-v2-Strom in einen begrenzten RAM-Bereich. Übereinstimmungen verweisen auf zuvor decodierte Bytes; das Ziel muss daher les- und beschreibbar sein. Geeignet für Tilemaps oder Leveltabellen, die die CPU vor ihrer Verwendung verarbeitet."
   },
   "zx0_gb_auto": {
     "ja": "`--format=auto`で作ったKQA1ヘッダーから方式とサイズを読み、rawコピー・RLE展開・ZX0展開を選んでRAMへ復元します。呼び出し側で方式ごとに分岐する必要はありません。",
     "en": "Read the codec and sizes from a KQA1 header generated by `--format=auto`, then copy raw bytes or decode RLE/ZX0 into RAM. Caller code does not need a separate branch for each codec.",
-    "zh-CN": "从 `--format=auto` 生成的 KQA1 头部读取编码类型和长度，再复制原始字节或将 RLE／ZX0 解压到 RAM。调用方无需为各编码类型分别编写分支。"
+    "zh-CN": "从 `--format=auto` 生成的 KQA1 头部读取编码类型和长度，再复制原始字节或将 RLE／ZX0 解压到 RAM。调用方无需为各编码类型分别编写分支。",
+    "ko": "`--format=auto`로 만든 KQA1 헤더에서 코덱과 크기를 읽은 뒤 raw 바이트를 복사하거나 RLE/ZX0를 RAM에 디코딩합니다. 호출자 코드는 코덱마다 별도 분기할 필요가 없습니다.",
+    "zh-TW": "從 `--format=auto` 產生的 KQA1 標頭讀取編碼方式與大小，再複製 raw 位元組或將 RLE/ZX0 解碼至 RAM。呼叫端不必為各編碼方式另外分支。",
+    "fr": "Lit le codec et les tailles dans l’en-tête KQA1 produit par `--format=auto`, puis copie les octets bruts ou décode RLE/ZX0 en RAM. L’appelant n’a pas besoin d’une branche distincte par codec.",
+    "es": "Lee el códec y los tamaños de la cabecera KQA1 generada por `--format=auto` y después copia bytes raw o decodifica RLE/ZX0 en RAM. El código que llama no necesita una rama distinta por códec.",
+    "de": "Liest Codec und Größen aus einem mit `--format=auto` erzeugten KQA1-Header und kopiert dann rohe Bytes oder decodiert RLE/ZX0 ins RAM. Der Aufrufer benötigt keine separate Verzweigung je Codec."
   },
   "zx0_gb_vram": {
     "ja": "LCDを停止した状態で、ZX0のタイル画像やマップを選択中のVRAMバンクへ直接展開します。VRAM自身を既出データの参照先として使うため、RAMの中間バッファは不要です。",
     "en": "With the LCD stopped, decode ZX0 tile pixels or map data directly into the selected VRAM bank. VRAM itself provides match history, so no intermediate RAM buffer is needed.",
-    "zh-CN": "LCD 关闭时，将 ZX0 图块像素或背景图数据直接解压到当前选择的 VRAM 存储体。VRAM 本身保存匹配历史，因此无需中间 RAM 缓冲。"
+    "zh-CN": "LCD 关闭时，将 ZX0 图块像素或背景图数据直接解压到当前选择的 VRAM 存储体。VRAM 本身保存匹配历史，因此无需中间 RAM 缓冲。",
+    "ko": "LCD를 멈춘 상태에서 ZX0 타일 픽셀이나 맵 데이터를 선택한 VRAM 뱅크에 직접 디코딩합니다. VRAM 자체가 일치 복사의 이력을 제공하므로 중간 RAM 버퍼가 필요 없습니다.",
+    "zh-TW": "LCD 停止時，將 ZX0 圖塊像素或地圖資料直接解碼至所選 VRAM 記憶體庫。VRAM 本身提供相符片段歷史，因此不需要中間 RAM 緩衝區。",
+    "fr": "LCD arrêté, décode directement les pixels de tuiles ou données de carte ZX0 dans la banque VRAM sélectionnée. La VRAM fournit elle-même l’historique des correspondances ; aucun tampon RAM intermédiaire n’est nécessaire.",
+    "es": "Con el LCD detenido, decodifica píxeles de tiles o datos de mapa ZX0 directamente en el banco VRAM seleccionado. La propia VRAM aporta el historial de coincidencias, sin necesidad de un búfer RAM intermedio.",
+    "de": "Decodiert bei angehaltenem LCD ZX0-Tilepixel oder Kartendaten direkt in die gewählte VRAM-Bank. VRAM selbst liefert den Verlauf für Rückverweise; ein RAM-Zwischenpuffer ist daher unnötig."
   },
   "zx0_gb_addr": {
     "ja": "VRAMの開始アドレス0x8000～0x9FFFです。書き込み上限は0xA000直前となります。CGBでは呼び出し前にVBKを選択してください。",
     "en": "VRAM start address, 0x8000..0x9FFF. Output is bounded by the end of VRAM at 0xA000. On CGB, select VBK before calling.",
-    "zh-CN": "VRAM 起始地址 0x8000～0x9FFF。输出限制在 VRAM 末端 0xA000 之前。CGB 应在调用前选择 VBK。"
+    "zh-CN": "VRAM 起始地址 0x8000～0x9FFF。输出限制在 VRAM 末端 0xA000 之前。CGB 应在调用前选择 VBK。",
+    "ko": "VRAM 시작 주소로 0x8000..0x9FFF입니다. 출력은 VRAM 끝인 0xA000을 넘지 않습니다. CGB에서는 호출 전에 VBK를 선택하세요.",
+    "zh-TW": "VRAM 起始位址，0x8000..0x9FFF。輸出受 VRAM 結尾 0xA000 限制。CGB 上須先選擇 VBK 再呼叫。",
+    "fr": "Adresse de début VRAM, 0x8000..0x9FFF. La sortie est bornée par la fin de VRAM à 0xA000. Sur CGB, sélectionnez VBK avant l’appel.",
+    "es": "Dirección inicial de VRAM, 0x8000..0x9FFF. La salida queda limitada por el final de VRAM en 0xA000. En CGB, selecciona VBK antes de llamar.",
+    "de": "VRAM-Startadresse, 0x8000..0x9FFF. Die Ausgabe wird durch das VRAM-Ende bei 0xA000 begrenzt. Wählen Sie auf CGB vor dem Aufruf VBK."
   },
   "zx0_gb_display": {
     "ja": "LCDが有効ならエラー5です。VBlank中というだけでは使えません。表示・VBK・割り込みの設定は変更せず、呼び出し側がLCD停止と再開を担当します。",
     "en": "Return error 5 when the LCD is enabled; merely being in VBlank is insufficient. Display, VBK and interrupt settings are unchanged. Caller code stops and restarts the LCD.",
-    "zh-CN": "LCD 开启时返回错误 5，仅处于 VBlank 并不满足要求。函数不改变显示、VBK 或中断设置，LCD 的关闭与重新开启由调用方负责。"
+    "zh-CN": "LCD 开启时返回错误 5，仅处于 VBlank 并不满足要求。函数不改变显示、VBK 或中断设置，LCD 的关闭与重新开启由调用方负责。",
+    "ko": "LCD가 켜져 있으면 오류 5를 반환합니다. VBlank 중인 것만으로는 충분하지 않습니다. 표시, VBK, 인터럽트 설정은 바꾸지 않습니다. 호출자 코드가 LCD를 끄고 다시 켭니다.",
+    "zh-TW": "LCD 啟用時傳回錯誤 5；僅處於 VBlank 並不足夠。顯示、VBK 與中斷設定保持不變。由呼叫端停止並重新啟動 LCD。",
+    "fr": "Renvoie l’erreur 5 si le LCD est activé ; être simplement en VBlank ne suffit pas. Affichage, VBK et interruptions restent inchangés. L’appelant arrête puis redémarre le LCD.",
+    "es": "Devuelve el error 5 si el LCD está encendido; estar en VBlank no basta. No cambia la pantalla, VBK ni la configuración de interrupciones. El código que llama detiene y reinicia el LCD.",
+    "de": "Liefert Fehler 5 bei aktiviertem LCD; VBlank allein genügt nicht. Anzeige-, VBK- und Interrupt-Einstellungen bleiben unverändert. Der Aufrufer stoppt und startet das LCD."
   },
   "zx0_fc_module": {
     "ja": "ZX0互換の圧縮素材をRAMやVRAMへ展開するライブラリです。PC側の`kitaqfc-zx0.exe`で素材を作り、実行中は必要なデータだけ展開します。`--format=auto`はraw・RLE・ZX0のペイロードを比較して最小を選びます。同サイズならraw、RLE、ZX0の順です。9バイトのヘッダーを含め65535バイト以内に収め、実際のCPUバンクやRAM容量にも合わせて素材を分割してください。",
     "en": "Decode ZX0-compatible assets into RAM or VRAM. Prepare assets with `kitaqfc-zx0.exe` on the PC, then decode only the data needed at runtime. `--format=auto` compares raw, RLE and ZX0 payloads and chooses the smallest; ties prefer raw, RLE, then ZX0. Keep the complete container within 65535 bytes including its nine-byte header, and split assets to fit actual CPU banks and RAM.",
-    "zh-CN": "将 ZX0 兼容素材解压到 RAM 或 VRAM。先在 PC 上用 `kitaqfc-zx0.exe` 准备素材，运行时仅解压当前需要的数据。`--format=auto` 比较原始、RLE 和 ZX0 载荷，选择最小者；大小相同时依次优先原始、RLE、ZX0。包含九字节头部的整个容器不得超过 65535 字节，还须按实际 CPU 存储体窗口和 RAM 容量拆分素材。"
+    "zh-CN": "将 ZX0 兼容素材解压到 RAM 或 VRAM。先在 PC 上用 `kitaqfc-zx0.exe` 准备素材，运行时仅解压当前需要的数据。`--format=auto` 比较原始、RLE 和 ZX0 载荷，选择最小者；大小相同时依次优先原始、RLE、ZX0。包含九字节头部的整个容器不得超过 65535 字节，还须按实际 CPU 存储体窗口和 RAM 容量拆分素材。",
+    "ko": "ZX0 호환 자산을 RAM 또는 VRAM에 디코딩합니다. PC에서 `kitaqfc-zx0.exe`로 준비한 뒤 실행 중 필요한 데이터만 디코딩하세요. `--format=auto`는 raw, RLE, ZX0 페이로드 크기를 비교해 가장 작은 것을 선택하며, 같은 크기면 raw, RLE, ZX0 순으로 우선합니다. 9바이트 헤더를 포함한 전체 컨테이너를 65535바이트 이내로 유지하고 실제 CPU 뱅크와 RAM에 맞게 자산을 나누세요.",
+    "zh-TW": "將 ZX0 相容素材解碼至 RAM 或 VRAM。先在 PC 上用 `kitaqfc-zx0.exe` 準備素材，執行時只解碼所需資料。`--format=auto` 比較 raw、RLE 與 ZX0 酬載並選擇最小者；相同大小時依 raw、RLE、ZX0 順序優先。含九位元組標頭的完整容器須不超過 65535 位元組，並依實際 CPU 記憶體庫與 RAM 容量拆分素材。",
+    "fr": "Décode les ressources compatibles ZX0 en RAM ou VRAM. Préparez-les sur PC avec `kitaqfc-zx0.exe`, puis décodez seulement les données nécessaires à l’exécution. `--format=auto` compare les charges utiles brutes, RLE et ZX0 et choisit la plus petite ; à égalité, l’ordre de préférence est brut, RLE, puis ZX0. Limitez le conteneur complet à 65535 octets, en-tête de neuf octets compris, et divisez les ressources selon les banques CPU et la RAM disponibles.",
+    "es": "Decodifica recursos compatibles con ZX0 en RAM o VRAM. Prepáralos en el PC con `kitaqfc-zx0.exe` y decodifica durante la ejecución solo los datos necesarios. `--format=auto` compara las cargas raw, RLE y ZX0 y elige la menor; en empate prefiere raw, RLE y después ZX0. Mantén el contenedor completo dentro de 65535 bytes, incluida su cabecera de nueve bytes, y divide los recursos para ajustarlos a los bancos CPU y la RAM reales.",
+    "de": "Decodiert ZX0-kompatible Assets in RAM oder VRAM. Bereiten Sie Assets am PC mit `kitaqfc-zx0.exe` vor und decodieren Sie zur Laufzeit nur benötigte Daten. `--format=auto` vergleicht unkomprimierte, RLE- und ZX0-Nutzdaten und wählt die kleinsten; bei Gleichstand gilt die Reihenfolge unkomprimiert, RLE, ZX0. Der gesamte Container einschließlich Neun-Byte-Header darf 65535 Bytes nicht überschreiten. Teilen Sie Assets passend zu tatsächlichen CPU-Bänken und RAM auf."
   },
   "zx0_fc_ram": {
     "ja": "ZX0 v2の圧縮列を指定容量内のRAMへ展開します。既に展開したデータを参照して繰り返しを復元するため、出力先は読み書きできる必要があります。タイルマップやステージ表をCPUで加工してから使う場合に適しています。",
     "en": "Decode a ZX0 v2 stream into bounded RAM. Matches reference previously decoded bytes, so the destination must be readable and writable. Use this for tile maps or level tables that the CPU will process before use.",
-    "zh-CN": "将 ZX0 v2 数据流解压到有容量限制的 RAM。匹配引用先前已解码的数据，因此目标必须同时可读、可写。适合 CPU 使用前还需处理的背景图或关卡表。"
+    "zh-CN": "将 ZX0 v2 数据流解压到有容量限制的 RAM。匹配引用先前已解码的数据，因此目标必须同时可读、可写。适合 CPU 使用前还需处理的背景图或关卡表。",
+    "ko": "제한된 RAM 영역에 ZX0 v2 스트림을 디코딩합니다. 일치 복사는 이미 디코딩한 바이트를 참조하므로 대상은 읽기·쓰기가 모두 가능해야 합니다. CPU가 사용 전에 처리할 타일 맵이나 레벨 테이블 등에 쓰세요.",
+    "zh-TW": "將 ZX0 v2 串流解碼至有界 RAM 區域。相符片段會參照先前已解碼的位元組，因此目的地須可讀寫。適用於 CPU 使用前還要處理的圖塊地圖或關卡表。",
+    "fr": "Décode un flux ZX0 v2 dans une zone RAM bornée. Les correspondances référencent des octets déjà décodés ; la destination doit donc être lisible et inscriptible. Utilisez-le pour des cartes de tuiles ou tables de niveaux que le CPU traitera avant utilisation.",
+    "es": "Decodifica un flujo ZX0 v2 en una región RAM acotada. Las coincidencias referencian bytes ya decodificados, por lo que el destino debe permitir lectura y escritura. Úsalo para mapas de tiles o tablas de niveles que la CPU procese antes de utilizarlos.",
+    "de": "Decodiert einen ZX0-v2-Strom in einen begrenzten RAM-Bereich. Übereinstimmungen verweisen auf zuvor decodierte Bytes; das Ziel muss daher les- und beschreibbar sein. Geeignet für Tilemaps oder Leveltabellen, die die CPU vor ihrer Verwendung verarbeitet."
   },
   "zx0_fc_auto": {
     "ja": "`--format=auto`で作ったKQA1ヘッダーから方式とサイズを読み、rawコピー・RLE展開・ZX0展開を選んでRAMへ復元します。呼び出し側で方式ごとに分岐する必要はありません。",
     "en": "Read the codec and sizes from a KQA1 header generated by `--format=auto`, then copy raw bytes or decode RLE/ZX0 into RAM. Caller code does not need a separate branch for each codec.",
-    "zh-CN": "从 `--format=auto` 生成的 KQA1 头部读取编码类型和长度，再复制原始字节或将 RLE／ZX0 解压到 RAM。调用方无需为各编码类型分别编写分支。"
+    "zh-CN": "从 `--format=auto` 生成的 KQA1 头部读取编码类型和长度，再复制原始字节或将 RLE／ZX0 解压到 RAM。调用方无需为各编码类型分别编写分支。",
+    "ko": "`--format=auto`로 만든 KQA1 헤더에서 코덱과 크기를 읽은 뒤 raw 바이트를 복사하거나 RLE/ZX0를 RAM에 디코딩합니다. 호출자 코드는 코덱마다 별도 분기할 필요가 없습니다.",
+    "zh-TW": "從 `--format=auto` 產生的 KQA1 標頭讀取編碼方式與大小，再複製 raw 位元組或將 RLE/ZX0 解碼至 RAM。呼叫端不必為各編碼方式另外分支。",
+    "fr": "Lit le codec et les tailles dans l’en-tête KQA1 produit par `--format=auto`, puis copie les octets bruts ou décode RLE/ZX0 en RAM. L’appelant n’a pas besoin d’une branche distincte par codec.",
+    "es": "Lee el códec y los tamaños de la cabecera KQA1 generada por `--format=auto` y después copia bytes raw o decodifica RLE/ZX0 en RAM. El código que llama no necesita una rama distinta por códec.",
+    "de": "Liest Codec und Größen aus einem mit `--format=auto` erzeugten KQA1-Header und kopiert dann rohe Bytes oder decodiert RLE/ZX0 ins RAM. Der Aufrufer benötigt keine separate Verzweigung je Codec."
   },
   "zx0_fc_vram": {
     "ja": "ZX0素材全体を呼び出し側のRAM作業領域へ展開し、成功したら128バイト以下の単位でPPUへ転送します。CPUから直接読めないVRAMを履歴に使う代わりに、RAMを使って一致列を復元します。",
     "en": "Decode the entire ZX0 asset into caller-owned RAM, then upload it to the PPU in chunks of at most 128 bytes. Match history stays in RAM because PPU memory is not directly readable through ordinary CPU pointers.",
-    "zh-CN": "先将整个 ZX0 素材解压到调用方提供的 RAM，再以每块最多 128 字节上传到 PPU。PPU 内存不能通过普通 CPU 指针直接读取，因此匹配历史保留在 RAM 中。"
+    "zh-CN": "先将整个 ZX0 素材解压到调用方提供的 RAM，再以每块最多 128 字节上传到 PPU。PPU 内存不能通过普通 CPU 指针直接读取，因此匹配历史保留在 RAM 中。",
+    "ko": "ZX0 자산 전체를 호출자가 소유한 RAM에 디코딩한 뒤 최대 128바이트씩 나누어 PPU에 업로드합니다. PPU 메모리는 일반 CPU 포인터로 직접 읽을 수 없으므로 일치 복사 이력은 RAM에 둡니다.",
+    "zh-TW": "將整個 ZX0 素材解碼至呼叫端持有的 RAM，再分成每塊最多 128 位元組上傳至 PPU。PPU 記憶體無法透過一般 CPU 指標直接讀取，因此相符片段歷史保留在 RAM。",
+    "fr": "Décode toute la ressource ZX0 dans la RAM de l’appelant, puis la transfère au PPU par blocs d’au plus 128 octets. L’historique des correspondances reste en RAM, car la mémoire PPU n’est pas lisible directement par les pointeurs CPU ordinaires.",
+    "es": "Decodifica todo el recurso ZX0 en RAM propiedad del código que llama y lo transfiere al PPU en bloques de hasta 128 bytes. El historial de coincidencias permanece en RAM porque la memoria PPU no se puede leer directamente mediante punteros normales de CPU.",
+    "de": "Decodiert das gesamte ZX0-Asset in RAM des Aufrufers und überträgt es dann in Blöcken von höchstens 128 Bytes zur PPU. Der Rückverweisverlauf bleibt im RAM, da PPU-Speicher nicht direkt über gewöhnliche CPU-Zeiger lesbar ist."
   },
   "zx0_fc_addr": {
     "ja": "転送開始PPUアドレス0x0000～0x2FFFです。展開後データ全体が0x3000未満に収まる必要があります。CHR領域ではCHR RAMを搭載したROM構成にしてください。",
     "en": "PPU destination, 0x0000..0x2FFF. The entire decoded extent must end before 0x3000. Pattern-table destinations require a cartridge configuration with CHR RAM.",
-    "zh-CN": "PPU 目标地址 0x0000～0x2FFF，全部解压数据必须结束在 0x3000 之前。若目标为图案表，卡带配置必须提供 CHR RAM。"
+    "zh-CN": "PPU 目标地址 0x0000～0x2FFF，全部解压数据必须结束在 0x3000 之前。若目标为图案表，卡带配置必须提供 CHR RAM。",
+    "ko": "PPU 대상 주소로 0x0000..0x2FFF입니다. 디코딩 범위 전체는 0x3000 전에 끝나야 합니다. 패턴 테이블에 쓰려면 CHR RAM이 있는 카트리지 구성이 필요합니다.",
+    "zh-TW": "PPU 目的位址，0x0000..0x2FFF。完整解碼範圍須在 0x3000 之前結束。圖樣表目的地需要具有 CHR RAM 的卡匣配置。",
+    "fr": "Destination PPU, 0x0000..0x2FFF. Toute la zone décodée doit se terminer avant 0x3000. Les destinations dans les tables de motifs exigent une configuration de cartouche avec CHR RAM.",
+    "es": "Destino PPU, 0x0000..0x2FFF. Todo el rango decodificado debe terminar antes de 0x3000. Para escribir en tablas de patrones se necesita una configuración de cartucho con CHR RAM.",
+    "de": "PPU-Ziel, 0x0000..0x2FFF. Der gesamte decodierte Bereich muss vor 0x3000 enden. Ziele in Mustertabellen benötigen eine Cartridge-Konfiguration mit CHR-RAM."
   },
   "zx0_fc_workspace": {
     "ja": "RAM作業領域の容量です。素材の展開後サイズ全体が入る必要があります。PPUへの転送単位128バイトとは別の制限です。",
     "en": "RAM workspace capacity. It must hold the whole decoded asset; the 128-byte PPU transfer chunk size does not reduce this requirement.",
-    "zh-CN": "RAM 工作区容量，须容纳完整的解压结果。PPU 每次仅传输 128 字节，并不意味着工作区可以缩小到 128 字节。"
+    "zh-CN": "RAM 工作区容量，须容纳完整的解压结果。PPU 每次仅传输 128 字节，并不意味着工作区可以缩小到 128 字节。",
+    "ko": "RAM 작업 영역 용량입니다. 디코딩한 자산 전체가 들어가야 합니다. PPU 전송을 128바이트로 나눈다고 필요한 용량이 줄지는 않습니다.",
+    "zh-TW": "RAM 工作區容量，須能容納完整解碼素材。PPU 每次傳輸 128 位元組不會降低此需求。",
+    "fr": "Capacité de l’espace de travail RAM. Il doit contenir toute la ressource décodée ; les blocs de transfert PPU de 128 octets ne réduisent pas ce besoin.",
+    "es": "Capacidad del área de trabajo RAM. Debe contener todo el recurso decodificado; el tamaño de bloque de transferencia PPU de 128 bytes no reduce este requisito.",
+    "de": "RAM-Arbeitsbereichskapazität. Sie muss das gesamte decodierte Asset aufnehmen; die PPU-Übertragungsblockgröße von 128 Bytes verringert diesen Bedarf nicht."
   },
   "zx0_fc_display": {
     "ja": "`__ppu_mask_set(0)`などで描画を停止してから呼びます。PPUCTRLの増分を一時的に1へ設定し、終了時にPPUCTRLを復元します。PPUADDR・PPUDATAの操作でPPUアドレスとラッチが変わるため、描画再開前にスクロールを設定してください。割り込み側もPPUを操作しないようにします。CHR ROMやパレットへの転送には使いません。出力先範囲の検査はRAM展開後なので、範囲エラーでも作業領域は変更され得ます。",
     "en": "Disable rendering with `__ppu_mask_set(0)` before calling. The routine temporarily selects PPU increment 1 and restores PPUCTRL afterward. PPUADDR/PPUDATA operations change PPU address and latch state; set scrolling before resuming rendering. Interrupt handlers must also avoid PPU access during the call. Do not use this for CHR ROM or palette transfers. Destination extent is checked after RAM decoding, so a range error may still modify the workspace.",
-    "zh-CN": "调用前用 `__ppu_mask_set(0)` 关闭渲染。函数临时将 PPU 地址递增步长设为 1，随后恢复 PPUCTRL。PPUADDR／PPUDATA 操作会改变 PPU 地址和锁存状态，重新开启渲染前应设置滚动。调用期间，中断处理程序也必须避免访问 PPU。本函数不能用于 CHR ROM 或调色板传输。目标范围在 RAM 解压后检查，因此范围错误也可能已经修改工作区。"
+    "zh-CN": "调用前用 `__ppu_mask_set(0)` 关闭渲染。函数临时将 PPU 地址递增步长设为 1，随后恢复 PPUCTRL。PPUADDR／PPUDATA 操作会改变 PPU 地址和锁存状态，重新开启渲染前应设置滚动。调用期间，中断处理程序也必须避免访问 PPU。本函数不能用于 CHR ROM 或调色板传输。目标范围在 RAM 解压后检查，因此范围错误也可能已经修改工作区。",
+    "ko": "호출 전에 `__ppu_mask_set(0)`으로 렌더링을 끄세요. 루틴은 PPU 주소 증가량을 일시적으로 1로 선택한 뒤 PPUCTRL을 복원합니다. PPUADDR/PPUDATA 연산은 PPU 주소와 래치 상태를 바꾸므로 렌더링을 다시 켜기 전에 스크롤을 설정하세요. 호출 중 인터럽트 핸들러도 PPU에 접근하면 안 됩니다. CHR ROM이나 팔레트 전송에는 사용하지 마세요. 대상 범위 검사는 RAM 디코딩 뒤에 이루어지므로 범위 오류가 나도 작업 영역은 바뀔 수 있습니다.",
+    "zh-TW": "呼叫前以 `__ppu_mask_set(0)` 停用繪製。常式暫時選擇 PPU 遞增量 1，完成後恢復 PPUCTRL。PPUADDR/PPUDATA 操作會改變 PPU 位址與鎖存狀態；恢復繪製前須設定捲動。呼叫期間中斷處理程式也須避免存取 PPU。不可用於 CHR ROM 或調色盤傳輸。目的範圍在 RAM 解碼後才檢查，因此範圍錯誤仍可能改變工作區。",
+    "fr": "Avant l’appel, désactivez le rendu avec `__ppu_mask_set(0)`. La routine choisit temporairement l’incrément PPU 1 puis restaure PPUCTRL. Les opérations PPUADDR/PPUDATA modifient adresse et verrou PPU ; réglez le défilement avant de réactiver le rendu. Les gestionnaires d’interruptions doivent aussi éviter le PPU pendant l’appel. N’utilisez pas cette fonction pour CHR ROM ou les palettes. La destination est vérifiée après décodage en RAM ; une erreur de plage peut donc tout de même modifier l’espace de travail.",
+    "es": "Antes de llamar, desactiva el renderizado con `__ppu_mask_set(0)`. La rutina selecciona temporalmente el incremento PPU 1 y restaura PPUCTRL después. Las operaciones PPUADDR/PPUDATA cambian la dirección y el estado del latch de PPU; configura el desplazamiento antes de reanudar el renderizado. Los manejadores de interrupciones también deben evitar acceder al PPU durante la llamada. No lo uses para CHR ROM ni paletas. El rango de destino se comprueba después de decodificar en RAM, por lo que un error de rango aún puede modificar el área de trabajo.",
+    "de": "Deaktivieren Sie vor dem Aufruf Rendering mit `__ppu_mask_set(0)`. Die Routine wählt vorübergehend PPU-Inkrement 1 und stellt PPUCTRL danach wieder her. PPUADDR/PPUDATA-Zugriffe ändern PPU-Adresse und Latch-Zustand; setzen Sie Scrolling vor Wiederaufnahme des Renderings. Auch Interrupt-Handler müssen während des Aufrufs PPU-Zugriffe vermeiden. Nicht für CHR-ROM oder Palettenübertragungen verwenden. Der Zielbereich wird erst nach RAM-Decodierung geprüft; ein Bereichsfehler kann den Arbeitsbereich daher trotzdem verändern."
   }
 }

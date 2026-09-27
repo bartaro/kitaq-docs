@@ -54,10 +54,7 @@ Cambios de registros, PCM generado y sonido correcto son comprobaciones distinta
 
 Como en KOKURA, `--emit-diagnostics` de KUROSAKI recibe una **ruta de archivo JSONL**. Separa trazas de CPU y eventos de diagnóstico.
 
-## 10. Alcance de la publicación
-KUROSAKI-GUI sigue sin publicarse. Este manual se centra en la CLI y sus API de integración.
-
-## 11. FDS y RAM de guardado
+## 10. FDS y RAM de guardado
 `fds-inspect` examina la estructura del disco y `export-assets` extrae recursos. Prueba FDS por separado de los cartuchos NES: arranque, BIOS y acceso al disco tienen otros requisitos. Los `.sav` de batería y las instantáneas `.kss.json` sirven a propósitos distintos. Usa una distribución de guardado admitida por la implementación.
 
 {{CODE:9}}

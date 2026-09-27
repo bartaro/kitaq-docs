@@ -2,541 +2,1081 @@
   "phys_void": {
     "ja": "戻り値はありません。更新されるフィールドと反映時期を、この項目で説明しています。",
     "en": "No return value. This entry describes the fields updated and when they take effect.",
-    "zh-CN": "无返回值。本条说明会更新哪些字段及其生效时机。"
+    "zh-CN": "无返回值。本条说明会更新哪些字段及其生效时机。",
+    "ko": "반환값은 없습니다. 이 항목에서는 갱신되는 필드와 변경이 적용되는 시점을 설명합니다.",
+    "zh-TW": "無回傳值。本項說明會更新哪些欄位，以及何時生效。",
+    "fr": "Aucune valeur de retour. Cette rubrique décrit les champs modifiés et le moment où les changements prennent effet.",
+    "es": "Sin valor de retorno. Esta entrada describe qué campos se actualizan y cuándo surten efecto los cambios.",
+    "de": "Kein Rückgabewert. Dieser Eintrag erläutert die geänderten Felder und den Zeitpunkt, zu dem die Änderungen wirksam werden."
   },
   "phys_units": {
     "ja": "座標・半径・半サイズ・速度・重力は、呼び出し側で統一した整数単位を使います。1回のstepが1時間刻みです。サンプルは1単位＝1ピクセルです。位置を自動的にQ8.8へ変換したり、描画したりはしません。",
     "en": "Choose consistent integer units for positions, radii, half extents, velocities and gravity. One step is one simulation tick. The samples use one unit per pixel. These routines neither convert positions to Q8.8 automatically nor render them.",
-    "zh-CN": "位置、半径、半尺寸、速度和重力须采用一致的整数单位。一次 step 对应一次模拟更新，示例以一单位表示一像素。函数不会自动将位置转换为 Q8.8，也不负责绘制。"
+    "zh-CN": "位置、半径、半尺寸、速度和重力须采用一致的整数单位。一次 step 对应一次模拟更新，示例以一单位表示一像素。函数不会自动将位置转换为 Q8.8，也不负责绘制。",
+    "ko": "위치, 반지름, 반크기, 속도, 중력에는 일관된 정수 단위를 사용하세요. 한 단계는 시뮬레이션 1틱입니다. 샘플에서는 1단위가 1픽셀입니다. 이 함수들은 위치를 Q8.8로 자동 변환하거나 화면에 그리지 않습니다.",
+    "zh-TW": "位置、半徑、各軸半長、速度與重力應使用一致的整數單位。每一步代表一個模擬刻度；範例中一單位等於一像素。這些函式不會自動將位置轉為 Q8.8，也不負責繪製。",
+    "fr": "Utilisez des unités entières cohérentes pour les positions, rayons, demi-dimensions, vitesses et la gravité. Un pas correspond à un tick de simulation. Les exemples utilisent une unité par pixel. Ces routines ne convertissent pas automatiquement les positions en Q8.8 et n’effectuent aucun rendu.",
+    "es": "Usa unidades enteras coherentes para posiciones, radios, semiextensiones, velocidades y gravedad. Cada paso equivale a un tick de simulación. Los ejemplos usan una unidad por píxel. Estas rutinas no convierten automáticamente las posiciones a Q8.8 ni las dibujan.",
+    "de": "Verwenden Sie einheitliche ganzzahlige Einheiten für Positionen, Radien, halbe Ausdehnungen, Geschwindigkeiten und Schwerkraft. Ein Schritt entspricht einem Simulationstakt. Die Beispiele verwenden eine Einheit pro Pixel. Diese Routinen wandeln Positionen weder automatisch in Q8.8 um noch zeichnen sie diese."
   },
   "phys_range": {
     "ja": "加算・差・半サイズの和・接触補正の積を、符号付き16ビットの範囲に収めてください。速度制限は加算後に適用されるため、加算時のオーバーフローは防げません。",
     "en": "Keep sums, differences, combined half extents and contact-correction products within signed 16-bit range. Velocity limits apply after addition and cannot prevent overflow during that addition.",
-    "zh-CN": "和、差、半尺寸之和及接触位置修正乘积须保持在有符号 16 位范围内。速度限制在加法之后执行，不能防止加法本身溢出。"
+    "zh-CN": "和、差、半尺寸之和及接触位置修正乘积须保持在有符号 16 位范围内。速度限制在加法之后执行，不能防止加法本身溢出。",
+    "ko": "합, 차, 반크기의 합, 접촉 위치 보정에 쓰는 곱이 부호 있는 16비트 범위 안에 들어가도록 하세요. 속도 제한은 덧셈 후에 적용되므로 덧셈 도중의 오버플로를 막지 못합니다.",
+    "zh-TW": "總和、差值、半長總和及接觸位置修正的乘積都必須落在帶正負號的 16 位元範圍內。速度限制在加法之後才套用，無法防止加法本身溢位。",
+    "fr": "Veillez à ce que sommes, différences, sommes de demi-dimensions et produits de correction des contacts restent dans la plage d’un entier signé de 16 bits. La limitation de vitesse intervient après l’addition et ne peut donc pas empêcher un dépassement pendant celle-ci.",
+    "es": "Mantén las sumas, diferencias, sumas de semiextensiones y productos de corrección de contactos dentro del rango de 16 bits con signo. Los límites de velocidad se aplican después de sumar y no pueden evitar un desbordamiento durante esa suma.",
+    "de": "Summen, Differenzen, addierte halbe Ausdehnungen und Produkte zur Kontaktkorrektur müssen im vorzeichenbehafteten 16-Bit-Bereich bleiben. Geschwindigkeitsgrenzen greifen erst nach der Addition und verhindern keinen Überlauf innerhalb dieser Addition."
   },
   "phys_storage": {
     "ja": "worldは配列を借りて使います。配列やbodyの領域確保・寿命管理は呼び出し側の責任です。worldの初期化だけでは配列要素は初期化されません。",
     "en": "A world borrows its array. The caller allocates and owns body storage and keeps it alive. Initializing a world does not initialize its array elements.",
-    "zh-CN": "world 仅引用数组，刚体存储由调用方分配、持有并保持有效。初始化 world 不会初始化数组中的元素。"
+    "zh-CN": "world 仅引用数组，刚体存储由调用方分配、持有并保持有效。初始化 world 不会初始化数组中的元素。",
+    "ko": "월드는 호출자가 소유한 배열을 빌려 사용합니다. 호출자가 물체 저장 공간을 할당하고 소유하며, 사용하는 동안 유효하게 유지해야 합니다. 월드를 초기화해도 배열 원소는 초기화되지 않습니다.",
+    "zh-TW": "世界僅借用陣列。呼叫端負責配置並持有物體儲存空間，且須在使用期間維持其有效。初始化世界不會初始化陣列元素。",
+    "fr": "Le monde emprunte son tableau : l’appelant alloue et possède la mémoire des corps et doit la garder valide. Initialiser le monde n’initialise pas les éléments du tableau.",
+    "es": "El mundo utiliza un array prestado. El código que llama reserva y posee la memoria de los cuerpos y debe mantenerla válida. Inicializar el mundo no inicializa los elementos del array.",
+    "de": "Eine Welt nutzt ein vom aufrufenden Code bereitgestelltes Array. Dieser reserviert und besitzt den Speicher für die Körper und hält ihn gültig. Das Initialisieren der Welt initialisiert nicht die Arrayelemente."
   },
   "phys_step2": {
     "ja": "接触補正は侵入の浅い軸を選び、同値ならY軸を選びます。逆質量で位置補正を分けますが、動く2物体の軸方向速度は単純平均、固定物との衝突では0になります。restitution_q8はこのソルバーでは使いません。高速なすり抜けを防ぐ連続衝突判定ではありません。",
     "en": "Contacts resolve along the shallower penetration axis, choosing Y on a tie. Position correction uses inverse masses, but two dynamic bodies receive their simple average axis velocity; collision with a static body zeros that component. This solver does not use restitution_q8. It is discrete collision handling and can miss fast crossings.",
-    "zh-CN": "沿穿透较浅的轴解决接触，深度相同时选择 Y。位置修正使用逆质量，但两个动态刚体的该轴速度直接取简单平均；与静态刚体碰撞则将该分量清零。此求解器不使用 restitution_q8，属于离散碰撞处理，可能漏掉高速穿越。"
+    "zh-CN": "沿穿透较浅的轴解决接触，深度相同时选择 Y。位置修正使用逆质量，但两个动态刚体的该轴速度直接取简单平均；与静态刚体碰撞则将该分量清零。此求解器不使用 restitution_q8，属于离散碰撞处理，可能漏掉高速穿越。",
+    "ko": "침투 깊이가 작은 축을 따라 접촉을 해결하며, 같으면 Y축을 선택합니다. 위치 보정은 역질량을 사용하지만, 두 동적 물체의 해당 축 속도는 단순 평균으로 설정됩니다. 정적 물체와 충돌하면 해당 속도 성분은 0이 됩니다. 이 솔버는 restitution_q8을 사용하지 않습니다. 이산 충돌 처리이므로 빠르게 통과하는 물체를 놓칠 수 있습니다.",
+    "zh-TW": "接觸沿穿入較淺的軸處理，深度相同時選 Y 軸。位置修正使用反質量，但兩個動態物體在該軸的速度會設為兩者的簡單平均；碰到靜態物體時，該速度分量歸零。此求解器不使用 restitution_q8。這是離散碰撞處理，可能漏掉快速穿越。",
+    "fr": "Les contacts sont résolus selon l’axe de pénétration minimale, avec priorité à Y en cas d’égalité. La correction de position utilise les masses inverses, mais deux corps dynamiques reçoivent la moyenne simple de leurs vitesses sur cet axe ; une collision avec un corps statique annule cette composante. Le solveur n’utilise pas restitution_q8. La détection est discrète et peut manquer des traversées rapides.",
+    "es": "Los contactos se resuelven por el eje de menor penetración, eligiendo Y en caso de empate. La corrección de posición usa las masas inversas, pero dos cuerpos dinámicos reciben la media simple de sus velocidades en ese eje; chocar con un cuerpo estático anula esa componente. Este solucionador no usa restitution_q8. La detección es discreta y puede pasar por alto cruces rápidos.",
+    "de": "Kontakte werden entlang der Achse mit der geringsten Eindringtiefe aufgelöst; bei Gleichstand wird Y gewählt. Die Positionskorrektur nutzt inverse Massen, zwei dynamische Körper erhalten auf dieser Achse jedoch den einfachen Mittelwert ihrer Geschwindigkeiten. Bei einer Kollision mit einem statischen Körper wird die Komponente null. Der Löser nutzt restitution_q8 nicht. Die diskrete Kollisionserkennung kann schnelle Durchquerungen übersehen."
   },
   "phys_scratch": {
     "ja": "矩形の積分・衝突処理は共有作業領域を使います。同じ物理処理を割り込みから重ねて呼び出さないでください。",
     "en": "Box integration and collision routines use shared scratch storage. Do not re-enter these physics routines from an interrupt.",
-    "zh-CN": "矩形积分与碰撞函数共享临时存储，不要从中断重入这些物理函数。"
+    "zh-CN": "矩形积分与碰撞函数共享临时存储，不要从中断重入这些物理函数。",
+    "ko": "박스 적분 및 충돌 함수는 임시 저장 공간을 공유합니다. 인터럽트에서 이 물리 함수들을 재진입 호출하지 마세요.",
+    "zh-TW": "盒體積分與碰撞函式共用暫存空間。請勿從中斷重入這些物理函式。",
+    "fr": "Les routines d’intégration et de collision des boîtes partagent une zone de travail. Ne les rappelez pas depuis une interruption lorsqu’elles sont déjà en cours d’exécution.",
+    "es": "Las rutinas de integración y colisión de cajas comparten memoria temporal. No vuelvas a entrar en estas rutinas de física desde una interrupción.",
+    "de": "Integration und Kollisionserkennung für Boxen verwenden gemeinsamen Arbeitsspeicher. Rufen Sie diese Physikroutinen nicht während ihrer Ausführung erneut aus einem Interrupt auf."
   },
   "phys_bank3": {
     "ja": "physics3d.cはROMバンク2に配置されます。サンプルはMBC5・128KB ROMで、本体を先に読み込み、mainをバンク0に配置しています。呼び出し中に外部処理でROMバンクを切り替えないでください。",
     "en": "physics3d.c resides in ROM bank 2. The sample uses an MBC5 128 KB ROM, includes that implementation first and places main in bank 0. Do not change the ROM mapping externally during a call.",
-    "zh-CN": "physics3d.c 位于 ROM 存储体 2。示例使用 MBC5、128 KB ROM，先包含该实现，再把 main 放在存储体 0。调用期间不要从外部改变 ROM 映射。"
+    "zh-CN": "physics3d.c 位于 ROM 存储体 2。示例使用 MBC5、128 KB ROM，先包含该实现，再把 main 放在存储体 0。调用期间不要从外部改变 ROM 映射。",
+    "ko": "physics3d.c는 ROM 뱅크 2에 배치됩니다. 샘플은 MBC5 128 KB ROM을 사용하며, 이 구현을 먼저 포함하고 main을 뱅크 0에 둡니다. 호출 중에는 외부에서 ROM 매핑을 변경하지 마세요.",
+    "zh-TW": "physics3d.c 位於 ROM 記憶體庫 2。範例使用 MBC5 128 KB ROM，先引入此實作，再將 main 放在記憶體庫 0。呼叫期間，外部程式不得改變 ROM 映射。",
+    "fr": "physics3d.c réside dans la banque ROM 2. L’exemple utilise une ROM MBC5 de 128 Ko, inclut d’abord cette implémentation et place main dans la banque 0. Ne modifiez pas le mappage ROM depuis l’extérieur pendant un appel.",
+    "es": "physics3d.c reside en el banco ROM 2. El ejemplo usa una ROM MBC5 de 128 KB, incluye primero esta implementación y sitúa main en el banco 0. No cambies el mapeo de ROM desde fuera durante una llamada.",
+    "de": "physics3d.c liegt in ROM-Bank 2. Das Beispiel verwendet ein 128-KB-ROM mit MBC5, bindet diese Implementierung zuerst ein und legt main in Bank 0 ab. Ändern Sie während eines Aufrufs die ROM-Zuordnung nicht von außen."
   },
   "phys_step3": {
     "ja": "侵入量が最小の軸で接触を解決し、同値ならX、Y、Zの順を優先します。接近中だけ、両者の反発係数の平均（0～256に制限）と逆質量で反発を計算します。高速なすり抜け、回転、角運動量、摩擦は扱いません。",
     "en": "Contacts use the least-penetrating axis, preferring X, then Y, then Z on ties. Only closing motion produces a bounce, using inverse masses and the average restitution clamped to 0..256. Fast tunnelling, rotation, angular momentum and friction are not handled.",
-    "zh-CN": "接触选择穿透最浅的轴，相同深度按 X、Y、Z 顺序优先。只有正在接近的运动产生反弹，使用逆质量及限制在 0～256 的平均恢复系数。不处理高速穿透、旋转、角动量或摩擦。"
+    "zh-CN": "接触选择穿透最浅的轴，相同深度按 X、Y、Z 顺序优先。只有正在接近的运动产生反弹，使用逆质量及限制在 0～256 的平均恢复系数。不处理高速穿透、旋转、角动量或摩擦。",
+    "ko": "접촉에는 침투 깊이가 가장 작은 축을 사용하며, 같으면 X, Y, Z 순으로 우선합니다. 서로 가까워지는 운동일 때만 반발을 적용합니다. 역질량과 두 반발 계수의 평균을 사용하며, 평균은 0..256으로 제한합니다. 빠른 관통, 회전, 각운동량, 마찰은 처리하지 않습니다.",
+    "zh-TW": "接觸使用穿入最淺的軸，相同時依 X、Y、Z 的順序選擇。只有彼此接近的運動才會產生反彈，計算使用反質量，以及限制在 0..256 的平均恢復係數。不處理高速穿透、旋轉、角動量或摩擦。",
+    "fr": "Les contacts utilisent l’axe de pénétration minimale, avec priorité à X, puis Y, puis Z en cas d’égalité. Seul un mouvement de rapprochement produit un rebond, calculé avec les masses inverses et la restitution moyenne bornée à 0..256. Les traversées rapides, la rotation, le moment cinétique et le frottement ne sont pas gérés.",
+    "es": "Los contactos usan el eje de menor penetración, con prioridad X, Y y Z en caso de empate. Solo hay rebote si los cuerpos se están acercando; se calcula con las masas inversas y la restitución media limitada a 0..256. No se gestionan el efecto túnel a alta velocidad, la rotación, el momento angular ni la fricción.",
+    "de": "Kontakte nutzen die Achse mit der geringsten Eindringtiefe; bei Gleichstand gilt die Reihenfolge X, Y, Z. Nur eine Annäherung führt zum Abprallen. Dafür werden inverse Massen und der auf 0..256 begrenzte mittlere Rückprallkoeffizient verwendet. Schnelles Durchtunneln, Rotation, Drehimpuls und Reibung werden nicht behandelt."
   },
   "phys_impact": {
     "ja": "last_impact_speedには軸方向の接近速度の最大値が記録されます。動的な有効bodyは積分時に0へ戻り、固定・無効bodyは値を保持します。break_speedやKQ3D_BODY_BROKENを見て自動的に壊す処理はありません。破壊判定・flags・activeの更新はゲーム側で行います。",
     "en": "last_impact_speed records the maximum closing speed along a contact axis. Integration clears it for active dynamic bodies; static and inactive bodies retain it. Neither break_speed nor KQ3D_BODY_BROKEN triggers automatic destruction. The game decides when to break a body and changes flags/active itself.",
-    "zh-CN": "last_impact_speed 记录接触轴上的最大接近速度。积分会为活动动态刚体清零此值，静态及非活动刚体保留。break_speed 和 KQ3D_BODY_BROKEN 都不会自动销毁物体，游戏须自行决定破坏时机并修改 flags／active。"
+    "zh-CN": "last_impact_speed 记录接触轴上的最大接近速度。积分会为活动动态刚体清零此值，静态及非活动刚体保留。break_speed 和 KQ3D_BODY_BROKEN 都不会自动销毁物体，游戏须自行决定破坏时机并修改 flags／active。",
+    "ko": "last_impact_speed는 접촉 축을 따라 서로 가까워지는 속도의 최댓값을 기록합니다. 적분 시 활성 동적 물체에서는 초기화되지만 정적 물체와 비활성 물체에서는 유지됩니다. break_speed나 KQ3D_BODY_BROKEN은 자동 파괴를 일으키지 않습니다. 파괴 시점은 게임에서 판단하고 flags/active를 직접 변경해야 합니다.",
+    "zh-TW": "last_impact_speed 記錄沿接觸軸的最大接近速度。積分時會清除作用中動態物體的此值；靜態及未啟用物體則保留。break_speed 與 KQ3D_BODY_BROKEN 都不會自動觸發破壞。遊戲自行決定何時破壞物體，並修改 flags/active。",
+    "fr": "last_impact_speed mémorise la vitesse maximale de rapprochement sur un axe de contact. L’intégration la remet à zéro pour les corps dynamiques actifs ; les corps statiques ou inactifs la conservent. Ni break_speed ni KQ3D_BODY_BROKEN ne déclenche une destruction automatique. Le jeu décide quand casser un corps et modifie lui-même flags/active.",
+    "es": "last_impact_speed registra la máxima velocidad de acercamiento en un eje de contacto. La integración la borra para los cuerpos dinámicos activos; los estáticos e inactivos la conservan. Ni break_speed ni KQ3D_BODY_BROKEN provocan una destrucción automática. El juego decide cuándo romper un cuerpo y modifica flags/active por su cuenta.",
+    "de": "last_impact_speed speichert die größte Annäherungsgeschwindigkeit entlang einer Kontaktachse. Die Integration setzt sie bei aktiven dynamischen Körpern zurück; statische und inaktive Körper behalten sie bei. Weder break_speed noch KQ3D_BODY_BROKEN löst automatisch eine Zerstörung aus. Das Spiel entscheidet darüber und ändert flags/active selbst."
   },
   "phys_circle_limits": {
     "ja": "円の距離と法線は整数近似です。成分を255以下へ縮小しても、二乗和が65535を超える場合があります。中心差・半径和・逆質量和を有効範囲に収め、重み計算のinv_mass_q8×255も32767以下にしてください（サンプルは64）。",
     "en": "Circle distance and normals are integer approximations. Reducing each component to at most 255 does not guarantee that the squared-distance sum fits 65535. Keep center differences, radius sums and inverse-mass sums representable, and keep inv_mass_q8 * 255 within 32767 in the weight calculation; the sample uses 64.",
-    "zh-CN": "圆形距离和法线使用整数近似。即使每个分量都缩至不超过 255，其平方和也不保证小于等于 65535。中心差、半径和及逆质量和须可表示；计算权重时 inv_mass_q8×255 须不超过 32767，示例使用 64。"
+    "zh-CN": "圆形距离和法线使用整数近似。即使每个分量都缩至不超过 255，其平方和也不保证小于等于 65535。中心差、半径和及逆质量和须可表示；计算权重时 inv_mass_q8×255 须不超过 32767，示例使用 64。",
+    "ko": "원의 거리와 법선은 정수 근삿값입니다. 각 성분을 255 이하로 줄여도 거리 제곱의 합이 65535 이내라는 보장은 없습니다. 중심 좌표의 차, 반지름의 합, 역질량의 합이 표현 가능한 범위에 들어가야 합니다. 가중치 계산에서 inv_mass_q8 * 255가 32767 이내가 되도록 하세요. 샘플은 64를 사용합니다.",
+    "zh-TW": "圓形的距離與法線採用整數近似。即使各分量降至 255 以下，也不能保證平方距離總和不超過 65535。中心差值、半徑總和與反質量總和都必須能以其資料型別表示；權重計算中的 inv_mass_q8 * 255 也必須不超過 32767。範例使用 64。",
+    "fr": "La distance et les normales des cercles sont des approximations entières. Ramener chaque composante à 255 au plus ne garantit pas que la somme des carrés tienne dans 65535. Gardez les écarts entre centres, les sommes de rayons et de masses inverses dans leur plage représentable, et limitez inv_mass_q8 * 255 à 32767 pour le calcul des poids ; l’exemple utilise 64.",
+    "es": "La distancia y las normales de los círculos son aproximaciones enteras. Reducir cada componente a un máximo de 255 no garantiza que la suma de cuadrados quepa en 65535. Mantén las diferencias entre centros y las sumas de radios y masas inversas dentro de su rango representable. En el cálculo de pesos, inv_mass_q8 * 255 no debe superar 32767; el ejemplo usa 64.",
+    "de": "Abstände und Normalen bei Kreisen sind ganzzahlige Näherungen. Auch wenn jede Komponente höchstens 255 beträgt, muss die Summe ihrer Quadrate nicht in 65535 passen. Mittelpunktsdifferenzen, Radiensummen und Summen inverser Massen müssen darstellbar bleiben. Beim Berechnen der Gewichte darf inv_mass_q8 * 255 höchstens 32767 betragen; das Beispiel verwendet 64."
   },
   "phys_arg_world": {
     "ja": "更新または参照するワールドへのポインタ。配列と設定値を保持します。",
     "en": "Pointer to the world holding the body array and simulation settings.",
-    "zh-CN": "包含刚体数组及模拟设置的 world 指针。"
+    "zh-CN": "包含刚体数组及模拟设置的 world 指针。",
+    "ko": "물체 배열과 시뮬레이션 설정을 보관하는 월드의 포인터입니다.",
+    "zh-TW": "指向持有物體陣列與模擬設定的世界。",
+    "fr": "Pointeur vers le monde contenant le tableau de corps et les paramètres de simulation.",
+    "es": "Puntero al mundo que contiene el array de cuerpos y los ajustes de simulación.",
+    "de": "Zeiger auf die Welt mit dem Körperarray und den Simulationseinstellungen."
   },
   "phys_arg_bodies": {
     "ja": "呼び出し側が保持するbody配列の先頭。body_count個の要素を用意します。",
     "en": "Start of a caller-owned body array containing body_count elements.",
-    "zh-CN": "调用方持有的刚体数组首地址，包含 body_count 个元素。"
+    "zh-CN": "调用方持有的刚体数组首地址，包含 body_count 个元素。",
+    "ko": "body_count개의 원소를 가진 호출자 소유 물체 배열의 시작 주소입니다.",
+    "zh-TW": "呼叫端持有的物體陣列起始位置，包含 body_count 個元素。",
+    "fr": "Début d’un tableau de corps appartenant à l’appelant et contenant body_count éléments.",
+    "es": "Inicio de un array de cuerpos propiedad del código que llama, con body_count elementos.",
+    "de": "Anfang eines vom aufrufenden Code gehaltenen Körperarrays mit body_count Elementen."
   },
   "phys_arg_body_count": {
     "ja": "配列中のbody数（0～255）。無効な要素も個数に含めます。",
     "en": "Number of array slots, 0..255, including inactive entries.",
-    "zh-CN": "数组槽位数 0～255，包括非活动元素。"
+    "zh-CN": "数组槽位数 0～255，包括非活动元素。",
+    "ko": "비활성 항목을 포함한 배열 슬롯 수이며, 범위는 0..255입니다.",
+    "zh-TW": "陣列欄位數量，範圍為 0..255，包含未啟用的項目。",
+    "fr": "Nombre d’emplacements du tableau, de 0 à 255, entrées inactives comprises.",
+    "es": "Número de posiciones del array, de 0 a 255, incluidas las entradas inactivas.",
+    "de": "Anzahl der Arrayplätze von 0 bis 255, einschließlich inaktiver Einträge."
   },
   "phys_arg_body": {
     "ja": "変更するbodyへのポインタ。この関数が使わないフィールドは保持されます。",
     "en": "Pointer to the body to modify. Fields not used by this operation are retained.",
-    "zh-CN": "要修改的刚体指针，本操作未使用的字段保持不变。"
+    "zh-CN": "要修改的刚体指针，本操作未使用的字段保持不变。",
+    "ko": "수정할 물체의 포인터입니다. 이 연산에서 사용하지 않는 필드는 유지됩니다.",
+    "zh-TW": "指向要修改的物體。本操作未使用的欄位會保持不變。",
+    "fr": "Pointeur vers le corps à modifier. Les champs non utilisés par cette opération sont conservés.",
+    "es": "Puntero al cuerpo que se va a modificar. Los campos que no usa esta operación se conservan.",
+    "de": "Zeiger auf den zu ändernden Körper. Von dieser Operation nicht verwendete Felder bleiben erhalten."
   },
   "phys_arg_x": {
     "ja": "中心または点のX座標。サンプルではピクセル単位です。",
     "en": "X coordinate of the center or point, in pixels in the sample.",
-    "zh-CN": "中心或点的 X 坐标，示例中以像素为单位。"
+    "zh-CN": "中心或点的 X 坐标，示例中以像素为单位。",
+    "ko": "중심 또는 점의 X 좌표입니다. 샘플에서는 픽셀 단위입니다.",
+    "zh-TW": "中心或點的 X 座標；範例以像素為單位。",
+    "fr": "Coordonnée X du centre ou du point, en pixels dans l’exemple.",
+    "es": "Coordenada X del centro o del punto, en píxeles en el ejemplo.",
+    "de": "X-Koordinate des Mittelpunkts oder Punkts, im Beispiel in Pixeln."
   },
   "phys_arg_y": {
     "ja": "中心または点のY座標。サンプルでは下向きが正です。",
     "en": "Y coordinate of the center or point; positive is downward in the sample.",
-    "zh-CN": "中心或点的 Y 坐标，示例中向下为正。"
+    "zh-CN": "中心或点的 Y 坐标，示例中向下为正。",
+    "ko": "중심 또는 점의 Y 좌표입니다. 샘플에서는 아래쪽이 양의 방향입니다.",
+    "zh-TW": "中心或點的 Y 座標；範例中正方向朝下。",
+    "fr": "Coordonnée Y du centre ou du point ; le sens positif va vers le bas dans l’exemple.",
+    "es": "Coordenada Y del centro o del punto; en el ejemplo, el sentido positivo es hacia abajo.",
+    "de": "Y-Koordinate des Mittelpunkts oder Punkts; im Beispiel zeigen positive Werte nach unten."
   },
   "phys_arg_z": {
     "ja": "中心のZ座標。サンプルでは上面図の縦軸に表示します。",
     "en": "Z coordinate of the center, shown vertically in the sample top view.",
-    "zh-CN": "中心 Z 坐标，在示例俯视图中沿竖直方向表示。"
+    "zh-CN": "中心 Z 坐标，在示例俯视图中沿竖直方向表示。",
+    "ko": "중심의 Z 좌표입니다. 샘플의 평면도에서는 세로 방향으로 표시됩니다.",
+    "zh-TW": "中心的 Z 座標，在範例俯視圖中以垂直方向呈現。",
+    "fr": "Coordonnée Z du centre, représentée verticalement dans la vue de dessus de l’exemple.",
+    "es": "Coordenada Z del centro, representada verticalmente en la vista superior del ejemplo.",
+    "de": "Z-Koordinate des Mittelpunkts, in der Draufsicht des Beispiels vertikal dargestellt."
   },
   "phys_arg_half_x": {
     "ja": "X方向の半サイズ。箱の全幅はこの値の2倍です。",
     "en": "Half extent along X; the full box width is twice this value.",
-    "zh-CN": "X 方向半尺寸，完整宽度为其两倍。"
+    "zh-CN": "X 方向半尺寸，完整宽度为其两倍。",
+    "ko": "X축 반크기입니다. 박스의 전체 너비는 이 값의 두 배입니다.",
+    "zh-TW": "X 軸半長；盒體的完整寬度為此值的兩倍。",
+    "fr": "Demi-dimension selon X ; la largeur totale de la boîte vaut deux fois cette valeur.",
+    "es": "Semiextensión en X; el ancho total de la caja es el doble de este valor.",
+    "de": "Halbe Ausdehnung entlang X; die gesamte Boxbreite ist doppelt so groß."
   },
   "phys_arg_half_y": {
     "ja": "Y方向の半サイズ。箱の全高はこの値の2倍です。",
     "en": "Half extent along Y; the full box height is twice this value.",
-    "zh-CN": "Y 方向半尺寸，完整高度为其两倍。"
+    "zh-CN": "Y 方向半尺寸，完整高度为其两倍。",
+    "ko": "Y축 반크기입니다. 박스의 전체 높이는 이 값의 두 배입니다.",
+    "zh-TW": "Y 軸半長；盒體的完整高度為此值的兩倍。",
+    "fr": "Demi-dimension selon Y ; la hauteur totale de la boîte vaut deux fois cette valeur.",
+    "es": "Semiextensión en Y; la altura total de la caja es el doble de este valor.",
+    "de": "Halbe Ausdehnung entlang Y; die gesamte Boxhöhe ist doppelt so groß."
   },
   "phys_arg_half_z": {
     "ja": "Z方向の半サイズ。奥行きはこの値の2倍です。",
     "en": "Half extent along Z; full depth is twice this value.",
-    "zh-CN": "Z 方向半尺寸，完整深度为其两倍。"
+    "zh-CN": "Z 方向半尺寸，完整深度为其两倍。",
+    "ko": "Z축 반크기입니다. 전체 깊이는 이 값의 두 배입니다.",
+    "zh-TW": "Z 軸半長；完整深度為此值的兩倍。",
+    "fr": "Demi-dimension selon Z ; la profondeur totale vaut deux fois cette valeur.",
+    "es": "Semiextensión en Z; la profundidad total es el doble de este valor.",
+    "de": "Halbe Ausdehnung entlang Z; die gesamte Tiefe ist doppelt so groß."
   },
   "phys_arg_vx": {
     "ja": "X方向の1刻み当たりの変位。位置と同じ単位です。",
     "en": "X displacement per simulation tick, in the same units as position.",
-    "zh-CN": "每次模拟更新的 X 位移，单位与位置相同。"
+    "zh-CN": "每次模拟更新的 X 位移，单位与位置相同。",
+    "ko": "시뮬레이션 1틱당 X 변위이며, 위치와 같은 단위를 사용합니다.",
+    "zh-TW": "每個模擬刻度的 X 位移，單位與位置相同。",
+    "fr": "Déplacement selon X par tick de simulation, dans les mêmes unités que la position.",
+    "es": "Desplazamiento en X por tick de simulación, en las mismas unidades que la posición.",
+    "de": "X-Verschiebung pro Simulationstakt, in derselben Einheit wie die Position."
   },
   "phys_arg_vy": {
     "ja": "Y方向の1刻み当たりの変位。位置と同じ単位です。",
     "en": "Y displacement per simulation tick, in the same units as position.",
-    "zh-CN": "每次模拟更新的 Y 位移，单位与位置相同。"
+    "zh-CN": "每次模拟更新的 Y 位移，单位与位置相同。",
+    "ko": "시뮬레이션 1틱당 Y 변위이며, 위치와 같은 단위를 사용합니다.",
+    "zh-TW": "每個模擬刻度的 Y 位移，單位與位置相同。",
+    "fr": "Déplacement selon Y par tick de simulation, dans les mêmes unités que la position.",
+    "es": "Desplazamiento en Y por tick de simulación, en las mismas unidades que la posición.",
+    "de": "Y-Verschiebung pro Simulationstakt, in derselben Einheit wie die Position."
   },
   "phys_arg_gravity_x": {
     "ja": "この呼び出しでX速度へ加える加速度。",
     "en": "Acceleration added to X velocity by this call.",
-    "zh-CN": "本次调用加到 X 速度上的加速度。"
+    "zh-CN": "本次调用加到 X 速度上的加速度。",
+    "ko": "이번 호출에서 X 속도에 더하는 가속도입니다.",
+    "zh-TW": "本次呼叫加至 X 速度的加速度。",
+    "fr": "Accélération ajoutée à la vitesse X par cet appel.",
+    "es": "Aceleración que esta llamada suma a la velocidad X.",
+    "de": "Beschleunigung, die dieser Aufruf zur X-Geschwindigkeit addiert."
   },
   "phys_arg_gravity_y": {
     "ja": "この呼び出しでY速度へ加える加速度。",
     "en": "Acceleration added to Y velocity by this call.",
-    "zh-CN": "本次调用加到 Y 速度上的加速度。"
+    "zh-CN": "本次调用加到 Y 速度上的加速度。",
+    "ko": "이번 호출에서 Y 속도에 더하는 가속도입니다.",
+    "zh-TW": "本次呼叫加至 Y 速度的加速度。",
+    "fr": "Accélération ajoutée à la vitesse Y par cet appel.",
+    "es": "Aceleración que esta llamada suma a la velocidad Y.",
+    "de": "Beschleunigung, die dieser Aufruf zur Y-Geschwindigkeit addiert."
   },
   "phys_arg_max_speed": {
     "ja": "速度の上限。軸ごとの制限か合成速度の制限かは関数ごとに異なります。",
     "en": "Speed limit; the entry specifies whether this limits each axis or the combined vector.",
-    "zh-CN": "速度上限；本条说明会指出限制的是各轴还是合成向量。"
+    "zh-CN": "速度上限；本条说明会指出限制的是各轴还是合成向量。",
+    "ko": "속도 제한값입니다. 각 축을 제한하는지 전체 벡터를 제한하는지는 해당 항목의 설명을 참조하세요.",
+    "zh-TW": "速度上限。各項說明會指出此限制是作用於每個軸，還是整個向量。",
+    "fr": "Limite de vitesse. La rubrique précise si elle s’applique à chaque axe ou au vecteur résultant.",
+    "es": "Límite de velocidad. La entrada indica si se aplica a cada eje o al vector conjunto.",
+    "de": "Geschwindigkeitsgrenze. Der jeweilige Eintrag erläutert, ob sie für jede Achse einzeln oder den gesamten Vektor gilt."
   },
   "phys_arg_surface": {
     "ja": "面の法線・移動速度・反発・摩擦を指定したKQSurface2Dへのポインタ。",
     "en": "Pointer to a KQSurface2D containing its normal, velocity, bounce and friction settings.",
-    "zh-CN": "KQSurface2D 指针，其中包含法线、表面速度、反弹及摩擦设置。"
+    "zh-CN": "KQSurface2D 指针，其中包含法线、表面速度、反弹及摩擦设置。",
+    "ko": "법선, 속도, 반발, 마찰 설정을 담은 KQSurface2D의 포인터입니다.",
+    "zh-TW": "指向包含法線、速度、反彈與摩擦設定的 KQSurface2D。",
+    "fr": "Pointeur vers une KQSurface2D contenant sa normale, sa vitesse et ses paramètres de rebond et de frottement.",
+    "es": "Puntero a una KQSurface2D que contiene su normal, velocidad y ajustes de rebote y fricción.",
+    "de": "Zeiger auf eine KQSurface2D mit Normale, Geschwindigkeit sowie Rückprall- und Reibungseinstellungen."
   },
   "phys_arg_value": {
     "ja": "倍率を掛ける符号付き16ビットの値。",
     "en": "Signed 16-bit value to scale.",
-    "zh-CN": "待缩放的有符号 16 位数值。"
+    "zh-CN": "待缩放的有符号 16 位数值。",
+    "ko": "배율을 적용할 부호 있는 16비트 값입니다.",
+    "zh-TW": "要縮放的帶正負號 16 位元值。",
+    "fr": "Valeur signée de 16 bits à mettre à l’échelle.",
+    "es": "Valor de 16 bits con signo al que se aplica el factor de escala.",
+    "de": "Vorzeichenbehafteter 16-Bit-Wert, auf den der Skalierungsfaktor angewendet wird."
   },
   "phys_arg_coefficient": {
     "ja": "256を1.0とする符号付き係数（−256～256）。",
     "en": "Signed coefficient in -256..256, with 256 representing 1.0.",
-    "zh-CN": "范围 −256～256 的带符号系数，256 表示 1.0。"
+    "zh-CN": "范围 −256～256 的带符号系数，256 表示 1.0。",
+    "ko": "-256..256 범위의 부호 있는 계수이며, 256이 1.0을 나타냅니다.",
+    "zh-TW": "範圍為 -256..256 的帶正負號係數，256 代表 1.0。",
+    "fr": "Coefficient signé de -256 à 256 ; 256 représente 1,0.",
+    "es": "Coeficiente con signo entre -256 y 256; 256 representa 1,0.",
+    "de": "Vorzeichenbehafteter Koeffizient von -256 bis 256; 256 steht für 1,0."
   },
   "phys_arg_start_gap": {
     "ja": "刻み開始時の面までの符号付き距離。正は面の外側です。",
     "en": "Signed gap at the start of the tick; positive means outside the surface.",
-    "zh-CN": "更新开始时的带符号间距，正值表示位于表面外侧。"
+    "zh-CN": "更新开始时的带符号间距，正值表示位于表面外侧。",
+    "ko": "틱 시작 시점의 부호 있는 간격입니다. 양수이면 표면 바깥쪽입니다.",
+    "zh-TW": "刻度開始時的帶正負號間距；正值表示位於表面外側。",
+    "fr": "Écart signé au début du tick ; une valeur positive indique l’extérieur de la surface.",
+    "es": "Distancia con signo al inicio del tick; un valor positivo indica que está fuera de la superficie.",
+    "de": "Vorzeichenbehafteter Abstand zu Beginn des Takts; positiv bedeutet außerhalb der Oberfläche."
   },
   "phys_arg_end_gap": {
     "ja": "刻み終了時の面までの符号付き距離。負は面を通過した側です。",
     "en": "Signed gap at the end of the tick; negative means past the surface.",
-    "zh-CN": "更新结束时的带符号间距，负值表示已越过表面。"
+    "zh-CN": "更新结束时的带符号间距，负值表示已越过表面。",
+    "ko": "틱 종료 시점의 부호 있는 간격입니다. 음수이면 표면을 지나 안쪽으로 들어간 상태입니다.",
+    "zh-TW": "刻度結束時的帶正負號間距；負值表示已越過表面。",
+    "fr": "Écart signé à la fin du tick ; une valeur négative indique que la surface a été franchie.",
+    "es": "Distancia con signo al final del tick; un valor negativo indica que se ha atravesado la superficie.",
+    "de": "Vorzeichenbehafteter Abstand am Ende des Takts; negativ bedeutet, dass die Oberfläche überschritten wurde."
   },
   "phys_arg_mass_q8": {
     "ja": "256を質量1.0とする値。0以下は固定物体です。",
     "en": "Mass value with 256 representing 1.0; nonpositive values create a static body.",
-    "zh-CN": "质量值，256 表示 1.0，非正值创建静态刚体。"
+    "zh-CN": "质量值，256 表示 1.0，非正值创建静态刚体。",
+    "ko": "256이 1.0을 나타내는 질량값입니다. 0 이하이면 정적 물체가 됩니다.",
+    "zh-TW": "質量值，256 代表 1.0；小於或等於零時建立靜態物體。",
+    "fr": "Masse, avec 256 pour 1,0 ; une valeur nulle ou négative crée un corps statique.",
+    "es": "Valor de masa, donde 256 representa 1,0; los valores no positivos crean un cuerpo estático.",
+    "de": "Massenwert, bei dem 256 für 1,0 steht. Werte kleiner oder gleich null erzeugen einen statischen Körper."
   },
   "phys_arg_r": {
     "ja": "左上座標x/yと幅w・高さhを持つKQRectの値。",
     "en": "KQRect value containing a top-left x/y position and width/height w/h.",
-    "zh-CN": "KQRect 值，包含左上角 x／y 及宽高 w／h。"
+    "zh-CN": "KQRect 值，包含左上角 x／y 及宽高 w／h。",
+    "ko": "왼쪽 위 위치 x/y와 너비/높이 w/h를 담은 KQRect 값입니다.",
+    "zh-TW": "KQRect 值，包含左上角位置 x/y 與寬度／高度 w/h。",
+    "fr": "Valeur KQRect contenant la position x/y du coin supérieur gauche et la largeur/hauteur w/h.",
+    "es": "Valor KQRect con la posición x/y de la esquina superior izquierda y el ancho/alto w/h.",
+    "de": "KQRect-Wert mit der Position x/y der linken oberen Ecke und Breite/Höhe w/h."
   },
   "phys_arg_friction_q8": {
     "ja": "残す速度の倍率です。この関数ではs8へ変換され、128～255は負の係数になる点に注意してください。",
     "en": "Velocity multiplier retained by this function. It is converted to s8, so 128..255 become negative coefficients.",
-    "zh-CN": "本函数使用的速度倍率，会转换为 s8，因此 128～255 会变成负系数。"
+    "zh-CN": "本函数使用的速度倍率，会转换为 s8，因此 128～255 会变成负系数。",
+    "ko": "이 함수가 사용하는 속도 배율입니다. s8로 변환하므로 128..255는 음수 계수가 됩니다.",
+    "zh-TW": "此函式使用的速度倍率。它會轉成 s8，因此 128..255 會成為負係數。",
+    "fr": "Facteur multiplicatif de vitesse utilisé par cette fonction. Il est converti en s8 : les valeurs 128..255 deviennent donc des coefficients négatifs.",
+    "es": "Multiplicador de velocidad que utiliza esta función. Se convierte a s8, por lo que los valores 128..255 se vuelven coeficientes negativos.",
+    "de": "Von dieser Funktion verwendeter Geschwindigkeitsfaktor. Er wird in s8 umgewandelt; dadurch werden 128..255 zu negativen Koeffizienten."
   },
   "phys_arg_min_x": {
     "ja": "境界の左端。円の中心の最小値はmin_x＋radiusです。",
     "en": "Left boundary; a circle center is limited to at least min_x + radius.",
-    "zh-CN": "左边界，圆心至少为 min_x+radius。"
+    "zh-CN": "左边界，圆心至少为 min_x+radius。",
+    "ko": "왼쪽 경계입니다. 원 중심의 최솟값은 min_x + radius로 제한됩니다.",
+    "zh-TW": "左側邊界；圓心不得小於 min_x + radius。",
+    "fr": "Limite gauche ; le centre du cercle ne peut pas descendre sous min_x + radius.",
+    "es": "Límite izquierdo; el centro del círculo no puede ser menor que min_x + radius.",
+    "de": "Linke Grenze; der Kreismittelpunkt wird auf mindestens min_x + radius begrenzt."
   },
   "phys_arg_min_y": {
     "ja": "境界の上端。円の中心の最小値はmin_y＋radiusです。",
     "en": "Top boundary; a circle center is limited to at least min_y + radius.",
-    "zh-CN": "上边界，圆心至少为 min_y+radius。"
+    "zh-CN": "上边界，圆心至少为 min_y+radius。",
+    "ko": "위쪽 경계입니다. 원 중심의 최솟값은 min_y + radius로 제한됩니다.",
+    "zh-TW": "上側邊界；圓心不得小於 min_y + radius。",
+    "fr": "Limite supérieure ; le centre du cercle ne peut pas descendre sous min_y + radius.",
+    "es": "Límite superior; el centro del círculo no puede ser menor que min_y + radius.",
+    "de": "Obere Grenze; der Kreismittelpunkt wird auf mindestens min_y + radius begrenzt."
   },
   "phys_arg_max_x": {
     "ja": "境界の右端。円の中心の最大値はmax_x−radiusです。",
     "en": "Right boundary; a circle center is limited to at most max_x - radius.",
-    "zh-CN": "右边界，圆心至多为 max_x−radius。"
+    "zh-CN": "右边界，圆心至多为 max_x−radius。",
+    "ko": "오른쪽 경계입니다. 원 중심의 최댓값은 max_x - radius로 제한됩니다.",
+    "zh-TW": "右側邊界；圓心不得大於 max_x - radius。",
+    "fr": "Limite droite ; le centre du cercle ne peut pas dépasser max_x - radius.",
+    "es": "Límite derecho; el centro del círculo no puede superar max_x - radius.",
+    "de": "Rechte Grenze; der Kreismittelpunkt wird auf höchstens max_x - radius begrenzt."
   },
   "phys_arg_max_y": {
     "ja": "境界の下端。円の中心の最大値はmax_y−radiusです。",
     "en": "Bottom boundary; a circle center is limited to at most max_y - radius.",
-    "zh-CN": "下边界，圆心至多为 max_y−radius。"
+    "zh-CN": "下边界，圆心至多为 max_y−radius。",
+    "ko": "아래쪽 경계입니다. 원 중심의 최댓값은 max_y - radius로 제한됩니다.",
+    "zh-TW": "下側邊界；圓心不得大於 max_y - radius。",
+    "fr": "Limite inférieure ; le centre du cercle ne peut pas dépasser max_y - radius.",
+    "es": "Límite inferior; el centro del círculo no puede superar max_y - radius.",
+    "de": "Untere Grenze; der Kreismittelpunkt wird auf höchstens max_y - radius begrenzt."
   },
   "phys_expected_body2d": {
     "ja": "左が衝突前、右が1刻み後です。赤い16×16の箱は中心(24,24)・速度(4,16)から中心(28,36)へ進み、青い床の上でY速度が0になります。各図の原点は画面(8,48)と(88,48)です。DMGではすべて黒で描きます。数値検証では初期値、設定、積分、矩形・点判定、符号付き倍率も確認します。",
     "en": "Left shows the initial state; right shows one tick later. A red 16x16 box with center (24,24) and velocity (4,16) reaches (28,36), with Y velocity zero on the blue floor. Panel origins are screen (8,48) and (88,48). DMG renders all marks in black. RAM checks also cover initialization, setters, integration, rectangle/point queries and signed scaling.",
-    "zh-CN": "左侧为初始状态，右侧为一次更新后。红色 16×16 矩形中心从 (24,24) 以速度 (4,16) 到达 (28,36)，碰到蓝色地板后 Y 速度为零。面板原点为屏幕 (8,48) 和 (88,48)，DMG 中所有标记为黑色。RAM 检查还覆盖初始化、设置函数、积分、矩形／点查询和带符号缩放。"
+    "zh-CN": "左侧为初始状态，右侧为一次更新后。红色 16×16 矩形中心从 (24,24) 以速度 (4,16) 到达 (28,36)，碰到蓝色地板后 Y 速度为零。面板原点为屏幕 (8,48) 和 (88,48)，DMG 中所有标记为黑色。RAM 检查还覆盖初始化、设置函数、积分、矩形／点查询和带符号缩放。",
+    "ko": "왼쪽은 초기 상태, 오른쪽은 1틱 후입니다. 중심 (24,24), 속도 (4,16)인 빨간색 16x16 박스가 (28,36)에 도달하고 파란색 바닥에서 Y 속도가 0이 됩니다. 패널 원점은 화면 좌표 (8,48)과 (88,48)입니다. DMG에서는 모든 표시가 검은색입니다. RAM 검사로 초기화, 설정 함수, 적분, 사각형·점 질의, 부호 있는 배율 연산도 확인합니다.",
+    "zh-TW": "左側為初始狀態，右側為一個刻度後。紅色 16x16 盒體的中心為 (24,24)、速度為 (4,16)，之後到達 (28,36)，在藍色地板上使 Y 速度歸零。面板原點位於螢幕座標 (8,48) 與 (88,48)。DMG 上所有標記皆為黑色。RAM 檢查也涵蓋初始化、設定函式、積分、矩形／點查詢與帶正負號的縮放運算。",
+    "fr": "À gauche, l’état initial ; à droite, après un tick. Une boîte rouge de 16x16, centrée en (24,24) avec une vitesse de (4,16), atteint (28,36) et sa vitesse Y s’annule sur le sol bleu. Les origines des panneaux sont aux coordonnées écran (8,48) et (88,48). Sur DMG, tous les repères sont noirs. Les contrôles RAM couvrent aussi l’initialisation, les fonctions de réglage, l’intégration, les tests de rectangles et de points et la mise à l’échelle signée.",
+    "es": "La izquierda muestra el estado inicial; la derecha, un tick después. Una caja roja de 16x16 con centro (24,24) y velocidad (4,16) llega a (28,36), con velocidad Y nula sobre el suelo azul. Los orígenes de los paneles están en las coordenadas de pantalla (8,48) y (88,48). En DMG, todas las marcas son negras. Las comprobaciones de RAM también cubren la inicialización, las funciones de ajuste, la integración, las consultas de rectángulos y puntos y el escalado con signo.",
+    "de": "Links ist der Anfangszustand zu sehen, rechts der Zustand nach einem Takt. Eine rote 16x16-Box mit Mittelpunkt (24,24) und Geschwindigkeit (4,16) erreicht (28,36); auf dem blauen Boden wird ihre Y-Geschwindigkeit null. Die Panelursprünge liegen bei den Bildschirmkoordinaten (8,48) und (88,48). Auf dem DMG sind alle Markierungen schwarz. RAM-Prüfungen decken außerdem Initialisierung, Setzfunktionen, Integration, Rechteck-/Punktabfragen und vorzeichenbehaftete Skalierung ab."
   },
   "phys_expected_surface": {
     "ja": "赤い物体の位置は変わりません。緑の速度線は左の(8,16)から右の(2,−8)へ変わり、青い面に対する反発と接線摩擦を表します。図の原点は画面(8,48)・(88,48)、物体中心は図内(24,40)です。接近速度は16、交差時刻の例は192/256です。速度制限の例では(300,400)が(147,196)になります。DMGでは全て黒です。",
     "en": "The red body stays in place. Its green velocity line changes from (8,16) on the left to (2,-8) on the right, showing bounce and tangential friction against the blue surface. Panel origins are screen (8,48)/(88,48); the body center is local (24,40). Incoming speed is 16 and the crossing-time example returns 192/256. The speed-limit example reduces (300,400) to (147,196). All marks are black on DMG.",
-    "zh-CN": "红色刚体位置不变，绿色速度线从左图的 (8,16) 变为右图的 (2,−8)，展示蓝色表面上的反弹和切向摩擦。面板原点为屏幕 (8,48)／(88,48)，刚体局部中心为 (24,40)。入射速度为 16，跨越时间示例返回 192/256，限速示例将 (300,400) 缩为 (147,196)。DMG 全部使用黑色。"
+    "zh-CN": "红色刚体位置不变，绿色速度线从左图的 (8,16) 变为右图的 (2,−8)，展示蓝色表面上的反弹和切向摩擦。面板原点为屏幕 (8,48)／(88,48)，刚体局部中心为 (24,40)。入射速度为 16，跨越时间示例返回 192/256，限速示例将 (300,400) 缩为 (147,196)。DMG 全部使用黑色。",
+    "ko": "빨간색 물체의 위치는 그대로입니다. 초록색 속도선은 왼쪽의 (8,16)에서 오른쪽의 (2,-8)로 바뀌어 파란색 표면에서의 반발과 접선 방향 마찰을 보여 줍니다. 패널 원점은 화면 (8,48)/(88,48), 물체 중심은 패널 내부 (24,40)입니다. 입사 속력은 16이고, 교차 시각 예제는 192/256을 반환합니다. 속력 제한 예제는 (300,400)을 (147,196)으로 줄입니다. DMG에서는 모든 표시가 검은색입니다.",
+    "zh-TW": "紅色物體保持原位。綠色速度線由左側的 (8,16) 變為右側的 (2,-8)，呈現對藍色表面的反彈與切向摩擦。面板原點為螢幕 (8,48)/(88,48)，物體中心為面板內的 (24,40)。入射速率為 16，穿越時間範例傳回 192/256。速度限制範例將 (300,400) 降為 (147,196)。DMG 上所有標記皆為黑色。",
+    "fr": "Le corps rouge reste en place. Son vecteur vitesse vert passe de (8,16) à gauche à (2,-8) à droite, montrant le rebond et le frottement tangent sur la surface bleue. Les origines des panneaux sont en (8,48)/(88,48) à l’écran ; le centre du corps est en (24,40) dans chaque panneau. La vitesse d’approche vaut 16 et l’exemple de temps de franchissement renvoie 192/256. L’exemple de limitation de vitesse réduit (300,400) à (147,196). Tous les repères sont noirs sur DMG.",
+    "es": "El cuerpo rojo permanece en su sitio. Su línea verde de velocidad cambia de (8,16) a la izquierda a (2,-8) a la derecha, mostrando el rebote y la fricción tangencial contra la superficie azul. Los orígenes de los paneles están en (8,48)/(88,48) de la pantalla; el centro del cuerpo está en (24,40) dentro del panel. La rapidez de entrada es 16 y el ejemplo del instante de cruce devuelve 192/256. El ejemplo del límite de rapidez reduce (300,400) a (147,196). En DMG, todas las marcas son negras.",
+    "de": "Der rote Körper bleibt an seiner Position. Seine grüne Geschwindigkeitslinie wechselt von (8,16) links zu (2,-8) rechts und zeigt so Rückprall und tangentiale Reibung an der blauen Oberfläche. Die Panelursprünge liegen auf dem Bildschirm bei (8,48)/(88,48), der Körpermittelpunkt innerhalb des Panels bei (24,40). Die Anprallgeschwindigkeit beträgt 16, das Beispiel zum Übertrittszeitpunkt liefert 192/256. Das Beispiel zur Geschwindigkeitsbegrenzung reduziert (300,400) auf (147,196). Auf dem DMG sind alle Markierungen schwarz."
   },
   "phys_expected_circle": {
     "ja": "半径6の赤い円が、左の中心(24,24)から右の(54,24)へ進みます。図内の境界は(4,4)～(60,60)です。右壁で中心が54に制限され、X速度は32から−15へ変わります。壁反発128/256に続き、減衰255/256が掛かります。図の原点は画面(8,48)・(88,48)。DMGでは円と枠を黒で表示します。",
     "en": "A red radius-6 circle moves from center (24,24) on the left to (54,24) on the right. Local bounds are (4,4)..(60,60). The right wall clamps the center to 54 and changes X velocity from 32 to -15: wall restitution 128/256 is followed by damping 255/256. Panel origins are screen (8,48)/(88,48). DMG shows the circle and boundary in black.",
-    "zh-CN": "红色半径 6 的圆从左图中心 (24,24) 移到右图 (54,24)。局部边界为 (4,4)～(60,60)。右墙将中心限制为 54，X 速度从 32 变为 −15：先应用墙面恢复系数 128/256，再应用阻尼 255/256。面板原点为屏幕 (8,48)／(88,48)，DMG 的圆与边框为黑色。"
+    "zh-CN": "红色半径 6 的圆从左图中心 (24,24) 移到右图 (54,24)。局部边界为 (4,4)～(60,60)。右墙将中心限制为 54，X 速度从 32 变为 −15：先应用墙面恢复系数 128/256，再应用阻尼 255/256。面板原点为屏幕 (8,48)／(88,48)，DMG 的圆与边框为黑色。",
+    "ko": "반지름 6인 빨간색 원이 왼쪽 중심 (24,24)에서 오른쪽 (54,24)로 이동합니다. 패널 내부 경계는 (4,4)..(60,60)입니다. 오른쪽 벽이 중심을 54로 제한하고 X 속도를 32에서 -15로 바꿉니다. 벽 반발 계수 128/256을 적용한 뒤 감쇠 255/256을 적용한 결과입니다. 패널 원점은 화면 (8,48)/(88,48)입니다. DMG에서는 원과 경계가 검은색입니다.",
+    "zh-TW": "半徑 6 的紅色圓由左側中心 (24,24) 移至右側的 (54,24)。面板內邊界為 (4,4)..(60,60)。右牆將圓心限制在 54，並將 X 速度從 32 改為 -15：先套用牆面恢復係數 128/256，再套用阻尼 255/256。面板原點位於螢幕 (8,48)/(88,48)。DMG 上圓與邊界皆為黑色。",
+    "fr": "Un cercle rouge de rayon 6 passe du centre (24,24) à gauche à (54,24) à droite. Les limites locales vont de (4,4) à (60,60). Le mur droit borne le centre à 54 et fait passer la vitesse X de 32 à -15 : restitution du mur de 128/256, puis amortissement de 255/256. Les origines des panneaux sont en (8,48)/(88,48) à l’écran. Sur DMG, le cercle et les limites sont noirs.",
+    "es": "Un círculo rojo de radio 6 pasa del centro (24,24) a la izquierda a (54,24) a la derecha. Los límites locales son (4,4)..(60,60). La pared derecha limita el centro a 54 y cambia la velocidad X de 32 a -15: primero se aplica una restitución de pared de 128/256 y después un amortiguamiento de 255/256. Los orígenes de los paneles están en (8,48)/(88,48) de la pantalla. En DMG, el círculo y el borde aparecen en negro.",
+    "de": "Ein roter Kreis mit Radius 6 bewegt sich vom Mittelpunkt (24,24) links nach (54,24) rechts. Die lokalen Grenzen sind (4,4)..(60,60). Die rechte Wand begrenzt den Mittelpunkt auf 54 und ändert die X-Geschwindigkeit von 32 auf -15: Auf den Wandrückprall mit 128/256 folgt eine Dämpfung mit 255/256. Die Panelursprünge liegen bei (8,48)/(88,48) auf dem Bildschirm. Auf dem DMG werden Kreis und Begrenzung schwarz dargestellt."
   },
   "phys_expected_body3d": {
     "ja": "左はX/Y正面図、右はX/Z上面図です。緑の枠が初期位置(24,24,16)、赤い箱が1刻み後の(36,24,24)、青い領域が固定障害物です。X速度16は−14へ反発し、Z速度8は保持されます。衝撃値は16ですが、break_speed=1でもflagsは0のままです。図の原点は画面(8,48)・(88,48)。DMGでは枠・箱・障害物が黒になります。",
     "en": "Left is the X/Y front view and right is the X/Z top view. Green outlines mark the initial (24,24,16); red boxes show (36,24,24) after one tick; blue regions are the static obstacle. X velocity bounces from 16 to -14 while Z velocity stays 8. Impact is 16, but flags remain zero despite break_speed=1. Panel origins are screen (8,48)/(88,48). All marks are black on DMG.",
-    "zh-CN": "左侧为 X／Y 正视图，右侧为 X／Z 俯视图。绿色轮廓表示初始位置 (24,24,16)，红色矩形表示更新后的 (36,24,24)，蓝色区域为静态障碍。X 速度从 16 反弹为 −14，Z 速度保持 8。冲击值为 16，但即使 break_speed=1，flags 仍为零。面板原点为屏幕 (8,48)／(88,48)，DMG 所有标记均为黑色。"
+    "zh-CN": "左侧为 X／Y 正视图，右侧为 X／Z 俯视图。绿色轮廓表示初始位置 (24,24,16)，红色矩形表示更新后的 (36,24,24)，蓝色区域为静态障碍。X 速度从 16 反弹为 −14，Z 速度保持 8。冲击值为 16，但即使 break_speed=1，flags 仍为零。面板原点为屏幕 (8,48)／(88,48)，DMG 所有标记均为黑色。",
+    "ko": "왼쪽은 X/Y 정면도, 오른쪽은 X/Z 평면도입니다. 초록색 윤곽은 초기 위치 (24,24,16), 빨간색 박스는 1틱 후의 (36,24,24), 파란색 영역은 정적 장애물을 나타냅니다. X 속도는 반발로 16에서 -14가 되고 Z 속도는 8을 유지합니다. 충격값은 16이지만 break_speed=1이어도 flags는 0입니다. 패널 원점은 화면 (8,48)/(88,48)입니다. DMG에서는 모든 표시가 검은색입니다.",
+    "zh-TW": "左側是 X/Y 正視圖，右側是 X/Z 俯視圖。綠色輪廓標示初始位置 (24,24,16)，紅色盒體顯示一個刻度後的 (36,24,24)，藍色區域為靜態障礙物。X 速度由 16 反彈為 -14，Z 速度維持 8。衝擊值為 16，但即使 break_speed=1，flags 仍為零。面板原點位於螢幕 (8,48)/(88,48)。DMG 上所有標記皆為黑色。",
+    "fr": "À gauche, la vue de face X/Y ; à droite, la vue de dessus X/Z. Les contours verts indiquent la position initiale (24,24,16), les boîtes rouges la position (36,24,24) après un tick, et les zones bleues l’obstacle statique. La vitesse X passe de 16 à -14 par rebond, tandis que la vitesse Z reste à 8. L’impact vaut 16, mais flags reste à zéro malgré break_speed=1. Les origines des panneaux sont en (8,48)/(88,48) à l’écran. Tous les repères sont noirs sur DMG.",
+    "es": "A la izquierda está la vista frontal X/Y y a la derecha, la vista superior X/Z. Los contornos verdes marcan la posición inicial (24,24,16); las cajas rojas muestran (36,24,24) tras un tick; las zonas azules son el obstáculo estático. La velocidad X rebota de 16 a -14, mientras que la velocidad Z se mantiene en 8. El impacto es 16, pero flags permanece en cero pese a break_speed=1. Los orígenes de los paneles están en (8,48)/(88,48) de la pantalla. En DMG, todas las marcas son negras.",
+    "de": "Links ist die X/Y-Vorderansicht, rechts die X/Z-Draufsicht. Grüne Umrisse markieren die Anfangsposition (24,24,16), rote Boxen zeigen (36,24,24) nach einem Takt, und blaue Flächen stellen das statische Hindernis dar. Die X-Geschwindigkeit springt beim Rückprall von 16 auf -14, während Z bei 8 bleibt. Der Aufprallwert beträgt 16, flags bleibt jedoch trotz break_speed=1 null. Die Panelursprünge liegen bei (8,48)/(88,48) auf dem Bildschirm. Auf dem DMG sind alle Markierungen schwarz."
   },
   "phys_kq2d_world_init_purpose": {
     "ja": "2Dワールドへ配列を関連付け、重力(0,32)、接触反復4回、軸速度上限512を設定します。",
     "en": "Attach an array to a 2D world and set gravity (0,32), four contact iterations and a per-axis speed limit of 512.",
-    "zh-CN": "为二维 world 绑定数组，并设置重力 (0,32)、四次接触迭代及各轴速度上限 512。"
+    "zh-CN": "为二维 world 绑定数组，并设置重力 (0,32)、四次接触迭代及各轴速度上限 512。",
+    "ko": "배열을 2D 월드에 연결하고 중력을 (0,32), 접촉 반복 횟수를 4, 축별 속도 제한을 512로 설정합니다.",
+    "zh-TW": "將陣列連接至 2D 世界，設定重力為 (0,32)、接觸迭代 4 次，以及每軸速度上限 512。",
+    "fr": "Associe un tableau à un monde 2D et règle la gravité à (0,32), le nombre d’itérations de contact à quatre et la limite de vitesse par axe à 512.",
+    "es": "Asocia un array a un mundo 2D y establece gravedad (0,32), cuatro iteraciones de contacto y un límite de velocidad por eje de 512.",
+    "de": "Verknüpft ein Array mit einer 2D-Welt und setzt die Schwerkraft auf (0,32), die Kontaktiterationen auf vier und die Geschwindigkeitsgrenze pro Achse auf 512."
   },
   "phys_init2": {
     "ja": "restitution_q8は0に設定します。bodyがNULLなら何もしません。半サイズは正の値を指定してください。",
     "en": "Sets restitution_q8 to zero. A NULL body is ignored. Supply positive half extents.",
-    "zh-CN": "将 restitution_q8 设为零，忽略空刚体指针。请提供正的半尺寸。"
+    "zh-CN": "将 restitution_q8 设为零，忽略空刚体指针。请提供正的半尺寸。",
+    "ko": "restitution_q8을 0으로 설정합니다. body가 NULL이면 무시합니다. 양의 반크기를 지정하세요.",
+    "zh-TW": "將 restitution_q8 設為零。body 為 NULL 時忽略呼叫。請提供正的半長。",
+    "fr": "Met restitution_q8 à zéro. Un corps NULL est ignoré. Fournissez des demi-dimensions positives.",
+    "es": "Establece restitution_q8 en cero. Ignora un cuerpo NULL. Proporciona semiextensiones positivas.",
+    "de": "Setzt restitution_q8 auf null. Ein NULL-Körper wird ignoriert. Geben Sie positive halbe Ausdehnungen an."
   },
   "phys_kq2d_body_init_purpose": {
     "ja": "中心と半サイズを設定し、速度0・逆質量256・有効状態の矩形bodyを作ります。",
     "en": "Initialize a centered box with the supplied half extents, zero velocity, inverse mass 256 and active status.",
-    "zh-CN": "按指定半尺寸初始化中心式矩形，速度为零、逆质量为 256，并设为活动状态。"
+    "zh-CN": "按指定半尺寸初始化中心式矩形，速度为零、逆质量为 256，并设为活动状态。",
+    "ko": "주어진 반크기로 중심 기준 박스를 초기화하고 속도 0, 역질량 256, 활성 상태로 설정합니다.",
+    "zh-TW": "以指定半長初始化以中心表示的盒體，將速度設為零、反質量設為 256，並啟用物體。",
+    "fr": "Initialise une boîte définie par son centre avec les demi-dimensions fournies, une vitesse nulle, une masse inverse de 256 et un état actif.",
+    "es": "Inicializa una caja definida por su centro con las semiextensiones indicadas, velocidad cero, masa inversa 256 y estado activo.",
+    "de": "Initialisiert eine über ihren Mittelpunkt definierte Box mit den angegebenen halben Ausdehnungen, Geschwindigkeit null, inverser Masse 256 und aktivem Zustand."
   },
   "phys_setters": {
     "ja": "NULLは無視します。無効bodyや固定bodyも、NULL以外なら変更します。",
     "en": "NULL is ignored. Inactive and static bodies are still changed when the pointer is valid.",
-    "zh-CN": "忽略空指针；指针有效时，非活动或静态刚体也会被修改。"
+    "zh-CN": "忽略空指针；指针有效时，非活动或静态刚体也会被修改。",
+    "ko": "NULL은 무시합니다. 포인터가 유효하면 비활성 물체와 정적 물체도 변경합니다.",
+    "zh-TW": "忽略 NULL。指標有效時，未啟用及靜態物體也會被修改。",
+    "fr": "NULL est ignoré. Si le pointeur est valide, les corps inactifs et statiques sont également modifiés.",
+    "es": "Ignora NULL. Si el puntero es válido, también modifica los cuerpos inactivos y estáticos.",
+    "de": "NULL wird ignoriert. Bei gültigem Zeiger werden auch inaktive und statische Körper geändert."
   },
   "phys_kq2d_body_set_pos_purpose": {
     "ja": "bodyの中心座標だけを置き換えます。速度・大きさ・有効状態を変更しません。",
     "en": "Replace only the body center, retaining velocity, extents and activity.",
-    "zh-CN": "仅替换刚体中心，保留速度、尺寸和活动状态。"
+    "zh-CN": "仅替换刚体中心，保留速度、尺寸和活动状态。",
+    "ko": "물체 중심만 바꾸고 속도, 크기, 활성 상태는 유지합니다.",
+    "zh-TW": "只取代物體中心，保留速度、尺寸與啟用狀態。",
+    "fr": "Remplace uniquement le centre du corps, en conservant sa vitesse, ses dimensions et son état d’activité.",
+    "es": "Sustituye solo el centro del cuerpo y conserva la velocidad, las dimensiones y el estado de actividad.",
+    "de": "Ersetzt nur den Körpermittelpunkt; Geschwindigkeit, Ausdehnungen und Aktivitätszustand bleiben erhalten."
   },
   "phys_kq2d_body_set_velocity_purpose": {
     "ja": "bodyの速度を直接設定します。上限への制限や位置更新は行いません。",
     "en": "Set velocity directly without clamping it or updating position.",
-    "zh-CN": "直接设置速度，不限速也不更新位置。"
+    "zh-CN": "直接设置速度，不限速也不更新位置。",
+    "ko": "제한을 적용하거나 위치를 갱신하지 않고 속도를 직접 설정합니다.",
+    "zh-TW": "直接設定速度，不限制其範圍，也不更新位置。",
+    "fr": "Fixe directement la vitesse, sans la borner ni modifier la position.",
+    "es": "Establece directamente la velocidad sin limitarla ni actualizar la posición.",
+    "de": "Setzt die Geschwindigkeit direkt, ohne sie zu begrenzen oder die Position zu ändern."
   },
   "phys_dynamic": {
     "ja": "NULL・active=0・inv_mass_q8<=0のbodyは無視します。速度上限には0以上を指定します。",
     "en": "Ignore NULL, inactive and nonpositive-inverse-mass bodies. Supply a nonnegative speed limit.",
-    "zh-CN": "忽略空指针、非活动刚体及逆质量非正的刚体。速度上限应为非负数。"
+    "zh-CN": "忽略空指针、非活动刚体及逆质量非正的刚体。速度上限应为非负数。",
+    "ko": "NULL, 비활성 물체, 역질량이 0 이하인 물체는 무시합니다. 속도 제한에는 0 이상의 값을 지정하세요.",
+    "zh-TW": "忽略 NULL、未啟用物體及反質量小於或等於零的物體。速度上限請提供非負值。",
+    "fr": "Ignore NULL, les corps inactifs et ceux dont la masse inverse est nulle ou négative. Fournissez une limite de vitesse positive ou nulle.",
+    "es": "Ignora NULL, los cuerpos inactivos y los de masa inversa no positiva. Proporciona un límite de velocidad no negativo.",
+    "de": "Ignoriert NULL, inaktive Körper und Körper mit inverser Masse kleiner oder gleich null. Geben Sie eine nichtnegative Geschwindigkeitsgrenze an."
   },
   "phys_kq2d_body_apply_gravity_purpose": {
     "ja": "有効な動的bodyの速度に重力を足し、各軸を±max_speedに制限します。位置は更新しません。",
     "en": "Add gravity to an active dynamic body and clamp each axis to +/-max_speed without updating position.",
-    "zh-CN": "向活动动态刚体施加重力，并将各轴速度限制在 ±max_speed，不更新位置。"
+    "zh-CN": "向活动动态刚体施加重力，并将各轴速度限制在 ±max_speed，不更新位置。",
+    "ko": "활성 동적 물체에 중력을 더하고 각 축 속도를 +/-max_speed로 제한합니다. 위치는 갱신하지 않습니다.",
+    "zh-TW": "對作用中的動態物體加上重力，並將每軸速度限制在 +/-max_speed，不更新位置。",
+    "fr": "Ajoute la gravité à un corps dynamique actif et borne chaque axe à +/-max_speed, sans modifier la position.",
+    "es": "Añade gravedad a un cuerpo dinámico activo y limita cada eje a +/-max_speed sin actualizar la posición.",
+    "de": "Addiert die Schwerkraft zu einem aktiven dynamischen Körper und begrenzt jede Achse auf +/-max_speed, ohne die Position zu ändern."
   },
   "phys_no_contacts": {
     "ja": "この呼び出し単独では他のbodyとの衝突を解決しません。worldがNULLの場合も何もしません。",
     "en": "This call does not resolve contacts with other bodies. A NULL world is also ignored.",
-    "zh-CN": "本调用不处理与其他刚体的接触，空 world 也会被忽略。"
+    "zh-CN": "本调用不处理与其他刚体的接触，空 world 也会被忽略。",
+    "ko": "이 호출은 다른 물체와의 접촉을 해결하지 않습니다. world가 NULL인 경우도 무시합니다.",
+    "zh-TW": "此呼叫不處理與其他物體的接觸。world 為 NULL 時也會忽略。",
+    "fr": "Cet appel ne résout pas les contacts avec d’autres corps. Un monde NULL est également ignoré.",
+    "es": "Esta llamada no resuelve contactos con otros cuerpos. También ignora un mundo NULL.",
+    "de": "Dieser Aufruf löst keine Kontakte mit anderen Körpern auf. Auch eine NULL-Welt wird ignoriert."
   },
   "phys_kq2d_integrate_body_purpose": {
     "ja": "1個の動的bodyへワールドの重力と軸速度制限を適用し、その速度を位置へ足します。",
     "en": "Apply world gravity and per-axis speed limits to one dynamic body, then add its velocity to position.",
-    "zh-CN": "对一个动态刚体应用 world 重力和各轴限速，再将速度加到位置。"
+    "zh-CN": "对一个动态刚体应用 world 重力和各轴限速，再将速度加到位置。",
+    "ko": "동적 물체 하나에 월드의 중력과 축별 속도 제한을 적용한 다음, 속도를 위치에 더합니다.",
+    "zh-TW": "對一個動態物體套用世界重力與每軸速度上限，再將速度加至位置。",
+    "fr": "Applique la gravité du monde et les limites de vitesse par axe à un corps dynamique, puis ajoute sa vitesse à sa position.",
+    "es": "Aplica la gravedad del mundo y los límites de velocidad por eje a un cuerpo dinámico; después suma su velocidad a la posición.",
+    "de": "Wendet Weltschwerkraft und Geschwindigkeitsgrenzen pro Achse auf einen dynamischen Körper an und addiert anschließend die Geschwindigkeit zur Position."
   },
   "phys_step_null": {
     "ja": "worldまたは配列がNULLなら何もしません。solver_iterations=0でも接触処理は1回行います。",
     "en": "A NULL world or array is ignored. A zero solver_iterations value still performs one contact pass.",
-    "zh-CN": "忽略空 world 或空数组。solver_iterations 为零时仍执行一次接触处理。"
+    "zh-CN": "忽略空 world 或空数组。solver_iterations 为零时仍执行一次接触处理。",
+    "ko": "world나 배열이 NULL이면 무시합니다. solver_iterations가 0이어도 접촉 처리를 한 번 수행합니다.",
+    "zh-TW": "world 或陣列為 NULL 時忽略。即使 solver_iterations 為零，仍會執行一次接觸處理。",
+    "fr": "Un monde ou un tableau NULL est ignoré. Même si solver_iterations vaut zéro, une passe de résolution des contacts est effectuée.",
+    "es": "Ignora un mundo o array NULL. Aunque solver_iterations valga cero, realiza una pasada de contactos.",
+    "de": "Eine NULL-Welt oder ein NULL-Array wird ignoriert. Auch bei solver_iterations gleich null wird ein Kontaktdurchlauf ausgeführt."
   },
   "phys_kq2d_step_purpose": {
     "ja": "有効な動的bodyを積分した後、配列内の有効なbody同士の接触をまとめて解決します。",
     "en": "Integrate active dynamic bodies, then resolve contacts among active array entries.",
-    "zh-CN": "积分活动动态刚体，再处理数组中活动元素之间的接触。"
+    "zh-CN": "积分活动动态刚体，再处理数组中活动元素之间的接触。",
+    "ko": "활성 동적 물체를 적분한 뒤, 배열의 활성 항목 사이에서 접촉을 해결합니다.",
+    "zh-TW": "先積分作用中的動態物體，再處理陣列中已啟用項目之間的接觸。",
+    "fr": "Intègre les corps dynamiques actifs, puis résout les contacts entre les entrées actives du tableau.",
+    "es": "Integra los cuerpos dinámicos activos y después resuelve los contactos entre las entradas activas del array.",
+    "de": "Integriert aktive dynamische Körper und löst anschließend Kontakte zwischen aktiven Arrayeinträgen auf."
   },
   "phys_friction_quirk": {
     "ja": "0～127は0～127/256の倍率です。128～255はs8への変換で負になり、速度を反転させます。0～255の正の減衰が必要なら、各速度にkq2d_scale_q8を使ってください。積の端数は0方向へ切り捨てます。NULLは無視します。",
     "en": "Values 0..127 give multipliers 0..127/256. Values 128..255 become negative after the s8 conversion and reverse velocity. For positive damping across 0..255, use kq2d_scale_q8 on each velocity instead. Products truncate toward zero. NULL is ignored.",
-    "zh-CN": "0～127 表示倍率 0～127/256；128～255 转为 s8 后为负，会反转速度。若需要 0～255 范围的正阻尼，应对每个速度分量使用 kq2d_scale_q8。乘积向零截断，空指针被忽略。"
+    "zh-CN": "0～127 表示倍率 0～127/256；128～255 转为 s8 后为负，会反转速度。若需要 0～255 范围的正阻尼，应对每个速度分量使用 kq2d_scale_q8。乘积向零截断，空指针被忽略。",
+    "ko": "0..127은 0..127/256의 배율입니다. 128..255는 s8 변환 후 음수가 되어 속도 방향을 뒤집습니다. 0..255 전체 범위에서 양의 감쇠를 적용하려면 각 속도에 kq2d_scale_q8을 사용하세요. 곱셈 결과는 0 방향으로 버림합니다. NULL은 무시합니다.",
+    "zh-TW": "0..127 對應倍率 0..127/256。128..255 轉成 s8 後成為負數，會反轉速度方向。若要在 0..255 範圍使用非負阻尼，請對各速度分量使用 kq2d_scale_q8。乘積向零截斷。忽略 NULL。",
+    "fr": "Les valeurs 0..127 donnent des facteurs de 0 à 127/256. Les valeurs 128..255 deviennent négatives après conversion en s8 et inversent la vitesse. Pour un amortissement non négatif sur toute la plage 0..255, utilisez kq2d_scale_q8 sur chaque composante. Les produits sont tronqués vers zéro. NULL est ignoré.",
+    "es": "Los valores 0..127 dan multiplicadores de 0 a 127/256. Los valores 128..255 se vuelven negativos al convertirlos a s8 e invierten la velocidad. Para aplicar amortiguamiento no negativo en todo el rango 0..255, usa kq2d_scale_q8 en cada componente. Los productos se truncan hacia cero. Ignora NULL.",
+    "de": "Werte von 0 bis 127 ergeben Faktoren von 0 bis 127/256. Werte von 128 bis 255 werden durch die s8-Umwandlung negativ und kehren die Geschwindigkeit um. Für nichtnegative Dämpfung über den gesamten Bereich 0..255 verwenden Sie kq2d_scale_q8 für jede Komponente. Produkte werden gegen null abgeschnitten. NULL wird ignoriert."
   },
   "phys_kq2d_body_apply_friction_purpose": {
     "ja": "両軸の速度を符号付き8ビット係数/256で縮小します。位置や有効状態は調べません。",
     "en": "Scale both velocity components by a signed-byte coefficient divided by 256 without checking position or activity.",
-    "zh-CN": "用带符号字节系数除以 256 缩放两个速度分量，不检查位置或活动状态。"
+    "zh-CN": "用带符号字节系数除以 256 缩放两个速度分量，不检查位置或活动状态。",
+    "ko": "위치나 활성 상태를 확인하지 않고 두 속도 성분에 부호 있는 바이트 계수를 256으로 나눈 배율을 적용합니다.",
+    "zh-TW": "將兩個速度分量乘上帶正負號位元組係數再除以 256，不檢查位置或啟用狀態。",
+    "fr": "Multiplie les deux composantes de vitesse par un coefficient signé sur un octet divisé par 256, sans vérifier la position ni l’activité.",
+    "es": "Escala ambas componentes de velocidad por un coeficiente de un byte con signo dividido entre 256, sin comprobar la posición ni la actividad.",
+    "de": "Skaliert beide Geschwindigkeitskomponenten mit einem vorzeichenbehafteten Bytekoeffizienten geteilt durch 256, ohne Position oder Aktivität zu prüfen."
   },
   "phys_overlap_return": {
     "ja": "内部が重なれば1、接触のみまたは離れていれば0です。",
     "en": "Returns 1 for interior overlap and 0 for touching or separated shapes.",
-    "zh-CN": "内部重叠返回 1，刚好接触或分离返回 0。"
+    "zh-CN": "内部重叠返回 1，刚好接触或分离返回 0。",
+    "ko": "내부가 겹치면 1, 접촉만 하거나 떨어져 있으면 0을 반환합니다.",
+    "zh-TW": "內部重疊時傳回 1，僅相觸或分離時傳回 0。",
+    "fr": "Renvoie 1 si les intérieurs se chevauchent, et 0 si les formes se touchent seulement ou sont séparées.",
+    "es": "Devuelve 1 si los interiores se solapan y 0 si las formas solo se tocan o están separadas.",
+    "de": "Liefert 1 bei Überlappung der Innenbereiche und 0 bei bloßer Berührung oder getrennten Formen."
   },
   "phys_kq2d_overlap_aabb_pair": {
     "ja": "有効なbodyへのポインタ。照会はactive・質量・flagsを無視します。",
     "en": "Valid body pointer; the query ignores activity, mass and flags.",
-    "zh-CN": "有效刚体指针，查询忽略活动状态、质量和标志。"
+    "zh-CN": "有效刚体指针，查询忽略活动状态、质量和标志。",
+    "ko": "유효한 물체 포인터입니다. 이 질의는 활성 상태, 질량, 플래그를 무시합니다.",
+    "zh-TW": "有效的物體指標。此查詢忽略啟用狀態、質量與旗標。",
+    "fr": "Pointeur valide vers un corps. La requête ignore l’activité, la masse et les indicateurs.",
+    "es": "Puntero válido a un cuerpo. La consulta ignora la actividad, la masa y las banderas.",
+    "de": "Gültiger Körperzeiger. Die Abfrage ignoriert Aktivität, Masse und Flags."
   },
   "phys_kq2d_overlap_aabb_purpose": {
     "ja": "中心と半サイズで表した2個の矩形が、X・Y両軸で厳密に重なるか調べます。",
     "en": "Test strict overlap of two centered boxes on both X and Y.",
-    "zh-CN": "检查两个中心式矩形在 X、Y 两轴是否严格重叠。"
+    "zh-CN": "检查两个中心式矩形在 X、Y 两轴是否严格重叠。",
+    "ko": "중심으로 표현한 두 박스가 X와 Y 양쪽 축에서 엄격히 겹치는지 검사합니다.",
+    "zh-TW": "檢查兩個以中心表示的盒體是否在 X、Y 兩軸皆嚴格重疊。",
+    "fr": "Teste le chevauchement strict de deux boîtes définies par leur centre sur les axes X et Y.",
+    "es": "Comprueba el solapamiento estricto de dos cajas definidas por su centro en los ejes X e Y.",
+    "de": "Prüft zwei über ihren Mittelpunkt definierte Boxen auf echte Überlappung entlang X und Y."
   },
   "phys_kq3d_overlap_aabb_pair": {
     "ja": "有効なbodyへのポインタ。照会はactive・質量・flagsを無視します。",
     "en": "Valid body pointer; the query ignores activity, mass and flags.",
-    "zh-CN": "有效刚体指针，查询忽略活动状态、质量和标志。"
+    "zh-CN": "有效刚体指针，查询忽略活动状态、质量和标志。",
+    "ko": "유효한 물체 포인터입니다. 이 질의는 활성 상태, 질량, 플래그를 무시합니다.",
+    "zh-TW": "有效的物體指標。此查詢忽略啟用狀態、質量與旗標。",
+    "fr": "Pointeur valide vers un corps. La requête ignore l’activité, la masse et les indicateurs.",
+    "es": "Puntero válido a un cuerpo. La consulta ignora la actividad, la masa y las banderas.",
+    "de": "Gültiger Körperzeiger. Die Abfrage ignoriert Aktivität, Masse und Flags."
   },
   "phys_kq3d_overlap_aabb_purpose": {
     "ja": "中心と半サイズで表した2個の箱が、X・Y・Zの全軸で厳密に重なるか調べます。",
     "en": "Test strict overlap of two centered boxes on all three axes.",
-    "zh-CN": "检查两个中心式长方体在三轴上是否严格重叠。"
+    "zh-CN": "检查两个中心式长方体在三轴上是否严格重叠。",
+    "ko": "중심으로 표현한 두 박스가 세 축 모두에서 엄격히 겹치는지 검사합니다.",
+    "zh-TW": "檢查兩個以中心表示的盒體是否在三個軸皆嚴格重疊。",
+    "fr": "Teste le chevauchement strict de deux boîtes définies par leur centre sur les trois axes.",
+    "es": "Comprueba el solapamiento estricto de dos cajas definidas por su centro en los tres ejes.",
+    "de": "Prüft zwei über ihren Mittelpunkt definierte Boxen auf echte Überlappung entlang aller drei Achsen."
   },
   "phys_rect_value": {
     "ja": "左上座標と幅・高さを持つKQRectの値。幅と高さには正の値を指定します。",
     "en": "KQRect value with top-left coordinates and positive width and height.",
-    "zh-CN": "以左上角坐标及正宽高表示的 KQRect 值。"
+    "zh-CN": "以左上角坐标及正宽高表示的 KQRect 值。",
+    "ko": "왼쪽 위 좌표와 양의 너비·높이를 갖는 KQRect 값입니다.",
+    "zh-TW": "KQRect 值，包含左上角座標及正的寬度與高度。",
+    "fr": "Valeur KQRect avec les coordonnées du coin supérieur gauche et une largeur et une hauteur positives.",
+    "es": "Valor KQRect con coordenadas de la esquina superior izquierda y ancho y alto positivos.",
+    "de": "KQRect-Wert mit den Koordinaten der linken oberen Ecke sowie positiver Breite und Höhe."
   },
   "phys_rect_nonpositive": {
     "ja": "0以下の幅や高さを除外するチェックはありません。bodyの中心・半サイズをそのままKQRectへ入れないでください。",
     "en": "Nonpositive dimensions are not explicitly rejected. Do not copy a body center and half extents directly into a KQRect.",
-    "zh-CN": "不会显式拒绝非正尺寸。不要把刚体中心和半尺寸直接复制到 KQRect。"
+    "zh-CN": "不会显式拒绝非正尺寸。不要把刚体中心和半尺寸直接复制到 KQRect。",
+    "ko": "0 이하의 크기를 명시적으로 거부하지 않습니다. 물체의 중심과 반크기를 KQRect에 그대로 복사하지 마세요.",
+    "zh-TW": "不會明確拒絕非正尺寸。請勿將物體中心與半長直接複製到 KQRect。",
+    "fr": "Les dimensions nulles ou négatives ne sont pas explicitement rejetées. Ne copiez pas directement le centre et les demi-dimensions d’un corps dans un KQRect.",
+    "es": "Las dimensiones no positivas no se rechazan explícitamente. No copies directamente el centro y las semiextensiones de un cuerpo en un KQRect.",
+    "de": "Abmessungen kleiner oder gleich null werden nicht ausdrücklich abgelehnt. Kopieren Sie Mittelpunkt und halbe Ausdehnungen eines Körpers nicht direkt in ein KQRect."
   },
   "phys_kq2d_rect_intersect_purpose": {
     "ja": "左上座標・幅・高さで表した2個の矩形について、内部の重なりを調べます。",
     "en": "Test interior overlap of two rectangles represented by top-left positions and sizes.",
-    "zh-CN": "检查由左上角和宽高表示的两个矩形内部是否重叠。"
+    "zh-CN": "检查由左上角和宽高表示的两个矩形内部是否重叠。",
+    "ko": "왼쪽 위 위치와 크기로 표현한 두 사각형의 내부가 겹치는지 검사합니다.",
+    "zh-TW": "檢查以左上角位置與尺寸表示的兩個矩形，其內部是否重疊。",
+    "fr": "Teste le chevauchement intérieur de deux rectangles représentés par leur coin supérieur gauche et leurs dimensions.",
+    "es": "Comprueba el solapamiento interior de dos rectángulos representados por la esquina superior izquierda y el tamaño.",
+    "de": "Prüft die Innenbereiche zweier Rechtecke auf Überlappung. Die Rechtecke werden durch linke obere Ecke und Größe angegeben."
   },
   "phys_point_return": {
     "ja": "範囲内なら1、範囲外なら0です。",
     "en": "Returns 1 inside and 0 outside.",
-    "zh-CN": "位于内部返回 1，否则返回 0。"
+    "zh-CN": "位于内部返回 1，否则返回 0。",
+    "ko": "안에 있으면 1, 밖에 있으면 0을 반환합니다.",
+    "zh-TW": "位於內部時傳回 1，外部時傳回 0。",
+    "fr": "Renvoie 1 à l’intérieur et 0 à l’extérieur.",
+    "es": "Devuelve 1 si está dentro y 0 si está fuera.",
+    "de": "Gibt innen 1 und außen 0 zurück."
   },
   "phys_kq2d_point_in_rect_purpose": {
     "ja": "点が矩形の左端・上端を含み、右端・下端を含まない範囲内にあるか調べます。",
     "en": "Test whether a point lies in a rectangle including its left/top edges but excluding right/bottom.",
-    "zh-CN": "检查点是否位于矩形内，包含左／上边界，不包含右／下边界。"
+    "zh-CN": "检查点是否位于矩形内，包含左／上边界，不包含右／下边界。",
+    "ko": "점이 사각형 안에 있는지 검사합니다. 왼쪽·위쪽 변은 포함하고 오른쪽·아래쪽 변은 제외합니다.",
+    "zh-TW": "檢查點是否位於矩形內；包含左邊與上邊，不包含右邊與下邊。",
+    "fr": "Teste si un point appartient au rectangle, bords gauche et supérieur inclus, bords droit et inférieur exclus.",
+    "es": "Comprueba si un punto está dentro de un rectángulo, incluidos los bordes izquierdo y superior, pero excluidos el derecho y el inferior.",
+    "de": "Prüft, ob ein Punkt im Rechteck liegt. Linker und oberer Rand zählen dazu, rechter und unterer Rand nicht."
   },
   "phys_smul_round": {
     "ja": "係数の範囲は−128～127で、256が1.0という倍率です。積の端数は正負どちらも0方向へ切り捨てます。例：−257×64/256は−64です。",
     "en": "The coefficient range is -128..127, scaled with 256 representing 1.0. Products truncate toward zero for either sign: -257*64/256 returns -64.",
-    "zh-CN": "系数范围 −128～127，以 256 表示 1.0。不论符号如何，乘积都向零截断，例如 −257×64/256 返回 −64。"
+    "zh-CN": "系数范围 −128～127，以 256 表示 1.0。不论符号如何，乘积都向零截断，例如 −257×64/256 返回 −64。",
+    "ko": "계수 범위는 -128..127이며, 256이 1.0인 배율을 사용합니다. 양수와 음수 모두 0 방향으로 버림합니다. -257*64/256은 -64를 반환합니다.",
+    "zh-TW": "係數範圍為 -128..127，以 256 代表 1.0。乘積不分正負皆向零截斷：-257*64/256 傳回 -64。",
+    "fr": "Le coefficient va de -128 à 127, avec une échelle où 256 représente 1,0. Les produits sont tronqués vers zéro quel que soit leur signe : -257*64/256 renvoie -64.",
+    "es": "El coeficiente va de -128 a 127, con una escala donde 256 representa 1,0. Los productos se truncan hacia cero para ambos signos: -257*64/256 devuelve -64.",
+    "de": "Der Koeffizient liegt in -128..127, mit 256 als Darstellung von 1,0. Produkte werden für beide Vorzeichen gegen null abgeschnitten: -257*64/256 liefert -64."
   },
   "phys_smul_return": {
     "ja": "符号付き16ビットの積/256を返します。",
     "en": "Returns the signed 16-bit scaled product.",
-    "zh-CN": "返回有符号 16 位缩放乘积。"
+    "zh-CN": "返回有符号 16 位缩放乘积。",
+    "ko": "배율 적용 결과를 부호 있는 16비트 값으로 반환합니다.",
+    "zh-TW": "傳回縮放後的帶正負號 16 位元乘積。",
+    "fr": "Renvoie le produit mis à l’échelle sous forme d’entier signé de 16 bits.",
+    "es": "Devuelve el producto escalado como un entero de 16 bits con signo.",
+    "de": "Liefert das skalierte Produkt als vorzeichenbehafteten 16-Bit-Wert."
   },
   "phys_smul_a": {
     "ja": "倍率を掛ける符号付き16ビット値。",
     "en": "Signed 16-bit value to scale.",
-    "zh-CN": "待缩放的有符号 16 位数值。"
+    "zh-CN": "待缩放的有符号 16 位数值。",
+    "ko": "배율을 적용할 부호 있는 16비트 값입니다.",
+    "zh-TW": "要縮放的帶正負號 16 位元值。",
+    "fr": "Valeur signée de 16 bits à mettre à l’échelle.",
+    "es": "Valor de 16 bits con signo al que se aplica el factor de escala.",
+    "de": "Vorzeichenbehafteter 16-Bit-Wert, auf den der Skalierungsfaktor angewendet wird."
   },
   "phys_smul_b": {
     "ja": "符号付き8ビット係数。−128～127を指定します。",
     "en": "Signed byte coefficient in -128..127.",
-    "zh-CN": "范围 −128～127 的有符号字节系数。"
+    "zh-CN": "范围 −128～127 的有符号字节系数。",
+    "ko": "-128..127 범위의 부호 있는 바이트 계수입니다.",
+    "zh-TW": "範圍為 -128..127 的帶正負號位元組係數。",
+    "fr": "Coefficient signé sur un octet, de -128 à 127.",
+    "es": "Coeficiente de un byte con signo, entre -128 y 127.",
+    "de": "Vorzeichenbehafteter Bytekoeffizient in -128..127."
   },
   "phys___smul16x8_purpose": {
     "ja": "符号付き16ビット値と符号付き8ビット係数を掛け、積/256の端数を0方向へ切り捨てます。",
     "en": "Multiply a signed 16-bit value by a signed 8-bit coefficient, divide by 256 and truncate toward zero.",
-    "zh-CN": "将有符号 16 位值乘以有符号 8 位系数，再除以 256，向零截断。"
+    "zh-CN": "将有符号 16 位值乘以有符号 8 位系数，再除以 256，向零截断。",
+    "ko": "부호 있는 16비트 값에 부호 있는 8비트 계수를 곱하고 256으로 나눈 뒤 0 방향으로 버림합니다.",
+    "zh-TW": "將帶正負號 16 位元值乘以帶正負號 8 位元係數，再除以 256，向零截斷。",
+    "fr": "Multiplie une valeur signée de 16 bits par un coefficient signé de 8 bits, divise par 256 et tronque vers zéro.",
+    "es": "Multiplica un valor de 16 bits con signo por un coeficiente de 8 bits con signo, divide entre 256 y trunca hacia cero.",
+    "de": "Multipliziert einen vorzeichenbehafteten 16-Bit-Wert mit einem vorzeichenbehafteten 8-Bit-Koeffizienten, teilt durch 256 und schneidet gegen null ab."
   },
   "phys_scale_range": {
     "ja": "係数は−256～256だけを指定してください。±256では倍率が±1になります。value=−32768とcoefficient=−256の組み合わせの数学的な結果32768はs16に収まりません。",
     "en": "Use coefficients only in -256..256; +/-256 gives +/-1. The mathematical result for value=-32768 and coefficient=-256 is 32768 and cannot fit s16.",
-    "zh-CN": "系数只应位于 −256～256，其中 ±256 表示 ±1。value=−32768 且系数为 −256 时，数学结果 32768 超出 s16。"
+    "zh-CN": "系数只应位于 −256～256，其中 ±256 表示 ±1。value=−32768 且系数为 −256 时，数学结果 32768 超出 s16。",
+    "ko": "계수는 -256..256 범위에서만 사용하세요. +/-256은 +/-1배입니다. value=-32768, coefficient=-256일 때 수학적 결과는 32768이므로 s16에 담을 수 없습니다.",
+    "zh-TW": "係數只能使用 -256..256；+/-256 代表 +/-1 倍。value=-32768 且 coefficient=-256 時，數學結果為 32768，無法以 s16 表示。",
+    "fr": "Utilisez uniquement des coefficients de -256 à 256 ; +/-256 correspond à +/-1. Pour value=-32768 et coefficient=-256, le résultat mathématique est 32768, qui ne tient pas dans un s16.",
+    "es": "Usa solo coeficientes entre -256 y 256; +/-256 equivale a +/-1. Para value=-32768 y coefficient=-256, el resultado matemático es 32768 y no cabe en s16.",
+    "de": "Verwenden Sie nur Koeffizienten in -256..256; +/-256 entspricht +/-1. Für value=-32768 und coefficient=-256 lautet das mathematische Ergebnis 32768 und passt nicht in s16."
   },
   "phys_scale_return": {
     "ja": "0方向に切り捨てた符号付き16ビットの結果を返します。",
     "en": "Returns the signed 16-bit result truncated toward zero.",
-    "zh-CN": "返回向零截断的有符号 16 位结果。"
+    "zh-CN": "返回向零截断的有符号 16 位结果。",
+    "ko": "0 방향으로 버림한 결과를 부호 있는 16비트 값으로 반환합니다.",
+    "zh-TW": "傳回向零截斷的帶正負號 16 位元結果。",
+    "fr": "Renvoie le résultat signé de 16 bits, tronqué vers zéro.",
+    "es": "Devuelve el resultado de 16 bits con signo truncado hacia cero.",
+    "de": "Liefert das gegen null abgeschnittene Ergebnis als vorzeichenbehafteten 16-Bit-Wert."
   },
   "phys_kq2d_scale_q8_purpose": {
     "ja": "符号付き係数/256を掛け、正負どちらも0方向へ切り捨てます。",
     "en": "Multiply by a signed coefficient divided by 256, truncating toward zero for either sign.",
-    "zh-CN": "乘以带符号系数并除以 256，正负结果均向零截断。"
+    "zh-CN": "乘以带符号系数并除以 256，正负结果均向零截断。",
+    "ko": "부호 있는 계수를 곱하고 256으로 나눕니다. 결과의 부호와 관계없이 0 방향으로 버림합니다.",
+    "zh-TW": "乘上帶正負號的係數再除以 256，不分正負皆向零截斷。",
+    "fr": "Multiplie par un coefficient signé divisé par 256, avec troncature vers zéro pour les deux signes.",
+    "es": "Multiplica por un coeficiente con signo dividido entre 256 y trunca hacia cero para ambos signos.",
+    "de": "Multipliziert mit einem vorzeichenbehafteten Koeffizienten geteilt durch 256 und schneidet bei beiden Vorzeichen gegen null ab."
   },
   "phys_limit": {
     "ja": "各速度の絶対値と正のmax_speedは16383以下にしてください。上限0以下は速度を0にします。NULLは無視しますが、activeや質量は無視して変更します。整数量子化により上限より小さくなり、ごく小さい倍率では0になります。",
     "en": "Keep velocity magnitudes and a positive max_speed within 16383. A nonpositive limit zeros velocity. NULL is ignored, but activity and mass do not suppress modification. Integer quantization can undershoot the limit and tiny scale factors can produce zero.",
-    "zh-CN": "速度分量绝对值和正 max_speed 须不超过 16383。非正上限会将速度清零。忽略空指针，但活动状态和质量不阻止修改。整数取整可能使结果低于上限，极小倍率可能产生零。"
+    "zh-CN": "速度分量绝对值和正 max_speed 须不超过 16383。非正上限会将速度清零。忽略空指针，但活动状态和质量不阻止修改。整数取整可能使结果低于上限，极小倍率可能产生零。",
+    "ko": "속도 성분의 절댓값과 양의 max_speed를 16383 이하로 유지하세요. 제한값이 0 이하이면 속도를 0으로 만듭니다. NULL은 무시하지만 활성 상태나 질량은 변경 여부에 영향을 주지 않습니다. 정수 양자화로 결과가 제한값보다 작아질 수 있으며, 배율이 매우 작으면 0이 될 수 있습니다.",
+    "zh-TW": "速度分量的絕對值與正的 max_speed 都應不超過 16383。上限小於或等於零時，速度歸零。忽略 NULL，但不會因啟用狀態或質量而略過修改。整數量化可能使結果低於上限，極小的縮放係數也可能使結果成為零。",
+    "fr": "Gardez les valeurs absolues des composantes de vitesse et un max_speed positif à 16383 au plus. Une limite nulle ou négative annule la vitesse. NULL est ignoré, mais ni l’activité ni la masse n’empêchentntntntntntntntnt la modification. La quantification entière peut donner un résultat inférieur à la limite, et un très petit facteur peut produire zéro.",
+    "es": "Mantén los valores absolutos de las componentes de velocidad y un max_speed positivo en 16383 como máximo. Un límite no positivo pone la velocidad a cero. Ignora NULL, pero la actividad y la masa no impiden la modificación. La cuantización entera puede dejar el resultado por debajo del límite y los factores muy pequeños pueden producir cero.",
+    "de": "Die Beträge der Geschwindigkeitskomponenten und ein positiver max_speed dürfen höchstens 16383 betragen. Eine Grenze kleiner oder gleich null setzt die Geschwindigkeit auf null. NULL wird ignoriert, Aktivität und Masse verhindern die Änderung jedoch nicht. Ganzzahlige Quantisierung kann das Ergebnis unter die Grenze drücken; sehr kleine Faktoren können null ergeben."
   },
   "phys_kq2d_body_limit_speed_purpose": {
     "ja": "速度ベクトルの長さを保守的に見積もり、両軸を同じ倍率で縮小して合成速度を制限します。",
     "en": "Estimate vector length conservatively and scale both axes together to limit combined speed.",
-    "zh-CN": "保守估计向量长度，并同比例缩放两轴以限制合成速度。"
+    "zh-CN": "保守估计向量长度，并同比例缩放两轴以限制合成速度。",
+    "ko": "벡터 길이를 보수적으로 추정하고 두 축에 같은 배율을 적용해 전체 속력을 제한합니다.",
+    "zh-TW": "保守估計向量長度，並以相同比例縮放兩軸，限制合成速率。",
+    "fr": "Estime prudemment la longueur du vecteur et met les deux axes à l’échelle ensemble pour limiter la vitesse résultante.",
+    "es": "Estima de forma conservadora la longitud del vector y escala ambos ejes conjuntamente para limitar la rapidez total.",
+    "de": "Schätzt die Vektorlänge konservativ und skaliert beide Achsen gemeinsam, um die Gesamtgeschwindigkeit zu begrenzen."
   },
   "phys_toi": {
     "ja": "距離は±8191以内にしてください。開始距離0以下は0、終了距離0以上は256です。初期重なりと時刻0、交差なしとちょうど終点での接触は同じ戻り値になります。位置は変更しません。",
     "en": "Keep gaps within +/-8191. A nonpositive start returns 0; a nonnegative end returns 256. Initial overlap and time zero share a return value, as do no crossing and contact exactly at the endpoint. No position is changed.",
-    "zh-CN": "间距须在 ±8191 内。起始间距非正返回 0，结束间距非负返回 256。初始重叠与时刻零共用返回值；没有跨越与恰在终点接触也共用返回值。不改变位置。"
+    "zh-CN": "间距须在 ±8191 内。起始间距非正返回 0，结束间距非负返回 256。初始重叠与时刻零共用返回值；没有跨越与恰在终点接触也共用返回值。不改变位置。",
+    "ko": "간격을 +/-8191 이내로 유지하세요. 시작 간격이 0 이하이면 0, 끝 간격이 0 이상이면 256을 반환합니다. 처음부터 겹친 상태와 시각 0은 같은 값을 반환하며, 교차하지 않는 경우와 정확히 끝점에서 접촉하는 경우도 같은 값을 반환합니다. 위치는 변경하지 않습니다.",
+    "zh-TW": "間距須在 +/-8191 內。起始間距小於或等於零時傳回 0；結束間距大於或等於零時傳回 256。初始重疊與時間零共用回傳值，沒有穿越與恰好在終點接觸也共用回傳值。不改變位置。",
+    "fr": "Gardez les écarts dans +/-8191. Un écart initial nul ou négatif renvoie 0 ; un écart final nul ou positif renvoie 256. Le chevauchement initial et l’instant zéro partagent la même valeur de retour, tout comme l’absence de franchissement et un contact exactement à la fin. Aucune position n’est modifiée.",
+    "es": "Mantén las distancias dentro de +/-8191. Un inicio no positivo devuelve 0; un final no negativo devuelve 256. El solapamiento inicial y el instante cero comparten valor de retorno, al igual que la ausencia de cruce y el contacto justo al final. No modifica ninguna posición.",
+    "de": "Halten Sie Abstände innerhalb von +/-8191. Ein Startwert kleiner oder gleich null liefert 0; ein Endwert größer oder gleich null liefert 256. Anfangsüberlappung und Zeitpunkt null haben denselben Rückgabewert. Ebenso teilen sich fehlender Übertritt und Kontakt genau am Endpunkt einen Rückgabewert. Positionen werden nicht geändert."
   },
   "phys_toi_return": {
     "ja": "0～256のQ8時刻を返します。192は刻みの75%です。",
     "en": "Returns Q8 time in 0..256; 192 is 75% of the tick.",
-    "zh-CN": "返回 0～256 的 Q8 时间，192 表示本次更新的 75%。"
+    "zh-CN": "返回 0～256 的 Q8 时间，192 表示本次更新的 75%。",
+    "ko": "0..256 범위의 Q8 시각을 반환합니다. 192는 틱의 75%에 해당합니다.",
+    "zh-TW": "傳回 0..256 的 Q8 時間；192 代表該刻度的 75%。",
+    "fr": "Renvoie un temps Q8 de 0 à 256 ; 192 représente 75 % du tick.",
+    "es": "Devuelve un tiempo Q8 de 0 a 256; 192 equivale al 75 % del tick.",
+    "de": "Liefert einen Q8-Zeitpunkt in 0..256; 192 entspricht 75 % des Takts."
   },
   "phys_kq2d_surface_toi_q8_purpose": {
     "ja": "開始・終了の符号付き距離から、線形運動で面を横切る刻み内時刻を見積もります。",
     "en": "Estimate the within-tick crossing time from signed start/end gaps under linear motion.",
-    "zh-CN": "根据起止带符号间距，在线性运动假设下估算本次更新内的跨越时刻。"
+    "zh-CN": "根据起止带符号间距，在线性运动假设下估算本次更新内的跨越时刻。",
+    "ko": "선형 운동을 가정하고 시작·끝의 부호 있는 간격으로 틱 내부의 교차 시각을 추정합니다.",
+    "zh-TW": "假設線性運動，以起始與結束的帶正負號間距估計刻度內的穿越時間。",
+    "fr": "Estime l’instant de franchissement à l’intérieur du tick à partir des écarts signés initial et final, en supposant un mouvement linéaire.",
+    "es": "Estima el instante de cruce dentro del tick a partir de las distancias inicial y final con signo, suponiendo un movimiento lineal.",
+    "de": "Schätzt bei linearer Bewegung den Übertrittszeitpunkt innerhalb des Takts anhand der vorzeichenbehafteten Start- und Endabstände."
   },
   "phys_surface": {
     "ja": "法線は256を長さ1とするQ8単位ベクトルです。相対速度の各成分は±8191以内、thresholdとkickは0以上、係数は0～255にします。閾値を厳密に超えた時だけ反発係数を使い、kickを最低反発速度として適用します。NULLや離れる動きは無変更です。接触検出・めり込み解消は別途必要で、activeや質量の判定はしません。",
     "en": "Use a Q8 unit normal with length 256. Keep relative components within +/-8191, threshold/kick nonnegative and coefficients in 0..255. Restitution applies only strictly above the threshold, with kick as a minimum rebound speed. NULL inputs or separating motion leave velocity unchanged. Contact detection and penetration correction are separate; activity and mass are not checked.",
-    "zh-CN": "使用长度为 256 的 Q8 单位法线。相对速度分量须在 ±8191 内，阈值和 kick 非负，系数为 0～255。只有严格超过阈值才应用恢复系数，kick 为最小反弹速度。空输入或正在分离时速度不变。接触检测及穿透修正需另行处理，不检查活动状态或质量。"
+    "zh-CN": "使用长度为 256 的 Q8 单位法线。相对速度分量须在 ±8191 内，阈值和 kick 非负，系数为 0～255。只有严格超过阈值才应用恢复系数，kick 为最小反弹速度。空输入或正在分离时速度不变。接触检测及穿透修正需另行处理，不检查活动状态或质量。",
+    "ko": "길이가 256인 Q8 단위 법선을 사용하세요. 상대 속도 성분은 +/-8191 이내, threshold/kick은 0 이상, 계수는 0..255로 유지하세요. 입사 속력이 임계값을 엄격히 초과할 때만 반발을 적용하며 kick은 최소 반발 속력입니다. 입력이 NULL이거나 서로 멀어지는 운동이면 속도를 바꾸지 않습니다. 접촉 감지와 침투 보정은 별도이며, 활성 상태와 질량은 검사하지 않습니다.",
+    "zh-TW": "使用長度為 256 的 Q8 單位法線。相對速度分量須在 +/-8191 內，threshold/kick 須非負，係數須在 0..255。僅在入射速率嚴格大於門檻時套用恢復係數，kick 作為最低反彈速率。輸入為 NULL 或彼此分離時，不改變速度。接觸偵測與穿入修正須另外處理；不檢查啟用狀態或質量。",
+    "fr": "Utilisez une normale unitaire Q8 de longueur 256. Gardez les composantes relatives dans +/-8191, threshold/kick positifs ou nuls et les coefficients dans 0..255. La restitution ne s’applique que strictement au-dessus du seuil ; kick fixe une vitesse minimale de rebond. Des entrées NULL ou un mouvement d’éloignement laissent la vitesse inchangée. La détection de contact et la correction de pénétration sont séparées ; l’activité et la masse ne sont pas vérifiées.",
+    "es": "Usa una normal unitaria Q8 de longitud 256. Mantén las componentes relativas en +/-8191, threshold/kick no negativos y los coeficientes en 0..255. La restitución solo se aplica si se supera estrictamente el umbral; kick fija la rapidez mínima de rebote. Las entradas NULL o el movimiento de separación dejan la velocidad intacta. La detección del contacto y la corrección de penetración se hacen aparte; no se comprueban la actividad ni la masa.",
+    "de": "Verwenden Sie eine Q8-Einheitsnormale mit Länge 256. Relative Komponenten müssen in +/-8191 liegen, threshold/kick nichtnegativ und Koeffizienten in 0..255 sein. Rückprall wird nur bei striktem Überschreiten des Schwellwerts angewendet; kick gibt die minimale Rückprallgeschwindigkeit vor. Bei NULL-Eingaben oder einer Trennbewegung bleibt die Geschwindigkeit unverändert. Kontakterkennung und Eindringkorrektur erfolgen separat; Aktivität und Masse werden nicht geprüft."
   },
   "phys_surface_return": {
     "ja": "面へ向かう法線速度の正の大きさを返します。NULLまたは離れる動きでは0です。",
     "en": "Returns the positive incoming normal speed, or 0 for NULL inputs or separating motion.",
-    "zh-CN": "返回正的入射法向速度；输入为空或正在分离时返回 0。"
+    "zh-CN": "返回正的入射法向速度；输入为空或正在分离时返回 0。",
+    "ko": "법선 방향 입사 속력을 양수로 반환합니다. 입력이 NULL이거나 서로 멀어지는 운동이면 0을 반환합니다.",
+    "zh-TW": "傳回正的法線方向入射速率；輸入為 NULL 或彼此分離時傳回 0。",
+    "fr": "Renvoie la vitesse normale d’approche positive, ou 0 si une entrée est NULL ou si le mouvement s’éloigne de la surface.",
+    "es": "Devuelve la rapidez normal de entrada como valor positivo, o 0 si hay entradas NULL o movimiento de separación.",
+    "de": "Liefert die positive Annäherungsgeschwindigkeit entlang der Normalen oder 0 bei NULL-Eingaben oder einer Trennbewegung."
   },
   "phys_kq2d_body_resolve_surface_purpose": {
     "ja": "移動する面との相対速度を使い、法線方向の反発・最低反発速度と接線摩擦を速度へ適用します。",
     "en": "Use velocity relative to a moving surface to apply normal bounce, minimum bounce speed and tangential friction.",
-    "zh-CN": "使用相对移动表面的速度，应用法向反弹、最小反弹速度和切向摩擦。"
+    "zh-CN": "使用相对移动表面的速度，应用法向反弹、最小反弹速度和切向摩擦。",
+    "ko": "움직이는 표면에 대한 상대 속도로 법선 방향 반발, 최소 반발 속력, 접선 방향 마찰을 적용합니다.",
+    "zh-TW": "以相對於移動表面的速度，套用法線方向反彈、最低反彈速率與切向摩擦。",
+    "fr": "Utilise la vitesse relative à une surface mobile pour appliquer un rebond normal, une vitesse minimale de rebond et un frottement tangent.",
+    "es": "Usa la velocidad relativa a una superficie móvil para aplicar rebote normal, rapidez mínima de rebote y fricción tangencial.",
+    "de": "Nutzt die Geschwindigkeit relativ zu einer bewegten Oberfläche, um normalen Rückprall, eine minimale Rückprallgeschwindigkeit und tangentiale Reibung anzuwenden."
   },
   "phys_circle_init": {
     "ja": "境界は無効で初期範囲は(0,0)～(159,143)、壁反発は240、壁摩擦は16です。円の初期化関数はないため、各bodyの全フィールドを呼び出し側で設定します。NULL worldは無視します。",
     "en": "Bounds start disabled with values (0,0)..(159,143); wall restitution is 240 and wall friction 16. There is no circle-body initializer: assign every body field in the caller. A NULL world is ignored.",
-    "zh-CN": "边界初始禁用，数值为 (0,0)～(159,143)，墙面恢复系数 240、摩擦 16。没有圆形刚体初始化函数，调用方须设置每个字段。空 world 被忽略。"
+    "zh-CN": "边界初始禁用，数值为 (0,0)～(159,143)，墙面恢复系数 240、摩擦 16。没有圆形刚体初始化函数，调用方须设置每个字段。空 world 被忽略。",
+    "ko": "경계의 초기 좌표는 (0,0)..(159,143)이지만 비활성 상태입니다. 벽 반발 계수는 240, 벽 마찰은 16입니다. 원형 물체 초기화 함수는 없으므로 호출자가 모든 물체 필드를 설정해야 합니다. world가 NULL이면 무시합니다.",
+    "zh-TW": "邊界初始值為 (0,0)..(159,143)，但預設停用；牆面恢復係數為 240，牆面摩擦為 16。沒有圓形物體初始化函式，呼叫端須設定所有物體欄位。world 為 NULL 時忽略。",
+    "fr": "Les limites sont initialement désactivées, avec les valeurs (0,0)..(159,143) ; la restitution des murs vaut 240 et leur frottement 16. Il n’existe pas de fonction d’initialisation des cercles : l’appelant doit renseigner tous les champs. Un monde NULL est ignoré.",
+    "es": "Los límites empiezan desactivados, con valores (0,0)..(159,143); la restitución de pared es 240 y la fricción de pared, 16. No hay inicializador de cuerpos circulares: el código que llama debe asignar todos los campos. Ignora un mundo NULL.",
+    "de": "Die Grenzen sind anfangs deaktiviert und auf (0,0)..(159,143) gesetzt; Wandrückprall beträgt 240, Wandreibung 16. Eine Initialisierungsfunktion für Kreiskörper gibt es nicht: Der aufrufende Code muss alle Körperfelder setzen. Eine NULL-Welt wird ignoriert."
   },
   "phys_kq2dc_world_init_purpose": {
     "ja": "円のワールドへ配列を関連付け、重力0・反復4・軸速度上限768・減衰252/256を設定します。",
     "en": "Attach a circle array and set zero gravity, four passes, per-axis limit 768 and damping 252/256.",
-    "zh-CN": "绑定圆形数组，设置零重力、四轮处理、各轴限速 768 和阻尼 252/256。"
+    "zh-CN": "绑定圆形数组，设置零重力、四轮处理、各轴限速 768 和阻尼 252/256。",
+    "ko": "원 배열을 연결하고 중력 0, 반복 4회, 축별 속도 제한 768, 감쇠 252/256으로 설정합니다.",
+    "zh-TW": "連接圓形陣列，設定零重力、4 次處理、每軸速度上限 768 與阻尼 252/256。",
+    "fr": "Associe un tableau de cercles et règle la gravité à zéro, le nombre de passes à quatre, la limite par axe à 768 et l’amortissement à 252/256.",
+    "es": "Asocia un array de círculos y establece gravedad cero, cuatro pasadas, límite por eje 768 y amortiguamiento 252/256.",
+    "de": "Verknüpft ein Kreisarray und setzt Schwerkraft null, vier Durchläufe, eine Geschwindigkeitsgrenze von 768 pro Achse und Dämpfung 252/256."
   },
   "phys_bounds": {
     "ja": "NULL worldは無視します。上下・左右の順序や円が収まるかは検証しないため、幅・高さを円の直径以上にしてください。実際の位置補正はstepで行います。",
     "en": "NULL is ignored. Ordering and fit are not validated, so provide width and height at least as large as the circle diameter. A step performs the actual position correction.",
-    "zh-CN": "忽略空指针，不验证边界顺序或能否容纳圆，因此宽高至少应等于圆直径。实际位置修正由 step 执行。"
+    "zh-CN": "忽略空指针，不验证边界顺序或能否容纳圆，因此宽高至少应等于圆直径。实际位置修正由 step 执行。",
+    "ko": "NULL은 무시합니다. 경계의 순서나 원이 들어갈 공간은 검사하지 않으므로 너비와 높이를 원의 지름 이상으로 지정하세요. 실제 위치 보정은 시뮬레이션 단계에서 수행합니다.",
+    "zh-TW": "忽略 NULL。不檢查邊界順序或容納空間，因此寬度與高度至少須等於圓的直徑。實際位置修正在模擬步驟中進行。",
+    "fr": "NULL est ignoré. L’ordre des limites et l’espace disponible ne sont pas vérifiés : fournissez une largeur et une hauteur au moins égales au diamètre du cercle. La correction de position est effectuée lors d’un pas de simulation.",
+    "es": "Ignora NULL. No valida el orden de los límites ni el espacio disponible; proporciona un ancho y un alto al menos iguales al diámetro del círculo. La corrección real de posición se realiza durante un paso de simulación.",
+    "de": "NULL wird ignoriert. Reihenfolge der Grenzen und ausreichender Platz werden nicht geprüft; Breite und Höhe müssen mindestens dem Kreisdurchmesser entsprechen. Die eigentliche Positionskorrektur erfolgt in einem Simulationsschritt."
   },
   "phys_kq2dc_set_bounds_purpose": {
     "ja": "円の行動範囲を保存して境界処理を有効にします。現在の位置は動かしません。",
     "en": "Store and enable circle-world bounds without moving bodies immediately.",
-    "zh-CN": "保存并启用圆形 world 边界，不立即移动刚体。"
+    "zh-CN": "保存并启用圆形 world 边界，不立即移动刚体。",
+    "ko": "원형 물체 월드의 경계를 저장하고 활성화합니다. 물체를 즉시 이동시키지는 않습니다.",
+    "zh-TW": "儲存並啟用圓形世界的邊界，不會立即移動物體。",
+    "fr": "Enregistre et active les limites du monde de cercles, sans déplacer immédiatement les corps.",
+    "es": "Guarda y activa los límites del mundo de círculos sin mover inmediatamente los cuerpos.",
+    "de": "Speichert und aktiviert die Grenzen der Kreiswelt, ohne Körper sofort zu verschieben."
   },
   "phys_circle_query": {
     "ja": "有効な2ポインタと正の半径が必要です。active・質量は無視します。縮小・整数平方根により、幾何学的に厳密な距離判定とは一致しない場合があります。",
     "en": "Requires two valid pointers and positive radii. Activity and mass are ignored. Reduction and integer square roots can differ from an exact geometric distance test.",
-    "zh-CN": "需要两个有效指针和正半径，忽略活动状态与质量。缩减计算及整数平方根可能使结果不同于精确几何距离检测。"
+    "zh-CN": "需要两个有效指针和正半径，忽略活动状态与质量。缩减计算及整数平方根可能使结果不同于精确几何距离检测。",
+    "ko": "유효한 두 포인터와 양의 반지름이 필요합니다. 활성 상태와 질량은 무시합니다. 축소 연산과 정수 제곱근 때문에 정확한 기하학적 거리 검사와 결과가 다를 수 있습니다.",
+    "zh-TW": "需要兩個有效指標及正半徑。忽略啟用狀態與質量。縮減運算與整數平方根可能使結果與精確的幾何距離測試不同。",
+    "fr": "Nécessite deux pointeurs valides et des rayons positifs. L’activité et la masse sont ignorées. La réduction et les racines carrées entières peuvent donner un résultat différent d’un test de distance géométrique exact.",
+    "es": "Requiere dos punteros válidos y radios positivos. Ignora la actividad y la masa. La reducción y las raíces cuadradas enteras pueden dar un resultado distinto de una prueba exacta de distancia geométrica.",
+    "de": "Benötigt zwei gültige Zeiger und positive Radien. Aktivität und Masse werden ignoriert. Reduktion und ganzzahlige Quadratwurzeln können zu Abweichungen von einem exakten geometrischen Abstandstest führen."
   },
   "phys_circle_a": {
     "ja": "判定する1個目の円への有効なポインタ。",
     "en": "Valid pointer to the first circle.",
-    "zh-CN": "第一个圆的有效指针。"
+    "zh-CN": "第一个圆的有效指针。",
+    "ko": "첫 번째 원의 유효한 포인터입니다.",
+    "zh-TW": "指向第一個圓的有效指標。",
+    "fr": "Pointeur valide vers le premier cercle.",
+    "es": "Puntero válido al primer círculo.",
+    "de": "Gültiger Zeiger auf den ersten Kreis."
   },
   "phys_circle_b": {
     "ja": "判定する2個目の円への有効なポインタ。",
     "en": "Valid pointer to the second circle.",
-    "zh-CN": "第二个圆的有效指针。"
+    "zh-CN": "第二个圆的有效指针。",
+    "ko": "두 번째 원의 유효한 포인터입니다.",
+    "zh-TW": "指向第二個圓的有效指標。",
+    "fr": "Pointeur valide vers le second cercle.",
+    "es": "Puntero válido al segundo círculo.",
+    "de": "Gültiger Zeiger auf den zweiten Kreis."
   },
   "phys_kq2dc_overlap_circle_purpose": {
     "ja": "縮小した中心距離と半径和を使い、2個の円の内部が重なるか近似判定します。",
     "en": "Approximate interior overlap using reduced center distance and the radius sum.",
-    "zh-CN": "用缩减后的中心距离和半径之和近似判断内部重叠。"
+    "zh-CN": "用缩减后的中心距离和半径之和近似判断内部重叠。",
+    "ko": "축소한 중심 간 거리와 반지름의 합으로 내부 겹침을 근사 판정합니다.",
+    "zh-TW": "使用縮減後的中心距離與半徑總和，近似判定內部重疊。",
+    "fr": "Approxime le chevauchement intérieur à partir de la distance réduite entre centres et de la somme des rayons.",
+    "es": "Aproxima el solapamiento interior usando la distancia reducida entre centros y la suma de los radios.",
+    "de": "Nähert die Überlappung der Innenbereiche anhand des reduzierten Mittelpunktabstands und der Radiensumme an."
   },
   "phys_circle_step": {
     "ja": "最後に速度の−1～1を0へ揃えます。減衰255でも完全維持ではありません。静止した円同士の重なりは解消されない場合があります。固定円も有効な境界に押し戻されます。反復0は1回、NULL world/配列は無視します。速度更新で接触の訪問順が変わり得る、離散的で量子化されたソルバーです。",
     "en": "Finally snaps velocity components in -1..1 to zero. Even damping 255 loses some speed. Overlaps between resting circles can remain. Static circles are also moved inside enabled bounds. Zero iterations means one pass; NULL world/array is ignored. This discrete, quantized solver can visit contacts in a different order as velocities change.",
-    "zh-CN": "最后将 −1～1 的速度分量归零。即使阻尼为 255 也会损失少量速度。静止圆之间的重叠可能保留，静态圆也会被移回已启用的边界内。迭代次数零按一轮处理，忽略空 world／数组。此离散、量化求解器可能随速度改变而以不同顺序处理接触。"
+    "zh-CN": "最后将 −1～1 的速度分量归零。即使阻尼为 255 也会损失少量速度。静止圆之间的重叠可能保留，静态圆也会被移回已启用的边界内。迭代次数零按一轮处理，忽略空 world／数组。此离散、量化求解器可能随速度改变而以不同顺序处理接触。",
+    "ko": "마지막으로 -1..1인 속도 성분을 0으로 만듭니다. 감쇠가 255여도 속도가 조금 줄어듭니다. 정지한 원 사이의 겹침은 남을 수 있습니다. 경계가 활성화되어 있으면 정적 원도 경계 안으로 이동됩니다. 반복 횟수 0은 1회를 뜻하며, world/배열이 NULL이면 무시합니다. 이산·양자화 솔버이므로 속도 변화에 따라 접촉을 처리하는 순서가 달라질 수 있습니다.",
+    "zh-TW": "最後將 -1..1 的速度分量歸零。即使阻尼為 255，速度仍會略減。靜止圓之間可能殘留重疊。啟用邊界時，靜態圓也會被移入邊界。迭代次數為零代表執行一次；忽略 NULL 世界／陣列。此求解器採離散與量化運算，速度改變時，處理接觸的順序也可能不同。",
+    "fr": "Enfin, ramène à zéro les composantes de vitesse dans -1..1. Même un amortissement de 255 réduit un peu la vitesse. Des chevauchements entre cercles au repos peuvent subsister. Les cercles statiques sont eux aussi ramenés à l’intérieur des limites actives. Zéro itération signifie une passe ; un monde ou tableau NULL est ignoré. Ce solveur discret et quantifié peut traiter les contacts dans un ordre différent selon l’évolution des vitesses.",
+    "es": "Al final pone a cero las componentes de velocidad entre -1 y 1. Incluso con amortiguamiento 255 se pierde algo de velocidad. Puede quedar solapamiento entre círculos en reposo. Los círculos estáticos también se mueven dentro de los límites activos. Cero iteraciones significa una pasada; ignora mundo o array NULL. Este solucionador discreto y cuantizado puede recorrer los contactos en distinto orden cuando cambian las velocidades.",
+    "de": "Setzt abschließend Geschwindigkeitskomponenten in -1..1 auf null. Selbst Dämpfung 255 verringert die Geschwindigkeit etwas. Überlappungen ruhender Kreise können bestehen bleiben. Auch statische Kreise werden in aktivierte Grenzen verschoben. Null Iterationen bedeutet einen Durchlauf; NULL-Welt oder -Array wird ignoriert. Dieser diskrete, quantisierte Löser kann Kontakte bei veränderten Geschwindigkeiten in anderer Reihenfolge bearbeiten."
   },
   "phys_kq2dc_step_purpose": {
     "ja": "円を積分し、境界・円同士の接触を解決してから線形減衰を掛けます。",
     "en": "Integrate circles, resolve bounds and circle contacts, then apply linear damping.",
-    "zh-CN": "积分圆形刚体，处理边界和圆间接触，再应用线性阻尼。"
+    "zh-CN": "积分圆形刚体，处理边界和圆间接触，再应用线性阻尼。",
+    "ko": "원을 적분하고 경계 및 원 사이의 접촉을 해결한 다음 선형 감쇠를 적용합니다.",
+    "zh-TW": "先積分圓形，處理邊界與圓形之間的接觸，再套用線性阻尼。",
+    "fr": "Intègre les cercles, résout les limites et les contacts entre cercles, puis applique l’amortissement linéaire.",
+    "es": "Integra los círculos, resuelve los límites y los contactos entre círculos y después aplica amortiguamiento lineal.",
+    "de": "Integriert Kreise, behandelt Grenzen und Kreiskontakte und wendet anschließend lineare Dämpfung an."
   },
   "phys_kq3d_world_init_purpose": {
     "ja": "3Dワールドへ配列を関連付け、重力(0,24,0)・反復4・軸速度上限512を設定します。",
     "en": "Attach a body array to a 3D world with gravity (0,24,0), four passes and per-axis speed limit 512.",
-    "zh-CN": "为三维 world 绑定刚体数组，设置重力 (0,24,0)、四轮处理及各轴速度上限 512。"
+    "zh-CN": "为三维 world 绑定刚体数组，设置重力 (0,24,0)、四轮处理及各轴速度上限 512。",
+    "ko": "물체 배열을 3D 월드에 연결하고 중력을 (0,24,0), 반복 횟수를 4, 축별 속도 제한을 512로 설정합니다.",
+    "zh-TW": "將物體陣列連接至 3D 世界，設定重力 (0,24,0)、4 次處理及每軸速度上限 512。",
+    "fr": "Associe un tableau de corps à un monde 3D avec une gravité de (0,24,0), quatre passes et une limite de vitesse par axe de 512.",
+    "es": "Asocia un array de cuerpos a un mundo 3D con gravedad (0,24,0), cuatro pasadas y límite de velocidad por eje 512.",
+    "de": "Verknüpft ein Körperarray mit einer 3D-Welt mit Schwerkraft (0,24,0), vier Durchläufen und Geschwindigkeitsgrenze 512 pro Achse."
   },
   "phys_init3": {
     "ja": "反発係数は224、break_speedは0です。質量設定はkq3d_body_set_massと同じ規則です。NULLは無視し、半サイズの妥当性は呼び出し側が保証します。",
     "en": "Restitution is 224 and break_speed is zero. Mass follows kq3d_body_set_mass rules. NULL is ignored; the caller supplies valid half extents.",
-    "zh-CN": "恢复系数为 224，break_speed 为零。质量遵循 kq3d_body_set_mass 规则。忽略空指针，调用方须提供有效半尺寸。"
+    "zh-CN": "恢复系数为 224，break_speed 为零。质量遵循 kq3d_body_set_mass 规则。忽略空指针，调用方须提供有效半尺寸。",
+    "ko": "반발 계수는 224, break_speed는 0입니다. 질량은 kq3d_body_set_mass의 규칙을 따릅니다. NULL은 무시하며, 호출자가 유효한 반크기를 지정해야 합니다.",
+    "zh-TW": "恢復係數為 224，break_speed 為零。質量遵循 kq3d_body_set_mass 的規則。忽略 NULL；呼叫端須提供有效半長。",
+    "fr": "La restitution vaut 224 et break_speed zéro. La masse suit les règles de kq3d_body_set_mass. NULL est ignoré ; l’appelant doit fournir des demi-dimensions valides.",
+    "es": "La restitución es 224 y break_speed es cero. La masa sigue las reglas de kq3d_body_set_mass. Ignora NULL; el código que llama debe proporcionar semiextensiones válidas.",
+    "de": "Der Rückprallkoeffizient beträgt 224, break_speed ist null. Für die Masse gelten die Regeln von kq3d_body_set_mass. NULL wird ignoriert; gültige halbe Ausdehnungen muss der aufrufende Code bereitstellen."
   },
   "phys_kq3d_body_init_purpose": {
     "ja": "3Dの中心・半サイズ・質量を設定し、速度・加速度・衝撃値・flagsを0にして有効化します。",
     "en": "Initialize 3D center, half extents and mass; zero velocity, acceleration, impact and flags, and activate the body.",
-    "zh-CN": "初始化三维中心、半尺寸和质量，将速度、加速度、冲击值及标志清零，并激活刚体。"
+    "zh-CN": "初始化三维中心、半尺寸和质量，将速度、加速度、冲击值及标志清零，并激活刚体。",
+    "ko": "3D 중심, 반크기, 질량을 초기화합니다. 속도, 가속도, 충격값, 플래그를 0으로 만들고 물체를 활성화합니다.",
+    "zh-TW": "初始化 3D 中心、半長與質量；將速度、加速度、衝擊與旗標歸零，並啟用物體。",
+    "fr": "Initialise le centre 3D, les demi-dimensions et la masse ; remet à zéro vitesse, accélération, impact et indicateurs, puis active le corps.",
+    "es": "Inicializa el centro 3D, las semiextensiones y la masa; pone a cero la velocidad, la aceleración, el impacto y las banderas, y activa el cuerpo.",
+    "de": "Initialisiert 3D-Mittelpunkt, halbe Ausdehnungen und Masse; setzt Geschwindigkeit, Beschleunigung, Aufprallwert und Flags auf null und aktiviert den Körper."
   },
   "phys_mass": {
     "ja": "0以下は逆質量0の固定物体です。正なら32767/max(mass,64)を整数除算し、最低1とします。保存するmassは元の値のままで、正確なQ8逆数ではありません。mass=256ではinv_mass=127です。速度やactiveは変更せず、NULLは無視します。",
     "en": "Nonpositive mass gives inverse mass zero (static). Positive mass uses integer 32767/max(mass,64), with a minimum of 1. Stored mass retains the requested value: the weight is not an exact Q8 reciprocal. Mass 256 gives inverse mass 127. Velocity/activity stay unchanged; NULL is ignored.",
-    "zh-CN": "质量非正时逆质量为零，表示静态。正质量使用整数 32767/max(mass,64)，结果至少为 1。保存的质量仍为请求值，该权重不是精确 Q8 倒数。质量 256 得到逆质量 127。速度和活动状态不变，忽略空指针。"
+    "zh-CN": "质量非正时逆质量为零，表示静态。正质量使用整数 32767/max(mass,64)，结果至少为 1。保存的质量仍为请求值，该权重不是精确 Q8 倒数。质量 256 得到逆质量 127。速度和活动状态不变，忽略空指针。",
+    "ko": "질량이 0 이하이면 역질량은 0이 되어 정적 물체가 됩니다. 양의 질량에는 정수식 32767/max(mass,64)를 사용하며 최솟값은 1입니다. 저장된 질량은 요청값 그대로이므로 이 가중치는 정확한 Q8 역수가 아닙니다. 질량 256의 역질량은 127입니다. 속도와 활성 상태는 유지하며 NULL은 무시합니다.",
+    "zh-TW": "質量小於或等於零時，反質量為零，代表靜態物體。正質量使用整數式 32767/max(mass,64)，最小值為 1。儲存的質量保留請求值，因此此權重不是精確的 Q8 倒數。質量 256 得到反質量 127。速度與啟用狀態不變；忽略 NULL。",
+    "fr": "Une masse nulle ou négative donne une masse inverse nulle, donc un corps statique. Pour une masse positive, le calcul entier est 32767/max(mass,64), avec un minimum de 1. La masse stockée conserve la valeur demandée : le poids obtenu n’est pas un inverse Q8 exact. Une masse de 256 donne une masse inverse de 127. Vitesse et activité restent inchangées ; NULL est ignoré.",
+    "es": "Una masa no positiva da masa inversa cero, es decir, un cuerpo estático. Para una masa positiva se usa la división entera 32767/max(mass,64), con un mínimo de 1. La masa almacenada conserva el valor solicitado: el peso no es un recíproco Q8 exacto. La masa 256 da masa inversa 127. La velocidad y la actividad no cambian; ignora NULL.",
+    "de": "Masse kleiner oder gleich null ergibt inverse Masse null und damit einen statischen Körper. Bei positiver Masse wird ganzzahlig 32767/max(mass,64) berechnet, mindestens jedoch 1. Die gespeicherte Masse behält den angeforderten Wert; das Gewicht ist daher kein exakter Q8-Kehrwert. Masse 256 ergibt inverse Masse 127. Geschwindigkeit und Aktivität bleiben unverändert; NULL wird ignoriert."
   },
   "phys_kq3d_body_set_mass_purpose": {
     "ja": "要求した質量を保存し、接触補正・反発に使う逆質量の重みを計算します。",
     "en": "Store the requested mass and compute an inverse-mass weight for correction and bounce.",
-    "zh-CN": "保存请求的质量，计算用于位置修正与反弹的逆质量权重。"
+    "zh-CN": "保存请求的质量，计算用于位置修正与反弹的逆质量权重。",
+    "ko": "요청한 질량을 저장하고 위치 보정과 반발에 사용할 역질량 가중치를 계산합니다.",
+    "zh-TW": "儲存指定質量，並計算用於修正與反彈的反質量權重。",
+    "fr": "Enregistre la masse demandée et calcule un poids de masse inverse pour la correction et le rebond.",
+    "es": "Guarda la masa solicitada y calcula un peso de masa inversa para la corrección y el rebote.",
+    "de": "Speichert die angeforderte Masse und berechnet ein Gewicht aus der inversen Masse für Korrektur und Rückprall."
   },
   "phys_accel": {
     "ja": "ax・ay・azは呼び出し後も保持され、次の積分でも加算します。この関数単独では衝突を解決しません。NULL、無効、固定bodyは変更しません。",
     "en": "ax/ay/az persist and apply again on the next integration. This function alone does not resolve contacts. NULL, inactive and static bodies are not modified.",
-    "zh-CN": "ax／ay／az 会保留，并在下次积分再次应用。仅此函数不解决接触，空指针、非活动及静态刚体不修改。"
+    "zh-CN": "ax／ay／az 会保留，并在下次积分再次应用。仅此函数不解决接触，空指针、非活动及静态刚体不修改。",
+    "ko": "ax/ay/az는 유지되며 다음 적분에서도 다시 적용됩니다. 이 함수만으로는 접촉을 해결하지 않습니다. NULL, 비활성 물체, 정적 물체는 변경하지 않습니다.",
+    "zh-TW": "ax/ay/az 會保留，並在下一次積分時再次套用。此函式本身不處理接觸。不修改 NULL、未啟用或靜態物體。",
+    "fr": "ax/ay/az persistent et s’appliquent à nouveau à l’intégration suivante. Cette fonction seule ne résout pas les contacts. NULL, les corps inactifs et les corps statiques ne sont pas modifiés.",
+    "es": "ax/ay/az se conservan y vuelven a aplicarse en la siguiente integración. Esta función por sí sola no resuelve contactos. No modifica NULL ni cuerpos inactivos o estáticos.",
+    "de": "ax/ay/az bleiben erhalten und wirken erneut bei der nächsten Integration. Diese Funktion allein löst keine Kontakte auf. NULL, inaktive und statische Körper werden nicht verändert."
   },
   "phys_kq3d_integrate_body_purpose": {
     "ja": "1個の有効な動的bodyの衝撃値を消去し、重力とbody固有の加速度を足して、軸速度制限後に位置を進めます。",
     "en": "Clear one active dynamic body’s impact, add world gravity and body acceleration, clamp each velocity axis and advance position.",
-    "zh-CN": "清除一个活动动态刚体的冲击值，叠加 world 重力与刚体加速度，对各轴限速，再推进位置。"
+    "zh-CN": "清除一个活动动态刚体的冲击值，叠加 world 重力与刚体加速度，对各轴限速，再推进位置。",
+    "ko": "활성 동적 물체 하나의 충격값을 초기화하고 월드 중력과 물체 가속도를 더합니다. 각 축 속도를 제한한 다음 위치를 갱신합니다.",
+    "zh-TW": "清除一個作用中動態物體的衝擊值，加上世界重力與物體加速度，限制各軸速度，再推進位置。",
+    "fr": "Remet à zéro l’impact d’un corps dynamique actif, ajoute la gravité du monde et l’accélération du corps, borne chaque composante de vitesse puis avance sa position.",
+    "es": "Borra el impacto de un cuerpo dinámico activo, suma la gravedad del mundo y la aceleración del cuerpo, limita cada eje de velocidad y avanza la posición.",
+    "de": "Setzt den Aufprallwert eines aktiven dynamischen Körpers zurück, addiert Weltschwerkraft und Körperbeschleunigung, begrenzt jede Geschwindigkeitsachse und aktualisiert die Position."
   },
   "phys_impulse_range": {
     "ja": "反発の中間式impact×(256+restitution)や補正量×逆質量もs16です。完全反発256ではimpactを63以下にするなど、積が32767を超えない設定にしてください。",
     "en": "The intermediate impact*(256+restitution) and correction*inverse-mass products are also s16. Keep products within 32767; for example, with restitution 256 keep impact at most 63.",
-    "zh-CN": "中间值 impact×(256+restitution) 和 correction×inverse_mass 也使用 s16，乘积须不超过 32767。例如 restitution=256 时，impact 至多为 63。"
+    "zh-CN": "中间值 impact×(256+restitution) 和 correction×inverse_mass 也使用 s16，乘积须不超过 32767。例如 restitution=256 时，impact 至多为 63。",
+    "ko": "중간 연산 impact*(256+restitution)과 correction*inverse-mass도 s16입니다. 곱이 32767 이내가 되도록 하세요. 예를 들어 restitution이 256이면 impact는 63 이하여야 합니다.",
+    "zh-TW": "中間運算 impact*(256+restitution) 與 correction*inverse-mass 的乘積也是 s16。乘積須不超過 32767；例如 restitution 為 256 時，impact 應不超過 63。",
+    "fr": "Les produits intermédiaires impact*(256+restitution) et correction*inverse-mass sont eux aussi en s16. Gardez-les à 32767 au plus ; par exemple, avec restitution à 256, limitez impact à 63.",
+    "es": "Los productos intermedios impact*(256+restitution) y correction*inverse-mass también son s16. Mantén los productos en 32767 como máximo; por ejemplo, con restitution 256, impact no debe superar 63.",
+    "de": "Auch die Zwischenprodukte impact*(256+restitution) und correction*inverse-mass sind s16. Halten Sie die Produkte bei höchstens 32767; bei restitution 256 darf impact beispielsweise höchstens 63 betragen."
   },
   "phys_kq3d_step_purpose": {
     "ja": "ワールド内の有効な動的bodyを積分し、有効な全bodyの接触補正・反発・衝撃値の記録を行います。",
     "en": "Integrate active dynamic bodies and resolve contact correction, bounce and impact records among active world entries.",
-    "zh-CN": "积分活动动态刚体，处理 world 中活动元素之间的接触位置修正、反弹和冲击记录。"
+    "zh-CN": "积分活动动态刚体，处理 world 中活动元素之间的接触位置修正、反弹和冲击记录。",
+    "ko": "활성 동적 물체를 적분하고, 월드의 활성 항목 사이에서 접촉 위치 보정, 반발, 충격 기록을 처리합니다.",
+    "zh-TW": "積分作用中的動態物體，並處理世界內已啟用項目之間的接觸修正、反彈與衝擊記錄。",
+    "fr": "Intègre les corps dynamiques actifs et traite la correction des contacts, les rebonds et les enregistrements d’impact entre les entrées actives du monde.",
+    "es": "Integra los cuerpos dinámicos activos y resuelve la corrección de contactos, el rebote y los registros de impacto entre las entradas activas del mundo.",
+    "de": "Integriert aktive dynamische Körper und verarbeitet Kontaktkorrektur, Rückprall und Aufprallwerte zwischen aktiven Welteinträgen."
   },
   "phys_dot_coeff": {
     "ja": "対応軸の符号付き8ビット係数（−128～127）。倍率は係数/256です。",
     "en": "Signed byte coefficient for this axis (-128..127), scaled by 1/256.",
-    "zh-CN": "该轴的有符号字节系数，范围 −128～127，按 1/256 缩放。"
+    "zh-CN": "该轴的有符号字节系数，范围 −128～127，按 1/256 缩放。",
+    "ko": "이 축의 부호 있는 바이트 계수(-128..127)이며, 1/256 배율로 적용합니다.",
+    "zh-TW": "此軸的帶正負號位元組係數（-128..127），以 1/256 為比例套用。",
+    "fr": "Coefficient signé sur un octet pour cet axe (-128..127), appliqué à l’échelle 1/256.",
+    "es": "Coeficiente de un byte con signo para este eje (-128..127), aplicado con escala 1/256.",
+    "de": "Vorzeichenbehafteter Bytekoeffizient für diese Achse (-128..127), mit Faktor 1/256 angewendet."
   },
   "phys_dot_value": {
     "ja": "対応する係数を掛ける符号付き16ビット成分。位置に限らず速度にも使えます。",
     "en": "Signed 16-bit component to multiply by the matching coefficient; it may represent position or velocity.",
-    "zh-CN": "与对应系数相乘的有符号 16 位分量，可表示位置或速度。"
+    "zh-CN": "与对应系数相乘的有符号 16 位分量，可表示位置或速度。",
+    "ko": "대응하는 계수를 곱할 부호 있는 16비트 성분입니다. 위치나 속도를 나타낼 수 있습니다.",
+    "zh-TW": "要乘上對應係數的帶正負號 16 位元分量，可代表位置或速度。",
+    "fr": "Composante signée de 16 bits à multiplier par le coefficient correspondant ; elle peut représenter une position ou une vitesse.",
+    "es": "Componente de 16 bits con signo que se multiplica por el coeficiente correspondiente; puede representar posición o velocidad.",
+    "de": "Vorzeichenbehaftete 16-Bit-Komponente, die mit dem zugehörigen Koeffizienten multipliziert wird; sie kann Position oder Geschwindigkeit darstellen."
   },
   "phys_dot_round": {
     "ja": "各項を先に0方向へ切り捨てるため、積の総和を最後に1回だけシフトする内積とは端数が異なります。係数に1.0=256は格納できません。最終和は飽和しません。",
     "en": "Truncating each term toward zero first can differ from shifting the full sum once. A coefficient cannot store 1.0=256. The final sum is not saturated.",
-    "zh-CN": "先将各项向零截断，再求和，结果可能不同于完整求和后只移位一次。该系数类型不能保存 1.0=256，最终和不做饱和处理。"
+    "zh-CN": "先将各项向零截断，再求和，结果可能不同于完整求和后只移位一次。该系数类型不能保存 1.0=256，最终和不做饱和处理。",
+    "ko": "각 항을 먼저 0 방향으로 버림하면 전체 합을 한 번 시프트하는 것과 결과가 다를 수 있습니다. 계수에는 1.0=256을 저장할 수 없습니다. 최종 합은 포화 처리하지 않습니다.",
+    "zh-TW": "先將每一項向零截斷，可能與總和只位移一次的結果不同。係數無法儲存 1.0=256。最後的總和不做飽和處理。",
+    "fr": "Tronquer chaque terme vers zéro avant la somme peut donner un résultat différent d’un unique décalage de la somme totale. Un coefficient ne peut pas contenir 1,0=256. La somme finale n’est pas saturée.",
+    "es": "Truncar primero cada término hacia cero puede dar un resultado distinto de desplazar una sola vez la suma completa. Un coeficiente no puede almacenar 1,0=256. La suma final no se satura.",
+    "de": "Jeden Term zuerst gegen null abzuschneiden kann ein anderes Ergebnis liefern als die Gesamtsumme einmal zu schieben. Ein Koeffizient kann 1,0=256 nicht speichern. Die Endsumme wird nicht gesättigt."
   },
   "phys_dot_return": {
     "ja": "量子化した3項の和をs16で返します。",
     "en": "Returns the sum of three quantized terms as s16.",
-    "zh-CN": "以 s16 返回三个量化项之和。"
+    "zh-CN": "以 s16 返回三个量化项之和。",
+    "ko": "양자화한 세 항의 합을 s16으로 반환합니다.",
+    "zh-TW": "以 s16 傳回三個量化項目的總和。",
+    "fr": "Renvoie la somme des trois termes quantifiés en s16.",
+    "es": "Devuelve la suma de tres términos cuantizados como s16.",
+    "de": "Liefert die Summe dreier quantisierter Terme als s16."
   },
   "phys_kq3d_dot_q8_8_purpose": {
     "ja": "3軸の符号付き積をそれぞれ256で割り、0方向へ切り捨ててから足し合わせます。",
     "en": "Divide each of three signed products by 256, truncate each toward zero, then add the terms.",
-    "zh-CN": "将三个带符号乘积各自除以 256、向零截断，然后求和。"
+    "zh-CN": "将三个带符号乘积各自除以 256、向零截断，然后求和。",
+    "ko": "부호 있는 곱 세 개를 각각 256으로 나누고 각 항을 0 방향으로 버림한 다음 더합니다.",
+    "zh-TW": "將三個帶正負號乘積各除以 256，分別向零截斷後再相加。",
+    "fr": "Divise chacun des trois produits signés par 256, tronque chaque terme vers zéro, puis additionne les termes.",
+    "es": "Divide cada uno de los tres productos con signo entre 256, trunca cada término hacia cero y después los suma.",
+    "de": "Teilt jedes der drei vorzeichenbehafteten Produkte durch 256, schneidet jeden Term gegen null ab und addiert anschließend die Terme."
   },
   "phys_module2": {
     "ja": "矩形bodyの積分・AABB接触と、個別に使える面応答を提供します。中心と半サイズで矩形を表し、active=0は処理対象外、inv_mass_q8<=0は固定物体です。KQRectは中心形式ではなく左上＋幅・高さです。bodyの反発係数は矩形ペアのソルバーでは使わず、面応答ではKQSurface2Dの係数を使います。",
     "en": "Provides box integration/AABB contacts and an optional surface-response solver. Bodies use centers and half extents; active=0 excludes a slot and inv_mass_q8<=0 makes it static. KQRect instead uses top-left coordinates and width/height. Box-pair contacts do not use the body restitution field; surface responses use KQSurface2D coefficients.",
-    "zh-CN": "提供矩形积分、轴对齐包围盒接触及可选表面响应求解。刚体使用中心和半尺寸，active=0 排除该槽位，inv_mass_q8<=0 表示静态。KQRect 则使用左上角和宽高。矩形对接触不使用刚体恢复系数字段，表面响应使用 KQSurface2D 系数。"
+    "zh-CN": "提供矩形积分、轴对齐包围盒接触及可选表面响应求解。刚体使用中心和半尺寸，active=0 排除该槽位，inv_mass_q8<=0 表示静态。KQRect 则使用左上角和宽高。矩形对接触不使用刚体恢复系数字段，表面响应使用 KQSurface2D 系数。",
+    "ko": "박스 적분과 AABB 접촉 처리, 선택적으로 사용할 수 있는 표면 반응 솔버를 제공합니다. 물체는 중심과 반크기로 표현합니다. active=0이면 해당 슬롯을 제외하고 inv_mass_q8<=0이면 정적 물체로 취급합니다. KQRect는 왼쪽 위 좌표와 너비·높이를 사용합니다. 박스 쌍의 접촉에는 물체의 restitution 필드를 사용하지 않으며, 표면 반응은 KQSurface2D의 계수를 사용합니다.",
+    "zh-TW": "提供盒體積分、AABB 接觸處理，以及可選用的表面反應求解器。物體使用中心與半長表示；active=0 會排除該欄位，inv_mass_q8<=0 則視為靜態物體。KQRect 使用左上角座標與寬度／高度。盒體配對接觸不使用物體的 restitution 欄位；表面反應則使用 KQSurface2D 係數。",
+    "fr": "Fournit l’intégration des boîtes, les contacts AABB et un solveur optionnel de réponse aux surfaces. Les corps utilisent des centres et des demi-dimensions ; active=0 exclut un emplacement, et inv_mass_q8<=0 rend le corps statique. KQRect utilise au contraire un coin supérieur gauche et une largeur/hauteur. Les contacts entre boîtes n’utilisent pas le champ restitution du corps ; les réponses aux surfaces utilisent les coefficients de KQSurface2D.",
+    "es": "Proporciona integración de cajas, contactos AABB y un solucionador opcional de respuesta a superficies. Los cuerpos usan centros y semiextensiones; active=0 excluye una posición del array e inv_mass_q8<=0 la hace estática. KQRect usa la esquina superior izquierda y ancho/alto. Los contactos entre cajas no usan el campo restitution del cuerpo; las respuestas a superficies usan los coeficientes de KQSurface2D.",
+    "de": "Bietet Boxintegration, AABB-Kontakte und einen optionalen Löser für Oberflächenreaktionen. Körper werden durch Mittelpunkt und halbe Ausdehnungen beschrieben; active=0 schließt einen Arrayplatz aus, inv_mass_q8<=0 macht ihn statisch. KQRect verwendet dagegen linke obere Ecke und Breite/Höhe. Kontakte zwischen Boxen nutzen das restitution-Feld des Körpers nicht; Oberflächenreaktionen verwenden KQSurface2D-Koeffizienten."
   },
   "phys_module_circle": {
     "ja": "円の半径、逆質量、反発、接線摩擦、世界の減衰と境界を扱います。bodyは呼び出し側で全フィールドを設定します。bodyのfriction_q8と壁のwall_friction_q8は「除く接線運動」、linear_damping_q8は「残す速度」の割合です。0～255の係数は256で割って使うため255も正確な1.0ではありません。",
     "en": "Supports circle radius, inverse mass, restitution, tangential friction, world damping and bounds. The caller initializes every body field. Body friction_q8 and wall_friction_q8 describe tangential motion removed, whereas linear_damping_q8 describes velocity retained. Byte coefficients are divided by 256, so 255 is not exactly 1.0.",
-    "zh-CN": "支持圆半径、逆质量、恢复系数、切向摩擦、world 阻尼和边界。调用方须初始化所有刚体字段。friction_q8 和 wall_friction_q8 表示去掉的切向运动比例，linear_damping_q8 表示保留的速度比例。字节系数均除以 256，因此 255 不恰好等于 1.0。"
+    "zh-CN": "支持圆半径、逆质量、恢复系数、切向摩擦、world 阻尼和边界。调用方须初始化所有刚体字段。friction_q8 和 wall_friction_q8 表示去掉的切向运动比例，linear_damping_q8 表示保留的速度比例。字节系数均除以 256，因此 255 不恰好等于 1.0。",
+    "ko": "원의 반지름, 역질량, 반발, 접선 방향 마찰, 월드 감쇠, 경계를 지원합니다. 호출자가 모든 물체 필드를 초기화해야 합니다. 물체의 friction_q8과 wall_friction_q8은 제거되는 접선 운동의 비율이고, linear_damping_q8은 유지되는 속도의 비율입니다. 바이트 계수는 256으로 나누므로 255도 정확히 1.0은 아닙니다.",
+    "zh-TW": "支援圓形半徑、反質量、恢復係數、切向摩擦、世界阻尼與邊界。呼叫端須初始化所有物體欄位。物體的 friction_q8 與 wall_friction_q8 表示移除的切向運動比例，linear_damping_q8 則表示保留的速度比例。位元組係數除以 256，因此 255 並不等於 1.0。",
+    "fr": "Gère le rayon des cercles, la masse inverse, la restitution, le frottement tangent, l’amortissement du monde et ses limites. L’appelant initialise tous les champs des corps. friction_q8 et wall_friction_q8 indiquent la part de mouvement tangent supprimée, tandis que linear_damping_q8 indique la part de vitesse conservée. Les coefficients sur un octet sont divisés par 256 : 255 n’est donc pas exactement 1,0.",
+    "es": "Admite radio de círculo, masa inversa, restitución, fricción tangencial, amortiguamiento del mundo y límites. El código que llama inicializa todos los campos del cuerpo. friction_q8 del cuerpo y wall_friction_q8 indican la proporción de movimiento tangencial eliminada; linear_damping_q8 indica la proporción de velocidad conservada. Los coeficientes de un byte se dividen entre 256, por lo que 255 no es exactamente 1,0.",
+    "de": "Unterstützt Kreisradius, inverse Masse, Rückprall, tangentiale Reibung, Weltdämpfung und Grenzen. Der aufrufende Code initialisiert alle Körperfelder. friction_q8 des Körpers und wall_friction_q8 beschreiben den entfernten Anteil tangentialer Bewegung, linear_damping_q8 dagegen den beibehaltenen Geschwindigkeitsanteil. Bytekoeffizienten werden durch 256 geteilt; 255 ist daher nicht genau 1,0."
   },
   "phys_module3": {
     "ja": "回転しない3Dの箱を中心と各軸の半サイズで表す物理ライブラリです。質量・逆質量は接触の重み、restitution_q8は反発係数、ax/ay/azは持続する加速度です。表示は別の処理で行います。サンプルは同じ物体を正面と上面に描き、Z方向の動きと壁の反発を分けて示します。",
     "en": "Physics for nonrotating 3D boxes represented by centers and per-axis half extents. Mass/inverse mass weight contacts, restitution_q8 controls bounce and ax/ay/az provide persistent acceleration. Rendering is separate. The sample draws front and top views of the same body to show depth movement and wall bounce.",
-    "zh-CN": "不旋转的三维长方体物理，使用中心及各轴半尺寸表示。质量／逆质量决定接触权重，restitution_q8 控制反弹，ax／ay／az 提供持续加速度。绘制另行处理，示例用同一刚体的正视图和俯视图展示深度移动及撞墙反弹。"
+    "zh-CN": "不旋转的三维长方体物理，使用中心及各轴半尺寸表示。质量／逆质量决定接触权重，restitution_q8 控制反弹，ax／ay／az 提供持续加速度。绘制另行处理，示例用同一刚体的正视图和俯视图展示深度移动及撞墙反弹。",
+    "ko": "중심과 축별 반크기로 표현하는, 회전하지 않는 3D 박스용 물리 기능입니다. 질량/역질량으로 접촉 가중치를 정하고 restitution_q8로 반발을 제어하며 ax/ay/az로 지속 가속도를 적용합니다. 렌더링은 별도입니다. 샘플은 같은 물체의 정면도와 평면도를 그려 깊이 방향 이동과 벽 반발을 보여 줍니다.",
+    "zh-TW": "用於不旋轉的 3D 盒體，以中心及各軸半長表示。質量／反質量決定接觸權重，restitution_q8 控制反彈，ax/ay/az 提供持續加速度。繪製須另外處理。範例繪出同一物體的正視圖與俯視圖，呈現深度方向移動及牆面反彈。",
+    "fr": "Physique pour des boîtes 3D sans rotation, représentées par un centre et des demi-dimensions par axe. Masse et masse inverse pondèrent les contacts, restitution_q8 règle le rebond et ax/ay/az fournissent une accélération persistante. Le rendu est séparé. L’exemple affiche les vues de face et de dessus du même corps pour montrer le déplacement en profondeur et le rebond sur un mur.",
+    "es": "Física para cajas 3D sin rotación, representadas por su centro y semiextensiones por eje. La masa y la masa inversa ponderan los contactos, restitution_q8 controla el rebote y ax/ay/az aportan aceleración persistente. El renderizado es independiente. El ejemplo dibuja vistas frontal y superior del mismo cuerpo para mostrar el movimiento en profundidad y el rebote contra una pared.",
+    "de": "Physik für nicht rotierende 3D-Boxen, beschrieben durch Mittelpunkt und halbe Ausdehnung je Achse. Masse und inverse Masse gewichten Kontakte, restitution_q8 steuert den Rückprall und ax/ay/az liefern eine dauerhafte Beschleunigung. Die Darstellung erfolgt separat. Das Beispiel zeichnet Vorder- und Draufsicht desselben Körpers, um Tiefenbewegung und Wandrückprall zu zeigen."
   }
 }

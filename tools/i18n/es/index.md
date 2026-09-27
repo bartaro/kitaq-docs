@@ -27,26 +27,21 @@ La sintaxis del lenguaje, las funciones intrínsecas del compilador, las funcion
 | SARAKURA | Información de compilación y eventos de diagnóstico | Informes, planes de corrección y de repetición de pruebas |
 
 ## La fuente incluida
-Las 26 mayúsculas, 10 cifras, 26 minúsculas y 30 símbolos proceden del archivo [ascii.c](samples/assets/ascii.c) del autor. No se han añadido formas nuevas: se conservan los 92 glifos originales. Consulta el [mapa de conversión](verification/font_conversion.json) y el [atlas de tiles](verification/font_source_atlas.png). El espacio utiliza un tile vacío. La barra inversa y la barra vertical no están incluidas y aparecen en blanco. `gb_font.c` y `fc_font.c` muestran todos los glifos disponibles.
+Los ejemplos utilizan la fuente [ascii.c](samples/assets/ascii.c), creada por el autor: 26 mayúsculas, 10 cifras, 26 minúsculas y 30 símbolos, para un total de 92 glifos. Puedes verlos en el [atlas de tiles](verification/font_source_atlas.png). El espacio utiliza un tile vacío. La barra inversa y la barra vertical no están incluidas y se muestran en blanco. `gb_font.c` y `fc_font.c` muestran todos los glifos.
 
 ## Edición y alcance de las comprobaciones
 Este manual describe el **código fuente del 14 de septiembre de 2026**. El inventario de referencia registra los hashes de los fuentes y los ejecutables. Consulta los registros de verificación para conocer las entradas, las condiciones y el alcance de cada prueba.
 
 Una compilación correcta significa que se generó una ROM. Una prueba de ejecución significa que el emulador avanzó los fotogramas indicados. Las comparaciones de píxeles, los controles y el sonido se comprueban por separado. Esto no garantiza compatibilidad con todos los periféricos o consolas reales; los avisos se conservan en los registros.
 
-La publicación actual no incluye KOKURA-GUI, KUROSAKI-GUI ni PLITA. Utiliza los núcleos, las CLI y las API de integración publicados.
-
 ## Preparar el directorio de trabajo
-Los ejemplos usan **Windows PowerShell**. Guarda los archivos C como texto UTF-8. El directorio actual es aquel desde el que ejecutas el comando. Encierra entre comillas las rutas con espacios y, cuando sea necesario, invoca el ejecutable con `& "ruta"`. Clona los repositorios uno junto a otro siguiendo la [guía de GitHub](../GITHUB_SETUP.md). Ejecuta los comandos que combinan proyectos desde su directorio padre.
+Los ejemplos usan **Windows PowerShell**. Guarda los archivos C como texto UTF-8. El directorio actual es aquel desde el que ejecutas el comando. Encierra entre comillas las rutas con espacios y, cuando sea necesario, invoca el ejecutable con `& "ruta"`. En los ejemplos que combinan herramientas, coloca sus repositorios y el proyecto del juego dentro de un mismo directorio padre y ejecuta los comandos desde él.
 
 {{CODE:0}}
 
 Sustituye `game.c`, `game.gb` y `game.nes` por tus archivos. Los corchetes angulares de `<ROM>` indican un valor que debes sustituir; no los escribas. Los comandos suelen ocupar una sola línea. La continuación con barra inversa de Bash no es sintaxis de PowerShell.
 
-## Correcciones del compilador utilizadas
-Los ejemplos revelaron una colisión de etiquetas locales internas en KITAQGB y problemas de KITAQFC al conservar valores intermedios y de retorno entre llamadas. Las comprobaciones registradas usaron los compiladores corregidos, incluido el ejemplo de reserva de objetos de GB y los de funciones y estructuras de FC. Esto no demuestra compatibilidad con todas las construcciones de C. Consulta la [verificación de cada ejemplo](verification.html).
-
-## Leer, imprimir y publicar el HTML
+## Leer e imprimir los manuales HTML
 Abre `index.html` desde la carpeta descargada para leer sin conexión. Los estilos, la búsqueda, los ejemplos y las imágenes son locales; no hace falta una CDN. Mantén la estructura completa de directorios. El botón de impresión aplica un diseño sin la columna de navegación.
 
-El sitio de los manuales se aloja en `kitaq-docs`. La vista del repositorio de GitHub suele mostrar el código HTML; GitHub Pages muestra las páginas renderizadas. El README explica cómo publicarlas y distribuir el código. Todas las ediciones comparten los siete volúmenes, las API, los ejemplos y las referencias de verificación. Los fragmentos de código y las respuestas capturadas de las herramientas se mantienen en su redacción original para poder cotejarlos con exactitud.
+Los fragmentos de código y las salidas reales de las herramientas mantienen su redacción original para poder cotejarlos directamente con los archivos y los resultados de los comandos.

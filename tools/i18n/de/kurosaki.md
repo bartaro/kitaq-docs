@@ -54,10 +54,7 @@ Registeränderungen, erzeugte PCM-Daten und korrekt klingender Ton erfordern jew
 
 KUROSAKIs `--emit-diagnostics` erwartet wie bei KOKURA einen **Pfad zu einer JSONL-Datei**. CPU-Traces und Dateien mit Diagnoseereignissen erfüllen unterschiedliche Aufgaben.
 
-## 10. Umfang der Veröffentlichung
-KUROSAKI-GUI ist noch nicht veröffentlicht. Dieses Handbuch behandelt die CLI und ihre Schnittstellen zur Einbindung in andere Programme.
-
-## 11. FDS und Spielstand-RAM
+## 10. FDS und Spielstand-RAM
 `fds-inspect` untersucht die Diskettenstruktur, `export-assets` exportiert Ressourcen. Testen Sie FDS getrennt von NES-Modulen, da sich Startvorgang, BIOS-Anforderungen und Datenträgerzugriffe unterscheiden. Batteriegestützte `.sav`-Dateien und `.kss.json`-Snapshots haben verschiedene Aufgaben. Verwenden Sie ein Speicherlayout, das die Implementierung unterstützt.
 
 {{CODE:9}}

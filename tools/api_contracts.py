@@ -158,8 +158,8 @@ class CardRanges(HTMLParser):
                 self.current = None
 
 
-def publish(language, require_complete=False):
-    if language not in ACTIVE_LANGUAGES:
+def publish(language, require_complete=False, *, local_preview=False):
+    if language not in ACTIVE_LANGUAGES and not local_preview:
         raise ValueError('Updates are paused for this edition: ' + language)
     messages, ui, contracts = load()
     folder = SITE if language == 'ja' else SITE / language
@@ -332,7 +332,7 @@ def publish(language, require_complete=False):
             path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
     publish_verification(language, contracts, proofs, messages, ui)
     from public_presentation import normalize
-    normalize(language)
+    normalize(language,local_preview=local_preview)
     from api_mapper_proofs import kurosaki_overview, write_page
     mapper_page = (SITE if language == 'ja' else SITE / language) / 'kurosaki.html'
     write_page(mapper_page, kurosaki_overview(mapper_page.read_text(encoding='utf-8'), language))

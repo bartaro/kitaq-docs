@@ -50,12 +50,12 @@ Compilez `audio_hwregs_gb.c`, puis `audio.c`, puis le source du jeu. Ne duplique
 
 `Audio_PlayMusic(bank,song)` indique explicitement la banque de la musique. `Audio_PlaySFXBanked` joue un effet depuis une autre banque. Les priorités départagent les effets qui partagent des canaux physiques. La GB possède quatre canaux sonores physiques : CH1, CH2, CH3 et CH4.
 
-Les commandes de flux musical `AUDIO_CMD_NOTE` et `AUDIO_CMD_SET_INST` utilisent les numéros de canaux suivants : **0=CH1, 1=CH2, 2=CH4, 3=CH3**. Ne le confondez pas avec les constantes de canaux de l'API ordinaire. L'en-tête définit actuellement `AUDIO_NOTE_MAX=67`.
+Les commandes du flux musical `AUDIO_CMD_NOTE`, `AUDIO_CMD_SET_INST` et `AUDIO_CMD_STOP_CHANNEL` utilisent les mêmes identifiants de canal que l’API ordinaire : **0=CH1, 1=CH2, 2=CH3, 3=CH4**. CH1 produit une onde impulsionnelle avec balayage, CH2 une onde impulsionnelle, CH3 une forme d’onde et CH4 du bruit. L’en-tête définit `AUDIO_NOTE_MAX=67`.
 
 Le flux d'effet CH1 de base lit une paire note/volume par image et se termine sur la note 0. CH3 utilise un marqueur et un format différents. Consultez `gb_sound.c`. Les fondus progressent pendant `Audio_Update` ; arrêter les mises à jour arrête aussi le fondu.
 
 ## 8. Musique par interruption VBlank
-`audio_vblank.c` utilise son propre format de lecture. Les enregistrements temporisés contiennent cinq octets : `delay, ch2_note, ch1_note, ch3_note, ch4_noise_param`. Le pilote lit des morceaux directement accessibles ou consomme une file en WRAM. La bibliothèque publique ne fournit pas de fonction pour alimenter cette file : le jeu doit assurer cette production et coordonner les écritures avec la routine d’interruption. `LOOP` n’est reconnu que dans les flux directs, et `IMMEDIATE` uniquement en mode file. Les flux ordinaires d’`audio.c` doivent donc être convertis.
+`audio_vblank.c` utilise un format de lecture distinct. Chaque enregistrement temporisé contient cinq octets : `delay, ch1_note, ch2_note, ch3_note, ch4_noise_param`. Le pilote lit des morceaux directement adressables ou consomme une file en WRAM. Initialisez le mode file avec AudioVBlank_QueueReset, fournissez des enregistrements complets de cinq octets avec AudioVBlank_QueueRefill, puis démarrez avec AudioVBlank_QueuePlay. Un seul producteur, exécuté au premier plan, doit alimenter la file. `LOOP` est reconnu uniquement dans les flux directs, et `IMMEDIATE` uniquement en mode file. Les flux ordinaires de `audio.c` ne peuvent pas être transmis tels quels.
 
 {{CODE:2}}
 
@@ -75,7 +75,7 @@ Pour les lignes CGB, utilisez les couleurs 1, 2 et 3. Le mode normal de 128 × 9
 Le mode de 160 × 144 alloue au maximum 127 tuiles par image. Si le tracé rapide ne peut pas allouer une tuile ou rencontre une coordonnée hors écran, `Wire3DCGB_GetFullScreenOverflow()` renvoie une valeur non nulle et les écritures de pixels sont suspendues jusqu'à l'initialisation de l'image suivante. Gardez les sommets dans la zone sélectionnée. La marge droite du masque triangulaire s'arrête à X=127 en mode 128 × 96 et à X=159 en plein écran. Respectez les exigences de sélection des banques WRAM indiquées pour chaque API, en particulier avec le plein écran ou FastMap.
 
 ## 10. Scènes, réserves d'objets et motifs de tirs
-`scene` gère des états tels que titre, jeu et pause ; `entity` fournit une réserve d'objets de capacité fixe ; `chain` conserve l'historique des coordonnées d'un serpent, d'un train ou d'une corde. Vérifiez les valeurs d'échec d'allocation, telles que 0xFF, avant d'utiliser le pointeur renvoyé par `entity_get`.
+`scene` gère les états tels que titre, partie et pause ; `entity` fournit un pool d’objets à capacité fixe ; `chain` propose le suivi d’un corps articulé et un historique des positions. Utilisez `ChainBody` pour déplacer un serpent ou une corde articulés. Vérifiez les valeurs d’échec d’allocation, telles que 0xFF, avant d’utiliser le pointeur renvoyé par `entity_get`.
 
 `danmaku` propose des réserves de projectiles en virgule fixe, des tirs directionnels ou en éventail, la détection des impacts et des frôlements. Son rendu CGB par composition de l'arrière-plan évite la limite habituelle du nombre d'OBJ, mais le temps de calcul par image et le débit des transferts restent limités. Mesurez le temps de traitement plutôt que de viser uniquement un grand nombre de projectiles.
 

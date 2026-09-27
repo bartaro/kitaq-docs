@@ -2,746 +2,1491 @@
   "link_note_shared": {
     "ja": "ライブラリは1台につき1つの通信状態を共有します。バイト送受信は全二重で、片側が内部クロック、もう片側が外部クロックを使います。通常速度は1ビット512クロック、CGB高速は16クロックです。",
     "en": "Each machine has one shared link state. Byte exchanges are full duplex: one side supplies the internal clock and the other uses external clocks. Normal speed takes 512 clocks per bit; CGB fast speed takes 16.",
-    "zh-CN": "每台主机只有一个共享通信状态。字节交换为全双工：一端提供内部时钟，另一端使用外部时钟。普通速度每位需要 512 个时钟周期，CGB 高速需要 16 个。"
+    "zh-CN": "每台主机只有一个共享通信状态。字节交换为全双工：一端提供内部时钟，另一端使用外部时钟。普通速度每位需要 512 个时钟周期，CGB 高速需要 16 个。",
+    "ko": "기기마다 공유 링크 상태가 하나 있습니다. 바이트 교환은 전이중 방식으로, 한쪽이 내부 클록을 공급하고 다른 쪽은 외부 클록을 사용합니다. 일반 속도는 비트당 512클록, CGB 고속은 16클록입니다.",
+    "zh-TW": "每台主機有一份共用連線狀態。位元組交換採全雙工：一端提供內部時脈，另一端使用外部時脈。一般速度每位元需 512 個時脈，CGB 高速則需 16 個。",
+    "fr": "Chaque machine possède un état de liaison partagé. Les échanges d’octets sont en duplex intégral : un côté fournit l’horloge interne, l’autre utilise l’horloge externe. La vitesse normale exige 512 cycles par bit ; la vitesse rapide CGB, 16.",
+    "es": "Cada máquina tiene un estado de enlace compartido. Los intercambios de bytes son de dúplex completo: un lado aporta el reloj interno y el otro usa reloj externo. La velocidad normal requiere 512 ciclos por bit; la rápida de CGB, 16.",
+    "de": "Jedes Gerät besitzt einen gemeinsamen Verbindungszustand. Der Byteaustausch erfolgt im Vollduplexbetrieb: Eine Seite liefert den internen Takt, die andere nutzt externe Takte. Normale Geschwindigkeit benötigt 512 Takte pro Bit, CGB-Schnellbetrieb 16."
   },
   "link_note_codes": {
     "ja": "エラーコードは0=正常、1=使用中、2=時間切れ、3=受信容量不足、4=設定またはプロトコル不正、5=ACK待ちで切断を示す応答です。開始・設定関数の成功は0、受信取得関数の成功は1なので区別してください。成功しても過去のエラーは消えません。",
     "en": "Error codes are 0=none, 1=busy, 2=timeout, 3=receive overflow, 4=invalid configuration/protocol and 5=an ACK timeout with a disconnect-like response. Start/configuration calls succeed with 0; receive/pop calls succeed with 1. Successful calls do not clear a latched error.",
-    "zh-CN": "错误码：0=无错误、1=忙、2=超时、3=接收溢出、4=配置/协议无效、5=ACK 超时且响应类似断线。启动/配置调用成功返回 0；接收/弹出调用成功返回 1。成功调用不清除已锁存错误。"
+    "zh-CN": "错误码：0=无错误、1=忙、2=超时、3=接收溢出、4=配置/协议无效、5=ACK 超时且响应类似断线。启动/配置调用成功返回 0；接收/弹出调用成功返回 1。成功调用不清除已锁存错误。",
+    "ko": "오류 코드는 0=없음, 1=사용 중, 2=시간 초과, 3=수신 오버플로, 4=잘못된 설정·프로토콜, 5=연결 해제와 비슷한 응답이 동반된 ACK 시간 초과입니다. 시작·설정 호출의 성공값은 0, 수신·꺼내기 호출의 성공값은 1입니다. 성공한 호출도 저장된 오류를 지우지 않습니다.",
+    "zh-TW": "錯誤碼為 0=無、1=忙碌、2=逾時、3=接收溢位、4=設定／協定無效、5=伴隨類似斷線回應的 ACK 逾時。啟動／設定呼叫以 0 表示成功，接收／取出呼叫以 1 表示成功。成功呼叫不會清除已鎖存的錯誤。",
+    "fr": "Codes d’erreur : 0=aucune, 1=occupé, 2=expiration du délai, 3=débordement en réception, 4=configuration/protocole invalide, 5=expiration ACK avec une réponse évoquant une déconnexion. Les appels de démarrage/configuration réussissent avec 0 ; ceux de réception/extraction avec 1. Un appel réussi n’efface pas une erreur mémorisée.",
+    "es": "Códigos de error: 0=ninguno, 1=ocupado, 2=tiempo agotado, 3=desbordamiento de recepción, 4=configuración/protocolo no válido y 5=tiempo de ACK agotado con respuesta similar a una desconexión. Las llamadas de inicio/configuración tienen éxito con 0; las de recepción/extracción, con 1. Una llamada correcta no borra un error retenido.",
+    "de": "Fehlercodes: 0=kein Fehler, 1=belegt, 2=Timeout, 3=Empfangsüberlauf, 4=ungültige Konfiguration/Protokoll, 5=ACK-Timeout mit einer Antwort wie bei einer getrennten Verbindung. Start- und Konfigurationsaufrufe melden Erfolg mit 0, Empfangs- und Entnahmeaufrufe mit 1. Erfolgreiche Aufrufe löschen keinen gespeicherten Fehler."
   },
   "link_note_reset": {
     "ja": "初期化は受信キュー、パケット、接続先、エラーを破棄し、転送とシリアル割り込みを停止します。送受信中のデータを保存する操作ではありません。",
     "en": "Initialization discards byte queues, packets, peer selection and errors, and disables the transfer and serial IRQ source. It does not preserve an in-flight exchange.",
-    "zh-CN": "初始化会丢弃字节队列、数据包、对端选择和错误，并关闭传送及串行 IRQ 源。不保留正在进行的交换。"
+    "zh-CN": "初始化会丢弃字节队列、数据包、对端选择和错误，并关闭传送及串行 IRQ 源。不保留正在进行的交换。",
+    "ko": "초기화는 바이트 큐, 패킷, 상대 선택, 오류를 버리고 전송과 시리얼 IRQ 소스를 비활성화합니다. 진행 중인 교환은 보존하지 않습니다.",
+    "zh-TW": "初始化會捨棄位元組佇列、封包、對端選擇及錯誤，並停用傳輸與序列 IRQ 來源。不保留進行中的交換。",
+    "fr": "L’initialisation supprime les files d’octets, les paquets, la sélection du correspondant et les erreurs, puis désactive le transfert et la source IRQ série. Un échange en cours n’est pas conservé.",
+    "es": "La inicialización descarta colas de bytes, paquetes, selección del interlocutor y errores, y deshabilita la transferencia y la fuente IRQ serie. No conserva un intercambio en curso.",
+    "de": "Die Initialisierung verwirft Bytewarteschlangen, Pakete, Gegenstellenauswahl und Fehler und deaktiviert Übertragung sowie serielle IRQ-Quelle. Ein laufender Austausch bleibt nicht erhalten."
   },
   "link_note_critical": {
     "ja": "内部のクリティカルセクションはソフトウェアの入れ子深さを使います。外側のセクションを抜けるとCPU割り込みが有効になるため、直前のIME状態の保存は前提にしないでください。",
     "en": "Internal critical sections track software nesting depth. Leaving the outer section enables CPU interrupts, so do not assume that a previously disabled IME state is preserved.",
-    "zh-CN": "内部临界区维护软件嵌套深度。退出最外层时会启用 CPU 中断，因此不要假定原先禁用的 IME 状态会保留。"
+    "zh-CN": "内部临界区维护软件嵌套深度。退出最外层时会启用 CPU 中断，因此不要假定原先禁用的 IME 状态会保留。",
+    "ko": "내부 임계 구역은 소프트웨어 중첩 깊이를 추적합니다. 가장 바깥 구역을 나올 때 CPU 인터럽트를 활성화하므로 이전에 비활성화되어 있던 IME 상태가 유지된다고 가정하지 마세요.",
+    "zh-TW": "內部臨界區會追蹤軟體巢狀深度。離開最外層時會啟用 CPU 中斷，因此不可假設原本停用的 IME 狀態會被保留。",
+    "fr": "Les sections critiques internes suivent leur profondeur d’imbrication logicielle. Sortir de la section la plus externe active les interruptions CPU ; ne supposez donc pas qu’un état IME précédemment désactivé sera conservé.",
+    "es": "Las secciones críticas internas controlan la profundidad de anidamiento por software. Salir de la más externa habilita las interrupciones de CPU; no supongas que se conserva un estado IME previamente deshabilitado.",
+    "de": "Interne kritische Abschnitte verfolgen ihre Software-Verschachtelungstiefe. Beim Verlassen des äußersten Abschnitts werden CPU-Interrupts aktiviert. Gehen Sie daher nicht davon aus, dass ein zuvor deaktivierter IME-Zustand erhalten bleibt."
   },
   "link_note_ring": {
     "ja": "受信リングは8要素中7バイトを保持できます。満杯では新しいバイトを捨て、エラー3を記録します。受信値0も有効なデータです。",
     "en": "An eight-entry receive ring holds seven bytes. A full ring drops the new byte and latches error 3. A received zero byte is valid data.",
-    "zh-CN": "八槽接收环形队列最多容纳七个字节。队列已满时丢弃新字节，并锁存错误 3。接收到的零字节也是有效数据。"
+    "zh-CN": "八槽接收环形队列最多容纳七个字节。队列已满时丢弃新字节，并锁存错误 3。接收到的零字节也是有效数据。",
+    "ko": "8개 항목의 수신 링 버퍼에는 7바이트를 담을 수 있습니다. 가득 차면 새 바이트를 버리고 오류 3을 저장합니다. 수신한 0바이트도 유효한 데이터입니다.",
+    "zh-TW": "八個項目的接收環狀緩衝區可存七個位元組。已滿時會捨棄新位元組並鎖存錯誤 3。收到的零位元組也是有效資料。",
+    "fr": "Le tampon circulaire de réception de huit entrées contient sept octets utiles. S’il est plein, le nouvel octet est abandonné et l’erreur 3 est mémorisée. Un octet reçu de valeur zéro est une donnée valide.",
+    "es": "El búfer circular de recepción de ocho entradas admite siete bytes. Si está lleno, descarta el nuevo byte y retiene el error 3. Un byte recibido con valor cero es un dato válido.",
+    "de": "Der Empfangsring mit acht Einträgen fasst sieben Bytes. Ein voller Ring verwirft das neue Byte und speichert Fehler 3. Ein empfangenes Nullbyte ist gültige Nutzlast."
   },
   "link_note_logical": {
     "ja": "Link4はホスト0と、1～3の相手を論理的に管理します。SelectPeerは電気的な配線を切り替えるコマンドを送りません。KOKURAのlink4接続ではコンパイラのメタデータを使って接続先を追従させます。DMG-07実機のプロトコルにはLinkDmg07を使います。",
     "en": "Link4 manages logical host slot 0 and peer slots 1–3. SelectPeer does not send a command that switches physical wiring. KOKURA’s link4 topology follows the selected peer through compiler metadata. Use LinkDmg07 for the physical DMG-07 protocol.",
-    "zh-CN": "Link4 管理逻辑主机槽位 0 和对端槽位 1–3。SelectPeer 不会发送切换实体接线的命令。KOKURA 的 link4 拓扑通过编译器元数据跟随所选对端。实体 DMG-07 协议请使用 LinkDmg07。"
+    "zh-CN": "Link4 管理逻辑主机槽位 0 和对端槽位 1–3。SelectPeer 不会发送切换实体接线的命令。KOKURA 的 link4 拓扑通过编译器元数据跟随所选对端。实体 DMG-07 协议请使用 LinkDmg07。",
+    "ko": "Link4는 논리 호스트 슬롯 0과 상대 슬롯 1~3을 관리합니다. SelectPeer는 물리 배선을 바꾸는 명령을 전송하지 않습니다. KOKURA의 link4 토폴로지는 컴파일러 메타데이터를 통해 선택한 상대를 따릅니다. 실제 DMG-07 프로토콜에는 LinkDmg07을 사용하세요.",
+    "zh-TW": "Link4 管理邏輯主機槽位 0 與對端槽位 1～3。SelectPeer 不會傳送切換實體接線的命令。KOKURA 的 link4 拓撲透過編譯器中繼資料跟隨所選對端。實體 DMG-07 協定請使用 LinkDmg07。",
+    "fr": "Link4 gère l’emplacement logique hôte 0 et les correspondants 1 à 3. SelectPeer n’envoie aucune commande modifiant le câblage physique. La topologie link4 de KOKURA suit le correspondant sélectionné via les métadonnées du compilateur. Utilisez LinkDmg07 pour le protocole de l’adaptateur physique DMG-07.",
+    "es": "Link4 gestiona la posición lógica de anfitrión 0 y las de interlocutor 1–3. SelectPeer no envía una orden que cambie el cableado físico. La topología link4 de KOKURA sigue al interlocutor seleccionado mediante los metadatos del compilador. Usa LinkDmg07 para el protocolo del adaptador físico DMG-07.",
+    "de": "Link4 verwaltet den logischen Hostplatz 0 und Gegenstellenplätze 1 bis 3. SelectPeer sendet keinen Befehl zum Umschalten physischer Leitungen. KOKURAs link4-Topologie folgt der ausgewählten Gegenstelle anhand der Compilermetadaten. Verwenden Sie LinkDmg07 für das Protokoll des echten DMG-07-Adapters."
   },
   "link_note_duplicate": {
     "ja": "Link4では同じ受信バイトを通常リングと相手別リングの両方へ入れます。片方を読んでも他方は減りません。パケットのポーリングは通常リングを消費するので、不要な相手別の生バイトも定期的に読み捨て、満杯を防ぎます。",
     "en": "Link4 copies each received byte to both the ordinary ring and a per-peer ring. Reading one does not drain the other. Packet polling consumes the ordinary ring; regularly discard unused per-peer raw bytes as well to prevent overflow.",
-    "zh-CN": "Link4 会将每个接收字节同时复制到普通环形队列和按对端划分的队列。读取一个不会清空另一个。数据包轮询消费普通队列；还应定期丢弃未使用的各对端原始字节，以免溢出。"
+    "zh-CN": "Link4 会将每个接收字节同时复制到普通环形队列和按对端划分的队列。读取一个不会清空另一个。数据包轮询消费普通队列；还应定期丢弃未使用的各对端原始字节，以免溢出。",
+    "ko": "Link4는 수신 바이트를 일반 링과 상대별 링 양쪽에 복사합니다. 한쪽을 읽어도 다른 쪽의 데이터는 줄지 않습니다. 패킷 폴링은 일반 링을 소비하므로 오버플로를 막으려면 쓰지 않는 상대별 원시 바이트도 주기적으로 버리세요.",
+    "zh-TW": "Link4 將每個接收位元組同時複製到一般環狀緩衝區與對端專用環狀緩衝區。讀取其中一個不會清空另一個。封包輪詢會消耗一般緩衝區；也須定期丟棄未使用的對端原始位元組，避免溢位。",
+    "fr": "Link4 copie chaque octet reçu dans le tampon général et dans un tampon propre au correspondant. Lire l’un ne vide pas l’autre. L’interrogation des paquets consomme le tampon général ; éliminez aussi régulièrement les octets bruts inutilisés des tampons par correspondant pour éviter un débordement.",
+    "es": "Link4 copia cada byte recibido tanto al búfer general como a uno por interlocutor. Leer uno no vacía el otro. El sondeo de paquetes consume el búfer general; descarta también periódicamente los bytes sin procesar que no uses de cada interlocutor para evitar desbordamientos.",
+    "de": "Link4 kopiert jedes empfangene Byte sowohl in den allgemeinen Ring als auch in einen Ring pro Gegenstelle. Das Lesen eines Rings leert den anderen nicht. Die Paketabfrage verbraucht den allgemeinen Ring. Verwerfen Sie auch regelmäßig ungenutzte Rohbytes in den Gegenstellenringen, um Überläufe zu vermeiden."
   },
   "link_note_packet": {
     "ja": "パケットは0xA5、コマンド、長さ、0～24バイトの内容、XORチェックサムの順で送り、受信確認0x79（ACK）または受信拒否0x1F（NAK）を返します。チェックサムはコマンド・長さ・内容のXORです。各機の通常メールボックスは1パケット、Link4は相手ごとにも1パケットを保持します。",
     "en": "A packet contains 0xA5, command, length, 0–24 payload bytes and an XOR checksum. The response is 0x79 (ACK, accepted) or 0x1F (NAK, rejected). The checksum XORs the command, length and payload. Each machine has one shared packet mailbox; Link4 additionally has one mailbox per peer.",
-    "zh-CN": "数据包包含 0xA5、命令、长度、0–24 个有效载荷字节和异或校验和。响应为 0x79（ACK，接受）或 0x1F（NAK，拒绝）。校验和对命令、长度和有效载荷求异或。每台主机有一个共享数据包邮箱；Link4 还为每个对端提供一个邮箱。"
+    "zh-CN": "数据包包含 0xA5、命令、长度、0–24 个有效载荷字节和异或校验和。响应为 0x79（ACK，接受）或 0x1F（NAK，拒绝）。校验和对命令、长度和有效载荷求异或。每台主机有一个共享数据包邮箱；Link4 还为每个对端提供一个邮箱。",
+    "ko": "패킷은 0xA5, 명령, 길이, 0~24바이트의 페이로드, XOR 체크섬으로 구성됩니다. 응답은 0x79(ACK, 수락) 또는 0x1F(NAK, 거부)입니다. 체크섬은 명령·길이·페이로드의 XOR입니다. 기기마다 공유 패킷 메일박스가 하나 있으며 Link4에는 상대별 메일박스도 하나씩 있습니다.",
+    "zh-TW": "封包包含 0xA5、命令、長度、0～24 個有效負載位元組及 XOR 檢查碼。回應為 0x79（ACK，接受）或 0x1F（NAK，拒絕）。檢查碼由命令、長度及有效負載做 XOR 得到。每台主機有一個共用封包信箱，Link4 另為每個對端提供一個信箱。",
+    "fr": "Un paquet contient 0xA5, la commande, la longueur, 0 à 24 octets utiles et une somme de contrôle XOR. La réponse est 0x79 (ACK, accepté) ou 0x1F (NAK, refusé). Le contrôle combine par XOR la commande, la longueur et les données utiles. Chaque machine possède une boîte de réception de paquets partagée ; Link4 en ajoute une par correspondant.",
+    "es": "Un paquete contiene 0xA5, orden, longitud, de 0 a 24 bytes de carga útil y una suma de comprobación XOR. La respuesta es 0x79 (ACK, aceptado) o 0x1F (NAK, rechazado). La suma aplica XOR a la orden, la longitud y la carga útil. Cada máquina tiene un buzón de paquetes compartido; Link4 añade uno por interlocutor.",
+    "de": "Ein Paket enthält 0xA5, Befehl, Länge, 0 bis 24 Nutzdatenbytes und eine XOR-Prüfsumme. Die Antwort ist 0x79 (ACK, angenommen) oder 0x1F (NAK, abgewiesen). Die Prüfsumme verknüpft Befehl, Länge und Nutzdaten per XOR. Jedes Gerät hat einen gemeinsamen Paketbriefkasten; Link4 besitzt zusätzlich einen pro Gegenstelle."
   },
   "link_note_polling": {
     "ja": "送受信の両側で継続してポーリングします。タイマーはハードウェアのフレーム数ではなく、進展のない呼び出し90回で満了します。ACKを待つための0xFF送信だけでは期限を延長せず、送信は最大3回試みます。再送で同じ内容が届く場合があるため、厳密に1回だけ実行したいコマンドにはアプリ側の識別番号を付けます。",
     "en": "Keep polling on both endpoints. A timeout counts 90 calls without progress, not hardware frames. Sending 0xFF solely to clock an ACK does not extend that deadline; transmission allows at most three attempts. Retries can deliver duplicates, so add application-level identifiers when a command must run exactly once.",
-    "zh-CN": "两端都要持续轮询。超时按连续 90 次无进展调用计算，不是硬件帧数。仅为提供 ACK 时钟而发送 0xFF 不会延长期限；最多尝试发送三次。重试可能造成重复交付，因此要求命令恰好执行一次时，应添加应用层标识符。"
+    "zh-CN": "两端都要持续轮询。超时按连续 90 次无进展调用计算，不是硬件帧数。仅为提供 ACK 时钟而发送 0xFF 不会延长期限；最多尝试发送三次。重试可能造成重复交付，因此要求命令恰好执行一次时，应添加应用层标识符。",
+    "ko": "양쪽 끝에서 계속 폴링하세요. 시간 초과는 하드웨어 프레임이 아니라 진행 없이 90번 호출한 횟수로 셉니다. ACK용 클록만 공급하려고 0xFF를 보내도 기한이 늘어나지 않습니다. 전송은 최대 세 번 시도합니다. 재시도로 중복 수신할 수 있으므로 명령이 정확히 한 번만 실행되어야 한다면 애플리케이션 수준의 식별자를 추가하세요.",
+    "zh-TW": "兩端都須持續輪詢。逾時計算的是沒有進展的 90 次呼叫，不是硬體影格。僅為 ACK 提供時脈而傳送 0xFF 不會延長期限；傳送最多嘗試三次。重試可能造成重複送達，若命令必須恰好執行一次，請加入應用層識別碼。",
+    "fr": "Continuez à interroger les deux extrémités. Le délai expire après 90 appels sans progression, pas après un nombre d’images matérielles. Envoyer 0xFF uniquement pour fournir l’horloge d’un ACK ne repousse pas cette échéance ; au plus trois tentatives sont permises. Les retransmissions peuvent livrer des doublons : ajoutez des identifiants applicatifs si une commande doit s’exécuter exactement une fois.",
+    "es": "Mantén el sondeo en ambos extremos. El tiempo de espera cuenta 90 llamadas sin progreso, no fotogramas de hardware. Enviar 0xFF solo para dar reloj a un ACK no amplía ese plazo; se permiten como máximo tres intentos. Los reintentos pueden entregar duplicados, así que añade identificadores de aplicación si una orden debe ejecutarse exactamente una vez.",
+    "de": "Fragen Sie beide Endpunkte fortlaufend ab. Ein Timeout zählt 90 Aufrufe ohne Fortschritt, keine Hardwareframes. Das Senden von 0xFF allein zur Taktversorgung eines ACK verlängert die Frist nicht; höchstens drei Sendeversuche sind erlaubt. Wiederholungen können Duplikate liefern. Ergänzen Sie Kennungen auf Anwendungsebene, wenn ein Befehl genau einmal ausgeführt werden muss."
   },
   "link_note_buffer": {
     "ja": "受信先の容量を渡す引数はありません。dstを使う場合は最大長24バイトの書き込み可能な領域を用意します。cmd・len・dstは個別に0を渡して省略できます。空き通知と読み取りを別スレッドや割り込みで競合させないでください。",
     "en": "There is no destination-capacity parameter. Provide 24 writable bytes when using dst. cmd, len and dst may independently be null. Serialize mailbox inspection and consumption against other code and interrupts.",
-    "zh-CN": "没有目标容量参数。使用 dst 时须提供 24 个可写字节。cmd、len 和 dst 都可以分别为 null。邮箱检查与消费必须与其他代码及中断互斥。"
+    "zh-CN": "没有目标容量参数。使用 dst 时须提供 24 个可写字节。cmd、len 和 dst 都可以分别为 null。邮箱检查与消费必须与其他代码及中断互斥。",
+    "ko": "대상 용량을 지정하는 매개변수는 없습니다. dst를 사용한다면 쓰기 가능한 24바이트를 제공하세요. cmd, len, dst는 각각 독립적으로 null일 수 있습니다. 메일박스 검사와 소비가 다른 코드나 인터럽트와 동시에 진행되지 않도록 직렬화하세요.",
+    "zh-TW": "沒有目的地容量參數。使用 dst 時須提供 24 個可寫入位元組。cmd、len、dst 可各自為 null。須將信箱檢查與取用序列化，避免與其他程式碼或中斷同時操作。",
+    "fr": "Il n’y a pas de paramètre de capacité de destination. Fournissez 24 octets inscriptibles si vous utilisez dst. cmd, len et dst peuvent être nuls indépendamment. Sérialisez l’inspection et la consommation de la boîte de réception par rapport aux autres codes et aux interruptions.",
+    "es": "No hay parámetro de capacidad del destino. Proporciona 24 bytes escribibles si usas dst. cmd, len y dst pueden ser null de forma independiente. Serializa la consulta y el consumo del buzón respecto al resto del código y las interrupciones.",
+    "de": "Es gibt keinen Parameter für die Zielkapazität. Stellen Sie bei Verwendung von dst 24 beschreibbare Bytes bereit. cmd, len und dst dürfen unabhängig voneinander null sein. Koordinieren Sie Prüfung und Entnahme des Briefkasteninhalts so, dass anderer Code oder Interrupts nicht gleichzeitig darauf zugreifen."
   },
   "link_note_scope": {
     "ja": "掲載画像はKOKURA上の結果です。複数台を使う通信例では、リンクしたエミュレータで送受信値を照合し、その終了状態から画面を取得しています。実機ケーブルや実物の4人用アダプターを使った検証ではありません。",
     "en": "The screens come from KOKURA. Multi-endpoint examples check values on linked emulator instances, and screens are captured from their final saved states. These checks do not establish physical cable or four-player adapter behavior.",
-    "zh-CN": "画面来自 KOKURA。多端示例在连接的模拟器实例间检查数值，并从最终保存状态截取画面。这些检查不能证明实体通信线或四人适配器的行为。"
+    "zh-CN": "画面来自 KOKURA。多端示例在连接的模拟器实例间检查数值，并从最终保存状态截取画面。这些检查不能证明实体通信线或四人适配器的行为。",
+    "ko": "화면은 KOKURA에서 얻었습니다. 여러 끝점을 사용하는 예제는 연결된 에뮬레이터 인스턴스의 값을 확인하고 마지막으로 저장한 상태에서 화면을 캡처합니다. 이 검증은 실제 케이블이나 4인용 어댑터 동작을 입증하지 않습니다.",
+    "zh-TW": "畫面來自 KOKURA。多端點範例會檢查相互連接的模擬器實例數值，並從最後儲存的狀態擷取畫面。這些檢查不證明實體線材或四人轉接器的行為。",
+    "fr": "Les écrans proviennent de KOKURA. Les exemples à plusieurs extrémités vérifient les valeurs d’instances d’émulateur reliées ; les captures proviennent de leurs états finaux sauvegardés. Ces vérifications ne prouvent pas le comportement d’un câble physique ou d’un adaptateur à quatre joueurs.",
+    "es": "Las pantallas proceden de KOKURA. Los ejemplos con varios extremos comprueban valores en instancias de emulador enlazadas y capturan sus estados finales guardados. Estas comprobaciones no demuestran el comportamiento de un cable físico ni de un adaptador para cuatro jugadores.",
+    "de": "Die Bilder stammen aus KOKURA. Beispiele mit mehreren Endpunkten prüfen Werte in verbundenen Emulatorinstanzen und nehmen Bilder aus deren abschließend gespeicherten Zuständen auf. Diese Prüfungen belegen kein Verhalten echter Kabel oder Vier-Spieler-Adapter."
   },
   "link_Link_InitCommon_purpose": {
     "ja": "通信状態を初期値へ戻し、外部クロック待ちの役割にします。",
     "en": "Reset the shared link state to its external-clock default.",
-    "zh-CN": "将共享通信状态重置为默认的外部时钟模式。"
+    "zh-CN": "将共享通信状态重置为默认的外部时钟模式。",
+    "ko": "공유 링크 상태를 기본 외부 클록 상태로 초기화합니다.",
+    "zh-TW": "將共用連線狀態重設為預設的外部時脈模式。",
+    "fr": "Réinitialise l’état de liaison partagé à sa configuration par défaut avec horloge externe.",
+    "es": "Reinicia el estado de enlace compartido a su configuración predeterminada de reloj externo.",
+    "de": "Setzt den gemeinsamen Verbindungszustand auf den Standard mit externem Takt zurück."
   },
   "link_Link_InitCommon_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_example_control": {
     "ja": "初期化、使用中エラー、外部クロック待ち、受信リングの満杯を確かめます。BUSY ERROR=1、TIMEOUT=2、OPEN RX=255、OVERFLOW=3、QUEUE BYTES=7になります。IRQ REQUEST=1を確認してから、割り込み禁止のままハンドラー本体を明示呼び出しします。",
     "en": "Check initialization, busy rejection, an external-clock timeout and ring capacity. Expect BUSY ERROR=1, TIMEOUT=2, OPEN RX=255, OVERFLOW=3 and QUEUE BYTES=7. After observing IRQ REQUEST=1, the lesson explicitly dispatches the handler body while the serial IRQ source remains masked.",
-    "zh-CN": "检查初始化、忙时拒绝、外部时钟超时及环形队列容量。预期 BUSY ERROR=1、TIMEOUT=2、OPEN RX=255、OVERFLOW=3、QUEUE BYTES=7。观测到 IRQ REQUEST=1 后，示例在串行 IRQ 源仍被屏蔽时，显式执行处理程序主体。"
+    "zh-CN": "检查初始化、忙时拒绝、外部时钟超时及环形队列容量。预期 BUSY ERROR=1、TIMEOUT=2、OPEN RX=255、OVERFLOW=3、QUEUE BYTES=7。观测到 IRQ REQUEST=1 后，示例在串行 IRQ 源仍被屏蔽时，显式执行处理程序主体。",
+    "ko": "초기화, 사용 중 요청 거부, 외부 클록 시간 초과, 링 용량을 확인합니다. 예상값은 BUSY ERROR=1, TIMEOUT=2, OPEN RX=255, OVERFLOW=3, QUEUE BYTES=7입니다. 예제는 IRQ REQUEST=1을 관측한 뒤 시리얼 IRQ 소스는 마스킹한 채 핸들러 본체를 명시적으로 호출합니다.",
+    "zh-TW": "檢查初始化、忙碌時拒絕、外部時脈逾時及環狀緩衝區容量。預期 BUSY ERROR=1、TIMEOUT=2、OPEN RX=255、OVERFLOW=3、QUEUE BYTES=7。觀察到 IRQ REQUEST=1 後，教學會在序列 IRQ 來源仍被遮罩時，明確執行處理常式本體。",
+    "fr": "Vérifie l’initialisation, le refus lorsque la liaison est occupée, l’expiration avec horloge externe et la capacité du tampon. Valeurs attendues : BUSY ERROR=1, TIMEOUT=2, OPEN RX=255, OVERFLOW=3 et QUEUE BYTES=7. Après avoir observé IRQ REQUEST=1, la leçon appelle explicitement le corps du gestionnaire en maintenant la source IRQ série masquée.",
+    "es": "Comprueba inicialización, rechazo por ocupación, tiempo agotado con reloj externo y capacidad del búfer. Se esperan BUSY ERROR=1, TIMEOUT=2, OPEN RX=255, OVERFLOW=3 y QUEUE BYTES=7. Tras observar IRQ REQUEST=1, la lección ejecuta explícitamente el cuerpo del manejador mientras la fuente IRQ serie permanece enmascarada.",
+    "de": "Prüft Initialisierung, Abweisung bei Belegung, Timeout mit externem Takt und Ringkapazität. Erwartet werden BUSY ERROR=1, TIMEOUT=2, OPEN RX=255, OVERFLOW=3 und QUEUE BYTES=7. Nach IRQ REQUEST=1 ruft die Lektion den Handlerkörper ausdrücklich auf, während die serielle IRQ-Quelle maskiert bleibt."
   },
   "link_Link_InitMaster_purpose": {
     "ja": "状態を初期化し、自機がクロックを供給する役割を選びます。",
     "en": "Reset state and make this machine the clock source.",
-    "zh-CN": "重置状态，并将本机设为时钟源。"
+    "zh-CN": "重置状态，并将本机设为时钟源。",
+    "ko": "상태를 초기화하고 이 기기를 클록 공급원으로 설정합니다.",
+    "zh-TW": "重設狀態，並將本機設為時脈來源。",
+    "fr": "Réinitialise l’état et fait de cette machine la source d’horloge.",
+    "es": "Reinicia el estado y convierte esta máquina en la fuente de reloj.",
+    "de": "Setzt den Zustand zurück und macht dieses Gerät zur Taktquelle."
   },
   "link_Link_InitMaster_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_example_raw_master": {
     "ja": "同梱のBYTE SLAVEと接続します。42を送り99を受け取り、次に双方で0を交換します。RECEIVED=1、PEER BYTE=99、ZERO READY=1、ZERO BYTE=0が、受信した0と未受信の違いを示します。CGB同士では2回目を高速クロックで行います。",
     "en": "Connect to BYTE SLAVE. Send 42 and receive 99, then exchange zero in both directions. RECEIVED=1, PEER BYTE=99, ZERO READY=1 and ZERO BYTE=0 distinguish valid zero data from no data. Two CGB instances use fast clocks for the second exchange.",
-    "zh-CN": "连接 BYTE SLAVE。发送 42 并接收 99，然后双向交换零。RECEIVED=1、PEER BYTE=99、ZERO READY=1 和 ZERO BYTE=0 区分有效零数据与无数据。两个 CGB 实例在第二次交换时使用高速时钟。"
+    "zh-CN": "连接 BYTE SLAVE。发送 42 并接收 99，然后双向交换零。RECEIVED=1、PEER BYTE=99、ZERO READY=1 和 ZERO BYTE=0 区分有效零数据与无数据。两个 CGB 实例在第二次交换时使用高速时钟。",
+    "ko": "BYTE SLAVE와 연결하세요. 42를 보내고 99를 받은 뒤 양방향으로 0을 교환합니다. RECEIVED=1, PEER BYTE=99, ZERO READY=1, ZERO BYTE=0은 유효한 0 데이터와 데이터 없음을 구분합니다. CGB 인스턴스 두 개는 두 번째 교환에 고속 클록을 사용합니다.",
+    "zh-TW": "請連接 BYTE SLAVE。傳送 42 並接收 99，接著雙向交換零。RECEIVED=1、PEER BYTE=99、ZERO READY=1、ZERO BYTE=0 可區分有效的零資料與無資料。兩個 CGB 實例在第二次交換使用高速時脈。",
+    "fr": "Reliez-vous à BYTE SLAVE. Envoyez 42 et recevez 99, puis échangez zéro dans les deux sens. RECEIVED=1, PEER BYTE=99, ZERO READY=1 et ZERO BYTE=0 distinguent une donnée zéro valide d’une absence de données. Deux instances CGB utilisent l’horloge rapide pour le second échange.",
+    "es": "Conecta con BYTE SLAVE. Envía 42 y recibe 99; después intercambia cero en ambos sentidos. RECEIVED=1, PEER BYTE=99, ZERO READY=1 y ZERO BYTE=0 distinguen un cero válido de la ausencia de datos. Dos instancias CGB usan reloj rápido para el segundo intercambio.",
+    "de": "Verbinden Sie sich mit BYTE SLAVE. Senden Sie 42, empfangen Sie 99 und tauschen Sie anschließend in beide Richtungen null aus. RECEIVED=1, PEER BYTE=99, ZERO READY=1 und ZERO BYTE=0 unterscheiden gültige Nulldaten von fehlenden Daten. Zwei CGB-Instanzen nutzen beim zweiten Austausch den schnellen Takt."
   },
   "link_Link_InitSlave_purpose": {
     "ja": "状態を初期化し、相手から来るクロックで通信する役割を選びます。",
     "en": "Reset state and select externally clocked communication.",
-    "zh-CN": "重置状态，并选择外部时钟通信。"
+    "zh-CN": "重置状态，并选择外部时钟通信。",
+    "ko": "상태를 초기화하고 외부 클록 통신을 선택합니다.",
+    "zh-TW": "重設狀態並選擇外部時脈通訊。",
+    "fr": "Réinitialise l’état et sélectionne la communication avec horloge externe.",
+    "es": "Reinicia el estado y selecciona comunicación con reloj externo.",
+    "de": "Setzt den Zustand zurück und wählt Kommunikation mit externem Takt."
   },
   "link_Link_InitSlave_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_example_raw_slave": {
     "ja": "同梱のBYTE MASTERがクロックを供給します。PEER BYTE=42、ZERO READY=1、ZERO BYTE=0になります。その後のEMPTY READも0になるため、空かどうかは準備フラグかTryReadの戻り値で判断します。",
     "en": "BYTE MASTER supplies the clocks. Expect PEER BYTE=42, ZERO READY=1 and ZERO BYTE=0. EMPTY READ is also zero afterwards, which is why readiness or TryRead’s return value is needed to distinguish an empty queue.",
-    "zh-CN": "BYTE MASTER 提供时钟。预期 PEER BYTE=42、ZERO READY=1、ZERO BYTE=0。随后 EMPTY READ 也为零，因此必须用就绪状态或 TryRead 返回值区分空队列。"
+    "zh-CN": "BYTE MASTER 提供时钟。预期 PEER BYTE=42、ZERO READY=1、ZERO BYTE=0。随后 EMPTY READ 也为零，因此必须用就绪状态或 TryRead 返回值区分空队列。",
+    "ko": "BYTE MASTER가 클록을 공급합니다. 예상값은 PEER BYTE=42, ZERO READY=1, ZERO BYTE=0입니다. 그 뒤 EMPTY READ도 0이므로 빈 큐와 구별하려면 준비 상태 또는 TryRead의 반환값이 필요합니다.",
+    "zh-TW": "由 BYTE MASTER 提供時脈。預期 PEER BYTE=42、ZERO READY=1、ZERO BYTE=0。之後 EMPTY READ 也為零，因此須用就緒狀態或 TryRead 的傳回值區分空佇列。",
+    "fr": "BYTE MASTER fournit l’horloge. Valeurs attendues : PEER BYTE=42, ZERO READY=1 et ZERO BYTE=0. EMPTY READ vaut aussi zéro ensuite ; il faut donc l’état de disponibilité ou le résultat de TryRead pour reconnaître une file vide.",
+    "es": "BYTE MASTER aporta el reloj. Se esperan PEER BYTE=42, ZERO READY=1 y ZERO BYTE=0. Después EMPTY READ también es cero, por lo que hace falta el estado de disponibilidad o el valor devuelto por TryRead para distinguir una cola vacía.",
+    "de": "BYTE MASTER liefert den Takt. Erwartet werden PEER BYTE=42, ZERO READY=1 und ZERO BYTE=0. EMPTY READ ergibt danach ebenfalls null. Deshalb ist die Bereitschaftsanzeige oder der Rückgabewert von TryRead nötig, um eine leere Warteschlange zu erkennen."
   },
   "link_note_irq": {
     "ja": "割り込みベクター0058hのハンドラーは別途必要です。ライブラリは自動登録しません。サンプルは転送開始前に許可を戻し、実際のCPU割り込み入口は検証していません。",
     "en": "Install a handler at vector 0058h separately; this library does not register one. The sample masks the source again before transferring and does not test a CPU interrupt entry stub.",
-    "zh-CN": "须另行在向量 0058h 安装处理程序；本库不会注册。示例在传送前再次屏蔽该中断源，不测试 CPU 中断入口代码。"
+    "zh-CN": "须另行在向量 0058h 安装处理程序；本库不会注册。示例在传送前再次屏蔽该中断源，不测试 CPU 中断入口代码。",
+    "ko": "벡터 0058h의 핸들러는 별도로 설치하세요. 이 라이브러리는 등록하지 않습니다. 예제는 전송 전에 소스를 다시 마스킹하며 CPU 인터럽트 진입 코드는 검사하지 않습니다.",
+    "zh-TW": "請另外在向量 0058h 安裝處理常式；此函式庫不會註冊。範例在傳輸前再次遮罩來源，不測試 CPU 中斷入口程式。",
+    "fr": "Installez séparément un gestionnaire au vecteur 0058h ; cette bibliothèque n’en enregistre pas. L’exemple masque à nouveau la source avant le transfert et ne teste pas le code d’entrée d’interruption CPU.",
+    "es": "Instala aparte un manejador en el vector 0058h; esta biblioteca no lo registra. El ejemplo vuelve a enmascarar la fuente antes de transferir y no prueba el código de entrada de interrupción de CPU.",
+    "de": "Installieren Sie den Handler für Vektor 0058h separat; die Bibliothek registriert keinen. Das Beispiel maskiert die Quelle vor der Übertragung erneut und prüft keinen CPU-Interrupt-Einstiegscode."
   },
   "link_Link_SetUseInterrupt_purpose": {
     "ja": "シリアル割り込みの許可ビットを設定し、保留中の要求を消します。",
     "en": "Set the serial interrupt-enable bit and clear a pending serial request.",
-    "zh-CN": "设置串行中断使能位，并清除待处理的串行请求。"
+    "zh-CN": "设置串行中断使能位，并清除待处理的串行请求。",
+    "ko": "시리얼 인터럽트 허용 비트를 설정하고 대기 중인 시리얼 요청을 지웁니다.",
+    "zh-TW": "設定序列中斷啟用位元，並清除待處理的序列請求。",
+    "fr": "Active le bit d’autorisation d’interruption série et efface une demande série en attente.",
+    "es": "Activa el bit de habilitación de interrupción serie y borra una petición serie pendiente.",
+    "de": "Setzt das Freigabebit des seriellen Interrupts und löscht eine ausstehende serielle Anforderung."
   },
   "link_Link_SetUseInterrupt_on": {
     "ja": "0で無効、0以外で有効にします。",
     "en": "Zero disables; any nonzero value enables.",
-    "zh-CN": "零表示禁用，任意非零值表示启用。"
+    "zh-CN": "零表示禁用，任意非零值表示启用。",
+    "ko": "0이면 비활성화하고 0이 아닌 값이면 활성화합니다.",
+    "zh-TW": "零表示停用，任何非零值表示啟用。",
+    "fr": "Zéro désactive ; toute valeur non nulle active.",
+    "es": "Cero deshabilita; cualquier valor distinto de cero habilita.",
+    "de": "Null deaktiviert; jeder andere Wert aktiviert."
   },
   "link_Link_SetUseInterrupt_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_note_fast": {
     "ja": "転送中の速度は変更しません。外部クロック側ではこの設定を使いません。CGB対応を調べる機能はなく、サンプルは両側を同じ機種で動かします。",
     "en": "Does not change an in-flight transfer. External-clock transfers ignore this setting. Hardware support is not checked; run both sample endpoints on matching hardware modes.",
-    "zh-CN": "不改变正在进行的传送。外部时钟传送忽略此设置。不检查硬件是否支持；示例两端应使用匹配的硬件模式。"
+    "zh-CN": "不改变正在进行的传送。外部时钟传送忽略此设置。不检查硬件是否支持；示例两端应使用匹配的硬件模式。",
+    "ko": "진행 중인 전송은 바꾸지 않습니다. 외부 클록 전송은 이 설정을 무시합니다. 하드웨어 지원 여부는 검사하지 않으므로 예제의 양쪽 끝을 서로 맞는 하드웨어 모드로 실행하세요.",
+    "zh-TW": "不會變更進行中的傳輸。外部時脈傳輸忽略此設定。不檢查硬體支援，請讓範例兩端使用相符的硬體模式。",
+    "fr": "Ne modifie pas un transfert en cours. Les transferts à horloge externe ignorent ce réglage. La prise en charge matérielle n’est pas vérifiée ; exécutez les deux extrémités de l’exemple dans des modes matériels compatibles.",
+    "es": "No cambia una transferencia en curso. Las transferencias con reloj externo ignoran este ajuste. No se comprueba la compatibilidad del hardware; ejecuta ambos extremos del ejemplo en modos de hardware compatibles.",
+    "de": "Ändert keine laufende Übertragung. Transfers mit externem Takt ignorieren diese Einstellung. Hardwareunterstützung wird nicht geprüft. Betreiben Sie beide Beispielendpunkte in zueinander passenden Hardwaremodi."
   },
   "link_Link_SetFastClock_purpose": {
     "ja": "以後の内部クロック転送でCGB高速ビットを使うか選びます。",
     "en": "Choose whether future internally clocked transfers use the CGB fast-clock bit.",
-    "zh-CN": "选择后续内部时钟传送是否使用 CGB 高速时钟位。"
+    "zh-CN": "选择后续内部时钟传送是否使用 CGB 高速时钟位。",
+    "ko": "앞으로의 내부 클록 전송에 CGB 고속 클록 비트를 사용할지 선택합니다.",
+    "zh-TW": "選擇後續內部時脈傳輸是否使用 CGB 高速時脈位元。",
+    "fr": "Choisit si les futurs transferts à horloge interne utilisent le bit d’horloge rapide CGB.",
+    "es": "Elige si las próximas transferencias con reloj interno usan el bit de reloj rápido de CGB.",
+    "de": "Wählt, ob künftige Transfers mit internem Takt das CGB-Schnelltaktbit verwenden."
   },
   "link_Link_SetFastClock_on": {
     "ja": "0で通常、0以外で高速を要求します。",
     "en": "Zero requests normal speed; nonzero requests fast speed.",
-    "zh-CN": "零请求普通速度，非零请求高速。"
+    "zh-CN": "零请求普通速度，非零请求高速。",
+    "ko": "0은 일반 속도, 0이 아닌 값은 고속을 요청합니다.",
+    "zh-TW": "零要求一般速度，非零要求高速。",
+    "fr": "Zéro demande la vitesse normale ; une valeur non nulle demande la vitesse rapide.",
+    "es": "Cero solicita velocidad normal; un valor distinto de cero solicita velocidad rápida.",
+    "de": "Null fordert normale, jeder andere Wert schnelle Übertragung an."
   },
   "link_Link_SetFastClock_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_note_busyside": {
     "ja": "単なる状態読み取りではありません。完了していればSBをキューへ入れ、受信準備フラグやエラーも変わり得ます。",
     "en": "This is not a passive query: a completed SB byte is enqueued, which can change readiness and error state.",
-    "zh-CN": "这不是被动查询：已完成的 SB 字节会入队，可能改变就绪状态和错误状态。"
+    "zh-CN": "这不是被动查询：已完成的 SB 字节会入队，可能改变就绪状态和错误状态。",
+    "ko": "단순 조회가 아닙니다. 완료된 SB 바이트를 큐에 넣으므로 수신 준비 상태와 오류 상태가 바뀔 수 있습니다.",
+    "zh-TW": "這不是被動查詢；已完成的 SB 位元組會加入佇列，可能改變資料就緒與錯誤狀態。",
+    "fr": "Ce n’est pas une requête passive : l’octet SB terminé est mis en file, ce qui peut modifier la disponibilité des données et l’état d’erreur.",
+    "es": "No es una consulta pasiva: el byte SB completado se añade a la cola, lo que puede cambiar la disponibilidad y el estado de error.",
+    "de": "Dies ist keine passive Abfrage: Ein fertig empfangenes SB-Byte wird eingereiht, wodurch sich Datenbereitschaft und Fehlerzustand ändern können."
   },
   "link_Link_IsBusy_purpose": {
     "ja": "完了済みの転送を一度取り込んでから、送受信中か返します。",
     "en": "Poll once for completion, then report whether an exchange remains active.",
-    "zh-CN": "轮询一次完成状态，然后报告交换是否仍在进行。"
+    "zh-CN": "轮询一次完成状态，然后报告交换是否仍在进行。",
+    "ko": "완료 여부를 한 번 폴링한 뒤 교환이 아직 진행 중인지 알려 줍니다.",
+    "zh-TW": "輪詢一次完成狀態，再回報交換是否仍在進行。",
+    "fr": "Interroge une fois la fin du transfert, puis indique si un échange reste actif.",
+    "es": "Consulta una vez si ha terminado y después indica si sigue activo un intercambio.",
+    "de": "Prüft einmal auf Abschluss und meldet danach, ob noch ein Austausch aktiv ist."
   },
   "link_Link_IsBusy_returns": {
     "ja": "1なら使用中、0ならアイドルです。",
     "en": "Returns 1 while busy, otherwise 0.",
-    "zh-CN": "忙时返回 1，否则返回 0。"
+    "zh-CN": "忙时返回 1，否则返回 0。",
+    "ko": "사용 중이면 1, 아니면 0을 반환합니다.",
+    "zh-TW": "忙碌時傳回 1，否則為 0。",
+    "fr": "Renvoie 1 si occupé, sinon 0.",
+    "es": "Devuelve 1 si está ocupado y 0 en otro caso.",
+    "de": "Gibt bei Belegung 1 zurück, sonst 0."
   },
   "link_note_nopoll": {
     "ja": "ハードウェアをポーリングしません。Link_Pollまたはシリアルハンドラーで転送完了を先に取り込みます。",
     "en": "Does not poll hardware. Collect completion through Link_Poll or the serial handler first.",
-    "zh-CN": "不轮询硬件。请先通过 Link_Poll 或串行处理程序收取完成结果。"
+    "zh-CN": "不轮询硬件。请先通过 Link_Poll 或串行处理程序收取完成结果。",
+    "ko": "하드웨어를 폴링하지 않습니다. 먼저 Link_Poll이나 시리얼 핸들러로 완료된 데이터를 수집하세요.",
+    "zh-TW": "不輪詢硬體。請先透過 Link_Poll 或序列處理常式收集已完成的資料。",
+    "fr": "N’interroge pas le matériel. Collectez d’abord le transfert terminé avec Link_Poll ou le gestionnaire série.",
+    "es": "No consulta el hardware. Recoge primero la finalización mediante Link_Poll o el manejador serie.",
+    "de": "Fragt die Hardware nicht ab. Übernehmen Sie den abgeschlossenen Transfer zuerst über Link_Poll oder den seriellen Handler."
   },
   "link_Link_HasByte_purpose": {
     "ja": "通常受信リングに未読バイトがあるか調べます。",
     "en": "Inspect whether the ordinary receive ring contains unread data.",
-    "zh-CN": "检查普通接收环形队列是否有未读数据。"
+    "zh-CN": "检查普通接收环形队列是否有未读数据。",
+    "ko": "일반 수신 링에 읽지 않은 데이터가 있는지 확인합니다.",
+    "zh-TW": "檢查一般接收環狀緩衝區中是否有未讀資料。",
+    "fr": "Vérifie si le tampon circulaire général de réception contient des données non lues.",
+    "es": "Comprueba si el búfer circular general de recepción contiene datos sin leer.",
+    "de": "Prüft, ob der allgemeine Empfangsring ungelesene Daten enthält."
   },
   "link_Link_HasByte_returns": {
     "ja": "未読があれば1、空なら0です。",
     "en": "Returns 1 when data is queued, otherwise 0.",
-    "zh-CN": "队列中有数据时返回 1，否则返回 0。"
+    "zh-CN": "队列中有数据时返回 1，否则返回 0。",
+    "ko": "큐에 데이터가 있으면 1, 없으면 0을 반환합니다.",
+    "zh-TW": "佇列中有資料時傳回 1，否則為 0。",
+    "fr": "Renvoie 1 si des données sont en file, sinon 0.",
+    "es": "Devuelve 1 si hay datos en cola y 0 en otro caso.",
+    "de": "Gibt bei Daten in der Warteschlange 1 zurück, sonst 0."
   },
   "link_Link_LastError_purpose": {
     "ja": "最後に記録された通信エラーを消さずに取得します。",
     "en": "Read the most recently latched link error without clearing it.",
-    "zh-CN": "读取最近一次锁存的通信错误，不清除它。"
+    "zh-CN": "读取最近一次锁存的通信错误，不清除它。",
+    "ko": "가장 최근에 저장된 링크 오류를 지우지 않고 읽습니다.",
+    "zh-TW": "讀取最近鎖存的連線錯誤，不將其清除。",
+    "fr": "Lit la dernière erreur de liaison mémorisée sans l’effacer.",
+    "es": "Lee el último error de enlace retenido sin borrarlo.",
+    "de": "Liest den zuletzt gespeicherten Verbindungsfehler, ohne ihn zu löschen."
   },
   "link_Link_LastError_returns": {
     "ja": "現在のエラーコード0～5です。",
     "en": "Returns the current error code, 0..5.",
-    "zh-CN": "返回当前错误码，范围为 0..5。"
+    "zh-CN": "返回当前错误码，范围为 0..5。",
+    "ko": "현재 오류 코드 0~5를 반환합니다.",
+    "zh-TW": "傳回目前錯誤碼，範圍為 0～5。",
+    "fr": "Renvoie le code d’erreur actuel, de 0 à 5.",
+    "es": "Devuelve el código de error actual, de 0 a 5.",
+    "de": "Gibt den aktuellen Fehlercode von 0 bis 5 zurück."
   },
   "link_example_packet_master": {
     "ja": "コマンド49と3バイト7/42/255を送り、送信直後に元の配列を変更します。QUEUED=0、重複開始はSECOND SEND=1です。この使用中エラーは送信成功後も残り、ClearErrorで0にします。受信側のPAYLOAD 2=42が、内容をコピーしていることの確認になります。",
     "en": "Send command 49 with payload 7/42/255, then change the source array. QUEUED=0 accepts the send; SECOND SEND=1 rejects a second start. That busy error remains latched until ClearError. PAYLOAD 2=42 on the receiving endpoint proves that the queued payload is an owned copy.",
-    "zh-CN": "发送命令 49 和有效载荷 7/42/255，然后修改源数组。QUEUED=0 表示接受发送；SECOND SEND=1 表示拒绝第二次启动。该忙错误会保持锁存，直到调用 ClearError。接收端的 PAYLOAD 2=42 证明队列持有有效载荷的独立副本。"
+    "zh-CN": "发送命令 49 和有效载荷 7/42/255，然后修改源数组。QUEUED=0 表示接受发送；SECOND SEND=1 表示拒绝第二次启动。该忙错误会保持锁存，直到调用 ClearError。接收端的 PAYLOAD 2=42 证明队列持有有效载荷的独立副本。",
+    "ko": "명령 49와 페이로드 7/42/255를 보낸 뒤 원본 배열을 바꿉니다. QUEUED=0은 전송 수락, SECOND SEND=1은 두 번째 시작 요청 거부를 나타냅니다. 사용 중 오류는 ClearError까지 유지됩니다. 수신 측의 PAYLOAD 2=42는 큐에 넣은 페이로드가 별도로 복사되어 있음을 입증합니다.",
+    "zh-TW": "傳送命令 49 與有效負載 7/42/255，然後修改來源陣列。QUEUED=0 表示接受傳送，SECOND SEND=1 表示拒絕第二次啟動。忙碌錯誤會保留至 ClearError。接收端的 PAYLOAD 2=42 證明排入佇列的有效負載是獨立副本。",
+    "fr": "Envoyez la commande 49 avec les données 7/42/255, puis modifiez le tableau source. QUEUED=0 accepte l’envoi ; SECOND SEND=1 refuse un second démarrage. L’erreur d’occupation reste mémorisée jusqu’à ClearError. PAYLOAD 2=42 chez le destinataire prouve que les données en file sont une copie détenue par la bibliothèque.",
+    "es": "Envía la orden 49 con carga útil 7/42/255 y luego cambia el array de origen. QUEUED=0 acepta el envío; SECOND SEND=1 rechaza un segundo inicio. El error de ocupado permanece hasta ClearError. PAYLOAD 2=42 en el receptor demuestra que la carga en cola es una copia propia.",
+    "de": "Senden Sie Befehl 49 mit Nutzdaten 7/42/255 und ändern Sie danach das Quellarray. QUEUED=0 nimmt den Versand an, SECOND SEND=1 weist einen zweiten Start ab. Der Belegtfehler bleibt bis ClearError gespeichert. PAYLOAD 2=42 auf der Empfangsseite belegt, dass die Bibliothek eine eigene Kopie der eingereihten Nutzdaten hält."
   },
   "link_note_clear": {
     "ja": "転送、キュー、パケットの状態はそのままです。停止が必要ならLink_Cancel、全体を破棄するなら初期化を使います。",
     "en": "Transfers, queues and packet state remain unchanged. Use Link_Cancel to stop the byte transfer, or initialize again to discard all state.",
-    "zh-CN": "传送、队列和数据包状态保持不变。用 Link_Cancel 停止字节传送，或重新初始化以丢弃全部状态。"
+    "zh-CN": "传送、队列和数据包状态保持不变。用 Link_Cancel 停止字节传送，或重新初始化以丢弃全部状态。",
+    "ko": "전송, 큐, 패킷 상태는 그대로 유지됩니다. 바이트 전송을 멈추려면 Link_Cancel을, 모든 상태를 버리려면 재초기화를 사용하세요.",
+    "zh-TW": "傳輸、佇列及封包狀態不變。若要停止位元組傳輸，請用 Link_Cancel；若要捨棄全部狀態，請重新初始化。",
+    "fr": "Transferts, files et état des paquets restent inchangés. Utilisez Link_Cancel pour arrêter le transfert d’octet, ou réinitialisez pour supprimer tout l’état.",
+    "es": "Las transferencias, colas y estado de paquetes no cambian. Usa Link_Cancel para detener la transferencia de bytes o vuelve a inicializar para descartar todo el estado.",
+    "de": "Transfers, Warteschlangen und Paketzustand bleiben unverändert. Stoppen Sie den Bytetransfer mit Link_Cancel oder initialisieren Sie erneut, um den gesamten Zustand zu verwerfen."
   },
   "link_Link_ClearError_purpose": {
     "ja": "エラー表示だけを0に戻します。",
     "en": "Clear only the error latch.",
-    "zh-CN": "只清除错误锁存值。"
+    "zh-CN": "只清除错误锁存值。",
+    "ko": "저장된 오류만 지웁니다.",
+    "zh-TW": "只清除鎖存的錯誤。",
+    "fr": "Efface uniquement l’erreur mémorisée.",
+    "es": "Borra únicamente el error retenido.",
+    "de": "Löscht nur den gespeicherten Fehler."
   },
   "link_Link_ClearError_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_note_start": {
     "ja": "外部クロックの役割では相手がクロックを送るまで完了しません。使用中の再呼び出しは、送信中のバイトを置き換えません。",
     "en": "An external-clock endpoint waits for the other side to supply clocks. A busy rejection does not replace the byte already in flight.",
-    "zh-CN": "外部时钟端等待另一端提供时钟。忙时拒绝不会替换已经在传送的字节。"
+    "zh-CN": "外部时钟端等待另一端提供时钟。忙时拒绝不会替换已经在传送的字节。",
+    "ko": "외부 클록 끝점은 상대가 클록을 공급할 때까지 기다립니다. 사용 중이라는 이유로 거부해도 이미 전송 중인 바이트를 바꾸지는 않습니다.",
+    "zh-TW": "外部時脈端點會等待另一端提供時脈。忙碌時拒絕請求不會取代正在傳輸的位元組。",
+    "fr": "Une extrémité à horloge externe attend les impulsions de l’autre côté. Un refus pour occupation ne remplace pas l’octet déjà en cours de transfert.",
+    "es": "Un extremo con reloj externo espera a que el otro aporte el reloj. Un rechazo por ocupado no sustituye el byte que ya está en tránsito.",
+    "de": "Ein Endpunkt mit externem Takt wartet auf Takte der Gegenseite. Eine Abweisung wegen Belegung ersetzt das bereits übertragene Byte nicht."
   },
   "link_Link_BeginTransfer_purpose": {
     "ja": "1バイトをSBへ置き、1回の全二重交換を開始または待ち受けます。",
     "en": "Load SB and start or arm one full-duplex byte exchange.",
-    "zh-CN": "写入 SB，并启动或准备一次全双工字节交换。"
+    "zh-CN": "写入 SB，并启动或准备一次全双工字节交换。",
+    "ko": "SB를 설정하고 전이중 바이트 교환 하나를 시작하거나 대기 상태로 준비합니다.",
+    "zh-TW": "載入 SB，並啟動或預備一次全雙工位元組交換。",
+    "fr": "Charge SB et démarre ou arme un échange d’octet en duplex intégral.",
+    "es": "Carga SB e inicia o prepara un intercambio de un byte en dúplex completo.",
+    "de": "Lädt SB und startet einen Vollduplex-Byteaustausch oder versetzt ihn in Bereitschaft."
   },
   "link_Link_BeginTransfer_out": {
     "ja": "相手へ送る8ビット値。受信だけが目的でも値を1つ送ります。",
     "en": "Eight-bit outgoing value; every exchange sends a byte even if only reception matters.",
-    "zh-CN": "要发送的八位值；即使只关心接收，每次交换也会发送一个字节。"
+    "zh-CN": "要发送的八位值；即使只关心接收，每次交换也会发送一个字节。",
+    "ko": "송신할 8비트 값입니다. 수신만 필요하더라도 모든 교환은 바이트 하나를 전송합니다.",
+    "zh-TW": "要送出的八位元值。即使只在意接收，每次交換仍會送出一個位元組。",
+    "fr": "Valeur sortante sur huit bits ; chaque échange envoie un octet, même si seule la réception vous intéresse.",
+    "es": "Valor saliente de ocho bits; todo intercambio envía un byte aunque solo interese recibir.",
+    "de": "Ausgehender Acht-Bit-Wert. Jeder Austausch sendet ein Byte, auch wenn nur der Empfang benötigt wird."
   },
   "link_Link_BeginTransfer_returns": {
     "ja": "開始できれば0、すでに使用中なら1です。",
     "en": "Returns 0 when started/armed, or 1 if already busy.",
-    "zh-CN": "成功启动/准备时返回 0；已忙时返回 1。"
+    "zh-CN": "成功启动/准备时返回 0；已忙时返回 1。",
+    "ko": "시작하거나 준비했으면 0, 이미 사용 중이면 1을 반환합니다.",
+    "zh-TW": "已啟動或預備時傳回 0，已忙碌時傳回 1。",
+    "fr": "Renvoie 0 si le transfert est démarré ou armé, et 1 s’il est déjà occupé.",
+    "es": "Devuelve 0 si se inicia o prepara, y 1 si ya está ocupado.",
+    "de": "Gibt bei Start oder Bereitschaft 0 zurück, bei bereits belegter Verbindung 1."
   },
   "link_note_poll": {
     "ja": "1回の呼び出しで待ち続けることはありません。ソフトウェア上でアイドルなら何もしません。タイムアウトも設定しません。",
     "en": "A call does not block. It does nothing when software state is idle and does not implement a timeout.",
-    "zh-CN": "调用不阻塞。软件状态空闲时不执行操作，也不实现超时。"
+    "zh-CN": "调用不阻塞。软件状态空闲时不执行操作，也不实现超时。",
+    "ko": "호출은 블로킹하지 않습니다. 소프트웨어 상태가 유휴이면 아무것도 하지 않으며 타임아웃 기능도 없습니다.",
+    "zh-TW": "呼叫不會阻塞。軟體狀態為閒置時不做任何事，也未實作逾時。",
+    "fr": "L’appel ne bloque pas. Il ne fait rien si l’état logiciel est inactif et n’implémente aucun délai d’expiration.",
+    "es": "La llamada no bloquea. No hace nada si el estado por software está inactivo y no implementa tiempo de espera máximo.",
+    "de": "Der Aufruf blockiert nicht. Bei inaktivem Softwarezustand tut er nichts; eine Timeoutfunktion ist nicht enthalten."
   },
   "link_Link_Poll_purpose": {
     "ja": "SCの開始ビットが消えた転送だけを取り込み、受信キューへ追加します。",
     "en": "Collect a busy transfer only after SC clears its start bit, and enqueue the received byte.",
-    "zh-CN": "仅在 SC 启动位清零后收取忙传送的结果，并将接收字节入队。"
+    "zh-CN": "仅在 SC 启动位清零后收取忙传送的结果，并将接收字节入队。",
+    "ko": "SC의 시작 비트가 해제된 뒤에만 진행 중이던 전송을 수집하고 수신 바이트를 큐에 넣습니다.",
+    "zh-TW": "只有在 SC 清除啟動位元後，才收集原先進行中的傳輸，將收到的位元組排入佇列。",
+    "fr": "Collecte un transfert en cours uniquement après l’effacement du bit de démarrage de SC, puis met l’octet reçu en file.",
+    "es": "Recoge una transferencia activa solo después de que SC borre su bit de inicio y añade el byte recibido a la cola.",
+    "de": "Übernimmt einen laufenden Transfer erst nach dem Löschen des Startbits in SC und reiht das empfangene Byte ein."
   },
   "link_Link_Poll_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_note_cancel": {
     "ja": "SCを0にし、使用中とシリアル要求を消します。受信済みバイト、パケット状態、エラーは消しません。プロトコルを最初からやり直す場合は初期化も行います。",
     "en": "Writes SC=0 and clears busy and serial-request state. Received bytes, packet state and errors remain. Reinitialize as well when restarting the protocol from scratch.",
-    "zh-CN": "写入 SC=0，清除忙状态及串行请求状态。保留已接收字节、数据包状态和错误。若从头重新启动协议，还应重新初始化。"
+    "zh-CN": "写入 SC=0，清除忙状态及串行请求状态。保留已接收字节、数据包状态和错误。若从头重新启动协议，还应重新初始化。",
+    "ko": "SC=0을 기록하고 사용 중 상태와 시리얼 요청 상태를 지웁니다. 수신 바이트, 패킷 상태, 오류는 남습니다. 프로토콜을 처음부터 재시작하려면 재초기화도 하세요.",
+    "zh-TW": "寫入 SC=0，並清除忙碌及序列請求狀態。已接收位元組、封包狀態及錯誤會保留。若要從頭重啟協定，也須重新初始化。",
+    "fr": "Écrit SC=0 et efface les états d’occupation et de demande série. Les octets reçus, l’état des paquets et les erreurs sont conservés. Réinitialisez également si vous recommencez le protocole depuis le début.",
+    "es": "Escribe SC=0 y borra los estados de ocupado y petición serie. Conserva bytes recibidos, estado de paquetes y errores. Vuelve a inicializar también si reinicias el protocolo desde cero.",
+    "de": "Schreibt SC=0 und löscht Belegt- und serielle Anforderungszustände. Empfangene Bytes, Paketzustand und Fehler bleiben bestehen. Initialisieren Sie beim vollständigen Protokollneustart zusätzlich neu."
   },
   "link_Link_Cancel_purpose": {
     "ja": "実行中または外部クロック待ちのバイト転送を停止します。",
     "en": "Stop the active or externally clocked byte transfer.",
-    "zh-CN": "停止活动中的或等待外部时钟的字节传送。"
+    "zh-CN": "停止活动中的或等待外部时钟的字节传送。",
+    "ko": "활성 상태이거나 외부 클록을 기다리는 바이트 전송을 멈춥니다.",
+    "zh-TW": "停止正在進行或等待外部時脈的位元組傳輸。",
+    "fr": "Arrête le transfert d’octet actif ou en attente d’horloge externe.",
+    "es": "Detiene la transferencia de byte activa o a la espera de reloj externo.",
+    "de": "Stoppt den aktiven oder auf externen Takt wartenden Bytetransfer."
   },
   "link_Link_Cancel_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_note_dispatch": {
     "ja": "この関数自身はSCの完了ビットを調べません。転送がまだ進行中のタイマー割り込み等から呼ばないでください。例は実際のIF.serial要求をCPU割り込み禁止中に確認して明示呼び出しし、関数本体を検証します。ベクターの設置例ではありません。",
     "en": "The function does not check SC for completion. Do not call it from an unrelated timer interrupt while serial transfer is active. This example explicitly dispatches after a real IF.serial request with the serial CPU IRQ source masked; it tests the body, not vector installation.",
-    "zh-CN": "函数不检查 SC 是否完成。串行传送仍活动时，不要从无关的定时器中断调用。示例在真实 IF.serial 请求出现后、串行 CPU IRQ 源被屏蔽的情况下显式执行它；测试的是主体，不是向量安装。"
+    "zh-CN": "函数不检查 SC 是否完成。串行传送仍活动时，不要从无关的定时器中断调用。示例在真实 IF.serial 请求出现后、串行 CPU IRQ 源被屏蔽的情况下显式执行它；测试的是主体，不是向量安装。",
+    "ko": "함수는 SC의 완료 여부를 확인하지 않습니다. 시리얼 전송 중에 관련 없는 타이머 인터럽트에서 호출하지 마세요. 예제는 실제 IF.serial 요청 후 시리얼 CPU IRQ 소스는 마스킹한 채 명시적으로 실행합니다. 벡터 설치가 아니라 핸들러 본체를 검사합니다.",
+    "zh-TW": "函式不檢查 SC 是否完成。序列傳輸中不可從無關的計時器中斷呼叫。範例在真正的 IF.serial 請求後，保持序列 CPU IRQ 來源被遮罩，再明確執行；測試的是本體，不是向量安裝。",
+    "fr": "La fonction ne vérifie pas la fin du transfert dans SC. Ne l’appelez pas depuis une interruption de temporisateur sans rapport pendant un transfert série. Cet exemple appelle explicitement le corps après une véritable demande IF.serial, avec la source IRQ série CPU masquée ; il teste le corps, pas l’installation du vecteur.",
+    "es": "La función no comprueba en SC si ha terminado. No la llames desde una interrupción de temporizador ajena mientras haya una transferencia serie activa. El ejemplo ejecuta explícitamente el cuerpo tras una petición IF.serial real, con la fuente IRQ serie de CPU enmascarada; prueba el cuerpo, no la instalación del vector.",
+    "de": "Die Funktion prüft SC nicht auf Abschluss. Rufen Sie sie bei aktivem seriellen Transfer nicht aus einem sachfremden Timerinterrupt auf. Das Beispiel führt sie nach einer echten IF.serial-Anforderung ausdrücklich aus, während die serielle CPU-IRQ-Quelle maskiert ist. Geprüft wird der Funktionskörper, nicht die Vektorinstallation."
   },
   "link_Link_OnSerialIRQ_purpose": {
     "ja": "シリアル要求を確認済みのハンドラーから、完了したバイトを取り込みます。",
     "en": "Collect a completed byte from a handler that has identified a serial request.",
-    "zh-CN": "由已经确认串行请求的处理程序收取一个完成的字节。"
+    "zh-CN": "由已经确认串行请求的处理程序收取一个完成的字节。",
+    "ko": "시리얼 요청임을 확인한 핸들러에서 완료된 바이트를 수집합니다.",
+    "zh-TW": "從已辨識出序列請求的處理常式收集完成的位元組。",
+    "fr": "Collecte un octet terminé depuis un gestionnaire ayant identifié une demande série.",
+    "es": "Recoge un byte completado desde un manejador que ha identificado una petición serie.",
+    "de": "Übernimmt ein abgeschlossenes Byte aus einem Handler, der eine serielle Anforderung erkannt hat."
   },
   "link_Link_OnSerialIRQ_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_Link_TryReadByte_purpose": {
     "ja": "通常受信リングの先頭を、待たずに1バイト取り出します。",
     "en": "Pop one byte from the ordinary receive ring without waiting.",
-    "zh-CN": "从普通接收环形队列弹出一个字节，不等待。"
+    "zh-CN": "从普通接收环形队列弹出一个字节，不等待。",
+    "ko": "기다리지 않고 일반 수신 링에서 바이트 하나를 꺼냅니다.",
+    "zh-TW": "不等待，直接從一般接收環狀緩衝區取出一個位元組。",
+    "fr": "Extrait un octet du tampon général de réception sans attendre.",
+    "es": "Extrae un byte del búfer general de recepción sin esperar.",
+    "de": "Entnimmt dem allgemeinen Empfangsring ohne Warten ein Byte."
   },
   "link_Link_TryReadByte_out": {
     "ja": "受信値を書き込む1バイトの領域。0なら読み捨てます。",
     "en": "Writable byte destination; null discards the byte.",
-    "zh-CN": "可写字节目标；为 null 时丢弃字节。"
+    "zh-CN": "可写字节目标；为 null 时丢弃字节。",
+    "ko": "쓰기 가능한 바이트 대상입니다. null이면 바이트를 버립니다.",
+    "zh-TW": "可寫入的位元組目的地；null 表示捨棄該位元組。",
+    "fr": "Destination d’un octet inscriptible ; null abandonne l’octet.",
+    "es": "Destino escribible de un byte; null descarta el byte.",
+    "de": "Beschreibbares Byteziel; bei null wird das Byte verworfen."
   },
   "link_Link_TryReadByte_returns": {
     "ja": "取り出せれば1、空なら0。空の場合outは変更しません。",
     "en": "Returns 1 when popped, 0 when empty; an empty read leaves out unchanged.",
-    "zh-CN": "弹出成功返回 1，队列为空时返回 0；空读取不改变 out。"
+    "zh-CN": "弹出成功返回 1，队列为空时返回 0；空读取不改变 out。",
+    "ko": "꺼냈으면 1, 비어 있으면 0을 반환합니다. 빈 큐를 읽어도 out은 바뀌지 않습니다.",
+    "zh-TW": "取出成功傳回 1，為空時傳回 0；空讀取不變更 out。",
+    "fr": "Renvoie 1 si un octet est extrait, 0 si le tampon est vide ; une lecture à vide laisse out inchangé.",
+    "es": "Devuelve 1 si extrae un byte y 0 si está vacío; una lectura vacía no modifica out.",
+    "de": "Gibt bei Entnahme 1 zurück, bei leerem Ring 0. Ein leerer Lesezugriff lässt out unverändert."
   },
   "link_note_zero": {
     "ja": "0を受信したのか空なのか、この戻り値だけでは判断できません。TryReadByteの成功値、または読み取り前のHasByteを使います。",
     "en": "The return value alone cannot distinguish a received zero from an empty queue. Use TryReadByte’s success flag, or HasByte before reading.",
-    "zh-CN": "仅凭返回值无法区分收到的零与空队列。请使用 TryReadByte 的成功标志，或先调用 HasByte。"
+    "zh-CN": "仅凭返回值无法区分收到的零与空队列。请使用 TryReadByte 的成功标志，或先调用 HasByte。",
+    "ko": "반환값만으로는 수신한 0과 빈 큐를 구별할 수 없습니다. TryReadByte의 성공 플래그를 사용하거나 읽기 전에 HasByte로 확인하세요.",
+    "zh-TW": "只靠傳回值無法區分收到零與空佇列。請使用 TryReadByte 的成功旗標，或讀取前先用 HasByte 檢查。",
+    "fr": "La valeur renvoyée seule ne distingue pas un zéro reçu d’une file vide. Utilisez l’indicateur de succès de TryReadByte ou HasByte avant de lire.",
+    "es": "El valor devuelto por sí solo no distingue un cero recibido de una cola vacía. Usa la bandera de éxito de TryReadByte o consulta HasByte antes de leer.",
+    "de": "Der Rückgabewert allein unterscheidet kein empfangenes Nullbyte von einer leeren Warteschlange. Nutzen Sie das Erfolgsflag von TryReadByte oder prüfen Sie vor dem Lesen mit HasByte."
   },
   "link_Link_ReadByte_purpose": {
     "ja": "通常受信リングから1バイトを値として取り出します。",
     "en": "Return one byte popped from the ordinary receive ring.",
-    "zh-CN": "返回从普通接收环形队列弹出的一个字节。"
+    "zh-CN": "返回从普通接收环形队列弹出的一个字节。",
+    "ko": "일반 수신 링에서 꺼낸 바이트 하나를 반환합니다.",
+    "zh-TW": "傳回從一般接收環狀緩衝區取出的一個位元組。",
+    "fr": "Renvoie un octet extrait du tampon général de réception.",
+    "es": "Devuelve un byte extraído del búfer general de recepción.",
+    "de": "Gibt ein aus dem allgemeinen Empfangsring entnommenes Byte zurück."
   },
   "link_Link_ReadByte_returns": {
     "ja": "受信値を返します。空の場合も0です。",
     "en": "Returns the received byte; an empty queue also returns zero.",
-    "zh-CN": "返回接收字节；空队列也返回零。"
+    "zh-CN": "返回接收字节；空队列也返回零。",
+    "ko": "수신 바이트를 반환합니다. 큐가 비어 있어도 0을 반환합니다.",
+    "zh-TW": "傳回接收的位元組；佇列為空時也傳回零。",
+    "fr": "Renvoie l’octet reçu ; une file vide renvoie aussi zéro.",
+    "es": "Devuelve el byte recibido; una cola vacía también devuelve cero.",
+    "de": "Gibt das empfangene Byte zurück; bei leerer Warteschlange ebenfalls null."
   },
   "link_note_wait": {
     "ja": "LCDを動作させて使います。時間切れはエラー2を記録し、outを変更しません。転送そのものは停止しないため、終了する場合はCancelします。",
     "en": "Use with the LCD running. Timeout latches error 2 and leaves out unchanged. The transfer itself is not cancelled; call Cancel if abandoning it.",
-    "zh-CN": "请在 LCD 运行时使用。超时会锁存错误 2，out 保持不变。传送本身不会取消；若放弃传送，请调用 Cancel。"
+    "zh-CN": "请在 LCD 运行时使用。超时会锁存错误 2，out 保持不变。传送本身不会取消；若放弃传送，请调用 Cancel。",
+    "ko": "LCD가 동작 중일 때 사용하세요. 시간 초과는 오류 2를 저장하고 out을 그대로 둡니다. 전송 자체를 취소하지는 않으므로 포기한다면 Cancel을 호출하세요.",
+    "zh-TW": "請在 LCD 運作時使用。逾時會鎖存錯誤 2，且不變更 out。傳輸本身不會取消；若放棄傳輸，請呼叫 Cancel。",
+    "fr": "Utilisez cette fonction avec le LCD actif. L’expiration mémorise l’erreur 2 et laisse out inchangé. Le transfert lui-même n’est pas annulé ; appelez Cancel si vous l’abandonnez.",
+    "es": "Úsalo con el LCD activo. El tiempo agotado retiene el error 2 y deja out intacto. La transferencia no se cancela; llama a Cancel si la abandonas.",
+    "de": "Verwenden Sie die Funktion bei laufendem LCD. Ein Timeout speichert Fehler 2 und lässt out unverändert. Der Transfer selbst wird nicht abgebrochen. Rufen Sie Cancel auf, wenn Sie ihn aufgeben."
   },
   "link_Link_WaitByte_purpose": {
     "ja": "直ちにポーリングし、必要ならVBlank単位で期限付き受信待ちをします。",
     "en": "Poll immediately, then wait for a byte with a VBlank-based limit.",
-    "zh-CN": "立即轮询一次，再按 VBlank 次数限制等待字节。"
+    "zh-CN": "立即轮询一次，再按 VBlank 次数限制等待字节。",
+    "ko": "즉시 폴링한 뒤 VBlank 기준 제한 시간 내에서 바이트를 기다립니다.",
+    "zh-TW": "立即輪詢，再以 VBlank 為等待上限的基準等候一個位元組。",
+    "fr": "Interroge immédiatement, puis attend un octet avec une limite fondée sur les VBlank.",
+    "es": "Consulta inmediatamente y espera un byte con un límite basado en VBlank.",
+    "de": "Fragt sofort ab und wartet danach mit einer VBlank-basierten Grenze auf ein Byte."
   },
   "link_Link_WaitByte_timeout_frames": {
     "ja": "最大のVBlank待ち回数。0でも最初のポーリングと取得を行います。",
     "en": "Maximum number of VBlank waits. Zero still performs the initial poll and read.",
-    "zh-CN": "最多等待 VBlank 的次数。零仍会执行首次轮询和读取。"
+    "zh-CN": "最多等待 VBlank 的次数。零仍会执行首次轮询和读取。",
+    "ko": "VBlank 대기 횟수의 최댓값입니다. 0이어도 최초 폴링과 읽기는 수행합니다.",
+    "zh-TW": "VBlank 等待次數上限。即使為零，仍會先輪詢並讀取一次。",
+    "fr": "Nombre maximal d’attentes VBlank. Zéro effectue tout de même l’interrogation et la lecture initiales.",
+    "es": "Número máximo de esperas VBlank. Cero aun así realiza la consulta y lectura iniciales.",
+    "de": "Maximale Anzahl von VBlank-Wartevorgängen. Auch null führt die erste Abfrage und den ersten Leseversuch aus."
   },
   "link_Link_WaitByte_out": {
     "ja": "必須の1バイト書き込み先。0なら待たず、エラーも変更せず0を返します。",
     "en": "Required writable byte. Null returns zero immediately without changing the error latch.",
-    "zh-CN": "必须提供的可写字节。为 null 时立即返回零，不改变错误锁存值。"
+    "zh-CN": "必须提供的可写字节。为 null 时立即返回零，不改变错误锁存值。",
+    "ko": "쓰기 가능한 바이트가 필수입니다. null이면 저장된 오류를 바꾸지 않고 즉시 0을 반환합니다.",
+    "zh-TW": "必須提供可寫入位元組。null 會立即傳回零，不變更已鎖存錯誤。",
+    "fr": "Octet inscriptible obligatoire. null renvoie immédiatement zéro sans modifier l’erreur mémorisée.",
+    "es": "Byte escribible obligatorio. null devuelve cero de inmediato sin cambiar el error retenido.",
+    "de": "Ein beschreibbares Byte ist erforderlich. Null liefert sofort null zurück, ohne den gespeicherten Fehler zu ändern."
   },
   "link_Link_WaitByte_returns": {
     "ja": "取得できれば1。時間切れ、またはout=0なら0です。",
     "en": "Returns 1 on receipt, 0 on timeout or a null output.",
-    "zh-CN": "收到数据返回 1；超时或输出为 null 时返回 0。"
+    "zh-CN": "收到数据返回 1；超时或输出为 null 时返回 0。",
+    "ko": "수신하면 1, 시간 초과 또는 null 출력이면 0을 반환합니다.",
+    "zh-TW": "收到資料傳回 1，逾時或輸出為 null 時傳回 0。",
+    "fr": "Renvoie 1 à la réception, 0 en cas d’expiration ou de sortie nulle.",
+    "es": "Devuelve 1 al recibir y 0 si se agota el tiempo o la salida es null.",
+    "de": "Gibt bei Empfang 1 zurück, bei Timeout oder Null-Ausgabe 0."
   },
   "link_note_accepted": {
     "ja": "0は送信の受付です。相手による受信やACKの完了を意味しません。送信元配列は受付後に再利用できます。",
     "en": "Zero means queued, not received or acknowledged by the peer. The source array may be reused after acceptance.",
-    "zh-CN": "零表示已入队，不表示对端已经接收或确认。接受后可重用源数组。"
+    "zh-CN": "零表示已入队，不表示对端已经接收或确认。接受后可重用源数组。",
+    "ko": "0은 큐에 들어갔다는 뜻이며 상대가 수신하거나 확인했다는 뜻은 아닙니다. 수락 후 원본 배열은 재사용할 수 있습니다.",
+    "zh-TW": "零表示已排入佇列，不代表對端已接收或確認。接受後可重複使用來源陣列。",
+    "fr": "Zéro signifie mis en file, pas reçu ni acquitté par le correspondant. Le tableau source peut être réutilisé après acceptation.",
+    "es": "Cero significa encolado, no recibido ni confirmado por el interlocutor. Puedes reutilizar el array de origen tras la aceptación.",
+    "de": "Null bedeutet eingereiht, nicht von der Gegenstelle empfangen oder bestätigt. Nach der Annahme darf das Quellarray wiederverwendet werden."
   },
   "link_Link_SendPacket_purpose": {
     "ja": "送信内容を内部バッファへコピーし、パケット送信を予約します。",
     "en": "Copy the payload into owned storage and schedule packet transmission.",
-    "zh-CN": "将有效载荷复制到库持有的存储空间，并安排数据包发送。"
+    "zh-CN": "将有效载荷复制到库持有的存储空间，并安排数据包发送。",
+    "ko": "페이로드를 내부 소유 저장 공간에 복사하고 패킷 전송을 예약합니다.",
+    "zh-TW": "將有效負載複製到內部持有的儲存空間，並排程封包傳送。",
+    "fr": "Copie les données utiles dans un stockage détenu par la bibliothèque et programme l’envoi du paquet.",
+    "es": "Copia la carga útil a almacenamiento propio y programa la transmisión del paquete.",
+    "de": "Kopiert die Nutzdaten in eigenen Speicher und plant den Paketversand ein."
   },
   "link_Link_SendPacket_data": {
     "ja": "lenバイトを読み取る元。len=0のときだけ0を渡せます。",
     "en": "Readable source of len bytes; may be null only when len is zero.",
-    "zh-CN": "含 len 个字节的可读源数据；只有 len 为零时才可为 null。"
+    "zh-CN": "含 len 个字节的可读源数据；只有 len 为零时才可为 null。",
+    "ko": "len바이트를 읽을 수 있는 원본입니다. len이 0일 때만 null을 허용합니다.",
+    "zh-TW": "可讀取 len 個位元組的來源；只有 len 為零時才可為 null。",
+    "fr": "Source lisible sur len octets ; peut être nulle uniquement si len vaut zéro.",
+    "es": "Origen legible de len bytes; solo puede ser null si len es cero.",
+    "de": "Über len Bytes lesbare Quelle; nur bei len gleich null darf sie null sein."
   },
   "link_Link_SendPacket_len": {
     "ja": "内容の長さ0～24バイト。",
     "en": "Payload length in bytes, 0..24.",
-    "zh-CN": "有效载荷长度，范围为 0..24 字节。"
+    "zh-CN": "有效载荷长度，范围为 0..24 字节。",
+    "ko": "페이로드 길이이며 바이트 단위로 0~24입니다.",
+    "zh-TW": "有效負載長度，以位元組為單位，範圍為 0～24。",
+    "fr": "Longueur des données utiles en octets, de 0 à 24.",
+    "es": "Longitud de la carga útil en bytes, de 0 a 24.",
+    "de": "Nutzdatenlänge in Bytes von 0 bis 24."
   },
   "link_Link_SendPacket_cmd": {
     "ja": "受信側アプリが意味を定める8ビットのコマンド。",
     "en": "Application-defined eight-bit command.",
-    "zh-CN": "应用定义的八位命令。"
+    "zh-CN": "应用定义的八位命令。",
+    "ko": "애플리케이션이 정의하는 8비트 명령입니다.",
+    "zh-TW": "應用程式定義的八位元命令。",
+    "fr": "Commande sur huit bits définie par l’application.",
+    "es": "Orden de ocho bits definida por la aplicación.",
+    "de": "Von der Anwendung definierter Acht-Bit-Befehl."
   },
   "link_Link_SendPacket_returns": {
     "ja": "受付なら0、送信状態が空いていなければ1、不正な長さやポインターなら4です。",
     "en": "Returns 0 when accepted, 1 for busy packet state, or 4 for invalid length/pointer.",
-    "zh-CN": "接受时返回 0，数据包状态忙时返回 1，长度或指针无效时返回 4。"
+    "zh-CN": "接受时返回 0，数据包状态忙时返回 1，长度或指针无效时返回 4。",
+    "ko": "수락하면 0, 패킷 상태가 사용 중이면 1, 길이나 포인터가 잘못되었으면 4를 반환합니다.",
+    "zh-TW": "接受時傳回 0，封包狀態忙碌時傳回 1，長度或指標無效時傳回 4。",
+    "fr": "Renvoie 0 si accepté, 1 si l’état de paquet est occupé, ou 4 si la longueur ou le pointeur est invalide.",
+    "es": "Devuelve 0 si se acepta, 1 si el estado de paquetes está ocupado y 4 si la longitud o el puntero no son válidos.",
+    "de": "Gibt bei Annahme 0 zurück, bei belegtem Paketzustand 1 und bei ungültiger Länge oder ungültigem Zeiger 4."
   },
   "link_note_nomix": {
     "ja": "同じ受信リングを直接のReadByte等でも読むと、パケットの途中を消費してしまいます。通常の生バイト読出しとパケット受信を同時に混ぜないでください。",
     "en": "Raw ReadByte-style calls consume the same ordinary ring and can steal part of a packet. Do not mix raw reads with packet reception.",
-    "zh-CN": "ReadByte 一类原始读取也会消费同一个普通环形队列，可能取走数据包的一部分。不要混用原始读取与数据包接收。"
+    "zh-CN": "ReadByte 一类原始读取也会消费同一个普通环形队列，可能取走数据包的一部分。不要混用原始读取与数据包接收。",
+    "ko": "ReadByte 계열의 원시 읽기도 같은 일반 링을 소비하므로 패킷 일부를 가져갈 수 있습니다. 원시 읽기와 패킷 수신을 섞어 쓰지 마세요.",
+    "zh-TW": "ReadByte 類原始讀取也會消耗相同的一般環狀緩衝區，可能取走封包的一部分。請勿混用原始讀取與封包接收。",
+    "fr": "Les lectures brutes de type ReadByte consomment le même tampon général et peuvent prélever une partie d’un paquet. Ne mélangez pas lectures brutes et réception de paquets.",
+    "es": "Las lecturas sin procesar de tipo ReadByte consumen el mismo búfer general y pueden llevarse parte de un paquete. No mezcles lecturas sin procesar con recepción de paquetes.",
+    "de": "Rohe Leseaufrufe wie ReadByte verbrauchen denselben allgemeinen Ring und können Teile eines Pakets entnehmen. Mischen Sie keine Rohlesezugriffe mit Paketempfang."
   },
   "link_Link_PollPacket_purpose": {
     "ja": "受信バイトを解析し、次の送信またはACKを開始して、期限と再試行を進めます。",
     "en": "Parse received bytes, start the next outgoing byte or ACK, and advance timeout/retry state.",
-    "zh-CN": "解析接收字节，启动下一个发送字节或 ACK，并推进超时/重试状态。"
+    "zh-CN": "解析接收字节，启动下一个发送字节或 ACK，并推进超时/重试状态。",
+    "ko": "수신 바이트를 해석하고 다음 송신 바이트나 ACK를 시작하며 시간 초과·재시도 상태를 진행시킵니다.",
+    "zh-TW": "解析接收位元組，啟動下一個送出位元組或 ACK，並推進逾時／重試狀態。",
+    "fr": "Analyse les octets reçus, démarre l’octet sortant ou l’ACK suivant et fait avancer l’état des délais et des tentatives.",
+    "es": "Analiza los bytes recibidos, inicia el siguiente byte saliente o ACK y avanza el estado de espera y reintentos.",
+    "de": "Verarbeitet empfangene Bytes, startet das nächste ausgehende Byte oder ACK und führt Timeout- und Wiederholungszustände weiter."
   },
   "link_Link_PollPacket_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_example_packet_slave": {
     "ja": "同梱のPACKET MASTERと接続し、COMMAND=49、LENGTH=3、PAYLOAD=7/42/255を確認します。ReadPacket後のCONSUMED=0は、メールボックスが空になったことを示します。",
     "en": "Connect to PACKET MASTER and check COMMAND=49, LENGTH=3 and payload 7/42/255. CONSUMED=0 after ReadPacket means that the mailbox is now empty.",
-    "zh-CN": "连接 PACKET MASTER，检查 COMMAND=49、LENGTH=3，以及有效载荷 7/42/255。ReadPacket 后 CONSUMED=0 表示邮箱已空。"
+    "zh-CN": "连接 PACKET MASTER，检查 COMMAND=49、LENGTH=3，以及有效载荷 7/42/255。ReadPacket 后 CONSUMED=0 表示邮箱已空。",
+    "ko": "PACKET MASTER에 연결하여 COMMAND=49, LENGTH=3, 페이로드 7/42/255를 확인하세요. ReadPacket 뒤의 CONSUMED=0은 메일박스가 이제 비었다는 뜻입니다.",
+    "zh-TW": "連接 PACKET MASTER，確認 COMMAND=49、LENGTH=3 及有效負載 7/42/255。ReadPacket 後的 CONSUMED=0 表示信箱現在已空。",
+    "fr": "Connectez-vous à PACKET MASTER et vérifiez COMMAND=49, LENGTH=3 et les données 7/42/255. CONSUMED=0 après ReadPacket signifie que la boîte de réception est désormais vide.",
+    "es": "Conecta con PACKET MASTER y comprueba COMMAND=49, LENGTH=3 y carga útil 7/42/255. CONSUMED=0 tras ReadPacket significa que el buzón ya está vacío.",
+    "de": "Verbinden Sie sich mit PACKET MASTER und prüfen Sie COMMAND=49, LENGTH=3 und Nutzdaten 7/42/255. CONSUMED=0 nach ReadPacket bedeutet, dass der Briefkasten jetzt leer ist."
   },
   "link_note_packetflag": {
     "ja": "プロトコルを進めず、フラグだけを読みます。送信相手がACKを受け取ったかどうかを示すフラグではありません。",
     "en": "Reads a flag without progressing the protocol. It does not indicate whether the sender has received its ACK.",
-    "zh-CN": "只读取标志，不推进协议。不表示发送方是否已收到 ACK。"
+    "zh-CN": "只读取标志，不推进协议。不表示发送方是否已收到 ACK。",
+    "ko": "프로토콜을 진행시키지 않고 플래그를 읽습니다. 송신자가 ACK를 받았는지는 나타내지 않습니다.",
+    "zh-TW": "只讀取旗標，不推進協定。不表示傳送端是否已收到 ACK。",
+    "fr": "Lit un indicateur sans faire avancer le protocole. N’indique pas si l’émetteur a reçu son ACK.",
+    "es": "Lee una bandera sin avanzar el protocolo. No indica si el emisor ha recibido su ACK.",
+    "de": "Liest ein Flag, ohne das Protokoll weiterzuführen. Zeigt nicht an, ob der Sender sein ACK empfangen hat."
   },
   "link_Link_HasPacket_purpose": {
     "ja": "通常の完成済みパケットメールボックスを調べます。",
     "en": "Inspect the shared completed-packet mailbox.",
-    "zh-CN": "检查共享的完整数据包邮箱。"
+    "zh-CN": "检查共享的完整数据包邮箱。",
+    "ko": "공유된 수신 완료 패킷 메일박스를 확인합니다.",
+    "zh-TW": "檢查共用的完整封包信箱。",
+    "fr": "Consulte la boîte partagée des paquets entièrement reçus.",
+    "es": "Consulta el buzón compartido de paquetes completados.",
+    "de": "Prüft den gemeinsamen Briefkasten vollständig empfangener Pakete."
   },
   "link_Link_HasPacket_returns": {
     "ja": "未読パケットがあれば1、空なら0です。",
     "en": "Returns 1 for an unread packet, otherwise 0.",
-    "zh-CN": "有未读数据包返回 1，否则返回 0。"
+    "zh-CN": "有未读数据包返回 1，否则返回 0。",
+    "ko": "읽지 않은 패킷이 있으면 1, 없으면 0을 반환합니다.",
+    "zh-TW": "有未讀封包時傳回 1，否則為 0。",
+    "fr": "Renvoie 1 pour un paquet non lu, sinon 0.",
+    "es": "Devuelve 1 si hay un paquete sin leer y 0 en otro caso.",
+    "de": "Gibt bei einem ungelesenen Paket 1 zurück, sonst 0."
   },
   "link_note_sharedmail": {
     "ja": "Link4の場合は、この共有パケットと同じ相手のメールボックスも空になります。他の相手のメールボックスは残ります。",
     "en": "In Link4 mode, also clears the peer mailbox corresponding to this shared packet. Other peer mailboxes remain available.",
-    "zh-CN": "Link4 模式下，还会清除与该共享数据包对应的对端邮箱。其他对端邮箱仍可用。"
+    "zh-CN": "Link4 模式下，还会清除与该共享数据包对应的对端邮箱。其他对端邮箱仍可用。",
+    "ko": "Link4 모드에서는 이 공유 패킷에 해당하는 상대별 메일박스도 비웁니다. 다른 상대의 메일박스는 그대로 사용할 수 있습니다.",
+    "zh-TW": "Link4 模式下也會清除與此共用封包對應的對端信箱。其他對端信箱仍可使用。",
+    "fr": "En mode Link4, vide aussi la boîte du correspondant associée à ce paquet partagé. Les boîtes des autres correspondants restent disponibles.",
+    "es": "En modo Link4 también vacía el buzón del interlocutor correspondiente a este paquete compartido. Los demás buzones siguen disponibles.",
+    "de": "Im Link4-Modus wird auch der zu diesem gemeinsamen Paket gehörende Gegenstellenbriefkasten geleert. Andere Gegenstellenbriefkästen bleiben verfügbar."
   },
   "link_Link_ReadPacket_purpose": {
     "ja": "完成済みパケットをコピーし、通常メールボックスを空にします。",
     "en": "Copy a completed packet and consume the shared mailbox.",
-    "zh-CN": "复制一个完整数据包，并消费共享邮箱。"
+    "zh-CN": "复制一个完整数据包，并消费共享邮箱。",
+    "ko": "완료된 패킷을 복사하고 공유 메일박스에서 소비합니다.",
+    "zh-TW": "複製完整封包，並從共用信箱取走它。",
+    "fr": "Copie un paquet terminé et le retire de la boîte partagée.",
+    "es": "Copia un paquete completado y lo consume del buzón compartido.",
+    "de": "Kopiert ein vollständiges Paket und entnimmt es aus dem gemeinsamen Briefkasten."
   },
   "link_Link_ReadPacket_cmd": {
     "ja": "受信コマンドを書き込む1バイト。0なら省略します。",
     "en": "Writable command byte; null omits it.",
-    "zh-CN": "可写命令字节；为 null 时不输出。"
+    "zh-CN": "可写命令字节；为 null 时不输出。",
+    "ko": "쓰기 가능한 명령 바이트입니다. null이면 이 출력을 생략합니다.",
+    "zh-TW": "可寫入的命令位元組；null 表示省略此輸出。",
+    "fr": "Octet de commande inscriptible ; null omet cette sortie.",
+    "es": "Byte de orden escribible; null omite esta salida.",
+    "de": "Beschreibbares Befehlsbyte; null lässt diese Ausgabe aus."
   },
   "link_Link_ReadPacket_len": {
     "ja": "受信長0～24を書き込む1バイト。0なら省略します。",
     "en": "Writable length byte, 0..24; null omits it.",
-    "zh-CN": "可写长度字节，范围为 0..24；为 null 时不输出。"
+    "zh-CN": "可写长度字节，范围为 0..24；为 null 时不输出。",
+    "ko": "쓰기 가능한 길이 바이트(0~24)입니다. null이면 이 출력을 생략합니다.",
+    "zh-TW": "可寫入的長度位元組，範圍為 0～24；null 表示省略此輸出。",
+    "fr": "Octet de longueur inscriptible, de 0 à 24 ; null omet cette sortie.",
+    "es": "Byte de longitud escribible, de 0 a 24; null omite esta salida.",
+    "de": "Beschreibbares Längenbyte von 0 bis 24; null lässt diese Ausgabe aus."
   },
   "link_Link_ReadPacket_dst": {
     "ja": "最大24バイトの書き込み先。0なら内容を読み捨てます。",
     "en": "Writable payload buffer with room for 24 bytes; null discards the payload.",
-    "zh-CN": "可容纳 24 字节的可写有效载荷缓冲区；为 null 时丢弃有效载荷。"
+    "zh-CN": "可容纳 24 字节的可写有效载荷缓冲区；为 null 时丢弃有效载荷。",
+    "ko": "24바이트를 담을 수 있는 쓰기 가능한 페이로드 버퍼입니다. null이면 페이로드를 버립니다.",
+    "zh-TW": "可寫入且容納 24 位元組的有效負載緩衝區；null 表示捨棄有效負載。",
+    "fr": "Tampon de données utiles inscriptible d’au moins 24 octets ; null abandonne les données utiles.",
+    "es": "Búfer de carga útil escribible con espacio para 24 bytes; null descarta la carga útil.",
+    "de": "Beschreibbarer Nutzdatenpuffer mit Platz für 24 Bytes; null verwirft die Nutzdaten."
   },
   "link_Link_ReadPacket_returns": {
     "ja": "取り出せれば1、空なら0。空では出力を書き換えません。",
     "en": "Returns 1 when consumed, 0 when empty; empty reads leave outputs unchanged.",
-    "zh-CN": "消费成功返回 1，为空时返回 0；空读取不改变输出。"
+    "zh-CN": "消费成功返回 1，为空时返回 0；空读取不改变输出。",
+    "ko": "소비했으면 1, 비어 있으면 0을 반환합니다. 빈 메일박스를 읽어도 출력은 바뀌지 않습니다.",
+    "zh-TW": "取出時傳回 1，為空時傳回 0；空讀取不變更輸出。",
+    "fr": "Renvoie 1 si le paquet est consommé, 0 si la boîte est vide ; une lecture à vide ne modifie pas les sorties.",
+    "es": "Devuelve 1 si consume un paquete y 0 si está vacío; una lectura vacía no modifica las salidas.",
+    "de": "Gibt bei Entnahme 1 zurück, bei leerem Briefkasten 0. Leere Lesezugriffe lassen die Ausgaben unverändert."
   },
   "link_note_invalidinit": {
     "ja": "設定の妥当性を調べる前に初期化します。失敗しても前の接続設定や未読データは残りません。",
     "en": "Initialization occurs before validation. A failed call still discards the previous topology and unread data.",
-    "zh-CN": "先初始化再验证。因此调用失败也会丢弃先前拓扑和未读数据。"
+    "zh-CN": "先初始化再验证。因此调用失败也会丢弃先前拓扑和未读数据。",
+    "ko": "검사 전에 초기화합니다. 호출에 실패해도 이전 토폴로지와 읽지 않은 데이터를 버립니다.",
+    "zh-TW": "先初始化再驗證。即使呼叫失敗，仍會捨棄先前拓撲與未讀資料。",
+    "fr": "L’initialisation précède la validation. Même un appel échoué supprime l’ancienne topologie et les données non lues.",
+    "es": "La inicialización se realiza antes de validar. Incluso una llamada fallida descarta la topología anterior y los datos sin leer.",
+    "de": "Die Initialisierung erfolgt vor der Prüfung. Auch ein fehlgeschlagener Aufruf verwirft die bisherige Topologie und ungelesene Daten."
   },
   "link_Link4_InitHost_purpose": {
     "ja": "2～4スロットの論理ホストとして初期化し、最初の相手を1にします。",
     "en": "Initialize a logical host with two to four slots and select peer 1.",
-    "zh-CN": "初始化拥有两至四个槽位的逻辑主机，并选择对端 1。"
+    "zh-CN": "初始化拥有两至四个槽位的逻辑主机，并选择对端 1。",
+    "ko": "2~4개 슬롯의 논리 호스트를 초기화하고 상대 1을 선택합니다.",
+    "zh-TW": "初始化包含二至四個槽位的邏輯主機，並選擇對端 1。",
+    "fr": "Initialise un hôte logique de deux à quatre emplacements et sélectionne le correspondant 1.",
+    "es": "Inicializa un anfitrión lógico con dos a cuatro posiciones y selecciona el interlocutor 1.",
+    "de": "Initialisiert einen logischen Host mit zwei bis vier Plätzen und wählt Gegenstelle 1."
   },
   "link_Link4_InitHost_slot_count": {
     "ja": "ホスト自身を含むスロット数2～4。",
     "en": "Number of slots including the host, 2..4.",
-    "zh-CN": "包括主机在内的槽位数，范围为 2..4。"
+    "zh-CN": "包括主机在内的槽位数，范围为 2..4。",
+    "ko": "호스트를 포함한 슬롯 수로 2~4입니다.",
+    "zh-TW": "包含主機的槽位數，範圍為 2～4。",
+    "fr": "Nombre d’emplacements, hôte compris, de 2 à 4.",
+    "es": "Número de posiciones incluido el anfitrión, de 2 a 4.",
+    "de": "Anzahl der Plätze einschließlich Host, 2 bis 4."
   },
   "link_Link4_InitHost_returns": {
     "ja": "設定できれば0、slot_countが範囲外なら4です。",
     "en": "Returns 0 for valid configuration, 4 for an invalid slot count.",
-    "zh-CN": "配置有效时返回 0，槽位数无效时返回 4。"
+    "zh-CN": "配置有效时返回 0，槽位数无效时返回 4。",
+    "ko": "설정이 유효하면 0, 슬롯 수가 잘못되었으면 4를 반환합니다.",
+    "zh-TW": "設定有效傳回 0，槽位數無效傳回 4。",
+    "fr": "Renvoie 0 pour une configuration valide, 4 pour un nombre d’emplacements invalide.",
+    "es": "Devuelve 0 si la configuración es válida y 4 si la cantidad de posiciones no lo es.",
+    "de": "Gibt bei gültiger Konfiguration 0 zurück, bei ungültiger Platzanzahl 4."
   },
   "link_example_four_host": {
     "ja": "4つのROMをKOKURAのlink4で接続します。ホストは相手1/2/3から161/162/163を受け取り、LAST PEER=3になります。続いて各相手へコマンド65/66/67と7/42/255を送ります。各相手の画面でも内容を確認します。",
     "en": "Connect all four ROMs with KOKURA’s link4 topology. The host receives 161/162/163 from peers 1/2/3 and shows LAST PEER=3. It then sends commands 65/66/67 with payload 7/42/255; verify those values on each peer’s screen too.",
-    "zh-CN": "用 KOKURA 的 link4 拓扑连接全部四个 ROM。主机从对端 1/2/3 接收 161/162/163，并显示 LAST PEER=3。随后向各对端发送命令 65/66/67，有效载荷均为 7/42/255；还需在每个对端画面检查这些值。"
+    "zh-CN": "用 KOKURA 的 link4 拓扑连接全部四个 ROM。主机从对端 1/2/3 接收 161/162/163，并显示 LAST PEER=3。随后向各对端发送命令 65/66/67，有效载荷均为 7/42/255；还需在每个对端画面检查这些值。",
+    "ko": "ROM 4개를 모두 KOKURA의 link4 토폴로지로 연결하세요. 호스트는 상대 1/2/3에서 161/162/163을 받고 LAST PEER=3을 표시합니다. 이어서 명령 65/66/67과 페이로드 7/42/255를 보냅니다. 각 상대의 화면에서도 이 값을 확인하세요.",
+    "zh-TW": "請以 KOKURA 的 link4 拓撲連接四個 ROM。主機從對端 1/2/3 收到 161/162/163，並顯示 LAST PEER=3。接著傳送命令 65/66/67 與有效負載 7/42/255；也請在各對端畫面確認這些值。",
+    "fr": "Reliez les quatre ROM avec la topologie link4 de KOKURA. L’hôte reçoit 161/162/163 des correspondants 1/2/3 et affiche LAST PEER=3. Il envoie ensuite les commandes 65/66/67 avec les données 7/42/255 ; vérifiez aussi ces valeurs sur l’écran de chaque correspondant.",
+    "es": "Conecta las cuatro ROM con la topología link4 de KOKURA. El anfitrión recibe 161/162/163 de los interlocutores 1/2/3 y muestra LAST PEER=3. Después envía las órdenes 65/66/67 con carga útil 7/42/255; verifica también esos valores en la pantalla de cada interlocutor.",
+    "de": "Verbinden Sie alle vier ROMs über KOKURAs link4-Topologie. Der Host empfängt 161/162/163 von Gegenstellen 1/2/3 und zeigt LAST PEER=3. Danach sendet er die Befehle 65/66/67 mit Nutzdaten 7/42/255. Prüfen Sie diese Werte auch auf jedem Gegenstellenbildschirm."
   },
   "link_Link4_InitPeer_purpose": {
     "ja": "指定スロットの外部クロック側として初期化し、相手をホスト0にします。",
     "en": "Initialize an externally clocked peer and select host slot 0.",
-    "zh-CN": "初始化使用外部时钟的对端，并选择主机槽位 0。"
+    "zh-CN": "初始化使用外部时钟的对端，并选择主机槽位 0。",
+    "ko": "외부 클록을 사용하는 상대를 초기화하고 호스트 슬롯 0을 선택합니다.",
+    "zh-TW": "初始化使用外部時脈的對端，並選擇主機槽位 0。",
+    "fr": "Initialise un correspondant à horloge externe et sélectionne l’emplacement hôte 0.",
+    "es": "Inicializa un interlocutor con reloj externo y selecciona la posición de anfitrión 0.",
+    "de": "Initialisiert eine Gegenstelle mit externem Takt und wählt Hostplatz 0."
   },
   "link_Link4_InitPeer_local_slot": {
     "ja": "自分の番号1～slot_count−1。",
     "en": "Local slot, 1..slot_count−1.",
-    "zh-CN": "本地槽位，范围为 1..slot_count−1。"
+    "zh-CN": "本地槽位，范围为 1..slot_count−1。",
+    "ko": "로컬 슬롯으로 1~slot_count−1입니다.",
+    "zh-TW": "本機槽位，範圍為 1～slot_count−1。",
+    "fr": "Emplacement local, de 1 à slot_count−1.",
+    "es": "Posición local, de 1 a slot_count−1.",
+    "de": "Lokaler Platz, 1 bis slot_count−1."
   },
   "link_Link4_InitPeer_slot_count": {
     "ja": "ホストを含む総数2～4。",
     "en": "Total slots including the host, 2..4.",
-    "zh-CN": "包含主机在内的总槽位数，范围为 2..4。"
+    "zh-CN": "包含主机在内的总槽位数，范围为 2..4。",
+    "ko": "호스트를 포함한 전체 슬롯 수로 2~4입니다.",
+    "zh-TW": "包含主機的總槽位數，範圍為 2～4。",
+    "fr": "Nombre total d’emplacements, hôte compris, de 2 à 4.",
+    "es": "Total de posiciones incluido el anfitrión, de 2 a 4.",
+    "de": "Gesamtzahl der Plätze einschließlich Host, 2 bis 4."
   },
   "link_Link4_InitPeer_returns": {
     "ja": "設定できれば0。スロット数や自分の番号が不正なら4です。",
     "en": "Returns 0 for valid configuration, 4 for an invalid slot count/local slot.",
-    "zh-CN": "配置有效时返回 0，槽位数或本地槽位无效时返回 4。"
+    "zh-CN": "配置有效时返回 0，槽位数或本地槽位无效时返回 4。",
+    "ko": "설정이 유효하면 0, 슬롯 수나 로컬 슬롯이 잘못되었으면 4를 반환합니다.",
+    "zh-TW": "設定有效傳回 0，槽位數或本機槽位無效傳回 4。",
+    "fr": "Renvoie 0 pour une configuration valide, 4 pour un nombre d’emplacements ou un emplacement local invalide.",
+    "es": "Devuelve 0 si la configuración es válida y 4 si la cantidad de posiciones o la posición local no son válidas.",
+    "de": "Gibt bei gültiger Konfiguration 0 zurück, bei ungültiger Platzanzahl oder ungültigem lokalen Platz 4."
   },
   "link_example_four_peer1": {
     "ja": "4スロットの相手1として、HOST BYTE=17、COMMAND=65、LENGTH=3、PAYLOAD 2=42を確認します。CONSUMED=0は相手0のメールボックスを消費した後の値です。",
     "en": "As peer 1 of four slots, expect HOST BYTE=17, COMMAND=65, LENGTH=3 and PAYLOAD 2=42. CONSUMED=0 is the host mailbox flag after consumption.",
-    "zh-CN": "作为四槽位配置中的对端 1，预期 HOST BYTE=17、COMMAND=65、LENGTH=3、PAYLOAD 2=42。CONSUMED=0 是消费后的主机邮箱标志。"
+    "zh-CN": "作为四槽位配置中的对端 1，预期 HOST BYTE=17、COMMAND=65、LENGTH=3、PAYLOAD 2=42。CONSUMED=0 是消费后的主机邮箱标志。",
+    "ko": "4개 슬롯 중 상대 1이면 HOST BYTE=17, COMMAND=65, LENGTH=3, PAYLOAD 2=42가 예상값입니다. CONSUMED=0은 소비 후의 호스트 메일박스 플래그입니다.",
+    "zh-TW": "作為四槽位中的對端 1，預期 HOST BYTE=17、COMMAND=65、LENGTH=3、PAYLOAD 2=42。CONSUMED=0 是取出後的主機信箱旗標。",
+    "fr": "Pour le correspondant 1 parmi quatre emplacements, les valeurs attendues sont HOST BYTE=17, COMMAND=65, LENGTH=3 et PAYLOAD 2=42. CONSUMED=0 est l’indicateur de la boîte de l’hôte après consommation.",
+    "es": "Como interlocutor 1 de cuatro posiciones, se esperan HOST BYTE=17, COMMAND=65, LENGTH=3 y PAYLOAD 2=42. CONSUMED=0 es la bandera del buzón del anfitrión tras consumirlo.",
+    "de": "Als Gegenstelle 1 von vier Plätzen sind HOST BYTE=17, COMMAND=65, LENGTH=3 und PAYLOAD 2=42 zu erwarten. CONSUMED=0 ist das Hostbriefkasten-Flag nach der Entnahme."
   },
   "link_note_notdetect": {
     "ja": "これらは設定や転送履歴の読み取りです。実物の接続検出、全相手への問い合わせ、転送完了待ちは行いません。",
     "en": "These are configuration/history getters. They do not detect physical connections, query every peer or wait for transfer completion.",
-    "zh-CN": "这些函数读取配置或历史记录。不检测实体连接、不查询所有对端，也不等待传送完成。"
+    "zh-CN": "这些函数读取配置或历史记录。不检测实体连接、不查询所有对端，也不等待传送完成。",
+    "ko": "설정과 이력을 읽는 함수들입니다. 물리 연결을 탐지하거나 모든 상대를 조회하거나 전송 완료를 기다리지 않습니다.",
+    "zh-TW": "這些函式讀取設定／歷史紀錄，不偵測實體連接、不查詢所有對端，也不等待傳輸完成。",
+    "fr": "Ces fonctions lisent la configuration et l’historique. Elles ne détectent pas les connexions physiques, n’interrogent pas tous les correspondants et n’attendent pas la fin des transferts.",
+    "es": "Estas funciones leen configuración e historial. No detectan conexiones físicas, consultan a todos los interlocutores ni esperan a que terminen las transferencias.",
+    "de": "Diese Funktionen lesen Konfiguration und Verlauf. Sie erkennen keine physischen Verbindungen, fragen nicht alle Gegenstellen ab und warten nicht auf Transferabschluss."
   },
   "link_Link4_GetMode_purpose": {
     "ja": "論理的な接続の役割を取得します。",
     "en": "Read the configured logical role.",
-    "zh-CN": "读取已配置的逻辑角色。"
+    "zh-CN": "读取已配置的逻辑角色。",
+    "ko": "설정된 논리 역할을 읽습니다.",
+    "zh-TW": "讀取已設定的邏輯角色。",
+    "fr": "Lit le rôle logique configuré.",
+    "es": "Lee el rol lógico configurado.",
+    "de": "Liest die konfigurierte logische Rolle."
   },
   "link_Link4_GetMode_returns": {
     "ja": "0=未設定、1=ホスト、2=相手です。",
     "en": "0=unconfigured, 1=host, 2=peer.",
-    "zh-CN": "0=未配置、1=主机、2=对端。"
+    "zh-CN": "0=未配置、1=主机、2=对端。",
+    "ko": "0=미설정, 1=호스트, 2=상대입니다.",
+    "zh-TW": "0=未設定、1=主機、2=對端。",
+    "fr": "0=non configuré, 1=hôte, 2=correspondant.",
+    "es": "0=sin configurar, 1=anfitrión, 2=interlocutor.",
+    "de": "0=nicht konfiguriert, 1=Host, 2=Gegenstelle."
   },
   "link_Link4_GetLocalSlot_purpose": {
     "ja": "自機に設定されたスロット番号を取得します。",
     "en": "Read this machine’s configured slot.",
-    "zh-CN": "读取本机配置的槽位。"
+    "zh-CN": "读取本机配置的槽位。",
+    "ko": "이 기기에 설정된 슬롯을 읽습니다.",
+    "zh-TW": "讀取本機已設定的槽位。",
+    "fr": "Lit l’emplacement configuré de cette machine.",
+    "es": "Lee la posición configurada de esta máquina.",
+    "de": "Liest den für dieses Gerät konfigurierten Platz."
   },
   "link_Link4_GetLocalSlot_returns": {
     "ja": "ホストは0、相手は1～3です。未設定時も0です。",
     "en": "Host is 0; peers are 1..3. Unconfigured state also returns 0.",
-    "zh-CN": "主机为 0，对端为 1..3。未配置时也返回 0。"
+    "zh-CN": "主机为 0，对端为 1..3。未配置时也返回 0。",
+    "ko": "호스트는 0, 상대는 1~3입니다. 미설정 상태도 0을 반환합니다.",
+    "zh-TW": "主機為 0，對端為 1～3。未設定狀態也傳回 0。",
+    "fr": "L’hôte vaut 0, les correspondants 1 à 3. L’état non configuré renvoie aussi 0.",
+    "es": "El anfitrión es 0 y los interlocutores, 1..3. Sin configurar también devuelve 0.",
+    "de": "Host ist 0, Gegenstellen sind 1 bis 3. Nicht konfiguriert ergibt ebenfalls 0."
   },
   "link_Link4_GetSlotCount_purpose": {
     "ja": "設定された総スロット数を取得します。",
     "en": "Read the configured total slot count.",
-    "zh-CN": "读取已配置的总槽位数。"
+    "zh-CN": "读取已配置的总槽位数。",
+    "ko": "설정된 전체 슬롯 수를 읽습니다.",
+    "zh-TW": "讀取已設定的總槽位數。",
+    "fr": "Lit le nombre total d’emplacements configuré.",
+    "es": "Lee el total de posiciones configurado.",
+    "de": "Liest die konfigurierte Gesamtzahl der Plätze."
   },
   "link_Link4_GetSlotCount_returns": {
     "ja": "有効な設定は2～4、未設定は0です。",
     "en": "Valid configurations return 2..4; unconfigured returns 0.",
-    "zh-CN": "有效配置返回 2..4，未配置返回 0。"
+    "zh-CN": "有效配置返回 2..4，未配置返回 0。",
+    "ko": "유효한 설정에서는 2~4, 미설정에서는 0을 반환합니다.",
+    "zh-TW": "有效設定傳回 2～4，未設定傳回 0。",
+    "fr": "Une configuration valide renvoie 2 à 4 ; non configuré renvoie 0.",
+    "es": "Una configuración válida devuelve 2..4; sin configurar devuelve 0.",
+    "de": "Gültige Konfigurationen liefern 2 bis 4, nicht konfiguriert liefert 0."
   },
   "link_Link4_GetSelectedPeer_purpose": {
     "ja": "次の交換で使う論理的な宛先を取得します。",
     "en": "Read the currently selected logical destination.",
-    "zh-CN": "读取当前选择的逻辑目标。"
+    "zh-CN": "读取当前选择的逻辑目标。",
+    "ko": "현재 선택된 논리 목적지를 읽습니다.",
+    "zh-TW": "讀取目前選定的邏輯目的地。",
+    "fr": "Lit la destination logique actuellement sélectionnée.",
+    "es": "Lee el destino lógico seleccionado actualmente.",
+    "de": "Liest das aktuell ausgewählte logische Ziel."
   },
   "link_Link4_GetSelectedPeer_returns": {
     "ja": "ホストでは選択中の相手、相手では0、未設定では255です。",
     "en": "Host returns its selected peer; a peer returns 0; unconfigured returns 255.",
-    "zh-CN": "主机返回所选对端；对端返回 0；未配置返回 255。"
+    "zh-CN": "主机返回所选对端；对端返回 0；未配置返回 255。",
+    "ko": "호스트는 선택한 상대를, 상대는 0을, 미설정 상태는 255를 반환합니다.",
+    "zh-TW": "主機傳回所選對端，對端傳回 0，未設定傳回 255。",
+    "fr": "L’hôte renvoie le correspondant sélectionné ; un correspondant renvoie 0 ; non configuré renvoie 255.",
+    "es": "El anfitrión devuelve el interlocutor seleccionado; un interlocutor devuelve 0; sin configurar devuelve 255.",
+    "de": "Der Host liefert seine ausgewählte Gegenstelle, eine Gegenstelle 0 und der unkonfigurierte Zustand 255."
   },
   "link_Link4_GetLastRxPeer_purpose": {
     "ja": "最後に完了したバイトを割り当てた相手番号を取得します。",
     "en": "Read the peer attributed to the last completed byte.",
-    "zh-CN": "读取最近一个已完成字节所属的对端。"
+    "zh-CN": "读取最近一个已完成字节所属的对端。",
+    "ko": "마지막으로 수신 완료한 바이트의 상대를 읽습니다.",
+    "zh-TW": "讀取最後完成接收的位元組所屬對端。",
+    "fr": "Lit le correspondant attribué au dernier octet reçu complètement.",
+    "es": "Lee el interlocutor atribuido al último byte completado.",
+    "de": "Liest die dem letzten abgeschlossenen Byte zugeordnete Gegenstelle."
   },
   "link_Link4_GetLastRxPeer_returns": {
     "ja": "ホストは選択相手、相手は0。まだ受信していなければ255です。",
     "en": "Host returns the selected peer and a peer returns 0; before reception returns 255.",
-    "zh-CN": "主机返回所选对端，对端返回 0；尚未接收时返回 255。"
+    "zh-CN": "主机返回所选对端，对端返回 0；尚未接收时返回 255。",
+    "ko": "호스트는 선택된 상대, 상대는 0을 반환합니다. 수신 전에는 255입니다.",
+    "zh-TW": "主機傳回選定對端，對端傳回 0；尚未接收時傳回 255。",
+    "fr": "L’hôte renvoie le correspondant sélectionné et un correspondant renvoie 0 ; avant toute réception, renvoie 255.",
+    "es": "El anfitrión devuelve el interlocutor seleccionado y un interlocutor, 0; antes de recibir devuelve 255.",
+    "de": "Der Host liefert die ausgewählte Gegenstelle, eine Gegenstelle 0; vor dem ersten Empfang wird 255 geliefert."
   },
   "link_Link4_GetLastTxPeer_purpose": {
     "ja": "最後のバイト転送を開始した時点の宛先を取得します。",
     "en": "Read the destination recorded when the last byte transfer started.",
-    "zh-CN": "读取最近一次字节传送启动时记录的目标。"
+    "zh-CN": "读取最近一次字节传送启动时记录的目标。",
+    "ko": "마지막 바이트 전송이 시작될 때 기록된 목적지를 읽습니다.",
+    "zh-TW": "讀取最後一次位元組傳輸啟動時記錄的目的地。",
+    "fr": "Lit la destination mémorisée au début du dernier transfert d’octet.",
+    "es": "Lee el destino registrado al iniciar la última transferencia de byte.",
+    "de": "Liest das beim Start des letzten Bytetransfers gespeicherte Ziel."
   },
   "link_Link4_GetLastTxPeer_returns": {
     "ja": "記録済みの宛先番号。開始前は255です。",
     "en": "Returns the recorded destination, or 255 before any start.",
-    "zh-CN": "返回记录的目标；尚未启动过传送时返回 255。"
+    "zh-CN": "返回记录的目标；尚未启动过传送时返回 255。",
+    "ko": "기록된 목적지를 반환하며 한 번도 시작하지 않았으면 255입니다.",
+    "zh-TW": "傳回記錄的目的地；從未啟動過時為 255。",
+    "fr": "Renvoie la destination mémorisée, ou 255 avant tout démarrage.",
+    "es": "Devuelve el destino registrado, o 255 si aún no se ha iniciado ninguno.",
+    "de": "Gibt das gespeicherte Ziel zurück, vor dem ersten Start 255."
   },
   "link_Link4_SelectPeer_purpose": {
     "ja": "未完了の交換がないことを確かめ、次の論理的な宛先を変更します。",
     "en": "Poll completion and change the logical destination only while idle.",
-    "zh-CN": "轮询完成状态，仅在空闲时改变逻辑目标。"
+    "zh-CN": "轮询完成状态，仅在空闲时改变逻辑目标。",
+    "ko": "완료를 폴링하고 유휴 상태일 때만 논리 목적지를 바꿉니다.",
+    "zh-TW": "輪詢完成狀態，並僅在閒置時變更邏輯目的地。",
+    "fr": "Interroge la fin du transfert et ne change la destination logique qu’à l’état inactif.",
+    "es": "Consulta la finalización y cambia el destino lógico solo cuando está inactivo.",
+    "de": "Prüft auf Abschluss und ändert das logische Ziel nur im Ruhezustand."
   },
   "link_Link4_SelectPeer_peer_slot": {
     "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
     "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer.",
-    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。"
+    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。",
+    "ko": "설정된 원격 슬롯입니다. 호스트에서는 1~slot_count−1, 상대에서는 0입니다.",
+    "zh-TW": "已設定的遠端槽位：主機使用 1～slot_count−1，對端使用 0。",
+    "fr": "Emplacement distant configuré : de 1 à slot_count−1 depuis l’hôte, ou 0 depuis un correspondant.",
+    "es": "Posición remota configurada: 1..slot_count−1 desde el anfitrión o 0 desde un interlocutor.",
+    "de": "Konfigurierter entfernter Platz: vom Host aus 1 bis slot_count−1, von einer Gegenstelle aus 0."
   },
   "link_Link4_SelectPeer_returns": {
     "ja": "選択できれば0、バイト/パケット/ACKが使用中なら1、未設定や不正な相手なら4です。",
     "en": "Returns 0 on selection, 1 for busy byte/packet/ACK state, or 4 for an unconfigured/invalid peer.",
-    "zh-CN": "选择成功返回 0；字节/数据包/ACK 状态忙时返回 1；未配置或对端无效时返回 4。"
+    "zh-CN": "选择成功返回 0；字节/数据包/ACK 状态忙时返回 1；未配置或对端无效时返回 4。",
+    "ko": "선택하면 0, 바이트·패킷·ACK 상태가 사용 중이면 1, 미설정이거나 잘못된 상대면 4를 반환합니다.",
+    "zh-TW": "選擇成功傳回 0；位元組／封包／ACK 狀態忙碌傳回 1；未設定或對端無效傳回 4。",
+    "fr": "Renvoie 0 après sélection, 1 si l’état octet/paquet/ACK est occupé, ou 4 si non configuré ou si le correspondant est invalide.",
+    "es": "Devuelve 0 al seleccionar, 1 si el estado de byte/paquete/ACK está ocupado y 4 si no está configurado o el interlocutor no es válido.",
+    "de": "Gibt bei Auswahl 0 zurück, bei belegtem Byte-, Paket- oder ACK-Zustand 1 und bei fehlender Konfiguration oder ungültiger Gegenstelle 4."
   },
   "link_Link4_BeginTransferTo_purpose": {
     "ja": "宛先を選んでから1バイトの交換を開始します。",
     "en": "Select a destination, then start one byte exchange.",
-    "zh-CN": "选择目标，然后启动一次字节交换。"
+    "zh-CN": "选择目标，然后启动一次字节交换。",
+    "ko": "목적지를 선택하고 바이트 교환 하나를 시작합니다.",
+    "zh-TW": "選擇目的地，再啟動一次位元組交換。",
+    "fr": "Sélectionne une destination, puis démarre un échange d’octet.",
+    "es": "Selecciona un destino e inicia un intercambio de un byte.",
+    "de": "Wählt ein Ziel und startet anschließend einen Byteaustausch."
   },
   "link_Link4_BeginTransferTo_peer_slot": {
     "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
     "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer.",
-    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。"
+    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。",
+    "ko": "설정된 원격 슬롯입니다. 호스트에서는 1~slot_count−1, 상대에서는 0입니다.",
+    "zh-TW": "已設定的遠端槽位：主機使用 1～slot_count−1，對端使用 0。",
+    "fr": "Emplacement distant configuré : de 1 à slot_count−1 depuis l’hôte, ou 0 depuis un correspondant.",
+    "es": "Posición remota configurada: 1..slot_count−1 desde el anfitrión o 0 desde un interlocutor.",
+    "de": "Konfigurierter entfernter Platz: vom Host aus 1 bis slot_count−1, von einer Gegenstelle aus 0."
   },
   "link_Link4_BeginTransferTo_out": {
     "ja": "送る8ビット値。",
     "en": "Outgoing eight-bit value.",
-    "zh-CN": "要发送的八位值。"
+    "zh-CN": "要发送的八位值。",
+    "ko": "송신할 8비트 값입니다.",
+    "zh-TW": "要送出的八位元值。",
+    "fr": "Valeur sortante sur huit bits.",
+    "es": "Valor saliente de ocho bits.",
+    "de": "Ausgehender Acht-Bit-Wert."
   },
   "link_Link4_BeginTransferTo_returns": {
     "ja": "選択または開始時の最初のエラー。成功は0です。",
     "en": "Returns the first selection/start error, or 0 on success.",
-    "zh-CN": "返回选择或启动时遇到的第一个错误；成功返回 0。"
+    "zh-CN": "返回选择或启动时遇到的第一个错误；成功返回 0。",
+    "ko": "선택·시작 중 처음 발생한 오류를 반환하며 성공하면 0입니다.",
+    "zh-TW": "傳回選擇／啟動時第一個錯誤，成功則為 0。",
+    "fr": "Renvoie la première erreur de sélection ou de démarrage, ou 0 en cas de succès.",
+    "es": "Devuelve el primer error de selección o inicio, o 0 si tiene éxito.",
+    "de": "Gibt den ersten Auswahl- oder Startfehler zurück, bei Erfolg 0."
   },
   "link_note_peernopoll": {
     "ja": "この問い合わせはハードウェアをポーリングせず、不正な相手でもエラーラッチを変更しません。",
     "en": "This query does not poll hardware; an invalid peer does not change the error latch.",
-    "zh-CN": "此查询不轮询硬件；无效对端不会改变错误锁存值。"
+    "zh-CN": "此查询不轮询硬件；无效对端不会改变错误锁存值。",
+    "ko": "하드웨어를 폴링하지 않는 조회입니다. 잘못된 상대를 지정해도 저장된 오류는 바뀌지 않습니다.",
+    "zh-TW": "此查詢不輪詢硬體；無效對端不會變更已鎖存錯誤。",
+    "fr": "Cette requête n’interroge pas le matériel ; un correspondant invalide ne modifie pas l’erreur mémorisée.",
+    "es": "Esta consulta no sondea el hardware; un interlocutor no válido no cambia el error retenido.",
+    "de": "Diese Abfrage liest die Hardware nicht aus; eine ungültige Gegenstelle ändert den gespeicherten Fehler nicht."
   },
   "link_Link4_HasByteFrom_purpose": {
     "ja": "指定相手の受信リングに未読バイトがあるか調べます。",
     "en": "Inspect unread data in one peer’s receive ring.",
-    "zh-CN": "检查某个对端的接收环形队列是否有未读数据。"
+    "zh-CN": "检查某个对端的接收环形队列是否有未读数据。",
+    "ko": "특정 상대의 수신 링에서 읽지 않은 데이터가 있는지 확인합니다.",
+    "zh-TW": "檢查某一對端接收環狀緩衝區中的未讀資料。",
+    "fr": "Vérifie les données non lues du tampon de réception d’un correspondant.",
+    "es": "Consulta los datos sin leer del búfer de recepción de un interlocutor.",
+    "de": "Prüft ungelesene Daten im Empfangsring einer Gegenstelle."
   },
   "link_Link4_HasByteFrom_peer_slot": {
     "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
     "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer.",
-    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。"
+    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。",
+    "ko": "설정된 원격 슬롯입니다. 호스트에서는 1~slot_count−1, 상대에서는 0입니다.",
+    "zh-TW": "已設定的遠端槽位：主機使用 1～slot_count−1，對端使用 0。",
+    "fr": "Emplacement distant configuré : de 1 à slot_count−1 depuis l’hôte, ou 0 depuis un correspondant.",
+    "es": "Posición remota configurada: 1..slot_count−1 desde el anfitrión o 0 desde un interlocutor.",
+    "de": "Konfigurierter entfernter Platz: vom Host aus 1 bis slot_count−1, von einer Gegenstelle aus 0."
   },
   "link_Link4_HasByteFrom_returns": {
     "ja": "データがあれば1、空または不正な相手なら0です。",
     "en": "Returns 1 for queued data, 0 for empty/invalid peer.",
-    "zh-CN": "有排队数据返回 1，队列为空或对端无效时返回 0。"
+    "zh-CN": "有排队数据返回 1，队列为空或对端无效时返回 0。",
+    "ko": "큐에 데이터가 있으면 1, 비어 있거나 상대가 잘못되었으면 0입니다.",
+    "zh-TW": "有排入的資料傳回 1；為空或對端無效傳回 0。",
+    "fr": "Renvoie 1 si des données sont en file, 0 si vide ou si le correspondant est invalide.",
+    "es": "Devuelve 1 si hay datos en cola y 0 si está vacío o el interlocutor no es válido.",
+    "de": "Gibt bei wartenden Daten 1 zurück, bei leerem Ring oder ungültiger Gegenstelle 0."
   },
   "link_Link4_TryReadByteFrom_purpose": {
     "ja": "指定相手の受信リングから1バイトを取り出します。",
     "en": "Pop one byte from a specific peer’s receive ring.",
-    "zh-CN": "从指定对端的接收环形队列弹出一个字节。"
+    "zh-CN": "从指定对端的接收环形队列弹出一个字节。",
+    "ko": "지정한 상대의 수신 링에서 바이트 하나를 꺼냅니다.",
+    "zh-TW": "從指定對端的接收環狀緩衝區取出一個位元組。",
+    "fr": "Extrait un octet du tampon de réception du correspondant indiqué.",
+    "es": "Extrae un byte del búfer de recepción de un interlocutor concreto.",
+    "de": "Entnimmt ein Byte aus dem Empfangsring einer bestimmten Gegenstelle."
   },
   "link_Link4_TryReadByteFrom_peer_slot": {
     "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
     "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer.",
-    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。"
+    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。",
+    "ko": "설정된 원격 슬롯입니다. 호스트에서는 1~slot_count−1, 상대에서는 0입니다.",
+    "zh-TW": "已設定的遠端槽位：主機使用 1～slot_count−1，對端使用 0。",
+    "fr": "Emplacement distant configuré : de 1 à slot_count−1 depuis l’hôte, ou 0 depuis un correspondant.",
+    "es": "Posición remota configurada: 1..slot_count−1 desde el anfitrión o 0 desde un interlocutor.",
+    "de": "Konfigurierter entfernter Platz: vom Host aus 1 bis slot_count−1, von einer Gegenstelle aus 0."
   },
   "link_Link4_TryReadByteFrom_out": {
     "ja": "受信値を書き込む1バイトの領域。0なら読み捨てます。",
     "en": "Writable byte destination; null discards the byte.",
-    "zh-CN": "可写字节目标；为 null 时丢弃字节。"
+    "zh-CN": "可写字节目标；为 null 时丢弃字节。",
+    "ko": "쓰기 가능한 바이트 대상입니다. null이면 바이트를 버립니다.",
+    "zh-TW": "可寫入的位元組目的地；null 表示捨棄該位元組。",
+    "fr": "Destination d’un octet inscriptible ; null abandonne l’octet.",
+    "es": "Destino escribible de un byte; null descarta el byte.",
+    "de": "Beschreibbares Byteziel; bei null wird das Byte verworfen."
   },
   "link_Link4_TryReadByteFrom_returns": {
     "ja": "取り出せれば1。空または不正な相手なら0で、outはそのままです。",
     "en": "Returns 1 on a pop; empty/invalid peer returns 0 and preserves out.",
-    "zh-CN": "弹出成功返回 1；队列为空或对端无效时返回 0，并保留 out。"
+    "zh-CN": "弹出成功返回 1；队列为空或对端无效时返回 0，并保留 out。",
+    "ko": "꺼냈으면 1을 반환합니다. 비어 있거나 상대가 잘못되었으면 out을 유지하고 0을 반환합니다.",
+    "zh-TW": "取出成功傳回 1；為空或對端無效時保留 out 並傳回 0。",
+    "fr": "Renvoie 1 après extraction ; si vide ou si le correspondant est invalide, renvoie 0 et conserve out.",
+    "es": "Devuelve 1 al extraer; si está vacío o el interlocutor no es válido, devuelve 0 y conserva out.",
+    "de": "Gibt bei Entnahme 1 zurück. Bei leerem Ring oder ungültiger Gegenstelle wird 0 zurückgegeben und out bleibt erhalten."
   },
   "link_note_priority": {
     "ja": "自分のスロットは飛ばします。番号の小さい相手に未読が続くと大きい相手より先に返るため、公平な巡回が必要なら相手別の取得を使います。",
     "en": "Skips the local slot. Continuously queued lower slots take priority; use per-peer reads when round-robin fairness is required.",
-    "zh-CN": "跳过本地槽位。持续有数据的较小编号槽位优先；若要求轮询公平性，请按对端分别读取。"
+    "zh-CN": "跳过本地槽位。持续有数据的较小编号槽位优先；若要求轮询公平性，请按对端分别读取。",
+    "ko": "자기 슬롯은 건너뜁니다. 낮은 슬롯에 데이터가 계속 쌓이면 그쪽이 우선됩니다. 순환 방식의 공정성이 필요하면 상대별 읽기를 사용하세요.",
+    "zh-TW": "略過本機槽位。較小槽位若持續有資料會優先處理；需要輪流公平讀取時，請使用各對端讀取函式。",
+    "fr": "Ignore l’emplacement local. Les emplacements de numéro inférieur continuellement alimentés sont prioritaires ; utilisez les lectures par correspondant si un partage équitable en rotation est nécessaire.",
+    "es": "Omite la posición local. Las posiciones inferiores con datos continuos tienen prioridad; usa lecturas por interlocutor si necesitas un reparto equitativo por turnos.",
+    "de": "Überspringt den lokalen Platz. Niedrigere Plätze mit ständig wartenden Daten haben Vorrang. Verwenden Sie bei gewünschter gleichmäßiger Rundumverteilung einzelne Gegenstellen-Leseaufrufe."
   },
   "link_Link4_TryReadByteAny_purpose": {
     "ja": "番号の小さい相手から順に調べ、最初に見つかった1バイトを取り出します。",
     "en": "Scan remote slots in ascending order and pop the first available byte.",
-    "zh-CN": "按槽位升序扫描远端，弹出第一个可用字节。"
+    "zh-CN": "按槽位升序扫描远端，弹出第一个可用字节。",
+    "ko": "원격 슬롯을 번호 오름차순으로 검사하여 처음 사용 가능한 바이트를 꺼냅니다.",
+    "zh-TW": "依編號遞增順序掃描遠端槽位，取出第一個可用位元組。",
+    "fr": "Parcourt les emplacements distants par ordre croissant et extrait le premier octet disponible.",
+    "es": "Recorre las posiciones remotas en orden ascendente y extrae el primer byte disponible.",
+    "de": "Prüft entfernte Plätze in aufsteigender Reihenfolge und entnimmt das erste verfügbare Byte."
   },
   "link_Link4_TryReadByteAny_peer_slot": {
     "ja": "受信元を書き込む1バイト。0なら番号の出力を省略します。",
     "en": "Writable origin-slot byte; null omits the origin output.",
-    "zh-CN": "可写的来源槽位字节；为 null 时不输出来源。"
+    "zh-CN": "可写的来源槽位字节；为 null 时不输出来源。",
+    "ko": "송신 원본 슬롯을 저장할 쓰기 가능한 바이트입니다. null이면 출처 출력을 생략합니다.",
+    "zh-TW": "用於來源槽位的可寫入位元組；null 表示省略來源輸出。",
+    "fr": "Octet inscriptible pour l’emplacement d’origine ; null omet cette sortie.",
+    "es": "Byte escribible para la posición de origen; null omite esa salida.",
+    "de": "Beschreibbares Byte für den Herkunftsplatz; null lässt diese Ausgabe aus."
   },
   "link_Link4_TryReadByteAny_out": {
     "ja": "受信値を書き込む1バイトの領域。0なら読み捨てます。",
     "en": "Writable byte destination; null discards the byte.",
-    "zh-CN": "可写字节目标；为 null 时丢弃字节。"
+    "zh-CN": "可写字节目标；为 null 时丢弃字节。",
+    "ko": "쓰기 가능한 바이트 대상입니다. null이면 바이트를 버립니다.",
+    "zh-TW": "可寫入的位元組目的地；null 表示捨棄該位元組。",
+    "fr": "Destination d’un octet inscriptible ; null abandonne l’octet.",
+    "es": "Destino escribible de un byte; null descarta el byte.",
+    "de": "Beschreibbares Byteziel; bei null wird das Byte verworfen."
   },
   "link_Link4_TryReadByteAny_returns": {
     "ja": "取得できれば1、どこにもなければ0です。",
     "en": "Returns 1 on receipt, otherwise 0.",
-    "zh-CN": "收到数据返回 1，否则返回 0。"
+    "zh-CN": "收到数据返回 1，否则返回 0。",
+    "ko": "수신했으면 1, 아니면 0을 반환합니다.",
+    "zh-TW": "收到資料傳回 1，否則為 0。",
+    "fr": "Renvoie 1 à la réception, sinon 0.",
+    "es": "Devuelve 1 al recibir y 0 en otro caso.",
+    "de": "Gibt bei Empfang 1 zurück, sonst 0."
   },
   "link_note_sendselect": {
     "ja": "選択に成功してから長さ等を調べるため、内容が不正で予約に失敗しても、宛先だけは変更される場合があります。",
     "en": "Selection happens before payload validation; a rejected payload can still leave the new destination selected.",
-    "zh-CN": "先选择目标，再验证有效载荷；因此即使有效载荷被拒绝，新目标仍可能保持选中。"
+    "zh-CN": "先选择目标，再验证有效载荷；因此即使有效载荷被拒绝，新目标仍可能保持选中。",
+    "ko": "페이로드 검사 전에 상대를 선택합니다. 페이로드가 거부되어도 새 목적지가 선택된 상태로 남을 수 있습니다.",
+    "zh-TW": "先選擇目的地再驗證有效負載；即使有效負載被拒絕，仍可能保留新選定的目的地。",
+    "fr": "La sélection précède la validation des données utiles ; même si elles sont refusées, la nouvelle destination peut rester sélectionnée.",
+    "es": "La selección ocurre antes de validar la carga útil; aunque se rechace, el nuevo destino puede quedar seleccionado.",
+    "de": "Die Auswahl erfolgt vor der Nutzdatenprüfung. Auch bei abgewiesenen Nutzdaten kann das neue Ziel ausgewählt bleiben."
   },
   "link_Link4_SendPacketTo_purpose": {
     "ja": "宛先を選択し、その相手へのパケットをコピーして予約します。",
     "en": "Select a logical peer, copy the packet and schedule its transmission.",
-    "zh-CN": "选择逻辑对端，复制数据包并安排发送。"
+    "zh-CN": "选择逻辑对端，复制数据包并安排发送。",
+    "ko": "논리 상대를 선택하고 패킷을 복사하여 전송을 예약합니다.",
+    "zh-TW": "選擇邏輯對端、複製封包並排程傳送。",
+    "fr": "Sélectionne un correspondant logique, copie le paquet et programme son envoi.",
+    "es": "Selecciona un interlocutor lógico, copia el paquete y programa su transmisión.",
+    "de": "Wählt eine logische Gegenstelle, kopiert das Paket und plant dessen Versand ein."
   },
   "link_Link4_SendPacketTo_peer_slot": {
     "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
     "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer.",
-    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。"
+    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。",
+    "ko": "설정된 원격 슬롯입니다. 호스트에서는 1~slot_count−1, 상대에서는 0입니다.",
+    "zh-TW": "已設定的遠端槽位：主機使用 1～slot_count−1，對端使用 0。",
+    "fr": "Emplacement distant configuré : de 1 à slot_count−1 depuis l’hôte, ou 0 depuis un correspondant.",
+    "es": "Posición remota configurada: 1..slot_count−1 desde el anfitrión o 0 desde un interlocutor.",
+    "de": "Konfigurierter entfernter Platz: vom Host aus 1 bis slot_count−1, von einer Gegenstelle aus 0."
   },
   "link_Link4_SendPacketTo_data": {
     "ja": "lenバイトを読み取る元。len=0のときだけ0を渡せます。",
     "en": "Readable source of len bytes; may be null only when len is zero.",
-    "zh-CN": "含 len 个字节的可读源数据；只有 len 为零时才可为 null。"
+    "zh-CN": "含 len 个字节的可读源数据；只有 len 为零时才可为 null。",
+    "ko": "len바이트를 읽을 수 있는 원본입니다. len이 0일 때만 null을 허용합니다.",
+    "zh-TW": "可讀取 len 個位元組的來源；只有 len 為零時才可為 null。",
+    "fr": "Source lisible sur len octets ; peut être nulle uniquement si len vaut zéro.",
+    "es": "Origen legible de len bytes; solo puede ser null si len es cero.",
+    "de": "Über len Bytes lesbare Quelle; nur bei len gleich null darf sie null sein."
   },
   "link_Link4_SendPacketTo_len": {
     "ja": "内容の長さ0～24バイト。",
     "en": "Payload length in bytes, 0..24.",
-    "zh-CN": "有效载荷长度，范围为 0..24 字节。"
+    "zh-CN": "有效载荷长度，范围为 0..24 字节。",
+    "ko": "페이로드 길이이며 바이트 단위로 0~24입니다.",
+    "zh-TW": "有效負載長度，以位元組為單位，範圍為 0～24。",
+    "fr": "Longueur des données utiles en octets, de 0 à 24.",
+    "es": "Longitud de la carga útil en bytes, de 0 a 24.",
+    "de": "Nutzdatenlänge in Bytes von 0 bis 24."
   },
   "link_Link4_SendPacketTo_cmd": {
     "ja": "受信側アプリが意味を定める8ビットのコマンド。",
     "en": "Application-defined eight-bit command.",
-    "zh-CN": "应用定义的八位命令。"
+    "zh-CN": "应用定义的八位命令。",
+    "ko": "애플리케이션이 정의하는 8비트 명령입니다.",
+    "zh-TW": "應用程式定義的八位元命令。",
+    "fr": "Commande sur huit bits définie par l’application.",
+    "es": "Orden de ocho bits definida por la aplicación.",
+    "de": "Von der Anwendung definierter Acht-Bit-Befehl."
   },
   "link_Link4_SendPacketTo_returns": {
     "ja": "選択または予約時の最初のエラー。受付は0です。",
     "en": "Returns the first selection/queueing error; 0 means accepted.",
-    "zh-CN": "返回选择或入队时的第一个错误；0 表示已接受。"
+    "zh-CN": "返回选择或入队时的第一个错误；0 表示已接受。",
+    "ko": "선택·큐 등록 중 처음 발생한 오류를 반환합니다. 0은 수락을 뜻합니다.",
+    "zh-TW": "傳回選擇／排入佇列時第一個錯誤；0 表示接受。",
+    "fr": "Renvoie la première erreur de sélection ou de mise en file ; 0 signifie accepté.",
+    "es": "Devuelve el primer error de selección o encolado; 0 significa aceptado.",
+    "de": "Gibt den ersten Auswahl- oder Einreihungsfehler zurück. 0 bedeutet angenommen."
   },
   "link_note_oneroute": {
     "ja": "全スロットを順番に選ぶ処理は含まれません。相手を切り替えるのは、送受信が完了して選択可能になってからです。",
     "en": "Does not rotate across all slots. Change peers only after the exchange has finished and selection is permitted.",
-    "zh-CN": "不会轮流访问全部槽位。只有交换结束且允许选择时，才能改变对端。"
+    "zh-CN": "不会轮流访问全部槽位。只有交换结束且允许选择时，才能改变对端。",
+    "ko": "모든 슬롯을 순환하지 않습니다. 교환이 끝나서 선택이 허용될 때만 상대를 바꾸세요.",
+    "zh-TW": "不會輪流處理所有槽位。只有交換完成且允許選擇時，才能變更對端。",
+    "fr": "Ne parcourt pas tous les emplacements en rotation. Ne changez de correspondant qu’après la fin de l’échange, lorsque la sélection est autorisée.",
+    "es": "No rota por todas las posiciones. Cambia de interlocutor solo cuando el intercambio haya terminado y se permita seleccionar.",
+    "de": "Wechselt nicht zyklisch durch alle Plätze. Ändern Sie die Gegenstelle erst nach Abschluss des Austauschs, wenn eine Auswahl erlaubt ist."
   },
   "link_Link4_PollPacket_purpose": {
     "ja": "共通のパケット処理を、現在の接続先に対して1回進めます。",
     "en": "Advance the shared packet engine once for the currently selected peer.",
-    "zh-CN": "针对当前所选对端，将共享数据包引擎推进一次。"
+    "zh-CN": "针对当前所选对端，将共享数据包引擎推进一次。",
+    "ko": "현재 선택된 상대에 대해 공유 패킷 처리기를 한 번 진행합니다.",
+    "zh-TW": "針對目前選定對端，將共用封包處理引擎推進一次。",
+    "fr": "Fait avancer une fois le moteur de paquets partagé pour le correspondant sélectionné.",
+    "es": "Avanza una vez el motor de paquetes compartido para el interlocutor seleccionado.",
+    "de": "Führt die gemeinsame Paketverarbeitung für die aktuell gewählte Gegenstelle einmal weiter."
   },
   "link_Link4_PollPacket_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "link_Link4_HasPacketFrom_purpose": {
     "ja": "指定相手の完成済みパケットメールボックスを調べます。",
     "en": "Inspect the completed-packet mailbox for one remote slot.",
-    "zh-CN": "检查某个远端槽位的完整数据包邮箱。"
+    "zh-CN": "检查某个远端槽位的完整数据包邮箱。",
+    "ko": "원격 슬롯 하나의 수신 완료 패킷 메일박스를 확인합니다.",
+    "zh-TW": "檢查某個遠端槽位的完整封包信箱。",
+    "fr": "Consulte la boîte des paquets terminés d’un emplacement distant.",
+    "es": "Consulta el buzón de paquetes completados de una posición remota.",
+    "de": "Prüft den Briefkasten vollständiger Pakete eines entfernten Platzes."
   },
   "link_Link4_HasPacketFrom_peer_slot": {
     "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
     "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer.",
-    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。"
+    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。",
+    "ko": "설정된 원격 슬롯입니다. 호스트에서는 1~slot_count−1, 상대에서는 0입니다.",
+    "zh-TW": "已設定的遠端槽位：主機使用 1～slot_count−1，對端使用 0。",
+    "fr": "Emplacement distant configuré : de 1 à slot_count−1 depuis l’hôte, ou 0 depuis un correspondant.",
+    "es": "Posición remota configurada: 1..slot_count−1 desde el anfitrión o 0 desde un interlocutor.",
+    "de": "Konfigurierter entfernter Platz: vom Host aus 1 bis slot_count−1, von einer Gegenstelle aus 0."
   },
   "link_Link4_HasPacketFrom_returns": {
     "ja": "未読があれば1、空または不正な相手なら0です。",
     "en": "Returns 1 for an unread packet, 0 for empty/invalid peer.",
-    "zh-CN": "有未读数据包返回 1，邮箱为空或对端无效时返回 0。"
+    "zh-CN": "有未读数据包返回 1，邮箱为空或对端无效时返回 0。",
+    "ko": "읽지 않은 패킷이 있으면 1, 비어 있거나 상대가 잘못되었으면 0입니다.",
+    "zh-TW": "有未讀封包時傳回 1，為空或對端無效時傳回 0。",
+    "fr": "Renvoie 1 pour un paquet non lu, 0 si vide ou si le correspondant est invalide.",
+    "es": "Devuelve 1 si hay un paquete sin leer y 0 si está vacío o el interlocutor no es válido.",
+    "de": "Gibt bei einem ungelesenen Paket 1 zurück, bei leerem Briefkasten oder ungültiger Gegenstelle 0."
   },
   "link_note_peermail": {
     "ja": "通常メールボックスがこの相手のパケットを指している場合だけ、通常側も消します。他の相手の未読パケットは保持します。",
     "en": "Clears the shared mailbox only when it refers to this same peer’s packet. Unread packets from other peers remain available.",
-    "zh-CN": "只有共享邮箱引用同一对端的数据包时，才清除共享邮箱。其他对端的未读数据包仍可用。"
+    "zh-CN": "只有共享邮箱引用同一对端的数据包时，才清除共享邮箱。其他对端的未读数据包仍可用。",
+    "ko": "공유 메일박스가 같은 상대의 패킷을 가리킬 때만 비웁니다. 다른 상대의 읽지 않은 패킷은 그대로 사용할 수 있습니다.",
+    "zh-TW": "只有共用信箱指向同一對端封包時才清除它。其他對端的未讀封包仍可使用。",
+    "fr": "Vide la boîte partagée uniquement si elle désigne le paquet de ce même correspondant. Les paquets non lus des autres correspondants restent disponibles.",
+    "es": "Vacía el buzón compartido solo si se refiere al paquete de ese mismo interlocutor. Los paquetes sin leer de otros interlocutores siguen disponibles.",
+    "de": "Leert den gemeinsamen Briefkasten nur, wenn er auf das Paket derselben Gegenstelle verweist. Ungelesene Pakete anderer Gegenstellen bleiben verfügbar."
   },
   "link_Link4_ReadPacketFrom_purpose": {
     "ja": "指定相手のパケットをコピーし、そのメールボックスを消費します。",
     "en": "Copy a packet from a specific peer and consume its mailbox.",
-    "zh-CN": "从指定对端复制数据包，并消费其邮箱。"
+    "zh-CN": "从指定对端复制数据包，并消费其邮箱。",
+    "ko": "지정한 상대의 패킷을 복사하고 해당 메일박스에서 소비합니다.",
+    "zh-TW": "複製指定對端的封包，並從其信箱取走。",
+    "fr": "Copie un paquet du correspondant indiqué et le retire de sa boîte.",
+    "es": "Copia un paquete de un interlocutor concreto y lo consume de su buzón.",
+    "de": "Kopiert ein Paket einer bestimmten Gegenstelle und entnimmt es aus deren Briefkasten."
   },
   "link_Link4_ReadPacketFrom_peer_slot": {
     "ja": "設定済みの自分以外のスロット。ホストからは1～slot_count−1、相手からは0を指定します。",
     "en": "Configured remote slot: 1..slot_count−1 from the host, or 0 from a peer.",
-    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。"
+    "zh-CN": "已配置的远端槽位：主机可选 1..slot_count−1，对端可选 0。",
+    "ko": "설정된 원격 슬롯입니다. 호스트에서는 1~slot_count−1, 상대에서는 0입니다.",
+    "zh-TW": "已設定的遠端槽位：主機使用 1～slot_count−1，對端使用 0。",
+    "fr": "Emplacement distant configuré : de 1 à slot_count−1 depuis l’hôte, ou 0 depuis un correspondant.",
+    "es": "Posición remota configurada: 1..slot_count−1 desde el anfitrión o 0 desde un interlocutor.",
+    "de": "Konfigurierter entfernter Platz: vom Host aus 1 bis slot_count−1, von einer Gegenstelle aus 0."
   },
   "link_Link4_ReadPacketFrom_cmd": {
     "ja": "受信コマンドを書き込む1バイト。0なら省略します。",
     "en": "Writable command byte; null omits it.",
-    "zh-CN": "可写命令字节；为 null 时不输出。"
+    "zh-CN": "可写命令字节；为 null 时不输出。",
+    "ko": "쓰기 가능한 명령 바이트입니다. null이면 이 출력을 생략합니다.",
+    "zh-TW": "可寫入的命令位元組；null 表示省略此輸出。",
+    "fr": "Octet de commande inscriptible ; null omet cette sortie.",
+    "es": "Byte de orden escribible; null omite esta salida.",
+    "de": "Beschreibbares Befehlsbyte; null lässt diese Ausgabe aus."
   },
   "link_Link4_ReadPacketFrom_len": {
     "ja": "受信長0～24を書き込む1バイト。0なら省略します。",
     "en": "Writable length byte, 0..24; null omits it.",
-    "zh-CN": "可写长度字节，范围为 0..24；为 null 时不输出。"
+    "zh-CN": "可写长度字节，范围为 0..24；为 null 时不输出。",
+    "ko": "쓰기 가능한 길이 바이트(0~24)입니다. null이면 이 출력을 생략합니다.",
+    "zh-TW": "可寫入的長度位元組，範圍為 0～24；null 表示省略此輸出。",
+    "fr": "Octet de longueur inscriptible, de 0 à 24 ; null omet cette sortie.",
+    "es": "Byte de longitud escribible, de 0 a 24; null omite esta salida.",
+    "de": "Beschreibbares Längenbyte von 0 bis 24; null lässt diese Ausgabe aus."
   },
   "link_Link4_ReadPacketFrom_dst": {
     "ja": "最大24バイトの書き込み先。0なら内容を読み捨てます。",
     "en": "Writable payload buffer with room for 24 bytes; null discards the payload.",
-    "zh-CN": "可容纳 24 字节的可写有效载荷缓冲区；为 null 时丢弃有效载荷。"
+    "zh-CN": "可容纳 24 字节的可写有效载荷缓冲区；为 null 时丢弃有效载荷。",
+    "ko": "24바이트를 담을 수 있는 쓰기 가능한 페이로드 버퍼입니다. null이면 페이로드를 버립니다.",
+    "zh-TW": "可寫入且容納 24 位元組的有效負載緩衝區；null 表示捨棄有效負載。",
+    "fr": "Tampon de données utiles inscriptible d’au moins 24 octets ; null abandonne les données utiles.",
+    "es": "Búfer de carga útil escribible con espacio para 24 bytes; null descarta la carga útil.",
+    "de": "Beschreibbarer Nutzdatenpuffer mit Platz für 24 Bytes; null verwirft die Nutzdaten."
   },
   "link_Link4_ReadPacketFrom_returns": {
     "ja": "取得できれば1、空または不正な相手なら0です。",
     "en": "Returns 1 when consumed, 0 for empty/invalid peer.",
-    "zh-CN": "消费成功返回 1，邮箱为空或对端无效时返回 0。"
+    "zh-CN": "消费成功返回 1，邮箱为空或对端无效时返回 0。",
+    "ko": "소비했으면 1, 비어 있거나 상대가 잘못되었으면 0을 반환합니다.",
+    "zh-TW": "取出成功傳回 1；為空或對端無效傳回 0。",
+    "fr": "Renvoie 1 si consommé, 0 si vide ou si le correspondant est invalide.",
+    "es": "Devuelve 1 si consume el paquete y 0 si está vacío o el interlocutor no es válido.",
+    "de": "Gibt bei Entnahme 1 zurück, bei leerem Briefkasten oder ungültiger Gegenstelle 0."
   },
   "link_example_deadline": {
     "ja": "相手を接続せずにパケットを送ります。内部クロックのバイト転送自体は完了してもACKが来ないため、再試行後にNO ACK ERROR=5になります。Cancel後はCANCEL BUSY=0です。",
     "en": "Send with no peer attached. Byte transfers complete under internal clocks, but no ACK arrives; after retries, NO ACK ERROR=5. Cancel leaves CANCEL BUSY=0.",
-    "zh-CN": "不连接对端进行发送。内部时钟会使字节传送完成，但收不到 ACK；重试后 NO ACK ERROR=5。取消后 CANCEL BUSY=0。"
+    "zh-CN": "不连接对端进行发送。内部时钟会使字节传送完成，但收不到 ACK；重试后 NO ACK ERROR=5。取消后 CANCEL BUSY=0。",
+    "ko": "상대가 연결되지 않은 상태에서 전송합니다. 내부 클록으로 바이트 전송은 완료되지만 ACK는 오지 않으므로 재시도 후 NO ACK ERROR=5가 됩니다. Cancel 후에는 CANCEL BUSY=0입니다.",
+    "zh-TW": "在未連接對端時傳送。內部時脈會讓位元組傳輸完成，但不會收到 ACK；重試後 NO ACK ERROR=5。Cancel 後為 CANCEL BUSY=0。",
+    "fr": "Envoyez sans correspondant connecté. Les transferts d’octets se terminent avec l’horloge interne, mais aucun ACK n’arrive ; après les tentatives, NO ACK ERROR=5. Cancel laisse CANCEL BUSY=0.",
+    "es": "Envía sin un interlocutor conectado. Las transferencias de bytes terminan con reloj interno, pero no llega ACK; tras los reintentos, NO ACK ERROR=5. Cancel deja CANCEL BUSY=0.",
+    "de": "Senden Sie ohne angeschlossene Gegenstelle. Bytetransfers enden mit internem Takt, aber es kommt kein ACK. Nach den Wiederholungen gilt NO ACK ERROR=5. Cancel hinterlässt CANCEL BUSY=0."
   },
   "link_note_launch": {
     "ja": "コマンドはkitaqgb・kokura・kitaq-docsを同じ親フォルダーに置き、その親でPowerShellを開いて実行します。接続する全ROMをビルドしてからまとめて起動します。Link4では出力されたシンボル等のメタデータをROMの隣に残してください。初代GBで確認する場合は全コマンドの--cgb=cgbを--cgb=dmg、--hardware cgbを--hardware dmgへ変更します。",
     "en": "Run these PowerShell commands from the parent containing kitaqgb, kokura and kitaq-docs. Build every participating ROM before launching the linked session. For Link4, retain the generated symbol metadata beside the ROMs. For DMG runs, change --cgb=cgb to --cgb=dmg and --hardware cgb to --hardware dmg throughout.",
-    "zh-CN": "在包含 kitaqgb、kokura 和 kitaq-docs 的父目录运行这些 PowerShell 命令。启动联机会话前，先构建所有参与的 ROM。Link4 要求生成的符号元数据保留在 ROM 旁。运行 DMG 时，将所有 --cgb=cgb 改为 --cgb=dmg，将 --hardware cgb 改为 --hardware dmg。"
+    "zh-CN": "在包含 kitaqgb、kokura 和 kitaq-docs 的父目录运行这些 PowerShell 命令。启动联机会话前，先构建所有参与的 ROM。Link4 要求生成的符号元数据保留在 ROM 旁。运行 DMG 时，将所有 --cgb=cgb 改为 --cgb=dmg，将 --hardware cgb 改为 --hardware dmg。",
+    "ko": "kitaqgb, kokura, kitaq-docs가 들어 있는 상위 폴더에서 이 PowerShell 명령을 실행하세요. 연결 세션을 시작하기 전에 참여하는 모든 ROM을 빌드하세요. Link4에서는 생성된 심벌 메타데이터를 ROM 옆에 유지하세요. DMG로 실행하려면 모든 명령의 --cgb=cgb를 --cgb=dmg로, --hardware cgb를 --hardware dmg로 바꾸세요.",
+    "zh-TW": "請在包含 kitaqgb、kokura、kitaq-docs 的上層資料夾執行這些 PowerShell 命令。啟動連線工作階段前，先建置所有參與的 ROM。Link4 須將產生的符號中繼資料保留在 ROM 旁。若以 DMG 執行，請將所有命令中的 --cgb=cgb 改為 --cgb=dmg，--hardware cgb 改為 --hardware dmg。",
+    "fr": "Exécutez ces commandes PowerShell depuis le dossier parent contenant kitaqgb, kokura et kitaq-docs. Compilez toutes les ROM participantes avant de lancer la session reliée. Pour Link4, conservez les métadonnées de symboles générées à côté des ROM. Pour les exécutions DMG, remplacez partout --cgb=cgb par --cgb=dmg et --hardware cgb par --hardware dmg.",
+    "es": "Ejecuta estos comandos PowerShell desde la carpeta que contiene kitaqgb, kokura y kitaq-docs. Compila todas las ROM participantes antes de iniciar la sesión enlazada. Para Link4, conserva los metadatos de símbolos generados junto a las ROM. Para ejecutar en DMG, cambia en todos los comandos --cgb=cgb por --cgb=dmg y --hardware cgb por --hardware dmg.",
+    "de": "Führen Sie diese PowerShell-Befehle im gemeinsamen übergeordneten Ordner von kitaqgb, kokura und kitaq-docs aus. Bauen Sie alle beteiligten ROMs vor dem Start der verbundenen Sitzung. Belassen Sie bei Link4 die erzeugten Symbolmetadaten neben den ROMs. Ersetzen Sie für DMG-Läufe überall --cgb=cgb durch --cgb=dmg und --hardware cgb durch --hardware dmg."
   },
   "link_module": {
     "ja": "このライブラリは、バイト交換、最大24バイトのパケット、接続先別キューの3層で通信を扱います。まずBYTE MASTER/SLAVEを動かし、次にPACKET、最後にLINK4へ進むと、クロックと受信待ちの関係を確認できます。ハードウェアレジスタ定義、link.c、link_packet.cは同じプログラムに1回ずつ組み込みます。サンプルのgb_link_example.hがこの順序をまとめています。",
     "en": "The library provides three layers: byte exchanges, packets of up to 24 bytes, and peer-specific queues. Start with BYTE MASTER/SLAVE, then PACKET, then LINK4 to learn clock ownership and receive readiness. Include the hardware-register unit, link.c and link_packet.c exactly once in a program; gb_link_example.h supplies that order.",
-    "zh-CN": "本库提供三个层次：字节交换、最多 24 字节的数据包，以及按对端划分的队列。先学习 BYTE MASTER/SLAVE，再学习 PACKET 和 LINK4，理解时钟归属和接收就绪状态。程序须恰好包含一次硬件寄存器单元、link.c 和 link_packet.c；gb_link_example.h 提供了正确顺序。"
+    "zh-CN": "本库提供三个层次：字节交换、最多 24 字节的数据包，以及按对端划分的队列。先学习 BYTE MASTER/SLAVE，再学习 PACKET 和 LINK4，理解时钟归属和接收就绪状态。程序须恰好包含一次硬件寄存器单元、link.c 和 link_packet.c；gb_link_example.h 提供了正确顺序。",
+    "ko": "라이브러리는 바이트 교환, 최대 24바이트 패킷, 상대별 큐의 세 계층을 제공합니다. BYTE MASTER/SLAVE부터 PACKET, LINK4 순으로 진행하여 클록 공급 주체와 수신 준비 상태를 익히세요. 한 프로그램에서 하드웨어 레지스터 단위, link.c, link_packet.c를 각각 정확히 한 번 포함해야 하며 gb_link_example.h가 이 순서를 제공합니다.",
+    "zh-TW": "函式庫提供三層：位元組交換、最多 24 位元組封包，以及各對端佇列。請從 BYTE MASTER/SLAVE 開始，再學 PACKET 與 LINK4，了解誰提供時脈及何時可接收。每個程式須依序包含硬體暫存器單元、link.c、link_packet.c，且各僅一次；gb_link_example.h 提供此順序。",
+    "fr": "La bibliothèque propose trois niveaux : échanges d’octets, paquets jusqu’à 24 octets et files par correspondant. Commencez par BYTE MASTER/SLAVE, puis PACKET, puis LINK4 pour comprendre la source d’horloge et la disponibilité des données reçues. Incluez exactement une fois dans le programme l’unité des registres matériels, link.c et link_packet.c ; gb_link_example.h fournit cet ordre.",
+    "es": "La biblioteca ofrece tres niveles: intercambio de bytes, paquetes de hasta 24 bytes y colas por interlocutor. Empieza con BYTE MASTER/SLAVE, sigue con PACKET y luego LINK4 para aprender quién aporta el reloj y cuándo hay datos recibidos disponibles. Incluye exactamente una vez la unidad de registros de hardware, link.c y link_packet.c en el programa; gb_link_example.h proporciona ese orden.",
+    "de": "Die Bibliothek bietet drei Ebenen: Byteaustausch, Pakete mit bis zu 24 Bytes und Warteschlangen pro Gegenstelle. Beginnen Sie mit BYTE MASTER/SLAVE, danach PACKET und LINK4, um Taktzuständigkeit und Empfangsbereitschaft kennenzulernen. Binden Sie die Hardwareregister-Einheit, link.c und link_packet.c je genau einmal in ein Programm ein. gb_link_example.h stellt diese Reihenfolge bereit."
   }
 }

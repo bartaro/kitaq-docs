@@ -58,6 +58,38 @@ def translate_text(text, messages):
     return text[:len(text)-len(text.lstrip())]+result+text[len(text.rstrip()):]
 
 
+def finish_inline_prose(soup,lang):
+    """Join translated punctuation and Korean particles to inline identifiers.
+
+    English source whitespace must not introduce a space before a period or
+    between a Korean particle and its preceding code token. Code, attributes
+    and separately rendered API/module contracts remain untouched.
+    """
+    if lang not in {'ko','zh-TW','fr','es','de'}:return
+    for node in list(soup.find_all(string=True)):
+        if isinstance(node,Comment) or node.find_parent(['pre','code','script','style']):continue
+        if node.find_parent(attrs={'data-api-contract':True}) or node.find_parent(attrs={'data-module-contract':True}):continue
+        previous=node.previous_sibling
+        if getattr(previous,'name',None) not in {'code','a','strong','em','span'}:continue
+        text=str(node);trimmed=text.lstrip()
+        if lang=='zh-TW' and trimmed=='.':trimmed='。'
+        join=bool(re.match(r'^[.,，。；：！？]',trimmed))
+        if lang=='ko' and re.match(r'^(?:은|는|을|를|에|가|로|의|와|과|도|에서|으로|만으로|입니다|이고)(?:\s|[.,;]|$)',trimmed):join=True
+        if join and text!=trimmed:node.replace_with(trimmed)
+
+
+def kokura_command_prose(lang):
+    """Insert authored command lessons with exact source command blocks."""
+    path=S/'tools/i18n'/lang/'kokura-commands.md'
+    if not path.exists():return ''
+    source=(S/'tools/en/kokura_commands.md').read_text(encoding='utf-8')
+    blocks=re.findall(r'^```[^\n]*\n.*?^```',source,re.M|re.S)
+    text=path.read_text(encoding='utf-8')
+    ids=[int(v) for v in re.findall(r'\{\{COMMAND:(\d+)\}\}',text)]
+    assert ids==list(range(len(blocks))),(lang,'command lesson blocks')
+    return re.sub(r'\{\{COMMAND:(\d+)\}\}',lambda m:blocks[int(m[1])],text)
+
+
 def make_page(lang,key,messages,inspect=False):
     source=(S/'en'/(key+'.html')).read_text(encoding='utf-8')
     # Prompt navigation is authored separately for each language, after translation.
@@ -79,6 +111,7 @@ def make_page(lang,key,messages,inspect=False):
             missing.add('MISSING CHAPTER: '+lang+'/'+key)
             prose=''
         else:prose=prose_path.read_text(encoding='utf-8')
+        if key=='kokura':prose+='\n\n'+kokura_command_prose(lang)
         source_blocks=re.findall(r'^```[^\n]*\n.*?^```',g.TEXT[key],re.M|re.S)
         prose=re.sub(r'\{\{CODE:(\d+)\}\}',lambda m:source_blocks[int(m[1])],prose)
         prose=prose.replace('{{ORIGIN}}',messages.get('origin','{{ORIGIN}}'))
@@ -99,12 +132,21 @@ def make_page(lang,key,messages,inspect=False):
         if node.find_parent(class_='authored'):continue
         if str(node).lower()=='html':continue
         node.replace_with(translate_text(str(node),messages))
+    finish_inline_prose(soup,lang)
     # The prose code widgets use the same localized labels as the reference widgets.
     for button in soup.select('button.copy'):button.string=lookup('Copy',messages)
     for node in soup.find_all(True):
         for attr in ('alt','placeholder','aria-label'):
             if node.has_attr(attr):node[attr]=translate_text(node[attr],messages)
     soup.html['lang']=HTML_LANG.get(lang,lang)
+    # Keep the game-guide card in the current language when its authored guide exists.
+    # This does not enable the edition in the public language navigation.
+    if key=='index' and lang in {'ko','zh-TW','fr','es','de'}:
+        guide=S/'apps/harapeko_shirohebi'/('guide-'+lang+'.html')
+        if guide.is_file():
+            for link in soup.select('a.book'):
+                if '/harapeko_shirohebi/guide-' in link.get('href',''):
+                    link['href']='../apps/harapeko_shirohebi/'+guide.name
     mast=soup.select_one('.mast')
     for a in mast.select('a[hreflang]'):a.decompose()
     mast.insert_after(BeautifulSoup(language_nav(key,lang,lookup('Languages',messages)),'html.parser'))
@@ -117,7 +159,11 @@ def make_page(lang,key,messages,inspect=False):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--language',choices=LANGUAGES,default='ko');parser.add_argument('--inspect',action='store_true')
+    parser.add_argument('--local-preview',action='store_true',help='Generate an unpublished edition locally without enabling public navigation')
     args=parser.parse_args();lang=args.language
+    from publication_languages import ACTIVE_LANGUAGES
+    if not args.inspect and lang not in ACTIVE_LANGUAGES and not args.local_preview:
+        parser.error('This edition is unpublished; use --local-preview for local generation.')
     path=S/'tools/i18n'/lang/'messages.json'
     if path.exists():
         messages=json.loads(path.read_text(encoding='utf-8'))
@@ -145,8 +191,8 @@ def main():
         from generate_prompts import publish
         publish(lang)
         from api_contracts import publish as publish_api_contracts
-        publish_api_contracts(lang)
-        if lang=='zh-CN':
+        publish_api_contracts(lang,require_complete=args.local_preview,local_preview=args.local_preview)
+        if lang in {'zh-CN','ko','zh-TW','fr','es','de'}:
             from localize_presentations import publish as localize_presentations
             localize_presentations(lang)
     stale=S/'tools/i18n'/lang/'missing.json'

@@ -34,7 +34,7 @@ Répétez ce cycle jusqu’à satisfaire les critères d’acceptation : précis
 
 - Envisagez NROM pour un petit jeu, puis MMC3 ou un autre mapper si la taille ou les changements de banque le nécessitent. Vérifiez les fonctions de la carte avec `inspect-rom`, `mapper-info`, `audit-board` et leur implémentation ; le nom du mapper ne garantit pas leur prise en charge.
 - Prévoyez les tailles PRG/CHR, CHR-ROM ou CHR-RAM, mirroring, banques fixes, vecteurs d’interruption et RAM de sauvegarde. Après optimisation ou modification des banques, comparez l’en-tête à la disposition réelle. `--nes-local-ram` utilise la RAM interne du CPU `$0000–$07FF` ; évitez tout chevauchement avec page zéro, pile, tampons OAM et zones du runtime ou des bibliothèques.
-- Utilisez le dialecte C de KITAQFC, les bibliothèques FC et `void main(void)`. Ne présumez pas la compatibilité des API GB. Certains en-têtes ne contiennent que des déclarations : repérez les implémentations et incluez les fichiers `.c` nécessaires.
+- Utilisez le dialecte C de KITAQFC, les bibliothèques FC et `void main(void)`. Ne présumez pas la compatibilité des API GB. Certains éléments des en-têtes ne sont que des déclarations : repérez les implémentations et incluez les fichiers `.c` nécessaires.
 - Tenez compte des registres PPU, de NMI, d’OAM DMA, du nombre de sprites par ligne, du défilement, du mirroring, des tables d’attributs et d’APU/DMC. L’espace libre de la file n’est pas la capacité de VRAM du PPU ; dimensionnez le travail de chaque NMI.
 - Convertissez la police originale `ascii.c` au format CHR FC, puis vérifiez CHR, palettes, tables de noms et attributs. Pour FDS, vérifiez séparément accès disque, sauvegarde et exigences de BIOS, sans supposer les mêmes conditions de démarrage qu’une cartouche.
 

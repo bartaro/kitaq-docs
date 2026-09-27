@@ -2,441 +2,881 @@
   "dmg07_note_scope": {
     "ja": "画像はKOKURAのDMG-07モデルで実行した結果です。接続するコンソールは個別に動作し、実際の送受信値を照合しています。実物のアダプターやケーブルの電気的特性・タイミングは未検証です。CGBの数値は青色で表示します。",
     "en": "Screens are captured from KOKURA’s DMG-07 model. Each console executes independently, and transmitted and received values are compared. Physical adapter/cable electrical behavior and timing are unverified. CGB screens display numeric values in blue.",
-    "zh-CN": "画面由 KOKURA 的 DMG-07 模型截取。各台主机独立执行，并比较发送与接收值。尚未验证实体适配器/线缆的电气行为及时序。CGB 画面以蓝色显示数值。"
+    "zh-CN": "画面由 KOKURA 的 DMG-07 模型截取。各台主机独立执行，并比较发送与接收值。尚未验证实体适配器/线缆的电气行为及时序。CGB 画面以蓝色显示数值。",
+    "ko": "화면은 KOKURA의 DMG-07 모델에서 캡처합니다. 각 콘솔은 독립적으로 실행하고 송수신 값을 비교합니다. 실제 어댑터·케이블의 전기적 동작과 타이밍은 검증하지 않았습니다. CGB 화면은 숫자를 파란색으로 표시합니다.",
+    "zh-TW": "畫面擷取自 KOKURA 的 DMG-07 模型。各主機獨立執行，並比對傳送與接收值。實體轉接器／線材的電氣行為及時序尚未驗證。CGB 畫面以藍色顯示數值。",
+    "fr": "Les écrans proviennent du modèle DMG-07 de KOKURA. Chaque console s’exécute indépendamment et les valeurs envoyées/reçues sont comparées. Le comportement électrique et le timing de l’adaptateur et du câble physiques ne sont pas vérifiés. Les écrans CGB affichent les nombres en bleu.",
+    "es": "Las pantallas se capturan con el modelo DMG-07 de KOKURA. Cada consola se ejecuta de forma independiente y se comparan los valores enviados y recibidos. No se han verificado el comportamiento eléctrico ni la temporización del adaptador y cable físicos. En CGB los números aparecen en azul.",
+    "de": "Die Bilder stammen aus KOKURAs DMG-07-Modell. Jede Konsole läuft unabhängig; gesendete und empfangene Werte werden verglichen. Elektrisches Verhalten und Timing physischer Adapter und Kabel sind ungeprüft. CGB-Bilder zeigen Zahlen blau."
   },
   "dmg07_note_port": {
     "ja": "このドライバーがシリアルポートを専有します。通常のLinkやLink4と同時に動かさず、link_hwregs_gb.cとlink_dmg07.cを1回ずつ組み込みます。外部クロックはアダプターが供給し、CGB専用の高速通信には切り替えません。",
     "en": "This driver owns the serial port. Do not run ordinary Link or Link4 concurrently; include link_hwregs_gb.c and link_dmg07.c once each. The adapter supplies external clocks; the driver does not select CGB fast serial mode.",
-    "zh-CN": "本驱动独占串行端口。不要同时运行普通 Link 或 Link4；link_hwregs_gb.c 和 link_dmg07.c 各包含一次。外部时钟由适配器提供；驱动不会选择 CGB 高速串行模式。"
+    "zh-CN": "本驱动独占串行端口。不要同时运行普通 Link 或 Link4；link_hwregs_gb.c 和 link_dmg07.c 各包含一次。外部时钟由适配器提供；驱动不会选择 CGB 高速串行模式。",
+    "ko": "이 드라이버는 직렬 포트를 독점합니다. 일반 Link나 Link4를 동시에 실행하지 말고 link_hwregs_gb.c와 link_dmg07.c를 각각 한 번 포함하세요. 외부 클록은 어댑터가 제공하며, 드라이버는 CGB 고속 직렬 모드를 선택하지 않습니다.",
+    "zh-TW": "此驅動程式獨占序列埠。不可同時執行一般 Link 或 Link4；link_hwregs_gb.c 與 link_dmg07.c 各包含一次。外部時脈由轉接器提供；驅動程式不選取 CGB 高速序列模式。",
+    "fr": "Ce pilote possède le port série. N’exécutez pas Link ordinaire ou Link4 simultanément ; incluez link_hwregs_gb.c et link_dmg07.c une fois chacun. L’adaptateur fournit les horloges externes ; le pilote ne sélectionne pas le mode série rapide CGB.",
+    "es": "Este controlador ocupa el puerto serie. No ejecutes Link normal ni Link4 a la vez; incluye link_hwregs_gb.c y link_dmg07.c una vez cada uno. El adaptador aporta el reloj externo; el controlador no selecciona el modo serie rápido de CGB.",
+    "de": "Dieser Treiber beansprucht den seriellen Port. Führen Sie gewöhnliches Link oder Link4 nicht gleichzeitig aus; binden Sie link_hwregs_gb.c und link_dmg07.c je einmal ein. Der Adapter liefert externe Takte; der Treiber wählt nicht den schnellen CGB-Seriellmodus."
   },
   "dmg07_note_poll": {
     "ja": "Pollはフレームの途中でも繰り返し呼び、TickFrameは1フレームにつき1回だけ呼びます。VBlankごとにPollを1回呼ぶだけではバイト間の再設定に間に合いません。共通ヘッダーのd_pollはLYが144以上になった境界を検出してTickFrameを呼びます。両者を割り込みとメイン処理から同時に操作しないでください。",
     "en": "Call Poll repeatedly throughout the frame and TickFrame exactly once per frame. One Poll per VBlank cannot re-arm the port between adapter bytes. The shared header’s d_poll detects entry into LY >= 144 to call TickFrame once. Serialize both operations instead of racing an ISR against the main loop.",
-    "zh-CN": "在整帧期间反复调用 Poll，并且每帧恰好调用一次 TickFrame。每个 VBlank 只调用一次 Poll，无法在适配器各字节之间及时重新准备端口。共享头文件中的 d_poll 检测进入 LY >= 144 的时刻，以调用一次 TickFrame。应串行执行两种操作，避免 ISR 与主循环发生竞态。"
+    "zh-CN": "在整帧期间反复调用 Poll，并且每帧恰好调用一次 TickFrame。每个 VBlank 只调用一次 Poll，无法在适配器各字节之间及时重新准备端口。共享头文件中的 d_poll 检测进入 LY >= 144 的时刻，以调用一次 TickFrame。应串行执行两种操作，避免 ISR 与主循环发生竞态。",
+    "ko": "프레임 전체에 걸쳐 Poll을 반복 호출하고 TickFrame은 프레임마다 정확히 한 번 호출하세요. VBlank마다 Poll 한 번으로는 어댑터 바이트 사이에 포트를 재준비할 수 없습니다. 공통 헤더의 d_poll은 LY >= 144 진입을 감지하여 TickFrame을 한 번 호출합니다. ISR과 메인 루프가 경쟁하지 않도록 두 작업을 순차 실행하세요.",
+    "zh-TW": "每影格持續重複呼叫 Poll，TickFrame 則恰好呼叫一次。每個 VBlank 只 Poll 一次，無法在轉接器的位元組之間重新準備埠。共用標頭的 d_poll 偵測進入 LY >= 144，呼叫一次 TickFrame。請序列化兩項操作，避免 ISR 與主迴圈競爭。",
+    "fr": "Appelez Poll de façon répétée pendant toute la trame et TickFrame exactement une fois par trame. Un Poll par VBlank ne peut pas réarmer le port entre les octets de l’adaptateur. Le d_poll de l’en-tête partagé détecte l’entrée dans LY >= 144 pour appeler TickFrame une fois. Sérialisez les deux opérations au lieu de faire rivaliser ISR et boucle principale.",
+    "es": "Llama a Poll repetidamente durante todo el fotograma y a TickFrame exactamente una vez por fotograma. Un Poll por VBlank no rearma el puerto entre bytes del adaptador. d_poll de la cabecera compartida detecta la entrada en LY >= 144 para llamar una vez a TickFrame. Serializa ambas operaciones para evitar carreras entre ISR y bucle principal.",
+    "de": "Rufen Sie Poll über den ganzen Frame wiederholt und TickFrame genau einmal pro Frame auf. Ein Poll pro VBlank kann den Port zwischen Adapterbytes nicht neu vorbereiten. d_poll im gemeinsamen Header erkennt den Eintritt in LY >= 144 und ruft TickFrame einmal auf. Serialisieren Sie beide Operationen, statt ISR und Hauptschleife konkurrieren zu lassen."
   },
   "dmg07_note_slots": {
     "ja": "ライブラリのプレイヤー番号は1～4、未検出は0です。接続マスクのビット0～3がプレイヤー1～4に対応します。KOKURAの--link-sessionに渡すslotは0～3なので、ROM内の番号と区別します。",
     "en": "Library player numbers are 1..4; zero means undiscovered. Connection-mask bits 0..3 correspond to players 1..4. KOKURA --link-session slot values are 0..3, a separate numbering convention from the ROM API.",
-    "zh-CN": "库的玩家编号为 1..4；零表示尚未发现。连接掩码的位 0..3 对应玩家 1..4。KOKURA --link-session 的 slot 值为 0..3，与 ROM API 使用不同的编号规则。"
+    "zh-CN": "库的玩家编号为 1..4；零表示尚未发现。连接掩码的位 0..3 对应玩家 1..4。KOKURA --link-session 的 slot 值为 0..3，与 ROM API 使用不同的编号规则。",
+    "ko": "라이브러리 플레이어 번호는 1~4이며 0은 미발견입니다. 연결 마스크 비트 0~3은 플레이어 1~4에 대응합니다. KOKURA --link-session의 slot 값 0~3은 ROM API와 별개의 번호 체계입니다.",
+    "zh-TW": "函式庫玩家編號為 1..4，零表示尚未發現。連線遮罩位元 0..3 對應玩家 1..4。KOKURA --link-session 的 slot 值為 0..3，與 ROM API 是不同編號慣例。",
+    "fr": "Les joueurs de la bibliothèque sont numérotés 1..4 ; zéro signifie non découvert. Les bits 0..3 du masque de connexion correspondent aux joueurs 1..4. Les slots KOKURA --link-session vont de 0 à 3, convention distincte de l’API ROM.",
+    "es": "La biblioteca numera jugadores 1..4; cero significa no descubierto. Los bits 0..3 de la máscara de conexión corresponden a jugadores 1..4. Los valores slot de KOKURA --link-session son 0..3, una numeración distinta de la API ROM.",
+    "de": "Die Bibliothek nummeriert Spieler 1..4; null bedeutet noch nicht erkannt. Verbindungsbits 0..3 entsprechen Spielern 1..4. Die Slotwerte von KOKURA --link-session sind 0..3, eine von der ROM-API getrennte Nummerierung."
   },
   "dmg07_note_errors": {
     "ja": "エラーは0=なし、1=不正なフェーズ、2=プレイヤー1ではない、3=接続準備不足、4=時間切れ、5=プロトコル不正、6=未読パケットの上書きです。要求の成功は0、受信取得の成功は1です。成功した要求が以前のエラーを消すことはありません。",
     "en": "Error codes are 0=none, 1=wrong phase, 2=not player 1, 3=not ready, 4=timeout, 5=protocol error and 6=unread packet overwritten. Requests succeed with zero; receive/pop operations succeed with one. A successful request does not clear an earlier error.",
-    "zh-CN": "错误码：0=无错误、1=阶段错误、2=不是玩家 1、3=尚未就绪、4=超时、5=协议错误、6=未读数据包被覆盖。请求成功返回零；接收/弹出操作成功返回一。请求成功不会清除先前错误。"
+    "zh-CN": "错误码：0=无错误、1=阶段错误、2=不是玩家 1、3=尚未就绪、4=超时、5=协议错误、6=未读数据包被覆盖。请求成功返回零；接收/弹出操作成功返回一。请求成功不会清除先前错误。",
+    "ko": "오류 코드는 0=없음, 1=잘못된 단계, 2=플레이어 1이 아님, 3=준비 안 됨, 4=시간 초과, 5=프로토콜 오류, 6=읽지 않은 패킷 덮어쓰기입니다. 요청은 0으로 성공하고 수신·pop 작업은 1로 성공합니다. 요청 성공은 이전 오류를 지우지 않습니다.",
+    "zh-TW": "錯誤碼為 0=無、1=階段錯誤、2=不是玩家 1、3=尚未就緒、4=逾時、5=通訊協定錯誤、6=未讀封包被覆寫。請求成功傳回零，接收／pop 成功傳回一。請求成功不會清除先前錯誤。",
+    "fr": "Codes d’erreur : 0=aucune, 1=mauvaise phase, 2=pas joueur 1, 3=non prêt, 4=expiration, 5=erreur de protocole, 6=paquet non lu écrasé. Les requêtes réussissent avec zéro ; réception/pop avec un. Une requête réussie n’efface pas une erreur antérieure.",
+    "es": "Errores: 0=ninguno, 1=fase incorrecta, 2=no es jugador 1, 3=no preparado, 4=tiempo agotado, 5=error de protocolo, 6=paquete sin leer sobrescrito. Las solicitudes tienen éxito con cero; recibir/extraer, con uno. Una solicitud correcta no borra un error anterior.",
+    "de": "Fehlercodes: 0=kein Fehler, 1=falsche Phase, 2=nicht Spieler 1, 3=nicht bereit, 4=Zeitüberschreitung, 5=Protokollfehler, 6=ungelesenes Paket überschrieben. Anforderungen sind mit null erfolgreich, Empfang/Pop mit eins. Eine erfolgreiche Anforderung löscht keinen früheren Fehler."
   },
   "dmg07_note_pipeline": {
     "ja": "SIZE=1で各台が1バイトを提出し、4バイトの配信はプレイヤー1～4の順です。最初の配信は捨て、次の配信から受け取ります。受信内容は1パケット前の提出値です。4バイトすべてが0xFFの配信は再起動通知として予約されています。",
     "en": "With SIZE=1 each console submits one byte; the four-byte broadcast is ordered by players 1..4. The initial broadcast is discarded. Subsequent broadcasts contain the previous packet’s submissions. An all-0xFF four-byte broadcast is reserved as the restart indication.",
-    "zh-CN": "SIZE=1 时，每台主机提交一个字节；四字节广播按玩家 1..4 排列。初始广播会被丢弃。后续广播包含前一个数据包的提交值。四字节全为 0xFF 的广播保留作重新启动指示。"
+    "zh-CN": "SIZE=1 时，每台主机提交一个字节；四字节广播按玩家 1..4 排列。初始广播会被丢弃。后续广播包含前一个数据包的提交值。四字节全为 0xFF 的广播保留作重新启动指示。",
+    "ko": "SIZE=1이면 각 콘솔이 한 바이트를 제출하며 4바이트 브로드캐스트는 플레이어 1~4 순서입니다. 첫 브로드캐스트는 버립니다. 이후 브로드캐스트에는 이전 패킷에서 제출한 값이 들어갑니다. 네 바이트가 모두 0xFF인 브로드캐스트는 재시작 표식으로 예약되어 있습니다.",
+    "zh-TW": "SIZE=1 時，各主機提交一個位元組，四位元組廣播依玩家 1..4 排列。首次廣播會被丟棄；後續廣播包含上一封包提交的值。四個位元組全為 0xFF 的廣播保留為重新啟動指示。",
+    "fr": "Avec SIZE=1, chaque console soumet un octet ; la diffusion de quatre octets suit l’ordre des joueurs 1..4. La première diffusion est jetée. Les suivantes contiennent les contributions du paquet précédent. Quatre octets 0xFF sont réservés à l’indication de redémarrage.",
+    "es": "Con SIZE=1, cada consola envía un byte; la difusión de cuatro bytes sigue el orden de jugadores 1..4. Se descarta la primera difusión. Las siguientes contienen las aportaciones del paquete anterior. Una difusión de cuatro bytes 0xFF se reserva como señal de reinicio.",
+    "de": "Bei SIZE=1 liefert jede Konsole ein Byte; die Vier-Byte-Rundsendung folgt Spielern 1..4. Die erste wird verworfen. Spätere Rundsendungen enthalten die Beiträge des vorigen Pakets. Vier Bytes mit ausschließlich 0xFF sind als Neustartsignal reserviert."
   },
   "dmg07_note_mailbox": {
     "ja": "受信メールボックスは最新の1パケットだけを保持します。未読のまま次が完成すると新しい内容で上書きし、エラー6とErrorCountを記録します。取り出すまでアダプターが待ってくれるわけではありません。",
     "en": "The receive mailbox holds only the latest packet. Completion of another packet overwrites unread data, latches error 6 and increments ErrorCount. The adapter does not wait for the application to consume the mailbox.",
-    "zh-CN": "接收邮箱只保留最新数据包。另一个数据包完成时，会覆盖未读数据、锁存错误 6，并增加 ErrorCount。适配器不会等待应用程序消费邮箱。"
+    "zh-CN": "接收邮箱只保留最新数据包。另一个数据包完成时，会覆盖未读数据、锁存错误 6，并增加 ErrorCount。适配器不会等待应用程序消费邮箱。",
+    "ko": "수신 메일박스는 최신 패킷 하나만 보관합니다. 다음 패킷이 완료되면 읽지 않은 데이터를 덮어쓰고 오류 6을 기록하며 ErrorCount를 증가시킵니다. 어댑터는 애플리케이션이 메일박스를 읽을 때까지 기다리지 않습니다.",
+    "zh-TW": "接收信箱只保存最新封包。另一封包完成時會覆寫未讀資料、記錄錯誤 6 並遞增 ErrorCount。轉接器不會等待應用程式讀取信箱。",
+    "fr": "La boîte de réception ne conserve que le dernier paquet. Un nouveau paquet terminé écrase les données non lues, mémorise l’erreur 6 et incrémente ErrorCount. L’adaptateur n’attend pas que l’application lise la boîte.",
+    "es": "El buzón de recepción solo conserva el último paquete. Completar otro sobrescribe los datos sin leer, registra el error 6 e incrementa ErrorCount. El adaptador no espera a que la aplicación consuma el buzón.",
+    "de": "Das Empfangsfach speichert nur das neueste Paket. Der Abschluss eines weiteren Pakets überschreibt ungelesene Daten, merkt Fehler 6 und erhöht ErrorCount. Der Adapter wartet nicht auf das Auslesen durch die Anwendung."
   },
   "dmg07_note_counters": {
     "ja": "SilenceFramesと診断カウンターは255で止まります。Initはすべて初期化しますが、通常のプロトコル再起動では診断カウンターを保持します。ClearErrorはエラー番号だけを消します。",
     "en": "SilenceFrames and diagnostic counters saturate at 255. Init resets them all; ordinary protocol restarts preserve diagnostic counters. ClearError clears only the error code.",
-    "zh-CN": "SilenceFrames 和诊断计数器在 255 饱和。Init 会全部重置；普通协议重启保留诊断计数器。ClearError 只清除错误码。"
+    "zh-CN": "SilenceFrames 和诊断计数器在 255 饱和。Init 会全部重置；普通协议重启保留诊断计数器。ClearError 只清除错误码。",
+    "ko": "SilenceFrames와 진단 카운터는 255에서 포화됩니다. Init은 모두 초기화하고 일반 프로토콜 재시작은 진단 카운터를 유지합니다. ClearError는 오류 코드만 지웁니다.",
+    "zh-TW": "SilenceFrames 與診斷計數器飽和於 255。Init 重設全部計數；一般通訊協定重新啟動保留診斷計數器。ClearError 只清除錯誤碼。",
+    "fr": "SilenceFrames et les compteurs de diagnostic saturent à 255. Init les réinitialise tous ; les redémarrages ordinaires du protocole préservent les diagnostics. ClearError n’efface que le code d’erreur.",
+    "es": "SilenceFrames y los contadores de diagnóstico se saturan en 255. Init los restablece todos; los reinicios normales del protocolo conservan los de diagnóstico. ClearError solo borra el código de error.",
+    "de": "SilenceFrames und Diagnosezähler sättigen bei 255. Init setzt alle zurück; gewöhnliche Protokollneustarts erhalten die Diagnosezähler. ClearError löscht nur den Fehlercode."
   },
   "dmg07_note_seq": {
     "ja": "番号は8ビットで255の次は0です。パケット公開時にPacketSequence=SentSequence−1となります。その後も送信が始まるとSentSequenceが進むため、後から読む2つの番号が常に差1になるとは限りません。",
     "en": "Sequence numbers wrap from 255 to zero. At publication, PacketSequence equals SentSequence minus one. Later transmit starts advance SentSequence, so two getters sampled later need not differ by one.",
-    "zh-CN": "序列号从 255 回绕到零。数据包交付时，PacketSequence 等于 SentSequence 减一。后续发送开始会推进 SentSequence，因此稍后分别读取这两个值时，不一定仍相差一。"
+    "zh-CN": "序列号从 255 回绕到零。数据包交付时，PacketSequence 等于 SentSequence 减一。后续发送开始会推进 SentSequence，因此稍后分别读取这两个值时，不一定仍相差一。",
+    "ko": "시퀀스 번호는 255 다음 0으로 돌아갑니다. 패킷을 게시하는 시점의 PacketSequence는 SentSequence−1입니다. 이후 송신 시작은 SentSequence를 증가시키므로 나중에 두 getter로 읽은 값은 차이가 1이 아닐 수 있습니다.",
+    "zh-TW": "序號從 255 回捲至零。發布封包時，PacketSequence 等於 SentSequence 減一。後續傳送開始會遞增 SentSequence，因此稍後讀取兩個 getter 的值不一定相差一。",
+    "fr": "Les numéros de séquence passent de 255 à zéro. À la publication du paquet, PacketSequence vaut SentSequence moins un. Les départs de transmission suivants avancent SentSequence ; deux lectures ultérieures ne diffèrent donc pas nécessairement d’un.",
+    "es": "Los números de secuencia pasan de 255 a cero. Al publicar el paquete, PacketSequence es SentSequence menos uno. Inicios de transmisión posteriores avanzan SentSequence, así que lecturas posteriores de ambos valores no tienen por qué diferir en uno.",
+    "de": "Sequenznummern laufen von 255 auf null um. Bei der Bereitstellung des Pakets ist PacketSequence gleich SentSequence minus eins. Spätere Sendestarts erhöhen SentSequence; später abgefragte Werte müssen daher nicht um eins differieren."
   },
   "dmg07_note_launch": {
     "ja": "kitaqgb・kokura・kitaq-docsを同じ親フォルダーへ配置し、親フォルダーでPowerShellを開きます。4台通信では同じROMを4セッションで起動します。初代GB用に試す場合は、全コマンドの--cgb=cgbを--cgb=dmg、--hardware cgbを--hardware dmgへ変更します。",
     "en": "Place kitaqgb, kokura and kitaq-docs under one parent directory and open PowerShell there. Four-console examples launch the same ROM in four sessions. For DMG checks, replace --cgb=cgb with --cgb=dmg and --hardware cgb with --hardware dmg throughout.",
-    "zh-CN": "将 kitaqgb、kokura 和 kitaq-docs 放在同一父目录下，并在该目录打开 PowerShell。四主机示例在四个会话中启动同一个 ROM。检查 DMG 时，将所有 --cgb=cgb 改为 --cgb=dmg，将 --hardware cgb 改为 --hardware dmg。"
+    "zh-CN": "将 kitaqgb、kokura 和 kitaq-docs 放在同一父目录下，并在该目录打开 PowerShell。四主机示例在四个会话中启动同一个 ROM。检查 DMG 时，将所有 --cgb=cgb 改为 --cgb=dmg，将 --hardware cgb 改为 --hardware dmg。",
+    "ko": "kitaqgb, kokura, kitaq-docs를 같은 상위 디렉터리 아래에 놓고 그 상위 디렉터리에서 PowerShell을 여세요. 4대 콘솔 예제는 같은 ROM을 네 세션에서 실행합니다. DMG 검사에서는 모든 --cgb=cgb를 --cgb=dmg로, --hardware cgb를 --hardware dmg로 바꾸세요.",
+    "zh-TW": "將 kitaqgb、kokura、kitaq-docs 放在同一父目錄下，並在該父目錄開啟 PowerShell。四主機範例會在四個工作階段啟動相同 ROM。DMG 檢查時，請將所有 --cgb=cgb 換成 --cgb=dmg，--hardware cgb 換成 --hardware dmg。",
+    "fr": "Placez kitaqgb, kokura et kitaq-docs sous un même répertoire parent et ouvrez PowerShell à cet endroit. Les exemples à quatre consoles lancent la même ROM dans quatre sessions. Pour DMG, remplacez partout --cgb=cgb par --cgb=dmg et --hardware cgb par --hardware dmg.",
+    "es": "Coloca kitaqgb, kokura y kitaq-docs bajo un mismo directorio padre y abre PowerShell allí. Los ejemplos de cuatro consolas ejecutan la misma ROM en cuatro sesiones. Para comprobar DMG, sustituye en todas partes --cgb=cgb por --cgb=dmg y --hardware cgb por --hardware dmg.",
+    "de": "Legen Sie kitaqgb, kokura und kitaq-docs unter demselben übergeordneten Verzeichnis ab und öffnen Sie dort PowerShell. Vier-Konsolen-Beispiele starten dieselbe ROM in vier Sitzungen. Ersetzen Sie für DMG-Prüfungen überall --cgb=cgb durch --cgb=dmg und --hardware cgb durch --hardware dmg."
   },
   "dmg07_note_init": {
     "ja": "SCを0x80、SBを0x88に設定し、IEとIFのシリアルビットだけを消します。ほかの割り込み許可ビットやCPUのIME状態を変更する処理ではありません。",
     "en": "Sets SC to 0x80 and SB to 0x88; clears only the serial bits in IE and IF. It does not alter the other interrupt-enable bits or CPU IME state.",
-    "zh-CN": "将 SC 设为 0x80、SB 设为 0x88；只清除 IE 和 IF 中的串行位。不改变其他中断使能位或 CPU IME 状态。"
+    "zh-CN": "将 SC 设为 0x80、SB 设为 0x88；只清除 IE 和 IF 中的串行位。不改变其他中断使能位或 CPU IME 状态。",
+    "ko": "SC를 0x80, SB를 0x88로 설정하고 IE와 IF의 직렬 비트만 지웁니다. 다른 인터럽트 활성 비트나 CPU IME 상태는 바꾸지 않습니다.",
+    "zh-TW": "將 SC 設為 0x80、SB 設為 0x88；只清除 IE 與 IF 的序列位元。不改變其他中斷啟用位元或 CPU IME 狀態。",
+    "fr": "Met SC à 0x80 et SB à 0x88 ; efface seulement les bits série dans IE et IF. Ne modifie ni les autres bits d’activation ni l’état IME du CPU.",
+    "es": "Pone SC en 0x80 y SB en 0x88; borra solo los bits serie de IE e IF. No modifica los demás bits de habilitación ni el IME de la CPU.",
+    "de": "Setzt SC auf 0x80 und SB auf 0x88; löscht nur die seriellen Bits in IE und IF. Andere Interruptfreigabebits und CPU-IME bleiben unverändert."
   },
   "dmg07_example_exchange": {
     "ja": "同じROMを4台で動かし、各台が32＋プレイヤー番号を送ります。全台でPLAYER 1～4が33/34/35/36になります。最初の有効な配信でSENT SEQ=2、PACKET SEQ=1を記録し、1パケットの遅延を示します。表示はその時点の観測値を固定したものです。ゲームでは受信後もポーリングを続けます。",
     "en": "Run the same ROM on four consoles, each sending 32 plus its player number. Every console receives PLAYER 1..4 = 33/34/35/36. The first valid broadcast records SENT SEQ=2 and PACKET SEQ=1, showing the one-packet delay. The screen freezes that observation; a game continues polling afterwards.",
-    "zh-CN": "在四台主机上运行同一个 ROM，每台发送 32 加自身玩家编号。每台主机都收到 PLAYER 1..4 = 33/34/35/36。首个有效广播记录 SENT SEQ=2、PACKET SEQ=1，展示一个数据包的延迟。画面固定显示这一观测结果；实际游戏应继续轮询。"
+    "zh-CN": "在四台主机上运行同一个 ROM，每台发送 32 加自身玩家编号。每台主机都收到 PLAYER 1..4 = 33/34/35/36。首个有效广播记录 SENT SEQ=2、PACKET SEQ=1，展示一个数据包的延迟。画面固定显示这一观测结果；实际游戏应继续轮询。",
+    "ko": "같은 ROM을 네 콘솔에서 실행하고 각 콘솔은 32+자기 플레이어 번호를 보냅니다. 모든 콘솔이 PLAYER 1..4 = 33/34/35/36을 받습니다. 첫 유효 브로드캐스트는 SENT SEQ=2, PACKET SEQ=1을 기록하여 한 패킷 지연을 보여 줍니다. 화면은 그 시점에서 멈추지만 게임에서는 이후에도 폴링을 계속합니다.",
+    "zh-TW": "四台主機執行相同 ROM，各自傳送 32 加上玩家編號。每台都收到 PLAYER 1..4 = 33／34／35／36。第一個有效廣播記錄 SENT SEQ=2、PACKET SEQ=1，顯示一個封包的延遲。畫面凍結此觀察結果；實際遊戲之後仍持續輪詢。",
+    "fr": "Exécutez la même ROM sur quatre consoles, chacune envoyant 32 plus son numéro. Toutes reçoivent PLAYER 1..4 = 33/34/35/36. La première diffusion valide enregistre SENT SEQ=2 et PACKET SEQ=1, montrant le retard d’un paquet. L’écran fige cette observation ; un jeu continue ensuite à interroger le port.",
+    "es": "Ejecuta la misma ROM en cuatro consolas, cada una enviando 32 más su número. Todas reciben PLAYER 1..4 = 33/34/35/36. La primera difusión válida registra SENT SEQ=2 y PACKET SEQ=1, mostrando el retraso de un paquete. La pantalla congela esa observación; un juego sigue consultando después.",
+    "de": "Starten Sie dieselbe ROM auf vier Konsolen; jede sendet 32 plus ihre Spielernummer. Alle empfangen PLAYER 1..4 = 33/34/35/36. Die erste gültige Rundsendung hält SENT SEQ=2 und PACKET SEQ=1 fest und zeigt die Verzögerung um ein Paket. Das Bild friert diese Beobachtung ein; ein Spiel fragt anschließend weiter ab."
   },
   "dmg07_LinkDmg07_Init_purpose": {
     "ja": "探索状態、受信保存領域、診断値を初期化し、アダプターからのクロックを待ち受けます。",
     "en": "Reset discovery, receive storage and diagnostics, then arm reception for adapter clocks.",
-    "zh-CN": "重置发现状态、接收存储和诊断信息，然后准备接收适配器时钟。"
+    "zh-CN": "重置发现状态、接收存储和诊断信息，然后准备接收适配器时钟。",
+    "ko": "발견 상태, 수신 저장 공간, 진단을 초기화하고 어댑터 클록을 받을 준비를 합니다.",
+    "zh-TW": "重設探索狀態、接收儲存空間及診斷，再準備接收轉接器時脈。",
+    "fr": "Réinitialise découverte, stockage de réception et diagnostics, puis arme la réception sur les horloges de l’adaptateur.",
+    "es": "Restablece descubrimiento, almacenamiento de recepción y diagnósticos, y prepara la recepción con el reloj del adaptador.",
+    "de": "Setzt Erkennung, Empfangsspeicher und Diagnose zurück und bereitet den Empfang von Adaptertakten vor."
   },
   "dmg07_LinkDmg07_Init_rate": {
     "ja": "アダプターへ返す8ビットRATE。0なら既定の0x10を使います。",
     "en": "Eight-bit RATE response to the adapter; zero selects the default 0x10.",
-    "zh-CN": "返回给适配器的八位 RATE 响应；零表示使用默认值 0x10。"
+    "zh-CN": "返回给适配器的八位 RATE 响应；零表示使用默认值 0x10。",
+    "ko": "어댑터에 보낼 8비트 RATE 응답입니다. 0은 기본값 0x10을 선택합니다.",
+    "zh-TW": "回覆轉接器的 8 位元 RATE；零選取預設值 0x10。",
+    "fr": "Réponse RATE sur huit bits à l’adaptateur ; zéro choisit la valeur par défaut 0x10.",
+    "es": "Respuesta RATE de ocho bits al adaptador; cero elige el valor predeterminado 0x10.",
+    "de": "8-Bit-RATE-Antwort an den Adapter; null wählt den Standardwert 0x10."
   },
   "dmg07_LinkDmg07_Init_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "dmg07_note_pollbusy": {
     "ja": "SCの開始ビットが立っている間は何もしません。完了を処理するとSilenceFramesと時間切れラッチをリセットします。初期化前には呼ばないでください。",
     "en": "Does nothing while SC’s start bit is set. Processing completion resets SilenceFrames and the timeout latch. Initialize before polling.",
-    "zh-CN": "SC 的启动位仍置位时不执行操作。处理完成事件会重置 SilenceFrames 和超时锁存标志。轮询前必须初始化。"
+    "zh-CN": "SC 的启动位仍置位时不执行操作。处理完成事件会重置 SilenceFrames 和超时锁存标志。轮询前必须初始化。",
+    "ko": "SC의 시작 비트가 켜져 있으면 아무 동작도 하지 않습니다. 완료 처리 시 SilenceFrames와 시간 초과 래치를 초기화합니다. 폴링 전에 초기화하세요.",
+    "zh-TW": "SC 啟動位元設定時不執行動作。處理完成會重設 SilenceFrames 與逾時鎖存。請先初始化再輪詢。",
+    "fr": "Ne fait rien tant que le bit de démarrage de SC est actif. Traiter une fin remet à zéro SilenceFrames et le verrou d’expiration. Initialisez avant d’interroger.",
+    "es": "No hace nada mientras esté activo el bit de inicio de SC. Procesar una finalización restablece SilenceFrames y el indicador retenido de timeout. Inicializa antes de consultar.",
+    "de": "Tut nichts bei gesetztem SC-Startbit. Die Verarbeitung eines Abschlusses setzt SilenceFrames und die gespeicherte Timeout-Markierung zurück. Initialisieren Sie vor dem Abfragen."
   },
   "dmg07_LinkDmg07_Poll_purpose": {
     "ja": "完了済みのシリアル1バイトを現在のフェーズで処理し、次の応答を設定して再び受信を開始します。",
     "en": "Process one completed serial byte in the current phase and immediately arm the next response.",
-    "zh-CN": "在当前阶段处理一个已完成的串行字节，并立即准备下一个响应。"
+    "zh-CN": "在当前阶段处理一个已完成的串行字节，并立即准备下一个响应。",
+    "ko": "현재 단계에서 완료된 직렬 바이트 하나를 처리하고 즉시 다음 응답을 준비합니다.",
+    "zh-TW": "在目前階段處理一個已完成的序列位元組，立即準備下一個回覆。",
+    "fr": "Traite un octet série terminé dans la phase courante et arme immédiatement la réponse suivante.",
+    "es": "Procesa un byte serie completado en la fase actual y prepara de inmediato la siguiente respuesta.",
+    "de": "Verarbeitet ein abgeschlossenes serielles Byte in der aktuellen Phase und bereitet sofort die nächste Antwort vor."
   },
   "dmg07_LinkDmg07_Poll_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "dmg07_note_watchdog": {
     "ja": "既定の期限は12回で、組込み前にLINK_DMG07_TIMEOUT_FRAMESを1～255へ設定できます。同じ無通信状態では1回だけ時間切れを数え、次の受信バイトでラッチを解除します。転送中は位置を保持して境界で再起動し、探索・開始待ちでは探索へ戻ります。",
     "en": "The default deadline is 12 calls; define LINK_DMG07_TIMEOUT_FRAMES as 1..255 before inclusion to choose another deadline. A silence episode is counted once until another byte clears its latch. Transfer recovery preserves byte alignment; discovery/start recovery returns to discovery.",
-    "zh-CN": "默认期限为 12 次调用；可在包含文件前将 LINK_DMG07_TIMEOUT_FRAMES 定义为 1..255，以选择其他期限。一次静默只计数一次，直到另一个字节清除锁存标志。传送恢复会保留字节对齐；发现/启动阶段的恢复则返回发现阶段。"
+    "zh-CN": "默认期限为 12 次调用；可在包含文件前将 LINK_DMG07_TIMEOUT_FRAMES 定义为 1..255，以选择其他期限。一次静默只计数一次，直到另一个字节清除锁存标志。传送恢复会保留字节对齐；发现/启动阶段的恢复则返回发现阶段。",
+    "ko": "기본 제한은 12회 호출입니다. 다른 값을 쓰려면 포함 전에 LINK_DMG07_TIMEOUT_FRAMES를 1~255로 정의하세요. 무응답 구간은 다른 바이트가 래치를 지울 때까지 한 번만 셉니다. 전송 복구는 바이트 정렬을 유지하며 발견·시작 복구는 발견 단계로 돌아갑니다.",
+    "zh-TW": "預設期限為 12 次呼叫。若需其他期限，請在包含前將 LINK_DMG07_TIMEOUT_FRAMES 定義為 1..255。每段靜默只計一次，直到另一位元組清除鎖存。傳輸復原保留位元組對齊；探索／啟動復原回到探索階段。",
+    "fr": "Le délai par défaut est de 12 appels ; définissez LINK_DMG07_TIMEOUT_FRAMES entre 1 et 255 avant inclusion pour le changer. Un épisode de silence n’est compté qu’une fois, jusqu’à ce qu’un octet efface son verrou. La reprise du transfert préserve l’alignement des octets ; celle de découverte/démarrage retourne à la découverte.",
+    "es": "El plazo predeterminado es de 12 llamadas; define LINK_DMG07_TIMEOUT_FRAMES entre 1 y 255 antes de incluir para cambiarlo. Cada episodio de silencio se cuenta una vez hasta que otro byte borra su marca. Recuperar una transferencia conserva la alineación de bytes; recuperar descubrimiento/inicio vuelve al descubrimiento.",
+    "de": "Die Standardfrist beträgt 12 Aufrufe; definieren Sie vor dem Einbinden LINK_DMG07_TIMEOUT_FRAMES als 1..255 für einen anderen Wert. Eine Ruhephase wird nur einmal gezählt, bis ein weiteres Byte ihre Markierung löscht. Transferwiederherstellung erhält die Byteausrichtung; Wiederherstellung bei Erkennung/Start kehrt zur Erkennung zurück."
   },
   "dmg07_example_absent": {
     "ja": "アダプターを接続せずに実行します。PLAYER=0、START ERROR=2、SILENT FRAME=12、TIMEOUTS=1、ERROR=4になります。一度もアダプターを見ていないためDISCONNECTS=0です。空の取得ではEMPTY BUFFER=77を保持し、ClearError後はCLEARED=0になります。",
     "en": "Run without an adapter. Expect PLAYER=0, START ERROR=2, SILENT FRAME=12, TIMEOUTS=1 and ERROR=4. DISCONNECTS stays zero because no adapter has ever been seen. An empty read preserves EMPTY BUFFER=77; ClearError produces CLEARED=0.",
-    "zh-CN": "不接适配器运行。预期 PLAYER=0、START ERROR=2、SILENT FRAME=12、TIMEOUTS=1、ERROR=4。由于从未发现适配器，DISCONNECTS 保持零。空读取保留 EMPTY BUFFER=77；ClearError 使 CLEARED=0。"
+    "zh-CN": "不接适配器运行。预期 PLAYER=0、START ERROR=2、SILENT FRAME=12、TIMEOUTS=1、ERROR=4。由于从未发现适配器，DISCONNECTS 保持零。空读取保留 EMPTY BUFFER=77；ClearError 使 CLEARED=0。",
+    "ko": "어댑터 없이 실행합니다. 기대값은 PLAYER=0, START ERROR=2, SILENT FRAME=12, TIMEOUTS=1, ERROR=4입니다. 어댑터를 한 번도 발견하지 않았으므로 DISCONNECTS는 0입니다. 빈 읽기는 EMPTY BUFFER=77을 유지하고 ClearError 후 CLEARED=0이 됩니다.",
+    "zh-TW": "不接轉接器執行。預期 PLAYER=0、START ERROR=2、SILENT FRAME=12、TIMEOUTS=1、ERROR=4。因從未發現轉接器，DISCONNECTS 維持零。空讀取保留 EMPTY BUFFER=77；ClearError 使 CLEARED=0。",
+    "fr": "Exécutez sans adaptateur. Attendez PLAYER=0, START ERROR=2, SILENT FRAME=12, TIMEOUTS=1 et ERROR=4. DISCONNECTS reste zéro, aucun adaptateur n’ayant été vu. Une lecture vide préserve EMPTY BUFFER=77 ; ClearError donne CLEARED=0.",
+    "es": "Ejecuta sin adaptador. Se espera PLAYER=0, START ERROR=2, SILENT FRAME=12, TIMEOUTS=1 y ERROR=4. DISCONNECTS sigue en cero porque nunca se detectó adaptador. Una lectura vacía conserva EMPTY BUFFER=77; ClearError produce CLEARED=0.",
+    "de": "Führen Sie das Beispiel ohne Adapter aus. Erwartet werden PLAYER=0, START ERROR=2, SILENT FRAME=12, TIMEOUTS=1 und ERROR=4. DISCONNECTS bleibt null, weil noch kein Adapter erkannt wurde. Leeres Lesen erhält EMPTY BUFFER=77; ClearError ergibt CLEARED=0."
   },
   "dmg07_LinkDmg07_TickFrame_purpose": {
     "ja": "無通信時間と開始・再起動ハンドシェイクの時間を1フレーム分進め、期限に達したら回復を要求します。",
     "en": "Advance silence and start/restart watchdogs by one frame, requesting recovery at the deadline.",
-    "zh-CN": "将静默及启动/重启看门狗推进一帧，到达期限时请求恢复。"
+    "zh-CN": "将静默及启动/重启看门狗推进一帧，到达期限时请求恢复。",
+    "ko": "무응답 및 시작·재시작 감시를 한 프레임 진행하고 제한에 도달하면 복구를 요청합니다.",
+    "zh-TW": "將靜默及啟動／重新啟動監控推進一影格，到期限時請求復原。",
+    "fr": "Avance d’une trame les surveillances de silence et de démarrage/redémarrage, puis demande une reprise à l’échéance.",
+    "es": "Avanza un fotograma las vigilancias de silencio e inicio/reinicio y solicita recuperación al alcanzar el plazo.",
+    "de": "Rückt Ruhe- und Start-/Neustartüberwachung um einen Frame vor und fordert bei Fristablauf Wiederherstellung an."
   },
   "dmg07_LinkDmg07_TickFrame_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "dmg07_note_phase": {
     "ja": "状態を読むだけでポーリングや待機はしません。要求を受け付けただけではTRANSFERにならず、連続する4バイトの0xCCを受信して初めて転送へ移ります。",
     "en": "Does not poll or wait. Acceptance of a start request is insufficient for TRANSFER: four consecutive 0xCC bytes are required.",
-    "zh-CN": "不轮询，也不等待。启动请求被接受还不足以进入 TRANSFER：必须连续收到四个 0xCC 字节。"
+    "zh-CN": "不轮询，也不等待。启动请求被接受还不足以进入 TRANSFER：必须连续收到四个 0xCC 字节。",
+    "ko": "폴링하거나 기다리지 않습니다. 시작 요청이 수락되어도 TRANSFER에는 아직 충분하지 않으며 연속된 0xCC 네 바이트가 필요합니다.",
+    "zh-TW": "不輪詢或等待。啟動請求獲接受仍不足以進入 TRANSFER；需要連續四個 0xCC 位元組。",
+    "fr": "N’interroge pas le port et n’attend pas. L’acceptation d’une demande de démarrage ne suffit pas pour TRANSFER : quatre octets 0xCC consécutifs sont requis.",
+    "es": "No consulta ni espera. Aceptar una solicitud de inicio no basta para TRANSFER: se necesitan cuatro bytes 0xCC consecutivos.",
+    "de": "Fragt nicht ab und wartet nicht. Die Annahme einer Startanforderung reicht für TRANSFER nicht aus; vier aufeinanderfolgende 0xCC-Bytes sind erforderlich."
   },
   "dmg07_LinkDmg07_GetPhase_purpose": {
     "ja": "探索、開始要求、開始確認、データ転送のうち現在の段階を読みます。",
     "en": "Read the current discovery, start-request, confirmation or transfer phase.",
-    "zh-CN": "读取当前的发现、启动请求、确认或传送阶段。"
+    "zh-CN": "读取当前的发现、启动请求、确认或传送阶段。",
+    "ko": "현재 발견, 시작 요청, 확인 또는 전송 단계를 읽습니다.",
+    "zh-TW": "讀取目前的探索、啟動請求、確認或傳輸階段。",
+    "fr": "Lit la phase courante : découverte, demande de démarrage, confirmation ou transfert.",
+    "es": "Lee la fase actual: descubrimiento, solicitud de inicio, confirmación o transferencia.",
+    "de": "Liest die aktuelle Erkennungs-, Startanforderungs-, Bestätigungs- oder Transferphase."
   },
   "dmg07_LinkDmg07_GetPhase_returns": {
     "ja": "0=PING、1=REQUEST_AA、2=WAIT_CC、3=TRANSFERです。",
     "en": "0=PING, 1=REQUEST_AA, 2=WAIT_CC, 3=TRANSFER.",
-    "zh-CN": "0=PING、1=REQUEST_AA、2=WAIT_CC、3=TRANSFER。"
+    "zh-CN": "0=PING、1=REQUEST_AA、2=WAIT_CC、3=TRANSFER。",
+    "ko": "0=PING, 1=REQUEST_AA, 2=WAIT_CC, 3=TRANSFER입니다.",
+    "zh-TW": "0=PING、1=REQUEST_AA、2=WAIT_CC、3=TRANSFER。",
+    "fr": "0=PING, 1=REQUEST_AA, 2=WAIT_CC, 3=TRANSFER.",
+    "es": "0=PING, 1=REQUEST_AA, 2=WAIT_CC, 3=TRANSFER.",
+    "de": "0=PING, 1=REQUEST_AA, 2=WAIT_CC, 3=TRANSFER."
   },
   "dmg07_LinkDmg07_GetLocalSlot_purpose": {
     "ja": "アダプターの状態通知から分かった自機のプレイヤー番号を読みます。",
     "en": "Read this console’s player number learned from adapter status.",
-    "zh-CN": "读取从适配器状态中得知的本机玩家编号。"
+    "zh-CN": "读取从适配器状态中得知的本机玩家编号。",
+    "ko": "어댑터 상태에서 얻은 이 콘솔의 플레이어 번호를 읽습니다.",
+    "zh-TW": "讀取由轉接器狀態得知的本機玩家編號。",
+    "fr": "Lit le numéro de joueur de cette console, appris dans l’état de l’adaptateur.",
+    "es": "Lee el número de jugador de esta consola obtenido del estado del adaptador.",
+    "de": "Liest die aus dem Adapterstatus ermittelte Spielernummer dieser Konsole."
   },
   "dmg07_LinkDmg07_GetLocalSlot_returns": {
     "ja": "検出済みは1～4、未検出または探索へのリセット直後は0です。",
     "en": "Returns 1..4 when discovered; zero before discovery or immediately after a discovery reset.",
-    "zh-CN": "已发现时返回 1..4；发现前或刚重置发现状态后返回零。"
+    "zh-CN": "已发现时返回 1..4；发现前或刚重置发现状态后返回零。",
+    "ko": "발견되었으면 1~4, 발견 전이나 발견 초기화 직후에는 0을 반환합니다.",
+    "zh-TW": "已發現時傳回 1..4；探索前或探索重設後立即傳回零。",
+    "fr": "Renvoie 1..4 après découverte ; zéro avant ou juste après une réinitialisation de découverte.",
+    "es": "Devuelve 1..4 tras descubrir; cero antes o justo después de reiniciar el descubrimiento.",
+    "de": "Gibt nach Erkennung 1..4 zurück, davor oder unmittelbar nach einem Erkennungsreset null."
   },
   "dmg07_note_cached": {
     "ja": "探索中に受け付けた値を保存しています。呼び出すたびに物理配線を調べるものではなく、転送中の表示は最後の通知に基づきます。",
     "en": "Returns cached discovery status rather than probing physical wiring. During transfer it reflects the most recent accepted notification.",
-    "zh-CN": "读取缓存的发现状态，不探测实体接线。传送期间反映最近一次接受的通知。"
+    "zh-CN": "读取缓存的发现状态，不探测实体接线。传送期间反映最近一次接受的通知。",
+    "ko": "물리 배선을 검사하는 것이 아니라 캐시된 발견 상태를 반환합니다. 전송 중에는 가장 최근에 수락한 알림을 반영합니다.",
+    "zh-TW": "傳回快取的探索狀態，不探測實體接線。傳輸期間反映最近接受的通知。",
+    "fr": "Renvoie l’état de découverte mémorisé, sans sonder le câblage physique. Pendant le transfert, reflète la dernière notification acceptée.",
+    "es": "Devuelve el estado de descubrimiento guardado, sin sondear el cableado físico. Durante la transferencia refleja la última notificación aceptada.",
+    "de": "Gibt den gespeicherten Erkennungsstatus zurück, ohne physische Verkabelung zu prüfen. Während des Transfers gilt die zuletzt akzeptierte Meldung."
   },
   "dmg07_LinkDmg07_GetConnectedMask_purpose": {
     "ja": "最後に受け付けた接続プレイヤーの集合を4ビットで読みます。",
     "en": "Read the four-bit set of players in the last accepted status.",
-    "zh-CN": "读取最近一次接受的状态中，表示玩家连接情况的四位集合。"
+    "zh-CN": "读取最近一次接受的状态中，表示玩家连接情况的四位集合。",
+    "ko": "마지막으로 수락한 상태의 4비트 플레이어 집합을 읽습니다.",
+    "zh-TW": "讀取最後接受狀態中的四位元玩家集合。",
+    "fr": "Lit l’ensemble de joueurs sur quatre bits du dernier état accepté.",
+    "es": "Lee el conjunto de jugadores de cuatro bits del último estado aceptado.",
+    "de": "Liest die Vier-Bit-Spielermenge des zuletzt akzeptierten Status."
   },
   "dmg07_LinkDmg07_GetConnectedMask_returns": {
     "ja": "ビット0～3に接続状態を返します。未検出は0、4台接続は15です。",
     "en": "Bits 0..3 report connected players. Undiscovered is zero; four connected players is 15.",
-    "zh-CN": "位 0..3 表示已连接玩家。尚未发现时为零；四名玩家全部连接时为 15。"
+    "zh-CN": "位 0..3 表示已连接玩家。尚未发现时为零；四名玩家全部连接时为 15。",
+    "ko": "비트 0~3이 연결된 플레이어를 나타냅니다. 미발견은 0, 네 명 연결은 15입니다.",
+    "zh-TW": "位元 0..3 表示已連線玩家。尚未發現為零，四位玩家連線為 15。",
+    "fr": "Les bits 0..3 indiquent les joueurs connectés. Zéro signifie non découvert ; quatre joueurs connectés donnent 15.",
+    "es": "Los bits 0..3 indican jugadores conectados. No descubierto es cero; cuatro jugadores conectados es 15.",
+    "de": "Bits 0..3 melden verbundene Spieler. Nicht erkannt ist null; vier verbundene Spieler ergeben 15."
   },
   "dmg07_note_status": {
     "ja": "ビット3が1、自機番号が0または5以上、検出後に自機番号が変わる通知は拒否し、エラー5を記録します。拒否された値はLastStatusへ保存しません。",
     "en": "Rejects status with bit 3 set, player number zero or above four, or a changed local number after discovery. Rejection latches error 5 without storing that value as LastStatus.",
-    "zh-CN": "若状态的第 3 位为一、玩家编号为零或大于四，或发现后本机编号发生变化，则拒绝该状态。拒绝时锁存错误 5，不会将该值保存为 LastStatus。"
+    "zh-CN": "若状态的第 3 位为一、玩家编号为零或大于四，或发现后本机编号发生变化，则拒绝该状态。拒绝时锁存错误 5，不会将该值保存为 LastStatus。",
+    "ko": "비트 3이 켜졌거나 플레이어 번호가 0 또는 4 초과이거나 발견 후 로컬 번호가 달라진 상태는 거부합니다. 거부하면 오류 5를 기록하며 그 값을 LastStatus에 저장하지 않습니다.",
+    "zh-TW": "拒絕位元 3 已設定、玩家編號為零或大於四，以及發現後本機編號改變的狀態。拒絕時記錄錯誤 5，不將該值存為 LastStatus。",
+    "fr": "Rejette un état avec bit 3 actif, numéro nul ou supérieur à quatre, ou numéro local changé après découverte. Le rejet mémorise l’erreur 5 sans enregistrer cette valeur comme LastStatus.",
+    "es": "Rechaza estados con bit 3 activado, jugador cero o mayor que cuatro, o número local cambiado después del descubrimiento. Registra el error 5 sin guardar ese valor en LastStatus.",
+    "de": "Lehnt Statuswerte mit gesetztem Bit 3, Spielernummer null oder über vier sowie nach Erkennung geänderter lokaler Nummer ab. Die Ablehnung merkt Fehler 5, ohne den Wert als LastStatus zu speichern."
   },
   "dmg07_LinkDmg07_GetLastStatus_purpose": {
     "ja": "最後に検証を通ったアダプターの状態バイトを変換せずに読みます。",
     "en": "Read the last validated raw adapter status byte.",
-    "zh-CN": "读取最近一次通过验证的适配器原始状态字节。"
+    "zh-CN": "读取最近一次通过验证的适配器原始状态字节。",
+    "ko": "마지막으로 검증한 원시 어댑터 상태 바이트를 읽습니다.",
+    "zh-TW": "讀取最後通過驗證的原始轉接器狀態位元組。",
+    "fr": "Lit le dernier octet d’état brut validé de l’adaptateur.",
+    "es": "Lee el último byte de estado bruto validado del adaptador.",
+    "de": "Liest das zuletzt geprüfte rohe Adapterstatusbyte."
   },
   "dmg07_LinkDmg07_GetLastStatus_returns": {
     "ja": "上位4ビットは接続マスク、下位3ビットは自機番号です。未検出は0です。",
     "en": "The high nibble is the connection mask; the low three bits contain the local player number. Initially zero.",
-    "zh-CN": "高半字节为连接掩码，低三位包含本机玩家编号。初始为零。"
+    "zh-CN": "高半字节为连接掩码，低三位包含本机玩家编号。初始为零。",
+    "ko": "상위 니블은 연결 마스크, 하위 3비트는 로컬 플레이어 번호입니다. 초기값은 0입니다.",
+    "zh-TW": "高半位元組為連線遮罩，最低三位元為本機玩家編號。初值為零。",
+    "fr": "Le quartet de poids fort est le masque de connexion ; les trois bits faibles contiennent le numéro local. Initialement zéro.",
+    "es": "El nibble alto es la máscara de conexión; los tres bits bajos contienen el número local. Inicialmente cero.",
+    "de": "Das obere Nibble enthält die Verbindungsmaske, die unteren drei Bits die lokale Spielernummer. Anfangswert null."
   },
   "dmg07_note_pingflag": {
     "ja": "フラグを読むだけです。探索中の不正な状態バイトでも交換自体は進むため、このフラグだけで全データの妥当性や転送開始完了を判断せず、番号・マスク・LastErrorも確認します。",
     "en": "Reads only a flag. A discovery exchange can progress despite a rejected status byte; do not use this flag alone to infer fully valid data or completed startup. Check the slot, mask and LastError too.",
-    "zh-CN": "只读取一个标志。即使状态字节被拒绝，发现交换仍可能继续；不要仅凭此标志判断数据完全有效或启动完成。还应检查槽位、掩码及 LastError。"
+    "zh-CN": "只读取一个标志。即使状态字节被拒绝，发现交换仍可能继续；不要仅凭此标志判断数据完全有效或启动完成。还应检查槽位、掩码及 LastError。",
+    "ko": "플래그만 읽습니다. 상태 바이트가 거부되어도 발견 교환이 진행될 수 있으므로 이 플래그만으로 데이터가 모두 유효하거나 시작이 끝났다고 판단하지 마세요. 슬롯, 마스크, LastError도 확인하세요.",
+    "zh-TW": "僅讀取旗標。即使狀態位元組被拒絕，探索交換仍可能推進；不可只憑此旗標推斷資料完全有效或啟動已完成。也請檢查 slot、mask 與 LastError。",
+    "fr": "Ne lit qu’un drapeau. Un échange de découverte peut avancer malgré un état rejeté ; ce drapeau seul ne prouve donc ni des données entièrement valides ni un démarrage terminé. Vérifiez aussi slot, masque et LastError.",
+    "es": "Solo lee un indicador. El intercambio de descubrimiento puede avanzar aunque se rechace un estado; no deduzcas solo de él datos totalmente válidos o inicio completado. Comprueba también slot, máscara y LastError.",
+    "de": "Liest nur ein Flag. Ein Erkennungsaustausch kann trotz abgelehntem Statusbyte fortschreiten. Leiten Sie daraus allein weder vollständig gültige Daten noch abgeschlossenen Start ab. Prüfen Sie auch Slot, Maske und LastError."
   },
   "dmg07_LinkDmg07_HasPingStatus_purpose": {
     "ja": "4バイトの探索交換を終えた通知が未消費かどうかを調べます。",
     "en": "Inspect whether a completed four-byte discovery exchange is awaiting acknowledgment.",
-    "zh-CN": "检查是否有已完成的四字节发现交换等待确认。"
+    "zh-CN": "检查是否有已完成的四字节发现交换等待确认。",
+    "ko": "완료된 4바이트 발견 교환이 확인 대기 중인지 검사합니다.",
+    "zh-TW": "檢查已完成的四位元組探索交換是否等待確認。",
+    "fr": "Vérifie si un échange de découverte de quatre octets terminé attend un acquittement.",
+    "es": "Comprueba si un intercambio de descubrimiento de cuatro bytes completado espera confirmación.",
+    "de": "Prüft, ob ein abgeschlossener Vier-Byte-Erkennungsaustausch auf Bestätigung wartet."
   },
   "dmg07_LinkDmg07_HasPingStatus_returns": {
     "ja": "未消費の通知があれば1、なければ0です。",
     "en": "Returns 1 for an unconsumed notification, otherwise 0.",
-    "zh-CN": "有未消费的通知时返回 1，否则返回 0。"
+    "zh-CN": "有未消费的通知时返回 1，否则返回 0。",
+    "ko": "소비하지 않은 알림이 있으면 1, 아니면 0을 반환합니다.",
+    "zh-TW": "尚有未消費通知時傳回 1，否則為 0。",
+    "fr": "Renvoie 1 pour une notification non consommée, sinon 0.",
+    "es": "Devuelve 1 si hay una notificación sin consumir y 0 si no.",
+    "de": "Gibt bei unverbrauchter Meldung 1 zurück, sonst 0."
   },
   "dmg07_note_consume": {
     "ja": "通知だけを消し、番号・接続マスク・LastStatusの保存値は残します。繰り返し呼ぶと新しい通知が来るまで0になります。",
     "en": "Clears only the notification, preserving slot, mask and LastStatus. Further calls return zero until a new notification arrives.",
-    "zh-CN": "只清除通知，保留槽位、掩码和 LastStatus。再次调用会返回零，直到有新通知到达。"
+    "zh-CN": "只清除通知，保留槽位、掩码和 LastStatus。再次调用会返回零，直到有新通知到达。",
+    "ko": "알림만 지우고 슬롯, 마스크, LastStatus는 유지합니다. 새 알림이 올 때까지 이후 호출은 0을 반환합니다.",
+    "zh-TW": "只清除通知，保留 slot、mask 與 LastStatus。新通知到達前，後續呼叫傳回零。",
+    "fr": "Efface seulement la notification, préservant slot, masque et LastStatus. Les appels suivants renvoient zéro jusqu’à une nouvelle notification.",
+    "es": "Borra solo la notificación y conserva slot, máscara y LastStatus. Las llamadas siguientes devuelven cero hasta que llegue otra notificación.",
+    "de": "Löscht nur die Meldung und erhält Slot, Maske und LastStatus. Weitere Aufrufe liefern bis zur nächsten Meldung null."
   },
   "dmg07_LinkDmg07_ConsumePingStatus_purpose": {
     "ja": "探索完了通知を1回分取り出してフラグを消します。",
     "en": "Consume and clear a completed-discovery notification.",
-    "zh-CN": "消费并清除已完成的发现通知。"
+    "zh-CN": "消费并清除已完成的发现通知。",
+    "ko": "발견 완료 알림을 소비하고 지웁니다.",
+    "zh-TW": "消費並清除探索完成通知。",
+    "fr": "Consomme et efface une notification de découverte terminée.",
+    "es": "Consume y borra una notificación de descubrimiento completado.",
+    "de": "Verbraucht und löscht eine abgeschlossene Erkennungsmeldung."
   },
   "dmg07_LinkDmg07_ConsumePingStatus_returns": {
     "ja": "通知があれば1、なければ0です。",
     "en": "Returns 1 when consumed, otherwise 0.",
-    "zh-CN": "成功消费返回 1，否则返回 0。"
+    "zh-CN": "成功消费返回 1，否则返回 0。",
+    "ko": "소비했으면 1, 아니면 0을 반환합니다.",
+    "zh-TW": "成功消費時傳回 1，否則為 0。",
+    "fr": "Renvoie 1 si consommé, sinon 0.",
+    "es": "Devuelve 1 si se consume y 0 si no.",
+    "de": "Gibt bei Verbrauch 1 zurück, sonst 0."
   },
   "dmg07_note_start": {
     "ja": "PINGでのみ予約できます。全4台がそろうまで待つ処理は含まず、サンプルはアプリ側でマスク15を待ちます。予約は即時転送ではなく、整列した0xAA列を送ってから0xCC列を待ちます。",
     "en": "Can be scheduled only in PING. It does not itself wait for all four players; the example checks mask 15 in application code. Scheduling is asynchronous: aligned 0xAA traffic precedes the 0xCC confirmation.",
-    "zh-CN": "只能在 PING 阶段安排请求。不会自行等待四名玩家全部连接；示例在应用代码中检查掩码 15。安排是异步的：先发送对齐的 0xAA，再进行 0xCC 确认。"
+    "zh-CN": "只能在 PING 阶段安排请求。不会自行等待四名玩家全部连接；示例在应用代码中检查掩码 15。安排是异步的：先发送对齐的 0xAA，再进行 0xCC 确认。",
+    "ko": "PING에서만 예약할 수 있습니다. 자체적으로 네 명을 기다리지 않으며 예제는 애플리케이션 코드에서 마스크 15를 확인합니다. 예약은 비동기식으로, 정렬된 0xAA 통신 뒤에 0xCC 확인이 옵니다.",
+    "zh-TW": "只能在 PING 排程。不會自行等待四位玩家；範例在應用程式檢查遮罩 15。排程為非同步：對齊的 0xAA 通訊先於 0xCC 確認。",
+    "fr": "Ne peut être programmé qu’en PING. N’attend pas lui-même les quatre joueurs ; l’exemple vérifie le masque 15 dans l’application. La programmation est asynchrone : le trafic 0xAA aligné précède la confirmation 0xCC.",
+    "es": "Solo se puede programar en PING. No espera por sí mismo a los cuatro jugadores; el ejemplo comprueba la máscara 15 en la aplicación. La programación es asíncrona: el tráfico 0xAA alineado precede a la confirmación 0xCC.",
+    "de": "Kann nur in PING eingeplant werden. Wartet nicht selbst auf alle vier Spieler; das Beispiel prüft Maske 15 im Anwendungscode. Die Einplanung ist asynchron: Ausgerichteter 0xAA-Verkehr geht der 0xCC-Bestätigung voraus."
   },
   "dmg07_LinkDmg07_RequestTransmission_purpose": {
     "ja": "物理プレイヤー1から、次の探索パケット境界で開始要求を送るよう予約します。",
     "en": "Schedule a start request from physical player 1 at the next discovery-packet boundary.",
-    "zh-CN": "由物理玩家 1 安排启动请求，在下一个发现数据包边界开始。"
+    "zh-CN": "由物理玩家 1 安排启动请求，在下一个发现数据包边界开始。",
+    "ko": "물리 플레이어 1의 시작 요청을 다음 발견 패킷 경계에 예약합니다.",
+    "zh-TW": "將實體玩家 1 的啟動請求排到下一個探索封包邊界。",
+    "fr": "Programme la demande de démarrage du joueur physique 1 à la prochaine frontière de paquet de découverte.",
+    "es": "Programa la solicitud de inicio del jugador físico 1 en el siguiente límite de paquete de descubrimiento.",
+    "de": "Plant die Startanforderung des physischen Spielers 1 an der nächsten Erkennungspaketgrenze ein."
   },
   "dmg07_LinkDmg07_RequestTransmission_returns": {
     "ja": "予約できれば0。フェーズ不正は1、プレイヤー1でなければ2、自機接続ビットがなければ3です。",
     "en": "Returns 0 when scheduled, 1 for the wrong phase, 2 when not player 1, or 3 when the local connection bit is absent.",
-    "zh-CN": "成功安排返回 0；阶段错误返回 1；不是玩家 1 返回 2；本机连接位未设置返回 3。"
+    "zh-CN": "成功安排返回 0；阶段错误返回 1；不是玩家 1 返回 2；本机连接位未设置返回 3。",
+    "ko": "예약하면 0, 잘못된 단계는 1, 플레이어 1이 아니면 2, 로컬 연결 비트가 없으면 3을 반환합니다.",
+    "zh-TW": "已排程傳回 0；階段錯誤為 1；不是玩家 1 為 2；缺少本機連線位元為 3。",
+    "fr": "Renvoie 0 si programmé, 1 pour une mauvaise phase, 2 si ce n’est pas le joueur 1, 3 si le bit de connexion local manque.",
+    "es": "Devuelve 0 si se programa, 1 por fase incorrecta, 2 si no es jugador 1 o 3 si falta el bit de conexión local.",
+    "de": "Gibt bei Einplanung 0 zurück, bei falscher Phase 1, wenn nicht Spieler 1 dann 2 und bei fehlendem lokalem Verbindungsbit 3."
   },
   "dmg07_note_restart": {
     "ja": "どのプレイヤーでも要求できます。途中のバイト位置を壊さず、境界から0xFFを送り続け、アダプターの全0xFF通知を受けて探索へ戻ります。要求しただけでは自機番号や受信パイプラインを消しません。",
     "en": "Any player may request it. Preserves the current byte position, sends aligned 0xFF traffic, and returns to discovery after the adapter’s all-0xFF indication. Merely requesting it does not erase the local slot or receive pipeline.",
-    "zh-CN": "任何玩家都可请求。保留当前字节位置，发送对齐的 0xFF 控制流量，并在收到适配器全 0xFF 指示后返回发现阶段。仅请求重启不会擦除本机槽位或接收流水线。"
+    "zh-CN": "任何玩家都可请求。保留当前字节位置，发送对齐的 0xFF 控制流量，并在收到适配器全 0xFF 指示后返回发现阶段。仅请求重启不会擦除本机槽位或接收流水线。",
+    "ko": "어느 플레이어든 요청할 수 있습니다. 현재 바이트 위치를 유지하며 정렬된 0xFF 통신을 보내고, 어댑터의 전체 0xFF 표식 후 발견 단계로 돌아갑니다. 요청만으로 로컬 슬롯이나 수신 파이프라인을 지우지는 않습니다.",
+    "zh-TW": "任何玩家皆可請求。保留目前位元組位置，傳送對齊的 0xFF 控制資料，在轉接器回傳全 0xFF 指示後回到探索。僅提出請求不會清除本機 slot 或接收管線。",
+    "fr": "Tout joueur peut le demander. Préserve la position d’octet, envoie un trafic 0xFF aligné et revient à la découverte après l’indication tout-0xFF de l’adaptateur. La demande seule n’efface ni le slot local ni le pipeline de réception.",
+    "es": "Puede solicitarlo cualquier jugador. Conserva la posición de byte, envía tráfico 0xFF alineado y vuelve al descubrimiento tras la indicación de todos 0xFF del adaptador. Solicitarlo no borra el slot local ni la cadena de recepción.",
+    "de": "Jeder Spieler darf dies anfordern. Erhält die aktuelle Byteposition, sendet ausgerichteten 0xFF-Verkehr und kehrt nach dem vollständigen 0xFF-Signal des Adapters zur Erkennung zurück. Die bloße Anforderung löscht weder lokalen Slot noch Empfangspipeline."
   },
   "dmg07_example_restart": {
     "ja": "4台のうちプレイヤー2が再起動を要求します。その台でPENDING=1とSENT FF=1を記録し、全台でDATA VALID=1、RESET PHASE=0、SLOT AFTER=0、RESET PRIME=0になります。要求直後に通信状態を捨てず、アダプターの通知後に探索へ戻ることを確認します。",
     "en": "Player 2 requests restart. That console records PENDING=1 and SENT FF=1. All four show DATA VALID=1, RESET PHASE=0, SLOT AFTER=0 and RESET PRIME=0. The driver preserves the active exchange until the adapter’s indication returns it to discovery.",
-    "zh-CN": "玩家 2 请求重启。该主机记录 PENDING=1、SENT FF=1。四台均显示 DATA VALID=1、RESET PHASE=0、SLOT AFTER=0、RESET PRIME=0。驱动会保留正在进行的交换，直到适配器指示使其返回发现阶段。"
+    "zh-CN": "玩家 2 请求重启。该主机记录 PENDING=1、SENT FF=1。四台均显示 DATA VALID=1、RESET PHASE=0、SLOT AFTER=0、RESET PRIME=0。驱动会保留正在进行的交换，直到适配器指示使其返回发现阶段。",
+    "ko": "플레이어 2가 재시작을 요청합니다. 해당 콘솔은 PENDING=1, SENT FF=1을 기록합니다. 네 콘솔 모두 DATA VALID=1, RESET PHASE=0, SLOT AFTER=0, RESET PRIME=0을 표시합니다. 드라이버는 어댑터 표식이 발견 단계로 되돌릴 때까지 진행 중인 교환을 유지합니다.",
+    "zh-TW": "玩家 2 請求重新啟動，該主機記錄 PENDING=1 與 SENT FF=1。四台皆顯示 DATA VALID=1、RESET PHASE=0、SLOT AFTER=0、RESET PRIME=0。驅動程式保留進行中的交換，直到轉接器指示使其回到探索。",
+    "fr": "Le joueur 2 demande le redémarrage et enregistre PENDING=1, SENT FF=1. Les quatre consoles montrent DATA VALID=1, RESET PHASE=0, SLOT AFTER=0 et RESET PRIME=0. Le pilote préserve l’échange actif jusqu’à ce que l’indication de l’adaptateur le ramène à la découverte.",
+    "es": "El jugador 2 solicita reinicio; su consola registra PENDING=1 y SENT FF=1. Las cuatro muestran DATA VALID=1, RESET PHASE=0, SLOT AFTER=0 y RESET PRIME=0. El controlador conserva el intercambio activo hasta que la indicación del adaptador lo devuelve al descubrimiento.",
+    "de": "Spieler 2 fordert Neustart an. Seine Konsole erfasst PENDING=1 und SENT FF=1. Alle vier zeigen DATA VALID=1, RESET PHASE=0, SLOT AFTER=0 und RESET PRIME=0. Der Treiber erhält den laufenden Austausch, bis ihn das Adaptersignal zur Erkennung zurückführt."
   },
   "dmg07_LinkDmg07_RequestRestart_purpose": {
     "ja": "転送中のパケット境界から再起動制御を送るよう予約します。",
     "en": "Schedule restart control traffic beginning at a transfer packet boundary.",
-    "zh-CN": "安排重启控制流量，从传送数据包边界开始。"
+    "zh-CN": "安排重启控制流量，从传送数据包边界开始。",
+    "ko": "전송 패킷 경계에서 시작하는 재시작 제어 통신을 예약합니다.",
+    "zh-TW": "排程在傳輸封包邊界開始的重新啟動控制通訊。",
+    "fr": "Programme le trafic de contrôle de redémarrage à une frontière de paquet de transfert.",
+    "es": "Programa tráfico de control de reinicio a partir de un límite de paquete de transferencia.",
+    "de": "Plant Neustartsteuerverkehr ab einer Transferpaketgrenze ein."
   },
   "dmg07_LinkDmg07_RequestRestart_returns": {
     "ja": "TRANSFERなら0、それ以外は1です。予約中・送信中の再要求も0です。",
     "en": "Returns 0 in TRANSFER, otherwise 1. Repeated requests while pending/sending also return 0.",
-    "zh-CN": "在 TRANSFER 阶段返回 0，否则返回 1。请求待执行或正在发送时重复请求，也返回 0。"
+    "zh-CN": "在 TRANSFER 阶段返回 0，否则返回 1。请求待执行或正在发送时重复请求，也返回 0。",
+    "ko": "TRANSFER에서는 0, 아니면 1을 반환합니다. 보류·송신 중 반복 요청도 0을 반환합니다.",
+    "zh-TW": "在 TRANSFER 傳回 0，其他情況為 1。等待或傳送期間重複請求也傳回 0。",
+    "fr": "Renvoie 0 en TRANSFER, sinon 1. Les demandes répétées pendant attente/envoi renvoient aussi 0.",
+    "es": "Devuelve 0 en TRANSFER y 1 fuera de esa fase. Las solicitudes repetidas mientras está pendiente/enviando también dan 0.",
+    "de": "Gibt in TRANSFER 0 zurück, sonst 1. Wiederholte Anforderungen während Vormerkung oder Senden liefern ebenfalls 0."
   },
   "dmg07_note_restartstate": {
     "ja": "これは通信フェーズとは別の状態です。値0だけでは接続済みや転送可能とは判断できません。",
     "en": "Separate from the communication phase. Zero alone does not imply an established or usable connection.",
-    "zh-CN": "与通信阶段分开记录。仅凭零不能判断连接已经建立或可用。"
+    "zh-CN": "与通信阶段分开记录。仅凭零不能判断连接已经建立或可用。",
+    "ko": "통신 단계와 별개입니다. 0만으로 연결이 성립되었거나 사용 가능하다고 볼 수 없습니다.",
+    "zh-TW": "與通訊階段分開。僅為零不代表已建立或可用的連線。",
+    "fr": "Distinct de la phase de communication. Zéro seul n’implique pas une connexion établie ou utilisable.",
+    "es": "Es independiente de la fase de comunicación. Cero por sí solo no implica una conexión establecida o utilizable.",
+    "de": "Getrennt von der Kommunikationsphase. Null allein belegt keine aufgebaute oder nutzbare Verbindung."
   },
   "dmg07_LinkDmg07_GetRestartState_purpose": {
     "ja": "再起動要求の待機・送信状態を読みます。",
     "en": "Read whether restart control is absent, pending or being sent.",
-    "zh-CN": "读取重启控制当前是无请求、等待执行还是正在发送。"
+    "zh-CN": "读取重启控制当前是无请求、等待执行还是正在发送。",
+    "ko": "재시작 제어가 없음, 보류, 송신 중 중 어느 상태인지 읽습니다.",
+    "zh-TW": "讀取重新啟動控制是無、等待中，或傳送中。",
+    "fr": "Lit si le contrôle de redémarrage est absent, en attente ou en cours d’envoi.",
+    "es": "Lee si el control de reinicio está ausente, pendiente o enviándose.",
+    "de": "Liest, ob Neustartsteuerung fehlt, vorgemerkt ist oder gesendet wird."
   },
   "dmg07_LinkDmg07_GetRestartState_returns": {
     "ja": "0=なし、1=境界待ち、2=制御送信中です。",
     "en": "0=none, 1=pending boundary, 2=sending control traffic.",
-    "zh-CN": "0=无请求、1=等待边界、2=正在发送控制流量。"
+    "zh-CN": "0=无请求、1=等待边界、2=正在发送控制流量。",
+    "ko": "0=없음, 1=경계 대기, 2=제어 통신 송신 중입니다.",
+    "zh-TW": "0=無、1=等待邊界、2=傳送控制資料。",
+    "fr": "0=aucun, 1=attente de frontière, 2=envoi du contrôle.",
+    "es": "0=ninguno, 1=esperando límite, 2=enviando control.",
+    "de": "0=keine, 1=Warten auf Grenze, 2=Steuerverkehr wird gesendet."
   },
   "dmg07_note_sampletime": {
     "ja": "値はパケットのバイト0を設定するときに読み取ります。すでにSBへ設定したバイトは変更しません。最初の提出値は開始要求前に設定します。",
     "en": "Sampled when packet byte zero is armed. Does not modify an already armed SB byte. Set the first submission before requesting startup.",
-    "zh-CN": "准备数据包的第零字节时采样此值。不会修改已准备好的 SB 字节。请求启动前应先设置首次提交值。"
+    "zh-CN": "准备数据包的第零字节时采样此值。不会修改已准备好的 SB 字节。请求启动前应先设置首次提交值。",
+    "ko": "패킷의 바이트 0을 준비할 때 읽습니다. 이미 준비된 SB 바이트는 바꾸지 않습니다. 시작을 요청하기 전에 첫 제출값을 설정하세요.",
+    "zh-TW": "準備封包位元組零時取樣，不修改已準備的 SB 位元組。請在請求啟動前設定第一個提交值。",
+    "fr": "Échantillonné lorsque l’octet zéro du paquet est armé. Ne change pas un octet SB déjà armé. Définissez la première contribution avant de demander le démarrage.",
+    "es": "Se toma al preparar el byte cero del paquete. No modifica un byte SB ya preparado. Establece el primer valor antes de solicitar el inicio.",
+    "de": "Wird beim Vorbereiten von Paketbyte null übernommen. Ändert kein bereits vorbereitetes SB-Byte. Setzen Sie den ersten Sendewert vor der Startanforderung."
   },
   "dmg07_LinkDmg07_SetLocalByte_purpose": {
     "ja": "次に自機データを送るパケット用の1バイトを設定します。",
     "en": "Set the one-byte application value for a future outgoing packet.",
-    "zh-CN": "设置将来发送的数据包要提交的一个应用字节。"
+    "zh-CN": "设置将来发送的数据包要提交的一个应用字节。",
+    "ko": "이후 송신 패킷에 넣을 애플리케이션 값 한 바이트를 설정합니다.",
+    "zh-TW": "設定未來送出封包的一位元組應用程式值。",
+    "fr": "Définit l’octet applicatif d’un prochain paquet sortant.",
+    "es": "Establece el valor de aplicación de un byte para un próximo paquete saliente.",
+    "de": "Setzt den Ein-Byte-Anwendungswert für ein künftiges ausgehendes Paket."
   },
   "dmg07_LinkDmg07_SetLocalByte_value": {
     "ja": "提出する8ビット値。",
     "en": "Eight-bit application value to submit.",
-    "zh-CN": "要提交的八位应用值。"
+    "zh-CN": "要提交的八位应用值。",
+    "ko": "제출할 8비트 애플리케이션 값입니다.",
+    "zh-TW": "要提交的 8 位元應用程式值。",
+    "fr": "Valeur applicative sur huit bits à soumettre.",
+    "es": "Valor de aplicación de ocho bits que se enviará.",
+    "de": "Zu übermittelnder 8-Bit-Anwendungswert."
   },
   "dmg07_LinkDmg07_SetLocalByte_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "dmg07_note_primed": {
     "ja": "1でも完成済みパケットがあるとは限りません。取り出せるかどうかはHasPacketで調べます。",
     "en": "A primed pipeline need not contain a completed packet. Use HasPacket to determine whether a read is available.",
-    "zh-CN": "流水线已准备就绪，不代表已经有完整数据包。请用 HasPacket 判断是否可读。"
+    "zh-CN": "流水线已准备就绪，不代表已经有完整数据包。请用 HasPacket 判断是否可读。",
+    "ko": "파이프라인이 준비되었어도 완료된 패킷이 없을 수 있습니다. 읽기 가능 여부는 HasPacket으로 확인하세요.",
+    "zh-TW": "管線已準備不代表已有完成封包。請用 HasPacket 判斷是否可讀取。",
+    "fr": "Un pipeline amorcé ne contient pas nécessairement un paquet terminé. Utilisez HasPacket pour savoir si une lecture est disponible.",
+    "es": "Una cadena preparada no tiene por qué contener un paquete completo. Usa HasPacket para saber si se puede leer.",
+    "de": "Eine vorbereitete Pipeline enthält nicht zwingend ein vollständiges Paket. Prüfen Sie die Lesebereitschaft mit HasPacket."
   },
   "dmg07_LinkDmg07_IsPipelinePrimed_purpose": {
     "ja": "初回の未定義配信を捨てて受信準備を終えたか調べます。",
     "en": "Inspect whether the initial undefined broadcast has been discarded.",
-    "zh-CN": "检查是否已经丢弃内容未定义的初始广播。"
+    "zh-CN": "检查是否已经丢弃内容未定义的初始广播。",
+    "ko": "초기의 정의되지 않은 브로드캐스트를 버렸는지 검사합니다.",
+    "zh-TW": "檢查是否已丟棄最初未定義的廣播。",
+    "fr": "Vérifie si la première diffusion indéfinie a été jetée.",
+    "es": "Comprueba si se ha descartado la difusión inicial indefinida.",
+    "de": "Prüft, ob die anfängliche undefinierte Rundsendung verworfen wurde."
   },
   "dmg07_LinkDmg07_IsPipelinePrimed_returns": {
     "ja": "初回配信の処理後は1、初期化・探索へのリセット・開始確認時は0です。",
     "en": "Returns 1 after the initial broadcast; initialization, discovery reset and startup confirmation clear it.",
-    "zh-CN": "初始广播之后返回 1；初始化、重置发现状态和启动确认都会将其清零。"
+    "zh-CN": "初始广播之后返回 1；初始化、重置发现状态和启动确认都会将其清零。",
+    "ko": "첫 브로드캐스트 후 1을 반환합니다. 초기화, 발견 초기화, 시작 확인 시 지웁니다.",
+    "zh-TW": "首次廣播後傳回 1；初始化、探索重設及啟動確認會清除它。",
+    "fr": "Renvoie 1 après la première diffusion ; initialisation, remise à zéro de découverte et confirmation de démarrage l’effacent.",
+    "es": "Devuelve 1 tras la difusión inicial; lo borran la inicialización, el reinicio de descubrimiento y la confirmación de inicio.",
+    "de": "Gibt nach der ersten Rundsendung 1 zurück; Initialisierung, Erkennungsreset und Startbestätigung löschen den Wert."
   },
   "dmg07_LinkDmg07_HasPacket_purpose": {
     "ja": "通常データの完成済み4バイトパケットが未読か調べます。",
     "en": "Inspect whether a completed four-byte data packet is unread.",
-    "zh-CN": "检查是否有尚未读取的完整四字节数据包。"
+    "zh-CN": "检查是否有尚未读取的完整四字节数据包。",
+    "ko": "완료된 4바이트 데이터 패킷이 아직 읽히지 않았는지 검사합니다.",
+    "zh-TW": "檢查是否有已完成但未讀取的四位元組資料封包。",
+    "fr": "Vérifie si un paquet de données terminé de quatre octets n’a pas été lu.",
+    "es": "Comprueba si hay un paquete completo de cuatro bytes sin leer.",
+    "de": "Prüft auf ein abgeschlossenes ungelesenes Vier-Byte-Datenpaket."
   },
   "dmg07_LinkDmg07_HasPacket_returns": {
     "ja": "未読があれば1、空なら0です。",
     "en": "Returns 1 for unread data, otherwise 0.",
-    "zh-CN": "有未读数据返回 1，否则返回 0。"
+    "zh-CN": "有未读数据返回 1，否则返回 0。",
+    "ko": "읽지 않은 데이터가 있으면 1, 아니면 0을 반환합니다.",
+    "zh-TW": "有未讀資料時傳回 1，否則為 0。",
+    "fr": "Renvoie 1 pour des données non lues, sinon 0.",
+    "es": "Devuelve 1 si hay datos sin leer y 0 si no.",
+    "de": "Gibt bei ungelesenen Daten 1 zurück, sonst 0."
   },
   "dmg07_note_retained": {
     "ja": "読んだ後も保存領域にはデータが残るため、GetPacketSlotで参照できます。空のReadPacketはその保存値を再取得する操作ではありません。",
     "en": "Cached bytes remain available through GetPacketSlot after consumption. An empty ReadPacket does not copy those cached bytes again.",
-    "zh-CN": "消费后，缓存字节仍可通过 GetPacketSlot 读取。空的 ReadPacket 不会再次复制这些缓存字节。"
+    "zh-CN": "消费后，缓存字节仍可通过 GetPacketSlot 读取。空的 ReadPacket 不会再次复制这些缓存字节。",
+    "ko": "소비 후에도 GetPacketSlot으로 캐시 바이트를 읽을 수 있습니다. 비어 있는 ReadPacket은 그 바이트를 다시 복사하지 않습니다.",
+    "zh-TW": "消費後仍可透過 GetPacketSlot 取得快取位元組。空的 ReadPacket 不會再次複製這些位元組。",
+    "fr": "Les octets mémorisés restent accessibles par GetPacketSlot après consommation. Un ReadPacket vide ne les recopie pas.",
+    "es": "Los bytes guardados siguen disponibles mediante GetPacketSlot después de consumir. Un ReadPacket vacío no vuelve a copiarlos.",
+    "de": "Gespeicherte Bytes bleiben nach dem Verbrauch über GetPacketSlot verfügbar. Ein leeres ReadPacket kopiert sie nicht erneut."
   },
   "dmg07_LinkDmg07_ReadPacket_purpose": {
     "ja": "最新の完成済みパケットを取り出し、未読フラグを消します。",
     "en": "Copy the latest completed packet and clear its unread flag.",
-    "zh-CN": "复制最新完成的数据包，并清除其未读标志。"
+    "zh-CN": "复制最新完成的数据包，并清除其未读标志。",
+    "ko": "가장 최근에 완료된 패킷을 복사하고 미읽음 플래그를 지웁니다.",
+    "zh-TW": "複製最新完成的封包，並清除未讀旗標。",
+    "fr": "Copie le dernier paquet terminé et efface son drapeau non lu.",
+    "es": "Copia el último paquete completo y borra su indicador de no leído.",
+    "de": "Kopiert das zuletzt abgeschlossene Paket und löscht dessen Ungelesen-Flag."
   },
   "dmg07_LinkDmg07_ReadPacket_dst": {
     "ja": "4バイトの書き込み可能な領域。0なら内容を読み捨てます。",
     "en": "Four writable bytes; null discards the packet.",
-    "zh-CN": "四个可写字节；为 null 时丢弃数据包。"
+    "zh-CN": "四个可写字节；为 null 时丢弃数据包。",
+    "ko": "쓰기 가능한 4바이트입니다. null이면 패킷을 버립니다.",
+    "zh-TW": "四個可寫入位元組；null 會丟棄封包。",
+    "fr": "Quatre octets accessibles en écriture ; null jette le paquet.",
+    "es": "Cuatro bytes escribibles; null descarta el paquete.",
+    "de": "Vier beschreibbare Bytes; null verwirft das Paket."
   },
   "dmg07_LinkDmg07_ReadPacket_returns": {
     "ja": "取得できれば1、空なら0です。空ではdstを書き換えません。",
     "en": "Returns 1 when consumed, 0 when empty. Empty reads leave dst unchanged.",
-    "zh-CN": "成功消费返回 1，为空时返回 0。空读取不会改变 dst。"
+    "zh-CN": "成功消费返回 1，为空时返回 0。空读取不会改变 dst。",
+    "ko": "소비하면 1, 비어 있으면 0을 반환합니다. 빈 읽기는 dst를 바꾸지 않습니다.",
+    "zh-TW": "消費成功傳回 1，無資料傳回 0。空讀取不改變 dst。",
+    "fr": "Renvoie 1 si consommé, 0 si vide. Une lecture vide laisse dst inchangé.",
+    "es": "Devuelve 1 si se consume y 0 si está vacío. Una lectura vacía no cambia dst.",
+    "de": "Gibt bei Verbrauch 1 zurück, bei Leere 0. Leeres Lesen lässt dst unverändert."
   },
   "dmg07_note_cachebyte": {
     "ja": "未読フラグは調べず、消費もしません。初期化直後は0、消費後や探索へのリセット後は保存値を返すことがあるため、新着判定には使いません。",
     "en": "Neither checks nor consumes readiness. Returns zero just after initialization and may return retained bytes after consumption or a discovery reset. Do not use it as a new-data test.",
-    "zh-CN": "既不检查也不消费就绪状态。刚初始化后返回零；消费后或重置发现状态后，可能仍返回保留的字节。不要用它判断是否有新数据。"
+    "zh-CN": "既不检查也不消费就绪状态。刚初始化后返回零；消费后或重置发现状态后，可能仍返回保留的字节。不要用它判断是否有新数据。",
+    "ko": "준비 상태를 검사하거나 소비하지 않습니다. 초기화 직후에는 0을 반환하며, 소비 또는 발견 초기화 후에는 남은 바이트를 반환할 수 있습니다. 새 데이터 검사로 사용하지 마세요.",
+    "zh-TW": "不檢查也不消費就緒狀態。初始化後立即傳回零；消費或探索重設後可能傳回保留位元組。不可用來判斷新資料。",
+    "fr": "Ne vérifie ni ne consomme la disponibilité. Renvoie zéro juste après initialisation et peut renvoyer des octets conservés après consommation ou remise à zéro de découverte. Ne l’utilisez pas comme test de nouvelles données.",
+    "es": "No comprueba ni consume la disponibilidad. Devuelve cero justo después de inicializar y puede devolver bytes conservados tras consumir o reiniciar descubrimiento. No lo uses para detectar datos nuevos.",
+    "de": "Prüft und verbraucht keine Bereitschaft. Liefert direkt nach Initialisierung null und eventuell erhaltene Bytes nach Verbrauch oder Erkennungsreset. Nicht als Neudatenprüfung verwenden."
   },
   "dmg07_LinkDmg07_GetPacketSlot_purpose": {
     "ja": "保存中のパケットから指定プレイヤーの1バイトを読みます。",
     "en": "Read one player’s byte from cached packet storage.",
-    "zh-CN": "从数据包缓存中读取一名玩家的字节。"
+    "zh-CN": "从数据包缓存中读取一名玩家的字节。",
+    "ko": "캐시된 패킷 저장 공간에서 플레이어 한 명의 바이트를 읽습니다.",
+    "zh-TW": "從快取封包儲存區讀取一位玩家的位元組。",
+    "fr": "Lit l’octet d’un joueur dans le paquet mémorisé.",
+    "es": "Lee el byte de un jugador del paquete guardado.",
+    "de": "Liest das Byte eines Spielers aus dem gespeicherten Paket."
   },
   "dmg07_LinkDmg07_GetPacketSlot_player_slot": {
     "ja": "物理プレイヤー番号1～4。",
     "en": "Physical player number, 1..4.",
-    "zh-CN": "物理玩家编号，范围为 1..4。"
+    "zh-CN": "物理玩家编号，范围为 1..4。",
+    "ko": "물리 플레이어 번호 1~4입니다.",
+    "zh-TW": "實體玩家編號，1..4。",
+    "fr": "Numéro de joueur physique, 1..4.",
+    "es": "Número de jugador físico, 1..4.",
+    "de": "Physische Spielernummer, 1..4."
   },
   "dmg07_LinkDmg07_GetPacketSlot_returns": {
     "ja": "1～4なら対応する保存値、不正な番号なら0です。",
     "en": "Returns the cached byte for player 1..4, or zero for an invalid number.",
-    "zh-CN": "返回玩家 1..4 对应的缓存字节；编号无效时返回零。"
+    "zh-CN": "返回玩家 1..4 对应的缓存字节；编号无效时返回零。",
+    "ko": "플레이어 1~4의 캐시 바이트를 반환하며 잘못된 번호는 0입니다.",
+    "zh-TW": "傳回玩家 1..4 的快取位元組；編號無效時為零。",
+    "fr": "Renvoie l’octet mémorisé du joueur 1..4, ou zéro pour un numéro invalide.",
+    "es": "Devuelve el byte guardado del jugador 1..4 o cero para un número no válido.",
+    "de": "Gibt das gespeicherte Byte von Spieler 1..4 zurück, bei ungültiger Nummer null."
   },
   "dmg07_LinkDmg07_GetSentSequence_purpose": {
     "ja": "自機の提出バイトが実際にクロックで送り出された回数を読みます。",
     "en": "Read the count of application submission bytes actually clocked out.",
-    "zh-CN": "读取实际已由时钟移出的应用提交字节数。"
+    "zh-CN": "读取实际已由时钟移出的应用提交字节数。",
+    "ko": "실제로 클록에 맞춰 송신된 애플리케이션 제출 바이트 수를 읽습니다.",
+    "zh-TW": "讀取實際由時脈送出的應用程式提交位元組數。",
+    "fr": "Lit le nombre d’octets applicatifs effectivement transmis sous horloge.",
+    "es": "Lee el número de bytes de aplicación realmente transmitidos con el reloj.",
+    "de": "Liest die Anzahl der tatsächlich ausgetakteten Anwendungsbytes."
   },
   "dmg07_LinkDmg07_GetSentSequence_returns": {
     "ja": "8ビットの送信番号です。初回の提出も数えますが、再起動制御の送信は数えません。",
     "en": "Returns the eight-bit sent sequence. Counts the initial submission but excludes restart-control traffic.",
-    "zh-CN": "返回八位发送序列号。计入初始提交，不计重启控制流量。"
+    "zh-CN": "返回八位发送序列号。计入初始提交，不计重启控制流量。",
+    "ko": "8비트 송신 시퀀스를 반환합니다. 첫 제출은 세지만 재시작 제어 통신은 제외합니다.",
+    "zh-TW": "傳回 8 位元傳送序號。包含首次提交，但排除重新啟動控制通訊。",
+    "fr": "Renvoie la séquence d’envoi sur huit bits. Compte la première contribution, mais exclut le contrôle de redémarrage.",
+    "es": "Devuelve la secuencia enviada de ocho bits. Cuenta el envío inicial pero excluye el control de reinicio.",
+    "de": "Gibt die 8-Bit-Sendesequenz zurück. Zählt den ersten Beitrag, aber keinen Neustartsteuerverkehr."
   },
   "dmg07_LinkDmg07_GetPacketSequence_purpose": {
     "ja": "最後にメールボックスへ公開したパケットの番号を読みます。",
     "en": "Read the sequence assigned to the most recently published packet.",
-    "zh-CN": "读取分配给最近一次交付数据包的序列号。"
+    "zh-CN": "读取分配给最近一次交付数据包的序列号。",
+    "ko": "가장 최근에 게시된 패킷에 부여한 시퀀스를 읽습니다.",
+    "zh-TW": "讀取最近發布封包所分配的序號。",
+    "fr": "Lit la séquence attribuée au dernier paquet publié.",
+    "es": "Lee la secuencia asignada al último paquete publicado.",
+    "de": "Liest die dem zuletzt bereitgestellten Paket zugewiesene Sequenz."
   },
   "dmg07_LinkDmg07_GetPacketSequence_returns": {
     "ja": "8ビットの受信パケット番号です。読み取りで未読フラグは変わりません。",
     "en": "Returns the eight-bit packet sequence without changing readiness.",
-    "zh-CN": "返回八位数据包序列号，不改变就绪状态。"
+    "zh-CN": "返回八位数据包序列号，不改变就绪状态。",
+    "ko": "준비 상태를 바꾸지 않고 8비트 패킷 시퀀스를 반환합니다.",
+    "zh-TW": "傳回 8 位元封包序號，不改變就緒狀態。",
+    "fr": "Renvoie la séquence du paquet sur huit bits sans changer la disponibilité.",
+    "es": "Devuelve la secuencia de paquete de ocho bits sin cambiar la disponibilidad.",
+    "de": "Gibt die 8-Bit-Paketsequenz zurück, ohne die Bereitschaft zu ändern."
   },
   "dmg07_LinkDmg07_GetSilenceFrames_purpose": {
     "ja": "最後のシリアル完了処理から経過したフレーム数を読みます。",
     "en": "Read frames counted since the last processed serial completion.",
-    "zh-CN": "读取自上次处理串行完成事件后累计的帧数。"
+    "zh-CN": "读取自上次处理串行完成事件后累计的帧数。",
+    "ko": "마지막 직렬 완료를 처리한 이후 센 프레임 수를 읽습니다.",
+    "zh-TW": "讀取上次處理序列傳輸完成後計算的影格數。",
+    "fr": "Lit les trames comptées depuis la dernière fin de transfert série traitée.",
+    "es": "Lee los fotogramas contados desde la última finalización serie procesada.",
+    "de": "Liest die seit dem letzten verarbeiteten seriellen Abschluss gezählten Frames."
   },
   "dmg07_LinkDmg07_GetSilenceFrames_returns": {
     "ja": "0～255。完了処理で0へ戻り、TickFrameごとに増えます。",
     "en": "0..255; processed completion resets it, and each TickFrame increments it.",
-    "zh-CN": "范围为 0..255；处理完成事件会清零，每次 TickFrame 会递增。"
+    "zh-CN": "范围为 0..255；处理完成事件会清零，每次 TickFrame 会递增。",
+    "ko": "0~255입니다. 완료 처리 시 초기화하며 TickFrame마다 증가합니다.",
+    "zh-TW": "0..255；處理完成時重設，每次 TickFrame 遞增。",
+    "fr": "0..255 ; une fin traitée le remet à zéro et chaque TickFrame l’incrémente.",
+    "es": "0..255; procesar una finalización lo restablece y cada TickFrame lo incrementa.",
+    "de": "0..255; ein verarbeiteter Abschluss setzt zurück, jeder TickFrame erhöht den Wert."
   },
   "dmg07_note_timeoutonce": {
     "ja": "受信が再開するまで同じ無通信状態を毎フレーム加算しません。ClearErrorを呼んでもこの抑制ラッチと累積値は残ります。",
     "en": "Does not count the same silence episode every frame before reception resumes. ClearError preserves both this suppression latch and the cumulative count.",
-    "zh-CN": "接收恢复前，不会每帧重复计数同一次静默。ClearError 会保留此抑制锁存标志及累计计数。"
+    "zh-CN": "接收恢复前，不会每帧重复计数同一次静默。ClearError 会保留此抑制锁存标志及累计计数。",
+    "ko": "수신이 재개될 때까지 같은 무응답 구간을 매 프레임 중복 계산하지 않습니다. ClearError는 이 억제 래치와 누적 횟수를 유지합니다.",
+    "zh-TW": "接收恢復前，不會每影格重複計算同一段靜默。ClearError 保留此抑制鎖存及累計次數。",
+    "fr": "Ne recompte pas le même silence à chaque trame avant la reprise. ClearError conserve ce verrou de suppression et le cumul.",
+    "es": "No cuenta el mismo silencio en cada fotograma antes de reanudar la recepción. ClearError conserva esta marca de supresión y el total.",
+    "de": "Zählt dieselbe Ruhephase vor Wiederaufnahme nicht in jedem Frame erneut. ClearError erhält diese Unterdrückungsmarkierung und den Gesamtzähler."
   },
   "dmg07_LinkDmg07_GetTimeoutCount_purpose": {
     "ja": "無通信またはハンドシェイクの期限超過を記録した回数を読みます。",
     "en": "Read the count of silence or handshake deadline expirations.",
-    "zh-CN": "读取静默或握手超时的累计次数。"
+    "zh-CN": "读取静默或握手超时的累计次数。",
+    "ko": "무응답 또는 핸드셰이크 제한 만료 횟수를 읽습니다.",
+    "zh-TW": "讀取靜默或交握期限逾時次數。",
+    "fr": "Lit le nombre d’expirations de silence ou de négociation.",
+    "es": "Lee el número de plazos agotados de silencio o negociación.",
+    "de": "Liest die Anzahl abgelaufener Ruhe- oder Handshake-Fristen."
   },
   "dmg07_LinkDmg07_GetTimeoutCount_returns": {
     "ja": "0～255の累積値です。",
     "en": "Returns a cumulative value in 0..255.",
-    "zh-CN": "返回 0..255 范围内的累计值。"
+    "zh-CN": "返回 0..255 范围内的累计值。",
+    "ko": "0~255의 누적값을 반환합니다.",
+    "zh-TW": "傳回 0..255 的累計值。",
+    "fr": "Renvoie un cumul de 0 à 255.",
+    "es": "Devuelve un total acumulado de 0 a 255.",
+    "de": "Gibt einen Gesamtwert von 0..255 zurück."
   },
   "dmg07_note_disconnect": {
     "ja": "アダプター未検出のまま期限を超えても増えません。1回の状態変化で複数人が消えても1イベントです。",
     "en": "A deadline before any adapter has been observed does not increment it. Multiple players removed by one status change count as one event.",
-    "zh-CN": "从未观测到适配器时发生超时，不会增加此计数。一次状态变化使多名玩家断开时，只计一次事件。"
+    "zh-CN": "从未观测到适配器时发生超时，不会增加此计数。一次状态变化使多名玩家断开时，只计一次事件。",
+    "ko": "어댑터를 한 번도 관측하지 못한 상태의 제한 만료는 횟수를 증가시키지 않습니다. 상태 변화 한 번으로 여러 플레이어가 사라져도 이벤트는 하나로 셉니다.",
+    "zh-TW": "從未觀察到轉接器之前的逾時不增加此值。一個狀態變更移除多位玩家時，只算一次事件。",
+    "fr": "Une expiration avant toute détection d’adaptateur ne l’incrémente pas. Plusieurs joueurs retirés par un seul changement d’état comptent comme un événement.",
+    "es": "Un plazo agotado antes de observar ningún adaptador no lo incrementa. Varios jugadores eliminados por un único cambio de estado cuentan como un evento.",
+    "de": "Fristablauf vor der ersten Adaptererkennung erhöht ihn nicht. Mehrere bei einer Statusänderung verschwundene Spieler zählen als ein Ereignis."
   },
   "dmg07_LinkDmg07_GetDisconnectCount_purpose": {
     "ja": "検出済みアダプターの無通信、または探索マスクからのプレイヤー減少を数えます。",
     "en": "Read recorded loss events: silence after seeing an adapter, or players disappearing from discovery status.",
-    "zh-CN": "读取记录的丢失事件数：发现适配器后发生静默，或发现状态中的玩家消失。"
+    "zh-CN": "读取记录的丢失事件数：发现适配器后发生静默，或发现状态中的玩家消失。",
+    "ko": "어댑터 관측 후 무응답 또는 발견 상태에서 플레이어가 사라지는 연결 손실 기록을 읽습니다.",
+    "zh-TW": "讀取已記錄的斷線事件：曾看見轉接器後靜默，或玩家從探索狀態消失。",
+    "fr": "Lit les pertes enregistrées : silence après détection d’un adaptateur ou disparition de joueurs de l’état de découverte.",
+    "es": "Lee las pérdidas registradas: silencio tras detectar adaptador o jugadores que desaparecen del estado de descubrimiento.",
+    "de": "Liest erfasste Verlustereignisse: Stille nach Adaptererkennung oder aus dem Erkennungsstatus verschwundene Spieler."
   },
   "dmg07_LinkDmg07_GetDisconnectCount_returns": {
     "ja": "0～255の累積イベント数です。失われた人数ではありません。",
     "en": "Returns 0..255 events, not the number of lost players.",
-    "zh-CN": "返回 0..255 的事件数，不是丢失的玩家人数。"
+    "zh-CN": "返回 0..255 的事件数，不是丢失的玩家人数。",
+    "ko": "잃은 플레이어 수가 아닌 0~255의 이벤트 수를 반환합니다.",
+    "zh-TW": "傳回 0..255 次事件，不是失去連線的玩家人數。",
+    "fr": "Renvoie 0..255 événements, pas le nombre de joueurs perdus.",
+    "es": "Devuelve 0..255 eventos, no el número de jugadores perdidos.",
+    "de": "Gibt 0..255 Ereignisse zurück, nicht die Anzahl verlorener Spieler."
   },
   "dmg07_example_overflow": {
     "ja": "最初の有効パケットを読まず、次が届くまで待ちます。SENT SEQ=3、PACKET SEQ=2、ERROR=6となり、取得内容は最新の33/34/35/36です。ClearErrorでCLEAR ERROR=0になりますが、ErrorCountは1のままです。",
     "en": "Leave the first valid packet unread until another arrives. Expect SENT SEQ=3, PACKET SEQ=2 and ERROR=6; the read returns the latest 33/34/35/36. ClearError changes CLEAR ERROR to zero while ErrorCount remains one.",
-    "zh-CN": "保留第一个有效数据包不读，直到下一个到达。预期 SENT SEQ=3、PACKET SEQ=2、ERROR=6；读取返回最新的 33/34/35/36。ClearError 使 CLEAR ERROR 变为零，但 ErrorCount 仍为一。"
+    "zh-CN": "保留第一个有效数据包不读，直到下一个到达。预期 SENT SEQ=3、PACKET SEQ=2、ERROR=6；读取返回最新的 33/34/35/36。ClearError 使 CLEAR ERROR 变为零，但 ErrorCount 仍为一。",
+    "ko": "다음 패킷이 올 때까지 첫 유효 패킷을 읽지 않습니다. SENT SEQ=3, PACKET SEQ=2, ERROR=6을 기대하며 읽기는 최신 33/34/35/36을 반환합니다. ClearError는 CLEAR ERROR를 0으로 바꾸지만 ErrorCount는 1을 유지합니다.",
+    "zh-TW": "保留第一個有效封包不讀，直到另一封包到達。預期 SENT SEQ=3、PACKET SEQ=2、ERROR=6，讀取傳回最新的 33／34／35／36。ClearError 使 CLEAR ERROR 歸零，ErrorCount 仍為一。",
+    "fr": "Laissez le premier paquet valide non lu jusqu’au suivant. Attendez SENT SEQ=3, PACKET SEQ=2 et ERROR=6 ; la lecture renvoie les dernières valeurs 33/34/35/36. ClearError met CLEAR ERROR à zéro, mais ErrorCount reste à un.",
+    "es": "Deja el primer paquete válido sin leer hasta que llegue otro. Se esperan SENT SEQ=3, PACKET SEQ=2 y ERROR=6; la lectura devuelve los últimos 33/34/35/36. ClearError pone CLEAR ERROR a cero, pero ErrorCount sigue en uno.",
+    "de": "Lassen Sie das erste gültige Paket bis zum nächsten ungelesen. Erwartet werden SENT SEQ=3, PACKET SEQ=2 und ERROR=6; gelesen werden die neuesten 33/34/35/36. ClearError setzt CLEAR ERROR auf null, während ErrorCount eins bleibt."
   },
   "dmg07_LinkDmg07_GetErrorCount_purpose": {
     "ja": "受信プロトコル不正と未読パケットの上書きを記録した回数を読みます。",
     "en": "Read the count of received-protocol errors and unread-packet overwrites.",
-    "zh-CN": "读取接收协议错误和未读数据包被覆盖的累计次数。"
+    "zh-CN": "读取接收协议错误和未读数据包被覆盖的累计次数。",
+    "ko": "수신 프로토콜 오류와 미읽음 패킷 덮어쓰기 횟수를 읽습니다.",
+    "zh-TW": "讀取接收通訊協定錯誤及未讀封包覆寫次數。",
+    "fr": "Lit le nombre d’erreurs de protocole reçues et d’écrasements de paquets non lus.",
+    "es": "Lee el número de errores de protocolo recibidos y sobrescrituras de paquetes sin leer.",
+    "de": "Liest die Anzahl empfangener Protokollfehler und überschriebener ungelesener Pakete."
   },
   "dmg07_LinkDmg07_GetErrorCount_returns": {
     "ja": "0～255の累積値です。要求の引数・状態エラーや時間切れはこの数に含めません。",
     "en": "Returns 0..255. Request validation/state errors and timeouts are not included.",
-    "zh-CN": "返回 0..255。不包括请求验证错误、状态错误和超时。"
+    "zh-CN": "返回 0..255。不包括请求验证错误、状态错误和超时。",
+    "ko": "0~255를 반환합니다. 요청 검증·상태 오류와 시간 초과는 포함하지 않습니다.",
+    "zh-TW": "傳回 0..255，不包含請求驗證／狀態錯誤或逾時。",
+    "fr": "Renvoie 0..255. N’inclut pas les erreurs de validation/état de requête ni les expirations.",
+    "es": "Devuelve 0..255. No incluye errores de validación/estado de solicitudes ni tiempos agotados.",
+    "de": "Gibt 0..255 zurück. Anforderungsvalidierungs-/Zustandsfehler und Timeouts sind nicht enthalten."
   },
   "dmg07_note_last": {
     "ja": "読み取りでは消えません。複数の問題が起きたときの全履歴ではなく、最後のコードだけです。",
     "en": "Reading does not clear it. Stores only the latest code, not a history of every error.",
-    "zh-CN": "读取不会清除错误。只保存最新错误码，不保存全部错误历史。"
+    "zh-CN": "读取不会清除错误。只保存最新错误码，不保存全部错误历史。",
+    "ko": "읽어도 지워지지 않습니다. 모든 오류 이력 대신 가장 최근 코드만 저장합니다.",
+    "zh-TW": "讀取不會清除。只儲存最新代碼，不保存所有錯誤歷程。",
+    "fr": "La lecture ne l’efface pas. Ne conserve que le dernier code, pas l’historique des erreurs.",
+    "es": "Leer no lo borra. Guarda solo el último código, no un historial de errores.",
+    "de": "Lesen löscht den Wert nicht. Gespeichert wird nur der neueste Code, kein Fehlerverlauf."
   },
   "dmg07_LinkDmg07_LastError_purpose": {
     "ja": "最後に記録したエラー番号を読みます。",
     "en": "Read the most recently latched error code.",
-    "zh-CN": "读取最近一次锁存的错误码。"
+    "zh-CN": "读取最近一次锁存的错误码。",
+    "ko": "가장 최근에 기록된 오류 코드를 읽습니다.",
+    "zh-TW": "讀取最近記錄的錯誤碼。",
+    "fr": "Lit le dernier code d’erreur mémorisé.",
+    "es": "Lee el último código de error registrado.",
+    "de": "Liest den zuletzt gespeicherten Fehlercode."
   },
   "dmg07_LinkDmg07_LastError_returns": {
     "ja": "0～6のエラー番号です。",
     "en": "Returns error code 0..6.",
-    "zh-CN": "返回错误码 0..6。"
+    "zh-CN": "返回错误码 0..6。",
+    "ko": "오류 코드 0~6을 반환합니다.",
+    "zh-TW": "傳回錯誤碼 0..6。",
+    "fr": "Renvoie un code d’erreur de 0 à 6.",
+    "es": "Devuelve un código de error de 0 a 6.",
+    "de": "Gibt einen Fehlercode von 0..6 zurück."
   },
   "dmg07_note_clear": {
     "ja": "受信データ、フェーズ、接続情報、時間切れラッチは変えません。これだけで再接続や受信再開を行う関数ではありません。",
     "en": "Preserves received data, phase, connection information and the timeout latch. This call alone does not reconnect or resume reception.",
-    "zh-CN": "保留接收数据、阶段、连接信息和超时锁存标志。仅调用此函数不会重新连接或恢复接收。"
+    "zh-CN": "保留接收数据、阶段、连接信息和超时锁存标志。仅调用此函数不会重新连接或恢复接收。",
+    "ko": "수신 데이터, 단계, 연결 정보, 시간 초과 래치를 유지합니다. 이 호출만으로 다시 연결하거나 수신을 재개하지 않습니다.",
+    "zh-TW": "保留接收資料、階段、連線資訊與逾時鎖存。僅此呼叫不會重新連線或恢復接收。",
+    "fr": "Préserve données reçues, phase, connexion et verrou d’expiration. Cet appel seul ne reconnecte pas et ne relance pas la réception.",
+    "es": "Conserva datos recibidos, fase, conexión y marca de timeout. Esta llamada por sí sola no reconecta ni reanuda la recepción.",
+    "de": "Erhält Empfangsdaten, Phase, Verbindungsinformationen und Timeout-Markierung. Dieser Aufruf allein verbindet nicht neu und setzt den Empfang nicht fort."
   },
   "dmg07_LinkDmg07_ClearError_purpose": {
     "ja": "最後のエラー番号を0へ戻します。",
     "en": "Reset the last-error code to zero.",
-    "zh-CN": "将最新错误码重置为零。"
+    "zh-CN": "将最新错误码重置为零。",
+    "ko": "마지막 오류 코드를 0으로 초기화합니다.",
+    "zh-TW": "將最後錯誤碼重設為零。",
+    "fr": "Remet le dernier code d’erreur à zéro.",
+    "es": "Restablece el último código de error a cero.",
+    "de": "Setzt den letzten Fehlercode auf null zurück."
   },
   "dmg07_LinkDmg07_ClearError_returns": {
     "ja": "戻り値はありません。",
     "en": "No return value.",
-    "zh-CN": "无返回值。"
+    "zh-CN": "无返回值。",
+    "ko": "반환값은 없습니다.",
+    "zh-TW": "無傳回值。",
+    "fr": "Aucune valeur de retour.",
+    "es": "No devuelve ningún valor.",
+    "de": "Kein Rückgabewert."
   },
   "dmg07_module": {
     "ja": "DMG-07は各台からの1バイトを4台へ配信するアダプターです。このライブラリは、探索、プレイヤー1による開始要求、1パケット遅れの配信、整列した再起動制御を扱います。EXCHANGEで基本の4台通信、NO ADAPTERで時間切れ、OVERFLOWで読み忘れ、RESTARTで回復を学べます。",
     "en": "The DMG-07 broadcasts one submitted byte from each console to all four players. This library handles discovery, player-1 startup, delayed packet broadcasts and aligned restart control. Learn four-console exchange with EXCHANGE, timeout behavior with NO ADAPTER, unread data with OVERFLOW and recovery with RESTART.",
-    "zh-CN": "DMG-07 将每台主机提交的一个字节广播给全部四名玩家。本库处理发现、玩家 1 启动、延迟数据包广播及对齐的重启控制。EXCHANGE 演示四机交换，NO ADAPTER 演示超时，OVERFLOW 演示未读数据处理，RESTART 演示恢复。"
+    "zh-CN": "DMG-07 将每台主机提交的一个字节广播给全部四名玩家。本库处理发现、玩家 1 启动、延迟数据包广播及对齐的重启控制。EXCHANGE 演示四机交换，NO ADAPTER 演示超时，OVERFLOW 演示未读数据处理，RESTART 演示恢复。",
+    "ko": "DMG-07은 각 콘솔이 제출한 한 바이트를 네 플레이어 모두에게 브로드캐스트합니다. 이 라이브러리는 발견, 플레이어 1의 시작, 지연된 패킷 브로드캐스트, 정렬된 재시작 제어를 처리합니다. EXCHANGE로 4대 교환, NO ADAPTER로 시간 초과, OVERFLOW로 읽지 않은 데이터, RESTART로 복구를 익히세요.",
+    "zh-TW": "DMG-07 將各主機提交的一個位元組廣播給四位玩家。此函式庫處理探索、玩家 1 啟動、延遲封包廣播及對齊的重新啟動控制。EXCHANGE 示範四機交換，NO ADAPTER 示範逾時，OVERFLOW 示範未讀資料，RESTART 示範復原。",
+    "fr": "Le DMG-07 diffuse l’octet de chaque console aux quatre joueurs. Cette bibliothèque gère découverte, démarrage par le joueur 1, diffusions retardées et contrôle de redémarrage aligné. Découvrez l’échange à quatre avec EXCHANGE, les expirations avec NO ADAPTER, les données non lues avec OVERFLOW et la reprise avec RESTART.",
+    "es": "DMG-07 difunde un byte de cada consola a los cuatro jugadores. La biblioteca gestiona descubrimiento, inicio por jugador 1, difusión retrasada y control de reinicio alineado. Aprende intercambio a cuatro con EXCHANGE, timeout con NO ADAPTER, datos sin leer con OVERFLOW y recuperación con RESTART.",
+    "de": "DMG-07 verteilt ein Byte jeder Konsole an alle vier Spieler. Diese Bibliothek verwaltet Erkennung, Start durch Spieler 1, verzögerte Paketrundsendungen und ausgerichtete Neustartsteuerung. EXCHANGE erklärt Vier-Konsolen-Austausch, NO ADAPTER Zeitüberschreitungen, OVERFLOW ungelesene Daten und RESTART Wiederherstellung."
   }
 }

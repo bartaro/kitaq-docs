@@ -54,10 +54,7 @@ KUROSAKI 是能讀取 KITAQFC 資訊的 NES／FC／FDS 觀察型模擬器。CLI 
 
 KUROSAKI 的 `--emit-diagnostics` 與 KOKURA 一樣，接收 **JSONL 檔案路徑**。請區分 CPU 追蹤與診斷事件檔。
 
-## 10. 公開範圍
-KUROSAKI-GUI 尚未公開。目前手冊涵蓋 CLI 和整合 API。
-
-## 11. FDS 與存檔 RAM
+## 10. FDS 與存檔 RAM
 `fds-inspect` 檢查磁碟結構，`export-assets` 匯出素材。FDS 的啟動、BIOS、磁碟存取條件與 NES 卡匣不同，應另外測試。電池存檔 `.sav` 和 `.kss.json` 快照用途不同，須採用實作支援的儲存配置。
 
 {{CODE:9}}

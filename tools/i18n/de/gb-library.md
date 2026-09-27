@@ -50,12 +50,12 @@ Kompilieren Sie zuerst `audio_hwregs_gb.c`, danach `audio.c` und zuletzt den Spi
 
 `Audio_PlayMusic(bank,song)` gibt die Musikbank ausdrücklich an. `Audio_PlaySFXBanked` spielt einen Effekt aus einer anderen Bank ab. Prioritäten entscheiden darüber, welcher Effekt einen gemeinsam genutzten Hardwarekanal erhält. Der GB besitzt vier Hardware-Soundkanäle: CH1, CH2, CH3 und CH4.
 
-Die Musikbefehle `AUDIO_CMD_NOTE` und `AUDIO_CMD_SET_INST` verwenden die Kanalzuordnung **0=CH1, 1=CH2, 2=CH4, 3=CH3**. Verwechseln Sie diese nicht mit den üblichen Kanalkonstanten der API. Im Header ist derzeit `AUDIO_NOTE_MAX=67` definiert.
+Die Musikstream-Befehle `AUDIO_CMD_NOTE`, `AUDIO_CMD_SET_INST` und `AUDIO_CMD_STOP_CHANNEL` verwenden dieselben Kanal-IDs wie die normale API: **0=CH1, 1=CH2, 2=CH3, 3=CH4**. CH1 erzeugt Pulse mit Sweep, CH2 Pulse, CH3 Wellenformen und CH4 Rauschen. Der Header definiert `AUDIO_NOTE_MAX=67`.
 
 Der einfache CH1-Effektstrom liest pro Bild ein Paar aus Note und Lautstärke und endet bei Note 0. CH3 verwendet ein anderes Format und eine andere Endmarkierung. Ein Beispiel finden Sie in `gb_sound.c`. Überblendungen schreiten bei `Audio_Update` fort; ohne weitere Aktualisierungen bleibt auch die Überblendung stehen.
 
 ## 8. Musik im VBlank-Interrupt
-`audio_vblank.c` verwendet ein eigenes Wiedergabeformat. Zeitgesteuerte Datensätze bestehen aus fünf Bytes: `delay, ch2_note, ch1_note, ch3_note, ch4_noise_param`. Der Treiber liest direkt adressierbare Musikdaten oder verarbeitet eine WRAM-Warteschlange. Die öffentliche Bibliothek enthält keine Routine zum Nachfüllen dieser Warteschlange. Ihr Spiel muss die Daten bereitstellen und Schreibzugriffe mit der ISR abstimmen. `LOOP` wird nur in direkten Datenströmen erkannt, `IMMEDIATE` nur im Warteschlangenmodus. Datenströme für `audio.c` lassen sich nicht unverändert übergeben.
+`audio_vblank.c` verwendet ein eigenes Wiedergabeformat. Zeitgesteuerte Datensätze bestehen aus fünf Bytes: `delay, ch1_note, ch2_note, ch3_note, ch4_noise_param`. Der Treiber liest direkt adressierbare Musikdaten oder verarbeitet eine WRAM-Warteschlange. Initialisieren Sie den Warteschlangenmodus mit AudioVBlank_QueueReset, übergeben Sie vollständige Fünf-Byte-Datensätze mit AudioVBlank_QueueRefill und starten Sie mit AudioVBlank_QueuePlay. Nur ein einziger Produzent im Vordergrund darf die Warteschlange nachfüllen. `LOOP` wird nur in direkten Streams erkannt, `IMMEDIATE` nur im Warteschlangenmodus. Normale `audio.c`-Streams können nicht unverändert übergeben werden.
 
 {{CODE:2}}
 
@@ -75,7 +75,7 @@ Verwenden Sie für CGB-Linien die Farben 1, 2 und 3. Der normale Modus mit 128 �
 Der Modus mit 160 × 144 reserviert höchstens 127 Kacheln pro Bild. Kann der schnelle Linienzeichner keine weitere Kachel reservieren oder trifft er auf eine Koordinate außerhalb des Bildschirms, liefert `Wire3DCGB_GetFullScreenOverflow()` einen Wert ungleich null. Weitere Pixelschreibzugriffe unterbleiben bis zur Initialisierung des nächsten Bildes. Halten Sie die Eckpunkte innerhalb des gewählten Zeichenbereichs. Der rechte Sicherheitsrand der Dreiecksmaske reicht im Modus 128 × 96 höchstens bis X=127, im Vollbildmodus bis X=159. Beachten Sie die bei den APIs beschriebene WRAM-Bankzuordnung, insbesondere bei Vollbild- und FastMap-Funktionen.
 
 ## 10. Szenen, Objektpools und Geschossmuster
-`scene` verwaltet Zustände wie Titelbild, Spiel und Pause. `entity` stellt einen Objektpool mit fester Kapazität bereit. `chain` speichert einen Koordinatenverlauf für Schlangen, Züge oder Seile. Prüfen Sie Fehlerwerte der Reservierung wie 0xFF, bevor Sie den von `entity_get` gelieferten Zeiger verwenden.
+`scene` verwaltet Zustände wie Titel, Spiel und Pause; `entity` bietet einen Objektpool fester Kapazität; `chain` stellt die Nachführung gegliederter Körper und einen Positionsverlauf bereit. Verwenden Sie `ChainBody`, um eine gegliederte Schlange oder ein Seil zu bewegen. Prüfen Sie vor der Verwendung des von `entity_get` gelieferten Pointers auf Fehlerwerte der Reservierung wie 0xFF.
 
 `danmaku` bietet Geschosspools mit Festkommaarithmetik, gerichtetes und fächerförmiges Erzeugen von Geschossen sowie Treffer- und Streiferkennung. Sein CGB-Pfad setzt Geschosse in den Hintergrund ein und umgeht damit die übliche OBJ-Anzahlbegrenzung. Rechenzeit pro Bild und Bandbreite für Hintergrundübertragungen bleiben jedoch begrenzt. Messen Sie die Verarbeitungszeit, statt allein eine hohe Geschosszahl anzustreben.
 

@@ -1,5 +1,5 @@
 ## Outil Windows prêt à l'emploi
-Le dépôt contient désormais `kurosaki.exe` à sa racine. Téléchargez l'archive ZIP du dépôt et conservez les mentions de licence avec l'exécutable. Cet outil Windows x64 en ligne de commande ne nécessite aucune installation de Rust, Python ou .NET pour fonctionner. Les étapes de compilation ci-dessous servent à le reconstruire depuis les sources. Le code propre au projet est proposé par DAISUKE OBA sous licence MIT ; les conditions des dépendances sont conservées dans BINARY_NOTICES.md et licenses/.
+Le dépôt contient `kurosaki.exe` à sa racine. Téléchargez l'archive ZIP du dépôt et conservez les mentions de licence avec l'exécutable. Cet outil Windows x64 en ligne de commande ne nécessite aucune installation de Rust, Python ou .NET pour fonctionner. Les étapes de compilation ci-dessous servent à le reconstruire depuis les sources. Le code propre au projet est proposé par DAISUKE OBA sous licence MIT ; les conditions des dépendances sont conservées dans BINARY_NOTICES.md et licenses/.
 
 ## 1. À quoi sert KUROSAKI ?
 KUROSAKI est un émulateur d'observation NES/Famicom/FDS capable de lire les informations de KITAQFC. Son outil en ligne de commande inspecte les ROM, exécute les logiciels, enregistre l'audio, produit des diagnostics, sauvegarde des états, rejoue les commandes, désassemble les instructions et décompile des fonctions candidates. L'étendue des implémentations de mappers varie : commencez par examiner la ROM et les informations de prise en charge.
@@ -54,10 +54,7 @@ Les changements de registres, le PCM généré et un son conforme à l'attente s
 
 Comme dans KOKURA, `--emit-diagnostics` de KUROSAKI reçoit un **chemin de fichier JSONL**. Distinguez les traces processeur des fichiers d'événements de diagnostic.
 
-## 10. Périmètre de publication
-KUROSAKI-GUI reste non publié. Ce manuel porte sur l'outil en ligne de commande et ses API d'intégration.
-
-## 11. FDS et RAM de sauvegarde
+## 10. FDS et RAM de sauvegarde
 `fds-inspect` examine la structure du disque ; `export-assets` exporte les ressources. Testez le FDS séparément des cartouches NES, car le démarrage, le BIOS et les accès disque ont des exigences différentes. Les fichiers de sauvegarde sur pile `.sav` et les instantanés `.kss.json` ont des rôles distincts ; utilisez une disposition de sauvegarde prise en charge par l'implémentation.
 
 {{CODE:9}}

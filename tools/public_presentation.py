@@ -84,8 +84,8 @@ def private_link(page, url):
     return not public_file(target.relative_to(SITE))
 
 
-def normalize(language):
-    if language not in ACTIVE_LANGUAGES:
+def normalize(language, *, local_preview=False):
+    if language not in ACTIVE_LANGUAGES and not local_preview:
         raise ValueError('Updates are paused for this edition: ' + language)
     index = LANGUAGES.index(language)
     folder = SITE if language == 'ja' else SITE / language

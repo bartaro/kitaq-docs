@@ -1,0 +1,28 @@
+`wire3d.c` dibuja modelos 3D de creación independiente mediante líneas cian sobre un fondo oscuro. Utiliza rotaciones con enteros, perspectiva mediante una tabla de recíprocos, un búfer de píxeles en la CPU y dos tablas de patrones en RAM CHR. No incluye código, modelos ni gráficos de juegos comerciales. DAISUKE OBA proporciona el código fuente bajo la licencia MIT.
+
+Antes de incluir `wire3d.c`, elige un área de visualización de 64×48, 96×64 o 128×96. Define **ambas** macros, `WIRE3D_FC_WIDTH` y `WIRE3D_FC_HEIGHT`; el tamaño predeterminado es 64×48. El área queda centrada en el fondo de 256×240. Cuanto mayor sea, más teselas usará y más largas serán las líneas: elige el tamaño a partir de mediciones de tu escena.
+
+{{EXAMPLE}}
+
+Este ejemplo dibuja dos diagonales que se cruzan para comprobar el área elegida y la cobertura de las líneas. Compila este archivo una sola vez: ya incluye la implementación.
+
+{{BUILD}}
+
+La ROM requiere **8 KiB de RAM CHR con acceso de escritura** y RAM PRG en el cartucho que cubra `$6800–$70BF`. El renderizador usa en exclusiva las dos tablas de patrones, la tabla de nombres cero, el desplazamiento y la paleta del fondo, y reserva la página cero `$00–$0A`. No utilices esas regiones para otros fines ni cambies su asignación en el mapper mientras dibuja. `--nes-chr-ram` selecciona RAM en lugar de ROM CHR; no puede combinarse con un archivo gráfico indicado mediante `--nes-chr` o `--chr-rom`, y el perfil CNROM no admite esta opción.
+
+El renderizador no es reentrante. La inicialización desactiva las NMI y habilita el fondo tras configurarlo. El dibujo y la transferencia se ejecutan en el flujo que llama a las funciones; no ejecutes a la vez otro proceso que escriba en la PPU ni un manejador de interrupciones que modifique su memoria de trabajo. Una transferencia puede abarcar varios fotogramas de pantalla. Esta implementación no proporciona un bucle de juego asíncrono ni un planificador de actualizaciones de audio.
+
+| Función | Finalidad y condiciones de uso |
+|---|---|
+| `Wire3DFC_Init()` | Borra ambas tablas CHR y los búferes de dibujo de la CPU, construye el mapa de teselas centrado, selecciona los colores cian sobre fondo oscuro y habilita el fondo con las NMI desactivadas. Llámala antes de cualquier operación de fotograma. |
+| `Wire3DFC_BeginFrame()` | Borra las teselas de la CPU utilizadas en el dibujo anterior. La imagen visible permanece intacta hasta que `EndFrame` intercambia los búferes. Llámala una vez antes de componer cada imagen completa. |
+| `Wire3DFC_DrawLine2D(ax,ay,bx,by)` | Dibuja un segmento con ambos extremos incluidos en el búfer de la CPU. Los extremos son coordenadas con signo en el intervalo −512…511. Recorta los píxeles que quedan fuera del área de visualización y descarta los segmentos cuya caja delimitadora está completamente fuera. Las líneas interiores usan un bucle de Bresenham basado en los registros del 6502. |
+| `Wire3DFC_RotatePoint(x,y,z,rx,ry,rz)` | Modifica tres componentes `s16` distintos y escribibles mediante rotaciones en el orden Y, X, Z. Los ángulos recorren cíclicamente 32 pasos por vuelta. Cada componente inicial debe estar entre −63 y 63. Las reducciones Q6 truncan hacia cero. Si cualquier puntero de componente es NULL, la llamada no modifica nada. |
+| `Wire3DFC_ProjectPoint(x,y,z,sx,sy)` | Convierte un punto del espacio de cámara a coordenadas de pantalla. X/Y deben estar entre −127 y 127, y la profundidad entre 32 y 255. Si tiene éxito, devuelve 1 y escribe coordenadas con signo sin recortar. Si las coordenadas no son válidas o algún puntero de salida es NULL, devuelve 0 sin cambiar las salidas. X positivo apunta a la derecha e Y positivo hacia arriba. |
+| `Wire3DFC_DrawLine3D(ax,ay,az,bx,by,bz)` | Proyecta ambos extremos y dibuja el segmento en pantalla. Si cualquiera de los extremos queda fuera del intervalo de proyección, omite la arista completa. No calcula intersecciones con los planos cercano o lejano. |
+| `Wire3DFC_DrawModel(vertices,count,edges,edge_count,x,y,z,rx,ry,rz)` | Transforma y proyecta una sola vez cada uno de los primeros 24 vértices como máximo, almacena los resultados y dibuja las aristas indicadas por índices. Cada vértice contiene tres componentes `s8`; cada arista, dos índices `u8`. Omite los arrays NULL, los índices no válidos y los extremos rechazados. Mantén las sumas tras la traslación dentro del intervalo de `s16`. Dibuja todas las aristas válidas; esta API no elimina caras ocultas. |
+| `Wire3DFC_EndFrame()` | Transfiere las teselas utilizadas por la imagen preparada o por el contenido anterior del búfer CHR oculto, incluidas las que deben borrarse. Envía como máximo 16 teselas por lote VBlank, restaura el desplazamiento y muestra la imagen completa en un nuevo VBlank. La llamada espera hasta que termina la operación. |
+
+Después de `EndFrame`, `wire3d_uploaded_tiles` indica las teselas transferidas y `wire3d_transfer_frames` el número de lotes de transferencia más la espera del intercambio final. Este último valor **no es el tiempo total de renderizado**: las transformaciones, la rasterización y la gestión del estado en la CPU también consumen tiempo. La perspectiva utiliza una tabla de recíprocos cuantizada; con una anchura de 128 píxeles, el factor para la profundidad más cercana se limita por saturación de 256 a 255.
+
+El ejemplo del cubo del manual HTML muestra cómo compartir vértices, rotarlos y proyectarlos, dibujar doce aristas indexadas y presentar una imagen completa. Las imágenes de verificación muestran un cubo girado alrededor de Y: las doce aristas deben permanecer conectadas y no deben quedar líneas de la imagen anterior.

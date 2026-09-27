@@ -54,10 +54,7 @@ KUROSAKI는 KITAQFC의 정보를 읽어 활용하는 NES·패미컴·FDS 관찰�
 
 KUROSAKI의 `--emit-diagnostics`에도 KOKURA와 마찬가지로 **JSONL 파일 경로**를 전달합니다. CPU 트레이스와 진단 이벤트 파일을 구분해 보관하세요.
 
-## 10. 공개 범위
-KUROSAKI-GUI는 아직 공개하지 않습니다. 현재 설명서는 CLI와 연동 API를 다룹니다.
-
-## 11. FDS와 세이브 RAM
+## 10. FDS와 세이브 RAM
 `fds-inspect`는 디스크 구조를 검사하고 `export-assets`는 리소스를 내보냅니다. FDS는 시작, BIOS, 디스크 접근 조건이 NES 카트리지와 다르므로 별도로 시험하세요. 배터리 저장용 `.sav`와 `.kss.json` 스냅샷은 목적이 다릅니다. 구현이 지원하는 저장 구성을 사용해야 합니다.
 
 {{CODE:9}}

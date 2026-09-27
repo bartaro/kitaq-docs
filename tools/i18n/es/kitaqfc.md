@@ -1,7 +1,7 @@
 ## 1. KITAQFC y el compilador de GB
 KITAQFC utiliza el front-end de KITAQGB para generar código para la CPU de la familia 6502 de NES/Famicom. No convierte una ROM de GB en una de NES. El programa debe diseñarse para la pantalla, el sonido, la memoria y el mapper de su destino.
 
-Las pruebas registradas ejecutaron ejemplos con copias de estructuras y llamadas normales. Sin embargo, **do-while y switch produjeron errores de generación de código no compatible en NES**. Que una construcción aparezca en el analizador no demuestra que pueda utilizarse en este destino.
+KITAQFC admite copias de estructuras, llamadas normales a funciones y bucles for, while y do-while. Un do-while ejecuta el cuerpo al menos una vez antes de comprobar la condición. continue pasa a esa comprobación final; break sale del bucle. switch selecciona una constante case entre 0 y 255, o el cuerpo de default si no hay coincidencia. La expresión de selección se evalúa una sola vez. break sale del bucle o switch más interno; continue dentro de un switch pasa a la siguiente iteración del bucle que lo contiene.
 
 ## 2. Requisitos y compilación
 {{CODE:0}}
@@ -22,12 +22,31 @@ Las sentencias y expresiones del volumen GB son una base común. FC acepta `unsi
 
 Mantén los enteros dentro de sus rangos de 8 o 16 bits. Los índices empiezan en cero. `fc_aggregate.c` enseña funciones, punteros y estructuras; `fc_arithmetic.c`, aritmética; `fc_control.c`, bucles. No incluyas registros CGB ni operaciones exclusivas de GB.
 
-## 5. Sustituir construcciones no compatibles
+<!-- common-language-kitaqfc:start -->
+### Resultados de las expresiones y evaluación
+
+Los operadores de comparación `==`, `!=`, `<`, `<=`, `>`, `>=` y los operadores lógicos `!`, `&&`, `||` devuelven 0 para falso y 1 para verdadero. Puedes guardar el resultado en un `u16`, pasarlo como argumento, devolverlo o usarlo en operaciones aritméticas. Por ejemplo, `score = 500 + (lives != 0);` produce 501 si queda alguna vida y 500 en caso contrario.
+
+`&&` omite la evaluación del operando derecho cuando el izquierdo es cero. `||` la omite cuando el izquierdo no es cero. En `pointer != 0 && pointer->active != 0`, un puntero nulo impide el acceso al miembro. Los dos bytes de un valor de 16 bits intervienen en la comprobación lógica, por lo que 256 es verdadero. Los operadores de bits `&` y `|` no realizan evaluación en cortocircuito.
+
+`++value` devuelve el valor actualizado; `value++`, el valor original. Estos operadores también admiten elementos de arrays, punteros desreferenciados y miembros de estructuras. `buffer[index()]++` llama a `index()` una sola vez. Para `u16 *p`, `p++` avanza dos bytes hasta el siguiente elemento, mientras que `(*p)++` incrementa el valor apuntado.
+
+`sizeof(array)` da el tamaño en bytes del array completo; `sizeof(pointer)` es 2. Para `u16 values[9];`, `sizeof(values)` es 18. Esto incluye arrays en ROM, arrays locales y miembros de tipo array. `sizeof(function())` examina el tipo de retorno sin llamar a la función.
+
+La declaración y la definición de una función deben coincidir en los tipos y el orden de los parámetros. Sus nombres pueden ser distintos; el cuerpo usa los de la definición. Por ejemplo, `u8 next(u8 input);` puede definirse como `u8 next(u8 value) { return (u8)(value + 1); }`. Los parámetros y las variables locales ocultan las variables globales con el mismo nombre.
+
+Seleccionar arrays o cadenas con `?:` produce un puntero al tipo de elemento seleccionado. Puedes pasarlo directamente, como en `show(ready ? "READY" : "WAIT");`. Para los arrays `u16` llamados `a` y `b`, `(ready ? a : b) + 1` avanza dos bytes hasta el segundo elemento del array elegido. No copia el array.
+
+`condition ? yes : no` evalúa la condición y después solo la rama seleccionada. La condición y las ramas pueden incluir desplazamientos con cantidades de bits variables. Por ejemplo, `on = (pattern & (0x80 >> bit)) != 0 ? 4 : 2;` elige cuatro o dos según el bit indicado. Tampoco se ejecutan las llamadas a funciones de un operando derecho omitido por `&&` o `||`. Un `continue` en un bucle `for` ejecuta una vez la expresión de actualización antes de reevaluar la condición; en `while` y `do ... while`, pasa a la condición.
+
+<!-- common-language-kitaqfc:end -->
+
+## 5. Bucles y selección de acciones según el estado
 {{CODE:4}}
 
-Para reemplazar do-while, ejecuta el cuerpo una vez antes de comprobar la condición de salida. Un switch sencillo puede convertirse en una cadena if/else. Son fragmentos explicativos: debes proporcionar `update` y las funciones de estado. Para una ROM completa, utiliza `fc_control.c`.
+Estos fragmentos muestran un bucle que actualiza al menos una vez y una bifurcación que elige el manejador del estado actual. Define update, condition, state y los manejadores de estado en tu programa. Consulta fc_control.c para un ejemplo completo de bucle y el ejemplo de fotogramas y escenas de la biblioteca para una ROM completa de gestión de escenas.
 
-No des por hecho el soporte de recursión, llamadas indirectas o funciones variádicas propio de un compilador de escritorio. Algunas API de scene/entity guardan punteros a callbacks, pero no los invocan indirectamente.
+Registra los callbacks de escenas, entidades y sistema con los tipos de argumentos y retorno que exigen sus declaraciones. Las bibliotecas invocan los manejadores registrados desde las operaciones correspondientes de actualización, dibujo o espera de fotograma. Respeta los requisitos de bancos ROM y mapeo de cada API. No presupongas el mismo soporte para recursión o funciones variádicas que en un equipo de escritorio.
 
 ## 6. Memoria y PPU
 La RAM interna de CPU ocupa 0x0000–0x07FF. Sus réplicas por encima de 0x0800 no son RAM adicional. La pila del 6502 usa la página 1; el OAM en RAM y las colas reservan otras zonas. `--nes-local-ram=START:LENGTH` y `--nes-temp-ram=START:LENGTH` son ajustes avanzados que requieren revisar el mapa.
@@ -55,6 +74,8 @@ Son selecciones del compilador, no una tabla de compatibilidad completa de hardw
 {{CODE:6}}
 
 Revisa los requisitos de `--battery` / `--no-battery`, capacidad CHR, distribución PRG y llamadas entre bancos. Tras cambiar de mapper o modo de mirroring, prueba el arranque, el desplazamiento y el acceso a bancos, además de generar la ROM.
+
+Las lecturas normales por índice y las referencias mediante punteros de C a arrays en ROM colocan esos arrays en el banco común 0, salvo que `#pragma fixed_bank` fije explícitamente su ubicación. Así, los datos siguen siendo visibles cuando quien los usa se ejecuta en un banco conmutable. Para un acceso lejano explícito, pasa en la misma llamada el nombre del array sin modificar y `__bankof` aplicado a ese mismo nombre, por ejemplo `__farpeek8(__bankof(table), table)`. Consultar únicamente el número de banco no solicita la ubicación en el banco común. Los datos fijados explícitamente a un banco y las referencias dentro de ensamblador requieren que mantengas el mapeo correcto. Esta regla comprueba la ubicación según la sintaxis, no mediante un análisis del flujo de punteros. Sigue aplicándose el límite de capacidad del banco común.
 
 ## 9. FDS, sonido de expansión y periféricos
 FDS requiere distribuir archivos de disco y planificar arranque, overlays y guardado. Consulta `fds_manifest_sample.json` y los encabezados FDS. Si necesitas una BIOS, debes disponer de ella en tu entorno de ejecución: no se incluye en la distribución pública.

@@ -8,14 +8,14 @@ Richten Sie `-I` nicht auf die ähnlich benannte GB-Bibliothek. Beispielsweise h
 ## 2. Laufzeit und System
 `runtime.c` bietet C-Hilfen für PPU-Register, OAM-Schattenpuffer und VRAM-Warteschlangen. Daneben gibt es Intrinsics wie `__vramq_*`. Prüfen Sie, welche Daten der NMI-Handler verarbeitet, statt getrennte Warteschlangen mit ähnlichen Namen zu vermischen.
 
-`system_init` initialisiert den Frame-Zustand und aktiviert NMI. `system_wait_vblank` wartet auf NMI und erhöht den Software-Frame-Zähler. **FC `system_set_vblank_callback` speichert den Wert, aber die aktuelle Wartefunktion führt den Callback nicht aus.** Verlegen Sie nicht sämtliche Spielaktualisierungen dorthin in der Annahme, es gelte das GB-Verhalten.
+`system_init` initialisiert den Frame-Zustand und aktiviert NMI. `system_wait_vblank` wartet auf NMI, erhöht den Software-Framezähler und ruft anschließend den registrierten Callback einmal synchron auf. Übergeben Sie null an `system_set_vblank_callback`, um ihn zu deaktivieren. Der Callback läuft im Kontext des Aufrufers der Wartefunktion, nicht im NMI-Handler.
 
 ## 3. PPU, Kacheln, Attribute und Paletten
 `ppu_direct.h` bietet direkte PPU-Operationen, `vram_queue.h` Aktualisierungen über NMI. `tilemap` / `nametable_asset` bearbeiten Tabellen und Ressourcen, `attribute` die Attribute und `palette` die Paletten. Trennen Sie das anfängliche Laden von der Arbeit pro Frame.
 
 Hintergrund- und Sprite-Paletten belegen jeweils eine Gruppe von 16 Bytes. Die Werte sind NES-Farbcodes, keine RGB-Komponenten. Attribute wählen Farben für Kachelgruppen. Eine scheinbar einzelne Palettenänderung kann daher benachbarte Kacheln beeinflussen.
 
-Einige Deklarationen in `ppu.h` stimmen nicht mit Implementierungsnamen in `ppu.c` überein. Bei Einträgen mit **nur deklariert** wurde im erfassten Bereich keine Implementierung gefunden; die Einsteigerbeispiele rufen sie nicht direkt auf. Die ausführbaren Übungen verwenden geprüfte Intrinsics. Eine Deklaration allein belegt keine fertige, linkbare Funktion.
+`ppu.h` und `ppu.c` bieten Bildschirmsteuerung, die Übertragung einer 32-Byte-Palette und die vollständige Initialisierung einer Namenstabelle. `nes_ppu_seek_bytes(hi,lo)` setzt das Adress-Latch zurück und stellt eine Adresse aus zwei Bytes ein. Die Funktion lässt sich zusammen mit `nes_ppu_seek(address)` aus `runtime.c` linken, das die Adresse als einzelnes Wort entgegennimmt. Deaktivieren Sie die Bildausgabe vor Übertragungen und Initialisierung.
 
 ## 4. OAM, Metasprites und abwechselnde Darstellung
 Das NES unterstützt bis zu 64 Sprites, gewöhnlich acht pro Scanline. Neun oder mehr Gegner oder Geschosse auf einer Zeile können nicht alle gleichzeitig erscheinen. Metasprites kombinieren mehrere OBJs zu einem Bild. Prüfen Sie dafür Reservierungsgrenzen und Abschlussmarkierungen.
@@ -35,12 +35,12 @@ DMC-Samples unterliegen Anforderungen an Adresse, Länge, Ausrichtung und Rate. 
 VRC6 bietet zusätzliche Puls- und Sägezahnkanäle, VRC7 FM-Register und FDS Wavetable-Sound. Wählen Sie einen passenden Mapper und zeichnen Sie das Ergebnis auf. Diese APIs sind vom GB-Treiber `Audio_*` getrennt.
 
 ## 7. Szenen, Akteure und Entities
-`actor` und `entity` verwalten Spielobjekte in festen Arrays, `scene` den Szenenzustand. Erkennen Sie erschöpfte Kapazitäten und verwenden Sie freigegebene IDs nicht weiter. Einige FC-APIs registrieren derzeit Callbacks, ohne sie aufzurufen. In Einsteigerprogrammen rufen Sie die Update-Funktion des jeweiligen Zustands ausdrücklich aus der Hauptschleife auf.
+`actor` und `entity` speichern Spielobjekte in Arrays fester Größe; `scene` verwaltet den Szenenzustand. Prüfen Sie auf erschöpfte Kapazität und verwenden Sie gelöschte IDs nicht weiter. Szenenwechsel, Aktualisierung und Zeichnen rufen ihre registrierten Callbacks synchron auf. Beachten Sie die Aufrufreihenfolge und die Einschränkungen zur Reentranz der jeweiligen API.
 
-`chain` speichert einen Koordinatenverlauf, `collision` prüft Berührungen zwischen Formen wie Rechtecken. Eine feste Reihenfolge aus Bewegung, Kollision und Zeichnen verhindert Kollisionsentscheidungen, die einen Frame hinterherhinken.
+`chain` bietet mit `ChainBody` die Nachführung gegliederter Körper und mit `Chain` einen Positionsverlauf. `collision` prüft Kontakte zwischen Formen wie Rechtecken. Die feste Reihenfolge Bewegen, Kollisionsprüfung, Zeichnen verhindert, dass Kollisionsentscheidungen um einen Frame verzögert werden.
 
 ## 8. Mathematik und Physik
-`fixed.h` bietet Q8.8-Arithmetik, `math_fast` / `math_fixed` numerische Operationen und `math_lut` tabellenbasierte Berechnungen. Die aktuelle `physics2d.h` liefert **Q5.3-Typen und -Konstanten**, keine Implementierung von Integrationsfunktionen oder Update-Makros. Sie ist nicht die world/body-Physik-API der GB-Bibliothek.
+`fixed.h` bietet Q8.8-Arithmetik, `math_fast` und `math_fixed` numerische Operationen und `math_lut` tabellenbasierte Berechnungen. `physics2d` verarbeitet die Bewegungsintegration von Boxen, Schwerkraft, AABB-Kontakte und Oberflächenreaktionen. `physics3d` verarbeitet nicht rotierende 3D-Boxen, Rückprall und Aufprallwerte. Reservieren Sie einen Weltzustand und ein Array von Körpern, initialisieren Sie diese, setzen Sie die Parameter und rufen Sie die Simulationsschrittfunktion auf. Positionen und Geschwindigkeiten verwenden einheitliche, vom Aufrufer gewählte ganzzahlige Einheiten.
 
 Q5.3-Bruchteile stellen Achtelpixel dar. Halten Sie ganzzahlige Koordinaten, Bruchteile, Geschwindigkeit und Richtung getrennt und bearbeiten Sie Addition und Übertrag im Spielcode. `fc_subpixel.c` addiert achtmal 2/8 Pixel und bewegt sich von Pixel 40 zu Pixel 42. Übernehmen Sie die Q8.8-Darstellung 256 nicht unverändert als Q5.3.
 
