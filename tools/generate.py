@@ -207,5 +207,7 @@ def main():
  publish('ja')
  from api_contracts import publish as publish_api_contracts
  publish_api_contracts('ja', require_complete=True)
+ from local_library_update import publish as publish_local_library
+ publish_local_library('ja')
  print('Generated 10 Japanese HTML pages including development prompts')
 if __name__=='__main__':main()

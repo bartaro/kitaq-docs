@@ -160,6 +160,8 @@ def main():
     publish('en')
     from api_contracts import publish as publish_api_contracts
     publish_api_contracts('en', require_complete=True)
+    from local_library_update import publish as publish_local_library
+    publish_local_library('en')
     print('Generated 10 English HTML pages including development prompts')
 
 if __name__=='__main__':main()

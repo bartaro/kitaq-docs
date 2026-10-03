@@ -96,6 +96,9 @@ def make_page(lang,key,messages,inspect=False):
     source=re.sub(r'<!-- loop-prompts:start -->.*?<!-- loop-prompts:end -->','',source,flags=re.S)
     source=re.sub(r'<!-- api-verification:start -->.*?<!-- api-verification:end -->','',source,flags=re.S)
     soup=BeautifulSoup(source,'html.parser')
+    # The local supplement has its own authored translation table.
+    for supplement in soup.select('[data-local-library], .local-library-note'):
+        supplement.decompose()
     # Replace the source edition's navigation instead of duplicating it.
     for navigation in soup.select('nav.languages'):navigation.decompose()
     main=soup.find('main')
@@ -195,6 +198,9 @@ def main():
         if lang in {'zh-CN','ko','zh-TW','fr','es','de'}:
             from localize_presentations import publish as localize_presentations
             localize_presentations(lang)
+    if not args.inspect:
+        from local_library_update import publish as publish_local_library
+        publish_local_library(lang)
     stale=S/'tools/i18n'/lang/'missing.json'
     if stale.exists():stale.unlink()
     print(f'{lang}: 9 pages '+('ready to generate' if args.inspect else 'generated')+'; all reference prose translated')

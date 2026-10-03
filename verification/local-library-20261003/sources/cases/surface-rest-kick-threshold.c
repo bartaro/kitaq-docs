@@ -1,0 +1,6 @@
+#include "fixed.c"
+#include "physics2d.c"
+#pragma bank 0
+__location(0xC700) u16 result[64];
+KQWorld2D w; KQBody2D b[2]; KQSurface2D s; KQRect r; KQRect q;
+void main(){u8 i;for(i=0;i<64;i++)result[i]=0;kq2d_body_init(&b[0],24,40,4,4);s.nx_q8=0;s.ny_q8=-256;s.vx=0;s.vy=0;s.bounce_threshold=2;s.kick=0;s.restitution_q8=0;s.friction_q8=64;b[0].vx=8;b[0].vy=16;result[0]=kq2d_body_resolve_surface(&b[0],&s);result[1]=b[0].vx;result[2]=b[0].vy;b[0].vx=8;b[0].vy=16;s.kick=4;s.friction_q8=0;result[3]=kq2d_body_resolve_surface(&b[0],&s);result[4]=b[0].vx;result[5]=b[0].vy;b[0].vx=8;b[0].vy=16;s.kick=0;s.restitution_q8=255;s.bounce_threshold=16;result[6]=kq2d_body_resolve_surface(&b[0],&s);result[7]=b[0].vy;b[0].vy=-5;result[8]=kq2d_body_resolve_surface(&b[0],&s);result[9]=b[0].vy;result[10]=kq2d_body_resolve_surface(0,&s);result[11]=kq2d_body_resolve_surface(&b[0],0);b[0].vx=3;b[0].vy=10;s.vx=3;s.vy=2;s.restitution_q8=128;s.bounce_threshold=0;result[12]=kq2d_body_resolve_surface(&b[0],&s);result[13]=b[0].vx;result[14]=b[0].vy;result[63]=0xA55A;while(1){}}

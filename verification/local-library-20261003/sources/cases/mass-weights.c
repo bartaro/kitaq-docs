@@ -1,0 +1,5 @@
+#include "physics3d.c"
+#pragma bank 0
+__location(0xC700) u16 result[64];
+KQWorld3D w; KQBody3D b[2];
+void main(){u8 i;for(i=0;i<64;i++)result[i]=0;kq3d_body_set_mass(&b[0],-1);result[0]=b[0].mass_q8;result[1]=b[0].inv_mass_q8;kq3d_body_set_mass(&b[0],0);result[2]=b[0].mass_q8;result[3]=b[0].inv_mass_q8;kq3d_body_set_mass(&b[0],1);result[4]=b[0].mass_q8;result[5]=b[0].inv_mass_q8;kq3d_body_set_mass(&b[0],63);result[6]=b[0].mass_q8;result[7]=b[0].inv_mass_q8;kq3d_body_set_mass(&b[0],64);result[8]=b[0].mass_q8;result[9]=b[0].inv_mass_q8;kq3d_body_set_mass(&b[0],65);result[10]=b[0].mass_q8;result[11]=b[0].inv_mass_q8;kq3d_body_set_mass(&b[0],256);result[12]=b[0].mass_q8;result[13]=b[0].inv_mass_q8;kq3d_body_set_mass(&b[0],512);result[14]=b[0].mass_q8;result[15]=b[0].inv_mass_q8;kq3d_body_set_mass(&b[0],32767);result[16]=b[0].mass_q8;result[17]=b[0].inv_mass_q8;result[63]=0xA55A;while(1){}}
