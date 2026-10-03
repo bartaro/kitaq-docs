@@ -162,6 +162,8 @@ def main():
     publish_api_contracts('en', require_complete=True)
     from local_library_update import publish as publish_local_library
     publish_local_library('en')
+    from fc_current_update import publish as publish_fc_current
+    publish_fc_current('en')
     print('Generated 10 English HTML pages including development prompts')
 
 if __name__=='__main__':main()
