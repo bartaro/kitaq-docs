@@ -4,22 +4,23 @@
   "tools": {
     "kitaqgb": {
       "path": "kitaqgb/kitaqgb.exe",
-      "sha256": "caadee2356a50725928c3c86e948b882ea147e4355f641d2ef15488ee2060e00",
+      "sha256": "033c3fe6fd6f5ce624eab7087b15351807d0dc8f5f146f65f1d821d55062fa13",
       "help": [
         {
           "argv": [
             "--help"
           ],
           "exit_code": 0,
-          "text": "KITAQGB native Rust migration (in progress)\n\nCommands:\n  disasm ROM -o dis.s\n  header ROM -o patched.gb [--title=NAME --cgb=dmg|cgb|cgb_only ...]\n  assemble-ir INPUT.assembly.json -o output.gb [header options]\n  tokenize SOURCE.c ... -I INCLUDE_DIR -o tokens.json\n  parse SOURCE.c ... -I INCLUDE_DIR -o ast.json\n  lower SOURCE.c ... -I INCLUDE_DIR -o lowered.json\n  emit-ir SOURCE.c ... -I INCLUDE_DIR -o raw.assembly.json\n  compile SOURCE.c ... -I INCLUDE_DIR -o output.gb [-O0|-O1]\n  optimize-ir INPUT.assembly.json -o optimized.json [-O0|-O1]\n  strip-ir INPUT.assembly.json -o stripped.json [--strip-keep=LABELS]\n\nC compilation, aggregates, banked calls and hardware intrinsics are implemented and covered by differential tests. Utility commands: kqhelp, symfind, src2asm, romdiff, template, snippet, conventions, fixhint, irsum, attrviz, recipe, test.\n\nDevelopment and recovery:\n  SOURCE.c ... --watch [--watch-max-builds=N]\n  devserver SOURCE.c ... [--once --poll-ms=N --debounce-ms=N --max-builds=N]\n  recipe [--history=FILE --out=FILE --script=FILE --last=N --stdout]\n  SOURCE.c ... --minimize[=FILE] [--minimize-out=FILE --minimize-work=DIR --minimize-quick --minimize-trace=final|all]\n  SOURCE.c ... --minimize-on-fail --repro-pack[=DIR]\n  SOURCE.c ... --debug-output --disasm-changed[=GIT_BASE]\nWatch loops stop with Ctrl+C; the Rust API also accepts a CancellationToken. Migration validation is still in progress. See PORT_STATUS.md.\n"
+          "text": "KITAQGB native Rust compiler\n\nCommands:\n  disasm ROM -o dis.s\n  header ROM -o patched.gb [--title=NAME --cgb=dmg|cgb|cgb_only ...]\n  assemble-ir INPUT.assembly.json -o output.gb [header options]\n  tokenize SOURCE.c ... -I INCLUDE_DIR -o tokens.json\n  parse SOURCE.c ... -I INCLUDE_DIR -o ast.json\n  lower SOURCE.c ... -I INCLUDE_DIR -o lowered.json\n  emit-ir SOURCE.c ... -I INCLUDE_DIR -o raw.assembly.json\n  compile SOURCE.c ... -I INCLUDE_DIR -o output.gb [-O0|-O1]\n  optimize-ir INPUT.assembly.json -o optimized.json [-O0|-O1]\n  strip-ir INPUT.assembly.json -o stripped.json [--strip-keep=LABELS]\n\nC compilation, aggregates, banked calls and hardware intrinsics are implemented and covered by differential tests. Utility commands: kqhelp, symfind, src2asm, romdiff, template, snippet, conventions, fixhint, irsum, attrviz, recipe, test.\n\nDevelopment and recovery:\n  SOURCE.c ... --watch [--watch-max-builds=N]\n  devserver SOURCE.c ... [--once --poll-ms=N --debounce-ms=N --max-builds=N]\n  recipe [--history=FILE --out=FILE --script=FILE --last=N --stdout]\n  SOURCE.c ... --minimize[=FILE] [--minimize-out=FILE --minimize-work=DIR --minimize-quick --minimize-trace=final|all]\n  SOURCE.c ... --minimize-on-fail --repro-pack[=DIR]\n  SOURCE.c ... --debug-output --disasm-changed[=GIT_BASE]\nWatch loops stop with Ctrl+C; the Rust API also accepts a CancellationToken. See PORT_STATUS.md for executed verification and compatibility limits.\n"
         }
       ],
       "implementation": "Rust",
-      "distribution_manifest": "verification/rust-native-20261004/kitaqgb.json"
+      "distribution_manifest": "verification/rust-native-20261004/kitaqgb.json",
+      "source_commit": "6d432c00f974853e7d1015c04b54fec265a4f93d"
     },
     "kitaqfc": {
       "path": "kitaqfc/kitaqfc.exe",
-      "sha256": "4c3a26621615bd6e7bd4031900c63cf2ec127e8d3223bbdc4ddd8c7973e9ac59",
+      "sha256": "911726bffa6e523bb6049075a999130cba79d3be4c6b6455b1af9b54d01d8a47",
       "help": [
         {
           "argv": [
@@ -30,7 +31,8 @@
         }
       ],
       "implementation": "Rust",
-      "distribution_manifest": "verification/rust-native-20261004/kitaqfc.json"
+      "distribution_manifest": "verification/rust-native-20261004/kitaqfc.json",
+      "source_commit": "f9c6644ba798939b71f412713e2ba70de6d3e904"
     },
     "kokura": {
       "path": "kokura/kokura-cli.exe",
@@ -437,474 +439,6 @@
   },
   "sources": [
     {
-      "path": "kitaqgb/kitaqgb/AsmInfo.cs",
-      "sha256": "9baa4987427907445680f87b8e57b15a72059820640c4357df005cd01ffc03e5"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Assembler.cs",
-      "sha256": "889325f772814b9ec22bcf4839fd33e4f9fe739c61a8a6ec1fa3709ebf01a4d7"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/BuildReports.cs",
-      "sha256": "4cc21a570c319a1f19820386e68e2200f2212772412b9d2a121d2f711753612c"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
-      "sha256": "084c65f2bf249b9843315660133b073174a50fb2ecf2e3a828b06708a26ea66a"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/CompilerApi.cs",
-      "sha256": "2ef9b09a106376df75fd0ea6cababde29f912f3e4f04015fb37bf101f567e257"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/CompilerSession.cs",
-      "sha256": "cc12d4c1c34984051c09b14da17a8b6752a50b61b9cb8dbeb79edd30fa6e6cfe"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/CType.cs",
-      "sha256": "4f99133318339dd9931699086d0381cc6fd0212e370fe4dcb56f59b7157a47de"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/DeadStripper.cs",
-      "sha256": "5d0a8499ac29fa0c35f7b2ad6427756e711091af2136daa6348272b4ce312822"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/DebugExporter.cs",
-      "sha256": "464cb0998d5ac8a6c59c4537c4d6e4992a766f89e620d2444e665b50b90751a1"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Disassembler.cs",
-      "sha256": "5e2a88ef00f4a85e3f1c3aa722b28b4f218536a1c5d0998c64ceccdcea394a9e"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Expr.cs",
-      "sha256": "db839d1a6a5a932d43ec863e8cda1af6e084177a5d19cbce32c32b1739c0f6a4"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/IoUtil.cs",
-      "sha256": "17f0ec2a7596b94c1a0334a19defd0c959367bef710bb4870ff92601f63b9ffb"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Lowerer.cs",
-      "sha256": "5fea0369cd3834bd6156a6ea7b0cf893a1a7a5e0bdcc340e58f3cda62a2ffa27"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Maybe.cs",
-      "sha256": "4df9faa279a8030316e025a18b91bb04c61c4b72940eb08ee2709d2a09d0bc9c"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Minimizer.cs",
-      "sha256": "58ba301c4e35963b65face0fd14e1659e49e9f1da402b3613c9f656134f82705"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Optimizer.cs",
-      "sha256": "1158193f0486075d225d339d280b0187ed0b3f96a0922193d154c497fb781754"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Other.cs",
-      "sha256": "6dd798eb868e1bb45f20c33da2b981f95419dfd2c45d370177ecd8124f49508e"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Parser.cs",
-      "sha256": "48e5f104409ae89868b37a5df534d365e4923ea9685cb2d245b66619106e214a"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Program.Api.cs",
-      "sha256": "2e5bdc022c3203bb34dc6f312824a1ef1f0f30eb26f6fac8b28a9831ea7eb71e"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Program.cs",
-      "sha256": "2f2cc605d5f5985ed93d3c0994bfcb8bd3900496a9dc0a2c8a11ad28c93b6575"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Program.DebugTools.cs",
-      "sha256": "0d0bdac271363adf4c241e29bb0ba77fb77043ca262f1879a0f7bdc631e3dba8"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Program.VibeTools.cs",
-      "sha256": "20663c5434db57e5e1b90280ade89fea16449e67e6d1ebef089dc22d296b93e6"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/RomHeaderPatcher.cs",
-      "sha256": "d0c271bf983fe8d50f606077eb4d5204132790d38e888d98cac1f9b3153fb3c0"
-    },
-    {
-      "path": "kitaqgb/kitaqgb/Tokenizer.cs",
-      "sha256": "b359aeb6c3dd9c235d553e18f776b92801cef11f19a7e2774a67b13863131bbb"
-    },
-    {
-      "path": "kitaqgb/lib/asset.c",
-      "sha256": "ba4bea6442865ea3865f19dd15c2566c9a1b7d3e3d0f25fb7d3f24cab4be57f1"
-    },
-    {
-      "path": "kitaqgb/lib/asset.h",
-      "sha256": "5e8be3c2429d8e6323e97f9633f4caae0a87ceda6143bb66ff5b1ae0da39f75e"
-    },
-    {
-      "path": "kitaqgb/lib/audio.c",
-      "sha256": "a1f007f196eaf51f238f9999b3ce6ee9ad1da52f683eabb4a312fb0038b97d6f"
-    },
-    {
-      "path": "kitaqgb/lib/audio.h",
-      "sha256": "72f1063e10ef394bd507b9a61d9abe90ce56ef9f064afceddb858a5010675862"
-    },
-    {
-      "path": "kitaqgb/lib/audio_hwregs_gb.c",
-      "sha256": "258c894f9059072b6f3587b2afdb0985c23dda13042965845cb2b29abcfef281"
-    },
-    {
-      "path": "kitaqgb/lib/audio_vblank.c",
-      "sha256": "2be8f575af5d71d3ca5a1d0c799bad75579e6d9c3df603ff97546e4655cb6590"
-    },
-    {
-      "path": "kitaqgb/lib/audio_vblank.h",
-      "sha256": "77048d1586d723d1873b985e2a3791b5da178dad49e04d977f101348484918c6"
-    },
-    {
-      "path": "kitaqgb/lib/bank.c",
-      "sha256": "fb99001ec01837b567eeb73f50fff8c0f0e8f31c55079d7f8b5a4fc2919a050a"
-    },
-    {
-      "path": "kitaqgb/lib/bank.h",
-      "sha256": "db10522973be5a3f934c82ba8f9d0a3c098c819894b551b68bdd814da676f094"
-    },
-    {
-      "path": "kitaqgb/lib/camera.c",
-      "sha256": "1dd9726124981eab4912e86542896317c5f19606ada3adcca6158cdd552c8184"
-    },
-    {
-      "path": "kitaqgb/lib/camera.h",
-      "sha256": "46ac6c1b774194ed98fb83c73cbd824a9089dfbc221321b4432f93817b092350"
-    },
-    {
-      "path": "kitaqgb/lib/cgb_palette.c",
-      "sha256": "90182aeb1fa1d868444590c7d1192738e3b3d1c3e1a2352f05d3aa6f56ddfb3b"
-    },
-    {
-      "path": "kitaqgb/lib/cgb_palette.h",
-      "sha256": "a81ce857659c433f6795b67776962af930f41883da79063ba93965f1df03c3df"
-    },
-    {
-      "path": "kitaqgb/lib/cgb_tile.c",
-      "sha256": "3e3244c0d3420b8fd45625348eb26211d096c8ed2e8792c7fa93fa8bfadd5e42"
-    },
-    {
-      "path": "kitaqgb/lib/cgb_tile.h",
-      "sha256": "71166f7e08e79a03a217de4f1ce139c3fe4196070b3b3b6c91a98cb30ab5bb3e"
-    },
-    {
-      "path": "kitaqgb/lib/chain.c",
-      "sha256": "2f6dc79c33634fb59b537637af42d826f4a74f138afe8d1a9dc022d00de4b30e"
-    },
-    {
-      "path": "kitaqgb/lib/chain.h",
-      "sha256": "f51655649f586726979b75608c992fe13ebf7676bab9b7b9fd9e794159f72e61"
-    },
-    {
-      "path": "kitaqgb/lib/danmaku.c",
-      "sha256": "ec7f43ada50498fc090e61d2812f9f9e6b890cd9b5d3c2b55bf0ef5e09971770"
-    },
-    {
-      "path": "kitaqgb/lib/danmaku.h",
-      "sha256": "c112737f279a88f90ed35df4b2351c8b65eb48ee0f99aeccc92181281ff67413"
-    },
-    {
-      "path": "kitaqgb/lib/danmaku_guide.md",
-      "sha256": "b634f0d1cb207cbf7b8cabeeb1d87bf30ac6cc260f6b54e8890056a6f9753d49"
-    },
-    {
-      "path": "kitaqgb/lib/debug.c",
-      "sha256": "4ec2045ce9522a4ccf29631eb3ef11294147effe7f29451af30b9d72eeed0a61"
-    },
-    {
-      "path": "kitaqgb/lib/debug.h",
-      "sha256": "0acf4e6304bf1c1290cfba21c8aba9b361d02bea962a4a5bb4969074cc8b4e32"
-    },
-    {
-      "path": "kitaqgb/lib/dmg3d.c",
-      "sha256": "294c5715f1f2d2f786f424de7cb437c33c3e218b30362570c74da1105f438866"
-    },
-    {
-      "path": "kitaqgb/lib/dmg3d.h",
-      "sha256": "23517e60d8897d324f30637a5566671f2620a11b7edc8c99072c3fbd16451535"
-    },
-    {
-      "path": "kitaqgb/lib/dmg3d_guide_ja.md",
-      "sha256": "1e4c41937f23e06f5edacbab0c8dc0b3a0ca12ff0d347b83e8b100c7a4ac73fc"
-    },
-    {
-      "path": "kitaqgb/lib/entity.c",
-      "sha256": "9d8f05cdbfa683a94634767dcce6d0c36294b9f5fe10a9106c553ba01abe009c"
-    },
-    {
-      "path": "kitaqgb/lib/entity.h",
-      "sha256": "07a09af8680f35ca8af7ad3b8de33a2ebcfa1b6a9ffa494fa5f201e3759d7413"
-    },
-    {
-      "path": "kitaqgb/lib/fixed.c",
-      "sha256": "f88e0408ebdc98521cb32709e27df68c374cf75ee1315fe2262aab45aec6b14b"
-    },
-    {
-      "path": "kitaqgb/lib/fixed.h",
-      "sha256": "25aef5c6dc8a0dc7d9bc96cc5b17b21ef3b173273874dd507493a9a85c99ae4a"
-    },
-    {
-      "path": "kitaqgb/lib/flags.c",
-      "sha256": "214775b5e41dbd25548fac6a8f890e4fd2c9c99cf4adabd8365abcd2dc5d1b95"
-    },
-    {
-      "path": "kitaqgb/lib/input.c",
-      "sha256": "ec0ddba52210340eaa742629ec1b34683b356124c7da37c375925c6c8da3b2aa"
-    },
-    {
-      "path": "kitaqgb/lib/input.h",
-      "sha256": "3e8b45f9504818b7d80230dec453bea7ba2c3cf72f17c3b6a154dcf2e5ad6c54"
-    },
-    {
-      "path": "kitaqgb/lib/link.c",
-      "sha256": "f44c05308b693d229be3e566d9385c588424dd6bc7cf3037003b077c247ae22c"
-    },
-    {
-      "path": "kitaqgb/lib/link.h",
-      "sha256": "f445f59243dc74e1807b1ebb295df5fb0fd5a500dabe8d4fb792769f62b9fd10"
-    },
-    {
-      "path": "kitaqgb/lib/link_dmg07.c",
-      "sha256": "bc554edf89d743ff8400377eb2e5d15c4d657c03d98b4d5db97284b95c15e80b"
-    },
-    {
-      "path": "kitaqgb/lib/link_dmg07.h",
-      "sha256": "45ebdcffcea676c18a7e98261012cc6f577fabc89a49fc5646ea6bfba061c3b3"
-    },
-    {
-      "path": "kitaqgb/lib/link_hwregs_gb.c",
-      "sha256": "32f39792c34f7f49450bc38e8f69c0c549d40fd6fe194b934d6bfdbbfe666b91"
-    },
-    {
-      "path": "kitaqgb/lib/link_packet.c",
-      "sha256": "d0882e94bcf0ec2fd9369c7290b654b40556efe8bbc582933ee679bc47e60fc3"
-    },
-    {
-      "path": "kitaqgb/lib/map.c",
-      "sha256": "49c1d3cf1b577519099b404825c1898698a6d380b3afb6b887cc0763541c9242"
-    },
-    {
-      "path": "kitaqgb/lib/math.c",
-      "sha256": "ed42c8d36191e4f2e7448bcbaaf9dc3cbf043c81f63d345a65329b0a4661576e"
-    },
-    {
-      "path": "kitaqgb/lib/menu.c",
-      "sha256": "c9d01e5462e6b984ebcf7cc1e8f62b82c818c96e2b3e5be4860c57dae11bcacb"
-    },
-    {
-      "path": "kitaqgb/lib/physics2d.c",
-      "sha256": "5736718686e5753b0171e06a57dc229cca522a2847f1548a84cccc09fbf35cd4"
-    },
-    {
-      "path": "kitaqgb/lib/physics2d.h",
-      "sha256": "b71b99ac1179c4b554f852091f18987eb7615214dde50dfe56eb779390a74344"
-    },
-    {
-      "path": "kitaqgb/lib/physics2d_circle.c",
-      "sha256": "ff35b6719ccf3bdcee23906609a95f0d80d7a426286f13f254decdf4978fd0ba"
-    },
-    {
-      "path": "kitaqgb/lib/physics2d_circle.h",
-      "sha256": "08f36d87527d861e557eefbff750ae86379dca5c18dffe69b8ad826f0c2ec373"
-    },
-    {
-      "path": "kitaqgb/lib/physics2d_surface.md",
-      "sha256": "7b9f2a92a003c4824233b780e6b6b2304fb213ae76206d8ea3b7601b19058b66"
-    },
-    {
-      "path": "kitaqgb/lib/physics3d.c",
-      "sha256": "95fa4c3e1f4a61114c550c4ed1baf5f1be87a088837ee2a99dd3b20b8885b342"
-    },
-    {
-      "path": "kitaqgb/lib/physics3d.h",
-      "sha256": "209dc2b5ab44b4a2403b20f2bc8db460f3b82975fee2c973b8a946135c5991ec"
-    },
-    {
-      "path": "kitaqgb/lib/raster.c",
-      "sha256": "c805f5d6de2d991e29633531510b3cb039de74e0bcb8dd088748dff167f12496"
-    },
-    {
-      "path": "kitaqgb/lib/raster.h",
-      "sha256": "e52e3ffbb1c27ed5c2d3d7173e57b05b23565084198a819f4e8aaf1c1ebcf1a1"
-    },
-    {
-      "path": "kitaqgb/lib/README.de.md",
-      "sha256": "3597bfc208d60080736668109bfab95cea8d978445e293ac9ed9a3be563436a8"
-    },
-    {
-      "path": "kitaqgb/lib/README.es.md",
-      "sha256": "4cfb2efc9eef29ace20838b85f0d228ff654d6d36aee347b84d9c597b4e0b84f"
-    },
-    {
-      "path": "kitaqgb/lib/README.fr.md",
-      "sha256": "27dbab351cda1cc8b36eeed82364981aa8a86ad8d808d71b83742fde36a23c31"
-    },
-    {
-      "path": "kitaqgb/lib/README.ja.md",
-      "sha256": "1b7cf8b93544ded7d8ef3ef1f1d1549ca9d9f9b2aa6aef0701146e703b817d1c"
-    },
-    {
-      "path": "kitaqgb/lib/README.ko.md",
-      "sha256": "aaa6d87f511bb484d8cee2175c94890731d4cac121436fbd6b4ed5292f2135c9"
-    },
-    {
-      "path": "kitaqgb/lib/README.md",
-      "sha256": "2197f1343ba59ac4e1c2d1b7ff6ccc94a53f4d72f53b1fb4d61bb4aaf81faa41"
-    },
-    {
-      "path": "kitaqgb/lib/README.pt-BR.md",
-      "sha256": "89b1faa4034f665346147b559beb8eb1186e45a03c9c2af20008148a189391bb"
-    },
-    {
-      "path": "kitaqgb/lib/README.zh-CN.md",
-      "sha256": "e66920572af820abeb7597958c8bc8c6badd7dab81e99da69490d9d9049b08ab"
-    },
-    {
-      "path": "kitaqgb/lib/README.zh-TW.md",
-      "sha256": "28583cc78b494f8d02165a6099ec0fe2311525637827aa5ee3c8d29491c2730c"
-    },
-    {
-      "path": "kitaqgb/lib/rle.c",
-      "sha256": "2a46fe2d5aaa956db903deaefff2daa5f0530e08e25530b2bba91327d091708b"
-    },
-    {
-      "path": "kitaqgb/lib/rng.c",
-      "sha256": "7e631b04280944b1546e77c28b68268fef15fb6957050c6c6e92f2947ebf2772"
-    },
-    {
-      "path": "kitaqgb/lib/rpg.h",
-      "sha256": "9e70419a729d8599e3454b804c6e304af4004beb210843226acf18c46d012680"
-    },
-    {
-      "path": "kitaqgb/lib/save.c",
-      "sha256": "5b58d872d7515b679744b7e5086bfe90d533dfb89fd80956fe07fdb3a5d80c3c"
-    },
-    {
-      "path": "kitaqgb/lib/scene.c",
-      "sha256": "66c40c5f346da946ff21d59c8bef60427b170c0a4529703f135eee5a64af1e93"
-    },
-    {
-      "path": "kitaqgb/lib/scene.h",
-      "sha256": "7206961ddc25cfcdf273a46ff61bbe403cda5c2eb559a24e4dd08f2e3f331a64"
-    },
-    {
-      "path": "kitaqgb/lib/script.c",
-      "sha256": "70eb813cae464214d36855332cde999f64d240b86a99ab2c6f3a63a175fb950c"
-    },
-    {
-      "path": "kitaqgb/lib/scroll.c",
-      "sha256": "2a136264f753a1774ee2b19b717ab6540a51dd1d6d279ab7b1b3f9e37e3c6f80"
-    },
-    {
-      "path": "kitaqgb/lib/scroll.h",
-      "sha256": "80b676b5adaed829c90db2c1ed349cd85bf4ef0d1e3758b9410d391cf8ef8a9e"
-    },
-    {
-      "path": "kitaqgb/lib/slg.h",
-      "sha256": "c47d2fcb830005277711805a114c3f89bf3ac63a8d537e9d8d8211fdfc301ea9"
-    },
-    {
-      "path": "kitaqgb/lib/slg_board.c",
-      "sha256": "5da2a6f7649fdfdbc703b9b79771a6b34b81ca019fbcefe3f671e06460609009"
-    },
-    {
-      "path": "kitaqgb/lib/slg_path.c",
-      "sha256": "c101437acc80815d8fd6082505a7f661a63c7eb3c37a92eb008030ee990c7545"
-    },
-    {
-      "path": "kitaqgb/lib/slg_unit.c",
-      "sha256": "9fe1faabbc60f58f1d81f718e486d67a7bbf08970326446dd4fb6f76306338a7"
-    },
-    {
-      "path": "kitaqgb/lib/sprite.c",
-      "sha256": "c389ed7002d3b43e2c5d15250d1ca614a2d690bd762df7ff158abed211fd8db7"
-    },
-    {
-      "path": "kitaqgb/lib/sprite.h",
-      "sha256": "5fec669e9c15aa456baa35c6a1dc97cbbc520c3cfac039d0d4df94682513b14f"
-    },
-    {
-      "path": "kitaqgb/lib/system.c",
-      "sha256": "b168b0f862b887eeef05096121d031908367826744a02957a3748572d65f214c"
-    },
-    {
-      "path": "kitaqgb/lib/system.h",
-      "sha256": "a15545bf20ab7d6db06e7df1929b95ada1ce8f9f809b6d943df9f2ad133a12d8"
-    },
-    {
-      "path": "kitaqgb/lib/text.c",
-      "sha256": "49d8f6a0f29f8f67ff8659bb28160533178118a22a954032302f8d812468380b"
-    },
-    {
-      "path": "kitaqgb/lib/THIRD_PARTY_NOTICES.md",
-      "sha256": "d94e174cc98d17d49b01bd7341b18cc08b76612be6de5b9d916ee355c8f10ed4"
-    },
-    {
-      "path": "kitaqgb/lib/vram.c",
-      "sha256": "01c67dde438275087b90defd89326d6eb21c5b83bf267bdc68a0427b6177b6c3"
-    },
-    {
-      "path": "kitaqgb/lib/vram.h",
-      "sha256": "d400b78cfdcf0a94665a6a5cec4422d80bcf9fc9b6cff9ec2601d476c1d67f21"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d.c",
-      "sha256": "4d0e236aee977ebca2d4132b34551f4309e1449085f6ca4cc23ed6c3407ce48c"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d.h",
-      "sha256": "52b9a36309d2a07387acbbdaa03241cf654ddfa4c9241dbe12702dea9bb76b47"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d_cgb.c",
-      "sha256": "e67141558e27f2618c8e18b20b96b3a64a5a505f6141f364487ab4cd16380610"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d_cgb.h",
-      "sha256": "6aec0f45d07929ebca908708016676cca5d99ac6e993ba0685b466209fec7fb6"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d_cgb_guide.md",
-      "sha256": "270ba2d30b0a34ac465039e3e2e5e706f554dd9888f5df3f8c764af48a309d0b"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d_dmg.c",
-      "sha256": "04905ad0a0e75879ab798d5bc4ddecda8febc130784e39cba61ba11e2e7d3a12"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d_dmg.h",
-      "sha256": "0f9330dc265c85396d372321fbbcf2b553d68103ec4f754f15a5f4b70c596fee"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d_dmg_96.c",
-      "sha256": "4b18013cea36d7c5219f6b13110f79b2bafbb268fc8a42e9161eba013da6e7d6"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d_dmg_guide.md",
-      "sha256": "f1b589886ea465554e92462f0959c09a0950a8379d2f17d1d58ea805fc67be9c"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d_dmg_guide_ja.md",
-      "sha256": "4658540b4d5dd4fc0f2b39f473255eec85dc5ffd0c880b122da3af6b2c5342eb"
-    },
-    {
-      "path": "kitaqgb/lib/wire3d_guide_ja.md",
-      "sha256": "2263fc78b38e8bdb96f057ab56aaa03771851427f37422780ec5cc08e24813f6"
-    },
-    {
-      "path": "kitaqgb/lib/zx0.c",
-      "sha256": "3740290f3b9105e9e0187863615c773ff5a9a4d44f5cbf60c83da3f4105348fc"
-    },
-    {
-      "path": "kitaqgb/lib/zx0.h",
-      "sha256": "c1c14c5fd8b320427b2714f7741059427d5c4d250326f82b151792b64b9d75de"
-    },
-    {
       "path": "kokura/crates/kokura-cli/src/args.rs",
       "sha256": "c0028b43263854969433e08eb31029e1b9eaaeb5199f1b52ad324ac34a27a1cc"
     },
@@ -921,518 +455,6 @@
       "sha256": "152e1d9f549e67620ac1972def577cd512580aa2aa70bbc0c6e7601489af8340"
     },
     {
-      "path": "kitaqfc/kitaqfc/AsmInfo.cs",
-      "sha256": "5cb5144a3a7167a2b6f13478af06eb0818cfbbfdc3cd01334fb77516bccdcf96"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Assembler.cs",
-      "sha256": "c1486d56cef50a861a71224b9df66da068011f79975e3ab9391692b47383cb3c"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/BankedAssemblerCore.cs",
-      "sha256": "e2e4b24541e2ab47405ccf572d2b0b0295a390a8d4949be55e7423d3bd1045e0"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/BuildReports.cs",
-      "sha256": "63e4a4a1177de722dd346c6ac9f20ae8cf316cb57fd212dcc2cd6582dc7f4f3f"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
-      "sha256": "3875db429f9ef69771496a7d920a3921acd1dd734da305219f1e24f11a37fcf4"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/CType.cs",
-      "sha256": "4f99133318339dd9931699086d0381cc6fd0212e370fe4dcb56f59b7157a47de"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/DebugExporter.cs",
-      "sha256": "a14ff83f2456bfcf128165bea13e2d5fd87eb0b9edf1c3e2d73747c47838452e"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Disassembler.cs",
-      "sha256": "9a921867a3f816fb951e32e017acd5b04be9ddaf0369402c5dc71cfc29feac46"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Expr.cs",
-      "sha256": "db839d1a6a5a932d43ec863e8cda1af6e084177a5d19cbce32c32b1739c0f6a4"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/FdsDiskImageBuilder.cs",
-      "sha256": "45473c8b21a31eb00bda1dcf2cf95fb707ceec3e525f1b1c22e2a1b995ef365a"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/FdsDiskMetadata.cs",
-      "sha256": "a1cc772fb236d3b7dd5327675f3bd759b054fb0b8e406d2c8d7b3e13e0c0b736"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/IoUtil.cs",
-      "sha256": "17f0ec2a7596b94c1a0334a19defd0c959367bef710bb4870ff92601f63b9ffb"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Lowerer.cs",
-      "sha256": "26c9b8993d66c5e9e2629f717af048ce6a211f5a96d7693fd745805b3cce5476"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Maybe.cs",
-      "sha256": "4df9faa279a8030316e025a18b91bb04c61c4b72940eb08ee2709d2a09d0bc9c"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Minimizer.cs",
-      "sha256": "5df8489811f7c48d16ef92bf804215cf718ac3ca28e404d9a3f95e1d14e10a94"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/NesActionCatalog.cs",
-      "sha256": "434e3f55281615fb33a06b3b1f6803aaf7f052f137ca7ced296c4549ea510e24"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/NesCartridge.cs",
-      "sha256": "25577e5e708f1eabd93f90fc6563d94443faae73ae2d47bbb2e795e27f986a0c"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Optimizer.cs",
-      "sha256": "b05b52b4630de79a0f7f55d358579da3884db27e716c55ae42293480fc03c5b8"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Other.cs",
-      "sha256": "6bf85ad20728bff7db405f1612f4ba8db50870164e56d6bfd20198d1f22d2db5"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Parser.cs",
-      "sha256": "a44aaa63d2a4f4f28d2f2722ce3f10a6d726bb2111853fe00b13bc7d69b8d889"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Program.cs",
-      "sha256": "2f4af03a6189cb707eb9d57017958e16564efa443c2cd67908bee3e8a81e0a72"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Program.DebugTools.cs",
-      "sha256": "b5906a95225665a961cae30b432ee46c37159f06532a3c9a0b7f94a2208afd1f"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Program.VibeTools.cs",
-      "sha256": "d71f5fd062f2064692fef716f9cc16f1ddf81e4ec807ba409b78ee965d5b86e9"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/RomHeaderPatcher.cs",
-      "sha256": "8b49be9811f3b58db9328dda523881548c56adfa8253b25d5cead6a051308877"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/TargetBackend.cs",
-      "sha256": "a7a3843e5bf163a91b2f84c0d22bba83ce9a766848ea2b8bbe917c29b146e9e2"
-    },
-    {
-      "path": "kitaqfc/kitaqfc/Tokenizer.cs",
-      "sha256": "073919183c4710dc5dd16d2bf75e351882a761c0ce46339dffdfca33e16e36ee"
-    },
-    {
-      "path": "kitaqfc/lib/actor.c",
-      "sha256": "0bbf6de9d2f18fab750e8533a91680ef487ed1d9f8105670b371f525e2e2ad35"
-    },
-    {
-      "path": "kitaqfc/lib/actor.h",
-      "sha256": "a37307ae64db16932e6a0f8a536d8cea4271234df750574416ea5b250ed09e5b"
-    },
-    {
-      "path": "kitaqfc/lib/asset.c",
-      "sha256": "450c37d18f79ae3011d652d99842e9b3cc6314b8a486bf099c02279bf71364b1"
-    },
-    {
-      "path": "kitaqfc/lib/asset.h",
-      "sha256": "75aaf32ed8b6fbfd921299511e9cb4d04abb1a2f0d68ab779f22f44a90c1157d"
-    },
-    {
-      "path": "kitaqfc/lib/ASSET_CONVENTIONS.md",
-      "sha256": "2c40357343b33587427f01f5c9e2809893bec1abe6c206d24af419ed7fb6f7e1"
-    },
-    {
-      "path": "kitaqfc/lib/attribute.c",
-      "sha256": "9e93cead95f7721e28d64d06e686ad734b7b30ce70cfb6e2aacecf5a8f8cdcea"
-    },
-    {
-      "path": "kitaqfc/lib/attribute.h",
-      "sha256": "e9f182dff684c3d30c4b0de1f802748ced136a6c8dcb5ffb48e2ada3329b4c3c"
-    },
-    {
-      "path": "kitaqfc/lib/audio.c",
-      "sha256": "e2c3c044f48a48ff18d1256fd58f87ded84dd8c237a7ee5771f7dc178b2a5f50"
-    },
-    {
-      "path": "kitaqfc/lib/audio.h",
-      "sha256": "c8a4325eaaf7b6df3894adffb09d4ff72e9cf3a795b05467f3d7de09fe8f9069"
-    },
-    {
-      "path": "kitaqfc/lib/audio_vblank.c",
-      "sha256": "d86bbe39d584749f7aa74a6cabdeac47c592ac8c976a9942be6a98e733760e2b"
-    },
-    {
-      "path": "kitaqfc/lib/audio_vblank.h",
-      "sha256": "a11fb3c3971ca0c3a7e0f3623aa922a1cf3630a94ddbf966fc212f80825b435f"
-    },
-    {
-      "path": "kitaqfc/lib/bank.c",
-      "sha256": "e39ed2dcb897ed75b0a65224fe08a1d89682c8a0feac7db0fd44e177a09ef543"
-    },
-    {
-      "path": "kitaqfc/lib/bank.h",
-      "sha256": "b05809ad64e8618da2428767e199d20dd535970a5fcee44f4380a1f55fa85610"
-    },
-    {
-      "path": "kitaqfc/lib/chain.c",
-      "sha256": "723155ac38f39d34ea11f80540510752517e73fcd5923c25646d14a4b8d90937"
-    },
-    {
-      "path": "kitaqfc/lib/chain.h",
-      "sha256": "72f3b419072ccb6d4e023c7ebb340c80456fb6140b0a0ddd2b92ecc1a16780ec"
-    },
-    {
-      "path": "kitaqfc/lib/collision.c",
-      "sha256": "91bc90eb98e0150249c3f36182fde1f2090bd144f44ff5ac3a94cb5b3f824a46"
-    },
-    {
-      "path": "kitaqfc/lib/collision.h",
-      "sha256": "854c328196c4f156dc8647cd05f1323b297f84c6e9df987bd4e18e943811d191"
-    },
-    {
-      "path": "kitaqfc/lib/core.h",
-      "sha256": "eef72d04bb6f0e29d7be915f26814b9880fb34f70d1898dfe22cb6109df153ae"
-    },
-    {
-      "path": "kitaqfc/lib/danmaku.c",
-      "sha256": "a658be5ba9a5b58f029121a0d4cb27b41ce588a3dd8b6ef0e2f5bb5358955c28"
-    },
-    {
-      "path": "kitaqfc/lib/danmaku.h",
-      "sha256": "b75523c5158133f6ba57e6102dbb68f715c645006d86266974c42c27cce5b97b"
-    },
-    {
-      "path": "kitaqfc/lib/danmaku.md",
-      "sha256": "1550f37cd6375a52e0f055c2fc7afbf24defe64db5ebeb4be2a681d5a921a3e9"
-    },
-    {
-      "path": "kitaqfc/lib/debug.c",
-      "sha256": "112a2dd4adb921170bde8155a7180b2bd7f40c1487a2e3b66e43da465965d768"
-    },
-    {
-      "path": "kitaqfc/lib/debug.h",
-      "sha256": "4dc54b6a7a3d5bc96b247b74cb3e4ef8915674b2d035e03415ea3d3b850d402e"
-    },
-    {
-      "path": "kitaqfc/lib/entity.c",
-      "sha256": "96197eca2ad3431a6d82a29e5db59205fb6ca9a4d36465d83b9f3a47f3617ef0"
-    },
-    {
-      "path": "kitaqfc/lib/entity.h",
-      "sha256": "d6a48286b59970bee79a8fb3bc6952614a238d95ca37b714e3d4f52c27991453"
-    },
-    {
-      "path": "kitaqfc/lib/fc.h",
-      "sha256": "697d338735cc83db0ee14e3533241ce30cb5c4afd93fed40fd84c4ac7cfb57c4"
-    },
-    {
-      "path": "kitaqfc/lib/fds.h",
-      "sha256": "8d6331eb5f4962be23bf923d10ecff11ed36e1152a11e39cc69ac9d802a2b039"
-    },
-    {
-      "path": "kitaqfc/lib/fds_file.h",
-      "sha256": "e836419bf961c658dfc82ffdc15704ddecfa0419a8d0f192af9e93de4b18c3f9"
-    },
-    {
-      "path": "kitaqfc/lib/fds_overlay.h",
-      "sha256": "c3279f804d0739d204576abda21608711d804659d12fdf3da252ba24721f700f"
-    },
-    {
-      "path": "kitaqfc/lib/fds_save.h",
-      "sha256": "cafc0faf9ef6567a463e3a4ab426fd279ba63c2e38918b545e32b218070a1275"
-    },
-    {
-      "path": "kitaqfc/lib/fds_sound.h",
-      "sha256": "543e7862b250684bfa69eaeed94f4b2f000044bf083a848506ae588ddf0e45e2"
-    },
-    {
-      "path": "kitaqfc/lib/fixed.c",
-      "sha256": "20acc9e76899329af56881bf4d4af0a880830ed33f8b2dc07c2a3b39a6d7f051"
-    },
-    {
-      "path": "kitaqfc/lib/fixed.h",
-      "sha256": "81941d1e9f20b6e65466f4fc2892193bfc22fbed93a0334381ee56c414d38bbc"
-    },
-    {
-      "path": "kitaqfc/lib/input.c",
-      "sha256": "4a6dbcaca09cc953303126ab66bc5fc46fe53a6c5cd17fbc289bf025f37478a4"
-    },
-    {
-      "path": "kitaqfc/lib/input.h",
-      "sha256": "5b2d7be9cbb0bcc6e494c3744722ebb81c36f145c394b961f570856373a96453"
-    },
-    {
-      "path": "kitaqfc/lib/input_repeat.c",
-      "sha256": "1b121687f1f279ff49245f64037dba8c39527d752c975e67f58fea85c8b80e2b"
-    },
-    {
-      "path": "kitaqfc/lib/input_repeat.h",
-      "sha256": "5a490490a3d440dc5adf08d8e772d4fc175be04bca8dd7dac36c1d56d2ee3545"
-    },
-    {
-      "path": "kitaqfc/lib/intrinsics.h",
-      "sha256": "74aa392f476743c3ae79126d6135842d25cfb26e6eba7f9837d96a26faceb6ea"
-    },
-    {
-      "path": "kitaqfc/lib/keyboard.h",
-      "sha256": "efd757a3e3373c43872f945e7238324dc3e59865ce42df2dbd073a6da10cfbad"
-    },
-    {
-      "path": "kitaqfc/lib/mapper.h",
-      "sha256": "ca9a487ae9172f917da33f50eefc4dd758c1dcf6e1e24614f18127bf28a22ab2"
-    },
-    {
-      "path": "kitaqfc/lib/math_fast.h",
-      "sha256": "a0d08a224b2a1fa8f766d193fe6a0fbf6153a80c90ecf039f3708f1739302635"
-    },
-    {
-      "path": "kitaqfc/lib/math_fixed.h",
-      "sha256": "712b7ee30c66a64af339e8ca62950d01cab160d0a63ba04f2f39b151ac1bc21e"
-    },
-    {
-      "path": "kitaqfc/lib/math_lut.c",
-      "sha256": "3abf400a05baa75add42faa689fb0a546ec99eed1525b1c159a053daadca264e"
-    },
-    {
-      "path": "kitaqfc/lib/math_lut.h",
-      "sha256": "c9f985aa6ff9553287e2f6fa8531db8fe81beb939cb75232509f56aef1ee541e"
-    },
-    {
-      "path": "kitaqfc/lib/metasprite.c",
-      "sha256": "428975bbf489d655597537c7541c4abb877f82d2628e473bb624513231612317"
-    },
-    {
-      "path": "kitaqfc/lib/metasprite.h",
-      "sha256": "c708de4226e36af17a09add2effb802a0ae2fc9391c62c014ebeb8a98e183ac1"
-    },
-    {
-      "path": "kitaqfc/lib/mic.h",
-      "sha256": "e919ce312d8b3395ed164ee374b6051d82d8397c9d7d6f7afa6736d51bfba372"
-    },
-    {
-      "path": "kitaqfc/lib/midi.h",
-      "sha256": "7c0d2416fa5102b9a99ad97d10a4e6cc9318417251971ef8a9bd098c220a8e29"
-    },
-    {
-      "path": "kitaqfc/lib/nametable_asset.c",
-      "sha256": "d750ccd73b4c20851f258abd2c2d963f58d6b0f57379a4b6c2b9c408e84dea04"
-    },
-    {
-      "path": "kitaqfc/lib/nametable_asset.h",
-      "sha256": "9813dde648edc491afb7823a35bf25eaa1d2491ef95fedb3258d246670fbfd25"
-    },
-    {
-      "path": "kitaqfc/lib/nes_game.h",
-      "sha256": "1e533e7ee1fb6abfc3fb5042572b15da3151aceb2507ba7628efb4df9c7f0811"
-    },
-    {
-      "path": "kitaqfc/lib/oam.h",
-      "sha256": "41c37671470e0e23fb8365fc5672d87bf67c727b9859e6ddbe0e13ffc5ae6410"
-    },
-    {
-      "path": "kitaqfc/lib/oam_fair.h",
-      "sha256": "d396b13057d5d576f0659418e3b88144349f8e6210d5545c50d6403f36582c8b"
-    },
-    {
-      "path": "kitaqfc/lib/oam_fair.md",
-      "sha256": "aa817bb3bfc5373855faf48f36645ba55f77eb0148c12101224f1a54dab5334c"
-    },
-    {
-      "path": "kitaqfc/lib/oam_fair_impl.h",
-      "sha256": "c9011272eb973801b9476644fa13548e25704003d58ab0692d48f6a1c0186f49"
-    },
-    {
-      "path": "kitaqfc/lib/pad.c",
-      "sha256": "87a0801547496cc09105bb04afba56df9518ffe7e70273d822ad55ea380b8b54"
-    },
-    {
-      "path": "kitaqfc/lib/pad.h",
-      "sha256": "abe15900e4cd41e82c65c4aec04c42d079aebce3fa2845a6e01fdb6002164b96"
-    },
-    {
-      "path": "kitaqfc/lib/palette.c",
-      "sha256": "9b10a26f55e6b86f5c6f4083986c400724cfc02a34342621936c3d6006d38341"
-    },
-    {
-      "path": "kitaqfc/lib/palette.h",
-      "sha256": "55902ab5ae4054a961f48653748180444eaa902cd6e3a92f90f0501ad63c43b2"
-    },
-    {
-      "path": "kitaqfc/lib/physics2d.c",
-      "sha256": "aae2c6ad8490cc6b37c6abe50274fd8f1d53bace72870c68da03b784fb313d1d"
-    },
-    {
-      "path": "kitaqfc/lib/physics2d.h",
-      "sha256": "8b3292eb3274a7702722339ff80362ef2d7ed95b42d85cf229106872361b52df"
-    },
-    {
-      "path": "kitaqfc/lib/physics3d.c",
-      "sha256": "845214a967b09b5ac433ff913287e345fe2acb7252db02c4a4e47fab83f82c20"
-    },
-    {
-      "path": "kitaqfc/lib/physics3d.h",
-      "sha256": "7e207d58e5dcb87a059ec4b1487030b6b7e25a4f853ac2afc4bfcf18064b58ab"
-    },
-    {
-      "path": "kitaqfc/lib/ppu.c",
-      "sha256": "1b1c79eb8c29950f4be5a531b8835ffd3e85ecfaa91871ed8b6117aaa88d88d1"
-    },
-    {
-      "path": "kitaqfc/lib/ppu.h",
-      "sha256": "acdf977858899f584ab15cb2303c50489d903bde4f86ae8b7161b5a0005acbe1"
-    },
-    {
-      "path": "kitaqfc/lib/ppu_direct.h",
-      "sha256": "998963bbeb8eb5a6c2cfa69934b4de244ee5ee146b0b831d843d4f2d1acd13e8"
-    },
-    {
-      "path": "kitaqfc/lib/README.de.md",
-      "sha256": "e3f0f0ba553d84780fac057f6a03c07d49d5d5c8d55ec3b92e45a7642b82cb90"
-    },
-    {
-      "path": "kitaqfc/lib/README.es.md",
-      "sha256": "baae5a5e8c9a521872d0ed2f79e6c32220512a5acf24dc7c00b7e03c72ea873a"
-    },
-    {
-      "path": "kitaqfc/lib/README.fr.md",
-      "sha256": "d870fd0fe4c25e0371a77ad8524ca2ed95c0a44e658dcedad612611b53b94a20"
-    },
-    {
-      "path": "kitaqfc/lib/README.ja.md",
-      "sha256": "3035bade6dcd93617c80108f151674756d5331151f8a07e03f0733eaa89c9394"
-    },
-    {
-      "path": "kitaqfc/lib/README.ko.md",
-      "sha256": "f8f869ab08f2376d1ea796bbfbef6ba571a62b1b0440b962f4f45d517a4b7b05"
-    },
-    {
-      "path": "kitaqfc/lib/README.md",
-      "sha256": "de18362a8e3e7e7ff4735c848fcb73875002a738010469133a3070613f178250"
-    },
-    {
-      "path": "kitaqfc/lib/README.pt-BR.md",
-      "sha256": "1d90d6058889f17c25c38790d297694cb95c58a69d62db920c2e7f452b25d6c9"
-    },
-    {
-      "path": "kitaqfc/lib/README.zh-CN.md",
-      "sha256": "59545ec48d6ded00ea79226af8a7e70da110273be81acbcb7738a96ff0a968be"
-    },
-    {
-      "path": "kitaqfc/lib/README.zh-TW.md",
-      "sha256": "389d05487dd2d5f00b053061b3d65cffad691e9ca85489ae7d758dcf702506e0"
-    },
-    {
-      "path": "kitaqfc/lib/rob.h",
-      "sha256": "1728fc55ee0c7876f8c0777c0a17cf150133b735d4ba83c2fe68273e94b6b8bd"
-    },
-    {
-      "path": "kitaqfc/lib/runtime.c",
-      "sha256": "132f7c664c2d4a91ba0aa3f4227943daadc9442868f6f557e39821facd755d08"
-    },
-    {
-      "path": "kitaqfc/lib/runtime.h",
-      "sha256": "32bffa18e0b1c95874894727bd0170e87c629b6a5acc967ecd857d3b282453a2"
-    },
-    {
-      "path": "kitaqfc/lib/scene.c",
-      "sha256": "48a409e79469a2f6953cc23a135c343fd3686747446b55236d163f323d482b66"
-    },
-    {
-      "path": "kitaqfc/lib/scene.h",
-      "sha256": "7fcdc7fb7f9501df2c0d8b44f6d34becbf61aabf20d1686842e2e41c04a1a074"
-    },
-    {
-      "path": "kitaqfc/lib/scroll.c",
-      "sha256": "d7d4802a02c9b854c60563e0258a301e2313cff57053c358d3e7347b2ce91ec1"
-    },
-    {
-      "path": "kitaqfc/lib/scroll.h",
-      "sha256": "f3097df4b926290d62fc209e8df7ec6b30518813765945f9143f0f75c0136462"
-    },
-    {
-      "path": "kitaqfc/lib/sprite.c",
-      "sha256": "fe3bdd0d28c34e9b81175f5a8ab7b67ae692cf7aa1ab17b4e20fa9e471d914d5"
-    },
-    {
-      "path": "kitaqfc/lib/sprite.h",
-      "sha256": "8ad792320d59b59d9bc1ac9d9d5cb558960724a1820a8ef634b2f2f8b18e220e"
-    },
-    {
-      "path": "kitaqfc/lib/system.c",
-      "sha256": "4cf453270535749e37f10a1fcc0d34032580632a359c327a62007441afa32d04"
-    },
-    {
-      "path": "kitaqfc/lib/system.h",
-      "sha256": "9ee154cb4fe244d6920f33afb2d8eb663f36a0a7a9bd8b3de7b571ba910a5a9e"
-    },
-    {
-      "path": "kitaqfc/lib/tilemap.c",
-      "sha256": "d5203c48d8cb2a717201b7c1231c72c6f3d3594c6605e3516a079699a2fa5d40"
-    },
-    {
-      "path": "kitaqfc/lib/tilemap.h",
-      "sha256": "600327336ab17375269fbb33cb13a3b62bc7adf42a417233651a0a8dbdd4eac6"
-    },
-    {
-      "path": "kitaqfc/lib/vram.c",
-      "sha256": "b9cdc48b34084ee3a2a6c8aa6d9e4eb584114f4730e362a0dcd79cd20cbea9c9"
-    },
-    {
-      "path": "kitaqfc/lib/vram.h",
-      "sha256": "462e3e35e9b6db0ae6a873d3dbc721c7f2e924a533c92e9737b6446458c159c4"
-    },
-    {
-      "path": "kitaqfc/lib/vram_queue.h",
-      "sha256": "eb3a23544328201d21ae3891454bc50923d9ae970541a7dd9a52f2ec9220728f"
-    },
-    {
-      "path": "kitaqfc/lib/vrc6_sound.c",
-      "sha256": "0d4fe0769513a3a1b0a56235386fc87eb36f9941994bd97de4cb92ecc35ca28b"
-    },
-    {
-      "path": "kitaqfc/lib/vrc6_sound.h",
-      "sha256": "5ae9c5adc9a0cc3c7d3cd04c5164e09af06d67517160bc2cec3ea9349a2902fa"
-    },
-    {
-      "path": "kitaqfc/lib/vrc7_sound.c",
-      "sha256": "98e97d5502c094dd71113cf5718b43a241264f928d09d214b49ffe5c1b01860c"
-    },
-    {
-      "path": "kitaqfc/lib/vrc7_sound.h",
-      "sha256": "9fa178459985cf17a05cfdaa02a35871fa3f52fa7650fdae9ddc3c1a5f6bba4e"
-    },
-    {
-      "path": "kitaqfc/lib/wire3d.c",
-      "sha256": "22002ecdeb0e3659579142d102617992fa21cc2e20528cc6516da6fe1583b77f"
-    },
-    {
-      "path": "kitaqfc/lib/wire3d.h",
-      "sha256": "ba067668b6fa461b1b17bbf9f1717d7fa2e3ac4f30211d02d022451a3ae3b119"
-    },
-    {
-      "path": "kitaqfc/lib/wire3d.md",
-      "sha256": "4d2445c12e8c4f4f0491561d3c31f51ba0ce8a66b67e4271097a3ba8a65ef1cc"
-    },
-    {
-      "path": "kitaqfc/lib/wire3d_tables.h",
-      "sha256": "7aaa2403d34fa11bd34e28efd0d157e4322c36e6f24eefe112105f8193f46a2f"
-    },
-    {
-      "path": "kitaqfc/lib/zapper.h",
-      "sha256": "1d27ebd125d36cab308b4c331a4ee95d15daa652e2b070ea4e5ba5bc860b3ab5"
-    },
-    {
-      "path": "kitaqfc/lib/zx0.c",
-      "sha256": "da956c77f44d9884fbdb31c9b27bb976506ed540d07919941fc70ca0bbb276e8"
-    },
-    {
-      "path": "kitaqfc/lib/zx0.h",
-      "sha256": "50887e6043b3150469deebac8b3f331aabf5852ddb5d9efff0b4611e8b6f94c8"
-    },
-    {
       "path": "kurosaki/crates/kurosaki-cli/src/main.rs",
       "sha256": "fd8d22dcaa0c1846c2e9e0a12e0d2526b10fca97f251cd47f6c784c21d9d9ea5"
     },
@@ -1447,6 +469,1406 @@
     {
       "path": "sarakura/catalogs/gb_diagnostics_v3_catalog.json",
       "sha256": "5013c9be30cb9da7c6b8d50b0e0312221cfacff9f8afaf540ab257aa66025b0b"
+    },
+    {
+      "path": "kitaqgb/src/analysis_reports.rs",
+      "sha256": "cacf34ba54ad3640374ac60b8cd943c173adcd7f447fc02becf1d63cdc785079"
+    },
+    {
+      "path": "kitaqgb/src/asm.rs",
+      "sha256": "a3a05116701dc938d8a80f482627c36a761c006e19e95111ab26d68a4d83952f"
+    },
+    {
+      "path": "kitaqgb/src/asm_info.rs",
+      "sha256": "04c139713a198ea0a1ac7a79c642e9669b913dab702f7c15706dce93f11ff5f3"
+    },
+    {
+      "path": "kitaqgb/src/assembler.rs",
+      "sha256": "2da2ea9e82abb588233feafd20ed2eaf4622d76d17d444bcb7c47492c3ea4196"
+    },
+    {
+      "path": "kitaqgb/src/assembly_json.rs",
+      "sha256": "5effad7caa301f4c4e0fe83238cca9331b79061a35908f8eda06f534033f30b2"
+    },
+    {
+      "path": "kitaqgb/src/build_helpers.rs",
+      "sha256": "570b8a70784cd3732bf976abde2bd1ce0861ef44c4e542f8c2b91ed01682b012"
+    },
+    {
+      "path": "kitaqgb/src/cache.rs",
+      "sha256": "dedf13c7433c9784ba1b9594bb340d22a4cf6622ff470c9dc29ef81784149f35"
+    },
+    {
+      "path": "kitaqgb/src/cli.rs",
+      "sha256": "b852bd7c113a0f744aa5e2c3b9e06d59d6e800a122676d07b4a3b4d86794e5b9"
+    },
+    {
+      "path": "kitaqgb/src/codegen.rs",
+      "sha256": "632a3f2842c923f9f3adff19ef3eda2d67b0a4a7c37be9a6b3a6e068a182a9f4"
+    },
+    {
+      "path": "kitaqgb/src/compiler_api.rs",
+      "sha256": "2624cb3ec2943fca0019788acf22a1fcd9b78fdf8f94b6908ee19593dbe408d0"
+    },
+    {
+      "path": "kitaqgb/src/ctype.rs",
+      "sha256": "058c270901f2ae60fd2663dfb8f7ca0f0f9f40049a1794e9a6f9ca6a34caec3f"
+    },
+    {
+      "path": "kitaqgb/src/dead_stripper.rs",
+      "sha256": "136a429e1f3fd1ba96cb803a05dfdbb994118f47a34e5b8ff966e3c4d2031ca2"
+    },
+    {
+      "path": "kitaqgb/src/debug_exporter.rs",
+      "sha256": "92f34a08c18b62f25d64045d3021774f0a70e6c2f8a7e7d0a1357770f70fa6c4"
+    },
+    {
+      "path": "kitaqgb/src/debug_tools.rs",
+      "sha256": "cec77498e8ecbc30f893750718e90a956c91feb1259ad1bb3053676e8e0d51f6"
+    },
+    {
+      "path": "kitaqgb/src/diagnostics.rs",
+      "sha256": "7453d8541d3912a547c77402eec1bec5aba133011c63d8e3b8e2a0cd0b67d01c"
+    },
+    {
+      "path": "kitaqgb/src/diagnostic_help.rs",
+      "sha256": "f65102a50d4bfef9a8a7c50ee31cef3088da6c0e779318169c89ba5f5757a6d4"
+    },
+    {
+      "path": "kitaqgb/src/disassembler.rs",
+      "sha256": "6dfd69758c35293cf1fbd37adc17d6437377e08e079c42ed516e62cc94e7ad3b"
+    },
+    {
+      "path": "kitaqgb/src/drivers.rs",
+      "sha256": "e409e780958d31e97a32dc1c4574d1669b6cccbbf473a0223dd90ad39cbdf11b"
+    },
+    {
+      "path": "kitaqgb/src/expr.rs",
+      "sha256": "c5d5ba78e01535c1cb4bf85e14a43dc0ac85177119fad6661663ffcb176f6854"
+    },
+    {
+      "path": "kitaqgb/src/hash.rs",
+      "sha256": "f68e86583eda32981f8aaad67f27802a270126bbb1f8a29385fb82a2447dac08"
+    },
+    {
+      "path": "kitaqgb/src/io.rs",
+      "sha256": "ab58d13d99040dabe4d0a81bc2281e671df3aa8267465236955ddbcf3f030035"
+    },
+    {
+      "path": "kitaqgb/src/ir_json.rs",
+      "sha256": "19a2d3d21b35be427e5a75154da5b8551233af77b2d676ad1286ff4dbc13e639"
+    },
+    {
+      "path": "kitaqgb/src/json.rs",
+      "sha256": "7c055ed74f8a80eb7a8846a30823d22ff81b810a547eac19bda91fddbc69e10f"
+    },
+    {
+      "path": "kitaqgb/src/lib.rs",
+      "sha256": "b44e8dd1559a5942286ab43c6c451296484c15585c2666588b074e516680aa0b"
+    },
+    {
+      "path": "kitaqgb/src/lowerer.rs",
+      "sha256": "c69c263b18a6c927789ca4be9cb2b4d8915b62076f33bb3564946792d3c52d6a"
+    },
+    {
+      "path": "kitaqgb/src/main.rs",
+      "sha256": "8b86d15c5d5ac0f534f3ddf73d1579f56c65c9da403ff98f21ca9cd8915f7af8"
+    },
+    {
+      "path": "kitaqgb/src/metadata.rs",
+      "sha256": "36d18fd6e8bbe16073780f730a4de217565048c2060b621bfb2c760c1817f69f"
+    },
+    {
+      "path": "kitaqgb/src/minimizer.rs",
+      "sha256": "1b6e1126760ee6e9deba4c483498e70a180ef950f62f3ea0f1a794e55b2256ad"
+    },
+    {
+      "path": "kitaqgb/src/observation.rs",
+      "sha256": "c1c57e59324dee16a2e92dab618ae533be7431b77f7de848d9da2213b6bbf3e3"
+    },
+    {
+      "path": "kitaqgb/src/optimizer.rs",
+      "sha256": "8a079d72f4413c651bb4156ee123382e2268f0c1fc4d6a7b6c9b938b2e53a9fa"
+    },
+    {
+      "path": "kitaqgb/src/palettes.rs",
+      "sha256": "2bfc39bfa2428c557de0f4aa57cb5a8570756c3fe698cefc2a26301e8cf99dbf"
+    },
+    {
+      "path": "kitaqgb/src/parser.rs",
+      "sha256": "a3a9d29b78ae91e8dc44485b4a1d9a71b47cc827f5003ad2698223c0fc0f602f"
+    },
+    {
+      "path": "kitaqgb/src/pipeline.rs",
+      "sha256": "a5ea56d471ec59c3d2bb14dd6b417c9048b9ae9bae726317a8e6498db674f4f3"
+    },
+    {
+      "path": "kitaqgb/src/preprocessor.rs",
+      "sha256": "56cb587ebb980336f433c91e5b39a2e3068f28885af5464c8ab35080f45f9297"
+    },
+    {
+      "path": "kitaqgb/src/recipe.rs",
+      "sha256": "9bfa171faa20b2175dc7c2181ff5abc46acfaf15452070787aacee9fea401a4e"
+    },
+    {
+      "path": "kitaqgb/src/reports.rs",
+      "sha256": "ab472d2bf61264c121acb75a22c88cd8bb08c102e7f376965abac12851f3a9ac"
+    },
+    {
+      "path": "kitaqgb/src/repro.rs",
+      "sha256": "5af932a50f54436eed7f6b22d9a728184c790c43f447c8a39860412178535b0a"
+    },
+    {
+      "path": "kitaqgb/src/rom_header.rs",
+      "sha256": "5f7153e48a95043d28e3071bb4d12e4b040ab6b698f658f49a24b4f76854e7c7"
+    },
+    {
+      "path": "kitaqgb/src/tags.rs",
+      "sha256": "5df35a4d9b564d779c341fb05901417f62fcba7a7fe46fd3e29d14bbe61786ed"
+    },
+    {
+      "path": "kitaqgb/src/token.rs",
+      "sha256": "15a1ae80824ab7573d60fb32d3e6a1e871b0613a734ffc6f87aefba2e32d3262"
+    },
+    {
+      "path": "kitaqgb/src/tokenizer.rs",
+      "sha256": "ed6f0952aed97d018b33ab56b9cfc29b9c6ee8c3b529a58da83dbaefb1407c52"
+    },
+    {
+      "path": "kitaqgb/src/vblank_patch.rs",
+      "sha256": "219b7d8cd7c52e8d9d528bf3580abf7216547456ea8cf7962d8530e84cb5d483"
+    },
+    {
+      "path": "kitaqgb/src/vibe_tools.rs",
+      "sha256": "19c67ee0b69d49bed3e4fd4439fca4698659c47d97f90f84f64addb03a875fe5"
+    },
+    {
+      "path": "kitaqgb/src/workflow.rs",
+      "sha256": "3fd8ec74fc7fe12156c05fb25b0f6973db4bf5d9347e93ada4961b881aa7595e"
+    },
+    {
+      "path": "kitaqgb/src/zx0.rs",
+      "sha256": "6755074befd471dfea8ab8cd486ab57909e21c3aa1ee59c43295518bdd40cea3"
+    },
+    {
+      "path": "kitaqgb/src/bin/kitaqgb-patch-vblank.rs",
+      "sha256": "71f27429877e571399f14f5d33762516897b7cf7ed6701d30af7829381bb42e4"
+    },
+    {
+      "path": "kitaqgb/src/bin/kitaqgb-zx0.rs",
+      "sha256": "7b15616acdbfebfcd5c86cfa4bd18bbb498c2c7196e98b22cfa1273d6756cdf7"
+    },
+    {
+      "path": "kitaqgb/src/codegen/allocation.rs",
+      "sha256": "da48993004ed8b2812180007f8a0bfdf15c1b2badb8a83de5c67a979eb634205"
+    },
+    {
+      "path": "kitaqgb/src/codegen/analysis.rs",
+      "sha256": "c829ba3c768bf8c31031da308a49548095daa5250fcd900962ed010c583a0f6a"
+    },
+    {
+      "path": "kitaqgb/src/codegen/constants.rs",
+      "sha256": "f7652ecb88fb144f711cb19a080e848f18c0e24856c2d196b01725299891fabe"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission.rs",
+      "sha256": "e40ccd17797b8e19ab795ceed1a3fda76849efe0c9e978a1a4f8357162f44e08"
+    },
+    {
+      "path": "kitaqgb/src/codegen/folding.rs",
+      "sha256": "4d295605a3c931bf0e7614502f710532fde183edb24d6e9e97947ab05f170984"
+    },
+    {
+      "path": "kitaqgb/src/codegen/identifier_order.rs",
+      "sha256": "9c61811ba1b49427af5cc5cb92f3b8af27627f0b0c68a316f79914c0f38b1d2b"
+    },
+    {
+      "path": "kitaqgb/src/codegen/intrinsic_types.rs",
+      "sha256": "6aecf046e69adae96620643a8eb3c75951804c4f37771fad3eee9e9bc3686f4e"
+    },
+    {
+      "path": "kitaqgb/src/codegen/readonly.rs",
+      "sha256": "41b453d1f66eb5747cf63e94accbcf5ea78dae5a6533586fe27e03f15db58d6f"
+    },
+    {
+      "path": "kitaqgb/src/codegen/rst.rs",
+      "sha256": "573df9b8d63c3c5b3824236deac8165785c5dc91ba079227c34a621767791a9d"
+    },
+    {
+      "path": "kitaqgb/src/codegen/types.rs",
+      "sha256": "1da3914879c60d18d088b48347abb190764afe73052868e7be69abb2414aac84"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/aggregates.rs",
+      "sha256": "36f4a628acd6127c2050451bc3d3ffd99b5ad36bd08e504c34c55b88b061e020"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/analysis.rs",
+      "sha256": "8ded4318bf47ba2f55adbfae70a7e4c88956dfd1c8ecd48f78041581cebbf64f"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/arithmetic.rs",
+      "sha256": "31472f4a31f082bba94b0e79f3a30c642ccda9bbb69b91eede1743e003b94b30"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/banks.rs",
+      "sha256": "6563d29b69219d811a198e87685266da3692510ec0386dcd1db4a7782752faba"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/branches.rs",
+      "sha256": "fce3e883876d114c7e70a14078dd27e97bfbbcf3d2673dd3f53e6b7ae40bb4e9"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/cgb_tiles.rs",
+      "sha256": "f346c21ee85d6b3850cecc3d4c22e7f17ac1a4b55e091b80caa50e5a1fff3651"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/countdown.rs",
+      "sha256": "f37e5e5251da1212b202bc8c3b8670a4c9de900047c58f7abc5e2546a3180461"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/declarations.rs",
+      "sha256": "5f6b4dcf2ff004b97720941c51e8e44a60b39346d47dc8def60cc32d7546e38e"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/expressions.rs",
+      "sha256": "548ffb71357bd9b6eb81cc84c6e8b010561b57ade15b646162efef7a3013031f"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/externs.rs",
+      "sha256": "023ed8d309cfc5bee4280ebe9b7edf04d3874cc43c919143e7f161ea9f750b40"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/inline.rs",
+      "sha256": "0548489e65f817168488034ff4694bf9e19b4ebf2c78c55b3757709fcc2bfd26"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/intrinsics_cgb.rs",
+      "sha256": "fcd99a5cc7cfba2d20949512e965f76df363897de9d79b7904c8022acd2f93be"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/intrinsics_far.rs",
+      "sha256": "d76e3ecd16f830ce98caad38fa259859153cabc7dcf615fcd1ad9e0944b508d8"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/intrinsics_geometry.rs",
+      "sha256": "1422a804869b70817a897c765a6ee10dc71920c2b65796185d7e10a5c3105a74"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/intrinsics_memory.rs",
+      "sha256": "132983c683c7a870158102915ce1a11ccf86c5169cf55c638e7779cb46f5fe7b"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/intrinsics_simple.rs",
+      "sha256": "95f84b0c5bdfd1231968c9279e989675af6573f2626d086ad4cdb6f743e3204b"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/intrinsics_tiles.rs",
+      "sha256": "df5527b424ce6b8db12d5cf6347dde182b4d3743694b259399eff92ff947c9e7"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/intrinsics_vram.rs",
+      "sha256": "25ea022bdfb512902c86c3890e288c6d2c787adaa48e39ce6cc8e7b8c6d33432"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/memory.rs",
+      "sha256": "8a865855d1dba9d557f1182a8838115cf76cbc79b1e50741b53c683e99619be5"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/safety.rs",
+      "sha256": "baad6d780d29d1ffab8ef1066dc826705ffff103f488853f3a19c9b78788520e"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/scaled_arithmetic.rs",
+      "sha256": "3369756b52bd92a0dfd5d12636e2ee2a751af6a77c22aa5f49e40317e0ecdfae"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/scroll.rs",
+      "sha256": "3221d58ed0cf675939a11f47acaaff2cd8fcb6a3f916bd66754c53cf66ff24a8"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/scroll_helpers.rs",
+      "sha256": "3848bcbbec2a182e95cf16a1f01e2fa7bdcad6ffa6035f2277446501cd5d8341"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/shifts.rs",
+      "sha256": "db6b5429a1046883408fdc2fc3638b8bbfbcc64d3f6e19f5e0d7a59bd87d150e"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/stack_abi.rs",
+      "sha256": "224ae92594ef2598724882fa9c2ac6508d1c53602cb4e7c9c418d76d87b08ebc"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/statements.rs",
+      "sha256": "bf58613bdc079eb277c07de553cf870f5a83ca8020764170da2051a4f3bd1cc5"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/switches.rs",
+      "sha256": "c91d75d44f1b05d7787fdf006387ae63519db784c95640b30d0b763365c0316e"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/tile_helpers.rs",
+      "sha256": "1128134af5d069648f124f3fa9905e6e170194b152af7a553fa897907bd60d58"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/tile_regions.rs",
+      "sha256": "a8929bf07619032ec895d064d92f368f795871df4b0dd6eba7a93751a9e5c144"
+    },
+    {
+      "path": "kitaqgb/src/codegen/emission/updates.rs",
+      "sha256": "c3f278a99ba459e29895e226764df261005ba0f01d258862b327c820b580ebac"
+    },
+    {
+      "path": "kitaqgb/src/lowerer/environment.rs",
+      "sha256": "891192f488ba7ff0d75bf696372abc39de27658b47f73f7a9f0c6d0625e1756e"
+    },
+    {
+      "path": "kitaqgb/src/lowerer/expressions.rs",
+      "sha256": "96db23d365660632ad51c59f36ebbe3eb8f13d3094389eb55154a0d5ebb15233"
+    },
+    {
+      "path": "kitaqgb/src/lowerer/lints.rs",
+      "sha256": "20f90ff27e68287d4df734641f3055f692a41e0626fed201e617a9ff1b7843ad"
+    },
+    {
+      "path": "kitaqgb/src/lowerer/ranges.rs",
+      "sha256": "686c3556adf2b794d9b2387497b5c19b7c1c59b55b8cbd59fee1ff95dd1145d5"
+    },
+    {
+      "path": "kitaqgb/src/lowerer/statements.rs",
+      "sha256": "a1bf63b6a7bf8d6baf6cbd11bb557e0d05e82f10b2936a58f826ea3cbaf79ea9"
+    },
+    {
+      "path": "kitaqgb/src/parser/declarations.rs",
+      "sha256": "1fb9fee516c64e1a26b5325603ea55eb63aa8ade26323e5bcc50f71864868ad1"
+    },
+    {
+      "path": "kitaqgb/src/parser/expressions.rs",
+      "sha256": "34391270502407023ead5bb378ad90dbe24d1896d8ff5e6fbe4f075fbba84749"
+    },
+    {
+      "path": "kitaqgb/src/parser/initializers.rs",
+      "sha256": "6d5839f87e66dc669526b848f091d35b4ed6c0a388d7ea446cc08a83e11e59c4"
+    },
+    {
+      "path": "kitaqgb/src/parser/statements.rs",
+      "sha256": "5b30ba50562e284b3d1535ab03f8e56fafd19cda47b9b676bf5b64c68dcd7205"
+    },
+    {
+      "path": "kitaqgb/lib/asset.c",
+      "sha256": "d9bb8db1577121b975a6771da4f25ac34dc75b7e5d2325dcf6e82bc62cf87896"
+    },
+    {
+      "path": "kitaqgb/lib/audio.c",
+      "sha256": "7b91d88a134e5916372f61c82eddceff097880aacee04e8c7e5c7e2f2d05ada3"
+    },
+    {
+      "path": "kitaqgb/lib/audio_hwregs_gb.c",
+      "sha256": "0963199b2371ef284ea5013c4263bb636c3dad92f1272210905181b583dfd036"
+    },
+    {
+      "path": "kitaqgb/lib/audio_vblank.c",
+      "sha256": "8b3eec79a4a56e2b03a507d9cbfa041273177ce736bae4a92f60718dabd80880"
+    },
+    {
+      "path": "kitaqgb/lib/bank.c",
+      "sha256": "2b2ee0e992015f5b39f91c8ab521fec1262d44b945f9f41c69d813138b1b7b65"
+    },
+    {
+      "path": "kitaqgb/lib/camera.c",
+      "sha256": "a0196f67a362c2babb5edf4b98eb811a3b5f5861f5af23eaaa9cc7dc920cee48"
+    },
+    {
+      "path": "kitaqgb/lib/cgb_palette.c",
+      "sha256": "92459f02705c007212ec2fe4123c3f0f2005c9fdae45651e395c53064da06d87"
+    },
+    {
+      "path": "kitaqgb/lib/cgb_tile.c",
+      "sha256": "3e3244c0d3420b8fd45625348eb26211d096c8ed2e8792c7fa93fa8bfadd5e42"
+    },
+    {
+      "path": "kitaqgb/lib/chain.c",
+      "sha256": "44a64ca55cd59812cfe552249818fe7da5db48ea9061796c560db14436248836"
+    },
+    {
+      "path": "kitaqgb/lib/danmaku.c",
+      "sha256": "5a3a5030db75e42e8130f9fe43019a5ed38a709bdb612e8b385ceb572406a0c1"
+    },
+    {
+      "path": "kitaqgb/lib/debug.c",
+      "sha256": "ea767ca2950f673a9e14790f927a8966e6579300b97cc8e487346bd312063e90"
+    },
+    {
+      "path": "kitaqgb/lib/dmg3d.c",
+      "sha256": "294c5715f1f2d2f786f424de7cb437c33c3e218b30362570c74da1105f438866"
+    },
+    {
+      "path": "kitaqgb/lib/entity.c",
+      "sha256": "7f0cc0a713218e722d430334d825c3b19a656229d9496df6389c714ae85cbad7"
+    },
+    {
+      "path": "kitaqgb/lib/fixed.c",
+      "sha256": "93aac2459403c162631724e52fa9002e25e28c41804c6dcacaea1115aab5c4a7"
+    },
+    {
+      "path": "kitaqgb/lib/flags.c",
+      "sha256": "214775b5e41dbd25548fac6a8f890e4fd2c9c99cf4adabd8365abcd2dc5d1b95"
+    },
+    {
+      "path": "kitaqgb/lib/input.c",
+      "sha256": "4d9c8325ecbcc8dbbebdca294449a4bcc09fa303d5f6fcfe333eebfc11dd1822"
+    },
+    {
+      "path": "kitaqgb/lib/link.c",
+      "sha256": "a6b16b395ae155d8c9a70196832fe07f160f8da06988b2f06c5a92921f231459"
+    },
+    {
+      "path": "kitaqgb/lib/link_dmg07.c",
+      "sha256": "fcf2e07f5920048efae7062669fec135f19aba77507199583a679e5787af7967"
+    },
+    {
+      "path": "kitaqgb/lib/link_hwregs_gb.c",
+      "sha256": "3c6f3724f3424b1d91e591706efcdaffa0f1ced739e6da40630000f8483e5edb"
+    },
+    {
+      "path": "kitaqgb/lib/link_packet.c",
+      "sha256": "611d7ee8275fb29eb57e99f1c62ae84d071fcf334fd5a617e026c13e52aeb9bb"
+    },
+    {
+      "path": "kitaqgb/lib/map.c",
+      "sha256": "a1886a267da9ef83f4c7757adfb6d768842714fa1b5167a0137341bcd9a376b9"
+    },
+    {
+      "path": "kitaqgb/lib/math.c",
+      "sha256": "269edc612e8a3613f6653e7b5d012dd7cff3ed1746604cfa8ea7c0708dd160d3"
+    },
+    {
+      "path": "kitaqgb/lib/menu.c",
+      "sha256": "238f256b917189e855b82045b31ae396ce2ef38e1ac566118efcbf7b2ee8e12e"
+    },
+    {
+      "path": "kitaqgb/lib/physics2d.c",
+      "sha256": "718bc320c68048c75341492eb63687e4188a66eaa2b4dc5bec7bb460922197a3"
+    },
+    {
+      "path": "kitaqgb/lib/physics2d_circle.c",
+      "sha256": "5145737f51c662766a1bea64ea4edc08ce59b4435b24328aec736ad28bc3c652"
+    },
+    {
+      "path": "kitaqgb/lib/physics3d.c",
+      "sha256": "820121a8e1dfc3c365c2ab7e6090fba27f97fe783258e416dde259d4541d1e17"
+    },
+    {
+      "path": "kitaqgb/lib/raster.c",
+      "sha256": "3726a984c1c6be68ccd556890a40a43b0b8b7f34eb0d89abca78a8ac3edca76c"
+    },
+    {
+      "path": "kitaqgb/lib/rle.c",
+      "sha256": "2a46fe2d5aaa956db903deaefff2daa5f0530e08e25530b2bba91327d091708b"
+    },
+    {
+      "path": "kitaqgb/lib/rng.c",
+      "sha256": "7e631b04280944b1546e77c28b68268fef15fb6957050c6c6e92f2947ebf2772"
+    },
+    {
+      "path": "kitaqgb/lib/save.c",
+      "sha256": "331704166a92a60b71843d157ce096ac03a7d09a2878f7b48553401b5b1b3e56"
+    },
+    {
+      "path": "kitaqgb/lib/scene.c",
+      "sha256": "58526c4c62ad95ea5da6f42ffa533b6587f1e9f360e6486077f12d6d7c429dda"
+    },
+    {
+      "path": "kitaqgb/lib/script.c",
+      "sha256": "d91e78cfba77d9de17a1b76bb7f86e9888613fc7165dc60e0d329c13c981309c"
+    },
+    {
+      "path": "kitaqgb/lib/scroll.c",
+      "sha256": "16d1e1160c3f3e8f8e5f5a639f0601d5dc2c4b52a9981ed593f92835e2b01a01"
+    },
+    {
+      "path": "kitaqgb/lib/slg_board.c",
+      "sha256": "a4246ba50ba52fa00b4e85a16321ca463dd83c7b189ef324f38a176924e97bee"
+    },
+    {
+      "path": "kitaqgb/lib/slg_path.c",
+      "sha256": "fae7dfc66e4a221c47850347e1ce7fbe35e9ccbbc6816733a8ef8667fef697ed"
+    },
+    {
+      "path": "kitaqgb/lib/slg_unit.c",
+      "sha256": "e73fc33522ad16aada5fa042ca557a9829075c158796ad831cb9bfb0ec80e6eb"
+    },
+    {
+      "path": "kitaqgb/lib/sprite.c",
+      "sha256": "bd564784db0ed2cd5f4db366ea385db692448e856615124be034300de1a86780"
+    },
+    {
+      "path": "kitaqgb/lib/sprite_order.c",
+      "sha256": "64d9fa94d86301ddd3b144a0b364bfa52ab97aaad5ae22d0aa0f3c12acd6328c"
+    },
+    {
+      "path": "kitaqgb/lib/system.c",
+      "sha256": "bf651c42f99486c16a89c9888385101baa7122d694b8a017b51d5bde355bd4c8"
+    },
+    {
+      "path": "kitaqgb/lib/text.c",
+      "sha256": "49d8f6a0f29f8f67ff8659bb28160533178118a22a954032302f8d812468380b"
+    },
+    {
+      "path": "kitaqgb/lib/vram.c",
+      "sha256": "af5bbccc171ce6906c2457862bbd78299ae12329cbf8f3913c2257f8da2e6ce2"
+    },
+    {
+      "path": "kitaqgb/lib/wire3d.c",
+      "sha256": "4d0e236aee977ebca2d4132b34551f4309e1449085f6ca4cc23ed6c3407ce48c"
+    },
+    {
+      "path": "kitaqgb/lib/wire3d_cgb.c",
+      "sha256": "e67141558e27f2618c8e18b20b96b3a64a5a505f6141f364487ab4cd16380610"
+    },
+    {
+      "path": "kitaqgb/lib/wire3d_dmg.c",
+      "sha256": "04905ad0a0e75879ab798d5bc4ddecda8febc130784e39cba61ba11e2e7d3a12"
+    },
+    {
+      "path": "kitaqgb/lib/wire3d_dmg_96.c",
+      "sha256": "4b18013cea36d7c5219f6b13110f79b2bafbb268fc8a42e9161eba013da6e7d6"
+    },
+    {
+      "path": "kitaqgb/lib/zx0.c",
+      "sha256": "3740290f3b9105e9e0187863615c773ff5a9a4d44f5cbf60c83da3f4105348fc"
+    },
+    {
+      "path": "kitaqgb/lib/asset.h",
+      "sha256": "3c12ee1a6eff8c23c6f5dbe564a15f0cca7ca04f258428dc85b4e64e69706822"
+    },
+    {
+      "path": "kitaqgb/lib/audio.h",
+      "sha256": "7d6705953024f21d90211be02343bf539f6bff250c43905e9f1ae037d0e9a9e9"
+    },
+    {
+      "path": "kitaqgb/lib/audio_vblank.h",
+      "sha256": "71de99c7f9269288fa9b89dd9a0416239e71ac36f5edd8dff5499e9a9ceecb5f"
+    },
+    {
+      "path": "kitaqgb/lib/bank.h",
+      "sha256": "953ac90741999c455eeed185dd4040175c1d3dc4cdeaf2f28110a9bee9bd0a94"
+    },
+    {
+      "path": "kitaqgb/lib/camera.h",
+      "sha256": "0a4520b64b9d31be0a3b934b02979339ff50c1b2621ca48bf31033c607018044"
+    },
+    {
+      "path": "kitaqgb/lib/cgb_palette.h",
+      "sha256": "ad2d4faa37b96776892670883805715bfc64b992b90dc65499b521bf21498842"
+    },
+    {
+      "path": "kitaqgb/lib/cgb_tile.h",
+      "sha256": "93a79fceb3b6edb1653f99edd3305db611f1bee98ca44adc26f43056cfcd3260"
+    },
+    {
+      "path": "kitaqgb/lib/chain.h",
+      "sha256": "6e2d3572caafbc93d1ad234b7aee99ddb17e8d20658ac718065e78e6fe2d101f"
+    },
+    {
+      "path": "kitaqgb/lib/danmaku.h",
+      "sha256": "9465046d1d22373a7de4f1e9c5edb5e0fa02aa3ad4016cbc2bb9238154a8d5a7"
+    },
+    {
+      "path": "kitaqgb/lib/debug.h",
+      "sha256": "c749a2cb90bf5c306cfb7e83f68134b84179d9b9ae55a3e1f6c38baa58a1076a"
+    },
+    {
+      "path": "kitaqgb/lib/dmg3d.h",
+      "sha256": "23517e60d8897d324f30637a5566671f2620a11b7edc8c99072c3fbd16451535"
+    },
+    {
+      "path": "kitaqgb/lib/entity.h",
+      "sha256": "d5a9d017a8827e67ee53386ab790b7aedbe0a23d89852f5b988ea256f3ae2d1c"
+    },
+    {
+      "path": "kitaqgb/lib/fixed.h",
+      "sha256": "2dc4c6bcb7b60edb78b8132b475eae0af79b29f525b82cbbe0c2d04b2764c854"
+    },
+    {
+      "path": "kitaqgb/lib/input.h",
+      "sha256": "7228ddd44dbbab529850cab62377db78abb6889ab7886a73c81bc2487b17b736"
+    },
+    {
+      "path": "kitaqgb/lib/link.h",
+      "sha256": "723f54240b01ff65e9c4970d00369801c42399679928e50b3ed4a38b9305249b"
+    },
+    {
+      "path": "kitaqgb/lib/link_dmg07.h",
+      "sha256": "1c856452e95d4257a14e7612fd5b16bb8f48f4de92c408aba2a39be81f92d82f"
+    },
+    {
+      "path": "kitaqgb/lib/physics2d.h",
+      "sha256": "a0257fa232a363a07a8d72e3dc638807c2d2a187d95aa6b011af2255e211a49e"
+    },
+    {
+      "path": "kitaqgb/lib/physics2d_circle.h",
+      "sha256": "a646dc0fe7c8375269a55f89e7032128451c9719b88e406df2ea307e28e375ca"
+    },
+    {
+      "path": "kitaqgb/lib/physics3d.h",
+      "sha256": "4813e0e9b9412efe2157d16c53095cff4ac699c1e2858e37119f13da92469a15"
+    },
+    {
+      "path": "kitaqgb/lib/raster.h",
+      "sha256": "24b85cd06af8946d424a8c02bd35afe1a013e60cf0387a1c8baed7c44083aefd"
+    },
+    {
+      "path": "kitaqgb/lib/rpg.h",
+      "sha256": "40272e152808c102906709e856adb52098dfde3019668079c94c9b244562828f"
+    },
+    {
+      "path": "kitaqgb/lib/scene.h",
+      "sha256": "0fe93e2e3165cba6110c255ba29b84ca5432d26b1a7611876e06617f926c59b5"
+    },
+    {
+      "path": "kitaqgb/lib/scroll.h",
+      "sha256": "461f2068d521a11e3d2a8c1bc55a59974aed5ede95a518d66bfb401e78142786"
+    },
+    {
+      "path": "kitaqgb/lib/slg.h",
+      "sha256": "7cc9c7d261e6ac6a6dc783bfdfb7240696197938f3e3a28f197c6af35ad96d6a"
+    },
+    {
+      "path": "kitaqgb/lib/sprite.h",
+      "sha256": "d1255346cc3c181e1f58db425132091cc5abfc9a8ed0b7a0a9ece6b379328ea5"
+    },
+    {
+      "path": "kitaqgb/lib/sprite_order.h",
+      "sha256": "b09c2bfb165fbf4eb7621bacd9072d3bbb42aee1ceac4b37bea412fb4f6588a2"
+    },
+    {
+      "path": "kitaqgb/lib/system.h",
+      "sha256": "f35c85dbbf234b6eb495d3ab2b0349df7762fd4205f68d78ea0e28091bdf7096"
+    },
+    {
+      "path": "kitaqgb/lib/vram.h",
+      "sha256": "b25c6086aead5016eaace443279180a40917e696e256563e964e4ca33b1d648b"
+    },
+    {
+      "path": "kitaqgb/lib/wire3d.h",
+      "sha256": "52b9a36309d2a07387acbbdaa03241cf654ddfa4c9241dbe12702dea9bb76b47"
+    },
+    {
+      "path": "kitaqgb/lib/wire3d_cgb.h",
+      "sha256": "4fdb29901638c80b9f3f70f900ef74856f0b045a39f16d9d7fc6f34622e18360"
+    },
+    {
+      "path": "kitaqgb/lib/wire3d_dmg.h",
+      "sha256": "898c127cf9ab6269f344b91feab24aa788558b40819b0680bd5edb11ac73aac2"
+    },
+    {
+      "path": "kitaqgb/lib/zx0.h",
+      "sha256": "c1c14c5fd8b320427b2714f7741059427d5c4d250326f82b151792b64b9d75de"
+    },
+    {
+      "path": "kitaqgb/Cargo.toml",
+      "sha256": "dee63d73c9bacfc1a7da2e6195216539d299e147f921a73fb3ca2f18d5e40999"
+    },
+    {
+      "path": "kitaqgb/Cargo.lock",
+      "sha256": "3702e5633c03c9bafecf07ca1bcdfefd0976b2cd240c27d03dfedd7d4b1ea7d2"
+    },
+    {
+      "path": "kitaqfc/src/asm.rs",
+      "sha256": "9a13e65061a5ef18316fac9d8a5e5c980aed476711c3fa036078fdea47804740"
+    },
+    {
+      "path": "kitaqfc/src/assembler.rs",
+      "sha256": "af03f4e735f05f11ea48d25f8be278b01d2488acdc8d3b56b6d0c61801156457"
+    },
+    {
+      "path": "kitaqfc/src/assembly_json.rs",
+      "sha256": "6a95307b7d1389eb73f28554b3e2a5e7d99960d81a5ba774d206d6bf5813ad5f"
+    },
+    {
+      "path": "kitaqfc/src/assets.rs",
+      "sha256": "17e96318ebf06cad849ca5674d2157dbadc3d34de2c6025cbe984363f6fdf595"
+    },
+    {
+      "path": "kitaqfc/src/build_helpers.rs",
+      "sha256": "48e83d4e18a7e2dfb8542efd548f77375b7372c65ac693dfebbd5d75be3927a4"
+    },
+    {
+      "path": "kitaqfc/src/cache.rs",
+      "sha256": "c852af72725f444415c192d26010ef724137f23c016ed6dac911977bfcf4d4fa"
+    },
+    {
+      "path": "kitaqfc/src/cartridge.rs",
+      "sha256": "3f505a4b82e2736f331355e4ef7173ac8c2b0e2e49e9158118625f4b24227fa0"
+    },
+    {
+      "path": "kitaqfc/src/cli.rs",
+      "sha256": "315f9e947683b5e42996df0d2580c5908d04441180d452c591cd572f8a0fe190"
+    },
+    {
+      "path": "kitaqfc/src/codegen.rs",
+      "sha256": "cb3a97bfc7795c3769965130e3c5e61a0c30b61a725da82b81037ceeb04aa472"
+    },
+    {
+      "path": "kitaqfc/src/ctype.rs",
+      "sha256": "058c270901f2ae60fd2663dfb8f7ca0f0f9f40049a1794e9a6f9ca6a34caec3f"
+    },
+    {
+      "path": "kitaqfc/src/debug_tools.rs",
+      "sha256": "0672c526abd4b7c38a58131976fdf83cd377a5ade2a89e8a7431a57509e35f43"
+    },
+    {
+      "path": "kitaqfc/src/diagnostics.rs",
+      "sha256": "5d015e41c82df372b3e46bd463768a2cf46345d53da3770123202b7e5751f2d0"
+    },
+    {
+      "path": "kitaqfc/src/diagnostic_help.rs",
+      "sha256": "226c8ebb711f56662348d27aaa851b3fd7ab398f1058853521b5fcb23dd919e2"
+    },
+    {
+      "path": "kitaqfc/src/drivers.rs",
+      "sha256": "baac6d80ba00b78564af467207a83f081777b9f390b2b2b994d68cf0b93bf79a"
+    },
+    {
+      "path": "kitaqfc/src/expr.rs",
+      "sha256": "c5d5ba78e01535c1cb4bf85e14a43dc0ac85177119fad6661663ffcb176f6854"
+    },
+    {
+      "path": "kitaqfc/src/fds.rs",
+      "sha256": "c24e8b99683cd87e39d18de33fcf1878a013837de7e5ff8493c34c10fa89d27d"
+    },
+    {
+      "path": "kitaqfc/src/hash.rs",
+      "sha256": "f68e86583eda32981f8aaad67f27802a270126bbb1f8a29385fb82a2447dac08"
+    },
+    {
+      "path": "kitaqfc/src/io.rs",
+      "sha256": "ab58d13d99040dabe4d0a81bc2281e671df3aa8267465236955ddbcf3f030035"
+    },
+    {
+      "path": "kitaqfc/src/ir_json.rs",
+      "sha256": "19a2d3d21b35be427e5a75154da5b8551233af77b2d676ad1286ff4dbc13e639"
+    },
+    {
+      "path": "kitaqfc/src/json.rs",
+      "sha256": "7c055ed74f8a80eb7a8846a30823d22ff81b810a547eac19bda91fddbc69e10f"
+    },
+    {
+      "path": "kitaqfc/src/lib.rs",
+      "sha256": "4d98dd6c1ca370461894701fc660769aebbc3024afaa28fe62921b93905f4dc2"
+    },
+    {
+      "path": "kitaqfc/src/lowerer.rs",
+      "sha256": "31684cbb2cfe40f0269c1b0ec96012569950348671b8e940673df0da9b477045"
+    },
+    {
+      "path": "kitaqfc/src/machine.rs",
+      "sha256": "4f7f382e8634772c05e6c186f55a6b73d11030976f1e333ae91c53be821a36e3"
+    },
+    {
+      "path": "kitaqfc/src/main.rs",
+      "sha256": "256f24f1ad593ac521c78647a04e10dd71e72b7899656aa90652eaad2ee4024f"
+    },
+    {
+      "path": "kitaqfc/src/metadata.rs",
+      "sha256": "25aea82900960b754e3196971ae4f73d6ad33d393761cc2def216eb5e3524aa2"
+    },
+    {
+      "path": "kitaqfc/src/minimizer.rs",
+      "sha256": "9911959be1a1f8285dca95fd8af007f0f6c0a5e0b976e6561f8e0af1d1efcc85"
+    },
+    {
+      "path": "kitaqfc/src/nes_actions.rs",
+      "sha256": "783b3346deaa8d2dde53a6ab6de189bcfb555033e8c513744d6906574de3bf6d"
+    },
+    {
+      "path": "kitaqfc/src/observation.rs",
+      "sha256": "ddefec88b209378d63b4c5a213a15eec4ab7231febda24ecc589ac5aa0e3bbae"
+    },
+    {
+      "path": "kitaqfc/src/optimizer.rs",
+      "sha256": "7ecd56d5618387a8eb6dc9f46c990c6dcdc3744919b7074fe7bf9a4c941fddbc"
+    },
+    {
+      "path": "kitaqfc/src/palettes.rs",
+      "sha256": "2bfc39bfa2428c557de0f4aa57cb5a8570756c3fe698cefc2a26301e8cf99dbf"
+    },
+    {
+      "path": "kitaqfc/src/parser.rs",
+      "sha256": "c9eb65f85fe9af5ee4bf93abea54d9a9df7f330ccb771d51cffd5a437bd4e6a0"
+    },
+    {
+      "path": "kitaqfc/src/pipeline.rs",
+      "sha256": "8ab26d72aa1ccfa7e43819f88b6e747cd20e6884fb665f7193245b0fe5a3b6db"
+    },
+    {
+      "path": "kitaqfc/src/preprocessor.rs",
+      "sha256": "56cb587ebb980336f433c91e5b39a2e3068f28885af5464c8ab35080f45f9297"
+    },
+    {
+      "path": "kitaqfc/src/recipe.rs",
+      "sha256": "5b30f8690ed84ca477d36de4d51098cd03a7380a4a606b298a6a8c0ac89ea016"
+    },
+    {
+      "path": "kitaqfc/src/reports.rs",
+      "sha256": "40345754a5f7df927ea70460888068c3543992f51743a455cfda67772d1e18aa"
+    },
+    {
+      "path": "kitaqfc/src/repro.rs",
+      "sha256": "6f0c99b2606b37cddac128ab07724e34765fef52181bce891de12d7e7ffeb12f"
+    },
+    {
+      "path": "kitaqfc/src/rights.rs",
+      "sha256": "07a575e5c0ea393d40ea76dc484c6fe9ed738b9c6bb90447b8c1f6e5969abe25"
+    },
+    {
+      "path": "kitaqfc/src/rom_header.rs",
+      "sha256": "5f7153e48a95043d28e3071bb4d12e4b040ab6b698f658f49a24b4f76854e7c7"
+    },
+    {
+      "path": "kitaqfc/src/tags.rs",
+      "sha256": "3cbe8a42240271c52f7f4fea5c9e9517cb88f13459e014a56f89e232373679fd"
+    },
+    {
+      "path": "kitaqfc/src/token.rs",
+      "sha256": "15a1ae80824ab7573d60fb32d3e6a1e871b0613a734ffc6f87aefba2e32d3262"
+    },
+    {
+      "path": "kitaqfc/src/tokenizer.rs",
+      "sha256": "18018c0bcc61ae997e537aaef94f2d44c0a8041b14bf42e540f4e01b89434e18"
+    },
+    {
+      "path": "kitaqfc/src/vibe_tools.rs",
+      "sha256": "3d88ae35d844e729c7bb98ba2debdc70f9f6404a754b9388919c94005fdbb220"
+    },
+    {
+      "path": "kitaqfc/src/workflow.rs",
+      "sha256": "1b8d48d022295c8c94f1c9686b4a07964277199ff89b5be2930451fa35e07dc2"
+    },
+    {
+      "path": "kitaqfc/src/zx0.rs",
+      "sha256": "6755074befd471dfea8ab8cd486ab57909e21c3aa1ee59c43295518bdd40cea3"
+    },
+    {
+      "path": "kitaqfc/src/assembler/fds.rs",
+      "sha256": "4595bc9ee3cd1c8dcf29a26e8c10e105cc07ef29ccc79eb2d25fd7040f40edb3"
+    },
+    {
+      "path": "kitaqfc/src/assembler/image.rs",
+      "sha256": "bb5b8fc9254084ada1bddfa84ba35a4cf35f9f9bae1600d3773988e87a80b405"
+    },
+    {
+      "path": "kitaqfc/src/assembler/layout.rs",
+      "sha256": "d14809b9104ca8b1d175ce3973ef154669cd1f81d66e254048df4116ec217f5f"
+    },
+    {
+      "path": "kitaqfc/src/bin/kitaqfc-asset-pack.rs",
+      "sha256": "68532ca47a48f5bc7b4180defd823f8ddc8c41e1ff3804743a1499e46ff790b3"
+    },
+    {
+      "path": "kitaqfc/src/bin/kitaqfc-asset-pipeline.rs",
+      "sha256": "a135da18c927995e6a6be9a681d8ec8973943bb911443908e3132b90ac3f453c"
+    },
+    {
+      "path": "kitaqfc/src/bin/kitaqfc-png-index-build.rs",
+      "sha256": "7354b02f1ad4e96fc4737ca74fd3571bc40d2e942a90db4e2abca4da6571d495"
+    },
+    {
+      "path": "kitaqfc/src/bin/kitaqfc-rights-name-guard.rs",
+      "sha256": "0c3cf1fafa2bedf6391b43c47f75dec8cd3c3cdbed923825b1d7d04a2be3ba65"
+    },
+    {
+      "path": "kitaqfc/src/bin/kitaqfc-zx0.rs",
+      "sha256": "a2919f572f474fdb3cd05390b68c54b529584cd69185f9e3b9709541a09dcbec"
+    },
+    {
+      "path": "kitaqfc/src/codegen/address.rs",
+      "sha256": "544379106cabdd9f0a465b8700bd15bb193391da6c4cbf0a214c4f142f7637aa"
+    },
+    {
+      "path": "kitaqfc/src/codegen/aggregate.rs",
+      "sha256": "3e2d5409e478aba7bd155aa8897384e3f4eb47369902ac8cbb47a684a1ee0161"
+    },
+    {
+      "path": "kitaqfc/src/codegen/analysis.rs",
+      "sha256": "156938e30b6fcb7e46e2708291b6725aa58a9a57b150f64018935588c9a049c3"
+    },
+    {
+      "path": "kitaqfc/src/codegen/arithmetic.rs",
+      "sha256": "bf66348c8c9def39eaf0da36a09ad4699f31e6de1ea628c92c0a2bdd38cdde57"
+    },
+    {
+      "path": "kitaqfc/src/codegen/callback.rs",
+      "sha256": "3b925018eaa6698e364eb9cfc234c7eb64bda64a1adc006ff6f726b28049c5ff"
+    },
+    {
+      "path": "kitaqfc/src/codegen/control.rs",
+      "sha256": "1445fbb0a421e3fed468c0bddabb655785c25612dfd774651085f782e34e0ed9"
+    },
+    {
+      "path": "kitaqfc/src/codegen/fastcall.rs",
+      "sha256": "47503b8aa67998a4899f03361916aa06bcf36f2073fb172ff9cf85dd29e1499f"
+    },
+    {
+      "path": "kitaqfc/src/codegen/helpers.rs",
+      "sha256": "ce6efeca1d6e3df7646535df65f991b559b61a8de8e56549381a031be8fb45e2"
+    },
+    {
+      "path": "kitaqfc/src/codegen/inline.rs",
+      "sha256": "d00c8e86665ab7d46d04c5bb91d70fb63e5a7650b775f23c7b801738d44602d1"
+    },
+    {
+      "path": "kitaqfc/src/codegen/intrinsic.rs",
+      "sha256": "d5220125fe0b228a66e98ae8993d5fd6bf3e96bd022e26a5ec945bcecbb1093f"
+    },
+    {
+      "path": "kitaqfc/src/codegen/intrinsic_table.rs",
+      "sha256": "dc0d091cbad4d1ac6c6e133bbbbdd9d7edb3b9b835698e2d38f7daa6236de264"
+    },
+    {
+      "path": "kitaqfc/src/codegen/placement.rs",
+      "sha256": "a08632efae16a711ce139d79e1e5e203ae70f16e9573209f73f29357c944d7fb"
+    },
+    {
+      "path": "kitaqfc/src/codegen/readonly.rs",
+      "sha256": "f6fa99609db4df009f88c8b65f6c1c8cdac2d61f086b574109dbef9f969cff2b"
+    },
+    {
+      "path": "kitaqfc/src/codegen/runtime.rs",
+      "sha256": "144b7c1eee33dbbae7cc06c0002e9ecc1f8955c1ba5e8efcffc1debc3ee8cee0"
+    },
+    {
+      "path": "kitaqfc/src/codegen/storage.rs",
+      "sha256": "fa598844e3af024d95156e8fb7da2d3a2311993305847f9e648840b14a30cab9"
+    },
+    {
+      "path": "kitaqfc/src/codegen/surom.rs",
+      "sha256": "df6556084142f5e86fc993df767e4775d4ab89aa4e636ffc730522d133ce381c"
+    },
+    {
+      "path": "kitaqfc/src/codegen/value.rs",
+      "sha256": "8d31ff2ef4460f25ed5e3c513468867eb18761ce3eb10d8ae61aedb3b66046f8"
+    },
+    {
+      "path": "kitaqfc/src/fds/disk.rs",
+      "sha256": "bf8920e397f128c8acbba2cf445616c683e456a504d9910526965e4683c780d1"
+    },
+    {
+      "path": "kitaqfc/src/fds/metadata.rs",
+      "sha256": "e412a7b99739de7325965dc9833c360ee9156b7c7bae804873236193f69506e7"
+    },
+    {
+      "path": "kitaqfc/src/lowerer/environment.rs",
+      "sha256": "7962691565f251fce9539ea6bbc2e3b87390b83c8beb98c5f7b910374e8493cf"
+    },
+    {
+      "path": "kitaqfc/src/lowerer/expressions.rs",
+      "sha256": "dba2f4794641a5ec6fee4e049c01da1b57be0c0f31d1cdb369cac54c8b0c9725"
+    },
+    {
+      "path": "kitaqfc/src/lowerer/lints.rs",
+      "sha256": "bd0ed065f432de8ebb36a89a7513559fbfd8ef1c9cfb2f35b66013b3572ca795"
+    },
+    {
+      "path": "kitaqfc/src/lowerer/ranges.rs",
+      "sha256": "23192b3682d03ac0631acc2ca92f9cb22bfcd9a1aa622456113741681c9ab974"
+    },
+    {
+      "path": "kitaqfc/src/lowerer/statements.rs",
+      "sha256": "e634f30296823bdb4d6f08f89cc4c5f53f61816c13e5f3886dd96c7afcd9e661"
+    },
+    {
+      "path": "kitaqfc/src/machine/opcodes.rs",
+      "sha256": "5773f2ca91f9c5401886d9fb59bdbf6a0dbd0299f2b8b1894b973a4b9a049b07"
+    },
+    {
+      "path": "kitaqfc/src/parser/declarations.rs",
+      "sha256": "7067db139d55000cb6252d535934d63916b894fc5c3a7fcde1f31ac2e4af11cb"
+    },
+    {
+      "path": "kitaqfc/src/parser/expressions.rs",
+      "sha256": "0bb58c6472be09f6f5716d79e5a9ed75530331e69f39a26457538ddb8f02a7a8"
+    },
+    {
+      "path": "kitaqfc/src/parser/initializers.rs",
+      "sha256": "6d5839f87e66dc669526b848f091d35b4ed6c0a388d7ea446cc08a83e11e59c4"
+    },
+    {
+      "path": "kitaqfc/src/parser/layout.rs",
+      "sha256": "578214546881d9bdc1d67cb041174d74da81b3049fe2e70afb0504291126e1d2"
+    },
+    {
+      "path": "kitaqfc/src/parser/statements.rs",
+      "sha256": "583d8b8c4d07fdd9e5f725d6e9638c6be62fca7110d7ab8d293536238512b042"
+    },
+    {
+      "path": "kitaqfc/src/rights/unicode_casefold.rs",
+      "sha256": "554bac630787b2c8f5f08164eea98d45e2c087b41509e8b08d290bde1cc0b142"
+    },
+    {
+      "path": "kitaqfc/lib/actor.c",
+      "sha256": "33264b6926cee95d8e1890acfcee1f45bdaa7d14c7a60b83bee612a91f69e362"
+    },
+    {
+      "path": "kitaqfc/lib/asset.c",
+      "sha256": "41b89f106afd7e9d7686b237839df96fdd2dfd7a5d01f0b8e2f07a56353ac461"
+    },
+    {
+      "path": "kitaqfc/lib/attribute.c",
+      "sha256": "03e7e68b032922d2b63a47004541cb3c47f23e5bf5e44056515252c5716c3b8a"
+    },
+    {
+      "path": "kitaqfc/lib/audio.c",
+      "sha256": "cb8fd25727c9fc83096137e2fc977858a758fba94659d07eb784cd3fa9a81227"
+    },
+    {
+      "path": "kitaqfc/lib/audio_vblank.c",
+      "sha256": "2c1a645e9eb640c73d6d40d93a6d59b68ecddc3cea02d97f9b5dc015a15078ab"
+    },
+    {
+      "path": "kitaqfc/lib/bank.c",
+      "sha256": "eea6317fc0b6c2186f12c24112f192cf390704812cc2e8c56838e891ceb8cd8a"
+    },
+    {
+      "path": "kitaqfc/lib/chain.c",
+      "sha256": "e19f54805c022fd372fa717a5e0962051c649a8da25ce350efb29d8b5d134fc4"
+    },
+    {
+      "path": "kitaqfc/lib/collision.c",
+      "sha256": "50168cc58ac18c80826ed7dd7d6690d9680f098db21daef9303436d37a3a6f5d"
+    },
+    {
+      "path": "kitaqfc/lib/danmaku.c",
+      "sha256": "a658be5ba9a5b58f029121a0d4cb27b41ce588a3dd8b6ef0e2f5bb5358955c28"
+    },
+    {
+      "path": "kitaqfc/lib/debug.c",
+      "sha256": "86370d4faaa5906378b25f2f80b6d39c52b86734fed529869e8daddd9e873281"
+    },
+    {
+      "path": "kitaqfc/lib/entity.c",
+      "sha256": "96197eca2ad3431a6d82a29e5db59205fb6ca9a4d36465d83b9f3a47f3617ef0"
+    },
+    {
+      "path": "kitaqfc/lib/fixed.c",
+      "sha256": "797eaf21aeaa4ae3c788e95bc4e7f6fb5f56a954eaf33a7b5f754c85300d01fb"
+    },
+    {
+      "path": "kitaqfc/lib/input.c",
+      "sha256": "36f87d578439ad6ec4db7172ad7572d474c021e8931c7ac76539c41115553027"
+    },
+    {
+      "path": "kitaqfc/lib/input_repeat.c",
+      "sha256": "715345beec7b4171feced3c907e3a1350f02f970856512959f4c2a002c02598f"
+    },
+    {
+      "path": "kitaqfc/lib/math_lut.c",
+      "sha256": "f8390e120b91504b747ebd27a194586764eb90756edcfa355e71834904772fdf"
+    },
+    {
+      "path": "kitaqfc/lib/metasprite.c",
+      "sha256": "a3b62a6a22cfce5da18436f18e19a126d2aefac096497cef3a6d052c556e1ff3"
+    },
+    {
+      "path": "kitaqfc/lib/nametable_asset.c",
+      "sha256": "c0afd6cca1aea8c609190300f98d077e292a4bac04a08a637a9cb00f327a04c1"
+    },
+    {
+      "path": "kitaqfc/lib/pad.c",
+      "sha256": "bd467c59dbc97128ab4bb5929a66027bbd6667cf7a4f494b4b5479f7796f27d2"
+    },
+    {
+      "path": "kitaqfc/lib/palette.c",
+      "sha256": "12c7a763917d02f95beee69e6da517f90c8cb328c8514777bb5fcb82eaaf613c"
+    },
+    {
+      "path": "kitaqfc/lib/physics2d.c",
+      "sha256": "743bf663b525e5c3166e87f2e9dabc0888c8df92b58fe788e82421d33c81fe13"
+    },
+    {
+      "path": "kitaqfc/lib/physics3d.c",
+      "sha256": "845214a967b09b5ac433ff913287e345fe2acb7252db02c4a4e47fab83f82c20"
+    },
+    {
+      "path": "kitaqfc/lib/ppu.c",
+      "sha256": "1b1c79eb8c29950f4be5a531b8835ffd3e85ecfaa91871ed8b6117aaa88d88d1"
+    },
+    {
+      "path": "kitaqfc/lib/runtime.c",
+      "sha256": "4a953bc05b1a18caccc6e3722fe48e239de6e7d39ab0e7c65870a8f5648ad5d5"
+    },
+    {
+      "path": "kitaqfc/lib/scene.c",
+      "sha256": "48a409e79469a2f6953cc23a135c343fd3686747446b55236d163f323d482b66"
+    },
+    {
+      "path": "kitaqfc/lib/scroll.c",
+      "sha256": "c2619ad582a3b950d20d4afc2d79a57b721d8384a9748c653c702ed29e50e8ef"
+    },
+    {
+      "path": "kitaqfc/lib/sprite.c",
+      "sha256": "fe3bdd0d28c34e9b81175f5a8ab7b67ae692cf7aa1ab17b4e20fa9e471d914d5"
+    },
+    {
+      "path": "kitaqfc/lib/system.c",
+      "sha256": "4cf453270535749e37f10a1fcc0d34032580632a359c327a62007441afa32d04"
+    },
+    {
+      "path": "kitaqfc/lib/tilemap.c",
+      "sha256": "1cd8fc1e7a3d63877fb94eaa77ebaa1f461a43cbc07441fca524d38406a12407"
+    },
+    {
+      "path": "kitaqfc/lib/vram.c",
+      "sha256": "b9cdc48b34084ee3a2a6c8aa6d9e4eb584114f4730e362a0dcd79cd20cbea9c9"
+    },
+    {
+      "path": "kitaqfc/lib/vrc6_sound.c",
+      "sha256": "da6e1b6f6c638299f7a420c889881523acffe1b8639449044475b90a65014340"
+    },
+    {
+      "path": "kitaqfc/lib/vrc7_sound.c",
+      "sha256": "4553d21d0406d75ea49dd830834ae0bf7e19422fb3b774c90e2b242a92669cb7"
+    },
+    {
+      "path": "kitaqfc/lib/wire3d.c",
+      "sha256": "22002ecdeb0e3659579142d102617992fa21cc2e20528cc6516da6fe1583b77f"
+    },
+    {
+      "path": "kitaqfc/lib/zx0.c",
+      "sha256": "da956c77f44d9884fbdb31c9b27bb976506ed540d07919941fc70ca0bbb276e8"
+    },
+    {
+      "path": "kitaqfc/lib/actor.h",
+      "sha256": "f6968cd2b1095163d58be096d6931da2494183a0f9b10b04802c8f8d63f977d2"
+    },
+    {
+      "path": "kitaqfc/lib/asset.h",
+      "sha256": "dc88fe3e5f28c716a990b452a9d5e1244048714ae9865c547cdd4d45048a615b"
+    },
+    {
+      "path": "kitaqfc/lib/attribute.h",
+      "sha256": "ac636474b5850064e72cc75cb8fbfe099c001b0d7cf8764ad4c0caffe9a8c2ec"
+    },
+    {
+      "path": "kitaqfc/lib/audio.h",
+      "sha256": "2b067542a8a29184e26c2f993acb5c46436c475b14edac2d26eb03c671a24247"
+    },
+    {
+      "path": "kitaqfc/lib/audio_vblank.h",
+      "sha256": "14ab99a1202127cf6b723da1f76682602f0c597be4da880174a714d13b2594cb"
+    },
+    {
+      "path": "kitaqfc/lib/bank.h",
+      "sha256": "c47eaebe1a0dd3db4ab11bcb4276940c0261104918e2041b4057e833b573007a"
+    },
+    {
+      "path": "kitaqfc/lib/chain.h",
+      "sha256": "92d06e42a79674b6fa298796ad04544e3a853d7463f31a6c8de4aef30c6fe3f4"
+    },
+    {
+      "path": "kitaqfc/lib/collision.h",
+      "sha256": "a5639e3c478ce66dafa8bdbd3e16e81ae87d0ad3e002d1da3dbdada9cc91fcec"
+    },
+    {
+      "path": "kitaqfc/lib/core.h",
+      "sha256": "f75700c6f85f43b46eab7f87eb9b327eb17b169ab5ff8cfdf6e23debf8fb92d8"
+    },
+    {
+      "path": "kitaqfc/lib/danmaku.h",
+      "sha256": "b75523c5158133f6ba57e6102dbb68f715c645006d86266974c42c27cce5b97b"
+    },
+    {
+      "path": "kitaqfc/lib/debug.h",
+      "sha256": "29a1b074b5e4752efd84f2303ac4b695ef9575ada237c7bdb5c7d3fd4f151727"
+    },
+    {
+      "path": "kitaqfc/lib/entity.h",
+      "sha256": "33e9d40177d42acc0e45760d9c1b0c133fe60c4fb0a7a5cb7493f7744bd428ef"
+    },
+    {
+      "path": "kitaqfc/lib/fc.h",
+      "sha256": "697d338735cc83db0ee14e3533241ce30cb5c4afd93fed40fd84c4ac7cfb57c4"
+    },
+    {
+      "path": "kitaqfc/lib/fds.h",
+      "sha256": "2705c809735ac4398e2bd6404e70dee16e549011bdc4b6b0d1d364996c92ddd0"
+    },
+    {
+      "path": "kitaqfc/lib/fds_file.h",
+      "sha256": "fa69d479b21cd8dbb2ed372b1fc12f67a3f9ffed78e46b1bbd3d7a297d5e7818"
+    },
+    {
+      "path": "kitaqfc/lib/fds_overlay.h",
+      "sha256": "ee94f793e4833940ec308539158c3c7bab85370f95c47f2d10fe0777c736211f"
+    },
+    {
+      "path": "kitaqfc/lib/fds_save.h",
+      "sha256": "dfc20752471a7626ab780840f3a13fb58965863d73cb7c9b832793a82f39d174"
+    },
+    {
+      "path": "kitaqfc/lib/fds_sound.h",
+      "sha256": "6b7d04779a7be5a36291b86cc89c47227d089f9e813dd75525de01803b8988c7"
+    },
+    {
+      "path": "kitaqfc/lib/fixed.h",
+      "sha256": "2c547b675025be814016dfd30ca47bde010a6a4ff66e26531077b1956b609090"
+    },
+    {
+      "path": "kitaqfc/lib/input.h",
+      "sha256": "58a77a4b8fc24fb0ea67af2d9e819de10298860c473a6c288ec44dce5f55d21c"
+    },
+    {
+      "path": "kitaqfc/lib/input_repeat.h",
+      "sha256": "675d259730af53e46dae95d6df0219e1be2083991a8c3b92461109399e240575"
+    },
+    {
+      "path": "kitaqfc/lib/intrinsics.h",
+      "sha256": "8027dcccbad8226568419a332dfd27147b1be72ae7f3ed8c688c6f8276464512"
+    },
+    {
+      "path": "kitaqfc/lib/keyboard.h",
+      "sha256": "a7e4c19eabd8b8eadc42ab240900871fcd1f57540c720790aea6db40c5bff047"
+    },
+    {
+      "path": "kitaqfc/lib/mapper.h",
+      "sha256": "a60e79ff9f24f84095ddbe91a7483f8ce2a5532ca4632365f29de28b1246bfeb"
+    },
+    {
+      "path": "kitaqfc/lib/math_fast.h",
+      "sha256": "3b0f9c09f4c3acab3c626db60059499f00656cf6e03efc2e441809ff730d15c7"
+    },
+    {
+      "path": "kitaqfc/lib/math_fixed.h",
+      "sha256": "f58f00719442061cfdd28532fe023b053cb874ca25981a63bebe8f1c35e6ea4e"
+    },
+    {
+      "path": "kitaqfc/lib/math_lut.h",
+      "sha256": "fac60ecee18eab42af7b5e2c4b2430faa10ab46f1a25900d943f4e28a764e12a"
+    },
+    {
+      "path": "kitaqfc/lib/metasprite.h",
+      "sha256": "4d03bff9d01c12f4c366ae841a39666181c88ee0d96edccf06ea03ea2bc6694d"
+    },
+    {
+      "path": "kitaqfc/lib/mic.h",
+      "sha256": "b9ee99c620f832746cec17a7d7bde9a28b4f641c398363f2aedaf0b8df871b77"
+    },
+    {
+      "path": "kitaqfc/lib/midi.h",
+      "sha256": "6c47c1b6bc31b24b1e5e1c1121b056fe155cd906d041d3693248f9ac2623f6f5"
+    },
+    {
+      "path": "kitaqfc/lib/nametable_asset.h",
+      "sha256": "2b9dc1fc25bf9e9f5a79f6147e5777b3b30f486d3dc445cfa59c0ca8d908a74d"
+    },
+    {
+      "path": "kitaqfc/lib/nes_game.h",
+      "sha256": "98d383b3253508287957f21d70df7c96c12e08676db9bbcf765d85ea58ab5974"
+    },
+    {
+      "path": "kitaqfc/lib/oam.h",
+      "sha256": "2b65d1c8d8d043e9aced39544e79b46d6ad5f5ee8ec6ae9d9271489d5b7222b7"
+    },
+    {
+      "path": "kitaqfc/lib/oam_fair.h",
+      "sha256": "36760c0be3a4a84d8cdace1ff61d334e10adc90b552fabe6ce95ef06a482264d"
+    },
+    {
+      "path": "kitaqfc/lib/oam_fair_impl.h",
+      "sha256": "e00f0b00c8092902008483da0dc4f03c866491a8e86d68fa37b029ad59875577"
+    },
+    {
+      "path": "kitaqfc/lib/pad.h",
+      "sha256": "f98be37465ebe3e02089f01933fe0314d334df3ddf9cc259ce185cb8f58b32dc"
+    },
+    {
+      "path": "kitaqfc/lib/palette.h",
+      "sha256": "b0aff1d1026a9239fb83eb86f65c8b1b2af7e29c1d905af5c7fac98864440fbe"
+    },
+    {
+      "path": "kitaqfc/lib/physics2d.h",
+      "sha256": "8b3292eb3274a7702722339ff80362ef2d7ed95b42d85cf229106872361b52df"
+    },
+    {
+      "path": "kitaqfc/lib/physics3d.h",
+      "sha256": "7e207d58e5dcb87a059ec4b1487030b6b7e25a4f853ac2afc4bfcf18064b58ab"
+    },
+    {
+      "path": "kitaqfc/lib/ppu.h",
+      "sha256": "acdf977858899f584ab15cb2303c50489d903bde4f86ae8b7161b5a0005acbe1"
+    },
+    {
+      "path": "kitaqfc/lib/ppu_direct.h",
+      "sha256": "c41e643dce3bb9b4983609f817f48b1d9104348e764d9695b2d5eeb7ed9091a6"
+    },
+    {
+      "path": "kitaqfc/lib/rob.h",
+      "sha256": "44f2c2a29d4cad6e34d414bec2dc829c8bbbeeda2f04df519203dbd984126f54"
+    },
+    {
+      "path": "kitaqfc/lib/runtime.h",
+      "sha256": "79dfb6cbcf3016c571ec567fb3f5db013e190c321035286de2f93c8863e7030f"
+    },
+    {
+      "path": "kitaqfc/lib/scene.h",
+      "sha256": "7fcdc7fb7f9501df2c0d8b44f6d34becbf61aabf20d1686842e2e41c04a1a074"
+    },
+    {
+      "path": "kitaqfc/lib/scroll.h",
+      "sha256": "89ed493fb048b30709f58249b5bba9925b497192ddbd7468d0d20bd838ac23b5"
+    },
+    {
+      "path": "kitaqfc/lib/sprite.h",
+      "sha256": "8de822351bb384cae69483380ca176d589379fe4cded3caa6fff0da1df566c48"
+    },
+    {
+      "path": "kitaqfc/lib/system.h",
+      "sha256": "9ee154cb4fe244d6920f33afb2d8eb663f36a0a7a9bd8b3de7b571ba910a5a9e"
+    },
+    {
+      "path": "kitaqfc/lib/tilemap.h",
+      "sha256": "1ec45bbbc960621b04dc24df09166526cfbe129ef23c1918558a69b895abc0aa"
+    },
+    {
+      "path": "kitaqfc/lib/vram.h",
+      "sha256": "462e3e35e9b6db0ae6a873d3dbc721c7f2e924a533c92e9737b6446458c159c4"
+    },
+    {
+      "path": "kitaqfc/lib/vram_queue.h",
+      "sha256": "319bb73c69af0e6ef3a218aea16cd1d4b5d87e6402c9231fbedf18de3de6db82"
+    },
+    {
+      "path": "kitaqfc/lib/vrc6_sound.h",
+      "sha256": "56a4b7f434a356ae5bcb01d5306d99131896ddbeca0ba16bb7527afa5ed08f6c"
+    },
+    {
+      "path": "kitaqfc/lib/vrc7_sound.h",
+      "sha256": "740e1dd1c08e744ee1770e28a5dcc4b1e66ad8e1453a524cf6f9ace0f57d4320"
+    },
+    {
+      "path": "kitaqfc/lib/wire3d.h",
+      "sha256": "ba067668b6fa461b1b17bbf9f1717d7fa2e3ac4f30211d02d022451a3ae3b119"
+    },
+    {
+      "path": "kitaqfc/lib/wire3d_tables.h",
+      "sha256": "7aaa2403d34fa11bd34e28efd0d157e4322c36e6f24eefe112105f8193f46a2f"
+    },
+    {
+      "path": "kitaqfc/lib/zapper.h",
+      "sha256": "0f85a27808a2dbf88fbea6199b4424ce2a9216db1befbe41cff313817c0bad89"
+    },
+    {
+      "path": "kitaqfc/lib/zx0.h",
+      "sha256": "50887e6043b3150469deebac8b3f331aabf5852ddb5d9efff0b4611e8b6f94c8"
+    },
+    {
+      "path": "kitaqfc/Cargo.toml",
+      "sha256": "90347f4002afc4da1113bf77756839c9d8ff14a497f133d3f9a3bd2e9f9f8f0f"
+    },
+    {
+      "path": "kitaqfc/Cargo.lock",
+      "sha256": "df85a913f7458f512d0bd1c25d32529287db032965df59b9a5f79a9580e1bf62"
     }
   ],
   "historical_tool_inventories": [
@@ -1662,6 +2084,993 @@
           "sha256": "a17b9072d580280d999cf37b6689400e7e99d67c1b7016291b899f624f5da855"
         }
       }
+    }
+  ],
+  "historical_source_inventories": [
+    {
+      "preserved_from_manual_commit": "72b5fc194412434013f871a621b42906c416b214",
+      "sources": [
+        {
+          "path": "kitaqgb/kitaqgb/AsmInfo.cs",
+          "sha256": "9baa4987427907445680f87b8e57b15a72059820640c4357df005cd01ffc03e5"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Assembler.cs",
+          "sha256": "889325f772814b9ec22bcf4839fd33e4f9fe739c61a8a6ec1fa3709ebf01a4d7"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/BuildReports.cs",
+          "sha256": "4cc21a570c319a1f19820386e68e2200f2212772412b9d2a121d2f711753612c"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/CodeGenerator.cs",
+          "sha256": "084c65f2bf249b9843315660133b073174a50fb2ecf2e3a828b06708a26ea66a"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/CompilerApi.cs",
+          "sha256": "2ef9b09a106376df75fd0ea6cababde29f912f3e4f04015fb37bf101f567e257"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/CompilerSession.cs",
+          "sha256": "cc12d4c1c34984051c09b14da17a8b6752a50b61b9cb8dbeb79edd30fa6e6cfe"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/CType.cs",
+          "sha256": "4f99133318339dd9931699086d0381cc6fd0212e370fe4dcb56f59b7157a47de"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/DeadStripper.cs",
+          "sha256": "5d0a8499ac29fa0c35f7b2ad6427756e711091af2136daa6348272b4ce312822"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/DebugExporter.cs",
+          "sha256": "464cb0998d5ac8a6c59c4537c4d6e4992a766f89e620d2444e665b50b90751a1"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Disassembler.cs",
+          "sha256": "5e2a88ef00f4a85e3f1c3aa722b28b4f218536a1c5d0998c64ceccdcea394a9e"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Expr.cs",
+          "sha256": "db839d1a6a5a932d43ec863e8cda1af6e084177a5d19cbce32c32b1739c0f6a4"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/IoUtil.cs",
+          "sha256": "17f0ec2a7596b94c1a0334a19defd0c959367bef710bb4870ff92601f63b9ffb"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Lowerer.cs",
+          "sha256": "5fea0369cd3834bd6156a6ea7b0cf893a1a7a5e0bdcc340e58f3cda62a2ffa27"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Maybe.cs",
+          "sha256": "4df9faa279a8030316e025a18b91bb04c61c4b72940eb08ee2709d2a09d0bc9c"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Minimizer.cs",
+          "sha256": "58ba301c4e35963b65face0fd14e1659e49e9f1da402b3613c9f656134f82705"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Optimizer.cs",
+          "sha256": "1158193f0486075d225d339d280b0187ed0b3f96a0922193d154c497fb781754"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Other.cs",
+          "sha256": "6dd798eb868e1bb45f20c33da2b981f95419dfd2c45d370177ecd8124f49508e"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Parser.cs",
+          "sha256": "48e5f104409ae89868b37a5df534d365e4923ea9685cb2d245b66619106e214a"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Program.Api.cs",
+          "sha256": "2e5bdc022c3203bb34dc6f312824a1ef1f0f30eb26f6fac8b28a9831ea7eb71e"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Program.cs",
+          "sha256": "2f2cc605d5f5985ed93d3c0994bfcb8bd3900496a9dc0a2c8a11ad28c93b6575"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Program.DebugTools.cs",
+          "sha256": "0d0bdac271363adf4c241e29bb0ba77fb77043ca262f1879a0f7bdc631e3dba8"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Program.VibeTools.cs",
+          "sha256": "20663c5434db57e5e1b90280ade89fea16449e67e6d1ebef089dc22d296b93e6"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/RomHeaderPatcher.cs",
+          "sha256": "d0c271bf983fe8d50f606077eb4d5204132790d38e888d98cac1f9b3153fb3c0"
+        },
+        {
+          "path": "kitaqgb/kitaqgb/Tokenizer.cs",
+          "sha256": "b359aeb6c3dd9c235d553e18f776b92801cef11f19a7e2774a67b13863131bbb"
+        },
+        {
+          "path": "kitaqgb/lib/asset.c",
+          "sha256": "ba4bea6442865ea3865f19dd15c2566c9a1b7d3e3d0f25fb7d3f24cab4be57f1"
+        },
+        {
+          "path": "kitaqgb/lib/asset.h",
+          "sha256": "5e8be3c2429d8e6323e97f9633f4caae0a87ceda6143bb66ff5b1ae0da39f75e"
+        },
+        {
+          "path": "kitaqgb/lib/audio.c",
+          "sha256": "a1f007f196eaf51f238f9999b3ce6ee9ad1da52f683eabb4a312fb0038b97d6f"
+        },
+        {
+          "path": "kitaqgb/lib/audio.h",
+          "sha256": "72f1063e10ef394bd507b9a61d9abe90ce56ef9f064afceddb858a5010675862"
+        },
+        {
+          "path": "kitaqgb/lib/audio_hwregs_gb.c",
+          "sha256": "258c894f9059072b6f3587b2afdb0985c23dda13042965845cb2b29abcfef281"
+        },
+        {
+          "path": "kitaqgb/lib/audio_vblank.c",
+          "sha256": "2be8f575af5d71d3ca5a1d0c799bad75579e6d9c3df603ff97546e4655cb6590"
+        },
+        {
+          "path": "kitaqgb/lib/audio_vblank.h",
+          "sha256": "77048d1586d723d1873b985e2a3791b5da178dad49e04d977f101348484918c6"
+        },
+        {
+          "path": "kitaqgb/lib/bank.c",
+          "sha256": "fb99001ec01837b567eeb73f50fff8c0f0e8f31c55079d7f8b5a4fc2919a050a"
+        },
+        {
+          "path": "kitaqgb/lib/bank.h",
+          "sha256": "db10522973be5a3f934c82ba8f9d0a3c098c819894b551b68bdd814da676f094"
+        },
+        {
+          "path": "kitaqgb/lib/camera.c",
+          "sha256": "1dd9726124981eab4912e86542896317c5f19606ada3adcca6158cdd552c8184"
+        },
+        {
+          "path": "kitaqgb/lib/camera.h",
+          "sha256": "46ac6c1b774194ed98fb83c73cbd824a9089dfbc221321b4432f93817b092350"
+        },
+        {
+          "path": "kitaqgb/lib/cgb_palette.c",
+          "sha256": "90182aeb1fa1d868444590c7d1192738e3b3d1c3e1a2352f05d3aa6f56ddfb3b"
+        },
+        {
+          "path": "kitaqgb/lib/cgb_palette.h",
+          "sha256": "a81ce857659c433f6795b67776962af930f41883da79063ba93965f1df03c3df"
+        },
+        {
+          "path": "kitaqgb/lib/cgb_tile.c",
+          "sha256": "3e3244c0d3420b8fd45625348eb26211d096c8ed2e8792c7fa93fa8bfadd5e42"
+        },
+        {
+          "path": "kitaqgb/lib/cgb_tile.h",
+          "sha256": "71166f7e08e79a03a217de4f1ce139c3fe4196070b3b3b6c91a98cb30ab5bb3e"
+        },
+        {
+          "path": "kitaqgb/lib/chain.c",
+          "sha256": "2f6dc79c33634fb59b537637af42d826f4a74f138afe8d1a9dc022d00de4b30e"
+        },
+        {
+          "path": "kitaqgb/lib/chain.h",
+          "sha256": "f51655649f586726979b75608c992fe13ebf7676bab9b7b9fd9e794159f72e61"
+        },
+        {
+          "path": "kitaqgb/lib/danmaku.c",
+          "sha256": "ec7f43ada50498fc090e61d2812f9f9e6b890cd9b5d3c2b55bf0ef5e09971770"
+        },
+        {
+          "path": "kitaqgb/lib/danmaku.h",
+          "sha256": "c112737f279a88f90ed35df4b2351c8b65eb48ee0f99aeccc92181281ff67413"
+        },
+        {
+          "path": "kitaqgb/lib/danmaku_guide.md",
+          "sha256": "b634f0d1cb207cbf7b8cabeeb1d87bf30ac6cc260f6b54e8890056a6f9753d49"
+        },
+        {
+          "path": "kitaqgb/lib/debug.c",
+          "sha256": "4ec2045ce9522a4ccf29631eb3ef11294147effe7f29451af30b9d72eeed0a61"
+        },
+        {
+          "path": "kitaqgb/lib/debug.h",
+          "sha256": "0acf4e6304bf1c1290cfba21c8aba9b361d02bea962a4a5bb4969074cc8b4e32"
+        },
+        {
+          "path": "kitaqgb/lib/dmg3d.c",
+          "sha256": "294c5715f1f2d2f786f424de7cb437c33c3e218b30362570c74da1105f438866"
+        },
+        {
+          "path": "kitaqgb/lib/dmg3d.h",
+          "sha256": "23517e60d8897d324f30637a5566671f2620a11b7edc8c99072c3fbd16451535"
+        },
+        {
+          "path": "kitaqgb/lib/dmg3d_guide_ja.md",
+          "sha256": "1e4c41937f23e06f5edacbab0c8dc0b3a0ca12ff0d347b83e8b100c7a4ac73fc"
+        },
+        {
+          "path": "kitaqgb/lib/entity.c",
+          "sha256": "9d8f05cdbfa683a94634767dcce6d0c36294b9f5fe10a9106c553ba01abe009c"
+        },
+        {
+          "path": "kitaqgb/lib/entity.h",
+          "sha256": "07a09af8680f35ca8af7ad3b8de33a2ebcfa1b6a9ffa494fa5f201e3759d7413"
+        },
+        {
+          "path": "kitaqgb/lib/fixed.c",
+          "sha256": "f88e0408ebdc98521cb32709e27df68c374cf75ee1315fe2262aab45aec6b14b"
+        },
+        {
+          "path": "kitaqgb/lib/fixed.h",
+          "sha256": "25aef5c6dc8a0dc7d9bc96cc5b17b21ef3b173273874dd507493a9a85c99ae4a"
+        },
+        {
+          "path": "kitaqgb/lib/flags.c",
+          "sha256": "214775b5e41dbd25548fac6a8f890e4fd2c9c99cf4adabd8365abcd2dc5d1b95"
+        },
+        {
+          "path": "kitaqgb/lib/input.c",
+          "sha256": "ec0ddba52210340eaa742629ec1b34683b356124c7da37c375925c6c8da3b2aa"
+        },
+        {
+          "path": "kitaqgb/lib/input.h",
+          "sha256": "3e8b45f9504818b7d80230dec453bea7ba2c3cf72f17c3b6a154dcf2e5ad6c54"
+        },
+        {
+          "path": "kitaqgb/lib/link.c",
+          "sha256": "f44c05308b693d229be3e566d9385c588424dd6bc7cf3037003b077c247ae22c"
+        },
+        {
+          "path": "kitaqgb/lib/link.h",
+          "sha256": "f445f59243dc74e1807b1ebb295df5fb0fd5a500dabe8d4fb792769f62b9fd10"
+        },
+        {
+          "path": "kitaqgb/lib/link_dmg07.c",
+          "sha256": "bc554edf89d743ff8400377eb2e5d15c4d657c03d98b4d5db97284b95c15e80b"
+        },
+        {
+          "path": "kitaqgb/lib/link_dmg07.h",
+          "sha256": "45ebdcffcea676c18a7e98261012cc6f577fabc89a49fc5646ea6bfba061c3b3"
+        },
+        {
+          "path": "kitaqgb/lib/link_hwregs_gb.c",
+          "sha256": "32f39792c34f7f49450bc38e8f69c0c549d40fd6fe194b934d6bfdbbfe666b91"
+        },
+        {
+          "path": "kitaqgb/lib/link_packet.c",
+          "sha256": "d0882e94bcf0ec2fd9369c7290b654b40556efe8bbc582933ee679bc47e60fc3"
+        },
+        {
+          "path": "kitaqgb/lib/map.c",
+          "sha256": "49c1d3cf1b577519099b404825c1898698a6d380b3afb6b887cc0763541c9242"
+        },
+        {
+          "path": "kitaqgb/lib/math.c",
+          "sha256": "ed42c8d36191e4f2e7448bcbaaf9dc3cbf043c81f63d345a65329b0a4661576e"
+        },
+        {
+          "path": "kitaqgb/lib/menu.c",
+          "sha256": "c9d01e5462e6b984ebcf7cc1e8f62b82c818c96e2b3e5be4860c57dae11bcacb"
+        },
+        {
+          "path": "kitaqgb/lib/physics2d.c",
+          "sha256": "5736718686e5753b0171e06a57dc229cca522a2847f1548a84cccc09fbf35cd4"
+        },
+        {
+          "path": "kitaqgb/lib/physics2d.h",
+          "sha256": "b71b99ac1179c4b554f852091f18987eb7615214dde50dfe56eb779390a74344"
+        },
+        {
+          "path": "kitaqgb/lib/physics2d_circle.c",
+          "sha256": "ff35b6719ccf3bdcee23906609a95f0d80d7a426286f13f254decdf4978fd0ba"
+        },
+        {
+          "path": "kitaqgb/lib/physics2d_circle.h",
+          "sha256": "08f36d87527d861e557eefbff750ae86379dca5c18dffe69b8ad826f0c2ec373"
+        },
+        {
+          "path": "kitaqgb/lib/physics2d_surface.md",
+          "sha256": "7b9f2a92a003c4824233b780e6b6b2304fb213ae76206d8ea3b7601b19058b66"
+        },
+        {
+          "path": "kitaqgb/lib/physics3d.c",
+          "sha256": "95fa4c3e1f4a61114c550c4ed1baf5f1be87a088837ee2a99dd3b20b8885b342"
+        },
+        {
+          "path": "kitaqgb/lib/physics3d.h",
+          "sha256": "209dc2b5ab44b4a2403b20f2bc8db460f3b82975fee2c973b8a946135c5991ec"
+        },
+        {
+          "path": "kitaqgb/lib/raster.c",
+          "sha256": "c805f5d6de2d991e29633531510b3cb039de74e0bcb8dd088748dff167f12496"
+        },
+        {
+          "path": "kitaqgb/lib/raster.h",
+          "sha256": "e52e3ffbb1c27ed5c2d3d7173e57b05b23565084198a819f4e8aaf1c1ebcf1a1"
+        },
+        {
+          "path": "kitaqgb/lib/README.de.md",
+          "sha256": "3597bfc208d60080736668109bfab95cea8d978445e293ac9ed9a3be563436a8"
+        },
+        {
+          "path": "kitaqgb/lib/README.es.md",
+          "sha256": "4cfb2efc9eef29ace20838b85f0d228ff654d6d36aee347b84d9c597b4e0b84f"
+        },
+        {
+          "path": "kitaqgb/lib/README.fr.md",
+          "sha256": "27dbab351cda1cc8b36eeed82364981aa8a86ad8d808d71b83742fde36a23c31"
+        },
+        {
+          "path": "kitaqgb/lib/README.ja.md",
+          "sha256": "1b7cf8b93544ded7d8ef3ef1f1d1549ca9d9f9b2aa6aef0701146e703b817d1c"
+        },
+        {
+          "path": "kitaqgb/lib/README.ko.md",
+          "sha256": "aaa6d87f511bb484d8cee2175c94890731d4cac121436fbd6b4ed5292f2135c9"
+        },
+        {
+          "path": "kitaqgb/lib/README.md",
+          "sha256": "2197f1343ba59ac4e1c2d1b7ff6ccc94a53f4d72f53b1fb4d61bb4aaf81faa41"
+        },
+        {
+          "path": "kitaqgb/lib/README.pt-BR.md",
+          "sha256": "89b1faa4034f665346147b559beb8eb1186e45a03c9c2af20008148a189391bb"
+        },
+        {
+          "path": "kitaqgb/lib/README.zh-CN.md",
+          "sha256": "e66920572af820abeb7597958c8bc8c6badd7dab81e99da69490d9d9049b08ab"
+        },
+        {
+          "path": "kitaqgb/lib/README.zh-TW.md",
+          "sha256": "28583cc78b494f8d02165a6099ec0fe2311525637827aa5ee3c8d29491c2730c"
+        },
+        {
+          "path": "kitaqgb/lib/rle.c",
+          "sha256": "2a46fe2d5aaa956db903deaefff2daa5f0530e08e25530b2bba91327d091708b"
+        },
+        {
+          "path": "kitaqgb/lib/rng.c",
+          "sha256": "7e631b04280944b1546e77c28b68268fef15fb6957050c6c6e92f2947ebf2772"
+        },
+        {
+          "path": "kitaqgb/lib/rpg.h",
+          "sha256": "9e70419a729d8599e3454b804c6e304af4004beb210843226acf18c46d012680"
+        },
+        {
+          "path": "kitaqgb/lib/save.c",
+          "sha256": "5b58d872d7515b679744b7e5086bfe90d533dfb89fd80956fe07fdb3a5d80c3c"
+        },
+        {
+          "path": "kitaqgb/lib/scene.c",
+          "sha256": "66c40c5f346da946ff21d59c8bef60427b170c0a4529703f135eee5a64af1e93"
+        },
+        {
+          "path": "kitaqgb/lib/scene.h",
+          "sha256": "7206961ddc25cfcdf273a46ff61bbe403cda5c2eb559a24e4dd08f2e3f331a64"
+        },
+        {
+          "path": "kitaqgb/lib/script.c",
+          "sha256": "70eb813cae464214d36855332cde999f64d240b86a99ab2c6f3a63a175fb950c"
+        },
+        {
+          "path": "kitaqgb/lib/scroll.c",
+          "sha256": "2a136264f753a1774ee2b19b717ab6540a51dd1d6d279ab7b1b3f9e37e3c6f80"
+        },
+        {
+          "path": "kitaqgb/lib/scroll.h",
+          "sha256": "80b676b5adaed829c90db2c1ed349cd85bf4ef0d1e3758b9410d391cf8ef8a9e"
+        },
+        {
+          "path": "kitaqgb/lib/slg.h",
+          "sha256": "c47d2fcb830005277711805a114c3f89bf3ac63a8d537e9d8d8211fdfc301ea9"
+        },
+        {
+          "path": "kitaqgb/lib/slg_board.c",
+          "sha256": "5da2a6f7649fdfdbc703b9b79771a6b34b81ca019fbcefe3f671e06460609009"
+        },
+        {
+          "path": "kitaqgb/lib/slg_path.c",
+          "sha256": "c101437acc80815d8fd6082505a7f661a63c7eb3c37a92eb008030ee990c7545"
+        },
+        {
+          "path": "kitaqgb/lib/slg_unit.c",
+          "sha256": "9fe1faabbc60f58f1d81f718e486d67a7bbf08970326446dd4fb6f76306338a7"
+        },
+        {
+          "path": "kitaqgb/lib/sprite.c",
+          "sha256": "c389ed7002d3b43e2c5d15250d1ca614a2d690bd762df7ff158abed211fd8db7"
+        },
+        {
+          "path": "kitaqgb/lib/sprite.h",
+          "sha256": "5fec669e9c15aa456baa35c6a1dc97cbbc520c3cfac039d0d4df94682513b14f"
+        },
+        {
+          "path": "kitaqgb/lib/system.c",
+          "sha256": "b168b0f862b887eeef05096121d031908367826744a02957a3748572d65f214c"
+        },
+        {
+          "path": "kitaqgb/lib/system.h",
+          "sha256": "a15545bf20ab7d6db06e7df1929b95ada1ce8f9f809b6d943df9f2ad133a12d8"
+        },
+        {
+          "path": "kitaqgb/lib/text.c",
+          "sha256": "49d8f6a0f29f8f67ff8659bb28160533178118a22a954032302f8d812468380b"
+        },
+        {
+          "path": "kitaqgb/lib/THIRD_PARTY_NOTICES.md",
+          "sha256": "d94e174cc98d17d49b01bd7341b18cc08b76612be6de5b9d916ee355c8f10ed4"
+        },
+        {
+          "path": "kitaqgb/lib/vram.c",
+          "sha256": "01c67dde438275087b90defd89326d6eb21c5b83bf267bdc68a0427b6177b6c3"
+        },
+        {
+          "path": "kitaqgb/lib/vram.h",
+          "sha256": "d400b78cfdcf0a94665a6a5cec4422d80bcf9fc9b6cff9ec2601d476c1d67f21"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d.c",
+          "sha256": "4d0e236aee977ebca2d4132b34551f4309e1449085f6ca4cc23ed6c3407ce48c"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d.h",
+          "sha256": "52b9a36309d2a07387acbbdaa03241cf654ddfa4c9241dbe12702dea9bb76b47"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d_cgb.c",
+          "sha256": "e67141558e27f2618c8e18b20b96b3a64a5a505f6141f364487ab4cd16380610"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d_cgb.h",
+          "sha256": "6aec0f45d07929ebca908708016676cca5d99ac6e993ba0685b466209fec7fb6"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d_cgb_guide.md",
+          "sha256": "270ba2d30b0a34ac465039e3e2e5e706f554dd9888f5df3f8c764af48a309d0b"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d_dmg.c",
+          "sha256": "04905ad0a0e75879ab798d5bc4ddecda8febc130784e39cba61ba11e2e7d3a12"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d_dmg.h",
+          "sha256": "0f9330dc265c85396d372321fbbcf2b553d68103ec4f754f15a5f4b70c596fee"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d_dmg_96.c",
+          "sha256": "4b18013cea36d7c5219f6b13110f79b2bafbb268fc8a42e9161eba013da6e7d6"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d_dmg_guide.md",
+          "sha256": "f1b589886ea465554e92462f0959c09a0950a8379d2f17d1d58ea805fc67be9c"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d_dmg_guide_ja.md",
+          "sha256": "4658540b4d5dd4fc0f2b39f473255eec85dc5ffd0c880b122da3af6b2c5342eb"
+        },
+        {
+          "path": "kitaqgb/lib/wire3d_guide_ja.md",
+          "sha256": "2263fc78b38e8bdb96f057ab56aaa03771851427f37422780ec5cc08e24813f6"
+        },
+        {
+          "path": "kitaqgb/lib/zx0.c",
+          "sha256": "3740290f3b9105e9e0187863615c773ff5a9a4d44f5cbf60c83da3f4105348fc"
+        },
+        {
+          "path": "kitaqgb/lib/zx0.h",
+          "sha256": "c1c14c5fd8b320427b2714f7741059427d5c4d250326f82b151792b64b9d75de"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/AsmInfo.cs",
+          "sha256": "5cb5144a3a7167a2b6f13478af06eb0818cfbbfdc3cd01334fb77516bccdcf96"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Assembler.cs",
+          "sha256": "c1486d56cef50a861a71224b9df66da068011f79975e3ab9391692b47383cb3c"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/BankedAssemblerCore.cs",
+          "sha256": "e2e4b24541e2ab47405ccf572d2b0b0295a390a8d4949be55e7423d3bd1045e0"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/BuildReports.cs",
+          "sha256": "63e4a4a1177de722dd346c6ac9f20ae8cf316cb57fd212dcc2cd6582dc7f4f3f"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/CodeGenerator.cs",
+          "sha256": "3875db429f9ef69771496a7d920a3921acd1dd734da305219f1e24f11a37fcf4"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/CType.cs",
+          "sha256": "4f99133318339dd9931699086d0381cc6fd0212e370fe4dcb56f59b7157a47de"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/DebugExporter.cs",
+          "sha256": "a14ff83f2456bfcf128165bea13e2d5fd87eb0b9edf1c3e2d73747c47838452e"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Disassembler.cs",
+          "sha256": "9a921867a3f816fb951e32e017acd5b04be9ddaf0369402c5dc71cfc29feac46"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Expr.cs",
+          "sha256": "db839d1a6a5a932d43ec863e8cda1af6e084177a5d19cbce32c32b1739c0f6a4"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/FdsDiskImageBuilder.cs",
+          "sha256": "45473c8b21a31eb00bda1dcf2cf95fb707ceec3e525f1b1c22e2a1b995ef365a"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/FdsDiskMetadata.cs",
+          "sha256": "a1cc772fb236d3b7dd5327675f3bd759b054fb0b8e406d2c8d7b3e13e0c0b736"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/IoUtil.cs",
+          "sha256": "17f0ec2a7596b94c1a0334a19defd0c959367bef710bb4870ff92601f63b9ffb"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Lowerer.cs",
+          "sha256": "26c9b8993d66c5e9e2629f717af048ce6a211f5a96d7693fd745805b3cce5476"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Maybe.cs",
+          "sha256": "4df9faa279a8030316e025a18b91bb04c61c4b72940eb08ee2709d2a09d0bc9c"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Minimizer.cs",
+          "sha256": "5df8489811f7c48d16ef92bf804215cf718ac3ca28e404d9a3f95e1d14e10a94"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/NesActionCatalog.cs",
+          "sha256": "434e3f55281615fb33a06b3b1f6803aaf7f052f137ca7ced296c4549ea510e24"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/NesCartridge.cs",
+          "sha256": "25577e5e708f1eabd93f90fc6563d94443faae73ae2d47bbb2e795e27f986a0c"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Optimizer.cs",
+          "sha256": "b05b52b4630de79a0f7f55d358579da3884db27e716c55ae42293480fc03c5b8"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Other.cs",
+          "sha256": "6bf85ad20728bff7db405f1612f4ba8db50870164e56d6bfd20198d1f22d2db5"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Parser.cs",
+          "sha256": "a44aaa63d2a4f4f28d2f2722ce3f10a6d726bb2111853fe00b13bc7d69b8d889"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Program.cs",
+          "sha256": "2f4af03a6189cb707eb9d57017958e16564efa443c2cd67908bee3e8a81e0a72"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Program.DebugTools.cs",
+          "sha256": "b5906a95225665a961cae30b432ee46c37159f06532a3c9a0b7f94a2208afd1f"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Program.VibeTools.cs",
+          "sha256": "d71f5fd062f2064692fef716f9cc16f1ddf81e4ec807ba409b78ee965d5b86e9"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/RomHeaderPatcher.cs",
+          "sha256": "8b49be9811f3b58db9328dda523881548c56adfa8253b25d5cead6a051308877"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/TargetBackend.cs",
+          "sha256": "a7a3843e5bf163a91b2f84c0d22bba83ce9a766848ea2b8bbe917c29b146e9e2"
+        },
+        {
+          "path": "kitaqfc/kitaqfc/Tokenizer.cs",
+          "sha256": "073919183c4710dc5dd16d2bf75e351882a761c0ce46339dffdfca33e16e36ee"
+        },
+        {
+          "path": "kitaqfc/lib/actor.c",
+          "sha256": "0bbf6de9d2f18fab750e8533a91680ef487ed1d9f8105670b371f525e2e2ad35"
+        },
+        {
+          "path": "kitaqfc/lib/actor.h",
+          "sha256": "a37307ae64db16932e6a0f8a536d8cea4271234df750574416ea5b250ed09e5b"
+        },
+        {
+          "path": "kitaqfc/lib/asset.c",
+          "sha256": "450c37d18f79ae3011d652d99842e9b3cc6314b8a486bf099c02279bf71364b1"
+        },
+        {
+          "path": "kitaqfc/lib/asset.h",
+          "sha256": "75aaf32ed8b6fbfd921299511e9cb4d04abb1a2f0d68ab779f22f44a90c1157d"
+        },
+        {
+          "path": "kitaqfc/lib/ASSET_CONVENTIONS.md",
+          "sha256": "2c40357343b33587427f01f5c9e2809893bec1abe6c206d24af419ed7fb6f7e1"
+        },
+        {
+          "path": "kitaqfc/lib/attribute.c",
+          "sha256": "9e93cead95f7721e28d64d06e686ad734b7b30ce70cfb6e2aacecf5a8f8cdcea"
+        },
+        {
+          "path": "kitaqfc/lib/attribute.h",
+          "sha256": "e9f182dff684c3d30c4b0de1f802748ced136a6c8dcb5ffb48e2ada3329b4c3c"
+        },
+        {
+          "path": "kitaqfc/lib/audio.c",
+          "sha256": "e2c3c044f48a48ff18d1256fd58f87ded84dd8c237a7ee5771f7dc178b2a5f50"
+        },
+        {
+          "path": "kitaqfc/lib/audio.h",
+          "sha256": "c8a4325eaaf7b6df3894adffb09d4ff72e9cf3a795b05467f3d7de09fe8f9069"
+        },
+        {
+          "path": "kitaqfc/lib/audio_vblank.c",
+          "sha256": "d86bbe39d584749f7aa74a6cabdeac47c592ac8c976a9942be6a98e733760e2b"
+        },
+        {
+          "path": "kitaqfc/lib/audio_vblank.h",
+          "sha256": "a11fb3c3971ca0c3a7e0f3623aa922a1cf3630a94ddbf966fc212f80825b435f"
+        },
+        {
+          "path": "kitaqfc/lib/bank.c",
+          "sha256": "e39ed2dcb897ed75b0a65224fe08a1d89682c8a0feac7db0fd44e177a09ef543"
+        },
+        {
+          "path": "kitaqfc/lib/bank.h",
+          "sha256": "b05809ad64e8618da2428767e199d20dd535970a5fcee44f4380a1f55fa85610"
+        },
+        {
+          "path": "kitaqfc/lib/chain.c",
+          "sha256": "723155ac38f39d34ea11f80540510752517e73fcd5923c25646d14a4b8d90937"
+        },
+        {
+          "path": "kitaqfc/lib/chain.h",
+          "sha256": "72f3b419072ccb6d4e023c7ebb340c80456fb6140b0a0ddd2b92ecc1a16780ec"
+        },
+        {
+          "path": "kitaqfc/lib/collision.c",
+          "sha256": "91bc90eb98e0150249c3f36182fde1f2090bd144f44ff5ac3a94cb5b3f824a46"
+        },
+        {
+          "path": "kitaqfc/lib/collision.h",
+          "sha256": "854c328196c4f156dc8647cd05f1323b297f84c6e9df987bd4e18e943811d191"
+        },
+        {
+          "path": "kitaqfc/lib/core.h",
+          "sha256": "eef72d04bb6f0e29d7be915f26814b9880fb34f70d1898dfe22cb6109df153ae"
+        },
+        {
+          "path": "kitaqfc/lib/danmaku.c",
+          "sha256": "a658be5ba9a5b58f029121a0d4cb27b41ce588a3dd8b6ef0e2f5bb5358955c28"
+        },
+        {
+          "path": "kitaqfc/lib/danmaku.h",
+          "sha256": "b75523c5158133f6ba57e6102dbb68f715c645006d86266974c42c27cce5b97b"
+        },
+        {
+          "path": "kitaqfc/lib/danmaku.md",
+          "sha256": "1550f37cd6375a52e0f055c2fc7afbf24defe64db5ebeb4be2a681d5a921a3e9"
+        },
+        {
+          "path": "kitaqfc/lib/debug.c",
+          "sha256": "112a2dd4adb921170bde8155a7180b2bd7f40c1487a2e3b66e43da465965d768"
+        },
+        {
+          "path": "kitaqfc/lib/debug.h",
+          "sha256": "4dc54b6a7a3d5bc96b247b74cb3e4ef8915674b2d035e03415ea3d3b850d402e"
+        },
+        {
+          "path": "kitaqfc/lib/entity.c",
+          "sha256": "96197eca2ad3431a6d82a29e5db59205fb6ca9a4d36465d83b9f3a47f3617ef0"
+        },
+        {
+          "path": "kitaqfc/lib/entity.h",
+          "sha256": "d6a48286b59970bee79a8fb3bc6952614a238d95ca37b714e3d4f52c27991453"
+        },
+        {
+          "path": "kitaqfc/lib/fc.h",
+          "sha256": "697d338735cc83db0ee14e3533241ce30cb5c4afd93fed40fd84c4ac7cfb57c4"
+        },
+        {
+          "path": "kitaqfc/lib/fds.h",
+          "sha256": "8d6331eb5f4962be23bf923d10ecff11ed36e1152a11e39cc69ac9d802a2b039"
+        },
+        {
+          "path": "kitaqfc/lib/fds_file.h",
+          "sha256": "e836419bf961c658dfc82ffdc15704ddecfa0419a8d0f192af9e93de4b18c3f9"
+        },
+        {
+          "path": "kitaqfc/lib/fds_overlay.h",
+          "sha256": "c3279f804d0739d204576abda21608711d804659d12fdf3da252ba24721f700f"
+        },
+        {
+          "path": "kitaqfc/lib/fds_save.h",
+          "sha256": "cafc0faf9ef6567a463e3a4ab426fd279ba63c2e38918b545e32b218070a1275"
+        },
+        {
+          "path": "kitaqfc/lib/fds_sound.h",
+          "sha256": "543e7862b250684bfa69eaeed94f4b2f000044bf083a848506ae588ddf0e45e2"
+        },
+        {
+          "path": "kitaqfc/lib/fixed.c",
+          "sha256": "20acc9e76899329af56881bf4d4af0a880830ed33f8b2dc07c2a3b39a6d7f051"
+        },
+        {
+          "path": "kitaqfc/lib/fixed.h",
+          "sha256": "81941d1e9f20b6e65466f4fc2892193bfc22fbed93a0334381ee56c414d38bbc"
+        },
+        {
+          "path": "kitaqfc/lib/input.c",
+          "sha256": "4a6dbcaca09cc953303126ab66bc5fc46fe53a6c5cd17fbc289bf025f37478a4"
+        },
+        {
+          "path": "kitaqfc/lib/input.h",
+          "sha256": "5b2d7be9cbb0bcc6e494c3744722ebb81c36f145c394b961f570856373a96453"
+        },
+        {
+          "path": "kitaqfc/lib/input_repeat.c",
+          "sha256": "1b121687f1f279ff49245f64037dba8c39527d752c975e67f58fea85c8b80e2b"
+        },
+        {
+          "path": "kitaqfc/lib/input_repeat.h",
+          "sha256": "5a490490a3d440dc5adf08d8e772d4fc175be04bca8dd7dac36c1d56d2ee3545"
+        },
+        {
+          "path": "kitaqfc/lib/intrinsics.h",
+          "sha256": "74aa392f476743c3ae79126d6135842d25cfb26e6eba7f9837d96a26faceb6ea"
+        },
+        {
+          "path": "kitaqfc/lib/keyboard.h",
+          "sha256": "efd757a3e3373c43872f945e7238324dc3e59865ce42df2dbd073a6da10cfbad"
+        },
+        {
+          "path": "kitaqfc/lib/mapper.h",
+          "sha256": "ca9a487ae9172f917da33f50eefc4dd758c1dcf6e1e24614f18127bf28a22ab2"
+        },
+        {
+          "path": "kitaqfc/lib/math_fast.h",
+          "sha256": "a0d08a224b2a1fa8f766d193fe6a0fbf6153a80c90ecf039f3708f1739302635"
+        },
+        {
+          "path": "kitaqfc/lib/math_fixed.h",
+          "sha256": "712b7ee30c66a64af339e8ca62950d01cab160d0a63ba04f2f39b151ac1bc21e"
+        },
+        {
+          "path": "kitaqfc/lib/math_lut.c",
+          "sha256": "3abf400a05baa75add42faa689fb0a546ec99eed1525b1c159a053daadca264e"
+        },
+        {
+          "path": "kitaqfc/lib/math_lut.h",
+          "sha256": "c9f985aa6ff9553287e2f6fa8531db8fe81beb939cb75232509f56aef1ee541e"
+        },
+        {
+          "path": "kitaqfc/lib/metasprite.c",
+          "sha256": "428975bbf489d655597537c7541c4abb877f82d2628e473bb624513231612317"
+        },
+        {
+          "path": "kitaqfc/lib/metasprite.h",
+          "sha256": "c708de4226e36af17a09add2effb802a0ae2fc9391c62c014ebeb8a98e183ac1"
+        },
+        {
+          "path": "kitaqfc/lib/mic.h",
+          "sha256": "e919ce312d8b3395ed164ee374b6051d82d8397c9d7d6f7afa6736d51bfba372"
+        },
+        {
+          "path": "kitaqfc/lib/midi.h",
+          "sha256": "7c0d2416fa5102b9a99ad97d10a4e6cc9318417251971ef8a9bd098c220a8e29"
+        },
+        {
+          "path": "kitaqfc/lib/nametable_asset.c",
+          "sha256": "d750ccd73b4c20851f258abd2c2d963f58d6b0f57379a4b6c2b9c408e84dea04"
+        },
+        {
+          "path": "kitaqfc/lib/nametable_asset.h",
+          "sha256": "9813dde648edc491afb7823a35bf25eaa1d2491ef95fedb3258d246670fbfd25"
+        },
+        {
+          "path": "kitaqfc/lib/nes_game.h",
+          "sha256": "1e533e7ee1fb6abfc3fb5042572b15da3151aceb2507ba7628efb4df9c7f0811"
+        },
+        {
+          "path": "kitaqfc/lib/oam.h",
+          "sha256": "41c37671470e0e23fb8365fc5672d87bf67c727b9859e6ddbe0e13ffc5ae6410"
+        },
+        {
+          "path": "kitaqfc/lib/oam_fair.h",
+          "sha256": "d396b13057d5d576f0659418e3b88144349f8e6210d5545c50d6403f36582c8b"
+        },
+        {
+          "path": "kitaqfc/lib/oam_fair.md",
+          "sha256": "aa817bb3bfc5373855faf48f36645ba55f77eb0148c12101224f1a54dab5334c"
+        },
+        {
+          "path": "kitaqfc/lib/oam_fair_impl.h",
+          "sha256": "c9011272eb973801b9476644fa13548e25704003d58ab0692d48f6a1c0186f49"
+        },
+        {
+          "path": "kitaqfc/lib/pad.c",
+          "sha256": "87a0801547496cc09105bb04afba56df9518ffe7e70273d822ad55ea380b8b54"
+        },
+        {
+          "path": "kitaqfc/lib/pad.h",
+          "sha256": "abe15900e4cd41e82c65c4aec04c42d079aebce3fa2845a6e01fdb6002164b96"
+        },
+        {
+          "path": "kitaqfc/lib/palette.c",
+          "sha256": "9b10a26f55e6b86f5c6f4083986c400724cfc02a34342621936c3d6006d38341"
+        },
+        {
+          "path": "kitaqfc/lib/palette.h",
+          "sha256": "55902ab5ae4054a961f48653748180444eaa902cd6e3a92f90f0501ad63c43b2"
+        },
+        {
+          "path": "kitaqfc/lib/physics2d.c",
+          "sha256": "aae2c6ad8490cc6b37c6abe50274fd8f1d53bace72870c68da03b784fb313d1d"
+        },
+        {
+          "path": "kitaqfc/lib/physics2d.h",
+          "sha256": "8b3292eb3274a7702722339ff80362ef2d7ed95b42d85cf229106872361b52df"
+        },
+        {
+          "path": "kitaqfc/lib/physics3d.c",
+          "sha256": "845214a967b09b5ac433ff913287e345fe2acb7252db02c4a4e47fab83f82c20"
+        },
+        {
+          "path": "kitaqfc/lib/physics3d.h",
+          "sha256": "7e207d58e5dcb87a059ec4b1487030b6b7e25a4f853ac2afc4bfcf18064b58ab"
+        },
+        {
+          "path": "kitaqfc/lib/ppu.c",
+          "sha256": "1b1c79eb8c29950f4be5a531b8835ffd3e85ecfaa91871ed8b6117aaa88d88d1"
+        },
+        {
+          "path": "kitaqfc/lib/ppu.h",
+          "sha256": "acdf977858899f584ab15cb2303c50489d903bde4f86ae8b7161b5a0005acbe1"
+        },
+        {
+          "path": "kitaqfc/lib/ppu_direct.h",
+          "sha256": "998963bbeb8eb5a6c2cfa69934b4de244ee5ee146b0b831d843d4f2d1acd13e8"
+        },
+        {
+          "path": "kitaqfc/lib/README.de.md",
+          "sha256": "e3f0f0ba553d84780fac057f6a03c07d49d5d5c8d55ec3b92e45a7642b82cb90"
+        },
+        {
+          "path": "kitaqfc/lib/README.es.md",
+          "sha256": "baae5a5e8c9a521872d0ed2f79e6c32220512a5acf24dc7c00b7e03c72ea873a"
+        },
+        {
+          "path": "kitaqfc/lib/README.fr.md",
+          "sha256": "d870fd0fe4c25e0371a77ad8524ca2ed95c0a44e658dcedad612611b53b94a20"
+        },
+        {
+          "path": "kitaqfc/lib/README.ja.md",
+          "sha256": "3035bade6dcd93617c80108f151674756d5331151f8a07e03f0733eaa89c9394"
+        },
+        {
+          "path": "kitaqfc/lib/README.ko.md",
+          "sha256": "f8f869ab08f2376d1ea796bbfbef6ba571a62b1b0440b962f4f45d517a4b7b05"
+        },
+        {
+          "path": "kitaqfc/lib/README.md",
+          "sha256": "de18362a8e3e7e7ff4735c848fcb73875002a738010469133a3070613f178250"
+        },
+        {
+          "path": "kitaqfc/lib/README.pt-BR.md",
+          "sha256": "1d90d6058889f17c25c38790d297694cb95c58a69d62db920c2e7f452b25d6c9"
+        },
+        {
+          "path": "kitaqfc/lib/README.zh-CN.md",
+          "sha256": "59545ec48d6ded00ea79226af8a7e70da110273be81acbcb7738a96ff0a968be"
+        },
+        {
+          "path": "kitaqfc/lib/README.zh-TW.md",
+          "sha256": "389d05487dd2d5f00b053061b3d65cffad691e9ca85489ae7d758dcf702506e0"
+        },
+        {
+          "path": "kitaqfc/lib/rob.h",
+          "sha256": "1728fc55ee0c7876f8c0777c0a17cf150133b735d4ba83c2fe68273e94b6b8bd"
+        },
+        {
+          "path": "kitaqfc/lib/runtime.c",
+          "sha256": "132f7c664c2d4a91ba0aa3f4227943daadc9442868f6f557e39821facd755d08"
+        },
+        {
+          "path": "kitaqfc/lib/runtime.h",
+          "sha256": "32bffa18e0b1c95874894727bd0170e87c629b6a5acc967ecd857d3b282453a2"
+        },
+        {
+          "path": "kitaqfc/lib/scene.c",
+          "sha256": "48a409e79469a2f6953cc23a135c343fd3686747446b55236d163f323d482b66"
+        },
+        {
+          "path": "kitaqfc/lib/scene.h",
+          "sha256": "7fcdc7fb7f9501df2c0d8b44f6d34becbf61aabf20d1686842e2e41c04a1a074"
+        },
+        {
+          "path": "kitaqfc/lib/scroll.c",
+          "sha256": "d7d4802a02c9b854c60563e0258a301e2313cff57053c358d3e7347b2ce91ec1"
+        },
+        {
+          "path": "kitaqfc/lib/scroll.h",
+          "sha256": "f3097df4b926290d62fc209e8df7ec6b30518813765945f9143f0f75c0136462"
+        },
+        {
+          "path": "kitaqfc/lib/sprite.c",
+          "sha256": "fe3bdd0d28c34e9b81175f5a8ab7b67ae692cf7aa1ab17b4e20fa9e471d914d5"
+        },
+        {
+          "path": "kitaqfc/lib/sprite.h",
+          "sha256": "8ad792320d59b59d9bc1ac9d9d5cb558960724a1820a8ef634b2f2f8b18e220e"
+        },
+        {
+          "path": "kitaqfc/lib/system.c",
+          "sha256": "4cf453270535749e37f10a1fcc0d34032580632a359c327a62007441afa32d04"
+        },
+        {
+          "path": "kitaqfc/lib/system.h",
+          "sha256": "9ee154cb4fe244d6920f33afb2d8eb663f36a0a7a9bd8b3de7b571ba910a5a9e"
+        },
+        {
+          "path": "kitaqfc/lib/tilemap.c",
+          "sha256": "d5203c48d8cb2a717201b7c1231c72c6f3d3594c6605e3516a079699a2fa5d40"
+        },
+        {
+          "path": "kitaqfc/lib/tilemap.h",
+          "sha256": "600327336ab17375269fbb33cb13a3b62bc7adf42a417233651a0a8dbdd4eac6"
+        },
+        {
+          "path": "kitaqfc/lib/vram.c",
+          "sha256": "b9cdc48b34084ee3a2a6c8aa6d9e4eb584114f4730e362a0dcd79cd20cbea9c9"
+        },
+        {
+          "path": "kitaqfc/lib/vram.h",
+          "sha256": "462e3e35e9b6db0ae6a873d3dbc721c7f2e924a533c92e9737b6446458c159c4"
+        },
+        {
+          "path": "kitaqfc/lib/vram_queue.h",
+          "sha256": "eb3a23544328201d21ae3891454bc50923d9ae970541a7dd9a52f2ec9220728f"
+        },
+        {
+          "path": "kitaqfc/lib/vrc6_sound.c",
+          "sha256": "0d4fe0769513a3a1b0a56235386fc87eb36f9941994bd97de4cb92ecc35ca28b"
+        },
+        {
+          "path": "kitaqfc/lib/vrc6_sound.h",
+          "sha256": "5ae9c5adc9a0cc3c7d3cd04c5164e09af06d67517160bc2cec3ea9349a2902fa"
+        },
+        {
+          "path": "kitaqfc/lib/vrc7_sound.c",
+          "sha256": "98e97d5502c094dd71113cf5718b43a241264f928d09d214b49ffe5c1b01860c"
+        },
+        {
+          "path": "kitaqfc/lib/vrc7_sound.h",
+          "sha256": "9fa178459985cf17a05cfdaa02a35871fa3f52fa7650fdae9ddc3c1a5f6bba4e"
+        },
+        {
+          "path": "kitaqfc/lib/wire3d.c",
+          "sha256": "22002ecdeb0e3659579142d102617992fa21cc2e20528cc6516da6fe1583b77f"
+        },
+        {
+          "path": "kitaqfc/lib/wire3d.h",
+          "sha256": "ba067668b6fa461b1b17bbf9f1717d7fa2e3ac4f30211d02d022451a3ae3b119"
+        },
+        {
+          "path": "kitaqfc/lib/wire3d.md",
+          "sha256": "4d2445c12e8c4f4f0491561d3c31f51ba0ce8a66b67e4271097a3ba8a65ef1cc"
+        },
+        {
+          "path": "kitaqfc/lib/wire3d_tables.h",
+          "sha256": "7aaa2403d34fa11bd34e28efd0d157e4322c36e6f24eefe112105f8193f46a2f"
+        },
+        {
+          "path": "kitaqfc/lib/zapper.h",
+          "sha256": "1d27ebd125d36cab308b4c331a4ee95d15daa652e2b070ea4e5ba5bc860b3ab5"
+        },
+        {
+          "path": "kitaqfc/lib/zx0.c",
+          "sha256": "da956c77f44d9884fbdb31c9b27bb976506ed540d07919941fc70ca0bbb276e8"
+        },
+        {
+          "path": "kitaqfc/lib/zx0.h",
+          "sha256": "50887e6043b3150469deebac8b3f331aabf5852ddb5d9efff0b4611e8b6f94c8"
+        }
+      ]
     }
   ]
 }

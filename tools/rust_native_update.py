@@ -24,6 +24,7 @@ def section(lang,book):
   else:body+='<p>'+E(t['build'])+'</p><p>'+E(t['files'])+'</p>'+tables(repo)
   body+='<p><a href="https://github.com/bartaro/'+repo+'">'+repo+'</a> · <a href="https://github.com/bartaro/'+repo+'/tree/main/tools">'+E(t['title'])+'</a> · <a href="https://github.com/bartaro/'+repo+'/actions">GitHub Actions</a></p>'
  body+='<p>'+E(t['proof'])+'</p><p>'+E(t['scope'])+'</p>'
+ if repo and book==repo:body+='<p>'+E(t['attach'])+'</p>'
  body+='<p><a href="'+prefix+'verification/rust-native-20261004/kitaqgb.json">KITAQGB · SHA-256</a> · <a href="'+prefix+'verification/rust-native-20261004/kitaqfc.json">KITAQFC · SHA-256</a></p>'
  if repo and book==repo:
   ext='gb' if repo=='kitaqgb' else 'nes';options='--cart=romonly --romsize=32k' if ext=='gb' else '--mapper=nrom'
@@ -41,7 +42,9 @@ def update_page(path,lang,book):
   text,count=re.subn(pattern,lambda m:m[1]+setup(lang,book),text,flags=re.S);assert count==1,(path,count)
  text=re.sub(r'<section id="rust-native-20261004">.*?</section>','',text,flags=re.S)
  text=re.sub(r'<a data-rust-native="true" href="#rust-native-20261004-heading">.*?</a>','',text,flags=re.S)
- text=text.replace('<main id="main">','<main id="main">'+section(lang,book),1)
+ cover=r'(<main id="main"><div class="cover">.*?</div></div>)'
+ if re.search(cover,text,re.S):text=re.sub(cover,lambda m:m[1]+section(lang,book),text,count=1,flags=re.S)
+ else:text=text.replace('<main id="main">','<main id="main">'+section(lang,book),1)
  if '<nav class="toc"' in text:
   text=re.sub(r'(<nav class="toc"[^>]*>)',lambda m:m[1]+'<a data-rust-native="true" href="#rust-native-20261004-heading">'+E(T[lang]['title'])+'</a>',text,count=1)
  if text!=before:path.write_text(text,encoding='utf-8',newline='\n')
