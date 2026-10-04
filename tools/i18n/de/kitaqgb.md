@@ -8,11 +8,13 @@ Er liest C-Dateien, erzeugt CPU-Befehle und verpackt sie in eine ROM. Sprache, B
 Der GB besitzt eine 8-Bit-CPU und wenig Speicher. Die Bildschirmgrafik besteht überwiegend aus Kacheln mit 8 × 8 Pixeln. Sprites sind kleine Bilder, die sich unabhängig positionieren lassen. Auch Text benötigt Kachelgrafik; eine allgemeine eingebaute Textausgabe wird nicht vorausgesetzt. Die Beispiele verwenden die Glyphen aus der `ascii.c` des Autors, für GB nach ASCII-Codes angeordnet, ohne ihre Bits zu verändern. Die FC-Ausgabe überträgt dieselben Formen in das NES-CHR-Layout.
 
 ## 2. Voraussetzungen und Compiler-Build
-Installieren Sie eine Visual-Studio-/MSBuild-Umgebung für .NET Framework 4.8. Verwenden Sie Developer PowerShell, in der `MSBuild.exe` verfügbar ist.
+Mit Rust 1.85 oder neuer lassen sich Compiler und sämtliche Hilfswerkzeuge für Windows, Linux, macOS ARM und macOS Intel bauen. Die nativen Programme benötigen kein .NET; die Werkzeuge für Grafikdaten benötigen auch weder Python noch Pillow.
 
 {{CODE:0}}
 
-Bewahren Sie die ausführbare Datei zusammen mit ihren Konfigurationsdateien auf. Geben Sie in Build-Befehlen den Compilerpfad ausdrücklich an. Beim Bauen des Projekts wird die ausführbare Datei in das Hauptverzeichnis des Repositorys `kitaqgb` kopiert.
+Die Windows-Programme liegen im Repository-Stammverzeichnis, die Linux- und macOS-Programme in den unten aufgeführten bin/-Ordnern. Bewahren Sie lib/ und die Lizenzhinweise zusammen mit den Werkzeugen auf. Unter Linux/macOS setzen Sie mit chmod +x das Ausführungsrecht und ergänzen den PATH, oder verwenden den vollständigen Pfad.
+
+Die PowerShell-Skripte verwenden das Windows-Programm im Stammverzeichnis. Unter Linux/macOS übergeben Sie dieselben C-Eingaben und Optionen an den nativen Compiler oder verwenden PowerShell 7. CHR-Grafik und C-Quellen sind getrennte Eingaben; font.chr bewahrt die Schrift der Beispiele.
 
 ## 3. Das erste Programm
 Die mitgelieferte `samples/gb_hello.c` nutzt Bildschirm- und Texthilfen aus `gb_common.h`. Bewahren Sie diesen Header zusammen mit den Schriftdateien auf. `#include` liest Deklarationen oder Definitionen aus einer anderen Datei ein.

@@ -4,9 +4,13 @@ KITAQFC utiliza el front-end de KITAQGB para generar código para la CPU de la f
 KITAQFC admite copias de estructuras, llamadas normales a funciones y bucles for, while y do-while. Un do-while ejecuta el cuerpo al menos una vez antes de comprobar la condición. continue pasa a esa comprobación final; break sale del bucle. switch selecciona una constante case entre 0 y 255, o el cuerpo de default si no hay coincidencia. La expresión de selección se evalúa una sola vez. break sale del bucle o switch más interno; continue dentro de un switch pasa a la siguiente iteración del bucle que lo contiene.
 
 ## 2. Requisitos y compilación
+Con Rust 1.85 o posterior puede compilar el compilador y todas las herramientas para Windows, Linux, macOS ARM y macOS Intel. Los ejecutables nativos no necesitan .NET; las herramientas de recursos tampoco requieren Python ni Pillow.
+
 {{CODE:0}}
 
-Instala .NET Framework 4.8 Developer Pack y Visual Studio Build Tools, y usa Developer PowerShell. Los comandos siguientes emplean el ejecutable copiado al repositorio `kitaqfc`; ajusta la ruta si utilizas otra ubicación. Los gráficos CHR y el código C son entradas distintas. `font.chr` es una conversión de 8 KiB del `ascii.c` del autor.
+Los ejecutables de Windows están en la raíz del repositorio; los de Linux y macOS, en los directorios bin/ de la tabla siguiente. Conserve lib/ y los avisos de licencia junto a las herramientas. En Linux/macOS use chmod +x y añada el directorio al PATH, o ejecute mediante la ruta completa.
+
+Los scripts PowerShell usan el ejecutable Windows de la raíz. En Linux/macOS pase las mismas entradas C y opciones al compilador nativo, o use PowerShell 7. Los gráficos CHR y el código C son entradas distintas; font.chr conserva la fuente de los ejemplos.
 
 ## 3. Tu primer programa
 {{CODE:1}}

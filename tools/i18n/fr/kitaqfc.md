@@ -4,9 +4,13 @@ KITAQFC reprend la partie frontale de KITAQGB pour générer du code destiné au
 KITAQFC prend en charge les copies de structures, les appels de fonctions ordinaires et les boucles for, while et do-while. Une boucle do-while exécute son corps au moins une fois avant de tester la condition. continue passe à ce test final ; break quitte la boucle. Un switch sélectionne une constante case comprise entre 0 et 255, ou le corps default si aucun case ne correspond. Son expression de sélection n’est évaluée qu’une fois. break quitte la boucle ou le switch le plus interne ; un continue à l’intérieur d’un switch passe à l’itération suivante de la boucle englobante.
 
 ## 2. Prérequis et compilation
+Rust 1.85 ou ultérieur permet de construire le compilateur et tous les outils auxiliaires pour Windows, Linux, macOS ARM et macOS Intel. Les exécutables natifs ne nécessitent pas .NET ; les outils de ressources fonctionnent aussi sans Python ni Pillow.
+
 {{CODE:0}}
 
-Installez le Developer Pack .NET Framework 4.8 et Visual Studio Build Tools, puis utilisez Developer PowerShell. Les commandes suivantes emploient l'exécutable copié dans le dépôt `kitaqfc`. Si vous le compilez ailleurs, adaptez le chemin. Les graphismes CHR et le source C sont deux entrées distinctes. Le fichier `font.chr` du manuel est une conversion sur 8 Kio du fichier `ascii.c` de l'auteur.
+Les exécutables Windows se trouvent à la racine du dépôt. Ceux de Linux et macOS sont dans les dossiers bin/ indiqués ci-dessous. Conservez lib/ et les mentions de licence avec les outils. Sous Linux/macOS, attribuez les droits d'exécution avec chmod +x, puis ajoutez le dossier au PATH ou utilisez le chemin complet.
+
+Les scripts PowerShell utilisent l'exécutable Windows à la racine. Sous Linux/macOS, transmettez les mêmes sources C et options au compilateur natif, ou utilisez PowerShell 7. Les graphismes CHR et le source C sont des entrées distinctes ; font.chr conserve la police des exemples.
 
 ## 3. Votre premier programme
 {{CODE:1}}

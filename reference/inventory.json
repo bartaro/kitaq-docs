@@ -1,32 +1,36 @@
 {
-  "date": "2026-09-22",
+  "date": "2026-10-04",
   "scope": "Current source and distributed executable inventory; historical runtime records retain their own provenance.",
   "tools": {
     "kitaqgb": {
       "path": "kitaqgb/kitaqgb.exe",
-      "sha256": "bc24ad4b78c4a0e2250d52443855a8e676a09ea8ffcc4b82fd012e36b3c1242a",
+      "sha256": "caadee2356a50725928c3c86e948b882ea147e4355f641d2ef15488ee2060e00",
       "help": [
         {
           "argv": [
             "--help"
           ],
-          "exit_code": 1,
-          "text": "usage: kitaqgb first.c second.c ... [-o out.gb] [-O0|-O1] [-I dir|--include-dir=dir] [--profile=dev|release|test] [--strict|--permissive] [--rom-header=header.json] [--rom-title=TITLE] [--header-logo=on|off|--no-header-logo] [--cgb=dmg|cgb|cgb_only] [--cart=romonly|mbc1|mbc3|mbc5|...] [--romsize=32k|64k|128k|256k|512k|1m|2m|4m|8m] [--ramsize=none|2k|8k|32k|64k|128k] [--sgb=on|off] [--dest=jp|nonjp] [--version=N] [--trace[=tokens,ast,ir,asm] [--trace-out=<dir>]] [--debug-output | --debug-out[=<dir>]] [--no-disasm|--fast-build] [--disasm-changed[=<git_base>] [--disasm-changed-out=<file>]] [--cache|--no-cache] [--diag-json[=<file>]] [--emit-ai-metadata=<file>] [--emit-path-manifest=<file>] [--machine-readable] [--no-banner] [--stack-bank=fixed|wramx1] [--stack-top=ADDR] [--stack-reserve=N] [--deps-out[=<file>]] [vlist|--vlist[=<file>]] [--max-errors=N] [--abi=legacy|stack] [--bank-sim[=<file>]] [--farcall-suggest[=<file>]] [--cross-bank-report[=<file>]] [--abi-verify[=<file>]] [--abi-diff-report[=<file>]] [--rst-report[=<file>]] [--opt-diff[=<file>]] [--func-size-report[=<file>]] [--hotspot-report[=<file>]] [--repro-check[=<file>]] [--repro-pack[=<dir>]] [--cgb-consistency[=<file>]] [--verify-cgb-symbols[=<file>]] [--minimize[=<file.c>] [--minimize-out=<out.c>] [--minimize-work=<dir>] [--minimize-quick] [--minimize-trace=final|all] [--minimize-on-fail]] [--rst-enable|--rst-on] [--rst-disable|--no-rst] [--rst-use-38] [--rst-speed-safe] [--rst-safe|--rst-unsafe] [--rst-max-calls=N] [--rst-exclude=a,b] [--rst-max-vectors=N] [--watch]\r\nsubcommands: kitaqgb test | attrviz | src2asm | symfind | romdiff | kqhelp | template | fixhint | irsum | conventions | snippet | devserver | recipe\r\n  --stack-bank: select WRAM window used for initial CPU stack\r\n  --stack-top: initial SP value inside selected stack window\r\n  --stack-reserve: reserve N bytes below stack top from automatic placement\r\n"
+          "exit_code": 0,
+          "text": "KITAQGB native Rust migration (in progress)\n\nCommands:\n  disasm ROM -o dis.s\n  header ROM -o patched.gb [--title=NAME --cgb=dmg|cgb|cgb_only ...]\n  assemble-ir INPUT.assembly.json -o output.gb [header options]\n  tokenize SOURCE.c ... -I INCLUDE_DIR -o tokens.json\n  parse SOURCE.c ... -I INCLUDE_DIR -o ast.json\n  lower SOURCE.c ... -I INCLUDE_DIR -o lowered.json\n  emit-ir SOURCE.c ... -I INCLUDE_DIR -o raw.assembly.json\n  compile SOURCE.c ... -I INCLUDE_DIR -o output.gb [-O0|-O1]\n  optimize-ir INPUT.assembly.json -o optimized.json [-O0|-O1]\n  strip-ir INPUT.assembly.json -o stripped.json [--strip-keep=LABELS]\n\nC compilation, aggregates, banked calls and hardware intrinsics are implemented and covered by differential tests. Utility commands: kqhelp, symfind, src2asm, romdiff, template, snippet, conventions, fixhint, irsum, attrviz, recipe, test.\n\nDevelopment and recovery:\n  SOURCE.c ... --watch [--watch-max-builds=N]\n  devserver SOURCE.c ... [--once --poll-ms=N --debounce-ms=N --max-builds=N]\n  recipe [--history=FILE --out=FILE --script=FILE --last=N --stdout]\n  SOURCE.c ... --minimize[=FILE] [--minimize-out=FILE --minimize-work=DIR --minimize-quick --minimize-trace=final|all]\n  SOURCE.c ... --minimize-on-fail --repro-pack[=DIR]\n  SOURCE.c ... --debug-output --disasm-changed[=GIT_BASE]\nWatch loops stop with Ctrl+C; the Rust API also accepts a CancellationToken. Migration validation is still in progress. See PORT_STATUS.md.\n"
         }
-      ]
+      ],
+      "implementation": "Rust",
+      "distribution_manifest": "verification/rust-native-20261004/kitaqgb.json"
     },
     "kitaqfc": {
       "path": "kitaqfc/kitaqfc.exe",
-      "sha256": "a17b9072d580280d999cf37b6689400e7e99d67c1b7016291b899f624f5da855",
+      "sha256": "4c3a26621615bd6e7bd4031900c63cf2ec127e8d3223bbdc4ddd8c7973e9ac59",
       "help": [
         {
           "argv": [
             "--help"
           ],
-          "exit_code": 1,
-          "text": "usage: kitaqfc first.c second.c ... [--target=nes] [--mapper=nrom|uxrom|cnrom|axrom|mmc1|mmc3|mmc5|vrc6|vrc7|fme7|fds] [--board=auto|generic|surom512] [--mirroring=horizontal|vertical|four-screen] [--battery|--no-battery] [--nes-chr=path/to/chr.bin | --nes-chr-ram] [--kurosaki-metadata[=<file>]] [-o out.nes]\r\nNES RAM placement: [--no-whole-program-zp] [--nes-local-ram=START:LENGTH] [--nes-temp-ram=START:LENGTH]\r\nsubcommands: kitaqfc test | attrviz | src2asm | symfind | romdiff | kqhelp | template | fixhint | irsum | conventions | snippet | devserver | recipe\r\n"
+          "exit_code": 0,
+          "text": "KITAQFC native Rust compiler\n\nBuild a NES ROM:\n  kitaqfc SOURCE.c ... -I INCLUDE --mapper=nrom -o GAME.nes\n  kitaqfc SOURCE.c ... -I lib --mapper=mmc3 --nes-chr=tiles.chr -O2 -o GAME.nes\n\nBuild a Famicom Disk System image:\n  kitaqfc SOURCE.c ... --mapper=fds --fds-layout=fds32 -o GAME.fds\n  --fds-meta=FILE --fds-meta-out[=FILE] --fds-out[=FILE]\n  --fds-auto-overlay / --fds-no-auto-overlay\n  --fds-overlay-farcall / --fds-no-overlay-farcall\n  --fds-overlay-guard / --fds-no-overlay-guard\n  --fds-overlay-trim --fds-overlay-prefix=NAME --fds-overlay-start-id=N\n  --fds-overlay-table / --fds-no-overlay-table\n  --fds-header / --fds-raw --fds-game-code=CODE\n  --fds-license-bypass / --fds-no-license-bypass\n\nCartridge and optimization:\n  --target=nes|fc|famicom|6502|2a03\n  --mapper=nrom|uxrom|cnrom|axrom|mmc1|mmc3|mmc5|vrc6|vrc7|fme7|fds|surom512\n  --board=auto|generic|surom512 --mirroring=horizontal|vertical|four_screen\n  --battery / --no-battery --nes-chr-ram --nes-chr=FILE\n  -O0 / -O1 / -O2 --nes-opt=all|off\n  --abi=legacy|stack|fastcall --reg-cc-v2 / --no-reg-cc-v2\n  --zp-alloc --static-frame --small-inline --loop-lowering\n  --library-lto-lite --mapper-aware-placement --kurosaki-profile=FILE\n  --nes-local-ram=START:LENGTH --nes-temp-ram=START:LENGTH\n  -Zcheck -Zcheck-bounds -Zconst-scalar-in-rom\n\nDiagnostics and reports:\n  --strict / --permissive --max-errors=N --diag-json[=FILE|-]\n  --profile=dev|release|test --cache / --no-cache --deps-out[=FILE]\n  --debug-output[=DIR] --trace[=tokens,ast,ir,asm] --trace-out=DIR\n  --no-debug-output --no-trace --fast-build --emit-path-manifest=FILE\n  --kurosaki-metadata[=FILE] --nes-opt-report[=FILE]\n  --func-size-report --hotspot-report --cross-bank-report --farcall-suggest\n  --abi-verify --abi-diff-report --bank-sim --opt-diff --rst-report --repro-check\n  Report switches accept =FILE; otherwise reports are placed beside the ROM.\n\nFrontend and typed assembly:\n  tokenize SOURCE.c ... -I INCLUDE -o tokens.json\n  parse SOURCE.c ... -I INCLUDE -o ast.json\n  lower SOURCE.c ... -I INCLUDE -o lowered.json\n  emit-ir SOURCE.c ... -I INCLUDE -o assembly.json\n  assemble-ir ASSEMBLY.json --mapper=nrom -o ROM.nes\n\nUtilities and development:\n  kqhelp, symfind, src2asm, romdiff, template, snippet,\n  conventions, fixhint, irsum, attrviz, recipe, test\n  SOURCE.c ... --watch [--watch-max-builds=N]\n  devserver SOURCE.c ... [--once --poll-ms=N --debounce-ms=N --max-builds=N]\n  SOURCE.c ... --repro-pack[=DIR] --auto-minimize\n  SOURCE.c ... --minimize[=FILE] --minimize-work=DIR --minimize-out=FILE\n\nLegacy ROM-header and RST flags retain the C# NES backend's behavior.\nNES disassembly and managed debugger attachment do not run in that backend.\n\n"
         }
-      ]
+      ],
+      "implementation": "Rust",
+      "distribution_manifest": "verification/rust-native-20261004/kitaqfc.json"
     },
     "kokura": {
       "path": "kokura/kokura-cli.exe",
@@ -1643,6 +1647,19 @@
         "sarakura": {
           "path": "sarakura/sarakura.exe",
           "sha256": "3cd07c46af9b78466fcf9b4ad90bc428bd67a70d2ee41e1523de22090dc8c156"
+        }
+      }
+    },
+    {
+      "date": "2026-09-22",
+      "tools": {
+        "kitaqgb": {
+          "path": "kitaqgb/kitaqgb.exe",
+          "sha256": "bc24ad4b78c4a0e2250d52443855a8e676a09ea8ffcc4b82fd012e36b3c1242a"
+        },
+        "kitaqfc": {
+          "path": "kitaqfc/kitaqfc.exe",
+          "sha256": "a17b9072d580280d999cf37b6689400e7e99d67c1b7016291b899f624f5da855"
         }
       }
     }

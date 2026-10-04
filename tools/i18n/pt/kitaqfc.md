@@ -4,9 +4,13 @@ KITAQFC usa a etapa de análise do KITAQGB para gerar código para a CPU da fam�
 As verificações registradas executaram exemplos com cópias de estruturas e chamadas comuns de função. Entretanto, **do-while e switch geraram erros de geração de código não suportada para NES**. Uma construção ser reconhecida pelo analisador não comprova que ela possa ser usada nesse destino.
 
 ## 2. Requisitos e compilação
+Use Rust 1.85 ou posterior para compilar o compilador e todas as ferramentas para Windows, Linux, macOS ARM e macOS Intel. Os executáveis nativos não exigem .NET; as ferramentas de recursos também dispensam Python e Pillow.
+
 {{CODE:0}}
 
-Instale o .NET Framework 4.8 Developer Pack e o Visual Studio Build Tools e use o Developer PowerShell. Os comandos seguintes usam o executável copiado para o repositório clonado de `kitaqfc`. Se usar outro local de compilação, ajuste o caminho. Gráficos CHR e código C são entradas distintas. O `font.chr` do manual é uma conversão de 8 KiB do `ascii.c` do autor.
+Os executáveis Windows ficam na raiz do repositório; os de Linux e macOS, nas pastas bin/ indicadas abaixo. Mantenha lib/ e os avisos de licença junto às ferramentas. No Linux/macOS, conceda permissão com chmod +x e adicione a pasta ao PATH, ou use o caminho completo.
+
+Os scripts PowerShell usam o executável Windows na raiz. No Linux/macOS, passe as mesmas entradas C e opções ao compilador nativo ou use PowerShell 7. Gráficos CHR e fontes C são entradas diferentes; font.chr preserva a fonte dos exemplos.
 
 ## 3. Seu primeiro programa
 {{CODE:1}}

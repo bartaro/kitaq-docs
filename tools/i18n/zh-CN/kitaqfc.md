@@ -4,9 +4,13 @@ KITAQFC 使用 KITAQGB 的前端，为 NES/FC 的 6502 系列 CPU 生成代码�
 KITAQFC 支持结构体复制、普通函数调用、for、while 和 do-while。do-while 先执行循环体至少一次，再检查条件；continue 进入末尾条件判断，break 退出循环。switch 选择 0..255 范围内的 case 常量，没有匹配时执行 default，选择表达式只求值一次。break 退出最内层循环或 switch；switch 内的 continue 推进外层循环。
 
 ## 2. 开发环境与构建
+使用 Rust 1.85 或更高版本，可为 Windows、Linux、macOS ARM 和 macOS Intel 构建编译器及全部辅助工具。原生程序运行不需要 .NET，素材处理工具也不需要 Python 或 Pillow。
+
 {{CODE:0}}
 
-安装 .NET Framework 4.8 Developer Pack 与 Visual Studio Build Tools，使用 Developer PowerShell。后续命令使用复制到 `kitaqfc` 仓库中的可执行文件；若位置不同，请调整路径。CHR 图像与 C 源码是不同的输入。手册的 `font.chr` 是由作者 `ascii.c` 转换而来的 8 KiB 文件。
+Windows 程序位于仓库根目录；Linux 和 macOS 程序位于下表所列的 bin/ 平台目录。请保留 lib/ 和许可声明。在 Linux/macOS 上下载后执行 chmod +x，并将目录加入 PATH，或使用完整路径运行。
+
+PowerShell 示例构建使用根目录的 Windows 程序。在 Linux/macOS 上使用原生编译器并传入相同的 C 输入和选项，或使用 PowerShell 7。CHR 图形与 C 源码是不同输入；font.chr 保留原示例字体。
 
 ## 3. 第一个程序
 {{CODE:1}}

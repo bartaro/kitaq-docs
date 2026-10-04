@@ -76,14 +76,15 @@ Cファイルを読み、CPU命令へ変換し、ゲーム機が読み込むROM�
 GBは小さなメモリと8ビットCPUを持ちます。画面は基本的に8×8画素のタイルを並べて作ります。背景とは別に動かす小さな絵がスプライトです。文字も自動的には存在せず、文字のタイルを用意します。本書のサンプルには、作者指定の `ascii.c` の英数字・記号を使います。GBではビット列を保ったままASCII番号へ配置し、FCでは同じ字形をNESのCHR形式へ変換しています。
 
 ## 2　準備とコンパイラのビルド
-ソースから作る場合は、.NET Framework 4.8を対象とするVisual Studio/MSBuild環境を用意します。以下はDeveloper PowerShellなど、`MSBuild.exe` が使える端末での操作です。
+Rust 1.85以降で、Windows・Linux・macOS ARM・macOS Intel用のコンパイラと全補助ツールをビルドできます。ネイティブ実行ファイルの動作に.NETは不要です。素材処理用の補助ツールもPythonやPillowを必要としません。
 
 ```powershell
-MSBuild.exe .\kitaqgb\kitaqgb\kitaqgb.csproj /t:Build /p:Configuration=Release
-.\kitaqgb\bin\Release\kitaqgb.exe --help
+cd kitaqgb
+cargo test --locked --tests
+cargo build --locked --release
 ```
 
-実行ファイル配布を使う場合は、その版の `kitaqgb.exe` と付属ファイルを使います。開発フォルダーのルートにあるEXEと `bin\Release` のEXEは、更新日時が違うことがあります。サンプルのビルド時には、どちらを使うか明示してください。
+Windows用実行ファイルはリポジトリ直下、Linux・macOS用は下表のbin/配下にあります。lib/とライセンス表記を一緒に保持してください。Linux/macOSでは取得した実行ファイルにchmod +xで実行権限を付け、配置先をPATHに追加するかフルパスで実行します。
 
 ## 3　最初のプログラム
 同梱 `samples/gb_hello.c` は `gb_common.h` の画面準備・文字表示関数を使います。ヘッダーとフォントも一緒に置きます。`#include` は別ファイルを読み込む指示です。
@@ -357,8 +358,9 @@ KITAQFCはKITAQGBのフロントエンドを利用し、NES/Famicomの6502系CPU
 
 ## 2　準備とビルド
 ```powershell
-MSBuild.exe .\kitaqfc\kitaqfc\kitaqfc.csproj /t:Build /p:Configuration=Release
-.\kitaqfc\bin\Release\kitaqfc.exe --help
+cd kitaqfc
+cargo test --locked --tests
+cargo build --locked --release
 ```
 
 以下では作業ツリーに配置済みの `kitaqfc.exe` を使う書式を示します。新しくビルドした版を使うときはEXEの場所を読み替えます。素材のCHRファイルとCコードは異なる入力です。本書の `font.chr` は作者指定の `ascii.c` を変換した8KiBのCHR素材です。

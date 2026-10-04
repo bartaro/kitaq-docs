@@ -4,9 +4,13 @@ KITAQFC uses the KITAQGB front end to generate code for the NES/Famicom's 6502-f
 KITAQFC supports structure copies, ordinary function calls, for, while and do-while. A do-while loop runs its body at least once before testing the condition. continue proceeds to that final test; break leaves the loop. A switch selects a case constant in 0..255 or the default body when no case matches. Its selector is evaluated once. break exits the innermost loop or switch; continue inside a switch advances the enclosing loop.
 
 ## 2. Requirements and build
+Build the compiler and all helper tools on Windows, Linux, macOS ARM or macOS Intel with Rust 1.85 or later. The native executables run without .NET; production asset tools also run without Python or Pillow.
+
 {{CODE:0}}
 
-Install the .NET Framework 4.8 Developer Pack and Visual Studio Build Tools, and use Developer PowerShell. Subsequent commands use the executable copied into the `kitaqfc` checkout. If you use another build location, adjust the path. CHR graphics and C source are distinct inputs. The manual's `font.chr` is an 8 KiB conversion of the author's `ascii.c`.
+Windows executables are at the repository root. Linux and macOS executables are under bin/ in the platform folders listed below. Keep lib/ and license notices with the tools. On Linux/macOS, run chmod +x on the downloaded executables and add their folder to PATH, or invoke them by their full path.
+
+PowerShell build scripts use the root Windows executable. For Linux/macOS use the native compiler command with the same C inputs and options, or PowerShell 7. Graphics CHR and C source are separate inputs; font.chr keeps the original sample font.
 
 ## 3. Your first program
 {{CODE:1}}

@@ -154,14 +154,14 @@ def cli_section(key,inventory):
   if entry:out.append(code(key+' '+entry[1],'powershell'))
   out.append(code(h['text'],'help')+'</details>')
  if key in ('kitaqgb','kitaqfc'):
-  base=ROOT/('kitaqgb/kitaqgb' if key=='kitaqgb' else 'kitaqfc/kitaqfc')
-  out.append('<h3>開発補助コマンドの書式</h3><p>以下は現在のProgram.DebugTools.cs / Program.VibeTools.csにある書式です。ROM差分、シンボル探索、テンプレートなどは通常のCコンパイルと別のサブコマンドです。</p>')
-  for file in ('Program.DebugTools.cs','Program.VibeTools.cs'):
-   for usage in re.findall(r'"(usage: [^"\r\n]+)"',read(base/file)):
+  base=ROOT/key/'src'
+  sources=[(path,read(path)) for path in base.rglob('*.rs')]
+  out.append('<h3>Rustソースの開発補助コマンド</h3><p>src/debug_tools.rs / src/vibe_tools.rs の書式です。</p>')
+  for filename in ['debug_tools.rs','vibe_tools.rs']:
+   for usage in re.findall(r'"([Uu]sage: [^"\r\n]+)"',read(base/filename)):
     out.append(code(usage,'usage'))
-  options=sorted(set(re.findall(r'arg\s*==\s*"(--[\w-]+)"|arg\.StartsWith\("(--[\w-]+)=?',read(base/'Program.cs'))))
-  names=sorted({a or b for a,b in options})
-  out.append('<h3>パーサーが認識する長いオプション索引</h3><p>完全な綴りを現在のProgram.csから採取。ここには互換・調査用の指定も含みます。値を必要とするかはヘルプと対応する処理を参照してください。</p><div class="tokens">'+''.join('<code>'+E(n)+'</code>' for n in names)+'</div>')
+  names=sorted({option for path,source in sources for option in re.findall(r'"(--[a-z][a-z0-9-]+)(?:[="\s])',source)})
+  out.append('<h3>Rust CLIの長いオプション索引</h3><div class="tokens">'+''.join('<code>'+E(n)+'</code>' for n in names)+'</div>')
   (SITE/'reference'/(key+'-options.json')).write_text(json.dumps(names,indent=2),encoding='utf-8')
  return ''.join(out)
 
@@ -173,12 +173,12 @@ def headers_section(platform):
   out.append('<details class="searchable"><summary><code>'+E(name)+'</code> — '+E(MODULES.get(Path(p).stem,''))+'</summary>'+code(read(ROOT/p))+'<p class="source">'+E(p)+'</p></details>')
  return ''.join(out)
 def asm_section(platform):
- p=ROOT/('kitaqgb/kitaqgb/AsmInfo.cs' if platform=='gb' else 'kitaqfc/kitaqfc/AsmInfo.cs')
- defs=re.findall(r'Def\(0x([\dA-Fa-f]{2}),\s*"([^"]+)",\s*(\w+)\)',read(p))
- out=['<h2 id="assembly">付録：アセンブリ命令索引</h2><p>AsmInfo.csの命令表を採取しています。これはコンパイラ内部の綴り・オペランド形式の索引です。分岐先やメモリアドレスを持つ行は書式例であり、単独で実行するプログラムではありません。レジスターの保持やフラグ変化は呼び出し規約とコード生成を参照してください。</p><div class="tablewrap"><table><tr><th>opcode</th><th>命令名</th><th>形式</th><th>書式例</th></tr>']
- formats={'IMP':'','IMM':' #1','IMM8':' #1','IMM16':' #0xC000','ABS':' 0xC000','REL':' +target','IND':'','ZPG':' 0x20','LDH':' 0x40','ABX':' 0x0200,X','ABY':' 0x0200,Y','ZPX':' 0x20,X','ZPY':' 0x20,Y','ZXI':' (0x20,X)','ZYI':' (0x20),Y'}
- for op,n,f in defs:out.append('<tr class="searchable"><td>'+op+'</td><td><code>'+E(n)+'</code></td><td>'+f+'</td><td><code>'+E(n+formats.get(f,' [operand]'))+'</code></td></tr>')
- out.append('</table></div>');return ''.join(out)
+ path=SITE/('kitaqgb.html' if platform=='gb' else 'kitaqfc.html')
+ text=read(path)
+ start=text.index('<h2 id="assembly">')
+ end=text.index('</table></div>',start)+len('</table></div>')
+ return text[start:end]
+
 
 def main():
  inventory=json.loads(read(SITE/'reference/inventory.json'));manifest=json.loads(read(SITE/'samples/manifest.json'))
@@ -211,5 +211,7 @@ def main():
  publish_local_library('ja')
  from fc_current_update import publish as publish_fc_current
  publish_fc_current('ja')
+ from rust_native_update import publish as publish_rust_native
+ publish_rust_native('ja')
  print('Generated 10 Japanese HTML pages including development prompts')
 if __name__=='__main__':main()

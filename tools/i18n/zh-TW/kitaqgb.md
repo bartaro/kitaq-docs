@@ -8,11 +8,13 @@ KITAQGB 是由 Zachtronics 的 NORCAL 發展而來的 GB/CGB C 語言編譯器�
 GB 使用 8 位元 CPU，記憶體有限。畫面主要由 8×8 像素圖塊構成；精靈則是能獨立定位的小圖像。文字也需要圖塊，不能假設系統內建通用文字顯示。本例採用作者的 `ascii.c`，依 GB 的 ASCII 順序重排而不更動字形位元；FC 版則轉成 NES CHR 配置。
 
 ## 2. 準備環境與建置編譯器
-安裝可針對 .NET Framework 4.8 建置的 Visual Studio/MSBuild 環境，並使用能執行 `MSBuild.exe` 的 Developer PowerShell。
+使用 Rust 1.85 或更新版本，可為 Windows、Linux、macOS ARM 和 macOS Intel 建置編譯器及所有輔助工具。原生程式執行不需要 .NET，素材處理工具也不需要 Python 或 Pillow。
 
 {{CODE:0}}
 
-請將執行檔與隨附的設定檔放在同一目錄，並在建置命令中明確指定編譯器路徑。建置專案時，執行檔會複製到 `kitaqgb` 儲存庫根目錄。
+Windows 程式位於儲存庫根目錄；Linux 和 macOS 程式位於下表所列的 bin/ 平台資料夾。請保留 lib/ 和授權聲明。在 Linux/macOS 下載後執行 chmod +x，並將資料夾加入 PATH，或使用完整路徑執行。
+
+PowerShell 範例建置使用根目錄的 Windows 程式。在 Linux/macOS 使用原生編譯器並傳入相同的 C 輸入及選項，或使用 PowerShell 7。CHR 圖像與 C 原始碼是不同輸入；font.chr 保留原範例字型。
 
 ## 3. 第一個程式
 `samples/gb_hello.c` 使用 `gb_common.h` 的畫面與文字輔助函式。請保留配套標頭檔與字型檔。`#include` 會讀入其他檔案的宣告或定義。

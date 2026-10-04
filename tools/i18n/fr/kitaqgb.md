@@ -8,11 +8,13 @@ Il lit les fichiers C, génère les instructions du processeur et les rassemble 
 La GB possède un processeur 8 bits et peu de mémoire. La plupart des graphismes utilisent des tuiles de 8 × 8 pixels. Les sprites sont de petites images que l'on positionne indépendamment. Le texte nécessite lui aussi des tuiles graphiques : il ne faut pas compter sur un affichage de texte universel intégré. Ces exemples utilisent les glyphes du fichier `ascii.c` de l'auteur, réordonnés selon les codes ASCII pour la GB sans modifier leurs pixels. L'édition FC convertit les mêmes dessins au format CHR de la NES.
 
 ## 2. Prérequis et compilation du compilateur
-Installez un environnement Visual Studio/MSBuild ciblant .NET Framework 4.8. Utilisez une invite Developer PowerShell dans laquelle `MSBuild.exe` est disponible.
+Rust 1.85 ou ultérieur permet de construire le compilateur et tous les outils auxiliaires pour Windows, Linux, macOS ARM et macOS Intel. Les exécutables natifs ne nécessitent pas .NET ; les outils de ressources fonctionnent aussi sans Python ni Pillow.
 
 {{CODE:0}}
 
-Gardez l’exécutable et ses fichiers de configuration ensemble. Indiquez le chemin du compilateur dans les commandes pour identifier précisément le fichier utilisé. La compilation du projet copie l’exécutable à la racine du dépôt `kitaqgb`.
+Les exécutables Windows se trouvent à la racine du dépôt. Ceux de Linux et macOS sont dans les dossiers bin/ indiqués ci-dessous. Conservez lib/ et les mentions de licence avec les outils. Sous Linux/macOS, attribuez les droits d'exécution avec chmod +x, puis ajoutez le dossier au PATH ou utilisez le chemin complet.
+
+Les scripts PowerShell utilisent l'exécutable Windows à la racine. Sous Linux/macOS, transmettez les mêmes sources C et options au compilateur natif, ou utilisez PowerShell 7. Les graphismes CHR et le source C sont des entrées distinctes ; font.chr conserve la police des exemples.
 
 ## 3. Votre premier programme
 Le fichier fourni `samples/gb_hello.c` utilise les fonctions d'affichage et de texte de `gb_common.h`. Conservez cet en-tête avec les fichiers de police. La directive `#include` lit les déclarations ou les définitions contenues dans un autre fichier.

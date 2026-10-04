@@ -8,11 +8,13 @@ Ele lê arquivos C, gera instruções de CPU e organiza tudo em uma ROM. Sua lin
 O GB tem uma CPU de 8 bits e pouca memória. A maior parte dos gráficos usa tiles de 8 × 8 pixels. Sprites são imagens pequenas posicionadas de forma independente. O texto também precisa de gráficos de tiles: não há uma tela de texto universal presumida pelo compilador. Estes exemplos usam os glifos do `ascii.c` do autor, reorganizados pelos códigos ASCII para GB sem alterar seus bits. A edição FC converte os mesmos desenhos para o formato CHR do NES.
 
 ## 2. Requisitos e compilação do compilador
-Instale um ambiente Visual Studio/MSBuild com suporte ao .NET Framework 4.8. Use um prompt Developer PowerShell em que `MSBuild.exe` esteja disponível.
+Use Rust 1.85 ou posterior para compilar o compilador e todas as ferramentas para Windows, Linux, macOS ARM e macOS Intel. Os executáveis nativos não exigem .NET; as ferramentas de recursos também dispensam Python e Pillow.
 
 {{CODE:0}}
 
-Mantenha o executável junto com seus arquivos de configuração. Informe o caminho do compilador nos comandos para deixar claro qual arquivo será usado. A compilação do projeto copia o executável para a raiz do repositório `kitaqgb`.
+Os executáveis Windows ficam na raiz do repositório; os de Linux e macOS, nas pastas bin/ indicadas abaixo. Mantenha lib/ e os avisos de licença junto às ferramentas. No Linux/macOS, conceda permissão com chmod +x e adicione a pasta ao PATH, ou use o caminho completo.
+
+Os scripts PowerShell usam o executável Windows na raiz. No Linux/macOS, passe as mesmas entradas C e opções ao compilador nativo ou use PowerShell 7. Gráficos CHR e fontes C são entradas diferentes; font.chr preserva a fonte dos exemplos.
 
 ## 3. Seu primeiro programa
 O exemplo `samples/gb_hello.c` usa funções auxiliares de tela e texto de `gb_common.h`. Mantenha esse cabeçalho e os arquivos da fonte de caracteres na mesma estrutura de pastas. `#include` lê declarações ou definições de outro arquivo.

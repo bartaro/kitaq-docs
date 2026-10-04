@@ -4,9 +4,13 @@ KITAQFC nutzt das Frontend von KITAQGB, um Code für die 6502-CPU-Familie des NE
 KITAQFC unterstützt Strukturkopien, gewöhnliche Funktionsaufrufe sowie for-, while- und do-while-Schleifen. Eine do-while-Schleife führt ihren Rumpf mindestens einmal aus und prüft danach die Bedingung. continue springt zu dieser abschließenden Prüfung; break verlässt die Schleife. Ein switch wählt eine case-Konstante im Bereich 0 bis 255 oder den default-Zweig, wenn kein case passt. Der Auswahlwert wird genau einmal ausgewertet. break verlässt die innerste Schleife oder das innerste switch; continue innerhalb eines switch setzt die umgebende Schleife mit ihrer nächsten Iteration fort.
 
 ## 2. Voraussetzungen und Build
+Mit Rust 1.85 oder neuer lassen sich Compiler und sämtliche Hilfswerkzeuge für Windows, Linux, macOS ARM und macOS Intel bauen. Die nativen Programme benötigen kein .NET; die Werkzeuge für Grafikdaten benötigen auch weder Python noch Pillow.
+
 {{CODE:0}}
 
-Installieren Sie das .NET Framework 4.8 Developer Pack und Visual Studio Build Tools und verwenden Sie Developer PowerShell. Die folgenden Befehle nutzen die ausführbare Datei im `kitaqfc`-Checkout. Passen Sie den Pfad an, wenn Sie einen anderen Build-Ort verwenden. CHR-Grafik und C-Quelltext sind getrennte Eingaben. Die `font.chr` des Handbuchs ist eine 8-KiB-Umwandlung der `ascii.c` des Autors.
+Die Windows-Programme liegen im Repository-Stammverzeichnis, die Linux- und macOS-Programme in den unten aufgeführten bin/-Ordnern. Bewahren Sie lib/ und die Lizenzhinweise zusammen mit den Werkzeugen auf. Unter Linux/macOS setzen Sie mit chmod +x das Ausführungsrecht und ergänzen den PATH, oder verwenden den vollständigen Pfad.
+
+Die PowerShell-Skripte verwenden das Windows-Programm im Stammverzeichnis. Unter Linux/macOS übergeben Sie dieselben C-Eingaben und Optionen an den nativen Compiler oder verwenden PowerShell 7. CHR-Grafik und C-Quellen sind getrennte Eingaben; font.chr bewahrt die Schrift der Beispiele.
 
 ## 3. Das erste Programm
 {{CODE:1}}

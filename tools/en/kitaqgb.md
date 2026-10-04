@@ -8,11 +8,13 @@ It reads C files, generates CPU instructions and packages them into a ROM. Its l
 The GB has an 8-bit CPU and limited memory. Most screen graphics use 8-by-8-pixel tiles. Sprites are small independently positioned images. Text also needs tile graphics: a built-in universal text display is not assumed. These examples use the author's `ascii.c` glyphs, rearranged by ASCII code for GB without changing their bits. The FC edition converts the same shapes to NES CHR layout.
 
 ## 2. Requirements and compiler build
-Install a Visual Studio/MSBuild environment targeting .NET Framework 4.8. Use a Developer PowerShell prompt in which `MSBuild.exe` is available.
+Build the compiler and all helper tools on Windows, Linux, macOS ARM or macOS Intel with Rust 1.85 or later. The native executables run without .NET; production asset tools also run without Python or Pillow.
 
 {{CODE:0}}
 
-Keep the executable and its accompanying configuration files together. Use an explicit path in build commands so that the compiler is clearly identified. Building the project copies the executable to the root of the `kitaqgb` repository.
+Windows executables are at the repository root. Linux and macOS executables are under bin/ in the platform folders listed below. Keep lib/ and license notices with the tools. On Linux/macOS, run chmod +x on the downloaded executables and add their folder to PATH, or invoke them by their full path.
+
+PowerShell build scripts use the root Windows executable. For Linux/macOS use the native compiler command with the same C inputs and options, or PowerShell 7. Graphics CHR and C source are separate inputs; font.chr keeps the original sample font.
 
 ## 3. Your first program
 The supplied `samples/gb_hello.c` uses screen and text helpers from `gb_common.h`. Keep that header and the font files together. `#include` reads declarations or definitions from another file.

@@ -164,6 +164,8 @@ def main():
     publish_local_library('en')
     from fc_current_update import publish as publish_fc_current
     publish_fc_current('en')
+    from rust_native_update import publish as publish_rust_native
+    publish_rust_native('en')
     print('Generated 10 English HTML pages including development prompts')
 
 if __name__=='__main__':main()

@@ -4,9 +4,13 @@ KITAQFC는 KITAQGB의 프런트엔드를 사용하여 NES·패미컴의 6502 계
 KITAQFC는 구조체 복사, 일반 함수 호출, for, while, do-while을 지원합니다. do-while은 본문을 적어도 한 번 실행한 뒤 조건을 검사합니다. continue는 마지막 조건 검사로 이동하고, break는 반복문을 빠져나갑니다. switch는 선택값에 맞는 0..255 범위의 case 상수를 찾고, 일치하는 case가 없으면 default 본문을 실행합니다. 선택식은 한 번만 평가합니다. break는 가장 안쪽의 반복문이나 switch를 빠져나가며, switch 안의 continue는 바깥 반복문의 다음 반복으로 진행합니다.
 
 ## 2. 개발 환경과 빌드
+Rust 1.85 이상으로 Windows, Linux, macOS ARM 및 macOS Intel용 컴파일러와 모든 보조 도구를 빌드할 수 있습니다. 네이티브 실행 파일에는 .NET이 필요하지 않으며, 리소스 처리 도구에도 Python이나 Pillow가 필요하지 않습니다.
+
 {{CODE:0}}
 
-.NET Framework 4.8 Developer Pack과 Visual Studio Build Tools를 설치하고 Developer PowerShell을 사용하세요. 이후 명령은 `kitaqfc` 저장소에 복사된 실행 파일을 기준으로 합니다. 다른 위치에서 빌드했다면 경로를 바꾸세요. CHR 그래픽과 C 소스는 별도 입력입니다. 설명서의 `font.chr`는 저자의 `ascii.c`를 변환한 8KiB 파일입니다.
+Windows 실행 파일은 저장소 최상위 폴더에, Linux와 macOS 실행 파일은 아래 표의 bin/ 폴더에 있습니다. lib/와 라이선스 고지를 함께 보관하세요. Linux/macOS에서는 chmod +x로 실행 권한을 주고 해당 폴더를 PATH에 추가하거나 전체 경로로 실행하세요.
+
+PowerShell 샘플 빌드는 최상위 Windows 실행 파일을 사용합니다. Linux/macOS에서는 같은 C 입력과 옵션을 네이티브 컴파일러에 전달하거나 PowerShell 7을 사용하세요. CHR 그래픽과 C 소스는 별도 입력이며 font.chr은 원래 샘플 글꼴을 유지합니다.
 
 ## 3. 첫 프로그램
 {{CODE:1}}
