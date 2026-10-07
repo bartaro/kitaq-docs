@@ -29,7 +29,7 @@ kurosaki snapshot-load .\out\title.kss.json
 kurosaki replay-record .\out\game.nes --frames 120 --out .\out\baseline.replay.json
 kurosaki replay-run .\out\game.nes .\out\baseline.replay.json --json .\out\replay.json</code></pre></div>
 <p>Los estados reanudables usan instantáneas de versión 2. Mantén la correspondencia SHA-256 con la ROM. <code>snapshot-resume</code> continúa desde el punto guardado. <code>snapshot-rebase</code> traslada explícitamente el estado a otra ROM compatible según un contrato. No reutilices sin comprobación un estado después de cambiar código o distribución de RAM; lo habitual es repetir las acciones desde el arranque.</p>
-<h2 id="6-Trazas-diagnósticos-y-perfiles">6. Trazas, diagnósticos y perfiles</h2>
+<!-- kurosaki-precision-20261007-p5 --><p>El JSON de las instantáneas conserva toda la precisión <code>f64</code> de los valores fraccionarios de temporización de audio al guardarlos y leerlos. No los redondees ni los reescribas: si cambian, una ROM y entradas idénticas no bastan para comparar con exactitud el estado tras la reanudación.</p><h2 id="6-Trazas-diagnósticos-y-perfiles">6. Trazas, diagnósticos y perfiles</h2>
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>kurosaki trace .\out\game.nes --frames 2 --cpu --ppu --apu --mapper --nmi --dma --out .\out\trace.jsonl
 kurosaki diagnose .\out\game.nes --frames 120 --out .\out\diagnostics.json --md .\out\diagnostics.md
 kurosaki profile .\out\game.nes --frames 120 --out .\out\profile.json</code></pre></div>
@@ -43,7 +43,7 @@ kurosaki run .\out\game.nes --frames 120 --png .\out\frame.png --snapshot .\out\
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>kurosaki disasm .\out\game.nes --bytes 256 --text .\out\reset.txt
 kurosaki decompile .\out\game.nes --format markdown --out .\out\decompile.md</code></pre></div>
 <p><code>disasm</code> muestra instrucciones. <code>decompile</code> produce candidatos a límites de función, CFG, referencias y pseudocódigo. Con bancos conmutables, una dirección de CPU no identifica por sí sola la posición física de ROM. Aporta el estado del mapper con <code>--snapshot</code> cuando haga falta y contrasta con trazas o anotaciones. No es una recuperación perfecta de las fuentes originales.</p>
-<h2 id="9-Conectar-con-SARAKURA">9. Conectar con SARAKURA</h2>
+<!-- kurosaki-precision-20261007-p8 --><p><code>Reset</code>, <code>Nmi</code> e <code>Irq</code> se identifican mediante sus vectores en el estado del mapper capturado. Otro PC de la instantánea es un candidato <code>current_pc</code>, con nombre automático <code>sub_B...</code>, no una prueba de reinicio ni de un límite de función confirmado.</p><h2 id="9-Conectar-con-SARAKURA">9. Conectar con SARAKURA</h2>
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copiar</button><pre><code>kurosaki run .\out\game.nes --frames 300 --emit-diagnostics .\out\kurosaki_events.jsonl --json .\out\run.json
 sarakura fc analyze --metadata .\out\build.json --events .\out\kurosaki_events.jsonl --out .\out\fc_report --fail-on error</code></pre></div>
 <p>Como en KOKURA, <code>--emit-diagnostics</code> de KUROSAKI recibe una <strong>ruta de archivo JSONL</strong>. Separa trazas de CPU y eventos de diagnóstico.</p>

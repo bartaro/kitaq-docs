@@ -32,6 +32,8 @@ KUROSAKI 是能讀取 KITAQFC 資訊的 NES／FC／FDS 觀察型模擬器。CLI 
 
 可恢復的狀態使用第 2 版快照。請保持狀態與 ROM SHA-256 相符。`snapshot-resume` 從儲存點繼續；`snapshot-rebase` 依提供的相容性契約，明確將狀態移轉到另一個相容 ROM。更動程式碼或 RAM 配置後，不應無條件沿用舊狀態；通常應從啟動重新執行相同操作。
 
+快照 JSON 儲存和讀取音訊時序小數時保留完整的 `f64` 精度。請勿四捨五入或改寫這些數值。若儲存的時序值發生變化，即使 ROM 和輸入相同，也不能據此比較恢復後的狀態是否完全一致。
+
 ## 6. 追蹤、診斷與效能剖析
 {{CODE:5}}
 
@@ -48,6 +50,8 @@ KUROSAKI 是能讀取 KITAQFC 資訊的 NES／FC／FDS 觀察型模擬器。CLI 
 {{CODE:7}}
 
 `disasm` 輸出指令序列；`decompile` 輸出函式邊界候選、CFG、參照與虛擬碼。有可切換 bank 時，CPU 位址不足以確定 ROM 實體位置。必要時透過 `--snapshot` 提供 mapper 狀態，並以執行追蹤或註解佐證。這不是完整還原原始碼。
+
+`Reset`、`Nmi` 和 `Irq` 依據擷取的 mapper 狀態中讀取的各個向量識別。其他快照目前 PC 是帶有自動名稱 `sub_B...` 的 `current_pc` 候選，不代表發生了重設，也不表示函式邊界已經確認。
 
 ## 9. 連接 SARAKURA
 {{CODE:8}}

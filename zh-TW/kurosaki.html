@@ -29,7 +29,7 @@ kurosaki snapshot-load .\out\title.kss.json
 kurosaki replay-record .\out\game.nes --frames 120 --out .\out\baseline.replay.json
 kurosaki replay-run .\out\game.nes .\out\baseline.replay.json --json .\out\replay.json</code></pre></div>
 <p>可恢復的狀態使用第 2 版快照。請保持狀態與 ROM SHA-256 相符。<code>snapshot-resume</code> 從儲存點繼續；<code>snapshot-rebase</code> 依提供的相容性契約，明確將狀態移轉到另一個相容 ROM。更動程式碼或 RAM 配置後，不應無條件沿用舊狀態；通常應從啟動重新執行相同操作。</p>
-<h2 id="6-追蹤-診斷與效能剖析">6. 追蹤、診斷與效能剖析</h2>
+<!-- kurosaki-precision-20261007-p5 --><p>快照 JSON 儲存和讀取音訊時序小數時保留完整的 <code>f64</code> 精度。請勿四捨五入或改寫這些數值。若儲存的時序值發生變化，即使 ROM 和輸入相同，也不能據此比較恢復後的狀態是否完全一致。</p><h2 id="6-追蹤-診斷與效能剖析">6. 追蹤、診斷與效能剖析</h2>
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>kurosaki trace .\out\game.nes --frames 2 --cpu --ppu --apu --mapper --nmi --dma --out .\out\trace.jsonl
 kurosaki diagnose .\out\game.nes --frames 120 --out .\out\diagnostics.json --md .\out\diagnostics.md
 kurosaki profile .\out\game.nes --frames 120 --out .\out\profile.json</code></pre></div>
@@ -43,7 +43,7 @@ kurosaki run .\out\game.nes --frames 120 --png .\out\frame.png --snapshot .\out\
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>kurosaki disasm .\out\game.nes --bytes 256 --text .\out\reset.txt
 kurosaki decompile .\out\game.nes --format markdown --out .\out\decompile.md</code></pre></div>
 <p><code>disasm</code> 輸出指令序列；<code>decompile</code> 輸出函式邊界候選、CFG、參照與虛擬碼。有可切換 bank 時，CPU 位址不足以確定 ROM 實體位置。必要時透過 <code>--snapshot</code> 提供 mapper 狀態，並以執行追蹤或註解佐證。這不是完整還原原始碼。</p>
-<h2 id="9-連接-SARAKURA">9. 連接 SARAKURA</h2>
+<!-- kurosaki-precision-20261007-p8 --><p><code>Reset</code>、<code>Nmi</code> 和 <code>Irq</code> 依據擷取的 mapper 狀態中讀取的各個向量識別。其他快照目前 PC 是帶有自動名稱 <code>sub_B...</code> 的 <code>current_pc</code> 候選，不代表發生了重設，也不表示函式邊界已經確認。</p><h2 id="9-連接-SARAKURA">9. 連接 SARAKURA</h2>
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">複製</button><pre><code>kurosaki run .\out\game.nes --frames 300 --emit-diagnostics .\out\kurosaki_events.jsonl --json .\out\run.json
 sarakura fc analyze --metadata .\out\build.json --events .\out\kurosaki_events.jsonl --out .\out\fc_report --fail-on error</code></pre></div>
 <p>KUROSAKI 的 <code>--emit-diagnostics</code> 與 KOKURA 一樣，接收 <strong>JSONL 檔案路徑</strong>。請區分 CPU 追蹤與診斷事件檔。</p>

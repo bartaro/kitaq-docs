@@ -29,7 +29,7 @@ kurosaki snapshot-load .\out\title.kss.json
 kurosaki replay-record .\out\game.nes --frames 120 --out .\out\baseline.replay.json
 kurosaki replay-run .\out\game.nes .\out\baseline.replay.json --json .\out\replay.json</code></pre></div>
 <p>재개 가능한 상태는 버전 2 스냅샷을 사용합니다. 상태와 ROM의 SHA-256을 맞춰 보관하세요. <code>snapshot-resume</code>은 저장 지점에서 실행을 이어 갑니다. <code>snapshot-rebase</code>는 명시한 호환성 계약에 따라 다른 ROM으로 상태를 옮깁니다. 코드나 RAM 배치를 바꾼 뒤 예전 상태를 무조건 재사용하면 안 됩니다. 보통은 시작부터 같은 조작을 다시 수행하는 편이 적절합니다.</p>
-<h2 id="6-트레이스-진단-프로파일">6. 트레이스, 진단, 프로파일</h2>
+<!-- kurosaki-precision-20261007-p5 --><p>스냅샷 JSON의 오디오 타이밍 소수 값은 <code>f64</code> 정밀도를 유지해 저장하고 읽습니다. 이 숫자를 반올림하거나 다시 쓰지 마세요. 저장된 타이밍 값이 바뀌면 ROM과 입력이 같아도 재개 후 상태의 완전한 일치를 비교할 수 없습니다.</p><h2 id="6-트레이스-진단-프로파일">6. 트레이스, 진단, 프로파일</h2>
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>kurosaki trace .\out\game.nes --frames 2 --cpu --ppu --apu --mapper --nmi --dma --out .\out\trace.jsonl
 kurosaki diagnose .\out\game.nes --frames 120 --out .\out\diagnostics.json --md .\out\diagnostics.md
 kurosaki profile .\out\game.nes --frames 120 --out .\out\profile.json</code></pre></div>
@@ -43,7 +43,7 @@ kurosaki run .\out\game.nes --frames 120 --png .\out\frame.png --snapshot .\out\
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>kurosaki disasm .\out\game.nes --bytes 256 --text .\out\reset.txt
 kurosaki decompile .\out\game.nes --format markdown --out .\out\decompile.md</code></pre></div>
 <p><code>disasm</code>은 명령열을, <code>decompile</code>은 함수 경계 후보, CFG, 참조, 의사 코드를 출력합니다. 전환 가능한 뱅크에서는 CPU 주소만으로 ROM의 실제 위치를 특정할 수 없습니다. 필요하면 <code>--snapshot</code>으로 매퍼 상태를 제공하고, 실행 트레이스나 주석을 근거로 대조하세요. 원본 소스의 완전한 복원은 아닙니다.</p>
-<h2 id="9-SARAKURA-연동">9. SARAKURA 연동</h2>
+<!-- kurosaki-precision-20261007-p8 --><p><code>Reset</code>, <code>Nmi</code>, <code>Irq</code>는 캡처한 매퍼 상태에서 읽은 각 벡터로 식별합니다. 그 밖의 스냅샷 현재 PC는 자동 이름 <code>sub_B...</code>를 가진 <code>current_pc</code> 후보이며, 리셋 발생이나 확정된 함수 경계의 증거가 아닙니다.</p><h2 id="9-SARAKURA-연동">9. SARAKURA 연동</h2>
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">복사</button><pre><code>kurosaki run .\out\game.nes --frames 300 --emit-diagnostics .\out\kurosaki_events.jsonl --json .\out\run.json
 sarakura fc analyze --metadata .\out\build.json --events .\out\kurosaki_events.jsonl --out .\out\fc_report --fail-on error</code></pre></div>
 <p>KUROSAKI의 <code>--emit-diagnostics</code>에도 KOKURA와 마찬가지로 <strong>JSONL 파일 경로</strong>를 전달합니다. CPU 트레이스와 진단 이벤트 파일을 구분해 보관하세요.</p>

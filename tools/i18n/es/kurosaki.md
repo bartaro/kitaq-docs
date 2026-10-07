@@ -32,6 +32,8 @@ El ejemplo mantiene A durante 120 fotogramas. Para acciones ordenadas, como tít
 
 Los estados reanudables usan instantáneas de versión 2. Mantén la correspondencia SHA-256 con la ROM. `snapshot-resume` continúa desde el punto guardado. `snapshot-rebase` traslada explícitamente el estado a otra ROM compatible según un contrato. No reutilices sin comprobación un estado después de cambiar código o distribución de RAM; lo habitual es repetir las acciones desde el arranque.
 
+El JSON de las instantáneas conserva toda la precisión `f64` de los valores fraccionarios de temporización de audio al guardarlos y leerlos. No los redondees ni los reescribas: si cambian, una ROM y entradas idénticas no bastan para comparar con exactitud el estado tras la reanudación.
+
 ## 6. Trazas, diagnósticos y perfiles
 {{CODE:5}}
 
@@ -48,6 +50,8 @@ Cambios de registros, PCM generado y sonido correcto son comprobaciones distinta
 {{CODE:7}}
 
 `disasm` muestra instrucciones. `decompile` produce candidatos a límites de función, CFG, referencias y pseudocódigo. Con bancos conmutables, una dirección de CPU no identifica por sí sola la posición física de ROM. Aporta el estado del mapper con `--snapshot` cuando haga falta y contrasta con trazas o anotaciones. No es una recuperación perfecta de las fuentes originales.
+
+`Reset`, `Nmi` e `Irq` se identifican mediante sus vectores en el estado del mapper capturado. Otro PC de la instantánea es un candidato `current_pc`, con nombre automático `sub_B...`, no una prueba de reinicio ni de un límite de función confirmado.
 
 ## 9. Conectar con SARAKURA
 {{CODE:8}}

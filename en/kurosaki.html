@@ -27,7 +27,7 @@ kurosaki snapshot-load .\out\title.kss.json
 kurosaki replay-record .\out\game.nes --frames 120 --out .\out\baseline.replay.json
 kurosaki replay-run .\out\game.nes .\out\baseline.replay.json --json .\out\replay.json</code></pre></div>
 <p>Resumable state uses version 2 snapshots. Keep the ROM SHA-256 matched to its state. <code>snapshot-resume</code> continues from a saved point. <code>snapshot-rebase</code> explicitly transfers state to a compatible different ROM under a supplied contract. Unconditionally reusing old state after changing code or RAM placement is unsafe; normally reproduce the same actions from startup.</p>
-<h2 id="6-Traces-diagnostics-and-profiles">6. Traces, diagnostics and profiles</h2>
+<!-- kurosaki-precision-20261007-p5 --><p>Snapshot JSON preserves fractional audio timing values with full <code>f64</code> precision. Do not round or rewrite these numbers: unchanged ROM and input are not enough for an exact continuation comparison if saved timing values have changed.</p><h2 id="6-Traces-diagnostics-and-profiles">6. Traces, diagnostics and profiles</h2>
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>kurosaki trace .\out\game.nes --frames 2 --cpu --ppu --apu --mapper --nmi --dma --out .\out\trace.jsonl
 kurosaki diagnose .\out\game.nes --frames 120 --out .\out\diagnostics.json --md .\out\diagnostics.md
 kurosaki profile .\out\game.nes --frames 120 --out .\out\profile.json</code></pre></div>
@@ -41,7 +41,7 @@ kurosaki run .\out\game.nes --frames 120 --png .\out\frame.png --snapshot .\out\
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>kurosaki disasm .\out\game.nes --bytes 256 --text .\out\reset.txt
 kurosaki decompile .\out\game.nes --format markdown --out .\out\decompile.md</code></pre></div>
 <p><code>disasm</code> emits instruction sequences. <code>decompile</code> emits function-boundary candidates, CFGs, references and pseudocode. With switchable banks, a CPU address alone does not identify a physical ROM position. Provide mapper state through <code>--snapshot</code> where needed and use execution traces or annotations as supporting evidence. This is not perfect recovery of original source.</p>
-<h2 id="9-Connect-to-SARAKURA">9. Connect to SARAKURA</h2>
+<!-- kurosaki-precision-20261007-p8 --><p><code>Reset</code>, <code>Nmi</code> and <code>Irq</code> are identified from their vectors in the captured mapper context. A different snapshot PC is a <code>current_pc</code> candidate with an automatic <code>sub_B...</code> name, not evidence of reset or a confirmed function boundary.</p><h2 id="9-Connect-to-SARAKURA">9. Connect to SARAKURA</h2>
 <div class="codebox"><span class="lang">powershell</span><button class="copy" type="button">Copy</button><pre><code>kurosaki run .\out\game.nes --frames 300 --emit-diagnostics .\out\kurosaki_events.jsonl --json .\out\run.json
 sarakura fc analyze --metadata .\out\build.json --events .\out\kurosaki_events.jsonl --out .\out\fc_report --fail-on error</code></pre></div>
 <p>KUROSAKI <code>--emit-diagnostics</code> takes a <strong>JSONL file path</strong>, just like KOKURA. Keep CPU traces and diagnostic-event files distinct.</p>

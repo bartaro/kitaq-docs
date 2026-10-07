@@ -32,6 +32,8 @@ Dieses Beispiel hält A für 120 Frames gedrückt. Für Abläufe wie Titelbildsc
 
 Fortsetzbare Zustände verwenden Snapshots der Version 2. Der SHA-256-Wert der ROM muss zum Zustand passen. `snapshot-resume` setzt einen gespeicherten Zustand fort. `snapshot-rebase` überträgt ihn ausdrücklich auf eine andere kompatible ROM, sofern ein entsprechender Kompatibilitätsvertrag vorliegt. Alte Zustände nach Änderungen am Code oder an der RAM-Belegung ungeprüft weiterzuverwenden ist keine verlässliche Methode. Wiederholen Sie normalerweise dieselben Aktionen ab dem Programmstart.
 
+Snapshot-JSON erhält beim Speichern und Lesen die volle `f64`-Genauigkeit der gebrochenen Audio-Zeitwerte. Runden oder überschreiben Sie diese Zahlen nicht: Veränderte Zeitwerte verhindern einen exakten Zustandsvergleich nach dem Fortsetzen, selbst bei gleicher ROM und gleichen Eingaben.
+
 ## 6. Traces, Diagnosen und Profile
 {{CODE:5}}
 
@@ -48,6 +50,8 @@ Registeränderungen, erzeugte PCM-Daten und korrekt klingender Ton erfordern jew
 {{CODE:7}}
 
 `disasm` gibt Befehlsfolgen aus. `decompile` liefert mögliche Funktionsgrenzen, Kontrollflussgraphen, Referenzen und Pseudocode. Bei umschaltbaren Banken bezeichnet eine CPU-Adresse allein keine eindeutige physische Position in der ROM. Übergeben Sie bei Bedarf den Mapper-Zustand über `--snapshot` und ziehen Sie Ausführungstraces oder Annotationen als weitere Belege heran. Der ursprüngliche Quelltext lässt sich damit nicht vollständig wiederherstellen.
+
+`Reset`, `Nmi` und `Irq` werden anhand ihrer Vektoren im erfassten Mapper-Zustand identifiziert. Ein anderer Snapshot-PC ist ein `current_pc`-Kandidat mit dem automatisch erzeugten Namen `sub_B...`, kein Nachweis eines Resets oder einer bestätigten Funktionsgrenze.
 
 ## 9. Verbindung mit SARAKURA
 {{CODE:8}}

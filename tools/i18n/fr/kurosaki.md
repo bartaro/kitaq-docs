@@ -32,6 +32,8 @@ Cette commande maintient A pendant 120 images. Utilisez le rejeu pour des action
 
 Les états permettant une reprise utilisent les instantanés de version 2. Conservez la correspondance entre le SHA-256 de la ROM et son état. `snapshot-resume` poursuit l'exécution depuis un point sauvegardé. `snapshot-rebase` transfère explicitement un état vers une autre ROM compatible, selon un contrat fourni. Réutiliser sans vérification un ancien état après avoir modifié le code ou le placement RAM est risqué ; reproduisez normalement les mêmes actions depuis le démarrage.
 
+Le JSON des instantanés conserve la précision complète `f64` des valeurs fractionnaires de synchronisation audio à la sauvegarde et à la lecture. Ne les arrondissez pas et ne les réécrivez pas : si elles changent, une ROM et des entrées identiques ne suffisent plus à comparer exactement l'état après la reprise.
+
 ## 6. Traces, diagnostics et profils
 {{CODE:5}}
 
@@ -48,6 +50,8 @@ Les changements de registres, le PCM généré et un son conforme à l'attente s
 {{CODE:7}}
 
 `disasm` produit des suites d'instructions. `decompile` produit des limites de fonctions candidates, des graphes de flot de contrôle, des références et du pseudocode. En présence de banques commutables, une adresse processeur ne suffit pas à identifier une position physique dans la ROM. Fournissez au besoin l'état du mapper avec `--snapshot` et étayez l'analyse par des traces d'exécution ou des annotations. Il ne s'agit pas d'une restitution parfaite du source d'origine.
+
+`Reset`, `Nmi` et `Irq` sont identifiés à partir de leurs vecteurs dans le contexte du mapper capturé. Un autre PC d'instantané est un candidat `current_pc`, nommé automatiquement `sub_B...`, et non la preuve d'une réinitialisation ou d'une limite de fonction confirmée.
 
 ## 9. Raccorder SARAKURA
 {{CODE:8}}

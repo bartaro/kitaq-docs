@@ -32,6 +32,8 @@ This holds A for 120 frames. Use replay for ordered actions such as title, start
 
 Resumable state uses version 2 snapshots. Keep the ROM SHA-256 matched to its state. `snapshot-resume` continues from a saved point. `snapshot-rebase` explicitly transfers state to a compatible different ROM under a supplied contract. Unconditionally reusing old state after changing code or RAM placement is unsafe; normally reproduce the same actions from startup.
 
+Snapshot JSON preserves fractional audio timing values with full `f64` precision. Do not round or rewrite these numbers: unchanged ROM and input are not enough for an exact continuation comparison if saved timing values have changed.
+
 ## 6. Traces, diagnostics and profiles
 {{CODE:5}}
 
@@ -48,6 +50,8 @@ Register changes, generated PCM and correctly sounding audio are separate checks
 {{CODE:7}}
 
 `disasm` emits instruction sequences. `decompile` emits function-boundary candidates, CFGs, references and pseudocode. With switchable banks, a CPU address alone does not identify a physical ROM position. Provide mapper state through `--snapshot` where needed and use execution traces or annotations as supporting evidence. This is not perfect recovery of original source.
+
+`Reset`, `Nmi` and `Irq` are identified from their vectors in the captured mapper context. A different snapshot PC is a `current_pc` candidate with an automatic `sub_B...` name, not evidence of reset or a confirmed function boundary.
 
 ## 9. Connect to SARAKURA
 {{CODE:8}}

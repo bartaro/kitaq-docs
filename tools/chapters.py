@@ -672,6 +672,8 @@ kurosaki replay-run .\out\game.nes .\out\baseline.replay.json --json .\out\repla
 
 再開できる状態はversion 2のスナップショットです。ROMのSHA-256と状態の対応を保ちます。snapshot-resumeは保存時点から続きを進める操作、snapshot-rebaseは互換な別ROMへの明示的な契約付き付け替えです。修正ROMへ古い状態を無条件に流用すると、RAMやコード配置が変わっていて危険なので、通常は起動から同じ操作を再現します。
 
+スナップショットJSONの音声タイミングの小数値は、`f64`の精度を保って保存・読込します。これらの数値を丸めたり書き換えたりしないでください。保存値が変わると、同じROMと入力でも再開後の完全一致を比較できません。
+
 ## 6　トレース・診断・プロファイル
 ```powershell
 kurosaki trace .\out\game.nes --frames 2 --cpu --ppu --apu --mapper --nmi --dma --out .\out\trace.jsonl
@@ -698,6 +700,8 @@ kurosaki decompile .\out\game.nes --format markdown --out .\out\decompile.md
 ```
 
 disasmは命令列、decompileは関数境界候補・CFG・参照・疑似コードを出します。切り替え可能なバンクでは、CPUアドレスだけで元のROM位置が決まりません。必要なら `--snapshot` でマッパー状態を与え、実行トレースや注釈を補助情報として使います。元ソースの完全復元ではありません。
+
+`Reset`・`Nmi`・`Irq`は、取得時のマッパー状態で読める各ベクターから識別します。それ以外のスナップショットの現在PCは、自動名`sub_B...`を持つ`current_pc`候補です。Resetの発生や関数境界の確定を意味しません。
 
 ## 9　SARAKURAへつなぐ
 ```powershell
