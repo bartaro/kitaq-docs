@@ -34,8 +34,8 @@ def renderer_profile(text, height):
   if directive:
    op,expr=directive.groups()
    if op in ('if','ifdef','ifndef'):
-    match=re.fullmatch(r'\s*WIRE3D_DMG_HEIGHT\s*==\s*(96|120)\s*',expr) if op=='if' else None
-    condition=height==int(match[1]) if match else True
+    match=re.fullmatch(r'\s*(?:WIRE3D_DMG_HEIGHT|WIRE3DCGB_HEIGHT)\s*(==|!=)\s*(88|96|120)\s*',expr) if op=='if' else None
+    condition=(height==int(match[2])) == (match[1]=='==') if match else True
     stack.append((active,bool(match),condition))
     if match:active=active and condition;keep=False
    elif op=='else':
@@ -51,8 +51,8 @@ def renderer_profile(text, height):
 
 def definitions(p, height=None):
  t=read(p)
- if p.name in ('wire3d_dmg.c','wire3d_dmg.h'):
-  t=renderer_profile(t,120 if height is None else height)
+ if p.name in ('wire3d_dmg.c','wire3d_dmg.h','wire3d_cgb.c','wire3d_cgb.h'):
+  t=renderer_profile(t,(96 if 'cgb' in p.name else 120) if height is None else height)
  ct=clean(t);out=[]
  for m in DECL.finditer(ct):
   ret,name,args,end=m.groups()

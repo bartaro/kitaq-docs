@@ -8,6 +8,16 @@ from catalog import clean, declaration_name_offsets, callable_aliases
 
 
 class CallSiteTests(unittest.TestCase):
+    def test_compact_renderer_profiles(self):
+        from catalog import renderer_profile
+        source = "#if WIRE3D_DMG_HEIGHT != 120\ncompact();\n#else\nlarge();\n#endif\n#if WIRE3DCGB_HEIGHT == 88\neleven();\n#else\ntwelve();\n#endif\n"
+        for height in [88,96,120]:
+            masked=renderer_profile(source,height)
+            self.assertEqual(masked.count("\n"),source.count("\n"))
+            self.assertEqual("compact();" in masked,height!=120)
+            self.assertEqual("large();" in masked,height==120)
+            self.assertEqual("eleven();" in masked,height==88)
+
     def test_only_executable_calls_remain(self):
         source = '''u8 query();
 u8 query() { return 32; }

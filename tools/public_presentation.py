@@ -32,6 +32,8 @@ def public_file(relative):
     path = Path(relative)
     if any(part.startswith('.') or part == '__pycache__' for part in path.parts):
         return False
+    if path.parts[:2] == ('verification', 'wire3d-feedback-20261009'):
+        return path.name in {'results.json','compatibility.json','diagnostics.json','dmg-88.png','cgb-88.png'} or (path.name.startswith('clocked_') and path.name.endswith('-samples.json'))
     if path.parts[0] == 'verification' and path.name == 'build.c':
         return False
     if path.parts[0] == 'verification' and any(part in ('state','oracle','multiply') for part in path.parts[2:]):
