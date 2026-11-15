@@ -1,28 +1,25 @@
 # Manuels de la série KITAQ
 
-<!-- readme-language-links:start -->
-[English](README.md#english) | [日本語](README.md#japanese) | [한국어](README.ko.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | **Français** | [Español](README.es.md) | [Deutsch](README.de.md)
-<!-- readme-language-links:end -->
+[English](README.md#english) | [日本語](README.md#japanese) | [한국어](README.ko.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | **Français** | [Español](README.es.md) | [Português (Brasil)](README.pt-BR.md) | [Deutsch](README.de.md)
 
-## Manuels HTML
+## Manuel
 
-[Français](https://bartaro.github.io/kitaq-docs/fr/index.html)
+[Sommaire général](https://bartaro.github.io/kitaq-docs/fr/)
 
-Les sept volumes présentent chaque API individuellement et proposent des programmes d’exemple complets. Ouvrez `fr/index.html` pour l’édition française. Le menu de chaque volume permet de choisir une autre langue. Les explications des exemples précisent les comportements vérifiés et les conditions des essais.
+- [KITAQGB](https://bartaro.github.io/kitaq-docs/fr/kitaqgb.html)
+- [GB LIBRARY](https://bartaro.github.io/kitaq-docs/fr/gb-library.html)
+- [KOKURA](https://bartaro.github.io/kitaq-docs/fr/kokura.html)
+- [KITAQFC](https://bartaro.github.io/kitaq-docs/fr/kitaqfc.html)
+- [FC LIBRARY](https://bartaro.github.io/kitaq-docs/fr/fc-library.html)
+- [KUROSAKI](https://bartaro.github.io/kitaq-docs/fr/kurosaki.html)
+- [SARAKURA](https://bartaro.github.io/kitaq-docs/fr/sarakura.html)
 
-Les extraits de code source sont conservés tels quels ; les captures d’écran de l’émulateur figurent à côté des explications. Les fichiers HTML permettent la lecture hors connexion, la recherche dans un volume, la copie du code et l’impression.
+## Lecture hors ligne et impression
 
-| Fichier / accès direct | Contenu |
-|---|---|
-| [kitaqgb.html](https://bartaro.github.io/kitaq-docs/fr/kitaqgb.html) | Syntaxe, fonctions intrinsèques et compilation KITAQGB |
-| [gb-library.html](https://bartaro.github.io/kitaq-docs/fr/gb-library.html) | Bibliothèques KITAQGB |
-| [kokura.html](https://bartaro.github.io/kitaq-docs/fr/kokura.html) | Exécution, entrées, observation et enregistrement avec KOKURA |
-| [kitaqfc.html](https://bartaro.github.io/kitaq-docs/fr/kitaqfc.html) | Syntaxe, fonctions intrinsèques et compilation KITAQFC |
-| [fc-library.html](https://bartaro.github.io/kitaq-docs/fr/fc-library.html) | Bibliothèques KITAQFC |
-| [kurosaki.html](https://bartaro.github.io/kitaq-docs/fr/kurosaki.html) | Exécution, sauvegarde et analyse avec KUROSAKI |
-| [sarakura.html](https://bartaro.github.io/kitaq-docs/fr/sarakura.html) | Diagnostics et nouveaux essais avec SARAKURA |
-| [verification.html](https://bartaro.github.io/kitaq-docs/fr/verification.html) | Captures des exemples |
+Ouvrez index.html dans le dossier téléchargé pour lire hors ligne. Conservez le dossier complet avec ses images, exemples et styles. Chaque volume propose une recherche et des boutons de copie du code. Le bouton d’impression masque la colonne de navigation.
 
-## Guide de programmation d’un jeu
+[Prompts de développement de jeux](https://bartaro.github.io/kitaq-docs/fr/loop-engineering.html)
 
-[HARAPEKO SHIROHEBI — Français](https://bartaro.github.io/kitaq-docs/apps/harapeko_shirohebi/guide-fr.html): Déroulement du programme, déplacement du serpent et utilisation des bibliothèques KITAQGB. [Code source et compilation](https://github.com/bartaro/kitaqgb/tree/main/apps/harapeko_shirohebi).
+[LICENSE](LICENSE) · [LICENSE.ja](LICENSE.ja) · [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md)
+
+Copyright (c) 2026 DAISUKE OBA. MIT.

@@ -1,6 +1,6 @@
-# GitHub checkout layout
+# Working with the repositories
 
-Clone the repositories into sibling directories:
+Clone only the repositories you need into sibling directories. The manual examples use this layout:
 
 ```powershell
 git clone https://github.com/bartaro/kitaqgb.git
@@ -11,35 +11,20 @@ git clone https://github.com/bartaro/sarakura.git
 git clone https://github.com/bartaro/kitaq-docs.git
 ```
 
-Build the tools using each README, then run `./kitaq-docs/samples/build.ps1`
-from their parent directory. The generated HTML is committed for offline use.
-GitHub Pages can publish the `main` branch root with `.nojekyll`.
+Use KITAQGB and KOKURA for GB/CGB, or KITAQFC and KUROSAKI for NES/Famicom/FDS. SARAKURA reads compiler metadata and emulator diagnostic events. See each repository's README for installation and the first example.
 
-## Compiler sources and executables
+## Compilers, libraries and samples
 
-KITAQGB and KITAQFC store build sources in a same-named subdirectory.
-From the parent of the sibling repositories, the GB project is
-`kitaqgb/kitaqgb/kitaqgb.csproj` and the executable is `kitaqgb/kitaqgb.exe`.
-The FC project is `kitaqfc/kitaqfc/kitaqfc.csproj` and the executable is
-`kitaqfc/kitaqfc.exe`. Each compiler repository has `lib/`, example sources,
-a Release executable and its `.exe.config`. Windows with .NET Framework 4.8
-is required. Build instructions are in each README.
+The compilers and host tools are written in Rust; the `lib/` libraries are C code linked into your ROM. Windows executables are at each repository root, with Linux and macOS versions under `bin/`. Running the supplied executables does not require Rust or .NET. Keep the libraries and license notices with the tools.
 
-日本語：コンパイラのビルド用ソースは各リポジトリ内の同名フォルダーにあります。
-ビルド済みEXEと設定ファイルはリポジトリ直下、ライブラリは `lib/` にあります。
-ビルド手順は各READMEを参照してください。
+To rebuild, use the repository's `scripts/build.ps1` or `scripts/build.sh`. Compiler sources are under `src/`, with dependencies in `Cargo.toml` and `Cargo.lock`.
 
-## Windows CLI executables
+Run `./kitaq-docs/samples/build.ps1` from the parent of the sibling directories to build the manual samples. The generated HTML is committed for offline reading. Open `kitaq-docs/index.html`, keeping the images, samples and styles in place. GitHub Pages serves the `main` branch root with `.nojekyll`.
 
-The sarakura, kokura and kurosaki repositories include root-level `sarakura.exe`,
-`kokura-cli.exe` and `kurosaki.exe` for Windows x64. No Rust/Python/.NET runtime
-is needed to execute these CLIs. Preserve the accompanying license notices.
-The independent code in all three projects is licensed by DAISUKE OBA.
-Run each `scripts/build.ps1` to build its CLI and copy the EXE to the root.
+## 日本語
 
-## Verification
+必要なリポジトリを同じ親フォルダーの下に配置してください。GB/CGB開発にはKITAQGBとKOKURA、FC/NES/FDS開発にはKITAQFCとKUROSAKIを使用します。SARAKURAはコンパイラのメタデータとエミュレータの診断イベントを読み込みます。
 
-See [publication checks](PUBLICATION_CHECKS.md) for the tested sources,
-executables and conditions. Sample run records are in `verification/current/`.
-They cover bounded emulator runs and specified pixel checks; physical hardware
-is not covered by these records.
+コンパイラとPC側の補助ツールはRust製、ROMに組み込む`lib/`はC製です。Windows用実行ファイルは各リポジトリ直下、Linux・macOS用は`bin/`にあります。配布実行ファイルの利用にRustや.NETは不要です。導入・ビルド手順は各READMEを参照してください。
+
+マニュアルはフォルダー一式を保持し、`kitaq-docs/index.html`から読めます。サンプルのビルドは、各リポジトリを配置した親フォルダーから`./kitaq-docs/samples/build.ps1`で実行します。

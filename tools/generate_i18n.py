@@ -205,6 +205,8 @@ def main():
         publish_fc_current(lang)
         from rust_native_update import publish as publish_rust_native
         publish_rust_native(lang)
+        from public_manual import publish as publish_public_manual
+        publish_public_manual(lang)
     stale=S/'tools/i18n'/lang/'missing.json'
     if stale.exists():stale.unlink()
     print(f'{lang}: 9 pages '+('ready to generate' if args.inspect else 'generated')+'; all reference prose translated')

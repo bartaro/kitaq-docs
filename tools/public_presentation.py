@@ -135,6 +135,8 @@ def normalize(language, *, local_preview=False):
         # available; ordinary build commands and useful example output stay intact.
         text = re.sub(r'<a\b[^>]*href="([^"]+)"[^>]*>.*?</a>', lambda m: '' if private_link(path, m[1]) else m[0], text, flags=re.S)
         text = re.sub(r'<p>[\s/／·|]*</p>', '', text)
+        from public_manual import normalize_html
+        text = normalize_html(text, language, path.stem)
         path.write_text(text, encoding='utf-8', newline='\r\n' if b'\r\n' in original else '\n')
 
 

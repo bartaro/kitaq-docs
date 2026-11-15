@@ -213,5 +213,7 @@ def main():
  publish_fc_current('ja')
  from rust_native_update import publish as publish_rust_native
  publish_rust_native('ja')
+ from public_manual import publish as publish_public_manual
+ publish_public_manual('ja')
  print('Generated 10 Japanese HTML pages including development prompts')
 if __name__=='__main__':main()

@@ -7,7 +7,7 @@ from urllib.parse import urlsplit, unquote
 LANGUAGES = {
     'en': 'English', 'ja': '日本語', 'ko': '한국어', 'zh-CN': '简体中文',
     'zh-TW': '繁體中文', 'fr': 'Français', 'es': 'Español',
-    'de': 'Deutsch', 'pt': 'Português (Brasil)',
+    'pt': 'Português (Brasil)', 'de': 'Deutsch',
 }
 HTML_LANG = {'pt': 'pt-BR'}
 

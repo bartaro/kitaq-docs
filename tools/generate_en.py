@@ -166,6 +166,8 @@ def main():
     publish_fc_current('en')
     from rust_native_update import publish as publish_rust_native
     publish_rust_native('en')
+    from public_manual import publish as publish_public_manual
+    publish_public_manual('en')
     print('Generated 10 English HTML pages including development prompts')
 
 if __name__=='__main__':main()
